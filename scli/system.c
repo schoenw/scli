@@ -22,6 +22,7 @@
 
 #include "scli.h"
 
+#include "snmpv2-tc.h"
 #include "host-resources-mib.h"
 #include "host-resources-types.h"
 #include "snmpv2-mib.h"
@@ -29,12 +30,13 @@
 #include "entity-mib.h"
 #include "bridge-mib.h"
 #include "disman-script-mib.h"
+#include "rs-232-mib.h"
 
 #include <ctype.h>
 
 
 
-static GSnmpEnum const dot1dBaseType[] = {
+static GNetSnmpEnum const dot1dBaseType[] = {
     { BRIDGE_MIB_DOT1DBASETYPE_UNKNOWN,	"unknown" },
     { BRIDGE_MIB_DOT1DBASETYPE_TRANSPARENT_ONLY,	"transparent (TP)" },
     { BRIDGE_MIB_DOT1DBASETYPE_SOURCEROUTE_ONLY,	"source route (SR)" },
@@ -65,7 +67,7 @@ static guint32 const oid_flash_memory[]
 static guint32 const oid_network_disk[]
     = { HOST_RESOURCES_TYPES_HRSTORAGENETWORKDISK };
 
-static GSnmpIdentity const storage_types[] = {
+static GNetSnmpIdentity const storage_types[] = {
     { oid_other,
       sizeof(oid_other)/sizeof(guint32),
       "other" },
@@ -148,7 +150,7 @@ static guint32 const oid_fs_fat32[]
 static guint32 const oid_fs_ext2[]
     = { HOST_RESOURCES_TYPES_HRFSLINUXEXT2 };
 
-static GSnmpIdentity const filesystem_types[] = {
+static GNetSnmpIdentity const filesystem_types[] = {
     { oid_fs_other,
       sizeof(oid_fs_other)/sizeof(guint32),
       "other" },
@@ -222,7 +224,7 @@ static GSnmpIdentity const filesystem_types[] = {
 };
 
 
-static GSnmpEnum const hrSWRunStatus[] = {
+static GNetSnmpEnum const hrSWRunStatus[] = {
     { HOST_RESOURCES_MIB_HRSWRUNSTATUS_RUNNING,		"C" },
     { HOST_RESOURCES_MIB_HRSWRUNSTATUS_RUNNABLE,	"R" },
     { HOST_RESOURCES_MIB_HRSWRUNSTATUS_NOTRUNNABLE,	"S" },
@@ -230,7 +232,7 @@ static GSnmpEnum const hrSWRunStatus[] = {
     { 0, NULL }
 };
 
-static GSnmpEnum const hrSWRunType[] = {
+static GNetSnmpEnum const hrSWRunType[] = {
     { HOST_RESOURCES_MIB_HRSWRUNTYPE_UNKNOWN,		"?" },
     { HOST_RESOURCES_MIB_HRSWRUNTYPE_OPERATINGSYSTEM,	"O" },
     { HOST_RESOURCES_MIB_HRSWRUNTYPE_DEVICEDRIVER,	"D" },
@@ -238,7 +240,15 @@ static GSnmpEnum const hrSWRunType[] = {
     { 0, NULL }
 };
 
-GSnmpEnum const hrFSAccess[] = {
+static GNetSnmpEnum const hrSWInstalledType[] = {
+    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_UNKNOWN,		"?" },
+    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_OPERATINGSYSTEM,	"O" },
+    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_DEVICEDRIVER,	"D" },
+    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_APPLICATION,		"A" },
+    { 0, NULL }
+};
+
+static GNetSnmpEnum const hrFSAccess[] = {
     { HOST_RESOURCES_MIB_HRFSACCESS_READWRITE,	"rw" },
     { HOST_RESOURCES_MIB_HRFSACCESS_READONLY,	"ro" },
     { 0, NULL }
@@ -255,10 +265,54 @@ strip_white(guchar *s, guint16 *len)
 }
 
 
+static char*
+get_command(host_resources_mib_hrSWRunEntry_t *hrSWRunEntry)
+{
+    char *s = NULL;
+    
+    strip_white(hrSWRunEntry->hrSWRunPath,
+		&hrSWRunEntry->_hrSWRunPathLength);
+    strip_white(hrSWRunEntry->hrSWRunName,
+		&hrSWRunEntry->_hrSWRunNameLength);
+    if (hrSWRunEntry->hrSWRunPath) {
+	s = g_strdup_printf("%.*s",
+			    (int) hrSWRunEntry->_hrSWRunPathLength,
+			    hrSWRunEntry->hrSWRunPath);
+    } else if (hrSWRunEntry->hrSWRunName) {
+	s = g_strdup_printf("%.*s",
+			    (int) hrSWRunEntry->_hrSWRunNameLength,
+			    hrSWRunEntry->hrSWRunName);
+    }
+    return s;
+}
+
+
 
 static int
 match_process(regex_t *regex_path,
 	      host_resources_mib_hrSWRunEntry_t *hrSWRunEntry)
+{
+    int match = 0;
+    char *s;
+    
+    if (! regex_path) {
+	return 1;
+    }
+
+    s = get_command(hrSWRunEntry);
+    if (s) {
+	match = (regexec(regex_path, s, (size_t) 0, NULL, 0) == 0);
+	g_free(s);
+    }
+
+    return match;
+}
+
+
+
+static int
+match_software(regex_t *regex_path,
+	       host_resources_mib_hrSWInstalledEntry_t *hrSWEntry)
 {
     int status;
     
@@ -267,23 +321,14 @@ match_process(regex_t *regex_path,
     }
 
     /*
-     * Does it really make sense to filter only on the description?
-     * This way, we do not need to read the ifXTable at all...
+     * Does it really make sense to filter this way?
      */
 
-    if (hrSWRunEntry->hrSWRunPath) {
+    if (hrSWEntry->hrSWInstalledName) {
 	char *s;
-	if (hrSWRunEntry->hrSWRunParameters) {
-	    s = g_strdup_printf("%.*s %.*s",
-				(int) hrSWRunEntry->_hrSWRunPathLength,
-				hrSWRunEntry->hrSWRunPath,
-				(int) hrSWRunEntry->_hrSWRunParametersLength,
-				hrSWRunEntry->hrSWRunParameters);
-	} else {
-	    s = g_strdup_printf("%.*s",
-				(int) hrSWRunEntry->_hrSWRunPathLength,
-				hrSWRunEntry->hrSWRunPath);
-	}
+	s = g_strdup_printf("%.*s",
+			    (int) hrSWEntry->_hrSWInstalledNameLength,
+			    hrSWEntry->hrSWInstalledName);
 	status = regexec(regex_path, s, (size_t) 0, NULL, 0);
 	g_free(s);
 	if (status == 0) {
@@ -458,6 +503,7 @@ xml_system_process(xmlNodePtr root,
 		   host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry)
 {
     xmlNodePtr tree, node;
+    char *c;
 
     tree = xmlNewChild(root, NULL, "process", NULL);
     xml_set_prop(tree, "index", "%d", hrSWRunEntry->hrSWRunIndex);
@@ -485,13 +531,10 @@ xml_system_process(xmlNodePtr root,
 	xml_set_prop(node, "unit", "seconds");
     }
 
-    if (hrSWRunEntry->hrSWRunPath
-	&& hrSWRunEntry->_hrSWRunPathLength) {
-	strip_white(hrSWRunEntry->hrSWRunPath,
-		    &hrSWRunEntry->_hrSWRunPathLength);
-	(void) xml_new_child(tree, NULL, "path", "%.*s",
-			     (int) hrSWRunEntry->_hrSWRunPathLength,
-			     hrSWRunEntry->hrSWRunPath);
+    c = get_command(hrSWRunEntry);
+    if (c) {
+	(void) xml_new_child(tree, NULL, "path", "%s", c);
+	g_free(c);
     }
     if (hrSWRunEntry->hrSWRunParameters
 	&& hrSWRunEntry->_hrSWRunParametersLength) {
@@ -507,10 +550,11 @@ xml_system_process(xmlNodePtr root,
 
 static void
 fmt_system_process(GString *s,
-		    host_resources_mib_hrSWRunEntry_t *hrSWRunEntry,
-		    host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry)
+		   host_resources_mib_hrSWRunEntry_t *hrSWRunEntry,
+		   host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry)
 {
     const char *e;
+    char *c;
     
     g_string_sprintfa(s, "%7d ", hrSWRunEntry->hrSWRunIndex);
 
@@ -524,22 +568,19 @@ fmt_system_process(GString *s,
 	&& hrSWRunPerfEntry->hrSWRunPerfMem) {
 	fmt_x_kbytes(s, (guint32) *(hrSWRunPerfEntry->hrSWRunPerfMem));
     } else {
-	g_string_sprintfa(s, " %5s", "-----");
+	g_string_sprintfa(s, " -----");
     }
     if (hrSWRunPerfEntry
 	&& hrSWRunPerfEntry->hrSWRunPerfCPU) {
 	g_string_sprintfa(s, " %s",
 		  fmt_seconds((guint32) *(hrSWRunPerfEntry->hrSWRunPerfCPU)/100));
     } else {
-	g_string_sprintfa(s, " %6s", "--:--");
+	g_string_sprintfa(s, "    -:--:--");
     }
-    if (hrSWRunEntry->hrSWRunPath
-	&& hrSWRunEntry->_hrSWRunPathLength) {
-	strip_white(hrSWRunEntry->hrSWRunPath,
-		    &hrSWRunEntry->_hrSWRunPathLength);
-	g_string_sprintfa(s, " %.*s",
-			  (int) hrSWRunEntry->_hrSWRunPathLength,
-			  hrSWRunEntry->hrSWRunPath);
+    c = get_command(hrSWRunEntry);
+    if (c) {
+	g_string_sprintfa(s, " %s", c);
+	g_free(c);
     }
     if (hrSWRunEntry->hrSWRunParameters
 	&& hrSWRunEntry->_hrSWRunParametersLength) {
@@ -588,10 +629,10 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 
     if (hrSWRunTable) {
 	host_resources_mib_get_hrSWRunPerfTable(interp->peer,
-						&hrSWRunPerfTable, 0);
+				  &hrSWRunPerfTable, 0);
 	if (! scli_interp_xml(interp)) {
 	    g_string_append(interp->header,
-			    "    PID S T MEMORY      TIME COMMAND");
+			    "    PID S T MEMORY       TIME COMMAND");
 	}
 	for (i = 0; hrSWRunTable[i]; i++) {
 	    if (match_process(regex_path, hrSWRunTable[i])) {
@@ -613,6 +654,89 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 	host_resources_mib_free_hrSWRunTable(hrSWRunTable);
     if (hrSWRunPerfTable)
 	host_resources_mib_free_hrSWRunPerfTable(hrSWRunPerfTable);
+
+    if (regex_path) regfree(regex_path);
+    
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_system_software(GString *s,
+		    host_resources_mib_hrSWInstalledEntry_t *hrSWEntry)
+{
+    const char *e;
+
+    g_string_sprintfa(s, "%7d ", hrSWEntry->hrSWInstalledIndex);
+
+    e = fmt_enum(hrSWInstalledType, hrSWEntry->hrSWInstalledType);
+    g_string_sprintfa(s, "%s ", e ? e : " ");
+
+    g_string_sprintfa(s, "%19s", fmt_date_and_time(hrSWEntry->hrSWInstalledDate,
+						   hrSWEntry->_hrSWInstalledDateLength));
+
+    if (hrSWEntry->hrSWInstalledName) {
+	strip_white(hrSWEntry->hrSWInstalledName,
+		    &hrSWEntry->_hrSWInstalledNameLength);
+        g_string_sprintfa(s, " %.*s",
+			  (int) hrSWEntry->_hrSWInstalledNameLength,
+			  hrSWEntry->hrSWInstalledName);
+    }
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_system_software(scli_interp_t *interp, int argc, char **argv)
+{
+    host_resources_mib_hrSWInstalledEntry_t **hrSWTable = NULL;
+    regex_t _regex_path, *regex_path = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (argc == 2) {
+	regex_path = &_regex_path;
+	if (regcomp(regex_path, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_path) regfree(regex_path);
+	return SCLI_OK;
+    }
+
+    host_resources_mib_get_hrSWInstalledTable(interp->peer, &hrSWTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (hrSWTable) {
+	if (! scli_interp_xml(interp)) {
+	    g_string_append(interp->header,
+			    "    SID T DATE                SOFTWARE");
+	}
+	for (i = 0; hrSWTable[i]; i++) {
+	    if (match_software(regex_path, hrSWTable[i])) {
+		if (scli_interp_xml(interp)) {
+//		    xml_system_software(interp->xml_node, hrSWTable[i]);
+		} else {
+		    fmt_system_software(interp->result, hrSWTable[i]);
+		}
+	    }
+	}
+    }
+	
+    if (hrSWTable)
+	host_resources_mib_free_hrSWInstalledTable(hrSWTable);
 
     if (regex_path) regfree(regex_path);
     
@@ -658,7 +782,7 @@ xml_system_mount(xmlNodePtr root,
     }
 
     if (fsEntry->hrFSBootable
-	&& *(fsEntry->hrFSBootable) == HOST_RESOURCES_MIB_HRFSBOOTABLE_TRUE) {
+	&& *(fsEntry->hrFSBootable) == SNMPV2_TC_TRUTHVALUE_TRUE) {
 	(void) xmlNewChild(tree, NULL, "boot", NULL);
     }
 }
@@ -698,7 +822,7 @@ fmt_system_mount(GString *s,
     g_string_sprintfa(s, "%s", e ? e : "");
 
     if (fsEntry->hrFSBootable
-	&& *(fsEntry->hrFSBootable) == HOST_RESOURCES_MIB_HRFSBOOTABLE_TRUE) {
+	&& *(fsEntry->hrFSBootable) == SNMPV2_TC_TRUTHVALUE_TRUE) {
 	g_string_append(s, ",boot");
     }
 
@@ -942,9 +1066,12 @@ xml_system_info(xmlNodePtr root, scli_interp_t *interp,
 			     (int) system->_sysNameLength,
 			     system->sysName);
 	if (interp->peer->taddress) {
+	    gchar *name =
+		gnet_inetaddr_get_canonical_name(interp->peer->taddress);
+	    gint port = gnet_inetaddr_get_port(interp->peer->taddress);
 	    (void) xml_new_child(root, NULL, "taddress", "%s:%d",
-				 interp->peer->taddress,
-				 interp->peer->port);
+				 name ? name : "?", port);
+	    g_free(name);
 	}
 	
 	(void) xml_new_child(root, NULL, "description", "%.*s",
@@ -992,6 +1119,7 @@ static void
 fmt_system_info(GString *s, scli_interp_t *interp,
 		snmpv2_mib_system_t *system)
 {
+    GURI *uri;
     int i;
     int const indent = 18;
 
@@ -1001,10 +1129,11 @@ fmt_system_info(GString *s, scli_interp_t *interp,
 			       (int) system->_sysNameLength,
 			       system->sysName);
 	}
-	if (interp->peer->taddress) {
-	    g_string_sprintfa(s, "%-*s", indent, "Address:");
-	    g_string_sprintfa(s, "%s:%d\n", interp->peer->taddress,
-			      interp->peer->port);
+	uri = gnet_snmp_get_uri(interp->peer);
+	if (uri) {
+	    gchar *name = gnet_uri_get_string(uri);
+	    g_string_sprintfa(s, "%-*s%s\n", indent, "Agent URI:", name);
+	    g_free(name);
 	}
 	if (system->sysDescr && system->_sysDescrLength) {
 	    fmt_display_string(s, indent, "Description:",
@@ -1067,6 +1196,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifMIBObjects_t *ifMibObjects = NULL;
     entity_mib_entityGeneral_t *entityGeneral = NULL;
     bridge_mib_dot1dBase_t *dot1dBase = NULL;
+    rs_232_mib_rs232_t *rs232 = NULL;
     disman_script_mib_smLangEntry_t **smLangTable = NULL;
     const char *e;
     GString *s;
@@ -1093,6 +1223,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     if_mib_get_ifMIBObjects(interp->peer, &ifMibObjects, 0);
     entity_mib_get_entityGeneral(interp->peer, &entityGeneral, 0);
     bridge_mib_get_dot1dBase(interp->peer, &dot1dBase, 0);
+    rs_232_mib_get_rs232(interp->peer, &rs232, 0);
     disman_script_mib_get_smLangTable(interp->peer, &smLangTable,
 				      DISMAN_SCRIPT_MIB_SMLANGDESCR);
 
@@ -1141,8 +1272,9 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	}
 	if (hrSystem->hrSystemInitialLoadDevice) {
 	    host_resources_mib_hrDeviceEntry_t *dev;
-	    host_resources_mib_get_hrDeviceEntry(interp->peer, &dev, *hrSystem->hrSystemInitialLoadDevice, 0);
-	    if (dev->hrDeviceDescr) {
+	    host_resources_mib_get_hrDeviceEntry(interp->peer, &dev,
+						 *hrSystem->hrSystemInitialLoadDevice, 0);
+	    if (dev && dev->hrDeviceDescr) {
 		fmt_display_string(s, indent, "System Boot Dev:",
 				   (int) dev->_hrDeviceDescrLength,
 				   dev->hrDeviceDescr);
@@ -1221,6 +1353,11 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	}
     }
 
+    if (rs232 && rs232->rs232Number && rs232->rs232Number > 0) {
+	g_string_sprintfa(s, "%-*s%d\n", indent, "RS 232 Ports:",
+			  *(rs232->rs232Number));
+    }
+
     if (smLangTable) {
 	for (i = 0; smLangTable[i]; i++) ;
 	g_string_sprintfa(s, "%-*s%u\n", indent, "Script Languages:", i);
@@ -1240,6 +1377,8 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	entity_mib_free_entityGeneral(entityGeneral);
     if (dot1dBase)
 	bridge_mib_free_dot1dBase(dot1dBase);
+    if (rs232)
+	rs_232_mib_free_rs232(rs232);
     if (smLangTable)
 	disman_script_mib_free_smLangTable(smLangTable);
 
@@ -1398,6 +1537,198 @@ dump_system(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+check_system_contact(scli_interp_t *interp, int argc, char **argv)
+{
+    regex_t _regex_contact, *regex_contact = NULL;
+    snmpv2_mib_system_t *system;
+    int status = 1;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (argc == 2) {
+	regex_contact = &_regex_contact;
+	if (regcomp(regex_contact, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+    
+    if (scli_interp_dry(interp)) {
+        if (regex_contact) regfree(regex_contact);
+	return SCLI_OK;
+    }
+
+    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSCONTACT);
+    if (interp->peer->error_status) {
+        if (regex_contact) regfree(regex_contact);
+	return SCLI_SNMP;
+    }
+
+    if (system) {
+	if (system->_sysContactLength == 0) {
+	    g_string_sprintfa(interp->result,
+			      "System contact is a zero-length string and "
+			      "should be configured to include at least an "
+			      "email address.\n\n");
+	}
+	if (regex_contact) {
+	    char *s = g_strdup_printf("%.*s",
+				      (int) system->_sysContactLength,
+				      system->sysContact);
+	    status = regexec(regex_contact, s, (size_t) 0, NULL, 0);
+	    g_free(s);
+	    if (status != 0) {
+		g_string_sprintfa(interp->result,
+				  "System contact `%.*s' does not match the "
+				  "regular expression `%s'.\n\n",
+				  (int) system->_sysContactLength,
+				  system->sysContact, argv[1]);
+	    }
+	}
+    }
+
+    if (system) snmpv2_mib_free_system(system);
+
+    if (regex_contact) regfree(regex_contact);
+    
+    return SCLI_OK;
+}
+
+
+
+static int
+check_system_storage(scli_interp_t *interp, int argc, char **argv)
+{
+    host_resources_mib_hrStorageEntry_t **hrStorageTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    host_resources_mib_get_hrStorageTable(interp->peer,
+					  &hrStorageTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (hrStorageTable) {
+	for (i = 0; hrStorageTable[i]; i++) {
+	    if (hrStorageTable[i]->hrStorageAllocationUnits
+		&& hrStorageTable[i]->hrStorageSize
+		&& hrStorageTable[i]->hrStorageUsed) {
+		
+		guint64 storage_size = 0;
+		guint64 storage_used = 0;
+		guint32 const scale = 1024;
+		double percentage;
+		
+		storage_size = *(hrStorageTable[i]->hrStorageSize);
+		storage_size *= *(hrStorageTable[i]->hrStorageAllocationUnits);
+		storage_size /= scale;
+
+		storage_used = *(hrStorageTable[i]->hrStorageUsed);
+		storage_used *= *(hrStorageTable[i]->hrStorageAllocationUnits);
+		storage_used /= scale;
+
+		percentage = storage_size ? storage_used * 100 / storage_size : 0;
+		if (percentage > 90) {
+		    g_string_sprintfa(interp->result,
+			      "Storage #%d (%.*s) is %3.1f%% (> 90%%) filled\n\n",
+			      hrStorageTable[i]->hrStorageIndex,
+			      hrStorageTable[i]->_hrStorageDescrLength,
+			      hrStorageTable[i]->hrStorageDescr,
+				      percentage);
+		}
+	    }
+	}
+    }
+
+    if (hrStorageTable) host_resources_mib_free_hrStorageTable(hrStorageTable);
+
+    return SCLI_OK;
+}
+
+
+
+static int
+check_system_process(scli_interp_t *interp, int argc, char **argv)
+{
+    host_resources_mib_hrSWRunEntry_t **hrSWRunTable = NULL;
+    regex_t _regex_path, *regex_path = NULL;
+    int i;
+    guint min = 0, max = 0xffffffff, cnt = 0;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 3) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    regex_path = &_regex_path;
+    if (regcomp(regex_path, (argc > 1) ? argv[1] : ".",
+		interp->regex_flags) != 0) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_REGEXP;
+    }
+
+    if (argc == 3) {
+	/* xxx scan this by hand to make sure it does what we want */
+	if (2 == sscanf(argv[2], "%u*%u", &min, &max)) {
+	} else if (1 == sscanf(argv[2], "%u", &min)) {
+	    max = min;
+	} else {
+	    if (regex_path) regfree(regex_path);
+	    return SCLI_SYNTAX_VALUE;
+	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_path) regfree(regex_path);
+	return SCLI_OK;
+    }
+
+    host_resources_mib_get_hrSWRunTable(interp->peer, &hrSWRunTable,
+					HOST_RESOURCES_MIB_HRSWRUNPATH);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (hrSWRunTable) {
+	for (i = 0, cnt = 0; hrSWRunTable[i]; i++) {
+	    if (match_process(regex_path, hrSWRunTable[i])) {
+		cnt++;
+	    }
+	}
+	if (cnt < min || cnt > max) {
+	    g_string_sprintfa(interp->result,
+		  "Number of processes (%d) matching the regular "
+	          "expression `%s' does not match the bound %u*%u.\n\n",
+			      cnt, argv[1], min, max);
+	}
+    }
+	
+    if (hrSWRunTable)
+	host_resources_mib_free_hrSWRunTable(hrSWRunTable);
+
+    if (regex_path) regfree(regex_path);
+    
+    return SCLI_OK;
+}
+
+
+
 #ifdef MEM_DEBUG
 static int
 cmd_xxx(scli_interp_t *interp, int argc, char **argv)
@@ -1520,7 +1851,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "The `show system processes' command display information about the\n"
 	  "processes currently running on the system. The regular expression\n"
 	  "<regexp> is matched against the command executed by the process\n"
-	  "to select the processes of interest.The command generates a table\n"
+	  "to select the processes of interest. The command generates a table\n"
 	  "with the following columns:\n"
 	  "\n"
 	  "  PID     process identification number\n"
@@ -1537,6 +1868,23 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "system processes", NULL,
 	  show_system_processes },
 
+	{ "show system software", "[<regexp>]",
+	  "The `show system software' command display information about the\n"
+	  "software installed on the system. The regular expression <regexp>\n"
+	  "is matched against the software name to select the software of\n"
+	  "interest. The command generates a table with the following columns:\n"
+	  "\n"
+	  "  SID     software identification number\n"
+	  "  T       type of the software (see below)\n"
+	  "  DATE    software installation date\n"
+	  "  NAME    software name\n"
+	  "\n"
+	  "The software type values are ?=unknown, O=operating system, \n"
+	  "D=device driver, and A=application.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  "system software", NULL,
+	  show_system_software },
+
 	{ "monitor system storage", NULL,
 	  "The `monitor system storage' command shows the same\n"
 	  "information as the show system storage command. The\n"
@@ -1544,22 +1892,32 @@ scli_init_system_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_system_storage },
-#if 0
-	{ "loop system storage", NULL,
-	  "The `monitor system storage' command shows the same\n"
-	  "information as the show system storage command. The\n"
-	  "information is updated periodically.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_LOOP | SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
-	  show_system_storage },
-#endif
+
 	{ "monitor system processes", "[<regexp>]",
 	  "The `monitor system processes' command show the same\n"
 	  "information as the show system processes command. The\n"
 	  "information is updated periodically.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_system_processes },
+
+	{ "check system contact", NULL,
+	  "The `check system contact' command xxx.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  check_system_contact },
+
+	{ "check system storage", NULL,
+	  "The `check system storage' command checks xxx.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  check_system_storage },
+
+	{ "check system process", "[<regexp>] [<n>*<m>]",
+	  "The `check system process' command checks xxx.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  check_system_process },
 
 #ifdef MEM_DEBUG
 	{ "xxx", "<repetitions>",
