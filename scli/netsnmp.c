@@ -88,13 +88,28 @@ show_netsnmp_info(scli_interp_t *interp, int argc, char **argv)
 static void
 fmt_load(GString *s, ucd_snmp_mib_laEntry_t *laEntry)
 {
-    int const indent = 18;
+    const char *names[] = {
+	"Load-1", "Load-5", "Load-15", NULL
+    };
+    const char *labels[] = {
+	"Load (1 min):", "Load (5 min):", "Load (15 min):", NULL
+    };
+    int const indent = 18; 
+    int i;
 
-    if (laEntry->laNames && laEntry->laLoadInt) {
-	g_string_sprintfa(s, "%-*.*s: %.2f\n", indent-1,
-			  laEntry->_laNamesLength, laEntry->laNames,
-			  *laEntry->laLoadInt / 100.0);
+    for (i = 0; names[i]; i++) {
+	if (strncmp(laEntry->laNames, names[i],
+		    laEntry->_laNamesLength) == 0) {
+	    break;
+	}
     }
+    if (! names[i]) {
+	return;
+    }
+
+    g_string_sprintfa(s, "%-*s%.2f\n", indent, labels[i],
+		      *laEntry->laLoadInt / 100.0);
+
     if (laEntry->_laErrMessageLength) {
 	fmt_display_string(s, indent, "Error:",
 			   (int) laEntry->_laErrMessageLength,
@@ -211,13 +226,10 @@ fmt_proc(GString *s, ucd_snmp_mib_prEntry_t *prEntry)
 		       prEntry->prNames);
     g_string_sprintfa(s, "%-*s%d\n", indent, "Minimum:",
 		      *prEntry->prMin);
-
     g_string_sprintfa(s, "%-*s%d\n", indent, "Maximum:",
 		      *prEntry->prMax);
-
     g_string_sprintfa(s, "%-*s%d\n", indent, "Current:",
 		      *prEntry->prCount);
-
     if (prEntry->_prErrMessageLength) {
 	fmt_display_string(s, indent, "Error:",
 			   (int) prEntry->_prErrMessageLength,
