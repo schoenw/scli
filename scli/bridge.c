@@ -143,8 +143,8 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 		}
 	    }
 	    show_bridge_port(interp->result, dot1dBasePortTable[i],
-			     j > 0 ? ifTable[j] : NULL,
-			     j > 0 && ifXTable ? ifXTable[j] : NULL);
+			     (ifTable && ifTable[j]) ? ifTable[j] : NULL,
+			     (ifXTable && ifXTable[j]) ? ifXTable[j] : NULL);
 	}
     }
 
