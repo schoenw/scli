@@ -394,7 +394,7 @@ scli_init_ether_mode(scli_interp_t *interp)
 	  "  MEDIA     media availability\n"
 	  "  JABBER    jabber state of the medium attachment unit\n"
 	  "  AUTONEG   autonegation capabilities\n"
-	  "  TYPE      type of the medium attachment unit\n",
+	  "  TYPE      type of the medium attachment unit",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  cmd_ether_mau_info },

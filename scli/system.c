@@ -1229,7 +1229,7 @@ dump_system(scli_interp_t *interp, int argc, char **argv)
 	}
 	if (system->sysLocation) {
 	    g_string_sprintfa(interp->result,
-			     "set system contact \"%.*s\"\n",
+			     "set system location \"%.*s\"\n",
 			      (int) system->_sysLocationLength,
 			      system->sysLocation);
 	}
