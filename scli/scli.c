@@ -27,6 +27,7 @@
 
 #include <getopt.h>
 #include <string.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -467,12 +468,11 @@ main(int argc, char **argv)
 	readline_init();
 	using_history();
 	if (home) {
-	    path = g_malloc(strlen(home) + 20);
-	    strcpy(path, home);
-	    strcat(path, "/.scli_history");
+	    path = g_strdup_printf("%s/.scli_history", home);
 	    if (access(path, R_OK) == 0) {
 		if (read_history(path) != 0) {
-		    perror("scli: reading history failed");
+		    g_printerr("scli: reading history failed: %s",
+			       g_strerror(errno));
 		}
 	    }
 	}
@@ -489,7 +489,8 @@ main(int argc, char **argv)
 		}
 		stifle_history(history_file_size);
 		if (write_history(path) != 0) {
-		    perror("scli: writing history failed");
+		    g_printerr("scli: writing history failed: %s",
+			       g_strerror(errno));
 		}
 	    }
 	    g_free(path);

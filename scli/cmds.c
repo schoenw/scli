@@ -450,13 +450,15 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
     g_string_sprintfa(interp->result, "%-*s %d seconds\n", indent, "Delay:",
 		      interp->delay / 1000);
 
-    g_string_sprintfa(interp->result, "%-*s ", indent, "Debugging:");
-    for (dft = gsnmp_enum_debug_table; dft && dft->label; dft++) {
-	if (g_snmp_debug_flags & dft->number) {
-	    g_string_sprintfa(interp->result, "%s ", dft->label);
+    if (g_snmp_debug_flags) {
+	g_string_sprintfa(interp->result, "%-*s ", indent, "Debugging:");
+	for (dft = gsnmp_enum_debug_table; dft && dft->label; dft++) {
+	    if (g_snmp_debug_flags & dft->number) {
+		g_string_sprintfa(interp->result, "%s ", dft->label);
+	    }
 	}
+	g_string_append(interp->result, "\n");
     }
-    g_string_append(interp->result, "\n");
 
     scli_get_screen(&rows, &cols);
     g_string_sprintfa(interp->result, "%-*s %d\n", indent,

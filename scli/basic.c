@@ -865,6 +865,8 @@ scli_eval_file(scli_interp_t *interp, char *path)
 
     stream = fopen(path, "r");
     if (! stream) {
+	g_printerr("error: failed to open file \"%s\": %s\n", path,
+		   g_strerror(errno));
 	return SCLI_ERROR;
     }
     code = scli_eval_file_stream(interp, stream);
