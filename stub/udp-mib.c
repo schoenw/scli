@@ -90,6 +90,22 @@ udp_mib_free_udp(udp_t *udp)
     }
 }
 
+static int
+unpack_udpEntry(GSnmpVarBind *vb, udpEntry_t *udpEntry)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        udpEntry->udpLocalAddress[i] = vb->id[idx++];
+    }
+    if (vb->id_len < idx) return -1;
+    udpEntry->udpLocalPort = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static udpEntry_t *
 assign_udpEntry(GSList *vbl)
 {
@@ -106,24 +122,10 @@ assign_udpEntry(GSList *vbl)
     p = (char *) udpEntry + sizeof(udpEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 10;
-        if (vb->id_len < idx + 4) goto illegal;
-        {
-            int i;
-            for (i = 0; i < 4; i++) {
-                udpEntry->udpLocalAddress[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len < idx) goto illegal;
-        udpEntry->udpLocalPort = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal udpEntry instance identifier");
-            g_free(udpEntry);
-            return NULL;
-        }
+    if (unpack_udpEntry((GSnmpVarBind *) vbl->data, udpEntry) < 0) {
+        g_warning("illegal udpEntry instance identifier");
+        g_free(udpEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

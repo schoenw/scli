@@ -77,6 +77,7 @@ stls_snmp_gettable(host_snmp *s, GSList *vbl);
 
 #include "if-mib.h"
 #include "ip-mib.h"
+#include "ip-forward-mib.h"
 #include "tcp-mib.h"
 #include "udp-mib.h"
 #include "snmpv2-mib.h"

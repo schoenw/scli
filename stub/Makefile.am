@@ -2,6 +2,7 @@ INCLUDES		= $(GLIB_CFLAGS) -I$(top_srcdir)/snmp
 
 MIBS			= IF-MIB \
 			  IP-MIB \
+			  IP-FORWARD-MIB \
 			  UDP-MIB \
 			  TCP-MIB \
 			  SNMPv2-MIB \
@@ -19,6 +20,7 @@ MIBS			= IF-MIB \
 
 STUBS			= if-mib.h if-mib.c \
 			  ip-mib.h ip-mib.c \
+			  ip-forward-mib.h ip-forward-mib.c \
 			  udp-mib.h udp-mib.c \
 			  tcp-mib.h tcp-mib.c \
 			  snmpv2-mib.h snmpv2-mib.c \

@@ -118,6 +118,17 @@ snmpv2_mib_free_system(system_t *system)
     }
 }
 
+static int
+unpack_sysOREntry(GSnmpVarBind *vb, sysOREntry_t *sysOREntry)
+{
+    int idx = 10;
+
+    if (vb->id_len < idx) return -1;
+    sysOREntry->sysORIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static sysOREntry_t *
 assign_sysOREntry(GSList *vbl)
 {
@@ -134,17 +145,10 @@ assign_sysOREntry(GSList *vbl)
     p = (char *) sysOREntry + sizeof(sysOREntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 10;
-        if (vb->id_len < idx) goto illegal;
-        sysOREntry->sysORIndex = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal sysOREntry instance identifier");
-            g_free(sysOREntry);
-            return NULL;
-        }
+    if (unpack_sysOREntry((GSnmpVarBind *) vbl->data, sysOREntry) < 0) {
+        g_warning("illegal sysOREntry instance identifier");
+        g_free(sysOREntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

@@ -142,6 +142,29 @@ disman_schedule_mib_free_schedObjects(schedObjects_t *schedObjects)
     }
 }
 
+static int
+unpack_schedEntry(GSnmpVarBind *vb, schedEntry_t *schedEntry)
+{
+    int i, len, idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    len = vb->id[idx++];
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        schedEntry->schedOwner[i] = vb->id[idx++];
+    }
+    schedEntry->_schedOwnerLength = len;
+    if (vb->id_len < idx) return -1;
+    len = vb->id[idx++];
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        schedEntry->schedName[i] = vb->id[idx++];
+    }
+    schedEntry->_schedNameLength = len;
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static schedEntry_t *
 assign_schedEntry(GSList *vbl)
 {
@@ -158,33 +181,10 @@ assign_schedEntry(GSList *vbl)
     p = (char *) schedEntry + sizeof(schedEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        {
-            int i;
-            if (vb->id_len < idx) goto illegal;
-            schedEntry->_schedOwnerLength = vb->id[idx++];
-            if (vb->id_len < idx + schedEntry->_schedOwnerLength) goto illegal;
-            for (i = 0; i < schedEntry->_schedOwnerLength; i++) {
-                schedEntry->schedOwner[i] = vb->id[idx++];
-            }
-        }
-        {
-            int i;
-            if (vb->id_len < idx) goto illegal;
-            schedEntry->_schedNameLength = vb->id[idx++];
-            if (vb->id_len < idx + schedEntry->_schedNameLength) goto illegal;
-            for (i = 0; i < schedEntry->_schedNameLength; i++) {
-                schedEntry->schedName[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal schedEntry instance identifier");
-            g_free(schedEntry);
-            return NULL;
-        }
+    if (unpack_schedEntry((GSnmpVarBind *) vbl->data, schedEntry) < 0) {
+        g_warning("illegal schedEntry instance identifier");
+        g_free(schedEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

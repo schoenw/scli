@@ -132,6 +132,21 @@ snmp_target_mib_free_snmpTargetObjects(snmpTargetObjects_t *snmpTargetObjects)
     }
 }
 
+static int
+unpack_snmpTargetAddrEntry(GSnmpVarBind *vb, snmpTargetAddrEntry_t *snmpTargetAddrEntry)
+{
+    int i, len, idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    len = vb->id_len - idx;
+    for (i = 0; i < len; i++) {
+        snmpTargetAddrEntry->snmpTargetAddrName[i] = vb->id[idx++];
+    }
+    snmpTargetAddrEntry->_snmpTargetAddrNameLength = len;
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static snmpTargetAddrEntry_t *
 assign_snmpTargetAddrEntry(GSList *vbl)
 {
@@ -148,24 +163,10 @@ assign_snmpTargetAddrEntry(GSList *vbl)
     p = (char *) snmpTargetAddrEntry + sizeof(snmpTargetAddrEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        {
-            int i;
-            if (vb->id_len < idx) goto illegal;
-            snmpTargetAddrEntry->_snmpTargetAddrNameLength = vb->id[idx++];
-            if (vb->id_len < idx + snmpTargetAddrEntry->_snmpTargetAddrNameLength) goto illegal;
-            for (i = 0; i < snmpTargetAddrEntry->_snmpTargetAddrNameLength; i++) {
-                snmpTargetAddrEntry->snmpTargetAddrName[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal snmpTargetAddrEntry instance identifier");
-            g_free(snmpTargetAddrEntry);
-            return NULL;
-        }
+    if (unpack_snmpTargetAddrEntry((GSnmpVarBind *) vbl->data, snmpTargetAddrEntry) < 0) {
+        g_warning("illegal snmpTargetAddrEntry instance identifier");
+        g_free(snmpTargetAddrEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -266,6 +267,21 @@ snmp_target_mib_free_snmpTargetAddrEntry(snmpTargetAddrEntry_t **snmpTargetAddrE
     }
 }
 
+static int
+unpack_snmpTargetParamsEntry(GSnmpVarBind *vb, snmpTargetParamsEntry_t *snmpTargetParamsEntry)
+{
+    int i, len, idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    len = vb->id_len - idx;
+    for (i = 0; i < len; i++) {
+        snmpTargetParamsEntry->snmpTargetParamsName[i] = vb->id[idx++];
+    }
+    snmpTargetParamsEntry->_snmpTargetParamsNameLength = len;
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static snmpTargetParamsEntry_t *
 assign_snmpTargetParamsEntry(GSList *vbl)
 {
@@ -282,24 +298,10 @@ assign_snmpTargetParamsEntry(GSList *vbl)
     p = (char *) snmpTargetParamsEntry + sizeof(snmpTargetParamsEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        {
-            int i;
-            if (vb->id_len < idx) goto illegal;
-            snmpTargetParamsEntry->_snmpTargetParamsNameLength = vb->id[idx++];
-            if (vb->id_len < idx + snmpTargetParamsEntry->_snmpTargetParamsNameLength) goto illegal;
-            for (i = 0; i < snmpTargetParamsEntry->_snmpTargetParamsNameLength; i++) {
-                snmpTargetParamsEntry->snmpTargetParamsName[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal snmpTargetParamsEntry instance identifier");
-            g_free(snmpTargetParamsEntry);
-            return NULL;
-        }
+    if (unpack_snmpTargetParamsEntry((GSnmpVarBind *) vbl->data, snmpTargetParamsEntry) < 0) {
+        g_warning("illegal snmpTargetParamsEntry instance identifier");
+        g_free(snmpTargetParamsEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

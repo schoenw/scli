@@ -187,6 +187,29 @@ snmp_user_based_sm_mib_free_usmUser(usmUser_t *usmUser)
     }
 }
 
+static int
+unpack_usmUserEntry(GSnmpVarBind *vb, usmUserEntry_t *usmUserEntry)
+{
+    int i, len, idx = 12;
+
+    if (vb->id_len < idx) return -1;
+    len = vb->id[idx++];
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        usmUserEntry->usmUserEngineID[i] = vb->id[idx++];
+    }
+    usmUserEntry->_usmUserEngineIDLength = len;
+    if (vb->id_len < idx) return -1;
+    len = vb->id[idx++];
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        usmUserEntry->usmUserName[i] = vb->id[idx++];
+    }
+    usmUserEntry->_usmUserNameLength = len;
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static usmUserEntry_t *
 assign_usmUserEntry(GSList *vbl)
 {
@@ -203,33 +226,10 @@ assign_usmUserEntry(GSList *vbl)
     p = (char *) usmUserEntry + sizeof(usmUserEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 12;
-        {
-            int i;
-            if (vb->id_len < idx) goto illegal;
-            usmUserEntry->_usmUserEngineIDLength = vb->id[idx++];
-            if (vb->id_len < idx + usmUserEntry->_usmUserEngineIDLength) goto illegal;
-            for (i = 0; i < usmUserEntry->_usmUserEngineIDLength; i++) {
-                usmUserEntry->usmUserEngineID[i] = vb->id[idx++];
-            }
-        }
-        {
-            int i;
-            if (vb->id_len < idx) goto illegal;
-            usmUserEntry->_usmUserNameLength = vb->id[idx++];
-            if (vb->id_len < idx + usmUserEntry->_usmUserNameLength) goto illegal;
-            for (i = 0; i < usmUserEntry->_usmUserNameLength; i++) {
-                usmUserEntry->usmUserName[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal usmUserEntry instance identifier");
-            g_free(usmUserEntry);
-            return NULL;
-        }
+    if (unpack_usmUserEntry((GSnmpVarBind *) vbl->data, usmUserEntry) < 0) {
+        g_warning("illegal usmUserEntry instance identifier");
+        g_free(usmUserEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

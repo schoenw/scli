@@ -169,6 +169,20 @@ ip_mib_free_ip(ip_t *ip)
     }
 }
 
+static int
+unpack_ipAddrEntry(GSnmpVarBind *vb, ipAddrEntry_t *ipAddrEntry)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        ipAddrEntry->ipAdEntAddr[i] = vb->id[idx++];
+    }
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static ipAddrEntry_t *
 assign_ipAddrEntry(GSList *vbl)
 {
@@ -185,22 +199,10 @@ assign_ipAddrEntry(GSList *vbl)
     p = (char *) ipAddrEntry + sizeof(ipAddrEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 10;
-        if (vb->id_len < idx + 4) goto illegal;
-        {
-            int i;
-            for (i = 0; i < 4; i++) {
-                ipAddrEntry->ipAdEntAddr[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal ipAddrEntry instance identifier");
-            g_free(ipAddrEntry);
-            return NULL;
-        }
+    if (unpack_ipAddrEntry((GSnmpVarBind *) vbl->data, ipAddrEntry) < 0) {
+        g_warning("illegal ipAddrEntry instance identifier");
+        g_free(ipAddrEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -281,6 +283,22 @@ ip_mib_free_ipAddrEntry(ipAddrEntry_t **ipAddrEntry)
     }
 }
 
+static int
+unpack_ipNetToMediaEntry(GSnmpVarBind *vb, ipNetToMediaEntry_t *ipNetToMediaEntry)
+{
+    int i, len, idx = 10;
+
+    if (vb->id_len < idx) return -1;
+    ipNetToMediaEntry->ipNetToMediaIfIndex = vb->id[idx++];
+    len = 4;
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        ipNetToMediaEntry->ipNetToMediaNetAddress[i] = vb->id[idx++];
+    }
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static ipNetToMediaEntry_t *
 assign_ipNetToMediaEntry(GSList *vbl)
 {
@@ -297,24 +315,10 @@ assign_ipNetToMediaEntry(GSList *vbl)
     p = (char *) ipNetToMediaEntry + sizeof(ipNetToMediaEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 10;
-        if (vb->id_len < idx) goto illegal;
-        ipNetToMediaEntry->ipNetToMediaIfIndex = vb->id[idx++];
-        if (vb->id_len < idx + 4) goto illegal;
-        {
-            int i;
-            for (i = 0; i < 4; i++) {
-                ipNetToMediaEntry->ipNetToMediaNetAddress[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal ipNetToMediaEntry instance identifier");
-            g_free(ipNetToMediaEntry);
-            return NULL;
-        }
+    if (unpack_ipNetToMediaEntry((GSnmpVarBind *) vbl->data, ipNetToMediaEntry) < 0) {
+        g_warning("illegal ipNetToMediaEntry instance identifier");
+        g_free(ipNetToMediaEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

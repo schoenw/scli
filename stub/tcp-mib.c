@@ -155,6 +155,29 @@ tcp_mib_free_tcp(tcp_t *tcp)
     }
 }
 
+static int
+unpack_tcpConnEntry(GSnmpVarBind *vb, tcpConnEntry_t *tcpConnEntry)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        tcpConnEntry->tcpConnLocalAddress[i] = vb->id[idx++];
+    }
+    if (vb->id_len < idx) return -1;
+    tcpConnEntry->tcpConnLocalPort = vb->id[idx++];
+    len = 4;
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        tcpConnEntry->tcpConnRemAddress[i] = vb->id[idx++];
+    }
+    if (vb->id_len < idx) return -1;
+    tcpConnEntry->tcpConnRemPort = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static tcpConnEntry_t *
 assign_tcpConnEntry(GSList *vbl)
 {
@@ -171,33 +194,10 @@ assign_tcpConnEntry(GSList *vbl)
     p = (char *) tcpConnEntry + sizeof(tcpConnEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 10;
-        if (vb->id_len < idx + 4) goto illegal;
-        {
-            int i;
-            for (i = 0; i < 4; i++) {
-                tcpConnEntry->tcpConnLocalAddress[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len < idx) goto illegal;
-        tcpConnEntry->tcpConnLocalPort = vb->id[idx++];
-        if (vb->id_len < idx + 4) goto illegal;
-        {
-            int i;
-            for (i = 0; i < 4; i++) {
-                tcpConnEntry->tcpConnRemAddress[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len < idx) goto illegal;
-        tcpConnEntry->tcpConnRemPort = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal tcpConnEntry instance identifier");
-            g_free(tcpConnEntry);
-            return NULL;
-        }
+    if (unpack_tcpConnEntry((GSnmpVarBind *) vbl->data, tcpConnEntry) < 0) {
+        g_warning("illegal tcpConnEntry instance identifier");
+        g_free(tcpConnEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

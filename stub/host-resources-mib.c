@@ -252,6 +252,17 @@ host_resources_mib_free_hrStorage(hrStorage_t *hrStorage)
     }
 }
 
+static int
+unpack_hrStorageEntry(GSnmpVarBind *vb, hrStorageEntry_t *hrStorageEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    hrStorageEntry->hrStorageIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static hrStorageEntry_t *
 assign_hrStorageEntry(GSList *vbl)
 {
@@ -268,17 +279,10 @@ assign_hrStorageEntry(GSList *vbl)
     p = (char *) hrStorageEntry + sizeof(hrStorageEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        hrStorageEntry->hrStorageIndex = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal hrStorageEntry instance identifier");
-            g_free(hrStorageEntry);
-            return NULL;
-        }
+    if (unpack_hrStorageEntry((GSnmpVarBind *) vbl->data, hrStorageEntry) < 0) {
+        g_warning("illegal hrStorageEntry instance identifier");
+        g_free(hrStorageEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -369,6 +373,17 @@ host_resources_mib_free_hrStorageEntry(hrStorageEntry_t **hrStorageEntry)
     }
 }
 
+static int
+unpack_hrDeviceEntry(GSnmpVarBind *vb, hrDeviceEntry_t *hrDeviceEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    hrDeviceEntry->hrDeviceIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static hrDeviceEntry_t *
 assign_hrDeviceEntry(GSList *vbl)
 {
@@ -385,17 +400,10 @@ assign_hrDeviceEntry(GSList *vbl)
     p = (char *) hrDeviceEntry + sizeof(hrDeviceEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        hrDeviceEntry->hrDeviceIndex = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal hrDeviceEntry instance identifier");
-            g_free(hrDeviceEntry);
-            return NULL;
-        }
+    if (unpack_hrDeviceEntry((GSnmpVarBind *) vbl->data, hrDeviceEntry) < 0) {
+        g_warning("illegal hrDeviceEntry instance identifier");
+        g_free(hrDeviceEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -483,6 +491,17 @@ host_resources_mib_free_hrDeviceEntry(hrDeviceEntry_t **hrDeviceEntry)
     }
 }
 
+static int
+unpack_hrProcessorEntry(GSnmpVarBind *vb, hrProcessorEntry_t *hrProcessorEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    hrProcessorEntry->hrDeviceIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static hrProcessorEntry_t *
 assign_hrProcessorEntry(GSList *vbl)
 {
@@ -499,17 +518,10 @@ assign_hrProcessorEntry(GSList *vbl)
     p = (char *) hrProcessorEntry + sizeof(hrProcessorEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        hrProcessorEntry->hrDeviceIndex = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal hrProcessorEntry instance identifier");
-            g_free(hrProcessorEntry);
-            return NULL;
-        }
+    if (unpack_hrProcessorEntry((GSnmpVarBind *) vbl->data, hrProcessorEntry) < 0) {
+        g_warning("illegal hrProcessorEntry instance identifier");
+        g_free(hrProcessorEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -583,6 +595,17 @@ host_resources_mib_free_hrProcessorEntry(hrProcessorEntry_t **hrProcessorEntry)
     }
 }
 
+static int
+unpack_hrNetworkEntry(GSnmpVarBind *vb, hrNetworkEntry_t *hrNetworkEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    hrNetworkEntry->hrDeviceIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static hrNetworkEntry_t *
 assign_hrNetworkEntry(GSList *vbl)
 {
@@ -599,17 +622,10 @@ assign_hrNetworkEntry(GSList *vbl)
     p = (char *) hrNetworkEntry + sizeof(hrNetworkEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        hrNetworkEntry->hrDeviceIndex = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal hrNetworkEntry instance identifier");
-            g_free(hrNetworkEntry);
-            return NULL;
-        }
+    if (unpack_hrNetworkEntry((GSnmpVarBind *) vbl->data, hrNetworkEntry) < 0) {
+        g_warning("illegal hrNetworkEntry instance identifier");
+        g_free(hrNetworkEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -678,6 +694,17 @@ host_resources_mib_free_hrNetworkEntry(hrNetworkEntry_t **hrNetworkEntry)
     }
 }
 
+static int
+unpack_hrPrinterEntry(GSnmpVarBind *vb, hrPrinterEntry_t *hrPrinterEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    hrPrinterEntry->hrDeviceIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static hrPrinterEntry_t *
 assign_hrPrinterEntry(GSList *vbl)
 {
@@ -694,17 +721,10 @@ assign_hrPrinterEntry(GSList *vbl)
     p = (char *) hrPrinterEntry + sizeof(hrPrinterEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        hrPrinterEntry->hrDeviceIndex = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal hrPrinterEntry instance identifier");
-            g_free(hrPrinterEntry);
-            return NULL;
-        }
+    if (unpack_hrPrinterEntry((GSnmpVarBind *) vbl->data, hrPrinterEntry) < 0) {
+        g_warning("illegal hrPrinterEntry instance identifier");
+        g_free(hrPrinterEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -778,6 +798,17 @@ host_resources_mib_free_hrPrinterEntry(hrPrinterEntry_t **hrPrinterEntry)
     }
 }
 
+static int
+unpack_hrDiskStorageEntry(GSnmpVarBind *vb, hrDiskStorageEntry_t *hrDiskStorageEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    hrDiskStorageEntry->hrDeviceIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static hrDiskStorageEntry_t *
 assign_hrDiskStorageEntry(GSList *vbl)
 {
@@ -794,17 +825,10 @@ assign_hrDiskStorageEntry(GSList *vbl)
     p = (char *) hrDiskStorageEntry + sizeof(hrDiskStorageEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        hrDiskStorageEntry->hrDeviceIndex = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal hrDiskStorageEntry instance identifier");
-            g_free(hrDiskStorageEntry);
-            return NULL;
-        }
+    if (unpack_hrDiskStorageEntry((GSnmpVarBind *) vbl->data, hrDiskStorageEntry) < 0) {
+        g_warning("illegal hrDiskStorageEntry instance identifier");
+        g_free(hrDiskStorageEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -885,6 +909,19 @@ host_resources_mib_free_hrDiskStorageEntry(hrDiskStorageEntry_t **hrDiskStorageE
     }
 }
 
+static int
+unpack_hrPartitionEntry(GSnmpVarBind *vb, hrPartitionEntry_t *hrPartitionEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    hrPartitionEntry->hrDeviceIndex = vb->id[idx++];
+    if (vb->id_len < idx) return -1;
+    hrPartitionEntry->hrPartitionIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static hrPartitionEntry_t *
 assign_hrPartitionEntry(GSList *vbl)
 {
@@ -901,19 +938,10 @@ assign_hrPartitionEntry(GSList *vbl)
     p = (char *) hrPartitionEntry + sizeof(hrPartitionEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        hrPartitionEntry->hrDeviceIndex = vb->id[idx++];
-        if (vb->id_len < idx) goto illegal;
-        hrPartitionEntry->hrPartitionIndex = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal hrPartitionEntry instance identifier");
-            g_free(hrPartitionEntry);
-            return NULL;
-        }
+    if (unpack_hrPartitionEntry((GSnmpVarBind *) vbl->data, hrPartitionEntry) < 0) {
+        g_warning("illegal hrPartitionEntry instance identifier");
+        g_free(hrPartitionEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -996,6 +1024,17 @@ host_resources_mib_free_hrPartitionEntry(hrPartitionEntry_t **hrPartitionEntry)
     }
 }
 
+static int
+unpack_hrFSEntry(GSnmpVarBind *vb, hrFSEntry_t *hrFSEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    hrFSEntry->hrFSIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static hrFSEntry_t *
 assign_hrFSEntry(GSList *vbl)
 {
@@ -1012,17 +1051,10 @@ assign_hrFSEntry(GSList *vbl)
     p = (char *) hrFSEntry + sizeof(hrFSEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        hrFSEntry->hrFSIndex = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal hrFSEntry instance identifier");
-            g_free(hrFSEntry);
-            return NULL;
-        }
+    if (unpack_hrFSEntry((GSnmpVarBind *) vbl->data, hrFSEntry) < 0) {
+        g_warning("illegal hrFSEntry instance identifier");
+        g_free(hrFSEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -1193,6 +1225,17 @@ host_resources_mib_free_hrSWRun(hrSWRun_t *hrSWRun)
     }
 }
 
+static int
+unpack_hrSWRunEntry(GSnmpVarBind *vb, hrSWRunEntry_t *hrSWRunEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    hrSWRunEntry->hrSWRunIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static hrSWRunEntry_t *
 assign_hrSWRunEntry(GSList *vbl)
 {
@@ -1209,17 +1252,10 @@ assign_hrSWRunEntry(GSList *vbl)
     p = (char *) hrSWRunEntry + sizeof(hrSWRunEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        hrSWRunEntry->hrSWRunIndex = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal hrSWRunEntry instance identifier");
-            g_free(hrSWRunEntry);
-            return NULL;
-        }
+    if (unpack_hrSWRunEntry((GSnmpVarBind *) vbl->data, hrSWRunEntry) < 0) {
+        g_warning("illegal hrSWRunEntry instance identifier");
+        g_free(hrSWRunEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -1312,6 +1348,17 @@ host_resources_mib_free_hrSWRunEntry(hrSWRunEntry_t **hrSWRunEntry)
     }
 }
 
+static int
+unpack_hrSWRunPerfEntry(GSnmpVarBind *vb, hrSWRunPerfEntry_t *hrSWRunPerfEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    hrSWRunPerfEntry->hrSWRunIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static hrSWRunPerfEntry_t *
 assign_hrSWRunPerfEntry(GSList *vbl)
 {
@@ -1328,17 +1375,10 @@ assign_hrSWRunPerfEntry(GSList *vbl)
     p = (char *) hrSWRunPerfEntry + sizeof(hrSWRunPerfEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        hrSWRunPerfEntry->hrSWRunIndex = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal hrSWRunPerfEntry instance identifier");
-            g_free(hrSWRunPerfEntry);
-            return NULL;
-        }
+    if (unpack_hrSWRunPerfEntry((GSnmpVarBind *) vbl->data, hrSWRunPerfEntry) < 0) {
+        g_warning("illegal hrSWRunPerfEntry instance identifier");
+        g_free(hrSWRunPerfEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -1484,6 +1524,17 @@ host_resources_mib_free_hrSWInstalled(hrSWInstalled_t *hrSWInstalled)
     }
 }
 
+static int
+unpack_hrSWInstalledEntry(GSnmpVarBind *vb, hrSWInstalledEntry_t *hrSWInstalledEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    hrSWInstalledEntry->hrSWInstalledIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static hrSWInstalledEntry_t *
 assign_hrSWInstalledEntry(GSList *vbl)
 {
@@ -1500,17 +1551,10 @@ assign_hrSWInstalledEntry(GSList *vbl)
     p = (char *) hrSWInstalledEntry + sizeof(hrSWInstalledEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        hrSWInstalledEntry->hrSWInstalledIndex = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal hrSWInstalledEntry instance identifier");
-            g_free(hrSWInstalledEntry);
-            return NULL;
-        }
+    if (unpack_hrSWInstalledEntry((GSnmpVarBind *) vbl->data, hrSWInstalledEntry) < 0) {
+        g_warning("illegal hrSWInstalledEntry instance identifier");
+        g_free(hrSWInstalledEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

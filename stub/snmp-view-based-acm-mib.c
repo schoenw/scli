@@ -86,6 +86,22 @@ stls_table_t snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStatus[] = {
 };
 
 
+static int
+unpack_vacmContextEntry(GSnmpVarBind *vb, vacmContextEntry_t *vacmContextEntry)
+{
+    int i, len, idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    len = vb->id[idx++];
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        vacmContextEntry->vacmContextName[i] = vb->id[idx++];
+    }
+    vacmContextEntry->_vacmContextNameLength = len;
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static vacmContextEntry_t *
 assign_vacmContextEntry(GSList *vbl)
 {
@@ -102,24 +118,10 @@ assign_vacmContextEntry(GSList *vbl)
     p = (char *) vacmContextEntry + sizeof(vacmContextEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        {
-            int i;
-            if (vb->id_len < idx) goto illegal;
-            vacmContextEntry->_vacmContextNameLength = vb->id[idx++];
-            if (vb->id_len < idx + vacmContextEntry->_vacmContextNameLength) goto illegal;
-            for (i = 0; i < vacmContextEntry->_vacmContextNameLength; i++) {
-                vacmContextEntry->vacmContextName[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal vacmContextEntry instance identifier");
-            g_free(vacmContextEntry);
-            return NULL;
-        }
+    if (unpack_vacmContextEntry((GSnmpVarBind *) vbl->data, vacmContextEntry) < 0) {
+        g_warning("illegal vacmContextEntry instance identifier");
+        g_free(vacmContextEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -184,6 +186,24 @@ snmp_view_based_acm_mib_free_vacmContextEntry(vacmContextEntry_t **vacmContextEn
     }
 }
 
+static int
+unpack_vacmSecurityToGroupEntry(GSnmpVarBind *vb, vacmSecurityToGroupEntry_t *vacmSecurityToGroupEntry)
+{
+    int i, len, idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    vacmSecurityToGroupEntry->vacmSecurityModel = vb->id[idx++];
+    if (vb->id_len < idx) return -1;
+    len = vb->id[idx++];
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        vacmSecurityToGroupEntry->vacmSecurityName[i] = vb->id[idx++];
+    }
+    vacmSecurityToGroupEntry->_vacmSecurityNameLength = len;
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static vacmSecurityToGroupEntry_t *
 assign_vacmSecurityToGroupEntry(GSList *vbl)
 {
@@ -200,26 +220,10 @@ assign_vacmSecurityToGroupEntry(GSList *vbl)
     p = (char *) vacmSecurityToGroupEntry + sizeof(vacmSecurityToGroupEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        vacmSecurityToGroupEntry->vacmSecurityModel = vb->id[idx++];
-        {
-            int i;
-            if (vb->id_len < idx) goto illegal;
-            vacmSecurityToGroupEntry->_vacmSecurityNameLength = vb->id[idx++];
-            if (vb->id_len < idx + vacmSecurityToGroupEntry->_vacmSecurityNameLength) goto illegal;
-            for (i = 0; i < vacmSecurityToGroupEntry->_vacmSecurityNameLength; i++) {
-                vacmSecurityToGroupEntry->vacmSecurityName[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal vacmSecurityToGroupEntry instance identifier");
-            g_free(vacmSecurityToGroupEntry);
-            return NULL;
-        }
+    if (unpack_vacmSecurityToGroupEntry((GSnmpVarBind *) vbl->data, vacmSecurityToGroupEntry) < 0) {
+        g_warning("illegal vacmSecurityToGroupEntry instance identifier");
+        g_free(vacmSecurityToGroupEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -297,6 +301,33 @@ snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(vacmSecurityToGroupEntry_t
     }
 }
 
+static int
+unpack_vacmAccessEntry(GSnmpVarBind *vb, vacmAccessEntry_t *vacmAccessEntry)
+{
+    int i, len, idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    len = vb->id[idx++];
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        vacmAccessEntry->vacmGroupName[i] = vb->id[idx++];
+    }
+    vacmAccessEntry->_vacmGroupNameLength = len;
+    if (vb->id_len < idx) return -1;
+    len = vb->id[idx++];
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        vacmAccessEntry->vacmAccessContextPrefix[i] = vb->id[idx++];
+    }
+    vacmAccessEntry->_vacmAccessContextPrefixLength = len;
+    if (vb->id_len < idx) return -1;
+    vacmAccessEntry->vacmAccessSecurityModel = vb->id[idx++];
+    if (vb->id_len < idx) return -1;
+    vacmAccessEntry->vacmAccessSecurityLevel = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static vacmAccessEntry_t *
 assign_vacmAccessEntry(GSList *vbl)
 {
@@ -313,37 +344,10 @@ assign_vacmAccessEntry(GSList *vbl)
     p = (char *) vacmAccessEntry + sizeof(vacmAccessEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        {
-            int i;
-            if (vb->id_len < idx) goto illegal;
-            vacmAccessEntry->_vacmGroupNameLength = vb->id[idx++];
-            if (vb->id_len < idx + vacmAccessEntry->_vacmGroupNameLength) goto illegal;
-            for (i = 0; i < vacmAccessEntry->_vacmGroupNameLength; i++) {
-                vacmAccessEntry->vacmGroupName[i] = vb->id[idx++];
-            }
-        }
-        {
-            int i;
-            if (vb->id_len < idx) goto illegal;
-            vacmAccessEntry->_vacmAccessContextPrefixLength = vb->id[idx++];
-            if (vb->id_len < idx + vacmAccessEntry->_vacmAccessContextPrefixLength) goto illegal;
-            for (i = 0; i < vacmAccessEntry->_vacmAccessContextPrefixLength; i++) {
-                vacmAccessEntry->vacmAccessContextPrefix[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len < idx) goto illegal;
-        vacmAccessEntry->vacmAccessSecurityModel = vb->id[idx++];
-        if (vb->id_len < idx) goto illegal;
-        vacmAccessEntry->vacmAccessSecurityLevel = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal vacmAccessEntry instance identifier");
-            g_free(vacmAccessEntry);
-            return NULL;
-        }
+    if (unpack_vacmAccessEntry((GSnmpVarBind *) vbl->data, vacmAccessEntry) < 0) {
+        g_warning("illegal vacmAccessEntry instance identifier");
+        g_free(vacmAccessEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -504,6 +508,23 @@ snmp_view_based_acm_mib_free_vacmMIBViews(vacmMIBViews_t *vacmMIBViews)
     }
 }
 
+static int
+unpack_vacmViewTreeFamilyEntry(GSnmpVarBind *vb, vacmViewTreeFamilyEntry_t *vacmViewTreeFamilyEntry)
+{
+    int i, len, idx = 12;
+
+    if (vb->id_len < idx) return -1;
+    len = vb->id[idx++];
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        vacmViewTreeFamilyEntry->vacmViewTreeFamilyViewName[i] = vb->id[idx++];
+    }
+    vacmViewTreeFamilyEntry->_vacmViewTreeFamilyViewNameLength = len;
+    /* XXX how to unpack vacmViewTreeFamilyEntry->vacmViewTreeFamilySubtree ? */
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static vacmViewTreeFamilyEntry_t *
 assign_vacmViewTreeFamilyEntry(GSList *vbl)
 {
@@ -520,25 +541,10 @@ assign_vacmViewTreeFamilyEntry(GSList *vbl)
     p = (char *) vacmViewTreeFamilyEntry + sizeof(vacmViewTreeFamilyEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 12;
-        {
-            int i;
-            if (vb->id_len < idx) goto illegal;
-            vacmViewTreeFamilyEntry->_vacmViewTreeFamilyViewNameLength = vb->id[idx++];
-            if (vb->id_len < idx + vacmViewTreeFamilyEntry->_vacmViewTreeFamilyViewNameLength) goto illegal;
-            for (i = 0; i < vacmViewTreeFamilyEntry->_vacmViewTreeFamilyViewNameLength; i++) {
-                vacmViewTreeFamilyEntry->vacmViewTreeFamilyViewName[i] = vb->id[idx++];
-            }
-        }
-        /* XXX fix this vacmViewTreeFamilyEntry->vacmViewTreeFamilySubtree = ?; */
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal vacmViewTreeFamilyEntry instance identifier");
-            g_free(vacmViewTreeFamilyEntry);
-            return NULL;
-        }
+    if (unpack_vacmViewTreeFamilyEntry((GSnmpVarBind *) vbl->data, vacmViewTreeFamilyEntry) < 0) {
+        g_warning("illegal vacmViewTreeFamilyEntry instance identifier");
+        g_free(vacmViewTreeFamilyEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

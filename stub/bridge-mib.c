@@ -136,6 +136,17 @@ bridge_mib_free_dot1dBase(dot1dBase_t *dot1dBase)
     }
 }
 
+static int
+unpack_dot1dBasePortEntry(GSnmpVarBind *vb, dot1dBasePortEntry_t *dot1dBasePortEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    dot1dBasePortEntry->dot1dBasePort = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static dot1dBasePortEntry_t *
 assign_dot1dBasePortEntry(GSList *vbl)
 {
@@ -152,17 +163,10 @@ assign_dot1dBasePortEntry(GSList *vbl)
     p = (char *) dot1dBasePortEntry + sizeof(dot1dBasePortEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        dot1dBasePortEntry->dot1dBasePort = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal dot1dBasePortEntry instance identifier");
-            g_free(dot1dBasePortEntry);
-            return NULL;
-        }
+    if (unpack_dot1dBasePortEntry((GSnmpVarBind *) vbl->data, dot1dBasePortEntry) < 0) {
+        g_warning("illegal dot1dBasePortEntry instance identifier");
+        g_free(dot1dBasePortEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -365,6 +369,17 @@ bridge_mib_free_dot1dStp(dot1dStp_t *dot1dStp)
     }
 }
 
+static int
+unpack_dot1dStpPortEntry(GSnmpVarBind *vb, dot1dStpPortEntry_t *dot1dStpPortEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    dot1dStpPortEntry->dot1dStpPort = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static dot1dStpPortEntry_t *
 assign_dot1dStpPortEntry(GSList *vbl)
 {
@@ -381,17 +396,10 @@ assign_dot1dStpPortEntry(GSList *vbl)
     p = (char *) dot1dStpPortEntry + sizeof(dot1dStpPortEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        dot1dStpPortEntry->dot1dStpPort = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal dot1dStpPortEntry instance identifier");
-            g_free(dot1dStpPortEntry);
-            return NULL;
-        }
+    if (unpack_dot1dStpPortEntry((GSnmpVarBind *) vbl->data, dot1dStpPortEntry) < 0) {
+        g_warning("illegal dot1dStpPortEntry instance identifier");
+        g_free(dot1dStpPortEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -565,6 +573,20 @@ bridge_mib_free_dot1dTp(dot1dTp_t *dot1dTp)
     }
 }
 
+static int
+unpack_dot1dTpFdbEntry(GSnmpVarBind *vb, dot1dTpFdbEntry_t *dot1dTpFdbEntry)
+{
+    int i, len, idx = 11;
+
+    len = 6;
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        dot1dTpFdbEntry->dot1dTpFdbAddress[i] = vb->id[idx++];
+    }
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static dot1dTpFdbEntry_t *
 assign_dot1dTpFdbEntry(GSList *vbl)
 {
@@ -581,22 +603,10 @@ assign_dot1dTpFdbEntry(GSList *vbl)
     p = (char *) dot1dTpFdbEntry + sizeof(dot1dTpFdbEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx + 6) goto illegal;
-        {
-            int i;
-            for (i = 0; i < 6; i++) {
-                dot1dTpFdbEntry->dot1dTpFdbAddress[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal dot1dTpFdbEntry instance identifier");
-            g_free(dot1dTpFdbEntry);
-            return NULL;
-        }
+    if (unpack_dot1dTpFdbEntry((GSnmpVarBind *) vbl->data, dot1dTpFdbEntry) < 0) {
+        g_warning("illegal dot1dTpFdbEntry instance identifier");
+        g_free(dot1dTpFdbEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -669,6 +679,17 @@ bridge_mib_free_dot1dTpFdbEntry(dot1dTpFdbEntry_t **dot1dTpFdbEntry)
     }
 }
 
+static int
+unpack_dot1dTpPortEntry(GSnmpVarBind *vb, dot1dTpPortEntry_t *dot1dTpPortEntry)
+{
+    int idx = 11;
+
+    if (vb->id_len < idx) return -1;
+    dot1dTpPortEntry->dot1dTpPort = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static dot1dTpPortEntry_t *
 assign_dot1dTpPortEntry(GSList *vbl)
 {
@@ -685,17 +706,10 @@ assign_dot1dTpPortEntry(GSList *vbl)
     p = (char *) dot1dTpPortEntry + sizeof(dot1dTpPortEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx) goto illegal;
-        dot1dTpPortEntry->dot1dTpPort = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal dot1dTpPortEntry instance identifier");
-            g_free(dot1dTpPortEntry);
-            return NULL;
-        }
+    if (unpack_dot1dTpPortEntry((GSnmpVarBind *) vbl->data, dot1dTpPortEntry) < 0) {
+        g_warning("illegal dot1dTpPortEntry instance identifier");
+        g_free(dot1dTpPortEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -776,6 +790,22 @@ bridge_mib_free_dot1dTpPortEntry(dot1dTpPortEntry_t **dot1dTpPortEntry)
     }
 }
 
+static int
+unpack_dot1dStaticEntry(GSnmpVarBind *vb, dot1dStaticEntry_t *dot1dStaticEntry)
+{
+    int i, len, idx = 11;
+
+    len = 6;
+    if (vb->id_len < idx + len) return -1;
+    for (i = 0; i < len; i++) {
+        dot1dStaticEntry->dot1dStaticAddress[i] = vb->id[idx++];
+    }
+    if (vb->id_len < idx) return -1;
+    dot1dStaticEntry->dot1dStaticReceivePort = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
 static dot1dStaticEntry_t *
 assign_dot1dStaticEntry(GSList *vbl)
 {
@@ -792,24 +822,10 @@ assign_dot1dStaticEntry(GSList *vbl)
     p = (char *) dot1dStaticEntry + sizeof(dot1dStaticEntry_t);
     * (GSList **) p = vbl;
 
-    {
-        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        int idx = 11;
-        if (vb->id_len < idx + 6) goto illegal;
-        {
-            int i;
-            for (i = 0; i < 6; i++) {
-                dot1dStaticEntry->dot1dStaticAddress[i] = vb->id[idx++];
-            }
-        }
-        if (vb->id_len < idx) goto illegal;
-        dot1dStaticEntry->dot1dStaticReceivePort = vb->id[idx++];
-        if (vb->id_len > idx) { 
-        illegal:
-            g_warning("illegal dot1dStaticEntry instance identifier");
-            g_free(dot1dStaticEntry);
-            return NULL;
-        }
+    if (unpack_dot1dStaticEntry((GSnmpVarBind *) vbl->data, dot1dStaticEntry) < 0) {
+        g_warning("illegal dot1dStaticEntry instance identifier");
+        g_free(dot1dStaticEntry);
+        return NULL;
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
