@@ -92,42 +92,42 @@ organized in a hierarchy. This section only describes the top-level
 commands. Invoke the \fIhelp\fP command described below to get a
 complete list of all commands supported by \fBscli\fP.
 .TP 10
-.I open
+.B open
 Establish an association to a remote SNMP agent.
 .TP
-.I close
+.B close
 Close the association to a remote SNMP agent.
 .TP
-.I exit
+.B exit
 Exit the \fBscli\fP command interpreter.
 .TP
-.I help
+.B help
 Display help information about the \fBscli\fP command interpreter
 including a full list of the \fBscli\fP command hierarchy.
 .TP
-.I history
+.B history
 Show the history of the last \fBscli\fP commands.
 .TP
-.I create
+.B create
 Create new object instances on the remote SNMP agent. This command
 has many sub-commands which are used to instantiate very different
 things.
 .TP
-.I delete
+.B delete
 Delete object instances from the remote SNMP agent. This command
 has many sub-commands which are used to delete very different
 things.
 .TP
-.I set
+.B set
 Modify object instances on the remote SNMP agent by assigning new
 values. This command has many sub-commands which are used to set
 very different things.
 .TP
-.I show
+.B show
 Show information provided by the remote SNMP agent. This command has
 many sub-commands focusing on various aspects of the system.
 .TP
-.I monitor
+.B monitor
 Monitor information provided by the remote SNMP agent. This command
 has many sub-commands focusing on various aspects of the system.
 \fBscli\fP monitors provide a live display of network and device
@@ -141,6 +141,39 @@ will recursively invoke all commands in the subtree identified by the
 entered command. In particular, entering \fIshow\fR will cause
 \fBscli\fP to retrieve and display all information accessible from the
 remote SNMP agent.
+
+.SH SYSTEM MODE
+The system mode provides information about general system capabilities
+and it provides core system configuration commands. It is primarily
+based on the SNMPv2-MIB as published in RFC 1907, the
+HOST-RESOURCES-MIB as published in RFC 2790, and the ENTITY-MIB as
+published in RFC 2737. Some commands which probe for certain features
+rely on additional MIBs.
+.TP
+.B set system name <string>
+.TP
+.B set system contact <string>
+.TP
+.B set system location <string>
+.TP
+.B show system info
+.TP
+.B show system devices
+.TP
+.B show system storage
+.TP
+.B show system mounts
+.TP
+.B show system processes
+.TP
+.B show system entity details
+.TP
+.B show system entity containment
+.TP
+.B monitor system storage
+.TP
+.B monitor system processes
+
 .SH INTERFACE MODE
 The interface mode is based on the IF-MIB as published in RFC 2863 and
 provides the following commands:
@@ -221,6 +254,26 @@ The \fBshow nortel bridge vlan details\fP command describes the
 selected vlans in more detail. The optional regular expression
 <regexp> is matched against the vlan names to select the vlans of
 interest. <tbd>
+
+.SH SCLI MODE
+The scli mode can be used to inspect and modify the status of the scli
+interpreter.
+.TP
+.B set scli debugging [<layer> [<layer> [...]]]
+.TP
+.B set scli pager <string>
+.TP
+.B set scli format <fmt>
+.TP
+.B create scli alias <name> <value>
+.TP
+.B delete scli alias <name>
+.TP
+.B show scli aliases
+.TP
+.B show scli info
+.TP
+.B show scli modes
 
 .SH INTERACTIVE MONITOR COMMANDS
 Several single-key commands are recognized while \fBscli\fP is running
