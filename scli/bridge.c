@@ -73,6 +73,10 @@ cmd_bridge_info(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (bridge_mib_get_dot1dBase(interp->peer, &dot1dBase)) {
 	return SCLI_ERROR;
     }
@@ -156,6 +160,10 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
     int i, j = -1;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     if (bridge_mib_get_dot1dBasePortTable(interp->peer, &dot1dBasePortTable)) {
 	return SCLI_ERROR;
@@ -257,6 +265,10 @@ cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (bridge_mib_get_dot1dTpFdbTable(interp->peer, &dot1dTpFdbTable)) {
 	return SCLI_ERROR;
     }
@@ -336,6 +348,10 @@ cmd_bridge_filter(scli_interp_t *interp, int argc, char **argv)
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (bridge_mib_get_dot1dStaticTable(interp->peer, &dot1dStaticTable)) {
 	return SCLI_ERROR;
     }
@@ -358,23 +374,23 @@ void
 scli_init_bridge_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show bridge info",
+	{ "show bridge info", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "bridge summary information",
 	  cmd_bridge_info },
-	{ "show bridge ports",
+	{ "show bridge ports", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "bridge ports",
 	  cmd_bridge_ports },
-	{ "show bridge forwarding",
+	{ "show bridge forwarding", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "bridge forwarding data base",
 	  cmd_bridge_forwarding },
-	{ "show bridge filter",
+	{ "show bridge filter", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "bridge filtering data base",
 	  cmd_bridge_filter },
-	{ NULL, 0, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t bridge_mode = {

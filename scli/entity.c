@@ -92,6 +92,10 @@ cmd_containment(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable)) {
 	return SCLI_ERROR;
     }
@@ -204,6 +208,10 @@ cmd_components(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable)) {
 	return SCLI_ERROR;
     }
@@ -228,15 +236,15 @@ void
 scli_init_entity_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show system components",
+	{ "show system components", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "physical components of the system",
 	  cmd_components },
-	{ "show system containment",
+	{ "show system containment", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "physical component's containment hierarchy",
 	  cmd_containment },
-	{ NULL, 0, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t entity_mode = {

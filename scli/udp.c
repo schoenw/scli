@@ -69,6 +69,10 @@ cmd_udp_listener(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (udp_mib_get_udpTable(interp->peer, &udpTable)) {
 	return SCLI_ERROR;
     }
@@ -113,11 +117,11 @@ void
 scli_init_udp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show udp listener",
+	{ "show udp listener", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "existing udp listener",
 	  cmd_udp_listener },
-	{ NULL, 0, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t udp_mode = {

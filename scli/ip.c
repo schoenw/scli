@@ -136,6 +136,10 @@ cmd_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (ip_forward_mib_get_ipCidrRouteTable(interp->peer, &ipCidrRouteTable)) {
 	if (rfc1213_mib_get_ipRouteTable(interp->peer, &ipRouteTable)) {
 	    return SCLI_ERROR;
@@ -224,6 +228,10 @@ cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     if (ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable)) {
 	return SCLI_ERROR;
@@ -346,6 +354,10 @@ cmd_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (tunnel_mib_get_tunnelIfTable(interp->peer, &tunnelIfTable)) {
 	return SCLI_ERROR;
     }
@@ -425,6 +437,10 @@ cmd_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (ip_mib_get_ipNetToMediaTable(interp->peer, &ipNetToMediaTable)) {
 	return SCLI_ERROR;
     }
@@ -459,23 +475,23 @@ void
 scli_init_ip_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show ip forwarding",
+	{ "show ip forwarding", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "IP forwarding data base",
 	  cmd_ip_forwarding },
-	{ "show ip addresses",
+	{ "show ip addresses", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "assigned IP addresses",
 	  cmd_ip_addresses },
-	{ "show ip tunnel",
+	{ "show ip tunnel", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "IP tunnels",
 	  cmd_ip_tunnel },
-	{ "show ip mapping",
+	{ "show ip mapping", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "IP address to lower layer address mappings",
 	  cmd_ip_media_mapping },
-	{ NULL, 0, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t ip_mode = {

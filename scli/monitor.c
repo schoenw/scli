@@ -148,7 +148,7 @@ static void
 show_mode_summary(char *string)
 {
     move(mode_line, 0);
-    mvprintw(mode_line, 0, "Monitor:  %.*s",
+    mvprintw(mode_line, 0, "Command:  %.*s",
 	     MIN(strlen(string), COLS-10), string);
     clrtoeol();
 }
@@ -512,7 +512,7 @@ show_interior(GSnmpSession *peer)
 
 
 static void
-help()
+help(scli_cmd_t *cmd, int argc, char **argv)
 {
     int y = 0;
     
@@ -546,7 +546,7 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 {
     int c, flags = 0;
     char *input, buffer[80];
-    int code;
+    int code = SCLI_OK;
     
     flags |= STOP_FLAG_RESTART;
     flags |= STOP_FLAG_NODELAY;
@@ -565,7 +565,7 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
                 show_tcp(interp->peer, flags);
             }
 	    if (do_mode_summary) {
-		show_mode_summary(cmd->desc);
+		show_mode_summary(cmd->path);
 	    }
         }
 	move(status_line, 0);
@@ -574,6 +574,9 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 	    g_string_truncate(interp->result, 0);
 	    g_string_truncate(interp->header, 0);
 	    code = (cmd->func) (interp, argc, argv);
+	    if (code != SCLI_OK) {
+		break;
+	    }
 	    if (! interp->result->len && ! interp->header->len) {
 		g_string_append(interp->header, "NO DATA AVAILABLE");
 	    }
@@ -587,11 +590,6 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 	    timeout(interp->delay);	
 	}
         flags = 0;
-#if 0	
-	if (interrupted) {
-	    onwinch(0);
-	}
-#endif
         switch (c = getch()) {
         case ERR:       /* timeout */
             break;
@@ -608,12 +606,12 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
             break;
 	case 'x':
 	case 'X':
-	    endwin();
-	    g_print("\n");
-	    exit(0);
+	    code = SCLI_EXIT;
+	    flags |= STOP_FLAG_DONE;
+	    break;
         case 'h':
         case '?':
-            help();
+            help(cmd, argc, argv);
             flags |= STOP_FLAG_RESTART;
             break;
         case '\f':
@@ -672,7 +670,7 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
             break;
         }
     }
-    return SCLI_OK;
+    return code;
 }
 
 
@@ -687,7 +685,7 @@ scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv)
 
     g_snmp_list_decode_hook = snmp_decode_hook;
     code = mainloop(interp, cmd, argc, argv);
-    if (code == SCLI_OK) {
+    if (code == SCLI_OK || code == SCLI_EXIT) {
 	g_string_truncate(interp->result, 0);
     }
 

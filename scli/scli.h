@@ -60,9 +60,10 @@ extern char const scli_copyright[];	/* copyright message (surprise) */
  * The return codes used by the scli commands functions.
  */
 
-#define SCLI_OK		0
-#define SCLI_ERROR	1
-#define SCLI_EXIT	2
+#define SCLI_OK		0	/* normal return code */
+#define SCLI_ERROR	1	/* generic error return code */
+#define SCLI_EXIT	2	/* return and exit the command loop */
+#define SCLI_SYNTAX	3	/* syntax error return code */
 
 
 typedef struct scli_interp	scli_interp_t;
@@ -76,6 +77,7 @@ typedef struct scli_alias	scli_alias_t;
 
 struct scli_cmd {
     char *path;			/* path where the command is registered */
+    char *options;		/* options accepted by the command */
     int   flags;		/* command flags */
     char *desc;			/* description of the command */
     int (*func) (scli_interp_t *interp, int argc, char **argv);
@@ -99,6 +101,7 @@ struct scli_alias {
 #define SCLI_INTERP_FLAG_INTERACTIVE	0x01
 #define SCLI_INTERP_FLAG_RECURSIVE	0x02
 #define SCLI_INTERP_FLAG_XML		0x04
+#define SCLI_INTERP_FLAG_MONITOR	0x08
 
 struct scli_interp {
     GNode *cmd_root;		/* root of the command tree */
@@ -119,9 +122,14 @@ scli_interp_create();
 extern void
 scli_interp_delete();
 
-#define scli_interp_xml(interp) (interp->flags & SCLI_INTERP_FLAG_XML)
-
-#define scli_interp_interactive(interp) (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE)
+#define scli_interp_interactive(interp) \
+	(interp->flags & SCLI_INTERP_FLAG_INTERACTIVE)
+#define scli_interp_recursive(interp) \
+	(interp->flags & SCLI_INTERP_FLAG_RECURSIVE)
+#define scli_interp_xml(interp) \
+	(interp->flags & SCLI_INTERP_FLAG_XML)
+#define scli_interp_monitor(interp) \
+	(interp->flags & SCLI_INTERP_FLAG_MONITOR)
 
 extern int
 scli_split(char *string, int *argc, char ***argv);

@@ -72,6 +72,10 @@ cmd_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable)) {
 	return SCLI_ERROR;
     }
@@ -189,6 +193,10 @@ cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable)) {
 	return SCLI_ERROR;
     }
@@ -255,19 +263,19 @@ void
 scli_init_tcp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show tcp listener",
+	{ "show tcp listener", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "existing tcp listener",
 	  cmd_tcp_listener },
-	{ "show tcp connections",
+	{ "show tcp connections", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "existing tcp connections",
 	  cmd_tcp_connections },
-	{ "monitor tcp connections",
+	{ "monitor tcp connections", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "existing tcp connections",
 	  cmd_tcp_connections },
-	{ NULL, 0, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t tcp_mode = {

@@ -117,7 +117,7 @@ page(scli_interp_t *interp, GString *s)
 
     if (scli_interp_interactive(interp)) {
 	if (g_snmp_list_decode_hook) {
-	    g_print("\r                                 \r");
+	    g_print("\r                               \r");
 	}
     } else {
     nopager:
@@ -333,7 +333,7 @@ snmp_decode_hook(GSList *list)
     now = time(NULL);
     
     n++, c += g_slist_length(list), i = (i+1) % 5;
-    g_print("\r%c %6.2f vps %6.2f vpm \r", x[i],
+    g_print("\r%c %6.2f vps %6.2f vpm\r", x[i],
 	    (now > start) ? c / (double) (now - start) : 0,
 	    c / (double) n);
     fflush(stdout);
@@ -347,28 +347,42 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
     scli_cmd_t *cmd = (scli_cmd_t *) node->data;
     int code = SCLI_OK;
 
-    if (cmd->func) {
-	g_string_truncate(interp->result, 0);
-	g_string_truncate(interp->header, 0);
-	if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER && ! interp->peer) {
-	    g_printerr("no association to a remote SNMP agent\n");
-	    return SCLI_ERROR;
-	}
-	if (cmd->flags & SCLI_CMD_FLAG_MONITOR) {
-	    code = scli_monitor(interp, node, argc, argv);
-	} else {
-	    code = (cmd->func) (interp, argc, argv);
-	    if (interp->flags & SCLI_INTERP_FLAG_RECURSIVE) {
-		return code;
-	    }
+    g_return_val_if_fail(cmd && cmd->func, SCLI_OK);
+
+    g_string_truncate(interp->result, 0);
+    g_string_truncate(interp->header, 0);
+    if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER && ! interp->peer) {
+	g_printerr("no association to a remote SNMP agent\n");
+	return SCLI_ERROR;
+    }
+    if (cmd->flags & SCLI_CMD_FLAG_MONITOR) {
+	interp->flags |= SCLI_INTERP_FLAG_MONITOR;
+	code = scli_monitor(interp, node, argc, argv);
+	interp->flags &= ~SCLI_INTERP_FLAG_MONITOR;
+    } else {
+	code = (cmd->func) (interp, argc, argv);
+    }
+
+    switch (code) {
+    case SCLI_SYNTAX:
+	g_printerr("usage: %s %s\n", cmd->path,
+		   cmd->options ? cmd->options : "");
+	break;
+    case SCLI_ERROR:
+	g_printerr("error: %s\n",
+		   interp->result->str ? interp->result->str : "");
+	break;
+    case SCLI_OK:
+    case SCLI_EXIT:
+	if (! (scli_interp_recursive(interp))
+	    && ! (cmd->flags & SCLI_CMD_FLAG_MONITOR)) {
 	    if (interp->header->len) {
 		g_string_prepend_c(interp->result, '\n');
 		g_string_prepend(interp->result, interp->header->str);
 	    }
-	    if (interp->result->len) {
-		page(interp, interp->result);
-	    }
+	    page(interp, interp->result);
 	}
+	break;
     }
 
     return code;

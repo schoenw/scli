@@ -242,6 +242,10 @@ cmd_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (mau_mib_get_ifMauTable(interp->peer, &ifMauTable)) {
 	return SCLI_ERROR;
     }
@@ -290,6 +294,10 @@ cmd_ether_stats(scli_interp_t *interp, int argc, char **argv)
     int i;
     static ether_stats_t *stats = NULL;
     static time_t epoch = 0;
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     if (etherlike_mib_get_dot3StatsTable(interp->peer, &dot3StatsTable)) {
 	return SCLI_ERROR;
@@ -371,19 +379,19 @@ void
 scli_init_ether_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show ethernet mau",
+	{ "show ethernet mau", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "ethernet medium attachment unit parameters",
 	  cmd_ether_mau_info },
-	{ "show ethernet stats",
+	{ "show ethernet stats", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "ethernet statistics",
 	  cmd_ether_stats },
-	{ "monitor ethernet stats",
+	{ "monitor ethernet stats", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "ethernet statistics",
 	  cmd_ether_stats },
-	{ NULL, 0, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t ether_mode = {

@@ -618,6 +618,10 @@ cmd_languages(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (disman_script_mib_get_smLangTable(interp->peer, &smLangTable)) {
 	return SCLI_ERROR;
     }
@@ -717,6 +721,10 @@ cmd_script_details(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (disman_script_mib_get_smLangTable(interp->peer, &smLangTable)) {
 	return SCLI_ERROR;
     }
@@ -815,6 +823,10 @@ cmd_script_info(scli_interp_t *interp, int argc, char **argv)
     int owner_width = 8, lang_width = 8;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     if (disman_script_mib_get_smLangTable(interp->peer, &smLangTable)) {
 	return SCLI_ERROR;
@@ -934,6 +946,10 @@ cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
     int owner_width = 8;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     if (disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable)) {
 	return SCLI_ERROR;
@@ -1089,6 +1105,10 @@ cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable)) {
 	return SCLI_ERROR;
     }
@@ -1159,6 +1179,10 @@ cmd_run_info(scli_interp_t *interp, int argc, char **argv)
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     if (disman_script_mib_get_smRunTable(interp->peer, &smRunTable)) {
 	return SCLI_ERROR;
@@ -1303,6 +1327,10 @@ cmd_run_details(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (disman_script_mib_get_smRunTable(interp->peer, &smRunTable)) {
 	return SCLI_ERROR;
     }
@@ -1361,6 +1389,10 @@ cmd_scheduler_info(scli_interp_t *interp, int argc, char **argv)
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     if (disman_schedule_mib_get_schedTable(interp->peer, &schedTable)) {
 	return SCLI_ERROR;
@@ -1476,6 +1508,10 @@ cmd_scheduler_details(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (disman_schedule_mib_get_schedTable(interp->peer, &schedTable)) {
 	return SCLI_ERROR;
     }
@@ -1500,51 +1536,47 @@ void
 scli_init_disman_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show disman languages",
+	{ "show disman languages", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "languages supported by the distributed manager",
 	  cmd_languages },
-	{ "show disman script info",
+	{ "show disman script info", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "script summary information",
 	  cmd_script_info },
-	{ "show disman script details",
+	{ "show disman script details", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "scripts installed at the distributed manager",
 	  cmd_script_details },
-	{ "show disman launch info",
+	{ "show disman launch info", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "launch summary information",
 	  cmd_launch_info },
-	{ "show disman launch details",
+	{ "show disman launch details", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "launch buttons installed on the distributed manager",
 	  cmd_launch_details },
-	{ "show disman run info",
+	{ "show disman run info", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "summary information about running scripts",
 	  cmd_run_info },
-	{ "show disman run details",
+	{ "show disman run details", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "running scripts on the distributed manager",
 	  cmd_run_details },
-	{ "show disman scheduler info",
+	{ "show disman scheduler info", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "scheduler information",
 	  cmd_scheduler_info },
-	{ "show disman scheduler details",
+	{ "show disman scheduler details", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "schedules on the distributed manager",
 	  cmd_scheduler_details },
-	{ "monitor disman run",
+	{ "monitor disman run", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "running scripts",
 	  cmd_run_info },
-	{ "monitor disman scheduler",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  "scheduler information",
-	  cmd_scheduler_info },
-	{ NULL, 0, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t disman_mode = {

@@ -45,6 +45,10 @@ cmd_scli_exit(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
         
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     return SCLI_EXIT;
 }
 
@@ -93,6 +97,10 @@ cmd_scli_modes(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (! scli_interp_xml(interp)) {
 	s = interp->result;
 	g_string_sprintfa(s, "%-15s %s\n", "Mode", "Description");
@@ -111,6 +119,10 @@ static int
 cmd_scli_help(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     if (! scli_interp_xml(interp)) {
 	g_string_sprintfa(interp->result,
@@ -131,6 +143,10 @@ cmd_scli_history(scli_interp_t *interp, int argc, char **argv)
     int i;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     the_list = history_list();
     if (the_list) {
@@ -155,7 +171,7 @@ scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
     } else if (argc == 3) {
 	scli_open_community(interp, argv[1], 161, argv[2]);
     } else {
-	return SCLI_ERROR;
+	return SCLI_SYNTAX;
     }
 
     return SCLI_OK;
@@ -167,6 +183,10 @@ static int
 cmd_scli_close(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     scli_close(interp);
 
@@ -189,7 +209,7 @@ cmd_scli_alias(scli_interp_t *interp, int argc, char **argv)
 	interp->alias_list = g_slist_insert_sorted(interp->alias_list,
 						   alias, alias_compare);
     } else {
-	return SCLI_ERROR;
+	return SCLI_SYNTAX;
     }
     
     return SCLI_OK;
@@ -206,7 +226,7 @@ cmd_scli_unalias(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
     
     if (argc != 2) {
-	return SCLI_ERROR;
+	return SCLI_SYNTAX;
     }
     
  again:
@@ -236,6 +256,10 @@ cmd_scli_aliases(scli_interp_t *interp, int argc, char **argv)
     int value_width = 16;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     if (interp->alias_list) {
 	for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
@@ -271,6 +295,10 @@ cmd_scli_peer(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (interp->peer) {
 	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
 			  "Host:", interp->peer->name);
@@ -299,6 +327,10 @@ cmd_scli_term(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     /* show terminal type ? */
 
     scli_get_screen(&rows, &cols);
@@ -324,6 +356,10 @@ cmd_scli_interp(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     g_string_sprintfa(interp->result, "%-*s %lu\n", indent, "Epoch:",
 		      interp->epoch);
 
@@ -333,7 +369,7 @@ cmd_scli_interp(scli_interp_t *interp, int argc, char **argv)
     g_string_sprintfa(interp->result, "%-*s %s\n", indent, "Interactive:",
 		      scli_interp_interactive(interp) ? "true" : "false");
 
-    g_string_sprintfa(interp->result, "%-*s %d sec\n", indent, "Delay:",
+    g_string_sprintfa(interp->result, "%-*s %d seconds\n", indent, "Delay:",
 		      interp->delay / 1000);
 
     return SCLI_OK;
@@ -345,55 +381,55 @@ void
 scli_init_scli_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-        { "create scli alias",
+        { "create scli alias", "<name> <value>",
 	  0,
 	  "create an scli command alias",
 	  cmd_scli_alias },
-	{ "close",
+	{ "close", NULL,
 	  0,
 	  "close the association to a remote SNMP agent",
 	  cmd_scli_close },
-	{ "exit",
+	{ "exit", NULL,
 	  0,
 	  "exit the scli command line program",
 	  cmd_scli_exit },
-	{ "help",
+	{ "help", NULL,
 	  0,
 	  "help about the current mode and commands",
 	  cmd_scli_help },
-	{ "history",
+	{ "history", NULL,
 	  0,
 	  "display the command history list with line numbers",
 	  cmd_scli_history },
-	{ "open",
+	{ "open", "<hostname> [<community>]",
 	  0,
 	  "open an association to a remote SNMP agent",
 	  scli_cmd_open },
-	{ "show scli aliases",
+	{ "show scli aliases", NULL,
 	  0,
 	  "show information about scli aliases",
 	  cmd_scli_aliases },
-	{ "show scli agent",
+	{ "show scli agent", NULL,
 	  0,
 	  "show information about the current SNMP agent",
 	  cmd_scli_peer },
-	{ "show scli term",
+	{ "show scli term", NULL,
 	  0,
 	  "show information about the terminal parameters",
 	  cmd_scli_term },
-	{ "show scli interp",
+	{ "show scli interp", NULL,
 	  0,
 	  "show information about the interpreter",
 	  cmd_scli_interp },
-	{ "show scli modes",
+	{ "show scli modes", NULL,
 	  0,
 	  "show information about the available modes",
 	  cmd_scli_modes },
-	{ "delete scli alias",
+	{ "delete scli alias", "<name>",
 	  0,
 	  "delete an scli command alias",
 	  cmd_scli_unalias },
-	{ NULL, 0, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t scli_mode = {

@@ -295,10 +295,14 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (argc > 1) {
+    if (argc > 2) {
+	return SCLI_SYNTAX;
+    }
+
+    if (argc == 2) {
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_ERROR;	/* xxx report error */
+	    return SCLI_SYNTAX;
 	}
     }
 
@@ -402,10 +406,14 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (argc > 1) {
+    if (argc > 2) {
+	return SCLI_SYNTAX;
+    }
+
+    if (argc == 2) {
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_ERROR;	/* xxx report error */
+	    return SCLI_SYNTAX;
 	}
     }
 
@@ -506,10 +514,14 @@ cmd_if_stack(scli_interp_t *interp, int argc, char **argv)
     regex_t _regex_iface, *regex_iface = NULL;
     int i, type_width;
 
-    if (argc > 1) {
+    if (argc > 2) {
+	return SCLI_SYNTAX;
+    }
+
+    if (argc == 2) {
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_ERROR;	/* xxx report error */
+	    return SCLI_SYNTAX;
 	}
     }
 
@@ -575,10 +587,14 @@ cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
 
-    if (argc > 1) {
+    if (argc > 2) {
+	return SCLI_SYNTAX;
+    }
+
+    if (argc == 2) {
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_ERROR;	/* xxx report error */
+	    return SCLI_SYNTAX;
 	}
     }
 
@@ -711,27 +727,27 @@ void
 scli_init_interface_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show interface info",
+	{ "show interface info", "[<regexp>]",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "network interface summary",
 	  cmd_if_info },
-	{ "show interface stats",
+	{ "show interface stats", "[<regexp>]",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "network interface statistics",
 	  cmd_if_stats },
-	{ "show interface details",
+	{ "show interface details", "[<regexp>]",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "network interface details",
 	  cmd_if_details },
-	{ "show interface stack",
+	{ "show interface stack", "[<regexp>]",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "network interface stacking",
 	  cmd_if_stack },
-	{ "monitor interface stats",
+	{ "monitor interface stats", "[<regexp>]",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "network interface statistics",
 	  cmd_if_stats },
-	{ NULL, 0, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t if_mib_mode = {

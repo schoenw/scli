@@ -224,6 +224,10 @@ cmd_system_devices(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable)) {
 	return SCLI_ERROR;
     }
@@ -357,6 +361,10 @@ cmd_system_processes(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (host_resources_mib_get_hrSWRunTable(interp->peer, &hrSWRunTable)) {
 	return SCLI_ERROR;
     }
@@ -435,6 +443,10 @@ cmd_system_mounts(scli_interp_t *interp, int argc, char **argv)
     int i, loc_len = 20, rem_len = 20;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     if (host_resources_mib_get_hrFSTable(interp->peer, &hrFSTable)) {
 	return SCLI_ERROR;
@@ -531,6 +543,10 @@ cmd_system_storage(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
     if (host_resources_mib_get_hrStorageTable(interp->peer,
 					      &hrStorageTable)) {
 	return SCLI_ERROR;
@@ -573,6 +589,10 @@ cmd_system_info(scli_interp_t *interp, int argc, char **argv)
     int const indent = 18;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
 
     if (snmpv2_mib_get_system(interp->peer, &system)) {
 	return SCLI_ERROR;
@@ -733,35 +753,35 @@ void
 scli_init_system_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show system info",
+	{ "show system info", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "system summary information",
 	  cmd_system_info },
-	{ "show system devices",
+	{ "show system devices", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "list of system devices",
 	  cmd_system_devices },
-	{ "show system storage",
+	{ "show system storage", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "storage areas attached to the system",
 	  cmd_system_storage },
-	{ "show system mounts",
+	{ "show system mounts", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "file systems mounted on the system",
 	  cmd_system_mounts },
-	{ "show system processes",
+	{ "show system processes", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "processes running on the system",
 	  cmd_system_processes },
-	{ "monitor system storage",
+	{ "monitor system storage", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "storage areas attached to the system",
 	  cmd_system_storage },
-	{ "monitor system processes",
+	{ "monitor system processes", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "processes running on the system",
 	  cmd_system_processes },
-	{ NULL, 0, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t system_mode = {
