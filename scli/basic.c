@@ -166,7 +166,10 @@ page(scli_interp_t *interp, GString *s)
     }
 
     /* Do not get fooled by nasty IFS tricks. */
-    setenv("IFS", " \t", 1);
+    if (putenv("IFS= \t") < 0) {
+	g_warning("putenv failed - ignoring pager");
+	goto nopager;
+    }
     
     f = popen(interp->pager, "w");
     if (! f) {
