@@ -27,10 +27,10 @@
 
 
 static void
-show_bridge_info(GString *s,
-		 bridge_mib_dot1dBase_t *dot1dBase,
-		 bridge_mib_dot1dTp_t *dot1dTp,
-		 bridge_mib_dot1dStp_t *dot1dStp)
+fmt_bridge_info(GString *s,
+		bridge_mib_dot1dBase_t *dot1dBase,
+		bridge_mib_dot1dTp_t *dot1dTp,
+		bridge_mib_dot1dStp_t *dot1dStp)
 {
     int const indent = 18;
     const char *type;
@@ -63,7 +63,7 @@ show_bridge_info(GString *s,
 
 
 static int
-cmd_bridge_info(scli_interp_t *interp, int argc, char **argv)
+show_bridge_info(scli_interp_t *interp, int argc, char **argv)
 {
     bridge_mib_dot1dBase_t *dot1dBase = NULL;
     bridge_mib_dot1dTp_t *dot1dTp = NULL;
@@ -84,7 +84,7 @@ cmd_bridge_info(scli_interp_t *interp, int argc, char **argv)
     if (dot1dBase
 	&& dot1dBase->dot1dBaseNumPorts
 	&& *dot1dBase->dot1dBaseNumPorts) {
-	show_bridge_info(interp->result, dot1dBase, dot1dTp, dot1dStp);
+	fmt_bridge_info(interp->result, dot1dBase, dot1dTp, dot1dStp);
     }
 
     if (dot1dBase)
@@ -100,9 +100,9 @@ cmd_bridge_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_bridge_port(GString *s,
-		 bridge_mib_dot1dBasePortEntry_t *dot1dBasePortEntry,
-		 if_mib_ifEntry_t *ifEntry,
+fmt_bridge_port(GString *s,
+		bridge_mib_dot1dBasePortEntry_t *dot1dBasePortEntry,
+		if_mib_ifEntry_t *ifEntry,
 		 if_mib_ifXEntry_t *ifXEntry,
 		 int type_width, int name_width)
 {
@@ -150,7 +150,7 @@ show_bridge_port(GString *s,
 
 
 static int
-cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
+show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 {
     bridge_mib_dot1dBasePortEntry_t **dot1dBasePortTable = NULL;
     if_mib_ifEntry_t **ifTable = NULL;
@@ -201,10 +201,10 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 		    }
 		}
 	    }
-	    show_bridge_port(interp->result, dot1dBasePortTable[i],
-			     (ifTable && ifTable[j]) ? ifTable[j] : NULL,
-			     (ifXTable && ifXTable[j]) ? ifXTable[j] : NULL,
-			     type_width, name_width);
+	    fmt_bridge_port(interp->result, dot1dBasePortTable[i],
+			    (ifTable && ifTable[j]) ? ifTable[j] : NULL,
+			    (ifXTable && ifXTable[j]) ? ifXTable[j] : NULL,
+			    type_width, name_width);
 	}
     }
 
@@ -219,9 +219,9 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_bridge_forwarding(GString *s,
-		       bridge_mib_dot1dTpFdbEntry_t *dot1dTpFdbEntry,
-		       int name_width)
+fmt_bridge_forwarding(GString *s,
+		      bridge_mib_dot1dTpFdbEntry_t *dot1dTpFdbEntry,
+		      int name_width)
 {
     scli_vendor_t *vendor;
     guint32 prefix;
@@ -257,7 +257,7 @@ show_bridge_forwarding(GString *s,
 
 
 static int
-cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
+show_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 {
     bridge_mib_dot1dTpFdbEntry_t **dot1dTpFdbTable = NULL;
     char *name;
@@ -295,8 +295,8 @@ cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 	    for (i = 0; dot1dTpFdbTable[i]; i++) {
 		if (dot1dTpFdbTable[i]->dot1dTpFdbPort
 		    && *dot1dTpFdbTable[i]->dot1dTpFdbPort == p) {
-		    show_bridge_forwarding(interp->result, dot1dTpFdbTable[i],
-					   name_width);
+		    fmt_bridge_forwarding(interp->result, dot1dTpFdbTable[i],
+					  name_width);
 		}
 	    }
 	}
@@ -310,7 +310,7 @@ cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_bridge_filter(GString *s,
+fmt_bridge_filter(GString *s,
 		   bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry)
 {
     const char *status;
@@ -346,7 +346,7 @@ show_bridge_filter(GString *s,
 
 
 static int
-cmd_bridge_filter(scli_interp_t *interp, int argc, char **argv)
+show_bridge_filter(scli_interp_t *interp, int argc, char **argv)
 {
     bridge_mib_dot1dStaticEntry_t **dot1dStaticTable = NULL;
     int i;
@@ -363,7 +363,7 @@ cmd_bridge_filter(scli_interp_t *interp, int argc, char **argv)
 
     if (dot1dStaticTable) {
 	for (i = 0; dot1dStaticTable[i]; i++) {
-	    show_bridge_filter(interp->result, dot1dStaticTable[i]);
+	    fmt_bridge_filter(interp->result, dot1dStaticTable[i]);
 	}
     }
 
@@ -375,32 +375,121 @@ cmd_bridge_filter(scli_interp_t *interp, int argc, char **argv)
 
 
 
+typedef struct {
+    guint32 inFrames;
+    guint32 outFrames;
+    guint32 inDiscards;
+} bridge_stats_t;
+
+
+
+static int
+show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
+{
+    bridge_mib_dot1dTpPortEntry_t **portTable = NULL;
+    static struct timeval last, now;
+    double delta;
+    static bridge_stats_t *stats = NULL;
+    static time_t epoch = 0;
+    int i;
+    
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
+    if (bridge_mib_get_dot1dTpPortTable(interp->peer, &portTable)) {
+	return SCLI_ERROR;
+    }
+
+    if (epoch < interp->epoch) {
+	if (stats) g_free(stats);
+	stats = NULL;
+	last.tv_sec = last.tv_usec = 0;
+    }
+
+    if (! stats && portTable) {
+	for (i = 0; portTable[i]; i++) ;
+	stats = (bridge_stats_t *) g_malloc0(i * sizeof(bridge_stats_t));
+    }
+
+    epoch = time(NULL);
+    gettimeofday(&now, NULL);
+    delta = TV_DIFF(last, now);
+
+    if (portTable) {
+	g_string_append(interp->header, " PORT I-FPS O-FPS D-FPS DESCRIPTION");
+	for (i = 0; portTable[i]; i++) {
+
+	    g_string_sprintfa(interp->result, "%5u ",
+			      portTable[i]->dot1dTpPort);
+	    
+	    fmt_counter_dt(interp->result, portTable[i]->dot1dTpPortInFrames,
+			   &(stats[i].inFrames),
+			   &last, delta);
+
+	    fmt_counter_dt(interp->result, portTable[i]->dot1dTpPortOutFrames,
+			   &(stats[i].outFrames),
+			   &last, delta);
+
+	    fmt_counter_dt(interp->result, portTable[i]->dot1dTpPortInDiscards,
+			   &(stats[i].inDiscards),
+			   &last, delta);
+
+	    g_string_append(interp->result, "\n");
+	}
+    }
+
+    last = now;
+    if (portTable) bridge_mib_free_dot1dTpPortTable(portTable);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_bridge_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
 	{ "show bridge info", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "bridge summary information",
-	  cmd_bridge_info },
+	  show_bridge_info },
+
 	{ "show bridge ports", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "bridge ports",
-	  cmd_bridge_ports },
+	  show_bridge_ports },
+
 	{ "show bridge forwarding", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "bridge forwarding data base",
-	  cmd_bridge_forwarding },
+	  show_bridge_forwarding },
+
 	{ "show bridge filter", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "bridge filtering data base",
-	  cmd_bridge_filter },
+	  show_bridge_filter },
+
+	{ "show bridge stats", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "xxx",
+	  show_bridge_stats },
+
+	{ "monitor bridge stats", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  "xxx",
+	  show_bridge_stats },
+
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t bridge_mode = {
 	"bridge",
-	"scli mode to display and configure bridge parameters",
+	"The scli bridge mode is based on the BRIDGE-MIB as published in\n"
+	"RFC 1493. It provides commands to browse information specific\n"
+	"to LAN bridges (also known as layer two switches).",
 	cmds
     };
     
