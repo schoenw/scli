@@ -1,3 +1,47 @@
+2001-02-27 11:06  schoenw
+
+	* NEWS, TODO: Updates for the 0.1.11 release.
+
+2001-02-27 11:04  schoenw
+
+	* scli/disman.c: Fixes some descriptive texts.
+
+2001-02-27 11:01  schoenw
+
+	* scli/entity.c: Implementation of the "show physical components"
+	and the "show physical containment" command (which replace the
+        "show system entities" command).
+
+2001-02-27 11:00  schoenw
+
+	* scli/system.c: Cleanup and some initial "show system devices"
+        command code.
+
+2001-02-27 10:58  schoenw
+
+	* scli/interface.c: Renames "show interfaces" to "show interface
+	info" since we are going to add a "show interface stack" command
+        soon.
+
+2001-02-27 10:54  schoenw
+
+	* stop/stop.c: Do not display the system description during startup
+        to reduce latency.
+
+2001-02-27 10:54  schoenw
+
+	* stop/interface.c: Updates to better display byte and packet
+        counters.
+
+2001-02-27 08:49  schoenw
+
+	* stop/interface.c: Work better if some deprecated objects are not
+        present.
+
+2001-02-26 16:32  schoenw
+
+	* ChangeLog: Generated the ChangeLog via cvs2cl.
+
 2001-02-26 16:20  schoenw
 
 	* README, configure, configure.in: Prepare for release 0.1.11.
