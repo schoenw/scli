@@ -59,10 +59,7 @@ AC_STRUCT_TIMEZONE
 
 dnl Checks for library functions.
 
-AC_CHECK_FUNC(gethostbyname)
-if test $ac_cv_func_gethostbyname = no; then
-  AC_CHECK_LIB(nsl, gethostbyname)
-fi
+AC_CHECK_FUNC(gethostbyname, [], AC_CHECK_LIB(nsl, gethostbyname))
 
 AC_CHECK_FUNC(connect)
 if test $ac_cv_func_connect = no; then
