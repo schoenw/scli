@@ -35,6 +35,7 @@ static scli_vendor_t iana_vendor_table[] = {
     { 1575,	"TU Braunschweig",	NULL },
     { 1751,	"Lucent Technologies",	"http://www.lucent.com/" },
     { 2021,	"UCD-SNMP",		"http://ucd-snmp.ucdavis.edu/" },
+    { 2356,	"ELSA GmbH",		"http://www.elsa.de/" },
     { 8072,	"NET-SNMP",		"http://net-snmp.sourceforge.net/" },
     {    0,	NULL,			NULL },
 };
