@@ -174,38 +174,6 @@ xml_port_set(xmlNodePtr root, guchar *bits, gsize bits_len)
 
 
 
-static int
-scan_port_set(guchar *bits, gsize bits_len, char *string)
-{
-    char *p = string;
-    int i, from, to, off;
-
-    memset(bits, 0, bits_len);
-    while (*p) {
-	if (sscanf(p, "%d-%d%n", &from, &to, &off) == 2) {
-	    p += off;
-	} else if (sscanf(p, "%d%n", &from, &off) == 1) {
-	    p += off;
-	    to = from;
-	} else {
-	    memset(bits, 0, bits_len);
-	    return SCLI_ERROR;
-	}
-	if (from < 0 || to >= bits_len*8) {
-	    memset(bits, 0, bits_len);
-	    return SCLI_ERROR;
-	}
-	for (i = from; i < to+1; i++) {
-	    bits[i/8] |= (1 <<(7-(i%8)));
-	}
-	if (*p == ',') p++;
-    }
-
-    return SCLI_OK;
-}
-
-
-
 static void
 fmt_id_list(GString *s, guchar *ids, gint32 numids)
 {
