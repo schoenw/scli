@@ -20,10 +20,6 @@
  * @(#) $Id$
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "scli.h"
 
 #include "snmpv2-mib.h"
@@ -31,7 +27,7 @@
 #include "snmp-view-based-acm-mib.h"
 
 
-static stls_enum_t const security_model[] = {
+static GSnmpEnum const security_model[] = {
     { 0,	"any" },
     { 1,	"v1" },
     { 2,	"v2c" },
@@ -41,7 +37,7 @@ static stls_enum_t const security_model[] = {
 
 
 
-static stls_enum_t const security_level[] = {
+static GSnmpEnum const security_level[] = {
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_NOAUTHNOPRIV,	"--" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_AUTHNOPRIV,	"a-" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_AUTHPRIV,		"ap" },
@@ -50,7 +46,7 @@ static stls_enum_t const security_level[] = {
 
 
 
-static stls_enum_t const view_tree_family_type[] = {
+static GSnmpEnum const view_tree_family_type[] = {
     { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE_INCLUDED,	"incl" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE_EXCLUDED,	"excl" },
     { 0, NULL }
@@ -61,7 +57,7 @@ static stls_enum_t const view_tree_family_type[] = {
 static void
 fmt_storage_type(GString *s, gint32 *storage)
 {
-    static stls_enum_t const storage_types[] = {
+    static GSnmpEnum const storage_types[] = {
 	{ 1, "o" },	/* other */
 	{ 2, "v" },	/* volatile */
 	{ 3, "n" },	/* nonVolatile */
@@ -69,15 +65,15 @@ fmt_storage_type(GString *s, gint32 *storage)
 	{ 5, "r" },	/* readOnly */
 	{ 0, NULL }
     };
-
+    
     const char *label;
-
+    
     if (! storage) {
 	g_string_append(s, " ");
 	return;
     }
-
-    label = stls_enum_get_label(storage_types, *storage);
+    
+    label = gsnmp_enum_get_label(storage_types, *storage);
     if (label) {
 	g_string_append(s, label);
     } else {
@@ -90,21 +86,21 @@ fmt_storage_type(GString *s, gint32 *storage)
 static void
 fmt_row_status(GString *s, gint32 *status)
 {
-    static stls_enum_t const row_states[] = {
+    static GSnmpEnum const row_states[] = {
 	{ 1, "a" },	/* active */
 	{ 2, "s" },	/* notInService */
 	{ 3, "r" },	/* notReady */
 	{ 0, NULL }
     };
-
+    
     const char *label;
-
+    
     if (! status) {
 	g_string_append(s, " ");
 	return;
     }
-
-    label = stls_enum_get_label(row_states, *status);
+    
+    label = gsnmp_enum_get_label(row_states, *status);
     if (label) {
 	g_string_append(s, label);
     } else {
@@ -119,13 +115,13 @@ cmd_snmp_engine(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_framework_mib_snmpEngine_t *snmpEngine;
     int const indent = 18;
-
+    
     g_return_val_if_fail(interp, SCLI_ERROR);
-
+    
     if (snmp_framework_mib_get_snmpEngine(interp->peer, &snmpEngine)) {
 	return SCLI_ERROR;
     }
-
+    
     if (snmpEngine) {
 	if (snmpEngine->snmpEngineBoots) {
 	    g_string_sprintfa(interp->result,
@@ -146,7 +142,7 @@ cmd_snmp_engine(scli_interp_t *interp, int argc, char **argv)
 			      *(snmpEngine->snmpEngineMaxMessageSize));
 	}
     }
-
+    
     if (snmpEngine) snmp_framework_mib_free_snmpEngine(snmpEngine);
     
     return SCLI_OK;
@@ -170,21 +166,21 @@ cmd_snmp_resources(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_sysOREntry_t **sysORTable;
     int i;
-
+    
     g_return_val_if_fail(interp, SCLI_ERROR);
-
+    
     if (snmpv2_mib_get_sysORTable(interp->peer, &sysORTable)) {
 	return SCLI_ERROR;
     }
-
+    
     if (sysORTable) {
 	for (i = 0; sysORTable[i]; i++) {
 	    show_snmp_resource(interp->result, sysORTable[i]);
 	}
     }
-
+    
     if (sysORTable) snmpv2_mib_free_sysORTable(sysORTable);
-
+    
     return SCLI_OK;
 }
 
@@ -197,20 +193,20 @@ show_snmp_vacm_group(GString *s,
 {
     char const *model;
     
-    /*
+     /*
 	group
 	|- name (usm) (pa)
 	|- foo  (usm)
 	`- bar  (usm)
 	asdf
 	`- base (snmpc)
-    */
+     */
 
     fmt_storage_type(s, vacmGroupEntry->vacmSecurityToGroupStorageType);
     fmt_row_status(s, vacmGroupEntry->vacmSecurityToGroupStatus);
-
-    model = stls_enum_get_label(security_model,
-				vacmGroupEntry->vacmSecurityModel);
+    
+    model = gsnmp_enum_get_label(security_model,
+				 vacmGroupEntry->vacmSecurityModel);
     g_string_sprintfa(s, "  %-3s %-*.*s",
 		      model ? model : "", sec_name_width,
 		      (int) vacmGroupEntry->_vacmSecurityNameLength,
@@ -272,12 +268,12 @@ show_snmp_vacm_access(GString *s,
     fmt_storage_type(s, vacmAccessEntry->vacmAccessStorageType);
     fmt_row_status(s, vacmAccessEntry->vacmAccessStatus);
 
-    model = stls_enum_get_label(security_model,
+    model = gsnmp_enum_get_label(security_model,
 				vacmAccessEntry->vacmAccessSecurityModel);
-    level = stls_enum_get_label(security_level,
+    level = gsnmp_enum_get_label(security_level,
 				vacmAccessEntry->vacmAccessSecurityLevel);
     if (vacmAccessEntry->vacmAccessContextMatch) {
-	match = stls_enum_get_label(snmp_view_based_acm_mib_enums_vacmAccessContextMatch,
+	match = gsnmp_enum_get_label(snmp_view_based_acm_mib_enums_vacmAccessContextMatch,
 				    *vacmAccessEntry->vacmAccessContextMatch);
     }
         
@@ -389,7 +385,7 @@ show_snmp_vacm_view(GString *s,
 	g_string_sprintfa(s, "%c- ", last ? '`' : '|');
 	fmt_storage_type(s, vacmViewEntry->vacmViewTreeFamilyStorageType);
 	fmt_row_status(s, vacmViewEntry->vacmViewTreeFamilyStatus);
-	type = stls_enum_get_label(view_tree_family_type,
+	type = gsnmp_enum_get_label(view_tree_family_type,
 				   *vacmViewEntry->vacmViewTreeFamilyType);
 	g_string_sprintfa(s, " %-4s ", type ? type : "");
 

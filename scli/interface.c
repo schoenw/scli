@@ -20,10 +20,6 @@
  * @(#) $Id$
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "scli.h"
 
 #include "snmpv2-mib.h"
@@ -39,14 +35,14 @@ static void
 fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 	     gint32 *conn, gint32 *prom)
 {
-    static stls_enum_t const admin_states[] = {
+    static GSnmpEnum const admin_states[] = {
 	{ IF_MIB_IFADMINSTATUS_UP,	"U" },
 	{ IF_MIB_IFADMINSTATUS_DOWN,	"D" },
 	{ IF_MIB_IFADMINSTATUS_TESTING,	"T" },
 	{ 0, NULL }
     };
 
-    static stls_enum_t const oper_states[] = {
+    static GSnmpEnum const oper_states[] = {
 	{ IF_MIB_IFOPERSTATUS_UP,		"U" },
 	{ IF_MIB_IFOPERSTATUS_DOWN,		"D" },
 	{ IF_MIB_IFOPERSTATUS_TESTING,		"T" },
@@ -57,13 +53,13 @@ fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 	{ 0, NULL }
     };
 
-    static stls_enum_t const conn_states[] = {
+    static GSnmpEnum const conn_states[] = {
 	{ IF_MIB_IFCONNECTORPRESENT_TRUE,	"C" },
 	{ IF_MIB_IFCONNECTORPRESENT_FALSE,	"N" },
 	{ 0, NULL }
     };
 
-    static stls_enum_t const prom_states[] = {
+    static GSnmpEnum const prom_states[] = {
 	{ IF_MIB_IFPROMISCUOUSMODE_TRUE,	"P" },
 	{ IF_MIB_IFPROMISCUOUSMODE_FALSE,	"N" },
 	{ 0, NULL }
@@ -133,8 +129,8 @@ get_if_type_width(if_mib_ifEntry_t **ifTable)
 	for (i = 0; ifTable[i]; i++) {
 	    if (ifTable[i]->ifType) {
 		char const *label;
-		label = stls_enum_get_label(if_mib_enums_ifType,
-					    *ifTable[i]->ifType);
+		label = gsnmp_enum_get_label(if_mib_enums_ifType,
+					     *ifTable[i]->ifType);
 		if (label && strlen(label) > type_width) {
 		    type_width = strlen(label);
 		}
@@ -246,8 +242,7 @@ show_if_details(GString *s,
 	     (ifXEntry && ifXEntry) ? ifXEntry->ifPromiscuousMode : NULL);
     if (ifEntry->ifLastChange && system && system->sysUpTime) {
 	guint32 dsecs = *(system->sysUpTime) - *(ifEntry->ifLastChange);
-	g_string_sprintfa(s, " Change:  %s\n",
-			  stls_fmt_timeticks(dsecs));
+	g_string_sprintfa(s, " Change:  %s\n", fmt_timeticks(dsecs));
     } else {
 	g_string_append(s, " Change:\n");
     }
@@ -284,10 +279,10 @@ show_if_details(GString *s,
 
 
 
-gint32
-getEntityIndex(gint32 ifIndex,
-	       entity_mib_entAliasMappingEntry_t **entAliasMappingTable,
-	       entity_mib_entPhysicalEntry_t **entPhysicalTable)
+static gint32
+get_entity_index(gint32 ifIndex,
+		 entity_mib_entAliasMappingEntry_t **entAliasMappingTable,
+		 entity_mib_entPhysicalEntry_t **entPhysicalTable)
 {
     int i;
     static const gint32 ifIndex_base[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 1};
@@ -382,8 +377,8 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
 		if (c) {
 		    g_string_append(interp->result, "\n");
 		}
-		(void) getEntityIndex(ifTable[i]->ifIndex,
-				      entAliasMappingTable, entPhysicalTable);
+		(void) get_entity_index(ifTable[i]->ifIndex,
+					entAliasMappingTable, entPhysicalTable);
 		show_if_details(interp->result, ifTable[i],
 				ifXTable ? ifXTable[i] : NULL,
 				system, ipAddrTable);

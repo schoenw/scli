@@ -26,6 +26,8 @@
 #ifndef _STOP_H
 #define _STOP_H
 
+#include "g_snmp.h"
+
 #include <stdlib.h>
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -39,8 +41,6 @@
 #include <curses.h>
 #endif
 #include <time.h>
-
-#include "stools.h"
 
 /*
  * Flags that are passed to the mode driver in order to give him a
@@ -104,6 +104,9 @@ stop_init_ether_mode();
 /*
  * Formatting utilities that are used frequently by scli modes.
  */
+
+extern const char *
+fmt_timeticks(guint32 timeticks);
 
 extern char const *
 fmt_seconds(guint32 secs);

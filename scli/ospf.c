@@ -20,10 +20,6 @@
  * @(#) $Id$
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "scli.h"
 
 #include "ip-mib.h"

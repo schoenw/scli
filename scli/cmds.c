@@ -20,10 +20,6 @@
  * @(#) $Id$
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "scli.h"
 
 #include <readline/history.h>
@@ -38,20 +34,6 @@ static SnmpDebugFlagToStringEntry debug_flag_table[] = {
     { G_SNMP_DEBUG_REQUESTS, "request" },
     { G_SNMP_DEBUG_SESSION, "session" },
     { G_SNMP_DEBUG_TRANSPORT, "transport" },
-    { 0, 0 }
-};
-
-
-
-typedef struct {
-    GSnmpVersion version;
-    gchar        *name;
-} SnmpVersionToStringEntry;
-
-static SnmpVersionToStringEntry version_name_table[] = {
-    { G_SNMP_V1, "SNMPv1" },
-    { G_SNMP_V2C, "SNMPv2c" },
-    { G_SNMP_V3, "SNMPv3" },
     { 0, 0 }
 };
 
@@ -334,7 +316,7 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
     int const indent = 18;
     int rows, cols;
     SnmpDebugFlagToStringEntry *dft;
-    SnmpVersionToStringEntry *vnt;
+    char const *label;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -381,14 +363,12 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 			  "Timeout:", interp->peer->timeout);
 	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
 			  "Community:", interp->peer->rcomm);
-	for (vnt = version_name_table; vnt && vnt->name; vnt++) {
-	    if (vnt->version == interp->peer->version) {
-		g_string_sprintfa(interp->result, "%-*s %s\n", indent,
-				  "Version:", vnt->name);
-		break;
-	    }
-	}
-	if (! vnt || (vnt && ! vnt->name)) {
+	label = gsnmp_enum_get_label(gsnmp_enum_version_table,
+				     interp->peer->version);
+	if (label) {
+	    g_string_sprintfa(interp->result, "%-*s %s\n", indent,
+			      "Version:", label);
+	} else {
 	    g_string_sprintfa(interp->result, "%-*s %d\n", indent,
 			      "Version:", interp->peer->version);
 	}
@@ -477,7 +457,7 @@ void
 scli_init_scli_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-        { "add scli alias", "<name> <value>",
+        { "create scli alias", "<name> <value>",
 	  0,
 	  "create an alias for an scli command",
 	  cmd_scli_alias },

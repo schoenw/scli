@@ -20,10 +20,6 @@
  * @(#) $Id$
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "scli.h"
 
 #include "mau-mib.h"
@@ -92,7 +88,7 @@ static guint32 const dot3MauType1000BaseTHD[]
 static guint32 const dot3MauType1000BaseTFD[]
 	= { MAU_MIB_DOT3MAUTYPE1000BASETFD };
 
-stls_identity_t const mau_type_identities[] = {
+GSnmpIdentity const mau_type_identities[] = {
     { dot3MauTypeAUI,
       sizeof(dot3MauTypeAUI)/sizeof(guint32),
       "AUI" },
@@ -207,9 +203,9 @@ show_ether_mau_info(GString *s, mau_mib_ifMauEntry_t *ifMauEntry)
 
     if (ifMauEntry->ifMauType) {
 	g_string_sprintfa(s, " %s", 
-		  stls_identity_get_label(mau_type_identities,
-					  ifMauEntry->ifMauType,
-					  ifMauEntry->_ifMauTypeLength));
+		  gsnmp_identity_get_label(mau_type_identities,
+					   ifMauEntry->ifMauType,
+					   ifMauEntry->_ifMauTypeLength));
     }
 
     /* ifMauEntry->ifMauTypeListBits */

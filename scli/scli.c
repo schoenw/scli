@@ -23,10 +23,6 @@
  * @(#) $Id$
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "scli.h"
 
 #include <getopt.h>
@@ -165,7 +161,11 @@ generator(char const *text, int state)
 	    }
 	    last_node = g_node_first_child(last_node);
 	}
-	last_elem = (argc < 2) ? interp->alias_list : NULL;
+	if (argc < 2 && !isspace((int) text[strlen(text)-1])) {
+	    last_elem = interp->alias_list;
+	} else {
+	    last_elem = NULL;
+	}
     }
 
     /*
@@ -226,7 +226,7 @@ completion(char *text, int start, int end)
      */
     
     if (! matches) {
-       rl_completion_entry_function = (Function *) completion;
+       rl_completion_entry_function = (rl_compentry_func_t *) completion;
     }
     
     return matches;

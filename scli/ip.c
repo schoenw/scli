@@ -20,10 +20,6 @@
  * @(#) $Id$
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "scli.h"
 
 #include "ip-mib.h"
@@ -68,14 +64,14 @@ show_ip_route(GString *s,
 
 	label = NULL;
 	if (ipRouteEntry->ipRouteType) {
-	    label = stls_enum_get_label(rfc1213_mib_enums_ipRouteType,
-					*ipRouteEntry->ipRouteType);
+	    label = gsnmp_enum_get_label(rfc1213_mib_enums_ipRouteType,
+					 *ipRouteEntry->ipRouteType);
 	}
 	g_string_sprintfa(s, "%-10s", label ? label : "");
 
 	label = NULL;
 	if (ipRouteEntry->ipRouteProto) {
-	    label = stls_enum_get_label(rfc1213_mib_enums_ipRouteProto,
+	    label = gsnmp_enum_get_label(rfc1213_mib_enums_ipRouteProto,
 					*ipRouteEntry->ipRouteProto);
 	}
 	g_string_sprintfa(s, "%-10s", label ? label : "");

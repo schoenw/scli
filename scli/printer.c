@@ -20,10 +20,6 @@
  * @(#) $Id$
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "scli.h"
 
 #include "host-resources-mib.h"
@@ -153,9 +149,9 @@ show_printer_info(GString *s,
 
     if (hrDeviceEntry && hrDeviceEntry->hrDeviceType) {
 	char const *type;
-	type = stls_identity_get_label(host_resources_types_identities,
-				       hrDeviceEntry->hrDeviceType,
-				       hrDeviceEntry->_hrDeviceDescrLength);
+	type = gsnmp_identity_get_label(host_resources_types_identities,
+					hrDeviceEntry->hrDeviceType,
+					hrDeviceEntry->_hrDeviceDescrLength);
 	if (type) {
 	    g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", type);
 	}
@@ -370,7 +366,7 @@ show_printer_alert(GString *s, printer_mib_prtAlertEntry_t *prtAlertEntry)
 
     if (prtAlertEntry->prtAlertTime) {
 	g_string_sprintfa(s, "%-*s %s\n", indent, "Date:",
-			  stls_fmt_timeticks(*prtAlertEntry->prtAlertTime));
+			  fmt_timeticks(*prtAlertEntry->prtAlertTime));
     }
 
     if (prtAlertEntry->prtAlertSeverityLevel) {

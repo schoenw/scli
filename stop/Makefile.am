@@ -3,5 +3,5 @@ bin_PROGRAMS	= stop
 stop_SOURCES	= stop.c stop.h stop.1 \
                   getopt.h getopt.c getopt1.c fmt.c \
 		  interface.c process.c disman.c tcp.c ether.c # snmp.c
-stop_LDADD	= -L../stub -lstub -L../snmp -lsnmp $(GLIB_LIBS)
+stop_LDADD	= -L../stub -lstub -L../snmp -lgsnmp $(GLIB_LIBS)
 man_MANS	= stop.1

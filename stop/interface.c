@@ -124,7 +124,7 @@ show_interface_summary(GSnmpSession *peer)
 		guint32 dsecs = *(system->sysUpTime)
 		    - *(ifMIBObjects->ifTableLastChange);
 		g_string_sprintfa(s, ", last create/delete %s",
-				  stls_fmt_timeticks(dsecs));
+				  fmt_timeticks(dsecs));
 	    }
 	    snmpv2_mib_free_system(system);
 	}

@@ -20,10 +20,6 @@
  * @(#) $Id$
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "scli.h"
 
 #include "bridge-mib.h"
@@ -185,8 +181,8 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 	    }
 	    if (ifTable[i]->ifType) {
 		char const *label;
-		label = stls_enum_get_label(if_mib_enums_ifType,
-					*ifTable[i]->ifType);
+		label = gsnmp_enum_get_label(if_mib_enums_ifType,
+					     *ifTable[i]->ifType);
 		if (label && strlen(label) > type_width) {
 		    type_width = strlen(label);
 		}

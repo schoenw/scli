@@ -28,6 +28,45 @@
 
 
 
+char const *
+fmt_timeticks(guint32 timeticks)
+{
+    static char buffer[80];
+    time_t now, gmt;
+    struct tm *tm;
+    int gmt_offset;
+    
+    now = time(NULL);
+    now -= timeticks/100;
+
+    /*
+     * Get the UTC time (which is basically identically with GMT)
+     * and the local time so that we can compute the UTC offset.
+     * Some C libraries give you the GMT offset in tm_gmtoff but
+     * you can't rely on it.
+     */
+
+    tm = gmtime(&now);
+    tm->tm_isdst = 0;
+    gmt = mktime(tm);
+
+    tm = localtime(&now);
+    tm->tm_isdst = 0;
+    gmt_offset = mktime(tm) - gmt;
+
+    g_snprintf(buffer, sizeof(buffer),
+	       "%04d-%02d-%02d %02d:%02d:%02d %c%02d:%02d",
+	       tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+	       tm->tm_hour, tm->tm_min, tm->tm_sec,
+	       gmt_offset >= 0 ? '+' : '-',
+	       (int) ABS(gmt_offset) / 3600,
+	       (int) (ABS(gmt_offset) / 60) % 60);
+    
+    return buffer;
+}
+
+
+
 static time_t
 date_to_time(guchar *date, gsize len)
 {

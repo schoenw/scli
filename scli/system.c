@@ -20,10 +20,6 @@
  * @(#) $Id$
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "scli.h"
 
 #include "host-resources-mib.h"
@@ -57,7 +53,7 @@ static guint32 const oid_flash_memory[]
 static guint32 const oid_network_disk[]
     = { HOST_RESOURCES_TYPES_HRSTORAGENETWORKDISK };
 
-static stls_identity_t const storage_types[] = {
+static GSnmpIdentity const storage_types[] = {
     { oid_ram,
       sizeof(oid_ram)/sizeof(guint32),
       "ram" },
@@ -90,7 +86,7 @@ static stls_identity_t const storage_types[] = {
 
 
 
-static stls_enum_t const error_strings[] = {
+static GSnmpEnum const error_strings[] = {
     { 0, "noError" },
     { 1, "tooBig" },
     { 2, "noSuchName"},
@@ -191,9 +187,9 @@ xml_system_device(xmlNodePtr root,
     }
 
     if (hrDeviceEntry->hrDeviceType) {
-	type = stls_identity_get_label(host_resources_types_identities,
-				       hrDeviceEntry->hrDeviceType,
-				       hrDeviceEntry->_hrDeviceDescrLength);
+	type = gsnmp_identity_get_label(host_resources_types_identities,
+					hrDeviceEntry->hrDeviceType,
+					hrDeviceEntry->_hrDeviceDescrLength);
 	if (type) {
 	    node = xmlNewChild(tree, NULL, "type", type);
 	}
@@ -226,9 +222,9 @@ show_system_device(GString *s,
     g_string_sprintfa(s, "%-8s", status ? status : "");
 
     if (hrDeviceEntry->hrDeviceType) {
-	type = stls_identity_get_label(host_resources_types_identities,
-				       hrDeviceEntry->hrDeviceType,
-				       hrDeviceEntry->_hrDeviceDescrLength);
+	type = gsnmp_identity_get_label(host_resources_types_identities,
+					hrDeviceEntry->hrDeviceType,
+					hrDeviceEntry->_hrDeviceDescrLength);
 	if (type) {
 	    g_string_sprintfa(s, " (%s) ", type);
 	}
@@ -511,9 +507,9 @@ show_system_storage(GString *s,
     g_return_if_fail(hrStorageEntry);
 
     if (hrStorageEntry->hrStorageType) {
-	type = stls_identity_get_label(storage_types,
-				       hrStorageEntry->hrStorageType,
-				       hrStorageEntry->_hrStorageTypeLength);
+	type = gsnmp_identity_get_label(storage_types,
+					hrStorageEntry->hrStorageType,
+					hrStorageEntry->_hrStorageTypeLength);
     }
 
     if (hrStorageEntry->hrStorageDescr
@@ -697,14 +693,14 @@ cmd_system_info(scli_interp_t *interp, int argc, char **argv)
     if (system) {
 	if (system->sysUpTime) {
 	    g_string_sprintfa(s, "\n%-*s ", indent, "Agent Boot Time:");
-	    g_string_append(s, stls_fmt_timeticks(*(system->sysUpTime)));
+	    g_string_append(s, fmt_timeticks(*(system->sysUpTime)));
 	}
     }
     
     if (hrSystem) {
 	if (hrSystem->hrSystemUptime) {
 	    g_string_sprintfa(s, "\n%-*s ", indent, "System Boot Time:");
-	    g_string_append(s, stls_fmt_timeticks(*(hrSystem->hrSystemUptime)));
+	    g_string_append(s, fmt_timeticks(*(hrSystem->hrSystemUptime)));
 	}
 	if (hrSystem->hrSystemNumUsers) {
 	    g_string_sprintfa(s, "\n%-*s %u", indent, "Users:", 
@@ -836,8 +832,8 @@ conf_system_location(scli_interp_t *interp, int argc, char **argv)
     snmpv2_mib_free_system(system);
     if (interp->peer->error_status) {
 	const char *error;
-	error = stls_enum_get_label(error_strings,
-				    interp->peer->error_status);
+	error = gsnmp_enum_get_label(error_strings,
+				     interp->peer->error_status);
 	g_string_sprintfa(interp->result, "%s at varbind %d\n",
 			  error ? error : "oops",
 			  interp->peer->error_index);

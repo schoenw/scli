@@ -26,6 +26,10 @@
 #ifndef _SCLI_H
 #define _SCLI_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #ifdef HAVE_UNISTD_H
@@ -44,7 +48,7 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/tree.h>
 
-#include "stools.h"
+#include "g_snmp.h"
 
 
 extern char const scli_copyright[];	/* copyright message (surprise) */
@@ -254,6 +258,9 @@ scli_get_ieee_vendor(guint32 prefix);
  * Formatting utilities that are used frequently by scli modes.
  */
 
+extern const char *
+fmt_timeticks(guint32 timeticks);
+
 extern char const *
 fmt_date_and_time(guchar *data, gsize len);
 
@@ -267,10 +274,10 @@ extern char const *
 fmt_kbytes(guint32 kbytes);
 
 extern char const *
-fmt_enum(stls_enum_t const *table, gint32 *number);
+fmt_enum(GSnmpEnum const *table, gint32 *number);
 
 extern void
-xxx_enum(GString *s, int width, stls_enum_t const *table, gint32 *number);
+xxx_enum(GString *s, int width, GSnmpEnum const *table, gint32 *number);
 
 extern char const *
 fmt_kmg(guint32 number);

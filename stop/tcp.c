@@ -107,8 +107,8 @@ show_tcp_connection(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry)
     
     if (tcpConnEntry->tcpConnState) {
 	char const *name;
-	name = stls_enum_get_label(tcp_mib_enums_tcpConnState,
-				   *tcpConnEntry->tcpConnState);
+	name = gsnmp_enum_get_label(tcp_mib_enums_tcpConnState,
+				    *tcpConnEntry->tcpConnState);
 	if (name) {
 	    g_string_sprintfa(s, "%s", name);
 	} else {

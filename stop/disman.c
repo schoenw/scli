@@ -36,7 +36,7 @@ fmt_run_state(GString *s, gint32 *state)
 {
     char const *name;
 
-    static stls_enum_t const run_states[] = {
+    static GSnmpEnum const run_states[] = {
 	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_INITIALIZING,	"I" },
 	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_EXECUTING,	"R" },
 	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_SUSPENDING,	"U" },
@@ -52,7 +52,7 @@ fmt_run_state(GString *s, gint32 *state)
 	return;
     }
     
-    name = stls_enum_get_label(run_states, *state);
+    name = gsnmp_enum_get_label(run_states, *state);
     if (name) {
 	g_string_append(s, name);
     } else {
@@ -66,7 +66,7 @@ fmt_exit_code(GString *s, gint32 *code)
 {
     char const *name;
 
-    static stls_enum_t const exit_codes[] = {
+    static GSnmpEnum const exit_codes[] = {
 	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_NOERROR,		"N" },
 	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_HALTED,		"H" },
 	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_LIFETIMEEXCEEDED,	"T" },
@@ -84,7 +84,7 @@ fmt_exit_code(GString *s, gint32 *code)
 	return;
     }
     
-    name = stls_enum_get_label(exit_codes, *code);
+    name = gsnmp_enum_get_label(exit_codes, *code);
     if (name) {
 	g_string_append(s, name);
     } else {
