@@ -34,10 +34,34 @@
 #endif
 
 
-char const scli_copyright[] = "(c) 2001 Juergen Schoenwaelder";
+char const scli_copyright[] = "(c) 2001-2002 Juergen Schoenwaelder";
 
 static int scli_curses_running = 0;
 
+
+struct error_info {
+    const int code;
+    const char *fmt;
+};
+
+static const struct error_info error_infos[] = {
+    { SCLI_MSG,			"%s" },
+    { SCLI_OK,			"ok" },
+    { SCLI_EXIT,		"ok" },
+    { SCLI_ERROR,		"%s" },
+    { SCLI_ERROR_NOPEER,	"no association to a remote SNMP agent" },
+    { SCLI_ERROR_NOXML,		"command `%s' does not support xml" },
+    { SCLI_SYNTAX,		NULL },
+    { SCLI_SYNTAX_NUMARGS,	NULL },
+    { SCLI_SYNTAX_REGEXP,	"invalid regular expression" },
+    { SCLI_SYNTAX_NUMBER,	"invalid number" },
+    { SCLI_SYNTAX_VALUE,	"invalid value" },
+    { SCLI_SYNTAX_TOKENIZER,	NULL },
+    { SCLI_SYNTAX_COMMAND,	NULL },
+    { SCLI_SNMP,		NULL },
+    { SCLI_SNMP_NAME,		"name lookup failed" },
+    { 0, NULL }
+};
 
 
 void
@@ -207,6 +231,7 @@ scli_interp_create()
     interp->result = g_string_new(NULL);
     interp->header = g_string_new(NULL);
     interp->epoch = time(NULL);
+    interp->regex_flags = REG_EXTENDED|REG_NOSUB;
 
     return interp;
 }
@@ -558,6 +583,123 @@ get_xml_tree(scli_interp_t *interp, char *xpath)
 
 
 
+static void
+show_result(scli_interp_t *interp, int code)
+{
+    xmlChar *buffer;
+    int len;
+
+    if (scli_interp_xml(interp)) {
+	xmlDocDumpFormatMemory(interp->xml_doc, &buffer, &len, 1);
+	g_string_truncate(interp->header, 0);
+	g_string_assign(interp->result, buffer);
+	xmlFree(buffer);
+    }
+    if (! scli_interp_recursive(interp) && interp->header->len) {
+	g_string_prepend_c(interp->result, '\n');
+	g_string_prepend(interp->result, interp->header->str);
+    }
+    page(interp, interp->result);
+}
+
+
+
+static void
+show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
+{
+    int i;
+    gchar *reason = NULL;
+
+    for (i = 0; error_infos[i].code; i++) {
+	if (error_infos[i].code == code) break;
+    }
+    g_assert(error_infos[i].code);
+    
+    switch (code) {
+    case SCLI_SYNTAX_VALUE:
+    case SCLI_SYNTAX_NUMBER:
+    case SCLI_SYNTAX_REGEXP:
+	reason = g_strdup_printf(error_infos[i].fmt);
+	break;
+    case SCLI_SYNTAX_NUMARGS:
+	reason = g_strdup_printf("wrong number of arguments: should be `%s%s%s'",
+		cmd->path,
+		cmd->options ? " " : "",
+		cmd->options ? cmd->options : "");
+	break;
+    case SCLI_SYNTAX:
+	reason = g_strdup_printf("%3d usage: %s %s", code, cmd->path,
+				 cmd->options ? cmd->options : "");
+	break;
+    case SCLI_SNMP:
+	if (interp->peer) {
+	    const char *error;
+	    error = gsnmp_enum_get_label(gsnmp_error_status_table,
+					 interp->peer->error_status);
+	    reason = g_strdup_printf("%s", error ? error : "internalError");
+#if 0
+	    if ((int) (interp->peer->error_status) > 0) {
+		g_print("@%d", interp->peer->error_index);
+	    }
+#endif
+	} else {
+	    reason = g_strdup("SNMP communication error (timeout)");
+	}
+	break;
+
+    case SCLI_SNMP_NAME:
+	reason = g_strdup_printf("%s", error_infos[i].fmt);
+	break;
+    case SCLI_ERROR:
+	reason = g_strdup_printf(error_infos[i].fmt,
+			 interp->result->str ? interp->result->str : "");
+	break;
+    case SCLI_ERROR_NOPEER:
+	reason = g_strdup_printf(error_infos[i].fmt);
+	break;
+    case SCLI_ERROR_NOXML:
+	reason = g_strdup_printf(error_infos[i].fmt, cmd->path);
+	break;
+    case SCLI_OK:
+    case SCLI_EXIT:
+	reason = g_strdup("ok");
+	break;
+    }
+
+    if (scli_interp_xml(interp)) {
+	if (code != SCLI_OK && code != SCLI_EXIT) {
+	    scli_interp_reset(interp);
+	}
+	if (interp->xml_doc && interp->xml_doc->children) {
+	    xmlNodePtr top = interp->xml_doc->children;
+	    xml_set_prop(top, "code", "%3d", code);
+	    if (reason) {
+		xml_set_prop(top, "reason", "%s", reason);
+	    }
+	}
+	if (! (scli_interp_recursive(interp))) {
+	    show_result(interp, code);
+	}
+    } else {
+	if (code == SCLI_OK || code == SCLI_EXIT) {
+	    if (! (scli_interp_recursive(interp))
+		&& ! (cmd->flags & SCLI_CMD_FLAG_MONITOR)) {
+		show_result(interp, code);
+	    }
+	} else {
+	    g_printerr("%s\n", reason);
+	}
+    }
+
+    if (reason) g_free(reason);
+
+    if (code == SCLI_EXIT) {
+	interp->flags &= ~SCLI_INTERP_FLAG_RECURSIVE;
+    }
+}
+
+
+
 static int
 eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 {
@@ -623,15 +765,14 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
     g_string_truncate(interp->header, 0);
     if (! scli_interp_dry(interp)
 	&& cmd->flags & SCLI_CMD_FLAG_NEED_PEER && ! interp->peer) {
-	g_print("%3d no association to a remote SNMP agent\n", SCLI_ERROR);
-	return SCLI_ERROR;
+	code = SCLI_ERROR_NOPEER;
+	goto done;
     }
 
     if (scli_interp_xml(interp) && ! (cmd->flags & SCLI_CMD_FLAG_XML)) {
 	if (! scli_interp_recursive(interp)) {
-	    g_print("%3d command \"%s\" does not support xml\n", SCLI_ERROR,
-		    cmd->path);
-	    return SCLI_ERROR;
+	    code = SCLI_ERROR_NOXML;
+	    goto done;
 	} else {
 	    return SCLI_OK;
 	}
@@ -658,74 +799,8 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 	}
     }
 
-    switch (code) {
-    case SCLI_SYNTAX_VALUE:
-	g_print("%3d invalid value\n", code);
-	break;
-    case SCLI_SYNTAX_NUMBER:
-	g_print("%3d invalid number\n", code);
-	break;
-    case SCLI_SYNTAX_REGEXP:
-	g_print("%3d invalid regular expression\n", code);
-	break;
-    case SCLI_SYNTAX_NUMARGS:
-	g_print("%3d wrong number of arguments: should be \"%s%s%s\"\n", code,
-		cmd->path,
-		cmd->options ? " " : "",
-		cmd->options ? cmd->options : "");
-	break;
-    case SCLI_SYNTAX:
-	g_print("%3d usage: %s %s\n", code, cmd->path,
-		cmd->options ? cmd->options : "");
-	break;
-    case SCLI_SNMP:
-	g_print("%3d", code);
-	if (interp->peer) {
-	    const char *error;
-	    error = gsnmp_enum_get_label(gsnmp_error_status_table,
-					 interp->peer->error_status);
-	    g_print(" %s", error ? error : "internalError");
-	    if ((int) (interp->peer->error_status) > 0) {
-		g_print("@%d", interp->peer->error_index);
-	    }
-	} else {
-	    g_print(" SNMP communication error (timeout)");
-	}
-	g_print("\n");
-	break;
-    case SCLI_SNMP_NAME:
-	g_print("%3d name lookup failed\n", SCLI_SNMP_NAME);
-	break;
-    case SCLI_ERROR:
-	g_print("%3d %s\n", code,
-		interp->result->str ? interp->result->str : "");
-	break;
-    case SCLI_OK:
-    case SCLI_EXIT:
-	if (! (scli_interp_recursive(interp))
-	    && ! (cmd->flags & SCLI_CMD_FLAG_MONITOR)) {
-	    if (scli_interp_xml(interp)) {
-		xmlChar *buffer;
-		int len;
-		g_print("%3d xml document follows\n", code);
-		xmlDocDumpFormatMemory(interp->xml_doc, &buffer, &len, 1);
-		g_string_truncate(interp->header, 0);
-		g_string_assign(interp->result, buffer);
-		xmlFree(buffer);
-	    } else {
-		if (interp->header->len) {
-		    g_string_prepend_c(interp->result, '\n');
-		    g_string_prepend(interp->result, interp->header->str);
-		}
-	    }
-	    page(interp, interp->result);
-	}
-	if (code == SCLI_EXIT) {
-	    interp->flags &= ~SCLI_INTERP_FLAG_RECURSIVE;
-	}
-	break;
-    }
-
+ done:
+    show_xxx(interp, cmd, code);
     return code;
 }
 
@@ -767,23 +842,17 @@ scli_eval_argc_argv(scli_interp_t *interp, int argc, char **argv)
 	    GString *s;
 	    done = TRUE;
 	    interp->flags |= SCLI_INTERP_FLAG_RECURSIVE;
-	    s = g_string_new(NULL);
 	    if (scli_interp_interactive(interp)) {
 		snmp_decode_hook(NULL);
 		g_snmp_list_decode_hook = snmp_decode_hook;
 	    } else {
 		g_snmp_list_decode_hook = NULL;
 	    }
+	    s = g_string_new(NULL);
 	    code = eval_all_cmd_node(interp, node, s);
-	    if (scli_interp_xml(interp)) {
-		xmlChar *buffer;
-		int len;
-		xmlDocDumpFormatMemory(interp->xml_doc, &buffer, &len, 1);
-		g_string_append(s, buffer);
-		xmlFree(buffer);
-	    }
-	    page(interp, s);
+	    g_string_assign(interp->result, s->str);
 	    g_string_free(s, 1);
+	    show_result(interp, code);
 	    scli_interp_reset(interp);
 	    interp->flags &= ~SCLI_INTERP_FLAG_RECURSIVE;
 	}
@@ -1017,14 +1086,10 @@ scli_prompt(scli_interp_t *interp)
 {
     char *prompt;
     
-    prompt = g_malloc0(20
-		       + (interp->peer ? strlen(interp->peer->taddress) : 0));
     if (interp->peer) {
-	strcat(prompt, "(");
-	strcat(prompt, interp->peer->taddress);
-	strcat(prompt, ") scli > ");
+	prompt = g_strdup_printf("(%s) scli > ", interp->peer->taddress);
     } else {
-	strcat(prompt, "scli > ");
+	prompt = g_strdup_printf("scli > ");
     }
 
     return prompt;
