@@ -29,7 +29,9 @@ static void
 fmt_vlanStatus(GString *s, productmib_a3ComVlanIfEntry_t *vlanEntry)
 {
     static GSnmpEnum const a3ComVlanIfStatus[] = {
-	{ PRODUCTMIB_A3COMVLANIFSTATUS_ACTIVE,	"A" },
+	{ PRODUCTMIB_A3COMVLANIFSTATUS_ACTIVE,		"A" },
+	{ PRODUCTMIB_A3COMVLANIFSTATUS_NOTINSERVICE,	"S" },
+	{ PRODUCTMIB_A3COMVLANIFSTATUS_NOTREADY,	"R" },
 	{ 0, NULL }
     };
     
