@@ -58,7 +58,7 @@ static const struct error_info error_infos[] = {
     { SCLI_SYNTAX_VALUE,	"invalid value" },
     { SCLI_SYNTAX_TOKENIZER,	NULL },
     { SCLI_SYNTAX_COMMAND,	NULL },
-    { SCLI_SNMP,		NULL },
+    { SCLI_SNMP,		"SNMP communication error (timeout)" },
     { SCLI_SNMP_NAME,		"name lookup failed" },
     { 0, NULL }
 };
@@ -222,11 +222,12 @@ page(scli_interp_t *interp, GString *s)
 
 
 scli_interp_t*
-scli_interp_create()
+scli_interp_create(char *name)
 {
     scli_interp_t *interp;
 
     interp = g_malloc0(sizeof(scli_interp_t));
+    interp->name = name ? g_strdup(name) : NULL;
     interp->cmd_root = g_node_new(NULL);
     interp->result = g_string_new(NULL);
     interp->header = g_string_new(NULL);
@@ -243,6 +244,9 @@ void
 scli_interp_delete(scli_interp_t *interp)
 {
     if (interp) {
+	if (interp->name) {
+	    g_free(interp->name);
+	}
 	if (interp->cmd_root) {
 	    g_node_destroy(interp->cmd_root);
 	}
@@ -260,6 +264,32 @@ scli_interp_delete(scli_interp_t *interp)
 	}
 	g_free(interp);
     }
+}
+
+
+
+void scli_interp_init(scli_interp_t *interp)
+{
+    scli_init_scli_mode(interp);
+    scli_init_system_mode(interp);
+    scli_init_entity_mode(interp);
+    scli_init_disman_mode(interp);
+    scli_init_snmp_mode(interp);
+    scli_init_ip_mode(interp);
+    scli_init_udp_mode(interp);
+    scli_init_tcp_mode(interp);
+    scli_init_interface_mode(interp);
+    scli_init_bridge_mode(interp);
+    scli_init_atm_mode(interp);
+    scli_init_ether_mode(interp);
+    scli_init_ospf_mode(interp);
+    scli_init_printer_mode(interp);
+    scli_init_isdn_mode(interp);
+    scli_init_rs232_mode(interp);
+    scli_init_cisco_mode(interp);
+    scli_init_nortel_mode(interp);
+    scli_init_netsnmp_mode(interp);
+    scli_init_3com_mode(interp);
 }
 
 
@@ -648,13 +678,14 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
     case SCLI_SYNTAX_VALUE:
     case SCLI_SYNTAX_NUMBER:
     case SCLI_SYNTAX_REGEXP:
-	reason = g_strdup_printf(error_infos[i].fmt);
+	reason = g_strdup_printf("%3d %s", code, error_infos[i].fmt);
 	break;
     case SCLI_SYNTAX_NUMARGS:
-	reason = g_strdup_printf("wrong number of arguments: should be `%s%s%s'",
-		cmd->path,
-		cmd->options ? " " : "",
-		cmd->options ? cmd->options : "");
+	reason = g_strdup_printf("%3d wrong number of arguments: should be `%s%s%s'",
+				 code,
+				 cmd->path,
+				 cmd->options ? " " : "",
+				 cmd->options ? cmd->options : "");
 	break;
     case SCLI_SYNTAX:
 	reason = g_strdup_printf("%3d usage: %s %s", code, cmd->path,
@@ -665,33 +696,34 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 	    const char *error;
 	    error = gsnmp_enum_get_label(gsnmp_enum_error_table,
 					 interp->peer->error_status);
-	    reason = g_strdup_printf("%s", error ? error : "internalError");
+	    reason = g_strdup_printf("%3d %s", code,
+				     error ? error : "internalError");
 #if 0
 	    if ((int) (interp->peer->error_status) > 0) {
 		g_print("@%d", interp->peer->error_index);
 	    }
 #endif
 	} else {
-	    reason = g_strdup("SNMP communication error (timeout)");
+	    reason = g_strdup_printf("%3d %s", code, error_infos[i].fmt);
 	}
 	break;
 
     case SCLI_SNMP_NAME:
-	reason = g_strdup_printf("%s", error_infos[i].fmt);
+	reason = g_strdup_printf("%3d %s", code, error_infos[i].fmt);
 	break;
-    case SCLI_ERROR:
+    case SCLI_ERROR:	/* xxx put the code into the output format */
 	reason = g_strdup_printf(error_infos[i].fmt,
 			 interp->result->str ? interp->result->str : "");
 	break;
-    case SCLI_ERROR_NOPEER:
-	reason = g_strdup_printf(error_infos[i].fmt);
+    case SCLI_ERROR_NOPEER: 
+	reason = g_strdup_printf("%3d %s", code, error_infos[i].fmt);
 	break;
-    case SCLI_ERROR_NOXML:
+    case SCLI_ERROR_NOXML: /* xxx put the code into the output format */
 	reason = g_strdup_printf(error_infos[i].fmt, cmd->path);
 	break;
     case SCLI_OK:
     case SCLI_EXIT:
-	reason = g_strdup("ok");
+	reason = g_strdup_printf("%3d %s", code, error_infos[i].fmt);
 	break;
     }
 

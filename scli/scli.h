@@ -176,9 +176,11 @@ struct scli_alarm {
 #define SCLI_INTERP_FLAG_DRY		0x20
 
 struct scli_interp {
+    char *name;			/* name of the interpreter */
     GNode *cmd_root;		/* root of the command tree */
     GSList *mode_list;		/* list of registered modes */
     GSList *alias_list;		/* list of command aliases */
+    GSList *interp_list;	/* list of slave interpreters */
     GSList *alarm_list;		/* list of detected alarms */
     int	flags;			/* interpreter flags */
     GString *result;		/* string result buffer */
@@ -196,10 +198,13 @@ struct scli_interp {
 };
 
 extern scli_interp_t *
-scli_interp_create(void);
+scli_interp_create(char *name);
 
 extern void
 scli_interp_delete(scli_interp_t *interp);
+
+extern void
+scli_interp_init(scli_interp_t *interp);
 
 extern void
 scli_interp_reset(scli_interp_t *interp);

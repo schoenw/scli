@@ -435,7 +435,7 @@ main(int argc, char **argv)
      * Initialize the interpreter. Register the toplevel commands.
      */
 
-    interp = scli_interp_create();
+    interp = scli_interp_create(NULL);
 
     if (file == NULL && cmd == NULL && isatty(0)) {
 	interp->flags |= SCLI_INTERP_FLAG_INTERACTIVE;
@@ -463,26 +463,7 @@ main(int argc, char **argv)
 	}
     }
 
-    scli_init_scli_mode(interp);
-    scli_init_system_mode(interp);
-    scli_init_entity_mode(interp);
-    scli_init_disman_mode(interp);
-    scli_init_snmp_mode(interp);
-    scli_init_ip_mode(interp);
-    scli_init_udp_mode(interp);
-    scli_init_tcp_mode(interp);
-    scli_init_interface_mode(interp);
-    scli_init_bridge_mode(interp);
-    scli_init_atm_mode(interp);
-    scli_init_ether_mode(interp);
-    scli_init_ospf_mode(interp);
-    scli_init_printer_mode(interp);
-    scli_init_isdn_mode(interp);
-    scli_init_rs232_mode(interp);
-    scli_init_cisco_mode(interp);
-    scli_init_nortel_mode(interp);
-    scli_init_netsnmp_mode(interp);
-    scli_init_3com_mode(interp);
+    scli_interp_init(interp);
 
     if (optind < argc) {
 	char *margv[] = { "open", NULL, NULL, NULL };
