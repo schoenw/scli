@@ -28,7 +28,6 @@
 #include "ip-mib.h"
 #include "entity-mib.h"
 
-#include <regex.h>
 
 
 #define IF_MIB_IFENTRY_CONFIG \
@@ -551,7 +550,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 
     if (argc == 2) {
 	regex_iface = &_regex_iface;
-	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -687,7 +686,7 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
 
     if (argc == 2) {
 	regex_iface = &_regex_iface;
-	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -803,7 +802,7 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
 
     if (argc == 2) {
 	regex_iface = &_regex_iface;
-	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -882,7 +881,7 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 
     if (argc == 2) {
 	regex_iface = &_regex_iface;
-	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -1024,7 +1023,7 @@ foreach_interface(scli_interp_t *interp, char *regex,
     regex_t _regex_iface, *regex_iface = &_regex_iface;
     int i;
 
-    if (regcomp(regex_iface, regex, REG_EXTENDED|REG_NOSUB) != 0) {
+    if (regcomp(regex_iface, regex, interp->regex_flags) != 0) {
 	return SCLI_SYNTAX_REGEXP;
     }
 

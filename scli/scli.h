@@ -44,6 +44,7 @@
 #else
 #include <curses.h>
 #endif
+#include <regex.h>
 
 #include <libxml/xmlmemory.h>
 #include <libxml/tree.h>
@@ -152,6 +153,7 @@ struct scli_interp {
     GSnmpSession *peer;		/* snmp peer we are talking to */
     gint delay;			/* delay between updates in milliseconds */
     time_t epoch;		/* epoch used to invalidate cached data */
+    int regex_flags;		/* regular expression flags (see regcomp(3)) */
 };
 
 extern scli_interp_t *

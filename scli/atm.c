@@ -25,7 +25,6 @@
 #include "atm-mib.h"
 #include "if-mib.h"
 
-#include <regex.h>
 
 
 static int
@@ -102,7 +101,7 @@ show_atm_interface_info(scli_interp_t *interp, int argc, char **argv)
 
     if (argc == 2) {
 	regex_iface = &_regex_iface;
-	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -250,7 +249,7 @@ show_atm_interface_details(scli_interp_t *interp, int argc, char **argv)
 
     if (argc == 2) {
 	regex_iface = &_regex_iface;
-	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }

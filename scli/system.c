@@ -30,7 +30,7 @@
 #include "disman-script-mib.h"
 
 #include <ctype.h>
-#include <regex.h>
+
 
 
 static GSnmpEnum const dot1dBaseType[] = {
@@ -268,9 +268,18 @@ match_process(regex_t *regex_path,
      */
 
     if (hrSWRunEntry->hrSWRunPath) {
-	char *s = g_strdup_printf("%.*s",
-				  (int) hrSWRunEntry->_hrSWRunPathLength,
-				  hrSWRunEntry->hrSWRunPath);
+	char *s;
+	if (hrSWRunEntry->hrSWRunParameters) {
+	    s = g_strdup_printf("%.*s %.*s",
+				(int) hrSWRunEntry->_hrSWRunPathLength,
+				hrSWRunEntry->hrSWRunPath,
+				(int) hrSWRunEntry->_hrSWRunParametersLength,
+				hrSWRunEntry->hrSWRunParameters);
+	} else {
+	    s = g_strdup_printf("%.*s",
+				(int) hrSWRunEntry->_hrSWRunPathLength,
+				hrSWRunEntry->hrSWRunPath);
+	}
 	status = regexec(regex_path, s, (size_t) 0, NULL, 0);
 	g_free(s);
 	if (status == 0) {
@@ -545,7 +554,7 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 
     if (argc == 2) {
 	regex_path = &_regex_path;
-	if (regcomp(regex_path, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	if (regcomp(regex_path, argv[1], interp->regex_flags) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }

@@ -23,8 +23,14 @@
 #include "scli.h"
 
 #include <ctype.h>
-#include <regex.h>
 #include <readline/history.h>
+
+
+static GSnmpEnum const scli_regex_table[] = {
+    { REG_EXTENDED,      "extended" },
+    { REG_ICASE,	 "case-insensitive" },
+    { 0, 0 }
+};
 
 
 
@@ -123,7 +129,7 @@ show_scli_modes(scli_interp_t *interp, int argc, char **argv)
 
     if (argc == 2) {
 	regex_mode = &_regex_mode;
-	if (regcomp(regex_mode, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	if (regcomp(regex_mode, argv[1], interp->regex_flags) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -174,7 +180,7 @@ show_scli_schema(scli_interp_t *interp, int argc, char **argv)
 
     if (argc == 2) {
 	regex_mode = &_regex_mode;
-	if (regcomp(regex_mode, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	if (regcomp(regex_mode, argv[1], interp->regex_flags) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -244,7 +250,7 @@ help(scli_interp_t *interp, int argc, char **argv)
       " - dump         Dump scli command sequences to restore configurations.\n"
       "\n"
       "Use the \"show scli commands\" command to browse the complete\n"
-      "scli command tree and \"show scli modes\" command to obtain\n"
+      "scli command tree and the \"show scli modes\" command to obtain\n"
       "a detailed description of the various scli commands.\n");
     
     return SCLI_OK;
@@ -435,7 +441,7 @@ delete_scli_alias(scli_interp_t *interp, int argc, char **argv)
     }
     
     regex_name = &_regex_name;
-    if (regcomp(regex_name, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+    if (regcomp(regex_name, argv[1], interp->regex_flags) != 0) {
 	return SCLI_SYNTAX_REGEXP;
     }
     
@@ -503,7 +509,7 @@ static int
 show_scli_info(scli_interp_t *interp, int argc, char **argv)
 {
     int const indent = 18;
-    int rows, cols;
+    int rows, cols, c;
     GSnmpEnum const *dft;
     char const *label;
 
@@ -528,15 +534,23 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
     g_string_sprintfa(interp->result, "%-*s %d seconds\n", indent, "Delay:",
 		      interp->delay / 1000);
 
-    if (g_snmp_debug_flags) {
-	g_string_sprintfa(interp->result, "%-*s ", indent, "Debugging:");
-	for (dft = gsnmp_enum_debug_table; dft && dft->label; dft++) {
-	    if (g_snmp_debug_flags & dft->number) {
-		g_string_sprintfa(interp->result, "%s ", dft->label);
-	    }
+    g_string_sprintfa(interp->result, "%-*s ", indent, "Regex:");
+    for (dft = scli_regex_table, c = 0; dft && dft->label; dft++) {
+	if (interp->regex_flags & dft->number) {
+	    g_string_sprintfa(interp->result, "%s%s", c ? "|" : "", dft->label);
+	    c++;
 	}
-	g_string_append(interp->result, "\n");
     }
+    g_string_append(interp->result, "\n");
+
+    g_string_sprintfa(interp->result, "%-*s ", indent, "Debugging:");
+    for (dft = gsnmp_enum_debug_table, c = 0; dft && dft->label; dft++) {
+	if (g_snmp_debug_flags & dft->number) {
+	    g_string_sprintfa(interp->result, "%s%s", c ? "|" : "", dft->label);
+	    c++;
+	}
+    }
+    g_string_append(interp->result, "\n");
 
     scli_get_screen(&rows, &cols);
     g_string_sprintfa(interp->result, "%-*s %d\n", indent,
@@ -580,6 +594,41 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
+set_scli_regex(scli_interp_t *interp, int argc, char **argv)
+{
+    int flags = 0;
+    GSnmpEnum const *dft;
+    regex_t _regex_flags, *regex_flags = NULL;
+
+    if (argc > 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (argc == 1) {
+	interp->regex_flags = 0;
+	return SCLI_OK;
+    }
+    
+    regex_flags = &_regex_flags;
+    if (regcomp(regex_flags, argv[1], interp->regex_flags) != 0) {
+	return SCLI_SYNTAX_REGEXP;
+    }
+
+    for (dft = scli_regex_table; dft && dft->label; dft++) {
+	if (regexec(regex_flags, dft->label, (size_t) 0, NULL, 0) == 0) {
+	    flags |= dft->number;
+	}
+    }
+    interp->regex_flags = flags;
+    
+    if (regex_flags) regfree(regex_flags);
+
+    return SCLI_OK;
+}
+
+
+
+static int
 set_scli_debugging(scli_interp_t *interp, int argc, char **argv)
 {
     GSnmpDebugFlags flags = 0;
@@ -598,7 +647,7 @@ set_scli_debugging(scli_interp_t *interp, int argc, char **argv)
     }
     
     regex_flags = &_regex_flags;
-    if (regcomp(regex_flags, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+    if (regcomp(regex_flags, argv[1], interp->regex_flags) != 0) {
 	return SCLI_SYNTAX_REGEXP;
     }
     
@@ -897,6 +946,20 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  delete_scli_alias },
 	
+	{ "set scli regex", "[<regexp>]",
+	  "The set scli regex command controls how scli matches regular\n"
+	  "expressions. The optional regular expression <regexp> is\n"
+	  "matched against the regular expression options. A successful\n"
+	  "match turns a regular expression option on while an unsuccessful\n"
+          "match turns a regular expression option off. Invoking the command\n"
+	  "without the <regexp> argument will turn all regular expression\n"
+	  "options off. The currently defined regular expression options\n"
+	  "are \"extended\" for POSIX extended regular expressions and\n"
+	  "\"case-insensitive\" case insensitive matches.",
+	  SCLI_CMD_FLAG_XML,
+	  "", NULL,
+	  set_scli_regex },
+	
 	{ "set scli debugging", "[<regexp>]",
 	  "The set scli debugging command sets the debugging level of\n"
 	  "the SNMP engine. The optional regular expression <regexp> is\n"
@@ -905,8 +968,9 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "debugging level off. Invoking the command without the <regexp>\n"
 	  "argument will turn all debugging levels off. The currently\n"
 	  "defined debugging levels are \"session\" for the SNMP session\n"
-	  "layer, \"request\" for the SNMP request handling layer, and\n"
-	  "\"transport\" for the SNMP transport layer.",
+	  "layer, \"request\" for the SNMP request handling layer, \n"
+	  "\"transport\" for the SNMP transport layer, \"packet\" for\n"
+	  "the SNMP packet layer, and \"asn1\" for the ASN.1 coding layer.",
 	  SCLI_CMD_FLAG_XML,
 	  "", NULL,
 	  set_scli_debugging },

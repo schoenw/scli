@@ -25,7 +25,6 @@
 #include "rapid-city.h"
 #include "rapid-city-proc.h"
 
-#include <regex.h>
 
 
 static GSnmpEnum const vlan_priority[] = {
@@ -481,7 +480,7 @@ show_nortel_bridge_vlan_details(scli_interp_t *interp, int argc, char **argv)
 
     if (argc == 2) {
 	regex_vlan = &_regex_vlan;
-	if (regcomp(regex_vlan, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	if (regcomp(regex_vlan, argv[1], interp->regex_flags) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -574,7 +573,7 @@ show_nortel_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
 
     if (argc == 2) {
 	regex_vlan = &_regex_vlan;
-	if (regcomp(regex_vlan, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	if (regcomp(regex_vlan, argv[1], interp->regex_flags) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -724,7 +723,7 @@ delete_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     }
 
     regex_vlan = &_regex_vlan;
-    if (regcomp(regex_vlan, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+    if (regcomp(regex_vlan, argv[1], interp->regex_flags) != 0) {
 	return SCLI_SYNTAX_REGEXP;
     }
 
@@ -807,7 +806,7 @@ set_nortel_bridge_vlan_ports(scli_interp_t *interp, int argc, char **argv)
     }
 
     regex_vlan = &_regex_vlan;
-    if (regcomp(regex_vlan, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+    if (regcomp(regex_vlan, argv[1], interp->regex_flags) != 0) {
 	return SCLI_SYNTAX_REGEXP;
     }
 
