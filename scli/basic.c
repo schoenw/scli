@@ -47,7 +47,7 @@ struct error_info {
 static const struct error_info error_infos[] = {
     { SCLI_MSG,			"%s" },
     { SCLI_OK,			"ok" },
-    { SCLI_EXIT,		"ok" },
+    { SCLI_EXIT,		"exiting" },
     { SCLI_ERROR,		"%s" },
     { SCLI_ERROR_NOPEER,	"no association to a remote SNMP agent" },
     { SCLI_ERROR_NOXML,		"command `%s' does not support xml" },
@@ -707,7 +707,6 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 	    reason = g_strdup(error_infos[i].fmt);
 	}
 	break;
-
     case SCLI_SNMP_NAME:
 	reason = g_strdup(error_infos[i].fmt);
 	break;
@@ -744,12 +743,18 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 	}
 	if (! (scli_interp_recursive(interp))) {
 	    show_result(interp, code);
+	    if (scli_interp_proto(interp)) {
+		g_printerr("%3d %s\n", code, reason);
+	    }
 	}
     } else {
 	if (code == SCLI_OK || code == SCLI_EXIT) {
 	    if (! (scli_interp_recursive(interp))
 		&& ! (cmd->flags & SCLI_CMD_FLAG_MONITOR)) {
 		show_result(interp, code);
+		if (scli_interp_proto(interp)) {
+		    g_printerr("%3d %s\n", code, reason);
+		}
 	    }
 	} else {
 	    g_printerr("%3d %s\n", code, reason);
@@ -920,6 +925,9 @@ scli_eval_argc_argv(scli_interp_t *interp, int argc, char **argv)
 	    g_string_assign(interp->result, s->str);
 	    g_string_free(s, 1);
 	    show_result(interp, code);
+	    if (scli_interp_proto(interp)) {
+		g_printerr("%3d xxx\n", code);
+	    }
 	    scli_interp_reset(interp);
 	    interp->flags &= ~SCLI_INTERP_FLAG_RECURSIVE;
 	}
