@@ -1,7 +1,7 @@
 /* 
  * 3com.c -- scli 3com mode implementation
  *
- * Copyright (C) 2001 Juergen Schoenwaelder
+ * Copyright (C) 2002 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,22 @@
 #include "scli.h"
 
 #include "productmib.h"
+
+
+static void
+fmt_vlanStatus(GString *s, productmib_a3ComVlanIfEntry_t *vlanEntry)
+{
+    static GSnmpEnum const a3ComVlanIfStatus[] = {
+	{ PRODUCTMIB_A3COMVLANIFSTATUS_ACTIVE,	"A" },
+	{ 0, NULL }
+    };
+    
+    const char *e;
+    
+    e = fmt_enum(a3ComVlanIfStatus, vlanEntry->a3ComVlanIfStatus);
+    g_string_sprintfa(s, "%s   ", e ? e : "-");
+}
+
 
 
 static int
@@ -76,6 +92,8 @@ fmt_3com_bridge_vlan_info(GString *s,
 		      vlanEntry->a3ComVlanIfGlobalIdentifier
 		      ? *vlanEntry->a3ComVlanIfGlobalIdentifier : 0);
 
+    fmt_vlanStatus(s, vlanEntry);
+    
     if (vlanEntry->a3ComVlanIfDescr && vlanEntry->_a3ComVlanIfDescrLength) {
 	g_string_sprintfa(s, "  %-*.*s ", name_width,
 			  (int) vlanEntry->_a3ComVlanIfDescrLength,
