@@ -954,7 +954,7 @@ xml_printer_path(xmlNodePtr root,
 	if (e) xml_set_prop(node, "unit", "%s", e);
     }
 
-    xml_media_dimensions(tree, "min-dimension",
+    xml_media_dimensions(tree, "min-dimensions",
 			 prtPathEntry->prtMediaPathMinMediaFeedDir,
 			 prtPathEntry->prtMediaPathMinMediaXFeedDir,
 			 prtPathEntry->prtMediaPathMediaSizeUnit,
