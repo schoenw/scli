@@ -29,8 +29,10 @@
 #include "snmpv2-mib.h"
 
 #include <ctype.h>
-#include <sys/ioctl.h>
 #include <errno.h>
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif
 
 
 char const scli_copyright[] = "(c) 2001 Juergen Schoenwaelder";
@@ -40,6 +42,7 @@ char const scli_copyright[] = "(c) 2001 Juergen Schoenwaelder";
 static int
 get_lines()
 {
+#ifdef HAVE_RESIZETERM
     struct winsize size;
     
     do {
@@ -49,6 +52,7 @@ get_lines()
     } while (errno == EINTR);
 
     return size.ws_row;
+#endif
 
  failure:
     return 24;	/* best guess */
