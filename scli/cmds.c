@@ -24,9 +24,11 @@
 
 #include <ctype.h>
 #include <readline/history.h>
+#include <arpa/inet.h>
 
 
-static GSnmpEnum const scli_regex_table[] = {
+
+static GNetSnmpEnum const scli_regex_table[] = {
     { REG_EXTENDED,      "extended" },
     { REG_ICASE,	 "case-insensitive" },
     { 0, 0 }
@@ -215,7 +217,6 @@ fmt_cmd_details(GString *s, scli_cmd_t *cmd)
 		      cmd->flags & SCLI_CMD_FLAG_XML ? ", xml" : "");
     if (cmd->desc) {
 	fmt_indent_string(s, indent, "Description:", strlen(cmd->desc), cmd->desc);
-	//g_string_sprintfa(s, "Description:\n%s\n", cmd->desc);
     }
     if (cmd->xsd) {
 	fmt_indent_string(s, indent, "Schema:", strlen(cmd->xsd), cmd->xsd);
@@ -355,14 +356,26 @@ show_scli_schema(scli_interp_t *interp, int argc, char **argv)
     }
 
     g_string_append(interp->result,
-		    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n"
-		    "\n"
-		    "<xsd:annotation>\n"
-		    "  <xsd:documentation xml:lang=\"en\">\n"
-		    "    XML schema definition for the output produced by scli version " VERSION ".\n"
-		    "  </xsd:documentation>\n"
-		    "</xsd:annotation>\n"
-		    "\n");
+	    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n"
+	    "\n"
+	    "<xsd:annotation>\n"
+	    "  <xsd:documentation xml:lang=\"en\">\n"
+	    "    XML schema definition for the output produced by scli version " VERSION ".\n"
+	    "  </xsd:documentation>\n"
+	    "</xsd:annotation>\n"
+	    "\n"
+	    "<xsd:element name=\"scli\" type=\"ScliType\"/>\n"
+	    "\n"
+	    "<xsd:complexType name=\"ScliType\">\n"
+	    "  <xsd:sequence>\n"
+	    "    <xsd:element name=\"system\" type=\"SystemType\" minOccurs=\"0\"/>\n"		    
+	    "    <xsd:element name=\"devices\" type=\"DevicesType\" minOccurs=\"0\"/>\n"		    
+	    "  </xsd:sequence>\n"
+	    "  <xsd:attribute name=\"version\" type=\"xsd:NMTOKEN\"/>\n"
+	    "  <xsd:attribute name=\"peer\" type=\"xsd:NMTOKEN\"/>\n"
+	    "  <xsd:attribute name=\"date\" type=\"xsd:string\"/>\n"
+	    "</xsd:complexType>\n"
+	    "\n");
 
     for (elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
 	mode = (scli_mode_t *) elem->data;
@@ -455,18 +468,54 @@ history(scli_interp_t *interp, int argc, char **argv)
 static int
 scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
 {
+    gchar *host;
+    gint ipv6, port = 161;
+    gchar *community = NULL;
+    GInetAddr *addr;
     int code;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (argc == 2) {
-	code = scli_open_community(interp, argv[1], interp->port, NULL);
-    } else if (argc == 3) {
-	code = scli_open_community(interp, argv[1], interp->port, argv[2]);
-    } else {
-	code = SCLI_SYNTAX_NUMARGS;
+    if (argc < 2 || argc > 4) {
+        return SCLI_SYNTAX_NUMARGS;
     }
 
+    host = argv[1];
+    if (argc == 3) {
+	community = argv[2];
+    }
+    if (argc == 4) {
+        port = atoi(argv[2]);
+	community = argv[3];
+    }
+
+    addr = gnet_inetaddr_new(host, port);
+    if (! addr) {
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (interp->taddress) gnet_inetaddr_delete(interp->taddress);
+    interp->taddress = addr;
+    ipv6 = gnet_inetaddr_is_ipv6(interp->taddress);
+
+    /*
+     * We prefer to use TCP so try TCP first and fall back to UDP if
+     * this fails for whatever reason.
+     */
+#if 1
+    interp->tdomain
+	    = ipv6 ? GNET_SNMP_TDOMAIN_TCP_IPV6 : GNET_SNMP_TDOMAIN_TCP_IPV4;
+    
+    code = scli_open_community(interp, interp->tdomain,
+			       interp->taddress, community);
+    if (code == SCLI_OK) {
+	return code;
+    }
+#endif
+    interp->tdomain
+	    = ipv6 ? GNET_SNMP_TDOMAIN_UDP_IPV6 : GNET_SNMP_TDOMAIN_UDP_IPV4;
+    code = scli_open_community(interp, interp->tdomain,
+			       interp->taddress, community);
     return code;
 }
 
@@ -790,7 +839,7 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 {
     int const indent = 18;
     int rows, cols, c;
-    GSnmpEnum const *dft;
+    GNetSnmpEnum const *dft;
     char const *label;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -824,8 +873,8 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
     g_string_append(interp->result, "\n");
 
     g_string_sprintfa(interp->result, "%-*s ", indent, "Debugging:");
-    for (dft = gsnmp_enum_debug_table, c = 0; dft && dft->label; dft++) {
-	if (g_snmp_debug_flags & dft->number) {
+    for (dft = gnet_snmp_enum_debug_table, c = 0; dft && dft->label; dft++) {
+	if (gnet_snmp_debug_flags & dft->number) {
 	    g_string_sprintfa(interp->result, "%s%s", c ? "|" : "", dft->label);
 	    c++;
 	}
@@ -841,30 +890,28 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 		      "Pager:", interp->pager ? interp->pager : "scli");
 
     if (interp->peer) {
-	label = gsnmp_enum_get_label(gsnmp_enum_tdomain_table,
-				     (gint32) interp->peer->tdomain);
-	if (label) {
-	    g_string_sprintfa(interp->result, "%-*s %s\n", indent,
-			      "TDomain:", label);
+        GURI *uri;
+	uri = gnet_snmp_get_uri(interp->peer);
+	if (uri) {
+	    gchar *name = gnet_uri_get_string(uri);
+	    g_string_sprintfa(interp->result, "%-*s %s\n",
+			      indent, "URI:", name);
+	    g_free(name);
 	}
+	g_string_sprintfa(interp->result, "%-*s %u\n", indent,
+			  "Retries:", gnet_snmp_get_retries(interp->peer));
+	g_string_sprintfa(interp->result, "%-*s %u ms\n", indent,
+			  "Timeout:", gnet_snmp_get_timeout(interp->peer));
 	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
-			  "TAddress:", interp->peer->taddress);
-	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
-			  "Port:", interp->peer->port);
-	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
-			  "Retries:", interp->peer->retries);
-	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
-			  "Timeout:", interp->peer->timeout);
-	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
-			  "Community:", interp->peer->rcomm);
-	label = gsnmp_enum_get_label(gsnmp_enum_version_table,
-				     (gint32) interp->peer->version);
+			  "Community:", gnet_snmp_get_community(interp->peer));
+	label = gnet_snmp_enum_get_label(gnet_snmp_enum_version_table,
+				 (gint32) gnet_snmp_get_version(interp->peer));
 	if (label) {
 	    g_string_sprintfa(interp->result, "%-*s %s\n", indent,
 			      "Protocol:", label);
 	} else {
 	    g_string_sprintfa(interp->result, "%-*s %d\n", indent,
-			      "Protocol:", interp->peer->version);
+			      "Protocol:", gnet_snmp_get_version(interp->peer));
 	}
     }
 
@@ -916,7 +963,7 @@ static int
 set_scli_regex(scli_interp_t *interp, int argc, char **argv)
 {
     int flags = 0;
-    GSnmpEnum const *dft;
+    GNetSnmpEnum const *dft;
     regex_t _regex_flags, *regex_flags = NULL;
 
     if (argc < 1 || argc > 2) {
@@ -951,8 +998,8 @@ set_scli_regex(scli_interp_t *interp, int argc, char **argv)
 static int
 set_scli_debugging(scli_interp_t *interp, int argc, char **argv)
 {
-    GSnmpDebugFlags flags = 0;
-    GSnmpEnum const *dft;
+    GNetSnmpDebugFlags flags = 0;
+    GNetSnmpEnum const *dft;
     regex_t _regex_flags, *regex_flags = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -962,7 +1009,7 @@ set_scli_debugging(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (argc == 1) {
-	g_snmp_debug_flags = 0;
+	gnet_snmp_debug_flags = 0;
 	return SCLI_OK;
     }
     
@@ -972,12 +1019,12 @@ set_scli_debugging(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_REGEXP;
     }
     
-    for (dft = gsnmp_enum_debug_table; dft && dft->label; dft++) {
+    for (dft = gnet_snmp_enum_debug_table; dft && dft->label; dft++) {
 	if (regexec(regex_flags, dft->label, (size_t) 0, NULL, 0) == 0) {
 	    flags |= dft->number;
 	}
     }
-    g_snmp_debug_flags = flags;
+    gnet_snmp_debug_flags = flags;
 
     if (regex_flags) regfree(regex_flags);
 
@@ -1000,6 +1047,64 @@ set_scli_pager(scli_interp_t *interp, int argc, char **argv)
 			  "pager `%s' contains unsafe characters",
 			  argv[1]);
 	return SCLI_ERROR;	
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+set_scli_retries(scli_interp_t *interp, int argc, char **argv)
+{
+    char *end;
+    guint32 retries; 
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    retries = strtoul(argv[1], &end, 0);
+    if (*end || retries < 0) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_NUMBER;
+    }
+
+    if (scli_set_retries(interp, retries) < 0) {
+	g_string_sprintfa(interp->result,
+			  "illegal number of retries `%u'", retries);
+	return SCLI_ERROR;
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+set_scli_timeout(scli_interp_t *interp, int argc, char **argv)
+{
+    char *end;
+    guint32 timeout; 
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    timeout = strtoul(argv[1], &end, 0);
+    if (*end || timeout < 0) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_NUMBER;
+    }
+
+    if (scli_set_timeout(interp, timeout) < 0) {
+	g_string_sprintfa(interp->result,
+			  "illegal timeout `%u'", timeout);
+	return SCLI_ERROR;
     }
 
     return SCLI_OK;
@@ -1051,81 +1156,68 @@ set_scli_mode(scli_interp_t *interp, int argc, char **argv)
 }
 
 
-#if 0
-static int
-cmd_scli_probe(scli_interp_t *interp, int argc, char **argv)
-{
-    GSList *in = NULL, *out = NULL;
-    static guint32 base[] = {1, 3, 6, 1, 2, 1, 1, 1, 0};
-    GSnmpSession *s = NULL;
-
-    g_return_val_if_fail(interp, SCLI_ERROR);
-    
-    s = g_snmp_session_clone(interp->peer);
-    g_snmp_vbl_add_null(&in, base, sizeof(base)/sizeof(guint32));
-    out = g_snmp_session_sync_get(s, in);
-    g_snmp_vbl_free(in);
-    if (out) {
-	g_snmp_vbl_free(out);
-    }
-    g_snmp_session_destroy(s);
-
-    return SCLI_OK;
-}
-
-
 
 static void
-fmt_walk(GString *s, GSnmpVarBind *vb)
+fmt_walk(GString *s, GNetSnmpVarBind *vb)
 {
     int i, printable;
+    const char *t;
     
-    for (i = 0; i < vb->id_len; i++) {
+    for (i = 0; i < vb->oid_len; i++) {
 	g_string_sprintfa(s, "%s%d",
-			  i ? "." : "", vb->id[i]);
+			  i ? "." : "", vb->oid[i]);
     }
+    t = gnet_snmp_enum_get_label(gnet_snmp_enum_type_table, vb->type);
     g_string_append(s, " = ");
+    if (t) {
+        g_string_sprintfa(s, "[%s] ", t);
+    }
     switch (vb->type) {
-    case G_SNMP_INTEGER32:
-	g_string_sprintfa(s, "%d", vb->syntax.i32[0]);
+    case GNET_SNMP_VARBIND_TYPE_INTEGER32:
+	g_string_sprintfa(s, "%d", vb->value.i32);
 	break;
-    case G_SNMP_UNSIGNED32:
-    case G_SNMP_COUNTER32:
-    case G_SNMP_TIMETICKS:
-	g_string_sprintfa(s, "%u", vb->syntax.ui32[0]);
+    case GNET_SNMP_VARBIND_TYPE_UNSIGNED32:
+    case GNET_SNMP_VARBIND_TYPE_COUNTER32:
+    case GNET_SNMP_VARBIND_TYPE_TIMETICKS:
+	g_string_sprintfa(s, "%u", vb->value.ui32);
 	break;
-    case G_SNMP_COUNTER64:
-	g_string_sprintfa(s, "%llu", vb->syntax.ui64[0]);
+    case GNET_SNMP_VARBIND_TYPE_COUNTER64:
+	g_string_sprintfa(s, "%llu", vb->value.ui64);
 	break;
-    case G_SNMP_IPADDRESS:
-	if (vb->syntax_len == 4) {
+    case GNET_SNMP_VARBIND_TYPE_IPADDRESS:
+	if (vb->value_len == 4) {
 	    g_string_sprintfa(s, "%d.%d.%d.%d",
-			      vb->syntax.uc[0],
-			      vb->syntax.uc[1],
-			      vb->syntax.uc[2],
-			      vb->syntax.uc[3]);
+			      vb->value.ui8v[0],
+			      vb->value.ui8v[1],
+			      vb->value.ui8v[2],
+			      vb->value.ui8v[3]);
 	}
 	break;
-    case G_SNMP_OCTET_STRING:
-    case G_SNMP_OPAQUE:
-	for (i = 0; i < vb->syntax_len; i++) {
-	    g_string_sprintfa(s, "%s%02x", i ? ":" : "", vb->syntax.uc[i]);
+    case GNET_SNMP_VARBIND_TYPE_OPAQUE:
+	for (i = 0; i < vb->value_len; i++) {
+	    g_string_sprintfa(s, "%s%02x", i ? ":" : "", vb->value.ui8v[i]);
 	}
-	for (i = 0, printable = 1; i < vb->syntax_len; i++) {
-	    printable = printable && isprint((int) vb->syntax.uc[i]);
+	break;
+    case GNET_SNMP_VARBIND_TYPE_OCTETSTRING:
+	for (i = 0, printable = 1; i < vb->value_len; i++) {
+	    printable = printable && isprint((int) vb->value.ui8v[i]);
 	}
-	if (printable && vb->syntax_len) {
+	if (printable && vb->value_len) {
 	    g_string_append(s, " \"");
-	    for (i = 0; i < vb->syntax_len; i++) {
-		g_string_append_c(s, vb->syntax.uc[i]);
+	    for (i = 0; i < vb->value_len; i++) {
+		g_string_append_c(s, vb->value.ui8v[i]);
 	    }
 	    g_string_append(s, "\"");
+	} else {
+	    for (i = 0; i < vb->value_len; i++) {
+		g_string_sprintfa(s, "%s%02x", i ? ":" : "", vb->value.ui8v[i]);
+	    }
 	}
 	break;
-    case G_SNMP_OBJECT_ID:
-	for (i = 0; i < vb->syntax_len/sizeof(guint32); i++) {
+    case GNET_SNMP_VARBIND_TYPE_OBJECTID:
+	for (i = 0; i < vb->value_len; i++) {
 	    g_string_sprintfa(s, "%s%d",
-			      i ? "." : "", vb->syntax.ui32[i]);
+			      i ? "." : "", vb->value.ui32v[i]);
 	}
 	break;
     default:
@@ -1139,12 +1231,12 @@ fmt_walk(GString *s, GSnmpVarBind *vb)
 static int
 cmd_scli_walk(scli_interp_t *interp, int argc, char **argv)
 {
-    GSList *in = NULL, *out = NULL;
-    guint32 base[SNMP_SIZE_OBJECTID];
-    GSnmpSession *s = NULL;
-    GSList *elem;
+    GList *in = NULL, *out = NULL;
+    guint32 base[GNET_SNMP_SIZE_OBJECTID];
+    GList *elem;
     int i, len;
     char *p;
+    GNetSnmpVarBind *vb;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -1153,40 +1245,315 @@ cmd_scli_walk(scli_interp_t *interp, int argc, char **argv)
     }
 
     for (i = 1; i < argc; i++) {
-	for (len = 0, p = argv[i]; p && *p && len < SNMP_SIZE_OBJECTID; len++) {
+	for (len = 0, p = argv[i]; p && *p && len < GNET_SNMP_SIZE_OBJECTID; len++) {
 	    base[len] = strtoul(p, &p, 0);
 	    if (p && *p) {
 		if (*p == '.') {
 		    p++;
 		} else {
-		    g_snmp_vbl_free(in);
+	            g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
+		    g_list_free(in);
 		    g_string_assign(interp->result, argv[i]);
 		    return SCLI_SYNTAX_VALUE;
 		}
 	    }
 	}
 	if ((p && *p) || len < 2 || base[0] > 2 || base[1] > 40) {
-	    g_snmp_vbl_free(in);
+	    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
+	    g_list_free(in);
 	    g_string_assign(interp->result, argv[i]);
 	    return SCLI_SYNTAX_VALUE;
 	}
-	g_snmp_vbl_add_null(&in, base, len);
+	vb = gnet_snmp_varbind_new(base, len,
+				   GNET_SNMP_VARBIND_TYPE_NULL, NULL, 0);
+	in = g_list_append(in, vb);
     }
 
-    s = g_snmp_session_clone(interp->peer);
-    out = g_snmp_session_sync_walk(s, in);
-    g_snmp_vbl_free(in);
+    out = gnet_snmp_sync_walk(interp->peer, in);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
+    g_list_free(in);
     if (out) {
-	for (elem = out; elem; elem = g_slist_next(elem)) {
-	    fmt_walk(interp->result, (GSnmpVarBind *) elem->data);
+	for (elem = out; elem; elem = g_list_next(elem)) {
+	    fmt_walk(interp->result, (GNetSnmpVarBind *) elem->data);
 	}
-	g_snmp_vbl_free(out);
     }
-    g_snmp_session_destroy(s);
+    g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
+    g_list_free(out);
             
     return SCLI_OK;
 }
-#endif
+
+
+
+struct scan_elem {
+    GNetSnmpTDomain tdomain;
+    GInetAddr *taddress;	/* xxx - not very efficient */
+    int descr_len;
+    char *descr;
+};
+
+static void
+scan_elem_free(gpointer data, gpointer user_data)
+{
+    struct scan_elem *p = data;
+    if (p) {
+	if (p->taddress) gnet_inetaddr_delete(p->taddress);
+	if (p->descr) g_free(p->descr);
+	g_free(p);
+    }
+}
+
+struct scanmagic {
+    GMainLoop *loop;
+    guint count;
+    GList *scan_list;
+};
+
+static void
+append_flat_string(GString *s, int len, char *string)
+{
+    int i;
+    char last = 0;
+    
+    /* Remove leading and trailing white-space characters first. */
+
+    while (len && isspace((int) string[0])) {
+	string++, len--;
+    }
+    while (len && isspace((int) string[len-1])) {
+	len--;
+    }
+
+    /* Turn \r and \n into white space characters (but only if there
+       are no other white space characters. Display non-printable
+       characters as special sequences such as \245. */
+
+    for (i = 0; i < len; i++) {
+	if (string[i] == '\r' || string[i] == '\n') {
+  	    if (isspace(last) || isspace(string[i+1])) {
+		continue;
+	    } else {
+	        g_string_append_c(s, ' ');
+	    }
+	} else {
+	    if (isprint((int) string[i])) {
+		g_string_append_c(s, string[i]);
+	    } else {
+		g_string_sprintfa(s, "\\%o", string[i]);
+	    }
+	}
+    }
+}
+
+static gint
+scan_cmp(gconstpointer a, gconstpointer b)
+{
+    struct scan_elem *n_a = (struct scan_elem *) a;
+    struct scan_elem *n_b = (struct scan_elem *) b;
+    gchar ip_a[GNET_INETADDR_MAX_LEN];
+    gchar ip_b[GNET_INETADDR_MAX_LEN];
+    gint len_a, len_b;
+
+    len_a = gnet_inetaddr_get_length(n_a->taddress);
+    len_b = gnet_inetaddr_get_length(n_b->taddress);
+
+    gnet_inetaddr_get_bytes(n_a->taddress, ip_a);
+    gnet_inetaddr_get_bytes(n_b->taddress, ip_b);
+
+    if (len_a == len_b) {
+	return memcmp(ip_a, ip_b, len_a);
+    }
+
+    return (len_a < len_b) ? -1 : 1;
+}
+
+static void
+scan_print(gpointer data, gpointer user_data)
+{
+    struct scan_elem *p = (struct scan_elem *) data;
+    scli_interp_t *interp = (scli_interp_t *) user_data;
+    gchar *name = NULL;
+
+    name = gnet_inetaddr_get_canonical_name(p->taddress);
+    g_string_sprintfa(interp->result, "%-16s ", name);
+    if (p->descr_len && p->descr) {
+	append_flat_string(interp->result, p->descr_len, p->descr);
+    }
+    g_string_append(interp->result, "\n");
+    g_free(name);
+}
+
+static gboolean
+scan_one_done(GNetSnmp *s, GNetSnmpPdu *pdu, GList *vbl, gpointer magic)
+{
+    struct scanmagic *sm = (struct scanmagic *) magic;
+    GNetSnmpVarBind *vb = NULL;
+    
+    sm->count--;
+    if (sm->count <= 0) g_main_quit(sm->loop);
+    if (s->error_status == GNET_SNMP_ERR_NOERROR && vbl) {
+	struct scan_elem *p;
+	p = g_new0(struct scan_elem, 1);
+	p->tdomain = s->tdomain;
+	p->taddress = gnet_inetaddr_clone(s->taddress);
+	vb = vbl->data;
+	if (vb->type == GNET_SNMP_VARBIND_TYPE_OCTETSTRING) {
+	    p->descr_len = vb->value_len;
+	    p->descr = vb->value.ui8v;
+	}
+	sm->scan_list = g_list_insert_sorted(sm->scan_list, p, scan_cmp);
+    }
+    gnet_snmp_delete(s);
+    return TRUE;
+}
+
+static void
+scan_one_time(GNetSnmp *s, void *magic)
+{
+    struct scanmagic *sm = (struct scanmagic *) magic;
+    sm->count--;
+    if (sm->count <= 0) g_main_quit(sm->loop);
+    gnet_snmp_delete(s);
+}
+
+static void
+scan_one(char *host, int port, char *community, gpointer magic)
+{
+    GInetAddr *taddress;
+    GNetSnmpTDomain tdomain;
+    GNetSnmp *s;
+    static GList *in = NULL;
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 1, 1, 0};
+    GNetSnmpVarBind *vb;
+
+    taddress = gnet_inetaddr_new(host, port); /* xxx where to release? */
+    if (! taddress) {
+        g_warning("failed to convert address");
+	return;
+    }
+    tdomain = gnet_inetaddr_is_ipv6(taddress)
+	    ? GNET_SNMP_TDOMAIN_UDP_IPV6 : GNET_SNMP_TDOMAIN_UDP_IPV4;
+     
+    s = gnet_snmp_new();
+    gnet_snmp_set_transport(s, tdomain, taddress);
+    gnet_snmp_set_community(s, community ? community : "public");
+    gnet_snmp_set_version(s, GNET_SNMP_V1);
+    if (! s) {
+	 g_warning("failed to create session: %s\n", host);
+	 return;
+    }
+
+    if (! in) {
+	 vb = gnet_snmp_varbind_new(base, G_N_ELEMENTS(base),
+				    GNET_SNMP_VARBIND_TYPE_NULL, NULL, 0);
+	 in = g_list_append(in, vb);
+    }
+
+    s->done_callback = scan_one_done;
+    s->time_callback = scan_one_time;
+    s->magic = magic;
+
+    if (gnet_snmp_async_get(s, in) == NULL) {
+        g_warning("failed to send async request");
+	return;
+    }
+    ((struct scanmagic *) magic)->count++;
+}
+
+
+static int
+cmd_scli_scan(scli_interp_t *interp, int argc, char **argv)
+{
+    int prefix;
+    GInetAddr *addr = NULL;
+    struct scanmagic *magic;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc < 2 || argc > 3) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    /* xxx accept port numbers? accept an optional community name? version? */
+
+    /*
+     * Check the network argument which should be of the format
+     * a.b.c.d/e where the lower case letters are decimal numbers
+     * in a suitable range.
+     */
+
+    {
+	char *p, *end;
+	
+	p = strchr(argv[1], '/');
+	if (! p)  {
+	    return SCLI_SYNTAX_VALUE;
+	}
+	*p = '\0', p++;
+	prefix = strtol(p, &end, 0);
+	if (*end || prefix < 0 || prefix > 31) {
+	    g_string_assign(interp->result, p);
+	    return SCLI_SYNTAX_VALUE;
+	}
+	
+	addr = gnet_inetaddr_new(argv[1], 161);
+	if (! addr) {
+	    g_string_assign(interp->result, argv[1]);
+	    return SCLI_SYNTAX_VALUE;
+	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	gnet_inetaddr_delete(addr);
+	return SCLI_OK;
+    }
+
+    magic = g_new0(struct scanmagic, 1);
+    magic->loop = g_main_new(TRUE);
+
+    /* put the sending loop also into the main loop so that we already
+     * process responses while we are still sending requests - in fact,
+     * we should do some nice traffic shaping like scotty did */
+    
+    {
+	 guint32 ip, start, end;
+	 struct in_addr ipaddr;
+	 char buf[INET_ADDRSTRLEN];
+	 gchar bin_addr[GNET_INETADDR_MAX_LEN];
+	 gchar bin_addr_len = 0;
+
+	 bin_addr_len = gnet_inetaddr_get_length(addr);
+	 gnet_inetaddr_get_bytes(addr, bin_addr);
+
+	 /* xxx this ipv4 specific and should be fixed */
+
+	 start = (ntohl(* (guint32 *) bin_addr) >> (32-prefix)) << (32-prefix);
+	 end = start + (1 << (32-prefix));
+	 for (ip = start + 1; ip < end; ip++) {
+	      ipaddr.s_addr = htonl(ip);
+	      inet_ntop(AF_INET, &ipaddr, buf, sizeof(buf));
+	      scan_one(buf, 161, argc == 3 ? argv[2] : "public", magic);
+	 }
+    }
+
+    while(g_main_is_running(magic->loop)) {
+	g_main_run(magic->loop);
+    }
+    g_main_destroy(magic->loop);
+    g_list_foreach(magic->scan_list, scan_print, (gpointer) interp);
+    g_list_foreach(magic->scan_list, scan_elem_free, NULL);
+    g_free(magic);
+
+    gnet_inetaddr_delete(addr);
+
+    if (interp->result->len) {
+	g_string_sprintfa(interp->header,
+			  "ADDRESS          DESCRIPTION");
+    }
+
+    return SCLI_OK;
+}
+
 
 
 void
@@ -1218,21 +1585,26 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_XML,
 	  "", NULL,
 	  cmd_scli_close },
-#if 0
-	{ "probe", NULL,
-	  "xxx",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  NULL, NULL,
-	  cmd_scli_probe },
 
-	{ "walk", "<oid> [<oid> ...]",
-	  "The `walk' command is a low-level debugging utility which simply\n"
+	{ "run scli walk", "<oid> [<oid> ...]",
+	  "The `run scli walk' command is a debugging utility which simply\n"
 	  "performs a MIB walk. Note that scli does not have general MIB\n"
 	  "knowledge and hence the output requires some post-processing.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  cmd_scli_walk },
-#endif
+
+	{ "run scli scan", "<network> [community]",
+	  "The `run scli scan' command is a utility which scans an IPv4\n"
+	  "address space identified by the <network> argument. The <network>\n"
+	  "must be specified in the format <ipv4address>/<prefix>.\n"
+	  "The optional <community> argument is the community string\n"
+	  "needed to communicate with the remote SNMP agent. The default\n"
+	  "community string is \"public\".",
+	  0,
+	  NULL, NULL,
+	  cmd_scli_scan },
+
 	{ "create scli plugin", "<module>",
 	  "The `create scli plugin' command dynamically loads an scli mode\n"
 	  "into a running scli process. This can be used to dynamically\n"
@@ -1343,6 +1715,20 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_scli_pager },
+
+	{ "set scli retries", "<retries>",
+	  "The `set scli retries' command defines the number of SNMP\n"
+	  "request retries before giving up requesting a certain object.",
+	  SCLI_CMD_FLAG_NORECURSE,
+	  NULL, NULL,
+	  set_scli_retries },
+
+	{ "set scli timeout", "<milliseconds>",
+	  "The `set scli timeout' command defines the number milliseconds\n"
+	  "between subsequent SNMP request retries.",
+	  SCLI_CMD_FLAG_NORECURSE,
+	  NULL, NULL,
+	  set_scli_timeout },
 	
 	{ "set scli format", "<fmt>",
 	  "The `set scli format' command defines the output format used by\n"
