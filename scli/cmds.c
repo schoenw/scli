@@ -922,7 +922,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 
 	{ "walk", "<oid> [<oid> ...]",
 	  "The walk command is a low-level debugging utility which simply\n"
-	  "performs a MIB walks. Note that scli does not have general MIB\n"
+	  "performs a MIB walk. Note that scli does not have general MIB\n"
 	  "knowledge and hence the output requires some post-processing.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
