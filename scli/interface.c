@@ -57,7 +57,7 @@ cmd_interface(scli_interp_t *interp, int argc, char **argv)
 	for (i = 0; ifEntry[i]; i++) {
 
 	    g_string_sprintfa(s, "Index:       %-*d", width,
-		      (ifEntry[i]->ifIndex) ? *(ifEntry[i]->ifIndex) : i);
+		      (ifEntry[i]->ifIndex) ? *(ifEntry[i]->ifIndex) : i+1);
 	    if (ifXEntry && ifXEntry[i]
 		&& ifXEntry[i]->ifName && ifXEntry[i]->_ifNameLength) {
 		g_string_sprintfa(s, " Name:    %.*s\n",
@@ -69,7 +69,8 @@ cmd_interface(scli_interp_t *interp, int argc, char **argv)
 			    (int) ifEntry[i]->_ifDescrLength,
 				  ifEntry[i]->ifDescr);
 	    } else {
-		g_string_sprintfa(s, " Name:    if#%-17d\n", i);
+		g_string_sprintfa(s, " Name:    if#%-17d\n",
+		  (ifEntry[i]->ifIndex) ? *(ifEntry[i]->ifIndex) : i+1);
 	    }
 
 	    g_string_append(s, "OperStatus:  ");
@@ -104,7 +105,7 @@ cmd_interface(scli_interp_t *interp, int argc, char **argv)
 		g_string_sprintfa(s, " MTU:     %d byte\n",
 				  *(ifEntry[i]->ifMtu));
 	    } else {
-		g_string_sprintfa(s, " MTU:     ? byte\n");
+		g_string_append(s, " MTU:\n");
 	    }
 
 	    g_string_append(s, "Connector:   ");
@@ -121,7 +122,7 @@ cmd_interface(scli_interp_t *interp, int argc, char **argv)
 				      fmt_kmg(*(ifEntry[i]->ifSpeed)));
 		}
 	    } else {
-		g_string_sprintfa(s, " Speed:   ? bps\n");
+		g_string_append(s, " Speed:\n");
 	    }
 	    
 	    g_string_append(s, "Promiscuous: ");
