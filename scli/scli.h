@@ -44,7 +44,7 @@
 #include "stools.h"
 
 
-extern char const scli_copyright[];
+extern char const scli_copyright[];	/* copyright message (surprise) */
 
 
 /*
@@ -158,6 +158,12 @@ scli_prompt(scli_interp_t *interp);
 
 extern void
 scli_get_screen(int *rows, int *cols);
+
+extern void
+scli_curses_on();
+
+extern void
+scli_curses_off();
 
 /*
  * Core scli commands:	XXX this should not be visible across modules XXX

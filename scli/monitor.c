@@ -683,10 +683,7 @@ scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv)
     scli_cmd_t *cmd = (scli_cmd_t *) node->data;
     int code = SCLI_OK;
 
-    (void) initscr();
-    (void) cbreak();
-    (void) noecho();
-    (void) nonl();
+    scli_curses_on();
 
     g_snmp_list_decode_hook = snmp_decode_hook;
     code = mainloop(interp, cmd, argc, argv);
@@ -694,7 +691,7 @@ scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv)
 	g_string_truncate(interp->result, 0);
     }
 
-    (void) endwin();
+    scli_curses_off();
     return code;
 }
 

@@ -37,6 +37,32 @@
 
 char const scli_copyright[] = "(c) 2001 Juergen Schoenwaelder";
 
+static int scli_curses_running = 0;
+
+
+void
+scli_curses_on()
+{
+    if (! scli_curses_running) {
+	(void) initscr();
+	(void) cbreak();
+	(void) noecho();
+	(void) nonl();
+    }
+    scli_curses_running = 1;
+}
+
+
+
+void
+scli_curses_off()
+{
+    if (scli_curses_running) {
+	if (! isendwin()) (void) endwin();
+    }
+    scli_curses_running = 0;
+}
+
 
 
 void
