@@ -164,7 +164,9 @@ show_tcp_connections(WINDOW *win, host_snmp *peer, int flags)
 	    p++;
 	    s = g_string_new(NULL);
 	    show_tcp_connection(s, tcpConnTable[i]);
-	    g_string_truncate(s, COLS);
+	    if (s->len > COLS) {
+	      g_string_truncate(s, COLS);
+	    }
 	    mvwprintw(win, p, 0, s->str);
 	    wclrtoeol(win);
 	    g_string_free(s, 1);

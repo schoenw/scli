@@ -139,7 +139,9 @@ show_ethers(WINDOW *win, host_snmp *peer, int flags)
 	fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsCarrierSenseErrors,
 		       &(stats[i].carrierSenseErrors), &last, delta);
 	
-	g_string_truncate(s, COLS);
+	if (s->len > COLS) {
+	  g_string_truncate(s, COLS);
+	}
 	mvwprintw(win, i + 1, 0, s->str);
 	wclrtoeol(win);
 	g_string_free(s, 1);

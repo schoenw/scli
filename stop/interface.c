@@ -263,7 +263,9 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 				  (int) ifTable[i]->_ifDescrLength,
 				  ifTable[i]->ifDescr);
 	    }
-	    g_string_truncate(s, COLS);
+	    if (s->len > COLS) {
+	      g_string_truncate(s, COLS);
+	    }
 	    mvwprintw(win, i+1, 0, s->str);
 	    g_string_free(s, 1);
 	}

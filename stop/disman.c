@@ -239,7 +239,9 @@ show_runs(WINDOW *win, host_snmp *peer, int flags)
 			      smRunTable[i]->smRunArgument);
 	}
 	
-	g_string_truncate(s, COLS);
+	if (s->len > COLS) {
+	  g_string_truncate(s, COLS);
+	}
 	mvwprintw(win, i + 1, 0, s->str);
 	wclrtoeol(win);
 	g_string_free(s, 1);
