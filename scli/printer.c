@@ -1837,7 +1837,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "  LINE    display line number\n"
 	  "  TEXT    contents of the display line",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
-	  "printer console",
+	  "printer console display",
 	  NULL,
 	  show_printer_console_display },
 
@@ -1852,7 +1852,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "  STATUS      current status (on, off, blink)\n"
 	  "  COLOR       current color of the light",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
-	  "printer console",
+	  "printer console lights",
 	  "<xsd:simpleType name=\"PrinterLightColor\">\n"
 	  "  <xsd:restriction base=\"xsd:string\">\n"
 	  "    <xsd:enumeration value=\"other\"/>\n"
