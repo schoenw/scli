@@ -230,11 +230,11 @@ static GSnmpEnum const hrSWRunStatus[] = {
     { 0, NULL }
 };
 
-static GSnmpEnum const hrSWInstalledType[] = {
-    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_UNKNOWN,		"?" },
-    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_OPERATINGSYSTEM,	"O" },
-    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_DEVICEDRIVER,	"D" },
-    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_APPLICATION,		"A" },
+static GSnmpEnum const hrSWRunType[] = {
+    { HOST_RESOURCES_MIB_HRSWRUNTYPE_UNKNOWN,		"?" },
+    { HOST_RESOURCES_MIB_HRSWRUNTYPE_OPERATINGSYSTEM,	"O" },
+    { HOST_RESOURCES_MIB_HRSWRUNTYPE_DEVICEDRIVER,	"D" },
+    { HOST_RESOURCES_MIB_HRSWRUNTYPE_APPLICATION,	"A" },
     { 0, NULL }
 };
 
@@ -518,7 +518,7 @@ fmt_system_process(GString *s,
     e = fmt_enum(hrSWRunStatus, hrSWRunEntry->hrSWRunStatus);
     g_string_sprintfa(s, "%s ", e ? e : " ");
     
-    e = fmt_enum(hrSWInstalledType, hrSWRunEntry->hrSWRunType);
+    e = fmt_enum(hrSWRunType, hrSWRunEntry->hrSWRunType);
     g_string_sprintfa(s, "%s ", e ? e : " ");
 
     if (hrSWRunPerfEntry
