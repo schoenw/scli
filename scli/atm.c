@@ -27,37 +27,6 @@
 
 
 
-static int
-match_interface(regex_t *regex_iface,
-		if_mib_ifEntry_t *ifEntry)
-{
-    int status;
-
-    if (! regex_iface) {
-	return 1;
-    }
-
-    /*
-     * Does it really make sense to filter only on the description?
-     * This way, we do not need to read the ifXTable at all...
-     */
-
-    if (ifEntry->ifDescr) {
-	char *s = g_strdup_printf("%.*s",
-				  (int) ifEntry->_ifDescrLength,
-				  ifEntry->ifDescr);
-	status = regexec(regex_iface, s, (size_t) 0, NULL, 0);
-	g_free(s);
-	if (status == 0) {
-	    return 1;
-	}
-    }
-
-    return 0;
-}
-
-
-
 static void
 fmt_atm_interface_info(GString *s,
 		       atm_mib_atmInterfaceConfEntry_t *atmIfaceConfEntry,
@@ -75,7 +44,7 @@ fmt_atm_interface_info(GString *s,
 			  *atmIfaceConfEntry->atmInterfaceMaxVccs);
     }
 
-    if (ifEntry && ifEntry->ifDescr && ifEntry->_ifDescrLength) {
+    if (ifEntry && ifEntry->ifDescr) {
 	g_string_sprintfa(s, "%.*s",
 			  (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);
     }
@@ -89,7 +58,6 @@ static int
 show_atm_interface_info(scli_interp_t *interp, int argc, char **argv)
 {
     atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfTable = NULL;
-    if_mib_ifEntry_t *ifEntry = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
     
@@ -122,11 +90,12 @@ show_atm_interface_info(scli_interp_t *interp, int argc, char **argv)
 	g_string_append(interp->header,
 			"INTERFACE MAX-VPCS MAX-VCCS DESCRIPTION");
 	for (i = 0; atmInterfaceConfTable[i]; i++) {
+	    if_mib_ifEntry_t *ifEntry = NULL;
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
 			       atmInterfaceConfTable[i]->ifIndex,
 			       IF_MIB_IFDESCR);
 	    if (! ifEntry) continue;
-	    if (match_interface(regex_iface, ifEntry)) {
+	    if (interface_match(regex_iface, ifEntry)) {
 		fmt_atm_interface_info(interp->result,
 				       atmInterfaceConfTable[i], ifEntry);
 	    }
@@ -238,7 +207,6 @@ static int
 show_atm_interface_details(scli_interp_t *interp, int argc, char **argv)
 {
     atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfTable = NULL;
-    if_mib_ifEntry_t *ifEntry = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i, c;
     
@@ -269,11 +237,11 @@ show_atm_interface_details(scli_interp_t *interp, int argc, char **argv)
     
     if (atmInterfaceConfTable) {
 	for (i = 0, c= 0; atmInterfaceConfTable[i]; i++) {
+	    if_mib_ifEntry_t *ifEntry = NULL;
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
 			       atmInterfaceConfTable[i]->ifIndex,
 			       IF_MIB_IFDESCR);
-	    if (! ifEntry) continue;
-	    if (match_interface(regex_iface, ifEntry)) {
+	    if (interface_match(regex_iface, ifEntry)) {
 		if (scli_interp_xml(interp)) {
 		    xml_atm_interface_details(interp->xml_node,
 					      atmInterfaceConfTable[i],
@@ -308,19 +276,20 @@ scli_init_atm_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show atm interface info", "<regexp>",
-	  "The show atm interface info command displays summary\n"
+	  "The `show atm interface info' command displays summary\n"
 	  "information for all selected ATM interfaces. The optional\n"
 	  "regular expression <regexp> is matched against the interface\n"
 	  "descriptions to select the interfaces of interest. The command\n"
 	  "generates a table with the following columns:\n"
 	  "\n"
-	  "  INTERFACE network interface number",
+	  "  INTERFACE   network interface number\n"
+          "  DESCRIPTION description of the network interface",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_atm_interface_info },
 	
 	{ "show atm interface details", "<regexp>",
-	  "The show atm interface details command describes the selected\n"
+	  "The `show atm interface details' command describes the selected\n"
 	  "ATM interfaces in more detail. The optional regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest.",
