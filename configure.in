@@ -39,6 +39,9 @@ AC_CHECK_HEADERS(unistd.h sys/ioctl.h sys/time.h ncurses.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 
+dnl defines HAVE_TM_ZONE if struct tm has tm_zone
+AC_STRUCT_TIMEZONE
+
 dnl Checks for library functions.
 
 AC_CHECK_FUNC(gethostbyname)

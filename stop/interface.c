@@ -30,7 +30,9 @@
 #include "if-mib.h"
 
 
+#ifndef HAVE_TM_ZONE
 extern time_t timezone;
+#endif
 
 
 typedef struct {
@@ -48,17 +50,24 @@ fmt_time_ticks(guint32 timeticks)
     static char buffer[80];
     time_t now;
     struct tm *tm;
+    long gmt_offset;
     
     now = time(NULL);
     now -= timeticks/100;
     tm = gmtime(&now);
 
+#ifdef HAVE_TM_ZONE
+    gmt_offset = tm->tm_gmtoff;
+#else
+    gmt_offset = timezone;
+#endif
     g_snprintf(buffer, sizeof(buffer),
 	       "%04d-%02d-%02d %02d:%02d:%02d %c%02d:%02d",
 	       tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
 	       tm->tm_hour, tm->tm_min, tm->tm_sec,
-	       timezone < 0 ? '+' : '-',
-	       (int) ABS(timezone) / 60 / 60, (int) (ABS(timezone) / 60) % 60);
+	       gmt_offset <= 0 ? '+' : '-',
+	       (int) ABS(gmt_offset) / 3600,
+	       (int) (ABS(gmt_offset) / 60) % 60);
     
     return buffer;
 }
