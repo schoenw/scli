@@ -942,31 +942,24 @@ xml_system_info(xmlNodePtr root, scli_interp_t *interp,
 		snmpv2_mib_system_t *system)
 {
     if (system) {
-	if (system->sysName && system->_sysNameLength) {
-	    (void) xml_new_child(root, NULL, "name", "%.*s",
-				 (int) system->_sysNameLength,
-				 system->sysName);
-	}
+	(void) xml_new_child(root, NULL, "name", "%.*s",
+			     (int) system->_sysNameLength,
+			     system->sysName);
 	if (interp->peer->taddress) {
 	    (void) xml_new_child(root, NULL, "taddress", "%s:%d",
 				 interp->peer->taddress,
 				 interp->peer->port);
 	}
-	if (system->sysDescr && system->_sysDescrLength) {
-	    (void) xml_new_child(root, NULL, "description", "%.*s",
-				 (int) system->_sysDescrLength,
-				 system->sysDescr);
-	}
-	if (system->sysContact && system->_sysContactLength) {
-	    (void) xml_new_child(root, NULL, "contact", "%.*s",
-				 (int) system->_sysContactLength,
-				 system->sysContact);
-	}
-	if (system->sysLocation && system->_sysLocationLength) {
-	    (void) xml_new_child(root, NULL, "location", "%.*s",
-				 (int) system->_sysLocationLength,
-				 system->sysLocation);
-	}
+	
+	(void) xml_new_child(root, NULL, "description", "%.*s",
+			     (int) system->_sysDescrLength,
+			     system->sysDescr);
+	(void) xml_new_child(root, NULL, "contact", "%.*s",
+			     (int) system->_sysContactLength,
+			     system->sysContact);
+	(void) xml_new_child(root, NULL, "location", "%.*s",
+			     (int) system->_sysLocationLength,
+			     system->sysLocation);
 
 	if (system->sysObjectID) {
 	    scli_vendor_t const *vendor;
@@ -1116,18 +1109,31 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     s = interp->result;
     if (hrSystem) {
 	if (hrSystem->hrSystemDate && hrSystem->_hrSystemDateLength) {
-	    g_string_sprintfa(s, "%-*s", indent, "Current Time:");
-	    g_string_append(s, fmt_date_and_time(hrSystem->hrSystemDate,
-					 hrSystem->_hrSystemDateLength));
-	    g_string_append_c(s, '\n');
+	    if (scli_interp_xml(interp)) {
+		(void) xml_new_child(interp->xml_node, NULL,
+				     "current-time", "%s",
+			     fmt_date_and_time(hrSystem->hrSystemDate,
+					       hrSystem->_hrSystemDateLength));
+	    } else {
+		g_string_sprintfa(s, "%-*s", indent, "Current Time:");
+		g_string_append(s, fmt_date_and_time(hrSystem->hrSystemDate,
+						     hrSystem->_hrSystemDateLength));
+		g_string_append_c(s, '\n');
+	    }
 	}
     }
 
     if (system) {
 	if (system->sysUpTime) {
-	    g_string_sprintfa(s, "%-*s", indent, "Agent Boot Time:");
-	    g_string_append(s, fmt_timeticks(*(system->sysUpTime)));
-	    g_string_append_c(s, '\n');
+	    if (scli_interp_xml(interp)) {
+		(void) xml_new_child(interp->xml_node, NULL,
+				     "agent-boot-time", "%s",
+				     fmt_timeticks(*(system->sysUpTime)));
+	    } else {
+		g_string_sprintfa(s, "%-*s", indent, "Agent Boot Time:");
+		g_string_append(s, fmt_timeticks(*(system->sysUpTime)));
+		g_string_append_c(s, '\n');
+	    }
 	}
     }
     
@@ -1179,8 +1185,14 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 
     if (interfaces) {
 	if (interfaces->ifNumber) {
-	    g_string_sprintfa(s, "%-*s%d\n", indent, "Interfaces:",
-			      *(interfaces->ifNumber));
+	    if (scli_interp_xml(interp)) {
+		(void) xml_new_child(interp->xml_node, NULL,
+				     "interfaces", "%d",
+				     *(interfaces->ifNumber));
+	    } else {
+		g_string_sprintfa(s, "%-*s%d\n", indent, "Interfaces:",
+				  *(interfaces->ifNumber));
+	    }
 	}
 	if (ifMibObjects && system && system->sysUpTime) {
 	    if (ifMibObjects->ifTableLastChange) {
