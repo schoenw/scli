@@ -71,28 +71,5 @@ extern GSList *
 stls_snmp_gettable(host_snmp *s, GSList *vbl);
 
 
-/*
- * The MIB module stub headers that are part of the stools distribution.
- */
-
-#include "if-mib.h"
-#include "ip-mib.h"
-#include "ip-forward-mib.h"
-#include "tcp-mib.h"
-#include "udp-mib.h"
-#include "snmpv2-mib.h"
-#include "host-resources-mib.h"
-#include "entity-mib.h"
-#include "bridge-mib.h"
-#include "disman-script-mib.h"
-#include "disman-schedule-mib.h"
-#include "snmp-framework-mib.h"
-#include "snmp-mpd-mib.h"
-#include "snmp-user-based-sm-mib.h"
-#include "snmp-community-mib.h"
-#include "snmp-view-based-acm-mib.h"
-#include "snmp-target-mib.h"
-#include "tunnel-mib.h"
-
 #endif
 
