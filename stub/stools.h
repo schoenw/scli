@@ -85,6 +85,13 @@ stls_snmp_getnext(host_snmp *s, GSList *vbl);
 extern GSList *
 stls_snmp_gettable(host_snmp *s, GSList *vbl);
 
+/*
+ * Some generic conversion functions that we need in several tools.
+ */
+
+extern const char *
+stls_fmt_timeticks(guint32 timeticks);
+
 
 #endif
 

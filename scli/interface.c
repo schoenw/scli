@@ -140,9 +140,8 @@ show_if_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 	     (ifXEntry && ifXEntry) ? ifXEntry->ifPromiscuousMode : NULL);
     if (ifEntry->ifLastChange && system && system->sysUpTime) {
 	guint32 dsecs = *(system->sysUpTime) - *(ifEntry->ifLastChange);
-	g_string_sprintfa(s, " Change:  ");
-	fmt_time_ticks(s, dsecs);
-	g_string_append(s, "\n");
+	g_string_sprintfa(s, " Change:  %s\n",
+			  stls_fmt_timeticks(dsecs));
     } else {
 	g_string_append(s, " Change:\n");
     }

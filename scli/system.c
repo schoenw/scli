@@ -499,14 +499,14 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
     if (system) {
 	if (system->sysUpTime) {
 	    g_string_sprintfa(s, "\n%-*s ", indent, "Agent Boot Time:");
-	    fmt_time_ticks(s, *(system->sysUpTime));
+	    g_string_append(s, stls_fmt_timeticks(*(system->sysUpTime)));
 	}
     }
     
     if (hrSystem) {
 	if (hrSystem->hrSystemUptime) {
 	    g_string_sprintfa(s, "\n%-*s ", indent, "System Boot Time:");
-	    fmt_time_ticks(s, *(hrSystem->hrSystemUptime));
+	    g_string_append(s, stls_fmt_timeticks(*(hrSystem->hrSystemUptime)));
 	}
 	if (hrSystem->hrSystemNumUsers) {
 	    g_string_sprintfa(s, "\n%-*s %u", indent, "Users:", 

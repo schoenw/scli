@@ -29,9 +29,6 @@
 #include <netdb.h>
 #include <netinet/in.h>
 
-#ifndef HAVE_TM_ZONE
-extern time_t timezone;
-#endif
 
 
 static time_t
@@ -52,41 +49,6 @@ date_to_time(guchar *date, gsize len)
     }
 
     return t;
-}
-
-
-
-void
-fmt_time_ticks(GString *s, guint32 timeticks)
-{
-    time_t now;
-    struct tm *tm;
-    long gmt_offset;
-    
-    now = time(NULL);
-    now -= timeticks/100;
-    tm = localtime(&now);
-
-#ifdef HAVE_TM_ZONE
-    gmt_offset = tm->tm_gmtoff;
-#else
-    gmt_offset = timezone;
-#endif
-
-    /*
-     * This code assumes that daylight savings time is always 1 hour,
-     * which is probably not true everywhere on the world. I have no
-     * clue how you get the real daylight savings time offset in a
-     * portable way.
-     */
-    
-    g_string_sprintfa(s, "%04d-%02d-%02d %02d:%02d:%02d %c%02d:%02d",
-		      tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-		      tm->tm_hour, tm->tm_min, tm->tm_sec,
-		      gmt_offset <= 0 ? '+' : '-',
-		      (int) ABS(gmt_offset) / 3600
-		      + ((tm->tm_isdst > 0) ? 1 : 0),
-		      (int) (ABS(gmt_offset) / 60) % 60);
 }
 
 

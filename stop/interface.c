@@ -30,56 +30,12 @@
 #include "if-mib.h"
 
 
-#ifndef HAVE_TM_ZONE
-extern time_t timezone;
-#endif
-
-
 typedef struct {
     guint32 inOctets;
     guint32 outOctets;
     guint32 inPkts;
     guint32 outPkts;
 } if_stats_t;
-
-
-
-static char*
-fmt_time_ticks(guint32 timeticks)
-{
-    static char buffer[80];
-    time_t now;
-    struct tm *tm;
-    long gmt_offset;
-    
-    now = time(NULL);
-    now -= timeticks/100;
-    tm = localtime(&now);
-
-#ifdef HAVE_TM_ZONE
-    gmt_offset = tm->tm_gmtoff;
-#else
-    gmt_offset = timezone;
-#endif
-    
-    /*
-     * This code assumes that daylight savings time is always 1 hour,
-     * which is probably not true everywhere on the world. I have no
-     * clue how you get the real daylight savings time offset in a
-     * portable way.
-     */
-    
-    g_snprintf(buffer, sizeof(buffer),
-	       "%04d-%02d-%02d %02d:%02d:%02d %c%02d:%02d",
-	       tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-	       tm->tm_hour, tm->tm_min, tm->tm_sec,
-	       gmt_offset <= 0 ? '+' : '-',
-	       (int) ABS(gmt_offset) / 3600
-	       + ((tm->tm_isdst > 0) ? 1 : 0),
-	       (int) (ABS(gmt_offset) / 60) % 60);
-    
-    return buffer;
-}
 
 
 
@@ -185,7 +141,7 @@ show_interface_summary(host_snmp *peer)
 		guint32 dsecs = *(system->sysUpTime)
 		    - *(ifMIBObjects->ifTableLastChange);
 		g_string_sprintfa(s, ", last create/delete %s",
-				  fmt_time_ticks(dsecs));
+				  stls_fmt_timeticks(dsecs));
 	    }
 	    snmpv2_mib_free_system(system);
 	}
