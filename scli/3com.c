@@ -241,7 +241,7 @@ show_3com_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
   done:
     if (vlanTable) productmib_free_a3ComVlanIfTable(vlanTable);
     if (ifStackTable) if_mib_free_ifStackTable(ifStackTable);
-    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifTable) if_mib_proc_free_ifTable(ifTable);
     if (regex_vlan) regfree(regex_vlan);
     
     return code;
@@ -458,7 +458,7 @@ dump_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 
     if (vlanTable) productmib_free_a3ComVlanIfTable(vlanTable);
     if (ifStackTable) if_mib_free_ifStackTable(ifStackTable);
-    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifTable) if_mib_proc_free_ifTable(ifTable);
     
     return SCLI_OK;
 }
