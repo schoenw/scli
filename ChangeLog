@@ -1,3 +1,142 @@
+2001-09-10 16:58  schoenw
+
+	* scli/monitor.c: Use strchr() instead of index().
+
+2001-09-10 16:54  schoenw
+
+	* scli/: atm.c, cmds.c, entity.c, interface.c, monitor.c, nortel.c,
+	system.c, tcp.c, udp.c: Updates to use the xpath for XML capable
+	commands. Implemented three more interface commands: set interface
+        [alias|promiscuous|notifications].
+
+2001-09-10 15:40  schoenw
+
+	* scli/basic.c: Use the xpath element of the command data structure
+        to generate the root for XML formatted output.
+
+2001-09-10 15:33  schoenw
+
+	* scli/Makefile.am: Changed the manual target back to scli.1 but
+        removed the dependencies that tried to build it everytime.
+
+2001-09-07 18:39  schoenw
+
+	* configure.in: Bumped the version number.
+
+2001-09-07 18:31  schoenw
+
+	* scli/Makefile.am: Renamed the scli.1 target so that this rule
+        does not cause problems in a distribution.
+
+2001-09-07 17:52  schoenw
+
+	* scli/printer.c: Added the "monitor printer console" command.
+
+2001-09-07 17:48  schoenw
+
+	* scli/: atm.c, bridge.c, cisco.c, cmds.c, disman.c, entity.c,
+	ether.c, interface.c, ip.c, nortel.c, ospf.c, printer.c, scli.h,
+	snmp.c, system.c, tcp.c, udp.c: Changed the struct scli_cmd so that
+        it can contain additional data for the XML output format driver.
+
+2001-09-07 17:47  schoenw
+
+	* snmp/g_utils.c: Added a sanity check.
+
+2001-09-05 09:42  schoenw
+
+	* scli/system.c: Reworked some commands, added better XML support,
+        updated the documentation.
+
+2001-09-05 09:41  schoenw
+
+	* scli/: ether.c, interface.c: Code cleanup.
+
+2001-09-05 09:41  schoenw
+
+	* scli/: fmt.c, scli.h: Removed fmt_kbytes() as it is not generally
+        useful.
+
+2001-09-03 13:41  schoenw
+
+	* scli/system.c: Better XML support and some code reorganization.
+
+2001-09-03 13:40  schoenw
+
+	* scli/: fmt.c, scli.h: Added fmt_display_string().
+
+2001-09-03 12:31  schoenw
+
+	* scli/nortel.c: Display more information in "show nortel bridge
+        vlan details". Better support for XML output.
+
+2001-08-31 10:55  schoenw
+
+	* scli/: Makefile.am, atm.c, basic.c, cmds.c, interface.c,
+	nortel.c, scli.h: Added a specific regex error code, removed
+        unneeded commands and added even more documentation.
+
+2001-08-31 10:54  schoenw
+
+	* snmp/: g_utils.c, g_utils.h: Added a table to convert debug
+        levels to strings and vice versa.
+
+2001-08-30 12:12  schoenw
+
+	* stub/: disman-script-mib.c, disman-script-mib.h: Updated to the
+        RFC 3165 version.
+
+2001-08-30 12:11  schoenw
+
+	* scli/: disman.c, ether.c, interface.c, system.c, tcp.c: More
+        documentation updates.
+
+2001-08-29 18:12  schoenw
+
+	* scli/ether.c: More documentation updates.
+
+2001-08-29 11:27  schoenw
+
+	* scli/: entity.c, ether.c, interface.c, monitor.c, nortel.c,
+        printer.c, tcp.c, udp.c: Documentation updates.
+
+2001-08-29 10:53  schoenw
+
+	* scli/scli.c: Fixed the completion of command aliases.
+
+2001-08-29 10:53  schoenw
+
+	* scli/: Makefile.am, cmds.c, scli.1, scli.1.in: Extract the mode
+        descriptions in scli.1 from the scli program itself.
+
+2001-08-29 10:51  schoenw
+
+	* scli/bridge.c: Started to work on a "show bridge stats" command.
+
+2001-08-29 10:51  schoenw
+
+	* scli/basic.c: Improved error messages.
+
+2001-08-29 10:50  schoenw
+
+	* scli/interface.c: Started to add XML support for "show interface
+        details".
+
+2001-08-28 15:31  schoenw
+
+	* scli/interface.c: Several changes to improve the online help
+        system and to generate documentation from the source code.
+
+2001-08-28 15:27  schoenw
+
+	* scli/: basic.c, cmds.c, disman.c, entity.c, nortel.c, system.c,
+	tcp.c, udp.c: Several changes to improve the online help system and
+        to generate documentation from the source code.
+
+2001-08-27 15:15  schoenw
+
+	* ChangeLog, NEWS: Updates for release 0.2.0.
+
 2001-08-27 15:09  schoenw
 
 	* autogen.sh: Replaced stools with scli.
