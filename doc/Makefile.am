@@ -1,7 +1,7 @@
 info_TEXINFOS = scli.texinfo
-scli_TEXINFOS = gpl.texinfo modes.texinfo
+scli_TEXINFOS = gpl.texinfo scli.texinfo
 
-scli.texinfo: scli.texinfo.in
+scli.texinfo:
 	$(top_builddir)/scli/scli -n -c "show scli modes" | \
 	awk '/^$$/		{ if (example) { \
 				    printf("@end example\n"); \
