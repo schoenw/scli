@@ -509,18 +509,25 @@ fmt_taddress(guint32 *tdomain, gsize tdomain_len,
 	}
     }
 
-    if (tdomain_identities[i].label) {
-	switch (i) {
-	case 0:
-	    if (taddress_len == 6) {
-		e = g_strdup_printf("%d.%d.%d.%d:%d",
-				    taddress[0], taddress[1], taddress[2], taddress[3],
-				    (taddress[4] << 8) + taddress[5]);
-	    }
-	    break;
-	default:
-	    e = g_strdup("?");
+    if (! tdomain_identities[i].label) {
+	for (i = 0; i < tdomain_len; i++) {
+	    g_printerr(".%u", tdomain[i]);
 	}
+	g_printerr(" transport domain unknown ********* \n");
+	e = g_strdup("?");
+	return NULL;
+    }
+
+    switch (i) {
+    case 0:
+	if (taddress_len == 6) {
+	    e = g_strdup_printf("%d.%d.%d.%d:%d",
+				taddress[0], taddress[1], taddress[2], taddress[3],
+				(taddress[4] << 8) + taddress[5]);
+	}
+	break;
+    default:
+	e = g_strdup("?!");
     }
 
     return e;

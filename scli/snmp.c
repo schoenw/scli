@@ -920,7 +920,7 @@ show_snmp_target_addresses(scli_interp_t *interp, int argc, char **argv)
 			     snmpTargetTable[i]->_snmpTargetAddrTDomainLength,
 			     snmpTargetTable[i]->snmpTargetAddrTAddress,
 			     snmpTargetTable[i]->_snmpTargetAddrTAddressLength);
-	    if (strlen(e) > addr_width) {
+	    if (e && strlen(e) > addr_width) {
 		addr_width = strlen(e);
 	    }
 	}
