@@ -89,12 +89,12 @@ fmt_sonet_media(GString *s, sonet_mib_sonetMediumEntry_t *sonetMediumEntry,
 
     e = fmt_enum(sonetMediumLineCoding,
 		 sonetMediumEntry->sonetMediumLineCoding);
-    g_string_sprintfa(s, "%-5s ", e ? e : "");
+    g_string_sprintfa(s, "%-5s  ", e ? e : "");
 
     e = fmt_enum(sonetMediumLineType,
 		 sonetMediumEntry->sonetMediumLineType);
     g_string_sprintfa(s, "%-*s ", line_type_width, e ? e : "");
-
+    
     if (ifEntry && ifEntry->ifDescr) {
 	g_string_sprintfa(s, "%.*s",
 			  (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);
@@ -109,7 +109,6 @@ static int
 show_sonet_media(scli_interp_t *interp, int argc, char **argv)
 {
     sonet_mib_sonetMediumEntry_t **sonetMediumTable = NULL;
-    if_mib_ifEntry_t *ifEntry;
     int line_type_width;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
@@ -140,18 +139,20 @@ show_sonet_media(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (sonetMediumTable) {
-        line_type_width = get_line_type_width(sonetMediumTable);
+	if_mib_ifEntry_t *ifEntry;
 	g_string_sprintfa(interp->header,
-			  "INTERFACE TYPE  CODE  %-*s DESCRIPTION",
-			  line_type_width, "LINE-TYPE");
+			  "INTERFACE TYPE  CODING LINE-TYPE");
 	for (i = 0; sonetMediumTable[i]; i++) {
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
 			       sonetMediumTable[i]->ifIndex, IF_MIB_IFDESCR);
-	    if (! interface_match(regex_iface, ifEntry)) {
-		continue;
+	    line_type_width = get_line_type_width(sonetMediumTable);
+	    if (interface_match(regex_iface, ifEntry)) {
+		fmt_sonet_media(interp->result, sonetMediumTable[i], ifEntry,
+				line_type_width);
 	    }
-	    fmt_sonet_media(interp->result, sonetMediumTable[i], ifEntry,
-			    line_type_width);
+	    if (ifEntry) {
+		if_mib_free_ifEntry(ifEntry);
+	    }
 	}
     }
 
@@ -164,17 +165,152 @@ show_sonet_media(scli_interp_t *interp, int argc, char **argv)
 
 
 
+/*
+$ show sonet section stats
+
+INTERFACE INTERVAL LOST   ES  SES SEFS   CV DESCRIPTION
+        4     666s  --  ---- ---- ---- ---- ATM/0
+        5     123s  --  ---- ---- ---- ---- ATM/1
+
+$ show sonet section history
+
+INTERFACE INTERVAL LOST   ES  SES SEFS   CV DESCRIPTION
+        4     15m   SF  ---- ---- ---- ---- ATM/0
+        4     30m   --  ---- ---- ---- ---- ATM/0
+        4     45m   --  ---- ---- ---- ---- ATM/0
+        4     60m   --  ---- ---- ---- ---- ATM/0
+*/
+
+static void
+fmt_sonet_section_stats(GString *s,
+			sonet_mib_sonetSectionCurrentEntry_t *sonetSectionEntry)
+{
+    const char *e;
+    
+    g_string_sprintfa(s, "%9u ", sonetSectionEntry->ifIndex);
+
+    g_string_sprintfa(s, "%8s ", "");
+
+    if (sonetSectionEntry->sonetSectionCurrentStatus) {
+	gint32 t = *sonetSectionEntry->sonetSectionCurrentStatus;
+	g_string_sprintfa(s, " %c%c  ",
+			  (t == 0x02) ? 'S' : '-',
+			  (t == 0x04) ? 'F' : '-');
+	
+    } else {
+	g_string_sprintfa(s, " %2s  ", "");
+    }
+
+    if (sonetSectionEntry->sonetSectionCurrentESs) {
+	e = fmt_kmg(*sonetSectionEntry->sonetSectionCurrentESs);
+	g_string_sprintfa(s, "%5s ", e);
+    } else {
+	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    if (sonetSectionEntry->sonetSectionCurrentSESs) {
+	e = fmt_kmg(*sonetSectionEntry->sonetSectionCurrentSESs);
+	g_string_sprintfa(s, "%5s ", e);
+    } else {
+	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    if (sonetSectionEntry->sonetSectionCurrentSESs) {
+	e = fmt_kmg(*sonetSectionEntry->sonetSectionCurrentSESs);
+	g_string_sprintfa(s, "%5s ", e);
+    } else {
+	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    if (sonetSectionEntry->sonetSectionCurrentSEFSs) {
+	e = fmt_kmg(*sonetSectionEntry->sonetSectionCurrentSEFSs);
+	g_string_sprintfa(s, "%5s ", e);
+    } else {
+	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_sonet_section_stats(scli_interp_t *interp, int argc, char **argv)
+{
+    sonet_mib_sonetSectionCurrentEntry_t **sonetSectionTable = NULL;
+    regex_t _regex_iface, *regex_iface = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (argc == 2) {
+	regex_iface = &_regex_iface;
+	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_iface) regfree(regex_iface);
+	return SCLI_OK;
+    }
+
+    sonet_mib_get_sonetSectionCurrentTable(interp->peer, &sonetSectionTable, 0);
+    if (interp->peer->error_status) {
+	if (regex_iface) regfree(regex_iface);
+	return SCLI_SNMP;
+    }
+
+    if (sonetSectionTable) {
+	g_string_sprintfa(interp->header,
+			  "INTERFACE INTERVAL LOST    ES   SES  SEFS    CV DESCRIPTION");
+	for (i = 0; sonetSectionTable[i]; i++) {
+	    fmt_sonet_section_stats(interp->result, sonetSectionTable[i]);
+	}
+    }
+
+    if (sonetSectionTable)
+	sonet_mib_free_sonetSectionCurrentTable(sonetSectionTable);
+
+    if (regex_iface) regfree(regex_iface);
+
+    return SCLI_OK;
+}
+
+
 void
 scli_init_sonet_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 
 	{ "show sonet media", "[<regexp>]",
-	  "The `show sonet media' command displays information about the"
+	  "The `show sonet media' command displays information about the\n"
 	  "configuration of SONET/SDH interfaces.\n",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_sonet_media },
+
+	{ "show sonet section stats", NULL,
+	  "The `show sonet section stats' command displays statistics\n"
+	  "about SONET/SDH section errors. The command outputs a table\n"
+	  "which has the following columns:\n"
+	  "\n"
+	  "  INTERFACE	 network interface number\n"
+	  "  INTERVAL    xxx\n"
+	  "  LOST        xxx\n"
+	  "  ES          errored seconds\n"
+	  "  SES	 severely errored seconds\n"
+	  "  SEFS	 severely errored framing seconds\n"
+	  "  CV          coding violations\n"
+	  "  DESCRIPTION description of the network interface",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_sonet_section_stats },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
