@@ -132,9 +132,9 @@ get_console_local_entry(printer_mib_prtGeneralEntry_t *prtGeneralEntry,
 
 
 static void
-show_printer_info(GString *s,
-		  host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
-		  host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
+fmt_printer_info(GString *s,
+		 host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
+		 host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
 {
     int const indent = 18;
 
@@ -185,7 +185,7 @@ show_printer_info(GString *s,
 
 
 static void
-show_printer_general(GString *s,
+fmt_printer_general(GString *s,
 		     printer_mib_prtGeneralEntry_t *prtGeneralEntry,
 		     printer_mib_prtLocalizationEntry_t **prtLocalTable)
 {
@@ -307,7 +307,7 @@ show_printer_general(GString *s,
 
 
 static int
-cmd_printer_info(scli_interp_t * interp, int argc, char **argv)
+show_printer_info(scli_interp_t * interp, int argc, char **argv)
 {
     host_resources_mib_hrPrinterEntry_t **hrPrinterTable = NULL;
     host_resources_mib_hrDeviceEntry_t **hrDeviceTable = NULL;
@@ -333,14 +333,14 @@ cmd_printer_info(scli_interp_t * interp, int argc, char **argv)
 		    g_string_append(interp->result, "\n");
 		}
 	    }
-	    show_printer_info(interp->result, hrPrinterTable[i],
-			      get_device_entry(hrPrinterTable[i],
+	    fmt_printer_info(interp->result, hrPrinterTable[i],
+			     get_device_entry(hrPrinterTable[i],
 					       hrDeviceTable));
 	    if (prtGeneralTable) {
-		show_printer_general(interp->result,
-				     get_general_entry(hrPrinterTable[i],
-						       prtGeneralTable),
-				     prtLocalTable);
+		fmt_printer_general(interp->result,
+				    get_general_entry(hrPrinterTable[i],
+						      prtGeneralTable),
+				    prtLocalTable);
 	    }
 	    last = hrPrinterTable[i]->hrDeviceIndex;
 	}
@@ -361,67 +361,88 @@ cmd_printer_info(scli_interp_t * interp, int argc, char **argv)
 
 
 static void
-show_printer_alert(GString *s, printer_mib_prtAlertEntry_t *prtAlertEntry)
+fmt_printer_alert(GString *s, printer_mib_prtAlertEntry_t *prtAlertEntry)
 {
-    int const indent = 18;
+    static GSnmpEnum const prtAlertGroup[] = {
+	{ PRINTER_MIB_PRTALERTGROUP_OTHER,	"other" },
+	{ PRINTER_MIB_PRTALERTGROUP_HOSTRESOURCESMIBSTORAGETABLE,	"storage" },
+	{ PRINTER_MIB_PRTALERTGROUP_HOSTRESOURCESMIBDEVICETABLE,	"device" },
+	{ PRINTER_MIB_PRTALERTGROUP_GENERALPRINTER,	"general" },
+	{ PRINTER_MIB_PRTALERTGROUP_COVER,	"cover" },
+	{ PRINTER_MIB_PRTALERTGROUP_LOCALIZATION,	"localization" },
+	{ PRINTER_MIB_PRTALERTGROUP_INPUT,	"input" },
+	{ PRINTER_MIB_PRTALERTGROUP_OUTPUT,	"output" },
+	{ PRINTER_MIB_PRTALERTGROUP_MARKER,	"marker" },
+	{ PRINTER_MIB_PRTALERTGROUP_MARKERSUPPLIES,	"marker supply" },
+	{ PRINTER_MIB_PRTALERTGROUP_MARKERCOLORANT,	"marker colorant" },
+	{ PRINTER_MIB_PRTALERTGROUP_MEDIAPATH,	"media path" },
+	{ PRINTER_MIB_PRTALERTGROUP_CHANNEL,	"channel" },
+	{ PRINTER_MIB_PRTALERTGROUP_INTERPRETER,	"interpreter" },
+	{ PRINTER_MIB_PRTALERTGROUP_CONSOLEDISPLAYBUFFER,	"console display buffer" },
+	{ PRINTER_MIB_PRTALERTGROUP_CONSOLELIGHTS,	"console light" },
+	{ PRINTER_MIB_PRTALERTGROUP_ALERT,	"alert" },
+	{ PRINTER_MIB_PRTALERTGROUP_FINDEVICE,	"finishing device" },
+	{ PRINTER_MIB_PRTALERTGROUP_FINSUPPLY,	"finishing supply" },
+	{ PRINTER_MIB_PRTALERTGROUP_FINSUPPLYMEDIAINPUT,	"finishing supply media input" },
+	{ PRINTER_MIB_PRTALERTGROUP_FINATTRIBUTETABLE,	"finishing attribute table" },
+	{ 0, NULL }
+    };
+
+    int const indent = 14;
+    const char *e;
+
+    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+		      prtAlertEntry->hrDeviceIndex);
+
+    g_string_sprintfa(s, "%-*s %d\n", indent, "Alert:",
+		      prtAlertEntry->prtAlertIndex);
 
     if (prtAlertEntry->prtAlertTime) {
 	g_string_sprintfa(s, "%-*s %s\n", indent, "Date:",
 			  fmt_timeticks(*prtAlertEntry->prtAlertTime));
     }
 
-    if (prtAlertEntry->prtAlertSeverityLevel) {
-	g_string_sprintfa(s, "%-*s ", indent, "Severity:");
-	xxx_enum(s, 24,
-		 printer_mib_enums_prtAlertSeverityLevel,
+    e = fmt_enum(printer_mib_enums_prtAlertCode,
+		 prtAlertEntry->prtAlertCode);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Code:", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtAlertSeverityLevel,
 		 prtAlertEntry->prtAlertSeverityLevel);
-	g_string_append(s, "\n");
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Severity:", e);
     }
 
     fmt_display_string(s, indent+1, "Description:",
 		       (int) prtAlertEntry->_prtAlertDescriptionLength,
 		       prtAlertEntry->prtAlertDescription);
 
-    g_string_sprintfa(s, "%-*s ", indent, "Alert Code:  ");
-    if (prtAlertEntry->prtAlertGroup) {
-	xxx_enum(s, 1, printer_mib_enums_prtAlertGroup,
-		 prtAlertEntry->prtAlertGroup);
-    } else {
-	g_string_append(s, "?");
-    }
-
-    if (prtAlertEntry->prtAlertGroupIndex) {
-	if (*prtAlertEntry->prtAlertGroupIndex != -1)
-	    g_string_sprintfa(s, " #%u",
-			      *prtAlertEntry->prtAlertGroupIndex);
-    }
-    g_string_append(s, " / ");
-    if (prtAlertEntry->prtAlertCode) {
-	xxx_enum(s, 1, printer_mib_enums_prtAlertCode,
-		 prtAlertEntry->prtAlertCode);
-    } else {
-	g_string_append(s, "?");
-    }
-    g_string_append(s, "\n");
-
-    if (prtAlertEntry->prtAlertLocation) {
-	g_string_sprintfa(s, "%-*s %u\n", indent, "Location:",
-			  *prtAlertEntry->prtAlertLocation);
-    }
-    
-    if (prtAlertEntry->prtAlertTrainingLevel) {
-	g_string_sprintfa(s, "%-*s ", indent, "Personnel:");
-	xxx_enum(s, 22,
-		 printer_mib_enums_prtAlertTrainingLevel,
-		 prtAlertEntry->prtAlertTrainingLevel);
+    e = fmt_enum(prtAlertGroup, prtAlertEntry->prtAlertGroup);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s", indent, "Location:", e);
+	if (prtAlertEntry->prtAlertGroupIndex
+	    && *prtAlertEntry->prtAlertGroupIndex > 0) {
+	    g_string_sprintfa(s, " #%u", *prtAlertEntry->prtAlertGroupIndex);
+	}
+	if (prtAlertEntry->prtAlertLocation
+	    && *prtAlertEntry->prtAlertLocation > 0) {
+	    g_string_sprintfa(s, " (at location %u)", *prtAlertEntry->prtAlertLocation);
+	}
 	g_string_append(s, "\n");
+    }
+
+    e = fmt_enum(printer_mib_enums_prtAlertTrainingLevel,
+		 prtAlertEntry->prtAlertTrainingLevel);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Personnel:", e);
     }
 }
 
 
 
 static int
-cmd_printer_alert(scli_interp_t * interp, int argc, char **argv)
+show_printer_alert(scli_interp_t * interp, int argc, char **argv)
 {
     printer_mib_prtAlertEntry_t **prtAlertTable = NULL;
     int i;
@@ -438,7 +459,7 @@ cmd_printer_alert(scli_interp_t * interp, int argc, char **argv)
 	    if (i > 0) {
 		g_string_append(interp->result, "\n");
 	    }
-	    show_printer_alert(interp->result, prtAlertTable[i]);
+	    fmt_printer_alert(interp->result, prtAlertTable[i]);
 	}
     }
 
@@ -805,10 +826,11 @@ cmd_printer_inputs(scli_interp_t * interp, int argc, char **argv)
 
 
 static void
-show_printer_console_display(GString *s,
-     printer_mib_prtConsoleDisplayBufferEntry_t *prtConsoleDisplayEntry)
+fmt_printer_display(GString *s,
+	    printer_mib_prtConsoleDisplayBufferEntry_t *prtConsoleDisplayEntry)
 {
-
+    g_string_sprintfa(s, "%6d  ", prtConsoleDisplayEntry->hrDeviceIndex);
+		      
     g_string_sprintfa(s, "%4d   ",
 		      prtConsoleDisplayEntry->prtConsoleDisplayBufferIndex);
 	
@@ -822,11 +844,10 @@ show_printer_console_display(GString *s,
 
 
 static int
-cmd_printer_console(scli_interp_t * interp, int argc, char **argv)
+show_printer_display(scli_interp_t * interp, int argc, char **argv)
 {
     printer_mib_prtConsoleDisplayBufferEntry_t **prtConsoleDisplayTable;
     int i;
-    gint32 last = 0;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -837,17 +858,10 @@ cmd_printer_console(scli_interp_t * interp, int argc, char **argv)
     }
 
     if (prtConsoleDisplayTable) {
-	g_string_sprintfa(interp->header, "LINE   TEXT");
+	g_string_sprintfa(interp->header, "PRINTER LINE   TEXT");
 	for (i = 0; prtConsoleDisplayTable[i]; i++) {
-	    if (prtConsoleDisplayTable[i]->hrDeviceIndex != last) {
-		if (i > 0) {
-		    g_string_append(interp->result, "\n");
-		}
-		g_string_sprintfa(interp->header, "LINE   TEXT");
-	    }
-	    show_printer_console_display(interp->result,
-					 prtConsoleDisplayTable[i]);
-	    last = prtConsoleDisplayTable[i]->hrDeviceIndex;
+	    fmt_printer_display(interp->result,
+				prtConsoleDisplayTable[i]);
 	}
     }
 
@@ -860,11 +874,12 @@ cmd_printer_console(scli_interp_t * interp, int argc, char **argv)
 
 
 static void
-show_printer_console_light(GString *s,
-		   printer_mib_prtConsoleLightEntry_t *prtConsoleLightEntry,
-			   int led_width)
+fmt_printer_light(GString *s,
+		  printer_mib_prtConsoleLightEntry_t *prtConsoleLightEntry,
+		  int led_width)
 {
-    char const *state = "off";
+    const char *state = "off";
+    const char *e;
     
     if (! prtConsoleLightEntry->prtConsoleOnTime
 	|| ! prtConsoleLightEntry->prtConsoleOffTime
@@ -873,16 +888,14 @@ show_printer_console_light(GString *s,
 	return;
     }
 
-    g_string_sprintfa(s, "%4d   ", prtConsoleLightEntry->prtConsoleLightIndex);
+    g_string_sprintfa(s, "%6d  ", prtConsoleLightEntry->hrDeviceIndex);
+		      
+    g_string_sprintfa(s, "%4d  ", prtConsoleLightEntry->prtConsoleLightIndex);
     
     g_string_sprintfa(s, "%-*.*s ", led_width,
 		      (int) prtConsoleLightEntry->_prtConsoleDescriptionLength,
 		      prtConsoleLightEntry->prtConsoleDescription);
-    
-    xxx_enum(s, 10,
-	     printer_mib_enums_prtConsoleColor,
-	     prtConsoleLightEntry->prtConsoleColor);
-    
+
     if (*prtConsoleLightEntry->prtConsoleOnTime
 	&& !*prtConsoleLightEntry->prtConsoleOffTime) {
 	state = "on";
@@ -893,19 +906,21 @@ show_printer_console_light(GString *s,
 	       && *prtConsoleLightEntry->prtConsoleOffTime) {
 	state = "blink";
     }
+    g_string_sprintfa(s, " %-*s ", 5, state);
 
-    g_string_sprintfa(s, "   %s\n", state);
+    e = fmt_enum(printer_mib_enums_prtConsoleColor,
+		 prtConsoleLightEntry->prtConsoleColor);
+    g_string_sprintfa(s, "%s\n", e ? e : "");
 }
 
 
 
 static int
-cmd_printer_lights(scli_interp_t * interp, int argc, char **argv)
+show_printer_lights(scli_interp_t * interp, int argc, char **argv)
 {
     printer_mib_prtConsoleLightEntry_t **prtConsoleLightTable;
     int i;
-    int led_width = 18;
-    gint32 last = 0;
+    int led_width = 12;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -921,18 +936,12 @@ cmd_printer_lights(scli_interp_t * interp, int argc, char **argv)
 		led_width = prtConsoleLightTable[i]->_prtConsoleDescriptionLength;
 	    }
 	}
+	g_string_sprintfa(interp->header, "PRINTER LIGHT %-*s STATUS COLOR",
+			  led_width, "DESCRIPTION");
 	for (i = 0; prtConsoleLightTable[i]; i++) {
-	    if (prtConsoleLightTable[i]->hrDeviceIndex != last) {
-		if (i > 0) {
-		    g_string_append(interp->result, "\n");
-		}
-		g_string_sprintfa(interp->result, "NUMBER %-*s COLOR      STATUS\n",
-				  led_width, "DESCRIPTION");
-	    }
-	    show_printer_console_light(interp->result,
-				       prtConsoleLightTable[i],
-				       led_width);
-	    last = prtConsoleLightTable[i]->hrDeviceIndex;
+	    fmt_printer_light(interp->result,
+			      prtConsoleLightTable[i],
+			      led_width);
 	}
     }
 
@@ -953,7 +962,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "general printer information",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_printer_info },
+	  show_printer_info },
 
 	{ "show printer inputs", NULL,
 	  "printer input information",
@@ -961,41 +970,64 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  NULL, NULL,
 	  cmd_printer_inputs },
 
-	{ "show printer console", NULL,
-	  "printer console information",
+	{ "show printer display", NULL,
+	  "The show printer display command shows the current contents\n"
+	  "or the printer's display. The command generates a table with the\n"
+	  "following columns:\n"
+	  "\n"
+	  "  PRINTER logical printer number\n"
+	  "  LINE    display line number\n"
+	  "  TEXT    contents of the display line",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_printer_console },
+	  show_printer_display },
 
 	{ "show printer lights", NULL,
-	  "printer console light information",
+	  "The show printer lights command shows the current status of\n"
+	  "the printers lights. The command generates a table with the\n"
+	  "following columns:\n"
+	  "\n"
+	  "  PRINTER     logical printer number\n"
+	  "  LIGHT       number identifying the light/led\n"
+	  "  DESCRIPTION description of the light/led\n"
+	  "  STATUS      current status (on, off, blink)\n"
+	  "  COLOR       current color of the light",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_printer_lights },
+	  show_printer_lights },
 
 	{ "show printer alerts", NULL,
-	  "printer alert information",
+	  "The show printer alerts command displays the list of active\n"
+	  "printer alerts including the alert code, the alert severity,\n"
+	  "the alert description, the alert time, the alert location and\n"
+	  "the personel required to handle the alert.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_printer_alert },
+	  show_printer_alert },
 
-	{ "monitor printer console", NULL,
-	  "printer console information",
+	{ "monitor printer display", NULL,
+	  "The monitor printer display command shows the same information\n"
+	  "as the show printer display command. The information is updated\n"
+	  "periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  NULL, NULL,
-	  cmd_printer_console },
+	  show_printer_display },
 
 	{ "monitor printer lights", NULL,
-	  "printer console light information",
+	  "The monitor printer lights command shows the same information"
+	  "as the show printer lights command. The information is updated\n"
+	  "periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  NULL, NULL,
-	  cmd_printer_lights },
+	  show_printer_lights },
 
 	{ "monitor printer alerts", NULL,
-	  "printer alert information",
+	  "The monitor printer alerts command shows the same information"
+	  "as the show printer alerts command. The information is updated\n"
+	  "periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  NULL, NULL,
-	  cmd_printer_alert },
+	  show_printer_alert },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
