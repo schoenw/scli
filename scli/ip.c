@@ -1,7 +1,7 @@
 /* 
  * ip.c -- scli ip mode implementation
  *
- * Copyright (C) 2001 Juergen Schoenwaelder
+ * Copyright (C) 2001-2002 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,10 @@
 #include "if-mib.h"
 #include "rfc1213-mib.h"
 
+#define RFC1213_MIB_IPROUTE_MASK \
+	( RFC1213_MIB_IPROUTEDEST | RFC1213_MIB_IPROUTEIFINDEX \
+	  | RFC1213_MIB_IPROUTENEXTHOP | RFC1213_MIB_IPROUTETYPE \
+	  | RFC1213_MIB_IPROUTEPROTO | RFC1213_MIB_IPROUTEMASK )
 
 
 GSnmpEnum const forwarding[] = {
@@ -134,7 +138,7 @@ show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 
     ip_forward_mib_get_ipCidrRouteTable(interp->peer, &ipCidrRouteTable, 0);
     if (interp->peer->error_status || !ipCidrRouteTable) {
-	rfc1213_mib_get_ipRouteTable(interp->peer, &ipRouteTable, 0);
+	rfc1213_mib_get_ipRouteTable(interp->peer, &ipRouteTable, RFC1213_MIB_IPROUTE_MASK);
 	if (interp->peer->error_status) {
 	    return SCLI_SNMP;
 	}
@@ -149,8 +153,7 @@ show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 	    for (i = 0; ipCidrRouteTable[i]; i++) {
 		fmt_ip_forward(interp->result, ipCidrRouteTable[i]);
 	    }
-	}
-	if (! ipCidrRouteTable && ipRouteTable) {
+	} else if (ipRouteTable) {
 	    for (i = 0; ipRouteTable[i]; i++) {
 		fmt_ip_route(interp->result, ipRouteTable[i],
 			     ifXTable, ifTable);
@@ -199,26 +202,70 @@ xml_ip_address(xmlNodePtr root, ip_mib_ipAddrEntry_t *ipAddrEntry)
 
 
 static void
-fmt_ip_address(GString *s, ip_mib_ipAddrEntry_t *ipAddrEntry)
+fmt_ip_address(GString *s,
+	       ip_mib_ipAddrEntry_t *ipAddrEntry,
+	       int name_width,
+	       if_mib_ifXEntry_t **ifXTable,
+	       if_mib_ifEntry_t **ifTable)
 {
     char *name;
+    int i;
 
+#if 0
     if (ipAddrEntry->ipAdEntIfIndex) {
 	g_string_sprintfa(s, "%9u ", *(ipAddrEntry->ipAdEntIfIndex));
     } else {
 	g_string_sprintfa(s, "%6s    ", "");
     }
-    g_string_sprintfa(s, "%-16s ",
+#endif
+    g_string_sprintfa(s, "%-17s ",
 	      fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_ADDR));
     if (ipAddrEntry->ipAdEntNetMask) {
-	g_string_sprintfa(s, "/%-5s",
+	g_string_sprintfa(s, "/%-4s",
 			  fmt_ipv4_mask(ipAddrEntry->ipAdEntNetMask));;
     } else {
-	g_string_sprintfa(s, "%-6s", "");
+	g_string_sprintfa(s, "%-5s", "");
     }
     name = fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_NAME);
-    if (name) {
-	g_string_append(s, name);
+    g_string_sprintfa(s, "%-*s ", name_width, name ? name : "");
+    
+    if (ipAddrEntry->ipAdEntIfIndex) {
+#if 1
+	g_string_sprintfa(s, " %u", *(ipAddrEntry->ipAdEntIfIndex));
+#endif
+	if (ifXTable) {
+	    for (i = 0; ifXTable[i]; i++) {
+		if (ifXTable[i]->ifIndex == *ipAddrEntry->ipAdEntIfIndex
+		    && ifXTable[i]->ifName) {
+#if 1
+		    g_string_sprintfa(s, " (%.*s)",
+				      (int) ifXTable[i]->_ifNameLength,
+				      ifXTable[i]->ifName);
+#else
+		    g_string_sprintfa(s, "%.*s",
+				      (int) ifXTable[i]->_ifNameLength,
+				      ifXTable[i]->ifName);
+#endif
+		    break;
+		}
+	    }
+	} else if (ifTable) {
+	    for (i = 0; ifTable[i]; i++) {
+		if (ifTable[i]->ifIndex == *ipAddrEntry->ipAdEntIfIndex
+		    && ifTable[i]->ifDescr) {
+#if 1
+		    g_string_sprintfa(s, " (%.*s)",
+				      (int) ifTable[i]->_ifDescrLength,
+				      ifTable[i]->ifDescr);
+#else
+		    g_string_sprintfa(s, "%.*s",
+				      (int) ifTable[i]->_ifDescrLength,
+				      ifTable[i]->ifDescr);
+#endif
+		    break;
+		}
+	    }
+	}
     }
     g_string_append(s, "\n");
 }
@@ -229,7 +276,9 @@ static int
 show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 {
     ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
-    int i;
+    if_mib_ifEntry_t **ifTable = NULL;
+    if_mib_ifXEntry_t **ifXTable = NULL;
+    int i, name_width = 4;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -247,20 +296,40 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (ipAddrTable) {
+	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFNAME);
 	if (! scli_interp_xml(interp)) {
+	    for (i = 0; ipAddrTable[i]; i++) {
+		char *name;
+		name = fmt_ipv4_address(ipAddrTable[i]->ipAdEntAddr, SCLI_FMT_NAME);
+		if (name && strlen(name) > name_width) {
+		    name_width = strlen(name);
+		}
+	    }
 	    g_string_sprintfa(interp->header,
-			      "INTERFACE ADDRESS        PREFIX  NAME");
+#if 0
+			      "INTERFACE ADDRESS         PREFIX %-*s DESCRIPTION",
+#else
+			      "ADDRESS         PREFIX %-*s INTERFACE",
+#endif
+			      name_width, "NAME");
 	}
 	for (i = 0; ipAddrTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
 		xml_ip_address(interp->xml_node, ipAddrTable[i]);
 	    } else {
-		fmt_ip_address(interp->result, ipAddrTable[i]);
+		fmt_ip_address(interp->result, ipAddrTable[i],
+			       name_width, ifXTable, ifTable);
 	    }
 	}
     }
 
-    if (ipAddrTable) ip_mib_free_ipAddrTable(ipAddrTable);
+    if (ifTable)
+	if_mib_free_ifTable(ifTable);
+    if (ifXTable)
+	if_mib_free_ifXTable(ifXTable);
+    if (ipAddrTable)
+	ip_mib_free_ipAddrTable(ipAddrTable);
 
     return SCLI_OK;
 }
@@ -696,11 +765,11 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "The `show ip forwarding' command displays the IP forwarding data\n"
 	  "base. The command generates a table with the following columns:\n"
 	  "\n"
-	  "  DESTINATION\n"
-	  "  NEXT HOP\n"
-	  "  TYPE\n"
-	  "  PROTO\n"
-	  "  INTERFACE",
+	  "  DESTINATION destination address and prefix\n"
+	  "  NEXT HOP    next hop towards the destination\n"
+	  "  TYPE        type (direct/indirect) of the entry\n"
+	  "  PROTO       protocol which created the entry\n"
+	  "  INTERFACE   interface used for forwarding",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_ip_forwarding },
