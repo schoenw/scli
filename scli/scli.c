@@ -361,6 +361,7 @@ main(int argc, char **argv)
     if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
 	char *pager = getenv("PAGER");
 	if (pager) {
+	    /* xxx do a sanity-check here ? */
 	    interp->pager = g_strdup(pager);
 	}
     }

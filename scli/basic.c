@@ -138,6 +138,9 @@ scli_interp_delete(scli_interp_t *interp)
 	if (interp->result) {
 	    g_string_free(interp->result, 1);
 	}
+	if (interp->pager) {
+	    g_free(interp->pager);
+	}
 	g_free(interp);
     }
 }

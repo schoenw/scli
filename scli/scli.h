@@ -77,6 +77,7 @@ struct scli_interp {
     GSList *mode_list;		/* root of list of registered modes */
     int	flags;			/* interpreter flags */
     GString *result;		/* string result buffer */
+    char *pager;		/* external pager we are using */
     host_snmp *peer;		/* the snmp peer we are talking to */
 };
 
@@ -134,6 +135,9 @@ scli_cmd_open(scli_interp_t *interp, int argc, char **argv);
 
 extern int
 scli_cmd_close(scli_interp_t *interp, int argc, char **argv);
+
+extern int
+scli_cmd_show(scli_interp_t *interp, int argc, char **argv);
 
 /*
  * Initialization functions for the various scli modes.

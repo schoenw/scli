@@ -95,7 +95,7 @@ show_ip_route(GString *s, rfc1213_mib_ipRouteEntry_t *ipRouteEntry,
 	}
 	g_string_sprintfa(s, "%-10s", label ? label : "");
 
-	g_string_sprintfa(s, "%d", *ipRouteEntry->ipRouteIfIndex);
+	g_string_sprintfa(s, "%2d", *ipRouteEntry->ipRouteIfIndex);
 
 	if (ifXTable) {
 	    for (i = 0; ifXTable[i]; i++) {

@@ -149,3 +149,35 @@ scli_cmd_close(scli_interp_t *interp, int argc, char **argv)
 
     return SCLI_OK;
 }
+
+
+
+int
+scli_cmd_show(scli_interp_t *interp, int argc, char **argv)
+{
+    int const indent = 18;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (interp->pager) {
+	g_string_sprintfa(interp->result, "%-*s %s \n", indent,
+			  "Pager:", interp->pager);
+    }
+
+    if (interp->peer) {
+	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
+			  "Host:", interp->peer->name);
+	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+			  "Port:", interp->peer->port);
+	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+			  "Retries:", interp->peer->retries);
+	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+			  "Timeout:", interp->peer->timeout);
+	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
+			  "Community:", interp->peer->rcomm);
+	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+			  "Version:", interp->peer->version);
+    }
+
+    return SCLI_OK;
+}
