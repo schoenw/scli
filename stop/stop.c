@@ -833,6 +833,7 @@ main(int argc, char **argv)
     stop_init_interface_mode();
     stop_init_process_mode();
     stop_init_disman_mode();
+    stop_init_tcp_mode();
 
     if (mode_name) {
 	GSList *elem;

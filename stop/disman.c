@@ -116,6 +116,21 @@ trim_string8(guchar *s, gsize len)
 
 
 static void
+show_disman_summary(host_snmp *peer)
+{
+    GString *s;
+    
+    g_return_if_fail(peer);
+    
+    s = g_string_new("Disman: ");
+
+    stop_show_mode_summary_line(s->str);
+    g_string_free(s, 1);
+}
+
+
+
+static void
 show_runs(WINDOW *win, host_snmp *peer, int flags)
 {
     smLaunchEntry_t **smLaunchTable = NULL;
@@ -123,7 +138,7 @@ show_runs(WINDOW *win, host_snmp *peer, int flags)
     int i;
 
     if (flags & STOP_FLAG_RESTART) {
-	/* show_disman_summary(peer); */
+	show_disman_summary(peer);
 	wattron(win, A_REVERSE);
 	mvwprintw(win, 0, 0, "%-*s", COLS, 
 		  "L-OWNER  L-NAME   RUNID STAT    LIFE   EXPIRE S-OWNER  S-NAME   ARGUMENT");

@@ -95,6 +95,9 @@ stop_init_process_mode();
 extern void
 stop_init_disman_mode();
 
+extern void
+stop_init_tcp_mode();
+
 /*
  * Formatting utilities that are used frequently by scli modes.
  */
