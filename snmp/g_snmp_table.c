@@ -59,7 +59,7 @@ g_snmp_table_done_callback(host_snmp *host, gpointer data,
                             MIN(index_len, cobj->id_len - obj->id_len)
                             * sizeof (gulong))))
                 {
-                  g_warning("Non-regular SNMP table");
+		    /* g_warning("Non-regular SNMP table"); (js) */
                   if (j>0)
                     {
                        index_len = cobj->id_len - obj->id_len;
