@@ -99,9 +99,7 @@ productmib_proc_set_vlan_port_member(GSnmpSession *s,
     for (i = 0; i < bits_len * 8; i++) {
 	int bit = bits[i/8] & 1 << (7-(i%8));
 	if (bit) {
-	    if_mib_proc_stack_interface(s,
-					ifStackTable[i]->ifStackLowerLayer,
-					ifStackTable[i]->ifStackHigherLayer);
+	    if_mib_proc_stack_interface(s, i, ifIndex);
 	    /* xxx error handling ? xxx */
 	}
     }
