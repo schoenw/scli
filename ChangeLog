@@ -1,3 +1,171 @@
+2002-09-02 11:21  schoenw
+
+	* scli/ip.c: Added some untested code to handle the
+	ipCidrRouteTable.
+
+2002-09-02 11:02  schoenw
+
+	* scli/ip.c: Removed dead code.
+
+2002-08-30 20:54  schoenw
+
+	* configure.in: Patches to keep autoconf happy submitted by Tomasz
+	Kloczek <kloczek@test2.zie.pg.gda.pl>.
+
+2002-08-14 10:28  schoenw
+
+	* scli/ip.c: Revised the output format of "show ip addresses".
+
+2002-08-14 10:28  schoenw
+
+	* scli/interface.c: Move the retrieval of sysUpTime closer to the
+	formatting function to reduce clock screws. This is not a real
+	solution but hopefully better than what we had before.
+
+2002-08-13 11:30  schoenw
+
+	* configure.in: Patch from Andrew Hood
+	<mithrandir@alwaysonline.net.au> to make autoconf 2.53 happy.
+
+2002-07-25 16:00  schoenw
+
+	* scli/cmds.c: Added the new set scli mode command.
+
+2002-07-24 16:27  schoenw
+
+	* scli/isdn.c: Some more ISDN specific updates.
+
+2002-07-24 16:19  schoenw
+
+	* stub/: Makefile.am, isdn-mib.c, isdn-mib.h: Added stubs for the
+	isdnEndpointEntry.
+
+2002-07-24 09:20  schoenw
+
+	* scli/isdn.c: Finalized the show isdn bri command.
+
+2002-07-24 08:55  schoenw
+
+	* scli/isdn.c: Started a new show isdn bri command.
+
+2002-07-24 08:55  schoenw
+
+	* scli/atm.c: Code and documentation cleanups.
+
+2002-07-24 08:54  schoenw
+
+	* scli/: cmds.c, entity.c: Documentation cosmetics.
+
+2002-07-24 08:53  schoenw
+
+	* stub/: Makefile.am, isdn-mib.c, isdn-mib.h: Regenerated stubs to
+	remove unused code.
+
+2002-07-23 18:32  schoenw
+
+	* scli/sonet.c: Added show sonet section history and monitor sonet
+	section stats commands and fixed a few bugs. Changed the output
+	format slightly.
+
+2002-07-23 15:18  schoenw
+
+	* snmp/: g_utils.c, g_utils.h: Changed some prototypes to use
+	size_t.
+
+2002-07-23 11:50  schoenw
+
+	* scli/sonet.c: Minor fixes and better documentation.
+
+2002-07-23 11:21  schoenw
+
+	* scli/sonet.c: Added the "show sonet section stats" command.
+
+2002-07-23 11:11  schoenw
+
+	* stub/: Makefile.am, etherlike-mib.c, etherlike-mib.h, mau-mib.c,
+	mau-mib.h, sonet-mib.c, sonet-mib.h: Regenerated stubs to
+	include/exclude objects.
+
+2002-07-22 21:44  schoenw
+
+	* scli/: interface.c, scli.h, sonet.c: The show sonet media command
+	now accepts regular expressions and does some smarter formatting.
+
+2002-07-22 21:43  schoenw
+
+	* scli/vendors.c: Added ceragon.
+
+2002-07-22 18:52  schoenw
+
+	* stub/: disman-script-mib.c, disman-script-mib.h, if-mib.c,
+	if-mib.h: Regenerated stubs to include new/fixed create/delete/set
+	methods.
+
+2002-07-19 14:16  schoenw
+
+	* scli/: ether.c, sonet.c: Some documentation cleanup.
+
+2002-07-19 14:02  schoenw
+
+	* scli/: Makefile.am, basic.c, scli.h, sonet.c: Added some
+	rudimentary support for SONET interfaces.
+
+2002-07-19 13:31  schoenw
+
+	* stub/: sonet-mib.c, Makefile.am, sonet-mib.h: Added some stubs
+	for the SONET-MIB.
+
+2002-07-19 11:17  schoenw
+
+	* scli/printer.c: Added a new "set printer operator" command.
+
+2002-07-19 11:17  schoenw
+
+	* scli/: interface.c, netsnmp.c, snmp.c, system.c: Changes to use
+	the new stub methods.
+
+2002-07-19 11:16  schoenw
+
+	* scli/tcp.c: Minor changes to the xml format produced by show tcp
+	states.
+
+2002-07-19 11:15  schoenw
+
+	* scli/Makefile.am: Fixed the currently unused rules for gscli.
+
+2002-07-19 11:13  schoenw
+
+	* stub/: if-mib.c, if-mib.h, printer-mib.c, printer-mib.h,
+	snmpv2-mib.c, snmpv2-mib.h, ucd-snmp-mib.c, ucd-snmp-mib.h:
+	Regenerated some stubs in order to use the new compiler generated
+	create/delete/set methods.
+
+2002-07-19 11:11  schoenw
+
+	* stub/Makefile.am: Generate less unused stub code.
+
+2002-07-19 11:11  schoenw
+
+	* proc/: if-mib-proc.c, if-mib-proc.h, productmib-proc.c,
+	snmp-view-based-acm-mib-proc.c: Removed several proc functions that
+	are now part of the stubs.
+
+2002-07-04 09:46  schoenw
+
+	* stub/: Makefile.am, ip-mib.c, ip-mib.h, ospf-mib.c, ospf-mib.h,
+	rfc1213-mib.c, rfc1213-mib.h, tcp-mib.c, tcp-mib.h: The Makefile
+	now uses explicit rules for generating stubs from MIB modules.
+	Regenerated some stubs to reduce the amount of unused code and to
+	remove redundant length checks in some unpack functions.
+
+2002-07-04 09:44  schoenw
+
+	* scli/ospf.c: Fixed another usage of a wrong enumeration.
+
+2002-07-03 20:48  schoenw
+
+	* AUTHORS, ChangeLog, NEWS: Updates for release 0.2.11.
+
 2002-07-03 20:43  schoenw
 
 	* doc/scli.texinfo: Regenerated the file for the next release.

@@ -1,3 +1,14 @@
+Changes in scli 0.2.12:
+
+- new "show isdn bri command"
+- new "show isdn bearer command"
+- new "show sonet media" command
+- new "show sonet section stats" command
+- new "show sonet section history" command
+- new "monitor sonet section stats" command
+- new "set printer operator" command
+- minor bug fixes
+
 Changes in scli 0.2.11:
 
 - new "show tcp states" and "monitor tcp states" commands

@@ -6,7 +6,7 @@
 @setchapternewpage odd
 @c %**end of header
 
-@set VERSION 0.2.10
+@set VERSION 0.2.12
 
 @ifinfo
 This file documents the @code{scli} SNMP command line interface.
@@ -293,17 +293,18 @@ This mode is intended to display and configure ATM parameters.
 @command{show atm interface details <regexp>}
 @end example
 
-The show atm interface info command displays summary
+The @command{show atm interface info} command displays summary
 information for all selected ATM interfaces. The optional
 regular expression <regexp> is matched against the interface
 descriptions to select the interfaces of interest. The command
 generates a table with the following columns:
 
 @verbatim
-  INTERFACE network interface number
+  INTERFACE   network interface number
+  DESCRIPTION description of the network interface
 @end verbatim
 
-The show atm interface details command describes the selected
+The @command{show atm interface details} command describes the selected
 ATM interfaces in more detail. The optional regular expression
 <regexp> is matched against the interface descriptions to
 select the interfaces of interest.
@@ -450,7 +451,7 @@ monitor running scripts
 
 The entity scli mode is based on the ENTITY-MIB as published in
 RFC 2737. It provides commands to browse the physical entities
-or physical components what make up a managed system.
+or physical components that make up a managed system.
 
 @example
 @command{show entity info}
@@ -458,7 +459,7 @@ or physical components what make up a managed system.
 @command{show entity containment}
 @end example
 
-The show entity info command displays summary information about
+The @command{show entity info} command displays summary information about
 the physical entities that compose the system. The command
 generates a table with the following columns:
 
@@ -469,10 +470,10 @@ generates a table with the following columns:
   DESCRIPTION description of the entity
 @end verbatim
 
-The show entity details command describes the physical entities
+The @command{show entity details} command describes the physical entities
 in more detail.
 
-The show entity containment command displays the physical entity
+The @command{show entity containment} command displays the physical entity
 containment hierarchy.
 @section ETHERNET MODE
 
@@ -485,7 +486,7 @@ in RFC 2665 and the MAU-MIB as published in RFC 2668.
 @command{monitor ethernet stats}
 @end example
 
-The show ethernet mau command displays information about the
+The @command{show ethernet mau} command displays information about the
 medium attachment units (MAUs) for each ethernet port. The
 command generates a table which has the following columns:
 
@@ -499,7 +500,7 @@ command generates a table which has the following columns:
   TYPE      type of the medium attachment unit
 @end verbatim
 
-The show ethernet stats command displays ethernet specific
+The @command{show ethernet stats} command displays ethernet specific
 statistics for each ethernet interface. The command outputs
 a table which has the following columns:
 
@@ -518,7 +519,7 @@ a table which has the following columns:
   CARR      carrier sense errors per second
 @end verbatim
 
-The monitor ethernet stats command shows the same information
+The @command{monitor ethernet stats} command shows the same information
 as the show ethernet stats command. The information is updated
 periodically.
 @section INTERFACE MODE
@@ -677,11 +678,12 @@ The @command{show ip forwarding} command displays the IP forwarding data
 base. The command generates a table with the following columns:
 
 @verbatim
-  DESTINATION
-  NEXT HOP
-  TYPE
-  PROTO
-  INTERFACE
+  DESTINATION destination address and prefix
+  NEXT-HOP    next hop towards the destination
+  TOS         type of service selector
+  TYPE        type (direct/indirect) of the entry
+  PROTO       protocol which created the entry
+  INTERFACE   interface used for forwarding
 @end verbatim
 
 The @command{show ip addresses} command displays the IP addresses
@@ -718,11 +720,29 @@ The scli isdn mode is based on the ISDN-MIB as published
 in RFC 2127.
 
 @example
+@command{show isdn bri [<regexp>]}
 @command{show isdn bearer}
+@command{show isdn endpoints}
 @end example
+
+The @command{show isdn bri} command shows information about
+the ISDN basic rate interfaces. The command outputs
+a table which has the following columns:
+
+@verbatim
+  INTERFACE   network interface number
+  TYPE        type of the ISDN interface
+  TOPOLOGY    line topology
+  MODE        interface mode (te/nt)
+  SIGNALING   signaling mode (active/inactive)
+  DESCRIPTION description of the network interface
+@end verbatim
 
 The @command{show isdn bearer} command shows information about
 the ISDN B (bearer) channels.
+
+The @command{show isdn endpoints} command shows information about
+the ISDN endpoints.
 @section NETSNMP MODE
 
 The netsnmp scli mode is used to display and configure netsnmp
@@ -872,6 +892,7 @@ in RFC 1759 and some updates currently being worked on in the
 IETF Printer MIB working group.
 
 @example
+@command{set printer operator <string>}
 @command{show printer info}
 @command{show printer covers}
 @command{show printer inputs}
@@ -887,6 +908,11 @@ IETF Printer MIB working group.
 @command{monitor printer console lights}
 @command{monitor printer alerts}
 @end example
+
+The @command{set printer operator} command configures the name of the
+person responsible for operating a printer. As a convention,
+the phone number, fax number or email address should be
+indicated by the tel:, fax: and mailto: URL schemes.
 
 The @command{show printer info} command shows general information about
 the printer including global status information.
@@ -986,6 +1012,7 @@ manipulate the internal state of the scli interpreter.
 @command{set scli debugging [<regexp>]}
 @command{set scli pager <pager>}
 @command{set scli format <fmt>}
+@command{set scli mode <mode>}
 @command{show scli info}
 @command{show scli command info [<regex]}
 @command{show scli command details [<regex]}
@@ -1083,6 +1110,12 @@ subsequent scli commands. The currently supported formats are
 format and described in this documentation. The "xml" output
 format is experimental and therefore not described here.
 
+The @command{set scli mode} command defines the scli mode used by
+subsequent scli commands. Setting the mode to "protocol"
+will force scli to work in protocol mode. Setting the mode to
+"normal" causes scli to work in normal mode where certain
+status messages are suppressed.
+
 The @command{show scli info} command displays the current status of the
 scli interpreter.
 
@@ -1090,11 +1123,9 @@ The @command{show scli command info} command displays summary information
 about scli commands. The optional regular expression <regexp> is
 matched against the command names to select the scli commands.
 
-
 The @command{show scli command details} command displays detailed information
 about scli commands. The optional regular expression <regexp> is
 matched against the command names to select the scli commands.
-
 
 The @command{show scli command tree} command displays the scli command
 tree. The full command syntax is displayed for each leaf node.
@@ -1255,6 +1286,63 @@ generates a table with the following columns:
 The @command{dump snmp} command generates a sequence of scli commands
 which can be used to restore the engine configuration.
 
+@section SONET MODE
+
+The sonet scli mode is based on the SONET-MIB as published
+in RFC 2558. It provides commands to manage Synchronous Optical
+Network/Synchronous Digital Hierarchy (SONET/SDH) interfaces.
+
+@example
+@command{show sonet media [<regexp>]}
+@command{show sonet section stats [<regexp>]}
+@command{show sonet section history [<regexp>]}
+@command{monitor sonet section stats [<regexp>]}
+@end example
+
+The @command{show sonet media} command displays information about the
+configuration of SONET/SDH interfaces. The command outputs a
+table which has the following columns:
+
+@verbatim
+  INTERFACE   network interface number
+  SIGNAL      type of the signal (SONET/SDH)
+  CODING      line coding (B3ZS, CMI, NRZ, RZ)
+  LINE        optical or electrical line type
+  DESCRIPTION description of the network interface
+@end verbatim
+
+The @command{show sonet section stats} command displays statistics
+about SONET/SDH section errors. The command outputs a table
+which has the following columns:
+
+@verbatim
+  INTERFACE   network interface number
+  INTERVAL    measurement interval
+  ES          errored seconds
+  SES         severely errored seconds
+  SEFS        severely errored framing seconds
+  CV          coding violations
+  LOSS        flags indicating loss of signal/frame
+  DESCRIPTION description of the network interface
+@end verbatim
+
+The @command{show sonet section history} command displays 15 minute
+history statistics about SONET/SDH section errors. The command
+outputs a table which has the following columns:
+
+@verbatim
+  INTERFACE   network interface number
+  INTERVAL    measurement interval start offset
+  ES          errored seconds
+  SES         severely errored seconds
+  SEFS        severely errored framing seconds
+  CV          coding violations
+  DESCRIPTION description of the network interface
+@end verbatim
+
+The @command{monitor sonet section stats} command shows the same
+information as the show sonet section stats command. The
+information is updated periodically.
 @section SYSTEM MODE
 
 The system scli mode is primarily based on the SNMPv2-MIB as
@@ -1276,20 +1364,20 @@ parameters and characteristics.
 @command{dump system}
 @end example
 
-The set system contact command configures the system contact
+The @command{set system contact} command configures the system contact
 information. The <string> argument should include information
 on how to contact a person who is responsible for this system.
 
-The set system name command configures the name of the system.
+The @command{set system name} command configures the name of the system.
 By convention, this is the fully-qualified domain name.
 
-The set system location command configures the physical
+The @command{set system location} command configures the physical
 location of the system.
 
-The show system info command shows general information about the
+The @command{show system info} command shows general information about the
 system.
 
-The show system devices command shows a list of system devices.
+The @command{show system devices} command shows a list of system devices.
 The command generates a table with the following columns:
 
 @verbatim
@@ -1298,7 +1386,7 @@ The command generates a table with the following columns:
   DESCRIPTION description of the device
 @end verbatim
 
-The show system storage command displays information about the
+The @command{show system storage} command displays information about the
 logical areas attached in the system. The command generates a
 table with the following columns:
 
@@ -1312,7 +1400,7 @@ table with the following columns:
   USE%        used storage in percent
 @end verbatim
 
-The show system mounts command shows the list of filesystems
+The @command{show system mounts} command shows the list of filesystems
 mounted on the system. The command generates a table with the
 following columns:
 
@@ -1324,7 +1412,7 @@ following columns:
   OPTIONS access mode (ro/rw) and boot flag
 @end verbatim
 
-The show system processes command display information about the
+The @command{show system processes} command display information about the
 processes currently running on the system. The regular expression
 <regexp> is matched against the command executed by the process
 to select the processes of interest.The command generates a table
@@ -1343,15 +1431,15 @@ The process status values are C=running, R=runnable,
 S=not runnable, and Z=invalid. The process types values are
 ?=unknown, O=operating system, D=device driver, and A=application.
 
-The monitor system storage command shows the same
+The @command{monitor system storage} command shows the same
 information as the show system storage command. The
 information is updated periodically.
 
-The monitor system processes command show the same
+The @command{monitor system processes} command show the same
 information as the show system processes command. The
 information is updated periodically.
 
-The dump system command generates a sequence of scli commands
+The @command{dump system} command generates a sequence of scli commands
 which can be used to restore the system configuration.
 
 @section TCP MODE
