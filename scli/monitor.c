@@ -564,8 +564,8 @@ help(scli_cmd_t *cmd, int argc, char **argv)
 static int
 mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 {
-    int c, flags = 0;
-    char *input, buffer[80];
+    int c, num, flags = 0;
+    char *input, buffer[80], *end;
     int code = SCLI_OK;
     
     flags |= STOP_FLAG_RESTART;
@@ -652,11 +652,14 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
             break;
         case 'd':
             input = prompt("Delay between updates (seconds): ");
-            if (atoi(input) > 0) {
-                interp->delay = atoi(input) * 1000;
-            }
-	    g_snprintf(buffer, sizeof(buffer),
-		       "Delay changed to %d seconds.", interp->delay / 1000);
+	    num = strtol(input, &end, 0);
+	    if (*end || num <= 0) {
+		g_snprintf(buffer, sizeof(buffer), "Invalid value `%s'", input);
+	    } else {
+		interp->delay = num * 1000;
+		g_snprintf(buffer, sizeof(buffer),
+			   "Delay changed to %d seconds.", interp->delay / 1000);
+	    }
 	    show_message(buffer);
             break;
 	case 'm':

@@ -1253,13 +1253,18 @@ cmd_xxx(scli_interp_t *interp, int argc, char **argv)
     if_mib_interfaces_t *interfaces = NULL;
     if_mib_ifEntry_t **ifTable = NULL;
     int i, n;
+    char *end;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 2) {
 	return SCLI_SYNTAX_NUMARGS;
     }
-    n = atoi(argv[1]);
+
+    n = strtol(argv[1], &end, 0);
+    if (*end) {
+	return SCLI_SYNTAX_NUMBER;
+    }
 
     for (i = 0; i < n; i++) {
 	(void) getuid();
