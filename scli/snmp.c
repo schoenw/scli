@@ -155,6 +155,14 @@ show_snmp_engine(scli_interp_t *interp, int argc, char **argv)
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     snmp_framework_mib_get_snmpEngine(interp->peer, &snmpEngine, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -212,6 +220,14 @@ show_snmp_resources(scli_interp_t *interp, int argc, char **argv)
     int i;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
 
     snmpv2_mib_get_sysORTable(interp->peer, &sysORTable, 0);
     if (interp->peer->error_status) {
@@ -277,6 +293,14 @@ show_snmp_vacm_groups(scli_interp_t *interp, int argc, char **argv)
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
 
     snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(interp->peer,
 							 &vacmGroupTable, 0);
@@ -369,6 +393,14 @@ show_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
 
     snmp_view_based_acm_mib_get_vacmAccessTable(interp->peer,
 						&vacmAccessTable, 0);
@@ -470,6 +502,14 @@ show_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     snmp_view_based_acm_mib_get_vacmViewTreeFamilyTable(interp->peer,
 							&vacmViewTable, 0);
     if (interp->peer->error_status) {
@@ -515,14 +555,14 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  "The show snmp engine command displays information about the\n"
 	  "SNMP protocol engine such as the number of boots, the current\n"
 	  "time relative to the last boot and the maximum message size.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_snmp_engine },
 
 	{ "show snmp resources", NULL,
 	  "The show snmp resources command displays information about the\n"
 	  "MIB resources supported by the SNMP agent.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_snmp_resources },
 
@@ -535,7 +575,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  "  MOD   security model\n"
 	  "  NAME  security name\n"
 	  "  GROUP security group name",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_snmp_vacm_groups },
 
@@ -553,13 +593,13 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  "  READ   view name for read access\n"
 	  "  WRITE  view name for write access\n"
 	  "  NOTIFY view name for notification",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_snmp_vacm_access },
 
 	{ "show snmp vacm views", NULL,
 	  "The show snmp vacm views command displays the view definitions.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_snmp_vacm_views },
 

@@ -103,6 +103,10 @@ show_entity_containment(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -315,6 +319,10 @@ show_entity_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -388,6 +396,10 @@ show_entity_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -429,19 +441,19 @@ scli_init_entity_mode(scli_interp_t *interp)
 
 	{ "show entity info ", NULL,
 	  "physical entities that compose the system",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_entity_info },
 	
 	{ "show entity details ", NULL,
 	  "physical entities that compose the system",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "entity details", NULL,
 	  show_entity_details },
 	
 	{ "show entity containment", NULL,
 	  "physical entity containment hierarchy",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_entity_containment },
 
