@@ -1287,6 +1287,8 @@ if_mib_create_ifStackEntry(GSnmpSession *s, gint32 ifStackHigherLayer, gint32 if
     gint32 create = IF_MIB_IFSTACKSTATUS_CREATEANDGO;
 
     ifStackEntry = if_mib_new_ifStackEntry();
+    ifStackEntry->ifStackHigherLayer = ifStackHigherLayer;
+    ifStackEntry->ifStackLowerLayer = ifStackLowerLayer;
     ifStackEntry->ifStackStatus = &create;
     if_mib_set_ifStackEntry(s, ifStackEntry, IF_MIB_IFSTACKSTATUS);
     if_mib_free_ifStackEntry(ifStackEntry);
@@ -1495,6 +1497,8 @@ if_mib_create_ifRcvAddressEntry(GSnmpSession *s, gint32 ifIndex, guchar *ifRcvAd
     gint32 create = IF_MIB_IFRCVADDRESSSTATUS_CREATEANDGO;
 
     ifRcvAddressEntry = if_mib_new_ifRcvAddressEntry();
+    ifRcvAddressEntry->ifIndex = ifIndex;
+    memcpy(ifRcvAddressEntry->ifRcvAddressAddress, ifRcvAddressAddress, _ifRcvAddressAddressLength);
     ifRcvAddressEntry->ifRcvAddressStatus = &create;
     if_mib_set_ifRcvAddressEntry(s, ifRcvAddressEntry, IF_MIB_IFRCVADDRESSSTATUS);
     if_mib_free_ifRcvAddressEntry(ifRcvAddressEntry);
