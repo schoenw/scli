@@ -225,14 +225,14 @@ assign_dot1dBasePortEntry(GSList *vbl)
             }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
+            if (vb->type == G_SNMP_COUNTER32) {
                 dot1dBasePortEntry->dot1dBasePortDelayExceededDiscards = &(vb->syntax.ui32[0]);
             } else {
                 g_warning("illegal type for dot1dBasePortDelayExceededDiscards");
             }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
+            if (vb->type == G_SNMP_COUNTER32) {
                 dot1dBasePortEntry->dot1dBasePortMtuExceededDiscards = &(vb->syntax.ui32[0]);
             } else {
                 g_warning("illegal type for dot1dBasePortMtuExceededDiscards");
@@ -360,7 +360,7 @@ assign_dot1dStp(GSList *vbl)
             }
         }
         if (vb->id_len > 9 && vb->id[8] == 4) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
+            if (vb->type == G_SNMP_COUNTER32) {
                 dot1dStp->dot1dStpTopChanges = &(vb->syntax.ui32[0]);
             } else {
                 g_warning("illegal type for dot1dStpTopChanges");
@@ -598,7 +598,7 @@ assign_dot1dStpPortEntry(GSList *vbl)
             }
         }
         if (vb->id_len > 11 && vb->id[10] == 10) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
+            if (vb->type == G_SNMP_COUNTER32) {
                 dot1dStpPortEntry->dot1dStpPortForwardTransitions = &(vb->syntax.ui32[0]);
             } else {
                 g_warning("illegal type for dot1dStpPortForwardTransitions");
@@ -710,7 +710,7 @@ assign_dot1dTp(GSList *vbl)
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 1) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
+            if (vb->type == G_SNMP_COUNTER32) {
                 dot1dTp->dot1dTpLearnedEntryDiscards = &(vb->syntax.ui32[0]);
             } else {
                 g_warning("illegal type for dot1dTpLearnedEntryDiscards");
@@ -956,21 +956,21 @@ assign_dot1dTpPortEntry(GSList *vbl)
             }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
+            if (vb->type == G_SNMP_COUNTER32) {
                 dot1dTpPortEntry->dot1dTpPortInFrames = &(vb->syntax.ui32[0]);
             } else {
                 g_warning("illegal type for dot1dTpPortInFrames");
             }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
+            if (vb->type == G_SNMP_COUNTER32) {
                 dot1dTpPortEntry->dot1dTpPortOutFrames = &(vb->syntax.ui32[0]);
             } else {
                 g_warning("illegal type for dot1dTpPortOutFrames");
             }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
+            if (vb->type == G_SNMP_COUNTER32) {
                 dot1dTpPortEntry->dot1dTpPortInDiscards = &(vb->syntax.ui32[0]);
             } else {
                 g_warning("illegal type for dot1dTpPortInDiscards");
