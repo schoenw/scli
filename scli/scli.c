@@ -175,6 +175,11 @@ completion(char *text, int start, int end)
 
     matches = completion_matches(text, generator);
 
+    /* Don't switch to filename completion if no matches ware found. */
+    if (! matches) {
+       rl_completion_entry_function = (Function *) completion;
+    }
+    
     return (matches);
 }
 
