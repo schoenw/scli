@@ -148,6 +148,8 @@ show_ospf_info(scli_interp_t *interp, int argc, char **argv)
 static void
 fmt_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
 {
+    const char *e;
+    
     g_string_append(s, "\nArea: ");
     if (ospfAreaEntry->ospfAreaId) {
 	g_string_sprintfa(s,"             %-15s", 
@@ -158,14 +160,11 @@ fmt_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
     }
     g_string_append(s, "\n");
 
-    g_string_append(s, "Area status:       ");
-    if (ospfAreaEntry->ospfAreaStatus) {
-	xxx_enum(s, 13, ospf_mib_enums_ospfAreaStatus,
+    e = fmt_enum(ospf_mib_enums_ospfAreaStatus,
 		 ospfAreaEntry->ospfAreaStatus);
-    } else {
-	g_string_append(s, "?");
+    if (e) {
+	g_string_sprintfa(s, "Area status:       %s\n", e);
     }
-    g_string_append(s, "\n");
     
     g_string_append(s, "Auth-Type:         ");
     if (ospfAreaEntry->ospfAuthType) {
@@ -187,15 +186,12 @@ fmt_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
 	g_string_append(s, "?     ");
     }
     g_string_append(s, "\n");
-    
-    g_string_append(s, "AS external LSAs:  ");
-    if (ospfAreaEntry->ospfImportAsExtern) {	 
-	xxx_enum(s, 16, ospf_mib_enums_ospfImportAsExtern,
+
+    e = fmt_enum(ospf_mib_enums_ospfImportAsExtern,
 		 ospfAreaEntry->ospfImportAsExtern);
-    } else {
-	g_string_append(s, "?");
+    if (e) {
+	g_string_sprintfa(s, "AS external LSAs:  %s\n", e);
     }
-    g_string_append(s, "\n");
     
     g_string_append(s, "Send summary LSAs: ");
     if (ospfAreaEntry->ospfAreaSummary) {
