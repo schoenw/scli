@@ -38,24 +38,6 @@ static void
 show_ip_forward(GString *s,
 		ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry)
 {
-#if 0    
-    int pos;
-    
-    g_string_sprintfa(s, "%s:%s%n",
-		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress, 1),
-		      fmt_port(tcpConnEntry->tcpConnLocalPort, 1),
-		      &pos);
-    g_string_sprintfa(s, "%*s", MAX(32-pos, 1), "");
-    g_string_sprintfa(s, "%s:%s%n",
-		      fmt_ipv4_address(tcpConnEntry->tcpConnRemAddress, 1),
-		      fmt_port(tcpConnEntry->tcpConnRemPort, 1),
-		      &pos);
-    g_string_sprintfa(s, "%*s", MAX(32-pos, 1), "");
-    if (tcpConnEntry->tcpConnState) {
-	fmt_enum(s, 1, tcp_mib_enums_tcpConnState,
-		 tcpConnEntry->tcpConnState);
-    }
-#endif
     g_string_append(s, "\n");
 }
 
