@@ -78,6 +78,7 @@ onsignal(int n)
 }
 
 
+
 static void
 onwinch(int n)
 {
@@ -96,6 +97,7 @@ onwinch(int n)
 }
 
 
+
 static void
 fix_string(guchar *s, gsize *len)
 {
@@ -105,6 +107,33 @@ fix_string(guchar *s, gsize *len)
         if (s[i] == '\r' || s[i] == '\n') s[i] = ' ';
     }
 }
+
+
+
+static void
+snmp_decode_hook(GSList *list)
+{
+    static char x[] = { '-', '/', '-', '\\', '|' };
+    static int i = 0;
+    char buffer[80];
+
+    if (! list) {
+	i = 0;
+	return;
+    }
+
+    i = (i+1) % 5;
+    g_snprintf(buffer, sizeof(buffer), "%c", x[i]);
+    
+    move(status_line, 0);
+    clrtoeol();
+    attron(A_BOLD);
+    addstr(buffer);
+    attroff(A_BOLD);
+    move(status_line, 0);
+    refresh();
+}
+
 
 
 void
@@ -119,6 +148,7 @@ stop_register_mode(stop_mode_t *mode)
 }
 
 
+
 void
 stop_show_message(char *message)
 {
@@ -130,6 +160,7 @@ stop_show_message(char *message)
     refresh();
     sleep(1);
 }
+
 
 
 char*
@@ -150,6 +181,7 @@ stop_prompt(char *message)
     clrtoeol();
     return buffer;
 }
+
 
 
 void
@@ -205,6 +237,7 @@ show_interior(host_snmp *peer)
     }
     mode_win = newwin(LINES-y, COLS, y, 0);
 }
+
 
 
 static int
@@ -290,6 +323,7 @@ show_system(host_snmp *peer, int flags)
     mvaddstr(0, COLS-strlen(timestr)-1, timestr);
     return 0;
 }
+
 
 
 static void
@@ -426,6 +460,7 @@ show_udp(host_snmp *peer, int flags)
 }
 
 
+
 static void
 show_tcp(host_snmp *peer, int flags)
 {
@@ -496,6 +531,7 @@ show_tcp(host_snmp *peer, int flags)
 }
 
 
+
 static void
 help()
 {
@@ -533,6 +569,7 @@ help()
     (void) getch();
     clear();
 }
+
 
 
 static void
@@ -687,6 +724,7 @@ mainloop(host_snmp *peer, int delay)
 }
 
 
+
 static void
 usage()
 {
@@ -702,6 +740,7 @@ usage()
 	"  -t, --timeout     timeout between retries in milliseconds (default 200)\n"
 	);
 }
+
 
 
 int
@@ -867,6 +906,7 @@ main(int argc, char **argv)
     (void) noecho();
     (void) nonl();
 
+    g_snmp_list_decode_hook = snmp_decode_hook;
     mainloop(peer, delay);
 
     (void) endwin();
