@@ -1200,7 +1200,7 @@ dump_interface(scli_interp_t *interp, int argc, char **argv)
 	    if (ifXEntry) {
 		if (ifXEntry->ifAlias) {
 		    g_string_sprintfa(interp->result,
-				      "set interface status \"^%.*s$\" \"%.*s\"\n",
+				      "set interface alias \"^%.*s$\" \"%.*s\"\n",
 				      (int) ifTable[i]->_ifDescrLength,
 				      ifTable[i]->ifDescr,
 				      (int) ifXEntry->_ifAliasLength,

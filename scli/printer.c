@@ -969,7 +969,7 @@ xml_printer_console_light(xmlNodePtr root,
 
 
 static int
-show_printer_console_lights(scli_interp_t * interp, int argc, char **argv)
+show_printer_console_lights(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtConsoleLightEntry_t **lightTable;
     int i;
