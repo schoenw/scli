@@ -32,21 +32,19 @@ xml_atm_interface(xmlNodePtr root,
 		  if_mib_ifEntry_t *ifEntry,
 		  if_mib_ifXEntry_t *ifXEntry)
 {
-    xmlNodePtr tree, node;
+    xmlNodePtr tree;
 
     tree = xmlNewChild(root, NULL, "interface", NULL);
     xml_set_prop(tree, "index", "%d", atmInterfaceConfEntry->ifIndex);
     
     if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
-	node = xmlNewChild(tree, NULL, "max_vpcs", NULL);
-	xml_set_content(node, "%d",
-			*atmInterfaceConfEntry->atmInterfaceMaxVpcs);
+	(void) xml_new_child(tree, NULL, "max_vpcs", "%d",
+			     *atmInterfaceConfEntry->atmInterfaceMaxVpcs);
     }
 
     if (atmInterfaceConfEntry->atmInterfaceMaxVccs) {
-	node = xmlNewChild(tree, NULL, "max_vccs", NULL);
-	xml_set_content(node, "%d",
-		   *atmInterfaceConfEntry->atmInterfaceMaxVccs);
+	(void) xml_new_child(tree, NULL, "max_vccs", "%d",
+			     *atmInterfaceConfEntry->atmInterfaceMaxVccs);
     }
 }
 
@@ -126,7 +124,7 @@ scli_init_atm_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 	{ "show atm interface", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "atm interfaces",
 	  show_atm_interface },
 	{ NULL, NULL, 0, NULL, NULL }

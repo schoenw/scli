@@ -81,6 +81,7 @@ typedef struct scli_alias	scli_alias_t;
 
 #define SCLI_CMD_FLAG_NEED_PEER	0x01
 #define SCLI_CMD_FLAG_MONITOR	0x02
+#define SCLI_CMD_FLAG_XML	0x04
 
 struct scli_cmd {
     char *path;			/* path where the command is registered */
@@ -329,5 +330,9 @@ extern void
 xml_set_content(xmlNodePtr node, const char *fmt, ...)
     G_GNUC_PRINTF(2, 3);
 
+extern xmlNodePtr
+xml_new_child(xmlNodePtr parent, xmlNsPtr ns, const xmlChar *name,
+	      const char *format, ...) G_GNUC_PRINTF(4, 5);
+    
 #endif /* _SCLI_H */
 

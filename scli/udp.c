@@ -111,7 +111,7 @@ scli_init_udp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 	{ "show udp listener", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "existing udp listener",
 	  show_udp_listener },
 	{ NULL, NULL, 0, NULL, NULL }

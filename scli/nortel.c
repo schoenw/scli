@@ -197,6 +197,53 @@ get_vlan_type_width(rapidcity_vlan_mib_rcVlanEntry_t **vlanTable)
 
 
 static void
+xml_nortel_baystack_vlan_details(xmlNodePtr root,
+				 rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry)
+{
+    xmlNodePtr tree, node;
+    const char *s;
+
+    tree = xmlNewChild(root, NULL, "vlan", NULL);
+    xml_set_prop(tree, "vlanid", "%d", vlanEntry->rcVlanId);
+
+    if (vlanEntry->rcVlanName) {
+	node = xmlNewChild(tree, NULL, "name", NULL);
+	xml_set_content(node, "%.*s",
+			(int) vlanEntry->_rcVlanNameLength,
+			vlanEntry->rcVlanName);
+    }
+
+    s = fmt_enum(rapidcity_vlan_mib_enums_rcVlanType, vlanEntry->rcVlanType);
+    if (s) {
+	node = xmlNewChild(tree, NULL, "type", s);
+    }
+
+    if (vlanEntry->rcVlanColor) {
+	node = xmlNewChild(tree, NULL, "color", NULL);
+	xml_set_content(node, "%d", *vlanEntry->rcVlanColor);
+    }
+
+    s = fmt_enum(vlan_priority, vlanEntry->rcVlanHighPriority);
+    if (s) {
+	node = xmlNewChild(tree, NULL, "priority", s);
+    }
+
+    s = fmt_enum(rapidcity_vlan_mib_enums_rcVlanRoutingEnable,
+		 vlanEntry->rcVlanRoutingEnable);
+    if (s) {
+	node = xmlNewChild(tree, NULL, "routing", s);
+    }
+
+    s = fmt_enum(rapidcity_vlan_mib_enums_rcVlanRowStatus,
+		 vlanEntry->rcVlanRowStatus);
+    if (s) {
+	node = xmlNewChild(tree, NULL, "status", s);
+    }
+}
+
+
+
+static void
 fmt_nortel_baystack_vlan_details(GString *s,
 				 rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry)
 {
@@ -291,11 +338,17 @@ show_nortel_baystack_vlan_details(scli_interp_t *interp, int argc, char **argv)
     if (vlanTable) {	
 	for (i = 0, c = 0; vlanTable[i]; i++) {
 	    if (match_vlan(regex_vlan, vlanTable[i])) {
-		if (c) {
-		    g_string_append(interp->result, "\n");
+		if (scli_interp_xml(interp)) {
+		    xml_nortel_baystack_vlan_details(interp->xml_node,
+						     vlanTable[i]);
+		} else {
+		    if (c) {
+			g_string_append(interp->result, "\n");
+		    }
+		    fmt_nortel_baystack_vlan_details(interp->result,
+						     vlanTable[i]);
+		    c++;
 		}
-		fmt_nortel_baystack_vlan_details(interp->result, vlanTable[i]);
-		c++;
 	    }
 	}
     }
@@ -304,53 +357,6 @@ show_nortel_baystack_vlan_details(scli_interp_t *interp, int argc, char **argv)
     if (regex_vlan) regfree(regex_vlan);
     
     return SCLI_OK;
-}
-
-
-
-static void
-xml_nortel_baystack_vlan_info(xmlNodePtr root,
-			      rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry)
-{
-    xmlNodePtr tree, node;
-    const char *s;
-
-    tree = xmlNewChild(root, NULL, "vlan", NULL);
-    xml_set_prop(tree, "vlanid", "%d", vlanEntry->rcVlanId);
-
-    if (vlanEntry->rcVlanName && vlanEntry->_rcVlanNameLength) {
-	node = xmlNewChild(tree, NULL, "name", NULL);
-	xml_set_content(node, "%.*s",
-			(int) vlanEntry->_rcVlanNameLength,
-			vlanEntry->rcVlanName);
-    }
-
-    s = fmt_enum(rapidcity_vlan_mib_enums_rcVlanType, vlanEntry->rcVlanType);
-    if (s) {
-	node = xmlNewChild(tree, NULL, "type", s);
-    }
-
-    if (vlanEntry->rcVlanColor) {
-	node = xmlNewChild(tree, NULL, "color", NULL);
-	xml_set_content(node, "%d", *vlanEntry->rcVlanColor);
-    }
-
-    s = fmt_enum(vlan_priority, vlanEntry->rcVlanHighPriority);
-    if (s) {
-	node = xmlNewChild(tree, NULL, "priority", s);
-    }
-
-    s = fmt_enum(rapidcity_vlan_mib_enums_rcVlanRoutingEnable,
-		 vlanEntry->rcVlanRoutingEnable);
-    if (s) {
-	node = xmlNewChild(tree, NULL, "routing", s);
-    }
-
-    s = fmt_enum(rapidcity_vlan_mib_enums_rcVlanRowStatus,
-		 vlanEntry->rcVlanRowStatus);
-    if (s) {
-	node = xmlNewChild(tree, NULL, "status", s);
-    }
 }
 
 
@@ -422,20 +428,13 @@ show_nortel_baystack_vlan_info(scli_interp_t *interp, int argc, char **argv)
     type_width = get_vlan_type_width(vlanTable);
 
     if (vlanTable) {
-	if (! scli_interp_xml(interp)) {
-	    g_string_sprintfa(interp->header,
-			      "VLAN %-*s %-*s COLOR PRIORITY ROUTING STATUS",
-			      name_width, "NAME", type_width, "TYPE");
-	}
+	g_string_sprintfa(interp->header,
+			  "VLAN %-*s %-*s COLOR PRIORITY ROUTING STATUS",
+			  name_width, "NAME", type_width, "TYPE");
 	for (i = 0; vlanTable[i]; i++) {
 	    if (match_vlan(regex_vlan, vlanTable[i])) {
-		if (scli_interp_xml(interp)) {
-		    xml_nortel_baystack_vlan_info(interp->xml_node,
-						  vlanTable[i]);
-		} else {
-		    fmt_nortel_baystack_vlan_info(interp->result, vlanTable[i],
-						  name_width, type_width);
-		}
+		fmt_nortel_baystack_vlan_info(interp->result, vlanTable[i],
+					      name_width, type_width);
 	    }
 	}
     }
@@ -590,6 +589,7 @@ set_vlan_ports(scli_interp_t *interp,
 }
 
 
+
 static int
 set_nortel_baystack_vlan_ports(scli_interp_t *interp, int argc, char **argv)
 {
@@ -645,7 +645,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "nortel (baystack) vlan summary",
 	  show_nortel_baystack_vlan_info },
 	{ "show nortel bridge vlan details", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "nortel (baystack) vlan details",
 	  show_nortel_baystack_vlan_details },
 	{ "delete nortel bridge vlan", "<regexp>",

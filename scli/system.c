@@ -144,7 +144,7 @@ static void
 xml_system_device(xmlNodePtr root,
 		  host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
 {
-    xmlNodePtr tree, node;
+    xmlNodePtr tree;
     char const *type;
     
     g_return_if_fail(hrDeviceEntry);
@@ -153,7 +153,7 @@ xml_system_device(xmlNodePtr root,
     xml_set_prop(tree, "index", "%d", hrDeviceEntry->hrDeviceIndex);
 
     if (hrDeviceEntry->hrDeviceStatus) {
-	node = xmlNewChild(tree, NULL, "status",
+	(void) xmlNewChild(tree, NULL, "status",
 			   fmt_enum(host_resources_mib_enums_hrDeviceStatus,
 				    hrDeviceEntry->hrDeviceStatus));
     }
@@ -163,15 +163,14 @@ xml_system_device(xmlNodePtr root,
 					hrDeviceEntry->hrDeviceType,
 					hrDeviceEntry->_hrDeviceDescrLength);
 	if (type) {
-	    node = xmlNewChild(tree, NULL, "type", type);
+	    (void) xmlNewChild(tree, NULL, "type", type);
 	}
     }
 	
     if (hrDeviceEntry->hrDeviceDescr) {
-	node = xmlNewChild(tree, NULL, "description", NULL);
-	xml_set_content(tree, "%.*s",
-			(int) hrDeviceEntry->_hrDeviceDescrLength,
-			hrDeviceEntry->hrDeviceDescr);
+	(void) xml_new_child(tree, NULL, "description", "%.*s",
+			     (int) hrDeviceEntry->_hrDeviceDescrLength,
+			     hrDeviceEntry->hrDeviceDescr);
     }
 }
 
@@ -257,45 +256,44 @@ xml_system_process(xmlNodePtr root,
     xml_set_prop(tree, "index", "%d", hrSWRunEntry->hrSWRunIndex);
     
     if (hrSWRunEntry->hrSWRunStatus) {
-	node = xmlNewChild(tree, NULL, "status",
+	(void) xmlNewChild(tree, NULL, "status",
 			   fmt_enum(host_resources_mib_enums_hrSWRunStatus,
 				    hrSWRunEntry->hrSWRunStatus));
     }
 
     if (hrSWRunEntry->hrSWRunType) {
-	node = xmlNewChild(tree, NULL, "type",
+	(void) xmlNewChild(tree, NULL, "type",
 			   fmt_enum(host_resources_mib_enums_hrSWRunType,
 				    hrSWRunEntry->hrSWRunType));
     }
 
-#if 0
-
     if (hrSWRunPerfEntry && hrSWRunPerfEntry->hrSWRunPerfMem) {
-	g_string_sprintfa(s, "    <memory unit=\"KByte\">%u</memory>\n",
-			  *hrSWRunPerfEntry->hrSWRunPerfMem);
+	node = xml_new_child(tree, NULL, "memory", "%u",
+			     *hrSWRunPerfEntry->hrSWRunPerfMem);
+	xml_set_prop(node, "unit", "KByte");
     }
     if (hrSWRunPerfEntry && hrSWRunPerfEntry->hrSWRunPerfCPU) {
-	g_string_sprintfa(s, "    <cpu unit=\"secs\">%u</cpu>\n",
-			  *(hrSWRunPerfEntry->hrSWRunPerfCPU)/100);
+	node = xml_new_child(tree, NULL, "cpu", "%u",
+			     *hrSWRunPerfEntry->hrSWRunPerfCPU/100);
+	xml_set_prop(node, "unit", "secs");
     }
 
     if (hrSWRunEntry->hrSWRunPath
 	&& hrSWRunEntry->_hrSWRunPathLength) {
 	strip_white(hrSWRunEntry->hrSWRunPath,
 		    &hrSWRunEntry->_hrSWRunPathLength);
-	g_string_sprintfa(s, "    <path>%.*s</path>\n",
-			  (int) hrSWRunEntry->_hrSWRunPathLength,
-			  hrSWRunEntry->hrSWRunPath);
+	(void) xml_new_child(tree, NULL, "path", "%.*s",
+			     (int) hrSWRunEntry->_hrSWRunPathLength,
+			     hrSWRunEntry->hrSWRunPath);
     }
     if (hrSWRunEntry->hrSWRunParameters
 	&& hrSWRunEntry->_hrSWRunParametersLength) {
 	strip_white(hrSWRunEntry->hrSWRunParameters,
 		    &hrSWRunEntry->_hrSWRunParametersLength);
-	g_string_sprintfa(s, "    <parameter>%.*s</parameter>\n",
-			  (int) hrSWRunEntry->_hrSWRunParametersLength,
-			  hrSWRunEntry->hrSWRunParameters);
+	(void) xml_new_child(tree, NULL, "parameter", "%.*s",
+			     (int) hrSWRunEntry->_hrSWRunParametersLength,
+			     hrSWRunEntry->hrSWRunParameters);
     }
-#endif
 }
 
 
@@ -867,7 +865,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "system summary information",
 	  cmd_system_info },
 	{ "show system devices", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "list of system devices",
 	  show_system_devices },
 	{ "show system storage", NULL,
@@ -879,7 +877,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "file systems mounted on the system",
 	  cmd_system_mounts },
 	{ "show system processes", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "processes running on the system",
 	  cmd_system_processes },
 	{ "monitor system storage", NULL,

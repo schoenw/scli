@@ -510,6 +510,11 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 	g_printerr("no association to a remote SNMP agent\n");
 	return SCLI_ERROR;
     }
+
+    if (scli_interp_xml(interp) && ! (cmd->flags & SCLI_CMD_FLAG_XML)) {
+	return SCLI_OK;
+    }
+
     if (cmd->flags & SCLI_CMD_FLAG_MONITOR) {
 	interp->flags |= SCLI_INTERP_FLAG_MONITOR;
 	code = scli_monitor(interp, node, argc, argv);

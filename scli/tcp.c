@@ -255,11 +255,11 @@ scli_init_tcp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 	{ "show tcp listener", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "existing tcp listener",
 	  show_tcp_listener },
 	{ "show tcp connections", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "existing tcp connections",
 	  show_tcp_connections },
 	{ "monitor tcp connections", NULL,

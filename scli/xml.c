@@ -59,3 +59,28 @@ xml_set_content(xmlNodePtr node, const char *format, ...)
 	g_free(s);
     }
 }
+
+
+
+xmlNodePtr
+xml_new_child(xmlNodePtr parent, xmlNsPtr ns, const xmlChar *name,
+	      const char *format, ...)
+{
+    char *s;
+    va_list args;
+    xmlNodePtr node;
+
+    node = xmlNewChild(parent, ns, name, NULL);
+    if (node && format) {
+	va_start(args, format);
+	s = g_strdup_vprintf(format, args);
+	va_end(args);
+
+	if (s) {
+	    xmlNodeSetContent(node, s);
+	    g_free(s);
+	}
+    }
+
+    return node;
+}

@@ -82,7 +82,7 @@ show_containment(GString *s, char *prefix,
 
 
 static int
-show_system_containment(scli_interp_t *interp, int argc, char **argv)
+show_system_entity_containment(scli_interp_t *interp, int argc, char **argv)
 {
     entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
 
@@ -201,95 +201,90 @@ fmt_entity(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 
 
 static void
-xml_entity(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
+xml_entity(xmlNodePtr root, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 {
-    g_string_sprintfa(s, "  <entity index=\"%d\"/>\n",
-		      entPhysicalEntry->entPhysicalIndex);
+    xmlNodePtr tree;
+    const char *s;
+
+    tree = xmlNewChild(root, NULL, "entity", NULL);
+    xml_set_prop(tree, "index", "%d", entPhysicalEntry->entPhysicalIndex);
     
     if (entPhysicalEntry->entPhysicalDescr) {
-	g_string_sprintfa(s, "    <description>%.*s</description>\n",
-		    (int) entPhysicalEntry->_entPhysicalDescrLength,
-			  entPhysicalEntry->entPhysicalDescr);
+	(void) xml_new_child(tree, NULL, "description", "%.*s",
+			     (int) entPhysicalEntry->_entPhysicalDescrLength,
+			     entPhysicalEntry->entPhysicalDescr);
     }
 
     if (entPhysicalEntry->entPhysicalName) {
-	g_string_sprintfa(s, "    <name>%.*s</name>\n",
-		    (int) entPhysicalEntry->_entPhysicalNameLength,
-			  entPhysicalEntry->entPhysicalName);
+	(void) xml_new_child(tree, NULL, "name", "%.*s",
+			     (int) entPhysicalEntry->_entPhysicalNameLength,
+			     entPhysicalEntry->entPhysicalName);
     }
 
-    g_string_sprintfa(s, "    <class>");
-    xxx_enum(s, 1, entity_mib_enums_entPhysicalClass,
-	     entPhysicalEntry->entPhysicalClass);
-    g_string_sprintfa(s, "</class>\n");
+    s = fmt_enum(entity_mib_enums_entPhysicalClass,
+		 entPhysicalEntry->entPhysicalClass);
+    if (s) {
+	(void) xml_new_child(tree, NULL, "class", "%s", s);
+    }
 
-    if (entPhysicalEntry->entPhysicalIsFRU) {
-	if (*entPhysicalEntry->entPhysicalIsFRU == 2) {
-	    g_string_append(s, "    <replaceable/>");
-	}
+    if (entPhysicalEntry->entPhysicalIsFRU
+	&& (*entPhysicalEntry->entPhysicalIsFRU
+	    == ENTITY_MIB_ENTPHYSICALISFRU_TRUE)) {
+	(void) xmlNewChild(tree, NULL, "replaceable", NULL);
     } 
  
     if (entPhysicalEntry->entPhysicalMfgName) {
-	g_string_sprintfa(s, "    <manufacturer>%.*s</manufacturer>\n",
-		    (int) entPhysicalEntry->_entPhysicalMfgNameLength,
-			  entPhysicalEntry->entPhysicalMfgName);
+	(void) xml_new_child(tree, NULL, "manufacturer", "%.*s",
+			     (int) entPhysicalEntry->_entPhysicalMfgNameLength,
+			     entPhysicalEntry->entPhysicalMfgName);
     }
 
     if (entPhysicalEntry->entPhysicalModelName) {
-	g_string_sprintfa(s, "    <model>%.*s</model>\n",
-		    (int) entPhysicalEntry->_entPhysicalModelNameLength,
-			  entPhysicalEntry->entPhysicalModelName);
+	(void) xml_new_child(tree, NULL, "model", "%.*s",
+		       (int) entPhysicalEntry->_entPhysicalModelNameLength,
+			     entPhysicalEntry->entPhysicalModelName);
     }
     
     if (entPhysicalEntry->entPhysicalSerialNum) {
-	g_string_sprintfa(s, "    <serial>%.*s</serial>\n",
-		    (int) entPhysicalEntry->_entPhysicalSerialNumLength,
-			  entPhysicalEntry->entPhysicalSerialNum);
+	(void) xml_new_child(tree, NULL, "serial", "%.*s",
+		       (int) entPhysicalEntry->_entPhysicalSerialNumLength,
+			     entPhysicalEntry->entPhysicalSerialNum);
     }
-#if 0
     
     if (entPhysicalEntry->entPhysicalHardwareRev) {
-	g_string_sprintfa(s, "HW Rev: %-30.*s\n",
-		    (int) entPhysicalEntry->_entPhysicalHardwareRevLength,
-			  entPhysicalEntry->entPhysicalHardwareRev);
-    } else {
-	g_string_sprintfa(s, "HW Rev:\n");
+	(void) xml_new_child(tree, NULL, "hardware-revision", "%.*s",
+		       (int) entPhysicalEntry->_entPhysicalHardwareRevLength,
+			     entPhysicalEntry->entPhysicalHardwareRev);
     }
     
     if (entPhysicalEntry->entPhysicalFirmwareRev) {
-	g_string_sprintfa(s, "FW Rev: %-30.*s\n",
-		    (int) entPhysicalEntry->_entPhysicalFirmwareRevLength,
-			  entPhysicalEntry->entPhysicalFirmwareRev);
-    } else {
-	g_string_sprintfa(s, "FW Rev:\n");
+	(void) xml_new_child(tree, NULL, "firmware-revision", "%.*s",
+		       (int) entPhysicalEntry->_entPhysicalFirmwareRevLength,
+			     entPhysicalEntry->entPhysicalFirmwareRev);
     }
     
     if (entPhysicalEntry->entPhysicalSoftwareRev) {
-	g_string_sprintfa(s, "SW Rev: %-30.*s\n",
-		    (int) entPhysicalEntry->_entPhysicalSoftwareRevLength,
-			  entPhysicalEntry->entPhysicalSoftwareRev);
-    } else {
-	g_string_sprintfa(s, "SW Rev:\n");
+	(void) xml_new_child(tree, NULL, "software-revision", "%.*s",
+		       (int) entPhysicalEntry->_entPhysicalSoftwareRevLength,
+			     entPhysicalEntry->entPhysicalSoftwareRev);
     }
-#endif
     
     if (entPhysicalEntry->entPhysicalAlias) {
-	g_string_sprintfa(s, "    <alias>%.*s</alias>\n",
-		    (int) entPhysicalEntry->_entPhysicalAliasLength,
-			  entPhysicalEntry->entPhysicalAlias);
+	(void) xml_new_child(tree, NULL, "alias", "%.*s",
+			     (int) entPhysicalEntry->_entPhysicalAliasLength,
+			     entPhysicalEntry->entPhysicalAlias);
     }
     if (entPhysicalEntry->entPhysicalAssetID) {
-	g_string_sprintfa(s, "    <asset>%.*s</asset>\n",
-		    (int) entPhysicalEntry->_entPhysicalAssetIDLength,
-			  entPhysicalEntry->entPhysicalAssetID);
+	(void) xml_new_child(tree, NULL, "asset","%.*s",
+			     (int) entPhysicalEntry->_entPhysicalAssetIDLength,
+			     entPhysicalEntry->entPhysicalAssetID);
     }
-    g_string_append(s, "  </entity>\n");
 }
 
 
 
 static int
-show_system_entities(scli_interp_t *interp, int argc, char **argv)
+show_system_entity_details(scli_interp_t *interp, int argc, char **argv)
 {
     entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
     int i;
@@ -305,21 +300,15 @@ show_system_entities(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (entPhysicalTable) {
-        if (scli_interp_xml(interp)) {
-	    g_string_append(interp->result, "<entities>\n");
-	}
 	for (i = 0; entPhysicalTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
-		xml_entity(interp->result, entPhysicalTable[i]);
+		xml_entity(interp->xml_node, entPhysicalTable[i]);
 	    } else {
 		if (i) {
 		    g_string_append(interp->result, "\n");
 		}
 		fmt_entity(interp->result, entPhysicalTable[i]);
 	    }
-	}
-        if (scli_interp_xml(interp)) {
-	    g_string_append(interp->result, "</entities>\n");
 	}
     }
 
@@ -334,14 +323,14 @@ void
 scli_init_entity_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show system entities", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
+	{ "show system entity details ", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "physical entities that compose the system",
-	  show_system_entities },
-	{ "show system containment", NULL,
+	  show_system_entity_details },
+	{ "show system entity containment", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "physical entity containment hierarchy",
-	  show_system_containment },
+	  show_system_entity_containment },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
