@@ -135,15 +135,10 @@ fmt_bridge_info(GString *s,
 	}
 	if (dot1dBase->dot1dBaseType
 	    && (*dot1dBase->dot1dBaseType == BRIDGE_MIB_DOT1DBASETYPE_TRANSPARENT_ONLY
-		|| *dot1dBase->dot1dBaseType == BRIDGE_MIB_DOT1DBASETYPE_SRT)
-	    && dot1dTp
-		&& dot1dTp->dot1dTpAgingTime) {
+		|| *dot1dBase->dot1dBaseType == BRIDGE_MIB_DOT1DBASETYPE_SRT)) {
+	    if (dot1dTp && dot1dTp->dot1dTpAgingTime) {
 		g_string_sprintfa(s, "%-*s%d seconds\n", indent, "Tp Aging Time:",
 				  *dot1dTp->dot1dTpAgingTime);
-	    }
-	    if (dot1dStp && dot1dStp->dot1dStpMaxAge) {
-		g_string_sprintfa(s, "%-*s %d seconds\n", indent, "Stp Aging Time:",
-				  *dot1dStp->dot1dStpMaxAge);
 	    }
 	}
     }
@@ -371,8 +366,9 @@ show_bridge_stp_ports(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (bridge_mib_get_dot1dStpPortTable(interp->peer, &dot1dStpPortTable)) {
-	return SCLI_ERROR;
+    bridge_mib_get_dot1dStpPortTable(interp->peer, &dot1dStpPortTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (dot1dStpPortTable) {
