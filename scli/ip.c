@@ -308,7 +308,7 @@ fmt_ip_address(GString *s,
 	for (i = 0; ifXTable && ifXTable[i]; i++) {
 	    if (ifXTable[i]->ifIndex == *ipAddrEntry->ipAdEntIfIndex
 		&& ifXTable[i]->ifName) {
-		g_string_sprintfa(s, " %*.*s", ifName_width,
+		g_string_sprintfa(s, " %-*.*s", ifName_width,
 				  (int) ifXTable[i]->_ifNameLength,
 				  ifXTable[i]->ifName);
 		break;

@@ -955,7 +955,7 @@ fmt_system_storage(GString *s,
 	&& hrStorageEntry->_hrStorageDescrLength) {
 	g_string_sprintfa(s, "%-*.*s",
 			  descr_width,
-			  (int) MIN(25, hrStorageEntry->_hrStorageDescrLength),
+			  (int) MIN(descr_width, hrStorageEntry->_hrStorageDescrLength),
 			  hrStorageEntry->hrStorageDescr);
     } else {
 	g_string_sprintfa(s, "%*s", descr_width, "");

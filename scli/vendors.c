@@ -47,6 +47,7 @@ static scli_vendor_t iana_vendor_table[] = {
     { 2272,     "Nortel Networks",	"http://www.nortelnetworks.com/" },
     { 2281,	"Ceragon",		"http://www.ceragon.com/" },
     { 2356,	"ELSA GmbH",		"http://www.elsa.de/" },
+    { 2636,     "Juniper Networks",     "http://www.juniper.net/" },
     { 5567,	"Riverstone Networks",	"http://www.riverstonenet.com/" },
     { 7313,	"1stWave",              "http://www.1stwave.de/" },
     { 8072,	"NET-SNMP",		"http://www.net-snmp.org/" },
