@@ -13,33 +13,6 @@
 
 #include "ip-forward-mib.h"
 
-GSnmpEnum const ip_forward_mib_enums_ipForwardType[] = {
-    { IP_FORWARD_MIB_IPFORWARDTYPE_OTHER,   "other" },
-    { IP_FORWARD_MIB_IPFORWARDTYPE_INVALID, "invalid" },
-    { IP_FORWARD_MIB_IPFORWARDTYPE_LOCAL,   "local" },
-    { IP_FORWARD_MIB_IPFORWARDTYPE_REMOTE,  "remote" },
-    { 0, NULL }
-};
-
-GSnmpEnum const ip_forward_mib_enums_ipForwardProto[] = {
-    { IP_FORWARD_MIB_IPFORWARDPROTO_OTHER,     "other" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_LOCAL,     "local" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_NETMGMT,   "netmgmt" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_ICMP,      "icmp" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_EGP,       "egp" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_GGP,       "ggp" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_HELLO,     "hello" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_RIP,       "rip" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_IS_IS,     "is-is" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_ES_IS,     "es-is" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_CISCOIGRP, "ciscoIgrp" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_BBNSPFIGP, "bbnSpfIgp" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_OSPF,      "ospf" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_BGP,       "bgp" },
-    { IP_FORWARD_MIB_IPFORWARDPROTO_IDPR,      "idpr" },
-    { 0, NULL }
-};
-
 GSnmpEnum const ip_forward_mib_enums_ipCidrRouteType[] = {
     { IP_FORWARD_MIB_IPCIDRROUTETYPE_OTHER,  "other" },
     { IP_FORWARD_MIB_IPCIDRROUTETYPE_REJECT, "reject" },
@@ -79,9 +52,6 @@ GSnmpEnum const ip_forward_mib_enums_ipCidrRouteStatus[] = {
 };
 
 
-static guint16 ipForwardMask_constraints[] = {4, 4, 0, 0};
-
-
 static guint32 const ipForward_oid[] = {1, 3, 6, 1, 2, 1, 4, 24};
 
 static GSnmpAttribute ipForward_attr[] = {
@@ -97,78 +67,6 @@ static GSnmpAttribute ipForward_attr[] = {
       G_STRUCT_OFFSET(ip_forward_mib_ipForward_t, ipCidrRouteNumber),
       0,
       0 },
-    { 0, 0, 0, NULL }
-};
-
-static guint32 const ipForwardEntry_oid[] = {1, 3, 6, 1, 2, 1, 4, 24, 2, 1};
-
-static GSnmpAttribute ipForwardEntry_attr[] = {
-    { 2, G_SNMP_IPADDRESS,
-      IP_FORWARD_MIB_IPFORWARDMASK, "ipForwardMask",
-       ipForwardMask_constraints,
-      G_STRUCT_OFFSET(ip_forward_mib_ipForwardEntry_t, ipForwardMask),
-      0,
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 5, G_SNMP_INTEGER32,
-      IP_FORWARD_MIB_IPFORWARDIFINDEX, "ipForwardIfIndex",
-       NULL,
-      G_STRUCT_OFFSET(ip_forward_mib_ipForwardEntry_t, ipForwardIfIndex),
-      0,
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 6, G_SNMP_INTEGER32,
-      IP_FORWARD_MIB_IPFORWARDTYPE, "ipForwardType",
-       NULL,
-      G_STRUCT_OFFSET(ip_forward_mib_ipForwardEntry_t, ipForwardType),
-      0,
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 8, G_SNMP_INTEGER32,
-      IP_FORWARD_MIB_IPFORWARDAGE, "ipForwardAge",
-       NULL,
-      G_STRUCT_OFFSET(ip_forward_mib_ipForwardEntry_t, ipForwardAge),
-      0,
-      0 },
-    { 9, G_SNMP_OBJECTID,
-      IP_FORWARD_MIB_IPFORWARDINFO, "ipForwardInfo",
-       NULL,
-      G_STRUCT_OFFSET(ip_forward_mib_ipForwardEntry_t, ipForwardInfo),
-      G_STRUCT_OFFSET(ip_forward_mib_ipForwardEntry_t, _ipForwardInfoLength),
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 10, G_SNMP_INTEGER32,
-      IP_FORWARD_MIB_IPFORWARDNEXTHOPAS, "ipForwardNextHopAS",
-       NULL,
-      G_STRUCT_OFFSET(ip_forward_mib_ipForwardEntry_t, ipForwardNextHopAS),
-      0,
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 11, G_SNMP_INTEGER32,
-      IP_FORWARD_MIB_IPFORWARDMETRIC1, "ipForwardMetric1",
-       NULL,
-      G_STRUCT_OFFSET(ip_forward_mib_ipForwardEntry_t, ipForwardMetric1),
-      0,
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 12, G_SNMP_INTEGER32,
-      IP_FORWARD_MIB_IPFORWARDMETRIC2, "ipForwardMetric2",
-       NULL,
-      G_STRUCT_OFFSET(ip_forward_mib_ipForwardEntry_t, ipForwardMetric2),
-      0,
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 13, G_SNMP_INTEGER32,
-      IP_FORWARD_MIB_IPFORWARDMETRIC3, "ipForwardMetric3",
-       NULL,
-      G_STRUCT_OFFSET(ip_forward_mib_ipForwardEntry_t, ipForwardMetric3),
-      0,
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 14, G_SNMP_INTEGER32,
-      IP_FORWARD_MIB_IPFORWARDMETRIC4, "ipForwardMetric4",
-       NULL,
-      G_STRUCT_OFFSET(ip_forward_mib_ipForwardEntry_t, ipForwardMetric4),
-      0,
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 15, G_SNMP_INTEGER32,
-      IP_FORWARD_MIB_IPFORWARDMETRIC5, "ipForwardMetric5",
-       NULL,
-      G_STRUCT_OFFSET(ip_forward_mib_ipForwardEntry_t, ipForwardMetric5),
-      0,
-      GSNMP_ATTR_FLAG_WRITABLE },
     { 0, 0, 0, NULL }
 };
 
@@ -260,7 +158,7 @@ ip_forward_mib_new_ipForward()
     return ipForward;
 }
 
-static ip_forward_mib_ipForward_t *
+static inline ip_forward_mib_ipForward_t *
 assign_ipForward(GSList *vbl)
 {
     ip_forward_mib_ipForward_t *ipForward;
@@ -315,203 +213,6 @@ ip_forward_mib_free_ipForward(ip_forward_mib_ipForward_t *ipForward)
     }
 }
 
-ip_forward_mib_ipForwardEntry_t *
-ip_forward_mib_new_ipForwardEntry()
-{
-    ip_forward_mib_ipForwardEntry_t *ipForwardEntry;
-
-    ipForwardEntry = (ip_forward_mib_ipForwardEntry_t *) g_malloc0(sizeof(ip_forward_mib_ipForwardEntry_t) + sizeof(gpointer));
-    return ipForwardEntry;
-}
-
-static int
-unpack_ipForwardEntry(GSnmpVarBind *vb, ip_forward_mib_ipForwardEntry_t *ipForwardEntry)
-{
-    guint8 idx = 11;
-    guint16 i, len;
-
-    len = 4;
-    if (vb->id_len < idx + len) return -1;
-    if (len != 4) return -1;
-    if (vb->id_len < idx + len) return -1;
-    for (i = 0; i < len; i++) {
-        ipForwardEntry->ipForwardDest[i] = vb->id[idx++];
-    }
-    if (vb->id_len < idx) return -1;
-    ipForwardEntry->ipForwardProto = vb->id[idx++];
-    if (vb->id_len < idx) return -1;
-    ipForwardEntry->ipForwardPolicy = vb->id[idx++];
-    len = 4;
-    if (vb->id_len < idx + len) return -1;
-    if (len != 4) return -1;
-    if (vb->id_len < idx + len) return -1;
-    for (i = 0; i < len; i++) {
-        ipForwardEntry->ipForwardNextHop[i] = vb->id[idx++];
-    }
-    if (vb->id_len > idx) return -1;
-    return 0;
-}
-
-static int
-pack_ipForwardEntry(guint32 *base, guchar *ipForwardDest, gint32 ipForwardProto, gint32 ipForwardPolicy, guchar *ipForwardNextHop)
-{
-    guint8 idx = 11;
-    guint16 i, len;
-
-    len = 4;
-    if (len != 4) return -1;
-    for (i = 0; i < len; i++) {
-        base[idx++] = ipForwardDest[i];
-        if (idx >= 128) return -1;
-    }
-    base[idx++] = ipForwardProto;
-    base[idx++] = ipForwardPolicy;
-    len = 4;
-    if (len != 4) return -1;
-    for (i = 0; i < len; i++) {
-        base[idx++] = ipForwardNextHop[i];
-        if (idx >= 128) return -1;
-    }
-    return idx;
-}
-
-static ip_forward_mib_ipForwardEntry_t *
-assign_ipForwardEntry(GSList *vbl)
-{
-    ip_forward_mib_ipForwardEntry_t *ipForwardEntry;
-    char *p;
-
-    ipForwardEntry = ip_forward_mib_new_ipForwardEntry();
-    if (! ipForwardEntry) {
-        return NULL;
-    }
-
-    p = (char *) ipForwardEntry + sizeof(ip_forward_mib_ipForwardEntry_t);
-    * (GSList **) p = vbl;
-
-    if (unpack_ipForwardEntry((GSnmpVarBind *) vbl->data, ipForwardEntry) < 0) {
-        g_warning("%s: invalid instance identifier", "ipForwardEntry");
-        g_free(ipForwardEntry);
-        return NULL;
-    }
-
-    gsnmp_attr_assign(vbl, ipForwardEntry_oid, sizeof(ipForwardEntry_oid)/sizeof(guint32),
-                      ipForwardEntry_attr, ipForwardEntry);
-
-    return ipForwardEntry;
-}
-
-void
-ip_forward_mib_get_ipForwardTable(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t ***ipForwardEntry, gint mask)
-{
-    GSList *in = NULL, *out = NULL;
-    GSList *row;
-    int i;
-    static guint32 base[] = {1, 3, 6, 1, 2, 1, 4, 24, 2, 1, 0};
-
-    *ipForwardEntry = NULL;
-
-    gsnmp_attr_get(s, &in, base, 11, 10, ipForwardEntry_attr, mask);
-
-    out = gsnmp_gettable(s, in);
-    /* g_snmp_vbl_free(in); */
-
-    if (out) {
-        *ipForwardEntry = (ip_forward_mib_ipForwardEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ip_forward_mib_ipForwardEntry_t *));
-        if (! *ipForwardEntry) {
-            s->error_status = G_SNMP_ERR_INTERNAL;
-            g_snmp_vbl_free(out);
-            return;
-        }
-        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-            (*ipForwardEntry)[i] = assign_ipForwardEntry(row->data);
-        }
-    }
-}
-
-void
-ip_forward_mib_get_ipForwardEntry(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t **ipForwardEntry, guchar *ipForwardDest, gint32 ipForwardProto, gint32 ipForwardPolicy, guchar *ipForwardNextHop, gint mask)
-{
-    GSList *in = NULL, *out = NULL;
-    guint32 base[128];
-    gint8 len;
-
-    memset(base, 0, sizeof(base));
-    memcpy(base, ipForwardEntry_oid, sizeof(ipForwardEntry_oid));
-    len = pack_ipForwardEntry(base, ipForwardDest, ipForwardProto, ipForwardPolicy, ipForwardNextHop);
-    if (len < 0) {
-        g_warning("%s: invalid index values", "ipForwardEntry");
-        s->error_status = G_SNMP_ERR_INTERNAL;
-        return;
-    }
-
-    *ipForwardEntry = NULL;
-
-    gsnmp_attr_get(s, &in, base, len, 10, ipForwardEntry_attr, mask);
-
-    out = g_snmp_session_sync_get(s, in);
-    g_snmp_vbl_free(in);
-    if (out) {
-        if (s->error_status != G_SNMP_ERR_NOERROR) {
-            g_snmp_vbl_free(out);
-            return;
-        }
-        *ipForwardEntry = assign_ipForwardEntry(out);
-    }
-}
-
-void
-ip_forward_mib_set_ipForwardEntry(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t *ipForwardEntry, gint mask)
-{
-    GSList *in = NULL, *out = NULL;
-    guint32 base[128];
-    gint8 len;
-
-    memset(base, 0, sizeof(base));
-    memcpy(base, ipForwardEntry_oid, sizeof(ipForwardEntry_oid));
-    len = pack_ipForwardEntry(base, ipForwardEntry->ipForwardDest, ipForwardEntry->ipForwardProto, ipForwardEntry->ipForwardPolicy, ipForwardEntry->ipForwardNextHop);
-    if (len < 0) {
-        g_warning("%s: invalid index values", "ipForwardEntry");
-        s->error_status = G_SNMP_ERR_INTERNAL;
-        return;
-    }
-
-    gsnmp_attr_set(s, &in, base, len, 10, ipForwardEntry_attr, mask, ipForwardEntry);
-
-    out = g_snmp_session_sync_set(s, in);
-    g_snmp_vbl_free(in);
-    if (out) {
-        g_snmp_vbl_free(out);
-    }
-}
-
-void
-ip_forward_mib_free_ipForwardEntry(ip_forward_mib_ipForwardEntry_t *ipForwardEntry)
-{
-    GSList *vbl;
-    char *p;
-
-    if (ipForwardEntry) {
-        p = (char *) ipForwardEntry + sizeof(ip_forward_mib_ipForwardEntry_t);
-        vbl = * (GSList **) p;
-        g_snmp_vbl_free(vbl);
-        g_free(ipForwardEntry);
-    }
-}
-
-void
-ip_forward_mib_free_ipForwardTable(ip_forward_mib_ipForwardEntry_t **ipForwardEntry)
-{
-    int i;
-
-    if (ipForwardEntry) {
-        for (i = 0; ipForwardEntry[i]; i++) {
-            ip_forward_mib_free_ipForwardEntry(ipForwardEntry[i]);
-        }
-        g_free(ipForwardEntry);
-    }
-}
-
 ip_forward_mib_ipCidrRouteEntry_t *
 ip_forward_mib_new_ipCidrRouteEntry()
 {
@@ -521,7 +222,7 @@ ip_forward_mib_new_ipCidrRouteEntry()
     return ipCidrRouteEntry;
 }
 
-static int
+static inline int
 unpack_ipCidrRouteEntry(GSnmpVarBind *vb, ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry)
 {
     guint8 idx = 11;
@@ -554,7 +255,7 @@ unpack_ipCidrRouteEntry(GSnmpVarBind *vb, ip_forward_mib_ipCidrRouteEntry_t *ipC
     return 0;
 }
 
-static int
+static inline int
 pack_ipCidrRouteEntry(guint32 *base, guchar *ipCidrRouteDest, guchar *ipCidrRouteMask, gint32 ipCidrRouteTos, guchar *ipCidrRouteNextHop)
 {
     guint8 idx = 11;
@@ -582,7 +283,7 @@ pack_ipCidrRouteEntry(guint32 *base, guchar *ipCidrRouteDest, guchar *ipCidrRout
     return idx;
 }
 
-static ip_forward_mib_ipCidrRouteEntry_t *
+static inline ip_forward_mib_ipCidrRouteEntry_t *
 assign_ipCidrRouteEntry(GSList *vbl)
 {
     ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry;

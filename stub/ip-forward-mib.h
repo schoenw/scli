@@ -20,31 +20,6 @@
  * Tables to map enumerations to strings and vice versa.
  */
 
-#define IP_FORWARD_MIB_IPFORWARDTYPE_OTHER   1
-#define IP_FORWARD_MIB_IPFORWARDTYPE_INVALID 2
-#define IP_FORWARD_MIB_IPFORWARDTYPE_LOCAL   3
-#define IP_FORWARD_MIB_IPFORWARDTYPE_REMOTE  4
-
-extern GSnmpEnum const ip_forward_mib_enums_ipForwardType[];
-
-#define IP_FORWARD_MIB_IPFORWARDPROTO_OTHER     1
-#define IP_FORWARD_MIB_IPFORWARDPROTO_LOCAL     2
-#define IP_FORWARD_MIB_IPFORWARDPROTO_NETMGMT   3
-#define IP_FORWARD_MIB_IPFORWARDPROTO_ICMP      4
-#define IP_FORWARD_MIB_IPFORWARDPROTO_EGP       5
-#define IP_FORWARD_MIB_IPFORWARDPROTO_GGP       6
-#define IP_FORWARD_MIB_IPFORWARDPROTO_HELLO     7
-#define IP_FORWARD_MIB_IPFORWARDPROTO_RIP       8
-#define IP_FORWARD_MIB_IPFORWARDPROTO_IS_IS     9
-#define IP_FORWARD_MIB_IPFORWARDPROTO_ES_IS     10
-#define IP_FORWARD_MIB_IPFORWARDPROTO_CISCOIGRP 11
-#define IP_FORWARD_MIB_IPFORWARDPROTO_BBNSPFIGP 12
-#define IP_FORWARD_MIB_IPFORWARDPROTO_OSPF      13
-#define IP_FORWARD_MIB_IPFORWARDPROTO_BGP       14
-#define IP_FORWARD_MIB_IPFORWARDPROTO_IDPR      15
-
-extern GSnmpEnum const ip_forward_mib_enums_ipForwardProto[];
-
 #define IP_FORWARD_MIB_IPCIDRROUTETYPE_OTHER  1
 #define IP_FORWARD_MIB_IPCIDRROUTETYPE_REJECT 2
 #define IP_FORWARD_MIB_IPCIDRROUTETYPE_LOCAL  3
@@ -101,68 +76,6 @@ ip_forward_mib_get_ipForward(GSnmpSession *s, ip_forward_mib_ipForward_t **ipFor
 
 extern void
 ip_forward_mib_free_ipForward(ip_forward_mib_ipForward_t *ipForward);
-
-/*
- * C type definitions for IP-FORWARD-MIB::ipForwardEntry.
- */
-
-#define IP_FORWARD_MIB_IPFORWARDDEST      (1 << 0) 
-#define IP_FORWARD_MIB_IPFORWARDMASK      (1 << 1) 
-#define IP_FORWARD_MIB_IPFORWARDPOLICY    (1 << 2) 
-#define IP_FORWARD_MIB_IPFORWARDNEXTHOP   (1 << 3) 
-#define IP_FORWARD_MIB_IPFORWARDIFINDEX   (1 << 4) 
-#define IP_FORWARD_MIB_IPFORWARDTYPE      (1 << 5) 
-#define IP_FORWARD_MIB_IPFORWARDPROTO     (1 << 6) 
-#define IP_FORWARD_MIB_IPFORWARDAGE       (1 << 7) 
-#define IP_FORWARD_MIB_IPFORWARDINFO      (1 << 8) 
-#define IP_FORWARD_MIB_IPFORWARDNEXTHOPAS (1 << 9) 
-#define IP_FORWARD_MIB_IPFORWARDMETRIC1   (1 << 10) 
-#define IP_FORWARD_MIB_IPFORWARDMETRIC2   (1 << 11) 
-#define IP_FORWARD_MIB_IPFORWARDMETRIC3   (1 << 12) 
-#define IP_FORWARD_MIB_IPFORWARDMETRIC4   (1 << 13) 
-#define IP_FORWARD_MIB_IPFORWARDMETRIC5   (1 << 14) 
-
-typedef struct {
-    guchar   ipForwardDest[4];
-#define IP_FORWARD_MIB_IPFORWARDDESTLENGTH 4
-    gint32   ipForwardProto;
-    gint32   ipForwardPolicy;
-    guchar   ipForwardNextHop[4];
-#define IP_FORWARD_MIB_IPFORWARDNEXTHOPLENGTH 4
-    guchar   *ipForwardMask;
-#define IP_FORWARD_MIB_IPFORWARDMASKLENGTH 4
-    gint32   *ipForwardIfIndex;
-    gint32   *ipForwardType;
-    gint32   *ipForwardAge;
-    guint32  *ipForwardInfo;
-#define IP_FORWARD_MIB_IPFORWARDINFOMINLENGTH 0
-#define IP_FORWARD_MIB_IPFORWARDINFOMAXLENGTH 128
-    guint16  _ipForwardInfoLength;
-    gint32   *ipForwardNextHopAS;
-    gint32   *ipForwardMetric1;
-    gint32   *ipForwardMetric2;
-    gint32   *ipForwardMetric3;
-    gint32   *ipForwardMetric4;
-    gint32   *ipForwardMetric5;
-} ip_forward_mib_ipForwardEntry_t;
-
-extern void
-ip_forward_mib_get_ipForwardTable(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t ***ipForwardEntry, gint mask);
-
-extern void
-ip_forward_mib_free_ipForwardTable(ip_forward_mib_ipForwardEntry_t **ipForwardEntry);
-
-extern ip_forward_mib_ipForwardEntry_t *
-ip_forward_mib_new_ipForwardEntry(void);
-
-extern void
-ip_forward_mib_get_ipForwardEntry(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t **ipForwardEntry, guchar *ipForwardDest, gint32 ipForwardProto, gint32 ipForwardPolicy, guchar *ipForwardNextHop, gint mask);
-
-extern void
-ip_forward_mib_set_ipForwardEntry(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t *ipForwardEntry, gint mask);
-
-extern void
-ip_forward_mib_free_ipForwardEntry(ip_forward_mib_ipForwardEntry_t *ipForwardEntry);
 
 /*
  * C type definitions for IP-FORWARD-MIB::ipCidrRouteEntry.

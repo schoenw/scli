@@ -263,21 +263,6 @@ extern GSnmpEnum const if_mib_enums_ifConnectorPresent[];
 
 extern GSnmpEnum const if_mib_enums_ifStackStatus[];
 
-#define IF_MIB_IFTESTSTATUS_NOTINUSE 1
-#define IF_MIB_IFTESTSTATUS_INUSE    2
-
-extern GSnmpEnum const if_mib_enums_ifTestStatus[];
-
-#define IF_MIB_IFTESTRESULT_NONE         1
-#define IF_MIB_IFTESTRESULT_SUCCESS      2
-#define IF_MIB_IFTESTRESULT_INPROGRESS   3
-#define IF_MIB_IFTESTRESULT_NOTSUPPORTED 4
-#define IF_MIB_IFTESTRESULT_UNABLETORUN  5
-#define IF_MIB_IFTESTRESULT_ABORTED      6
-#define IF_MIB_IFTESTRESULT_FAILED       7
-
-extern GSnmpEnum const if_mib_enums_ifTestResult[];
-
 #define IF_MIB_IFRCVADDRESSSTATUS_ACTIVE        1
 #define IF_MIB_IFRCVADDRESSSTATUS_NOTINSERVICE  2
 #define IF_MIB_IFRCVADDRESSSTATUS_NOTREADY      3
@@ -511,54 +496,6 @@ if_mib_set_ifStackEntry(GSnmpSession *s, if_mib_ifStackEntry_t *ifStackEntry, gi
 
 extern void
 if_mib_free_ifStackEntry(if_mib_ifStackEntry_t *ifStackEntry);
-
-/*
- * C type definitions for IF-MIB::ifTestEntry.
- */
-
-#define IF_MIB_IFTESTID     (1 << 0) 
-#define IF_MIB_IFTESTSTATUS (1 << 1) 
-#define IF_MIB_IFTESTTYPE   (1 << 2) 
-#define IF_MIB_IFTESTRESULT (1 << 3) 
-#define IF_MIB_IFTESTCODE   (1 << 4) 
-#define IF_MIB_IFTESTOWNER  (1 << 5) 
-
-typedef struct {
-    gint32   ifIndex;
-    gint32   *ifTestId;
-    gint32   *ifTestStatus;
-    guint32  *ifTestType;
-#define IF_MIB_IFTESTTYPEMINLENGTH 0
-#define IF_MIB_IFTESTTYPEMAXLENGTH 128
-    guint16  _ifTestTypeLength;
-    gint32   *ifTestResult;
-    guint32  *ifTestCode;
-#define IF_MIB_IFTESTCODEMINLENGTH 0
-#define IF_MIB_IFTESTCODEMAXLENGTH 128
-    guint16  _ifTestCodeLength;
-    guchar   *ifTestOwner;
-#define IF_MIB_IFTESTOWNERMINLENGTH 0
-#define IF_MIB_IFTESTOWNERMAXLENGTH 255
-    guint16  _ifTestOwnerLength;
-} if_mib_ifTestEntry_t;
-
-extern void
-if_mib_get_ifTestTable(GSnmpSession *s, if_mib_ifTestEntry_t ***ifTestEntry, gint mask);
-
-extern void
-if_mib_free_ifTestTable(if_mib_ifTestEntry_t **ifTestEntry);
-
-extern if_mib_ifTestEntry_t *
-if_mib_new_ifTestEntry(void);
-
-extern void
-if_mib_get_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t **ifTestEntry, gint32 ifIndex, gint mask);
-
-extern void
-if_mib_set_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t *ifTestEntry, gint mask);
-
-extern void
-if_mib_free_ifTestEntry(if_mib_ifTestEntry_t *ifTestEntry);
 
 /*
  * C type definitions for IF-MIB::ifRcvAddressEntry.

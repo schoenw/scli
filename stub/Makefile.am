@@ -78,12 +78,18 @@ SMIDUMP			= ../../libsmi/tools/smidump
 rmstubs:
 	rm -f $(STUBS)
 
-stubs:
-	$(SMIDUMP) -f scli --scli-match="VlanEntry|VlanPortEntry" RAPID-CITY
-	$(SMIDUMP) -f scli --scli-match="ipRouteEntry" RFC1213-MIB
-	$(SMIDUMP) -f scli --scli-match="atmInterfaceConfEntry" ATM-MIB
-	$(SMIDUMP) -f scli --scli-match="a3ComVlanIfEntry|a3ComVirtualGroup" PRODUCTMIB
+stubs: $(STUBS)
+	$(SMIDUMP) -f scli --scli-include="VlanEntry|VlanPortEntry" RAPID-CITY
+	$(SMIDUMP) -f scli --scli-include="ipRouteEntry" RFC1213-MIB
+	$(SMIDUMP) -f scli --scli-include="atmInterfaceConfEntry" ATM-MIB
+	$(SMIDUMP) -f scli --scli-include="a3ComVlanIfEntry|a3ComVirtualGroup" PRODUCTMIB
 	@for f in $(MIBS) ; do \
 	    echo "$(SMIDUMP) -f scli $$f" ; \
 	    $(SMIDUMP) -f scli $$f ; \
 	done
+
+if-mib.h if-mib.c:
+	$(SMIDUMP) -f scli --scli-exclude="ifTest" IF-MIB
+
+ip-forward-mib.h ip-forward-mib.c:
+	$(SMIDUMP) -f scli --scli-exclude="ipForwardEntry" IF-FORWARD-MIB

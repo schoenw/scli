@@ -263,23 +263,6 @@ GSnmpEnum const if_mib_enums_ifStackStatus[] = {
     { 0, NULL }
 };
 
-GSnmpEnum const if_mib_enums_ifTestStatus[] = {
-    { IF_MIB_IFTESTSTATUS_NOTINUSE, "notInUse" },
-    { IF_MIB_IFTESTSTATUS_INUSE,    "inUse" },
-    { 0, NULL }
-};
-
-GSnmpEnum const if_mib_enums_ifTestResult[] = {
-    { IF_MIB_IFTESTRESULT_NONE,         "none" },
-    { IF_MIB_IFTESTRESULT_SUCCESS,      "success" },
-    { IF_MIB_IFTESTRESULT_INPROGRESS,   "inProgress" },
-    { IF_MIB_IFTESTRESULT_NOTSUPPORTED, "notSupported" },
-    { IF_MIB_IFTESTRESULT_UNABLETORUN,  "unAbleToRun" },
-    { IF_MIB_IFTESTRESULT_ABORTED,      "aborted" },
-    { IF_MIB_IFTESTRESULT_FAILED,       "failed" },
-    { 0, NULL }
-};
-
 GSnmpEnum const if_mib_enums_ifRcvAddressStatus[] = {
     { IF_MIB_IFRCVADDRESSSTATUS_ACTIVE,        "active" },
     { IF_MIB_IFRCVADDRESSSTATUS_NOTINSERVICE,  "notInService" },
@@ -301,8 +284,6 @@ GSnmpEnum const if_mib_enums_ifRcvAddressType[] = {
 static guint16 ifDescr_constraints[] = {0, 255, 0, 0};
 static guint16 ifName_constraints[] = {0, 255, 0, 0};
 static guint16 ifAlias_constraints[] = {0, 64, 0, 0};
-static guint32 ifTestId_constraints[] = {0L, 2147483647L, 0, 0};
-static guint16 ifTestOwner_constraints[] = {0, 255, 0, 0};
 
 
 static guint32 const interfaces_oid[] = {1, 3, 6, 1, 2, 1, 2};
@@ -599,48 +580,6 @@ static GSnmpAttribute ifStackEntry_attr[] = {
     { 0, 0, 0, NULL }
 };
 
-static guint32 const ifTestEntry_oid[] = {1, 3, 6, 1, 2, 1, 31, 1, 3, 1};
-
-static GSnmpAttribute ifTestEntry_attr[] = {
-    { 1, G_SNMP_INTEGER32,
-      IF_MIB_IFTESTID, "ifTestId",
-       ifTestId_constraints,
-      G_STRUCT_OFFSET(if_mib_ifTestEntry_t, ifTestId),
-      0,
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 2, G_SNMP_INTEGER32,
-      IF_MIB_IFTESTSTATUS, "ifTestStatus",
-       NULL,
-      G_STRUCT_OFFSET(if_mib_ifTestEntry_t, ifTestStatus),
-      0,
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 3, G_SNMP_OBJECTID,
-      IF_MIB_IFTESTTYPE, "ifTestType",
-       NULL,
-      G_STRUCT_OFFSET(if_mib_ifTestEntry_t, ifTestType),
-      G_STRUCT_OFFSET(if_mib_ifTestEntry_t, _ifTestTypeLength),
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 4, G_SNMP_INTEGER32,
-      IF_MIB_IFTESTRESULT, "ifTestResult",
-       NULL,
-      G_STRUCT_OFFSET(if_mib_ifTestEntry_t, ifTestResult),
-      0,
-      0 },
-    { 5, G_SNMP_OBJECTID,
-      IF_MIB_IFTESTCODE, "ifTestCode",
-       NULL,
-      G_STRUCT_OFFSET(if_mib_ifTestEntry_t, ifTestCode),
-      G_STRUCT_OFFSET(if_mib_ifTestEntry_t, _ifTestCodeLength),
-      0 },
-    { 6, G_SNMP_OCTETSTRING,
-      IF_MIB_IFTESTOWNER, "ifTestOwner",
-       ifTestOwner_constraints,
-      G_STRUCT_OFFSET(if_mib_ifTestEntry_t, ifTestOwner),
-      G_STRUCT_OFFSET(if_mib_ifTestEntry_t, _ifTestOwnerLength),
-      GSNMP_ATTR_FLAG_WRITABLE },
-    { 0, 0, 0, NULL }
-};
-
 static guint32 const ifRcvAddressEntry_oid[] = {1, 3, 6, 1, 2, 1, 31, 1, 4, 1};
 
 static GSnmpAttribute ifRcvAddressEntry_attr[] = {
@@ -669,7 +608,7 @@ if_mib_new_interfaces()
     return interfaces;
 }
 
-static if_mib_interfaces_t *
+static inline if_mib_interfaces_t *
 assign_interfaces(GSList *vbl)
 {
     if_mib_interfaces_t *interfaces;
@@ -733,7 +672,7 @@ if_mib_new_ifEntry()
     return ifEntry;
 }
 
-static int
+static inline int
 unpack_ifEntry(GSnmpVarBind *vb, if_mib_ifEntry_t *ifEntry)
 {
     guint8 idx = 10;
@@ -744,7 +683,7 @@ unpack_ifEntry(GSnmpVarBind *vb, if_mib_ifEntry_t *ifEntry)
     return 0;
 }
 
-static int
+static inline int
 pack_ifEntry(guint32 *base, gint32 ifIndex)
 {
     guint8 idx = 10;
@@ -753,7 +692,7 @@ pack_ifEntry(guint32 *base, gint32 ifIndex)
     return idx;
 }
 
-static if_mib_ifEntry_t *
+static inline if_mib_ifEntry_t *
 assign_ifEntry(GSList *vbl)
 {
     if_mib_ifEntry_t *ifEntry;
@@ -899,7 +838,7 @@ if_mib_new_ifMIBObjects()
     return ifMIBObjects;
 }
 
-static if_mib_ifMIBObjects_t *
+static inline if_mib_ifMIBObjects_t *
 assign_ifMIBObjects(GSList *vbl)
 {
     if_mib_ifMIBObjects_t *ifMIBObjects;
@@ -963,7 +902,7 @@ if_mib_new_ifXEntry()
     return ifXEntry;
 }
 
-static int
+static inline int
 unpack_ifXEntry(GSnmpVarBind *vb, if_mib_ifXEntry_t *ifXEntry)
 {
     guint8 idx = 11;
@@ -974,7 +913,7 @@ unpack_ifXEntry(GSnmpVarBind *vb, if_mib_ifXEntry_t *ifXEntry)
     return 0;
 }
 
-static int
+static inline int
 pack_ifXEntry(guint32 *base, gint32 ifIndex)
 {
     guint8 idx = 11;
@@ -983,7 +922,7 @@ pack_ifXEntry(guint32 *base, gint32 ifIndex)
     return idx;
 }
 
-static if_mib_ifXEntry_t *
+static inline if_mib_ifXEntry_t *
 assign_ifXEntry(GSList *vbl)
 {
     if_mib_ifXEntry_t *ifXEntry;
@@ -1129,7 +1068,7 @@ if_mib_new_ifStackEntry()
     return ifStackEntry;
 }
 
-static int
+static inline int
 unpack_ifStackEntry(GSnmpVarBind *vb, if_mib_ifStackEntry_t *ifStackEntry)
 {
     guint8 idx = 11;
@@ -1142,7 +1081,7 @@ unpack_ifStackEntry(GSnmpVarBind *vb, if_mib_ifStackEntry_t *ifStackEntry)
     return 0;
 }
 
-static int
+static inline int
 pack_ifStackEntry(guint32 *base, gint32 ifStackHigherLayer, gint32 ifStackLowerLayer)
 {
     guint8 idx = 11;
@@ -1152,7 +1091,7 @@ pack_ifStackEntry(guint32 *base, gint32 ifStackHigherLayer, gint32 ifStackLowerL
     return idx;
 }
 
-static if_mib_ifStackEntry_t *
+static inline if_mib_ifStackEntry_t *
 assign_ifStackEntry(GSList *vbl)
 {
     if_mib_ifStackEntry_t *ifStackEntry;
@@ -1289,172 +1228,6 @@ if_mib_free_ifStackTable(if_mib_ifStackEntry_t **ifStackEntry)
     }
 }
 
-if_mib_ifTestEntry_t *
-if_mib_new_ifTestEntry()
-{
-    if_mib_ifTestEntry_t *ifTestEntry;
-
-    ifTestEntry = (if_mib_ifTestEntry_t *) g_malloc0(sizeof(if_mib_ifTestEntry_t) + sizeof(gpointer));
-    return ifTestEntry;
-}
-
-static int
-unpack_ifTestEntry(GSnmpVarBind *vb, if_mib_ifTestEntry_t *ifTestEntry)
-{
-    guint8 idx = 11;
-
-    if (vb->id_len < idx) return -1;
-    ifTestEntry->ifIndex = vb->id[idx++];
-    if (vb->id_len > idx) return -1;
-    return 0;
-}
-
-static int
-pack_ifTestEntry(guint32 *base, gint32 ifIndex)
-{
-    guint8 idx = 11;
-
-    base[idx++] = ifIndex;
-    return idx;
-}
-
-static if_mib_ifTestEntry_t *
-assign_ifTestEntry(GSList *vbl)
-{
-    if_mib_ifTestEntry_t *ifTestEntry;
-    char *p;
-
-    ifTestEntry = if_mib_new_ifTestEntry();
-    if (! ifTestEntry) {
-        return NULL;
-    }
-
-    p = (char *) ifTestEntry + sizeof(if_mib_ifTestEntry_t);
-    * (GSList **) p = vbl;
-
-    if (unpack_ifTestEntry((GSnmpVarBind *) vbl->data, ifTestEntry) < 0) {
-        g_warning("%s: invalid instance identifier", "ifTestEntry");
-        g_free(ifTestEntry);
-        return NULL;
-    }
-
-    gsnmp_attr_assign(vbl, ifTestEntry_oid, sizeof(ifTestEntry_oid)/sizeof(guint32),
-                      ifTestEntry_attr, ifTestEntry);
-
-    return ifTestEntry;
-}
-
-void
-if_mib_get_ifTestTable(GSnmpSession *s, if_mib_ifTestEntry_t ***ifTestEntry, gint mask)
-{
-    GSList *in = NULL, *out = NULL;
-    GSList *row;
-    int i;
-    static guint32 base[] = {1, 3, 6, 1, 2, 1, 31, 1, 3, 1, 0};
-
-    *ifTestEntry = NULL;
-
-    gsnmp_attr_get(s, &in, base, 11, 10, ifTestEntry_attr, mask);
-
-    out = gsnmp_gettable(s, in);
-    /* g_snmp_vbl_free(in); */
-
-    if (out) {
-        *ifTestEntry = (if_mib_ifTestEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(if_mib_ifTestEntry_t *));
-        if (! *ifTestEntry) {
-            s->error_status = G_SNMP_ERR_INTERNAL;
-            g_snmp_vbl_free(out);
-            return;
-        }
-        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-            (*ifTestEntry)[i] = assign_ifTestEntry(row->data);
-        }
-    }
-}
-
-void
-if_mib_get_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t **ifTestEntry, gint32 ifIndex, gint mask)
-{
-    GSList *in = NULL, *out = NULL;
-    guint32 base[128];
-    gint8 len;
-
-    memset(base, 0, sizeof(base));
-    memcpy(base, ifTestEntry_oid, sizeof(ifTestEntry_oid));
-    len = pack_ifTestEntry(base, ifIndex);
-    if (len < 0) {
-        g_warning("%s: invalid index values", "ifTestEntry");
-        s->error_status = G_SNMP_ERR_INTERNAL;
-        return;
-    }
-
-    *ifTestEntry = NULL;
-
-    gsnmp_attr_get(s, &in, base, len, 10, ifTestEntry_attr, mask);
-
-    out = g_snmp_session_sync_get(s, in);
-    g_snmp_vbl_free(in);
-    if (out) {
-        if (s->error_status != G_SNMP_ERR_NOERROR) {
-            g_snmp_vbl_free(out);
-            return;
-        }
-        *ifTestEntry = assign_ifTestEntry(out);
-    }
-}
-
-void
-if_mib_set_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t *ifTestEntry, gint mask)
-{
-    GSList *in = NULL, *out = NULL;
-    guint32 base[128];
-    gint8 len;
-
-    memset(base, 0, sizeof(base));
-    memcpy(base, ifTestEntry_oid, sizeof(ifTestEntry_oid));
-    len = pack_ifTestEntry(base, ifTestEntry->ifIndex);
-    if (len < 0) {
-        g_warning("%s: invalid index values", "ifTestEntry");
-        s->error_status = G_SNMP_ERR_INTERNAL;
-        return;
-    }
-
-    gsnmp_attr_set(s, &in, base, len, 10, ifTestEntry_attr, mask, ifTestEntry);
-
-    out = g_snmp_session_sync_set(s, in);
-    g_snmp_vbl_free(in);
-    if (out) {
-        g_snmp_vbl_free(out);
-    }
-}
-
-void
-if_mib_free_ifTestEntry(if_mib_ifTestEntry_t *ifTestEntry)
-{
-    GSList *vbl;
-    char *p;
-
-    if (ifTestEntry) {
-        p = (char *) ifTestEntry + sizeof(if_mib_ifTestEntry_t);
-        vbl = * (GSList **) p;
-        g_snmp_vbl_free(vbl);
-        g_free(ifTestEntry);
-    }
-}
-
-void
-if_mib_free_ifTestTable(if_mib_ifTestEntry_t **ifTestEntry)
-{
-    int i;
-
-    if (ifTestEntry) {
-        for (i = 0; ifTestEntry[i]; i++) {
-            if_mib_free_ifTestEntry(ifTestEntry[i]);
-        }
-        g_free(ifTestEntry);
-    }
-}
-
 if_mib_ifRcvAddressEntry_t *
 if_mib_new_ifRcvAddressEntry()
 {
@@ -1464,7 +1237,7 @@ if_mib_new_ifRcvAddressEntry()
     return ifRcvAddressEntry;
 }
 
-static int
+static inline int
 unpack_ifRcvAddressEntry(GSnmpVarBind *vb, if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry)
 {
     guint8 idx = 11;
@@ -1484,7 +1257,7 @@ unpack_ifRcvAddressEntry(GSnmpVarBind *vb, if_mib_ifRcvAddressEntry_t *ifRcvAddr
     return 0;
 }
 
-static int
+static inline int
 pack_ifRcvAddressEntry(guint32 *base, gint32 ifIndex, guchar *ifRcvAddressAddress, guint16 _ifRcvAddressAddressLength)
 {
     guint8 idx = 11;
@@ -1501,7 +1274,7 @@ pack_ifRcvAddressEntry(guint32 *base, gint32 ifIndex, guchar *ifRcvAddressAddres
     return idx;
 }
 
-static if_mib_ifRcvAddressEntry_t *
+static inline if_mib_ifRcvAddressEntry_t *
 assign_ifRcvAddressEntry(GSList *vbl)
 {
     if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry;
