@@ -91,6 +91,7 @@ typedef struct scli_alias	scli_alias_t;
 #define SCLI_CMD_FLAG_MONITOR	0x02
 #define SCLI_CMD_FLAG_LOOP	0x04
 #define SCLI_CMD_FLAG_XML	0x08
+#define SCLI_CMD_FLAG_DRY	0x10
 
 struct scli_cmd {
     char *path;			/* absolute command name */
@@ -122,6 +123,7 @@ struct scli_alias {
 #define SCLI_INTERP_FLAG_MONITOR	0x04
 #define SCLI_INTERP_FLAG_LOOP		0x08
 #define SCLI_INTERP_FLAG_XML		0x10
+#define SCLI_INTERP_FLAG_DRY		0x20
 
 struct scli_interp {
     GNode *cmd_root;		/* root of the command tree */

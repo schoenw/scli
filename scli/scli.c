@@ -287,6 +287,7 @@ usage()
 	"  -r, --retries     number of retries (default 3)\n"
 	"  -t, --timeout     timeout between retries in milliseconds (default 500)\n"
 	"  -x, --xml         produce machine readable XML output\n"
+	"  -y, --dry         parse commands but do not execute them (dry mode)\n"
 	);
 }
 
@@ -304,13 +305,14 @@ main(int argc, char **argv)
     int c;
     
     int norc = 0, port = 161, delay = 5000, retries = 3, timeout = 500000;
-    int xml = 0;
+    int xml = 0, dry = 0;
 
     static struct option const long_options[] =
     {
         { "version", no_argument,       0, 'V' },
 	{ "command", required_argument, 0, 'c' },
         { "delay",   required_argument, 0, 'd' },
+	{ "dry",     required_argument, 0, 'y' },
         { "file",    required_argument, 0, 'f' },
         { "help",    no_argument,       0, 'h' },
         { "norc",    no_argument,       0, 'n' },
@@ -321,7 +323,7 @@ main(int argc, char **argv)
         { NULL, 0, NULL, 0}
     };
 
-    while ((c = getopt_long(argc, argv, "Vc:d:f:hnp:r:t:x", long_options,
+    while ((c = getopt_long(argc, argv, "Vc:d:f:hnp:r:t:xy", long_options,
                             (int *) 0)) != EOF) {
         switch (c) {
         case 'V':
@@ -368,13 +370,16 @@ main(int argc, char **argv)
 	case 'x':
 	    xml = 1;
 	    break;
+	case 'y':
+	    dry = 1;
+	    break;
         default:
             usage();
             exit(1);
         }
     }
 
-    if (/*argc-optind < 1 ||*/ argc-optind > 2) {
+    if (argc-optind > 2) {
         usage();
         exit(1);
     }
@@ -425,6 +430,10 @@ main(int argc, char **argv)
 
     if (xml) {
 	interp->flags |= SCLI_INTERP_FLAG_XML;
+    }
+
+    if (dry) {
+	interp->flags |= SCLI_INTERP_FLAG_DRY;
     }
 
     if (scli_interp_interactive(interp)) {

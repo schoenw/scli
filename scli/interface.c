@@ -1044,7 +1044,7 @@ static int
 set_interface_status(scli_interp_t *interp, int argc, char **argv)
 {
     gint32 value;
-    int status;
+    int status = SCLI_OK;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -1056,7 +1056,9 @@ set_interface_status(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_VALUE;
     }
 
-    status = foreach_interface(interp, argv[1], set_status, &value);
+    if (! (interp->flags & SCLI_INTERP_FLAG_DRY)) {
+	status = foreach_interface(interp, argv[1], set_status, &value);
+    }
     return status;
 }
 
@@ -1243,7 +1245,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest. The <value> parameter must\n"
 	  "be one of the strings \"up\", \"down\", or \"testing\".",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_interface_status },
 

@@ -592,7 +592,12 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
         refresh();
         if (! (flags & STOP_FLAG_SNMP_FAILURE)) {
 	    scli_interp_reset(interp);
-	    code = (cmd->func) (interp, argc, argv);
+	    if (! (interp->flags & SCLI_INTERP_FLAG_DRY)
+		|| ((interp->flags & SCLI_INTERP_FLAG_DRY) && (cmd->flags & SCLI_CMD_FLAG_DRY))) {
+		code = (cmd->func) (interp, argc, argv);
+	    } else {
+		code = SCLI_OK;
+	    }
 	    if (code != SCLI_OK) {
 		break;
 	    }
@@ -730,7 +735,10 @@ loop_iteration(gpointer data)
     
     g_printerr("loop_iteration()\n");
     scli_interp_reset(interp);
-    (void) (cmd->func) (interp, argc, argv);
+    if (! (interp->flags & SCLI_INTERP_FLAG_DRY)
+	|| ((interp->flags & SCLI_INTERP_FLAG_DRY) && (cmd->flags & SCLI_CMD_FLAG_DRY))) {
+	(void) (cmd->func) (interp, argc, argv);
+    }
     g_print("%s\n%s", interp->header->str, interp->result->str);
     return TRUE;
 }
@@ -756,7 +764,12 @@ scli_loop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
     struct loop_data loop_data;
     int code;
 
-    code = (cmd->func) (interp, argc, argv);
+    if (! (interp->flags & SCLI_INTERP_FLAG_DRY)
+	|| ((interp->flags & SCLI_INTERP_FLAG_DRY) && (cmd->flags & SCLI_CMD_FLAG_DRY))) {
+	code = (cmd->func) (interp, argc, argv);
+    } else {
+	code = SCLI_OK;
+    }
     if (code != SCLI_OK) {
 	return code;
     }
