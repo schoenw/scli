@@ -25,8 +25,8 @@
 
 
 static gboolean
-g_snmp_walk_done_callback(GSnmpSession *session, gpointer data, 
-			  GSnmpPdu *spdu, GSList *objs)
+g_snmp_walk_done_callback(GSnmpSession *session, 
+			  GSnmpPdu *spdu, GSList *objs, gpointer data)
 {
     GSnmpWalk   *walk;
     GSList	*elem, *orig_elem;

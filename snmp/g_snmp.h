@@ -58,7 +58,7 @@ typedef enum {
 
 #define SNMP_SIZE_SMALLOBJECTID     16
 
-/* Requests */
+/* Protocol operations as defined in RFC 1905: */
 
 typedef enum {
     G_SNMP_PDU_GET	= 0,
@@ -71,7 +71,8 @@ typedef enum {
     G_SNMP_PDU_TRAP2	= 7
 } GSnmpPduType;
 
-/* Errors */
+/* Protocol errors codes as defined in RFC 1905. The negative codes
+   are scli internal codes. */
 
 typedef enum {
     G_SNMP_ERR_PROCEDURE	      = -3,

@@ -24,20 +24,19 @@
 #include "g_snmp.h"
 
 static gboolean
-g_snmp_table_done_callback(GSnmpSession *session, gpointer data, 
-                           GSnmpPdu *spdu, GSList *objs)
+g_snmp_table_done_callback(GSnmpSession *session,
+                           GSnmpPdu *spdu, GSList *objs, gpointer data)
 {
     GSnmpTable   *table;
-    GSList       *nobjs; /* New list of objects for next query */
+    GSList       *nobjs; /* New varbind list for next query */
     GSnmpVarBind *cobj;  /* Current object being processed */
     GSnmpVarBind *obj;   /* Base object being processed */
-    GSnmpVarBind *nobj;  /* New NULL object for next query */
-    GHashTable   *otable;
-    int           rows;
-    int           i,j, *p;
+    int           cols;  /* Number of columns we expect */
+    int           i, j, eov = 0;
     guint32       index[SNMP_SIZE_OBJECTID];
     int           index_len;
-    
+    GSList *cb_vbl = NULL;
+
     session->error_status = spdu->request.error_status;
     session->error_index = spdu->request.error_index;
     
@@ -48,113 +47,118 @@ g_snmp_table_done_callback(GSnmpSession *session, gpointer data,
     
     table = (GSnmpTable *) data;
     table->request = 0;
+
+    /* Check whether we reached the end of the MIB view... */
     
-  rows = g_slist_length(table->objs);
-  if (spdu->request.error_status == G_SNMP_ERR_NOSUCHNAME) {
-      if (table->cb_finish)
-        table->cb_finish(table->data);
-      else
-        g_snmp_table_destroy(table);
-      return TRUE;
-  }
-/* We got error back. */
-  if (spdu->request.error_status)
-    {
-      if (table->cb_error)
-        table->cb_error(table->data);
-      else
-        g_snmp_table_destroy(table);  
-      return TRUE;
+    cols = g_slist_length(table->objs);
+    if (spdu->request.error_status == G_SNMP_ERR_NOSUCHNAME) {
+	if (table->cb_finish) {
+	    table->cb_finish(table->data);
+	} else {
+	    g_snmp_table_destroy(table);
+	}
+	return TRUE;
     }
-/* Check if the number of requested variables matches the number of returned
-   variables */
-  if (g_slist_length(objs) != rows)
-    {
-      if (table->cb_error)
-        table->cb_error(table->data);
-      else
-        g_snmp_table_destroy(table);  
-      return TRUE;
+    
+    /* Check whether we got an error back... */
+    
+    if (spdu->request.error_status) {
+	if (table->cb_error) {
+	    table->cb_error(table->data);
+	} else {
+	    g_snmp_table_destroy(table);
+	}
+	return TRUE;
     }
-  index_len = 0;
-/* Search smallest index in all valid returned columns. */
-  for (i=0; i<rows; i++)
-    {
-      obj  = (GSnmpVarBind *) g_slist_nth_data(table->objs, i);
-      cobj = (GSnmpVarBind *) g_slist_nth_data(objs, i);
-      if (cobj->id_len >= obj->id_len
-	  && !memcmp (cobj->id, obj->id, obj->id_len * sizeof (guint32)))
-        {
-          if (!index_len)
-            {
-              index_len = cobj->id_len - obj->id_len;
-              g_memmove(index, cobj->id+obj->id_len, 
-                        index_len * sizeof (guint32));
-            }
-          else
-            {
-              if ((j=memcmp(index, cobj->id+obj->id_len, 
-                            MIN(index_len, cobj->id_len - obj->id_len)
-                            * sizeof (guint32))))
-                {
+    
+    /* Check if the number of requested variables matches the number
+       of returned variables */
+    
+    if (g_slist_length(objs) != cols) {
+	if (table->cb_error) {
+	    table->cb_error(table->data);
+	} else {
+	    g_snmp_table_destroy(table);
+	}
+	return TRUE;
+    }
+    
+    /* Search smallest index in all valid returned columns. */
+
+    index_len = 0;
+    for (i = 0; i < cols; i++) {
+	obj  = (GSnmpVarBind *) g_slist_nth_data(table->objs, i);
+	cobj = (GSnmpVarBind *) g_slist_nth_data(objs, i);
+	if (cobj->id_len >= obj->id_len
+	    && !memcmp (cobj->id, obj->id, obj->id_len * sizeof (guint32))) {
+	    if (!index_len) {
+		index_len = cobj->id_len - obj->id_len;
+		g_memmove(index, cobj->id+obj->id_len, 
+			  index_len * sizeof (guint32));
+            } else {
+		if ((j=memcmp(index, cobj->id+obj->id_len, 
+			      MIN(index_len, cobj->id_len - obj->id_len)
+			      * sizeof (guint32)))) {
 		    /* g_warning("Non-regular SNMP table"); (js) */
-                  if (j>0)
-                    {
-                       index_len = cobj->id_len - obj->id_len;
-                       g_memmove(index, cobj->id+obj->id_len,
-                                 index_len * sizeof (guint32));
-                    }
-                }
-              if (cobj->id_len - obj->id_len < index_len)
-                {
-                  g_warning("SNMP table index length changed");
-                  index_len = cobj->id_len - obj->id_len;
+		    if (j>0) {
+			index_len = cobj->id_len - obj->id_len;
+			g_memmove(index, cobj->id+obj->id_len,
+				  index_len * sizeof (guint32));
+		    }
+		}
+		if (cobj->id_len - obj->id_len < index_len) {
+		    g_warning("SNMP table index length changed");
+		    index_len = cobj->id_len - obj->id_len;
                 }
             }
+	}
+	if (cobj->type == G_SNMP_ENDOFMIBVIEW) {
+	    eov++;
         }
     }
-/* If no valid columns found, table query must be finished. */
-  if (!index_len)
-    {
-      if (table->cb_finish)
-        table->cb_finish(table->data);
-      else
-        g_snmp_table_destroy(table);
-      return TRUE;
+    
+    /* If no valid columns found, table query must be finished. */
+
+    if (! index_len || eov) {
+	if (table->cb_finish) {
+	    table->cb_finish(table->data);
+	} else {
+	    g_snmp_table_destroy(table);
+	}
+	return TRUE;
     }
-/* Build hash for callback and construct query for next row. */
-  otable = g_hash_table_new(g_int_hash, g_int_equal);
-  nobjs = NULL;
-  for (i=0; i<rows; i++)
-    {
-      obj  = (GSnmpVarBind *) g_slist_nth_data(table->objs, i);
-      cobj = (GSnmpVarBind *) g_slist_nth_data(objs, i);
-      if (!memcmp (cobj->id, obj->id, obj->id_len * sizeof (guint32)))
-        {
-          if (cobj->id_len - obj->id_len == index_len)
-            if (!memcmp(cobj->id + obj->id_len, index, 
-                        index_len * sizeof (guint32)))
-              {
-                p = g_malloc(sizeof(int));
-                *p = i;
-                g_hash_table_insert(otable, p, cobj);
-              }
-        }
-      nobj             = g_malloc0(sizeof(GSnmpVarBind));
-      nobj->type       = G_SNMP_NULL;
-      nobj->syntax_len = 0;
-      nobj->id_len     = obj->id_len + index_len;
-      nobj->id         = g_malloc(nobj->id_len * sizeof(guint32));
-      g_memmove (nobj->id, obj->id, obj->id_len * sizeof(guint32));
-      g_memmove (nobj->id + obj->id_len, index, index_len * sizeof(guint32));
-      nobjs            = g_slist_append(nobjs, nobj);
+    
+    /* Build varbind list for the callback and construct a new varbind
+       list for next row. */
+    
+    nobjs = NULL;
+    for (i = 0; i < cols; i++) {
+	obj  = (GSnmpVarBind *) g_slist_nth_data(table->objs, i);
+	cobj = (GSnmpVarBind *) g_slist_nth_data(objs, i);
+	if (!memcmp (cobj->id, obj->id, obj->id_len * sizeof (guint32))) {
+	    if (cobj->id_len - obj->id_len == index_len)
+		if (!memcmp(cobj->id + obj->id_len, index, 
+			    index_len * sizeof (guint32))) {
+		    cb_vbl = g_slist_append(cb_vbl, cobj);
+		}
+	}
+	if (obj->id_len + index_len < SNMP_SIZE_OBJECTID) {
+	    guint32 oid[SNMP_SIZE_OBJECTID];
+	    g_memmove(oid, obj->id, obj->id_len * sizeof(guint32));
+	    g_memmove(oid + obj->id_len, index, index_len * sizeof(guint32)); 
+	    g_snmp_vbl_add_null(&nobjs, oid, obj->id_len + index_len);
+	}
     }
-  if (table->cb_row)
-    table->cb_row(otable, index_len, table->data);
-  g_hash_table_destroy(otable);
-  table->request = g_snmp_session_async_getnext(table->session, nobjs);
-  return TRUE;
-}  
+    
+    if (table->cb_row) {
+	table->cb_row(cb_vbl, index_len, table->data);
+    }
+    /* g_slist_free(cb_vbl); ?? */
+    
+    table->request = g_snmp_session_async_getnext(table->session, nobjs);
+    g_snmp_vbl_free(nobjs);
+    return TRUE;
+}
 
 
 static void
@@ -243,29 +247,9 @@ cb_error(gpointer *data)
 }
 
 static void
-append_elem(gpointer key, gpointer value, gpointer user_data)
+cb_row(GSList *rowlist, int index_len, gpointer *data)
 {
-    GSList **list = (GSList **) user_data;
-    
-    GSnmpVarBind *obj = (GSnmpVarBind *) value;
-
-    *list = g_slist_append(*list, obj);
-
-    if (obj->type == G_SNMP_ENDOFMIBVIEW) {
-	cb_finish(user_data);
-	return;
-    }
-}
-
-
-
-static void
-cb_row(GHashTable *table, int index_len, gpointer *data)
-{
-    GSList *rowlist = NULL;
     GSList **tablelist = (GSList **) data;
-
-    g_hash_table_foreach(table, append_elem, &rowlist);
 
     *tablelist = g_slist_append(*tablelist, rowlist);
 }

@@ -347,7 +347,7 @@ cb_time(GSnmpSession *session, void *magic)
 }
 
 static gboolean
-cb_done(GSnmpSession *session, void *magic, GSnmpPdu *spdu, GSList *objs)
+cb_done(GSnmpSession *session, GSnmpPdu *spdu, GSList *objs, gpointer magic)
 {
     struct syncmagic *sm = (struct syncmagic *) magic;
     sm->result = objs;
@@ -516,68 +516,58 @@ g_snmp_printf(char *buf, int buflen, GSnmpVarBind *obj)
 int
 g_snmp_timeout_cb (gpointer data)
 {
-  GSList       *mylist;
-  time_t        now;
-  GSnmpRequest *request;
-  int           model = 0, pduv = 0;
-
-#ifdef SNMP_DEBUG
-  printf("SNMP Timeout called\n");
-#endif
-
-again:
-  now = time(NULL);
-  mylist = request_queue;
-
-  while(mylist)
-    {
-      request = (GSnmpRequest *) mylist->data;
-      mylist = mylist->next;
-      if (request->time <= now)
-        {
-          if (request->retries)
-            {
-              request->retries--;
-              request->time = now + request->timeoutval;
-	      /* 
-               * Again what happens on a -1 return to sendto
-	       */
-              switch (request->version)
-                {
-                  case G_SNMP_V1: 
-                    model = PMODEL_SNMPV1;
-                    pduv  = PDUV1;
-                    break;
-                  case G_SNMP_V2C: 
-                    model = PMODEL_SNMPV2C;
-                    pduv  = PDUV2;
-                    break;
-                  case G_SNMP_V3: 
-                    model = PMODEL_SNMPV3;
-                    pduv  = PDUV2;
-                    break;
-                }
- 
-              sendPdu(request->tdomain, request->address, model, SMODEL_ANY, 
-                request->auth, SLEVEL_NANP, NULL, NULL, pduv, 
-                &request->pdu, TRUE);
-            }
-          else
-            {
+    GSList       *mylist;
+    time_t        now;
+    GSnmpRequest *request;
+    int           model = 0, pduv = 0;
+    
+  again:
+    now = time(NULL);
+    mylist = request_queue;
+    
+    while (mylist) {
+	request = (GSnmpRequest *) mylist->data;
+	mylist = mylist->next;
+	if (request->time <= now) {
+	    if (request->retries) {
+		request->retries--;
+		request->time = now + request->timeoutval;
+		/* 
+		 * Again what happens on a -1 return to sendto
+		 */
+		switch (request->version) {
+		case G_SNMP_V1: 
+		    model = PMODEL_SNMPV1;
+		    pduv  = PDUV1;
+		    break;
+		case G_SNMP_V2C: 
+		    model = PMODEL_SNMPV2C;
+		    pduv  = PDUV2;
+		    break;
+		case G_SNMP_V3: 
+		    model = PMODEL_SNMPV3;
+		    pduv  = PDUV2;
+		    break;
+		}
+		
+		sendPdu(request->tdomain, request->address, model, SMODEL_ANY, 
+			request->auth, SLEVEL_NANP, NULL, NULL, pduv, 
+			&request->pdu, TRUE);
+	    } else {
 		g_snmp_request_dequeue(request);
-              if (request->timeout)
-                {
-#ifdef SNMP_DEBUG
-                   printf("Calling time callback for request: %p\n", request);
-#endif
-                   request->timeout(request->session, request->magic);
-                }
-	      g_snmp_request_destroy(request);
-              goto again;
-            }
-        }
+		if (request->timeout) {
+		    if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
+			g_printerr("request %p: timeout callback invoked\n",
+				   request);
+		    }
+		    request->timeout(request->session, request->magic);
+		}
+		g_snmp_request_destroy(request);
+		goto again;
+	    }
+	}
     }
-  return TRUE;
+    return TRUE;
 }
 
 void
@@ -621,7 +611,7 @@ g_session_response_pdu(guint messageProcessingModel,
 	return;
     }
 
-    if (request->callback(request->session, request->magic, PDU, vbl)) {
+    if (request->callback(request->session, PDU, vbl, request->magic)) {
 	if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
 	    g_printerr("request %p: callback invoked\n", request);
 	}

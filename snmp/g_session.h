@@ -30,7 +30,16 @@
  * application as part of the session structure. (!)
  */
 
-typedef struct _GSnmpSession {
+typedef struct _GSnmpSession GSnmpSession;
+
+typedef gboolean (*GSnmpSessionDoneFunc) (GSnmpSession *session,
+					  GSnmpPdu *pdu,
+					  GSList *vbl,
+					  gpointer data);
+typedef void     (*GSnmpSessionTimeFunc) (GSnmpSession *session,
+					  gpointer data);
+
+struct _GSnmpSession {
     struct sockaddr *address;
     GSnmpTDomain  tdomain;
     gchar        *taddress;
@@ -42,12 +51,13 @@ typedef struct _GSnmpSession {
     guint32	  error_index;
     guint         timeout;
     GSnmpVersion  version;
-    gboolean      (*done_callback) (); /* what to call when complete */
-    void          (*time_callback) (); /* what to call on a timeout */
-    gpointer      magic;               /* additional data for callbacks */
-} GSnmpSession;
+    GSnmpSessionDoneFunc done_callback; /* what to call when complete */
+    GSnmpSessionTimeFunc time_callback; /* what to call on a timeout */
+    gpointer      magic;                /* additional data for callbacks */
+};
 
-GSnmpSession*	g_snmp_session_new(GSnmpTDomain domain, gchar *address, guint16 port);
+GSnmpSession*	g_snmp_session_new(GSnmpTDomain domain,
+				   gchar *address, guint16 port);
 GSnmpSession*	g_snmp_session_clone(GSnmpSession *s);
 void		g_snmp_session_destroy(GSnmpSession *s);
 
@@ -74,8 +84,8 @@ GSList* g_snmp_session_sync_getbulk  (GSnmpSession *session,
 				      guint32 maxrep);
 
 typedef struct _GSnmpRequest {
-    gboolean            (*callback) ();
-    void                (*timeout) ();
+    GSnmpSessionDoneFunc callback;
+    GSnmpSessionTimeFunc timeout;
     GSnmpSession        *session;
     GString             *auth;
     GSnmpPdu             pdu;
@@ -102,7 +112,6 @@ GSnmpRequest*	g_snmp_request_find(gint32 request_id);
  */
 
 int g_snmp_timeout_cb        (gpointer    data);
-void g_snmp_input_cb         (gpointer    data);
 
 void g_session_response_pdu (guint messageProcessingModel,
   guint securityModel, GString *securityName, guint securityLevel, 

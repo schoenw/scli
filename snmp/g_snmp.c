@@ -195,43 +195,43 @@ g_snmp_varbind_new(guint32 const *oid, gsize oid_len, GSnmpVarBindType type,
     GSnmpVarBind *obj = NULL;
     gsize len = 0;
 
-    switch (type) 
-    {
-      case G_SNMP_NULL:
-      case G_SNMP_NOSUCHOBJECT:
-      case G_SNMP_NOSUCHINSTANCE:
-      case G_SNMP_ENDOFMIBVIEW:
+    switch (type) {
+    case G_SNMP_NULL:
+    case G_SNMP_NOSUCHOBJECT:
+    case G_SNMP_NOSUCHINSTANCE:
+    case G_SNMP_ENDOFMIBVIEW:
 	obj = g_malloc(sizeof(GSnmpVarBind));
         break;
-      case G_SNMP_INTEGER32:
-        obj = g_malloc(sizeof(GSnmpVarBind));
+    case G_SNMP_INTEGER32:
+	g_assert(value);    
+	obj = g_malloc(sizeof(GSnmpVarBind));
         obj->syntax.i32[0] = *((gint32 *) value);
         break;
-      case G_SNMP_COUNTER32:
-      case G_SNMP_UNSIGNED32:
-      case G_SNMP_TIMETICKS:
+    case G_SNMP_COUNTER32:
+    case G_SNMP_UNSIGNED32:
+    case G_SNMP_TIMETICKS:
+	g_assert(value);    
         obj = g_malloc(sizeof(GSnmpVarBind));
         obj->syntax.ui32[0] = *((guint32 *) value);
         break;
-      case G_SNMP_COUNTER64:
+    case G_SNMP_COUNTER64:
+	g_assert(value);    
 	obj = g_malloc(sizeof(GSnmpVarBind));
 	obj->syntax.ui64[0] = *((guint64 *) value);
 	break;
-      case G_SNMP_OCTETSTRING:
-      case G_SNMP_IPADDRESS:
-      case G_SNMP_OPAQUE:
+    case G_SNMP_OCTETSTRING:
+    case G_SNMP_IPADDRESS:
+    case G_SNMP_OPAQUE:
         len = value_len;
         obj = g_malloc(sizeof(GSnmpVarBind) + len);
         memcpy(obj->syntax.uc, value, len);
         break;
-      case G_SNMP_OBJECTID:
+    case G_SNMP_OBJECTID:
 	len = value_len;
 	len *= sizeof(guint32);
         obj = g_malloc(sizeof(GSnmpVarBind) + len);
 	memcpy(obj->syntax.ui32, value, len);
 	break;
-      default:
-        return NULL;
     }
 
     obj->syntax_len = len;
@@ -240,7 +240,6 @@ g_snmp_varbind_new(guint32 const *oid, gsize oid_len, GSnmpVarBindType type,
     obj->id         = g_malloc(oid_len * sizeof(guint32));
     
     g_memmove(obj->id, oid, oid_len * sizeof(guint32));
-
     return obj;
 }
 

@@ -24,11 +24,10 @@
 #ifndef _G_SNMP_TABLE_H_
 #define _G_SNMP_TABLE_H_
 
-typedef struct _GSnmpTable
-{
+typedef struct _GSnmpTable {
     GSnmpSession *session;
     GSList       *objs;
-    gpointer      data;
+    gpointer     data;
     gpointer     request;
     void      (* cb_error)();
     void      (* cb_row)();
