@@ -125,9 +125,11 @@ fmt_3com_bridge_vlan_info(GString *s,
 			  guchar *bits, gsize bits_len,
 			  int name_width)
 {
-    g_string_sprintfa(s, "%4d  ",
-		      vlanEntry->a3ComVlanIfGlobalIdentifier
-		      ? *vlanEntry->a3ComVlanIfGlobalIdentifier : 0);
+    if (vlanEntry->a3ComVlanIfGlobalIdentifier) {
+	g_string_sprintfa(s, "%4d  ", *vlanEntry->a3ComVlanIfGlobalIdentifier);
+    } else {
+	g_string_sprintfa(s, "%4s  ", "-");
+    }
 
     fmt_vlanStatus(s, vlanEntry);
     
@@ -252,8 +254,11 @@ show_3com_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
 static int
 create_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 {
+    productmib_a3ComVlanIfEntry_t **vlanTable = NULL;
     gint32 vlanId;
-    char *end;
+    char *end, *name;
+    size_t name_len;
+    int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -266,11 +271,42 @@ create_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMBER;
     }
 
+    name = argv[2];
+    name_len = strlen(name);
+    if (name_len < PRODUCTMIB_A3COMVLANIFDESCRMINLENGTH
+	|| name_len > PRODUCTMIB_A3COMVLANIFDESCRMAXLENGTH) {
+	return SCLI_SYNTAX_VALUE;
+    }
+
     if (scli_interp_dry(interp)) {
 	return SCLI_OK;
     }
 
-    productmib_proc_create_vlan(interp->peer, vlanId, argv[2],
+    productmib_get_a3ComVlanIfTable(interp->peer, &vlanTable,
+				    PRODUCTMIB_A3COMVLANIFGLOBALIDENTIFIER
+				    | PRODUCTMIB_A3COMVLANIFDESCR);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (vlanTable) {
+	for (i = 0; vlanTable[i]; i++) {
+	    if (vlanTable[i]->a3ComVlanIfGlobalIdentifier
+		&& *vlanTable[i]->a3ComVlanIfGlobalIdentifier == vlanId) {
+		productmib_free_a3ComVlanIfTable(vlanTable);
+		return SCLI_SYNTAX_VALUE;
+	    }
+	    if (vlanTable[i]->_a3ComVlanIfDescrLength == name_len
+		&& memcmp(vlanTable[i]->a3ComVlanIfDescr, name, name_len)==0) {
+		productmib_free_a3ComVlanIfTable(vlanTable);
+		return SCLI_SYNTAX_VALUE;
+	    }
+	}
+    }
+    
+    if (vlanTable) productmib_free_a3ComVlanIfTable(vlanTable);
+
+    productmib_proc_create_vlan(interp->peer, vlanId, name, name_len,
 				PRODUCTMIB_A3COMVLANIFTYPE_VLANLAYER2);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -325,6 +361,65 @@ delete_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     if (vlanTable) productmib_free_a3ComVlanIfTable(vlanTable);
     regfree(regex_vlan);
     
+    return SCLI_OK;
+}
+
+
+
+static int
+set_3com_bridge_vlan_name(scli_interp_t *interp, int argc, char **argv)
+{
+    productmib_a3ComVlanIfEntry_t **vlanTable = NULL;
+    gint32 vlanId;
+    char *end, *name;
+    size_t name_len;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 3) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    vlanId = strtol(argv[1], &end, 0);
+    if (*end) {
+	return SCLI_SYNTAX_NUMBER;
+    }
+
+    name = argv[2];
+    name_len = strlen(name);
+    if (name_len < PRODUCTMIB_A3COMVLANIFDESCRMINLENGTH
+	|| name_len > PRODUCTMIB_A3COMVLANIFDESCRMAXLENGTH) {
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    productmib_get_a3ComVlanIfTable(interp->peer, &vlanTable,
+				    PRODUCTMIB_A3COMVLANIFGLOBALIDENTIFIER);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (vlanTable) {
+	for (i = 0; vlanTable[i]; i++) {
+	    if (vlanTable[i]->a3ComVlanIfGlobalIdentifier
+		&& *vlanTable[i]->a3ComVlanIfGlobalIdentifier == vlanId) {
+		vlanTable[i]->a3ComVlanIfDescr = name;
+		vlanTable[i]->_a3ComVlanIfDescrLength = name_len;
+		productmib_set_a3ComVlanIfEntry(interp->peer, vlanTable[i],
+						PRODUCTMIB_A3COMVLANIFDESCR);
+		if (interp->peer->error_status) {
+		    vlan_snmp_error(interp, vlanTable[i]);
+		}
+	    }
+	}
+    }
+    
+    if (vlanTable) productmib_free_a3ComVlanIfTable(vlanTable);
+
     return SCLI_OK;
 }
 
@@ -429,6 +524,10 @@ dump_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 		|| !vlanTable[i]->a3ComVlanIfGlobalIdentifier) {
 		continue;
 	    }
+	    if (! vlanTable[i]->a3ComVlanIfStatus
+		|| *vlanTable[i]->a3ComVlanIfStatus != PRODUCTMIB_A3COMVLANIFSTATUS_ACTIVE) {
+		continue;
+	    }
 	    create_port_list(ports, sizeof(ports),
 			     vlanTable[i]->a3ComVlanIfIndex,
 			     ifStackTable, ifTable);
@@ -442,6 +541,10 @@ dump_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     	for (i = 0; vlanTable[i]; i++) {
 	    if (! vlanTable[i]->a3ComVlanIfDescr
 		|| !vlanTable[i]->a3ComVlanIfGlobalIdentifier) {
+		continue;
+	    }
+	    if (! vlanTable[i]->a3ComVlanIfStatus
+		|| *vlanTable[i]->a3ComVlanIfStatus != PRODUCTMIB_A3COMVLANIFSTATUS_ACTIVE) {
 		continue;
 	    }
 	    create_port_list(ports, sizeof(ports),
@@ -485,6 +588,13 @@ scli_init_3com_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  delete_3com_bridge_vlan },
+
+	{ "set 3com bridge vlan name", "<vlanid> <name>",
+	  "The `set 3com bridge vlan name' command changes the name of\n"
+	  "a virtual LAN.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  set_3com_bridge_vlan_name },
 
 	{ "set 3com bridge vlan ports", "<regexp> <ports>",
 	  "The `set 3com bridge vlan ports' command allows to assign ports\n"

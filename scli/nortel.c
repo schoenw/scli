@@ -646,7 +646,8 @@ static int
 create_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 {
     gint32 vlanId;
-    char *end;
+    char *end, *name;
+    size_t name_len;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -659,11 +660,18 @@ create_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMBER;
     }
 
+    name = argv[2];
+    name_len = strlen(name);
+    if (name_len < RAPID_CITY_RCVLANNAMEMINLENGTH
+	|| name_len > RAPID_CITY_RCVLANNAMEMAXLENGTH) {
+	return SCLI_SYNTAX_VALUE;
+    }
+
     if (scli_interp_dry(interp)) {
 	return SCLI_OK;
     }
 
-    rapid_city_proc_create_vlan(interp->peer, vlanId, argv[2],
+    rapid_city_proc_create_vlan(interp->peer, vlanId, name, name_len,
 				RAPID_CITY_RCVLANTYPE_BYPORT);
     if (interp->peer->error_status) {
 	vlan_snmp_error(interp, NULL);
