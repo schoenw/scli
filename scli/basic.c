@@ -585,6 +585,7 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 			if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER) {
 			    g_string_sprintfa(s, " [%s]",
 			      (interp->peer) ? interp->peer->name : "?");
+			    g_string_sprintfa(s, " [%s]", fmt_timeticks(0));
 			}
 			g_string_sprintfa(s, "\n\n");
 			if (interp->header->len) {
