@@ -31,40 +31,6 @@
 
 
 static char*
-fmt_hsec32(guint32 number)
-{
-    static char buffer[80];
-    guint32 sec, min, hour;
-
-    sec  = (number / 100) % 60;
-    min  = (number / 100 / 60) % 60;
-    hour = (number / 100 / 60 / 60);
-
-    if (hour) {
-	g_snprintf(buffer, sizeof(buffer), "%2d:%02d:%02d", hour, min, sec);
-    } else {
-	g_snprintf(buffer, sizeof(buffer), "   %02d:%02d", min, sec);
-    }
-
-#if 0
-    if (number > 99900) {
-      g_snprintf(buffer, sizeof(buffer), "%3dh", number / 3600 / 100);
-    } else if (number > 5900) {
-      g_snprintf(buffer, sizeof(buffer), "%3dm", number / 60 / 100);
-    } else if (number < 100) {
-      g_snprintf(buffer, sizeof(buffer), ".%02ds", number);
-    } else if (number < 1000) {
-      g_snprintf(buffer, sizeof(buffer), "%3.1fs", number / 100.0);
-    } else {
-      g_snprintf(buffer, sizeof(buffer), "%3ds", number / 100);
-    }
-#endif
-    return buffer;
-}
-
-
-
-static char*
 fmt_kbytes(guint32 bytes)
 {
     static char buffer[80];
@@ -193,7 +159,6 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 		  "  PID S T    MEM     TIME COMMAND");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
-	sleep(1);
     }
 
     if (host_resources_mib_get_hrSWRunTable(peer, &hrSWRunTable) != 0 
@@ -228,7 +193,7 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 	g_string_sprintfa(s, " %5s", 
 			  fmt_kbytes(*hrSWRunPerfTable[i]->hrSWRunPerfMem));
 	g_string_sprintfa(s, " %7s", 
-			  fmt_hsec32(*hrSWRunPerfTable[i]->hrSWRunPerfCPU));
+			  fmt_seconds(*hrSWRunPerfTable[i]->hrSWRunPerfCPU/100));
 	if (hrSWRunTable[i]->hrSWRunPath) {
 	    g_string_sprintfa(s, " %.*s",
 			(int) hrSWRunTable[i]->_hrSWRunPathLength,
@@ -241,9 +206,10 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 	}
 	g_string_truncate(s, COLS);
 	mvwprintw(win, j + 1, 0, s->str);
-	clrtoeol();
+	wclrtoeol(win);
 	g_string_free(s, 1);
     }
+    wclrtobot(win);
 
     host_resources_mib_free_hrSWRunTable(hrSWRunTable);
     host_resources_mib_free_hrSWRunPerfTable(hrSWRunPerfTable);

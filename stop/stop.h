@@ -95,4 +95,11 @@ stop_init_process_mode();
 extern void
 stop_init_disman_mode();
 
+/*
+ * Formatting utilities that are used frequently by scli modes.
+ */
+
+extern char const *
+fmt_seconds(guint32 secs);
+    
 #endif /* _STOP_H */
