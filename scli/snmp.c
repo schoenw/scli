@@ -1156,7 +1156,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "create snmp vacm member", "<name> <group> [<model>]",
-	  "The create snmp vacm member commands can be used to assign\n"
+	  "The `create snmp vacm member' commands can be used to assign\n"
 	  "new members (security names) to vacm groups. New groups are\n"
 	  "created if they do not exist.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
@@ -1164,7 +1164,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  create_snmp_vacm_member },
 
 	{ "delete snmp vacm member", "<regex-name> <regex-group> [<model>]",
-	  "The delete snmp vacm member commands can be used to delete\n"
+	  "The `delete snmp vacm member' commands can be used to delete\n"
 	  "members (security names) from vacm groups. Groups are deleted\n"
 	  "if the last member is deleted.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
@@ -1172,7 +1172,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  delete_snmp_vacm_member },
 
 	{ "set snmp authentication traps", "<status>",
-	  "The set snmp authentication traps command controls whether the\n"
+	  "The `set snmp authentication traps' command controls whether the\n"
 	  "SNMP engine generates authentication failure notifications.\n"
 	  "The <value> parameter must be one of the strings \"enabled\"\n"
 	  "or \"disabled\".",
@@ -1181,7 +1181,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  set_snmp_authentication_traps },
 
 	{ "show snmp engine", NULL,
-	  "The show snmp engine command displays information about the\n"
+	  "The `show snmp engine' command displays information about the\n"
 	  "SNMP protocol engine such as the number of boots, the current\n"
 	  "time relative to the last boot and the maximum message size.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
@@ -1189,14 +1189,14 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  show_snmp_engine },
 
 	{ "show snmp resources", NULL,
-	  "The show snmp resources command displays information about the\n"
+	  "The `show snmp resources' command displays information about the\n"
 	  "MIB resources supported by the SNMP agent.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_snmp_resources },
 
 	{ "show snmp vacm member", NULL,
-	  "The show snmp vacm member command displays the mapping of\n"
+	  "The `show snmp vacm member' command displays the mapping of\n"
 	  "security names to group names. The command generates a table\n"
 	  "with the following columns:\n"
 	  "\n"
@@ -1209,7 +1209,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  show_snmp_vacm_member },
 
 	{ "show snmp vacm access", NULL,
-	  "The show snmp vacm access command display the access control\n"
+	  "The `show snmp vacm access' command display the access control\n"
 	  "rules for the security groups. The command generates a table\n"
 	  "with the following columns:\n"
 	  "\n"
@@ -1227,7 +1227,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  show_snmp_vacm_access },
 
 	{ "show snmp vacm views", NULL,
-	  "The show snmp vacm views command displays MIB view definitions.\n"
+	  "The `show snmp vacm views' command displays MIB view definitions.\n"
 	  "The command generates a table with the following columns:\n"
 	  "\n"
 	  "  ROW    row storage type and status\n"
@@ -1239,7 +1239,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  show_snmp_vacm_views },
 
 	{ "show snmp usm users", NULL,
-	  "The show snmp usm users command displays the configured users.\n"
+	  "The `show snmp usm users' command displays the configured users.\n"
 	  "The command generates a table with the following columns:\n"
 	  "\n"
 	  "  ROW    row storage type and status\n"
@@ -1252,7 +1252,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  show_snmp_usm_users },
 
 	{ "show snmp target addresses", NULL,
-	  "The show snmp target addresses command displays information\n"
+	  "The `show snmp target addresses' command displays information\n"
 	  "about the configured SNMP target addresses. The command\n"
 	  "generates a table with the following columns:\n"
 	  "\n"
@@ -1269,7 +1269,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  show_snmp_target_addresses },
 
 	{ "show snmp target parameters", NULL,
-	  "The show snmp target parameters command displays information\n"
+	  "The `show snmp target parameters' command displays information\n"
 	  "about the configured SNMP target parameters. The command\n"
 	  "generates a table with the following columns:\n"
 	  "\n"
@@ -1281,7 +1281,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  show_snmp_target_parameters },
 
 	{ "show snmp notification targets", NULL,
-	  "The show snmp notification targets command displays information\n"
+	  "The `show snmp notification targets' command displays information\n"
 	  "about the configured SNMP notification targets. The command\n"
 	  "generates a table with the following columns:\n"
 	  "\n"
@@ -1294,7 +1294,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  show_snmp_notification_targets },
 
 	{ "dump snmp", NULL,
-	  "The dump snmp command generates a sequence of scli commands\n"
+	  "The `dump snmp' command generates a sequence of scli commands\n"
 	  "which can be used to restore the engine configuration.\n",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
