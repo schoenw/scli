@@ -34,33 +34,50 @@
 char const scli_copyright[] = "(c) 2001 Juergen Schoenwaelder";
 
 
+
 static void
 page(GString *s)
 {
-#if 0
-    char c;
+    char *file_name, *pager;
+    char cmd[1024];
+    FILE *f = NULL;
     int i, cnt;
     int const lines = 20;
 
-    while (s->str[0]) {
-	for (i = 0, cnt = 0; s->str[i] && cnt < lines; i++) {
-	    if (s->str[i] == '\n') {
-		cnt++;
-	    }
-	}
-	if (cnt != lines || !s->str[i]) {
-	    break;
-	}
-	c = s->str[i];
-	s->str[i] = 0;
+    pager = getenv("PAGER");
+    if (!pager) {
 	fputs(s->str, stdout);
-	fputs("**** press <cr> to continue ****", stdout);
-	(void) fgetc(stdin);
-	s->str[i] = c;
-	g_string_erase(s, 0, i);
+	return;
     }
-#endif
-    fputs(s->str, stdout);
+
+    for (i = 0, cnt = 0; s->str[i]; i++) {
+	if (s->str[i] == '\n') {
+	    cnt++;
+	}
+    }
+
+    if (cnt < lines) {
+	fputs(s->str, stdout);
+	return;
+    }
+
+    file_name = tmpnam(NULL);
+    if (file_name) {
+	f = fopen(file_name, "w");
+	if (f) {
+	    fputs(s->str, f);
+	    fflush(f);
+	    g_snprintf(cmd, sizeof(cmd), "less %s", file_name);
+	    system(cmd);
+	}
+    }
+
+    if (f) {
+	fclose(f);
+    } else {
+	fputs(s->str, stdout);
+    }
+    (void) unlink(file_name);
 }
 
 
@@ -222,12 +239,15 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 	    return SCLI_ERROR;
 	}
 	code = (cmd->func) (interp, argc, argv);
+	if (interp->flags & SCLI_INTERP_FLAG_RECURSIVE) {
+	    return code;
+	}
 	if (interp->result) {
 	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
 		page(interp->result);
 	    } else {
 		fputs(interp->result->str, stdout);
-	    }
+ 	    }
 	}
     }
 
@@ -237,9 +257,9 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 
 
 static int
-eval_all_cmd_node(scli_interp_t *interp, GNode *node)
+eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 {
-    char *prompt;
+    int code;
     
     for (node = g_node_first_child(node);
 	 node; node = g_node_next_sibling(node)) {
@@ -247,13 +267,19 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node)
 	    scli_cmd_t *cmd = node->data;
 	    if (cmd
 		&& !(cmd->flags & SCLI_CMD_FLAG_NEED_PEER && !interp->peer)) {
-		prompt = scli_prompt(interp);
-		printf("%s%s %s\n", prompt, cmd->path, cmd->name);
-		g_free(prompt);
-		eval_cmd_node(interp, node, 0, NULL);
+		code = eval_cmd_node(interp, node, 0, NULL);
+		if (code == SCLI_OK && interp->result->len) {
+		    if (s->len) {
+			g_string_append(s, "\n");
+		    }
+		    g_string_sprintfa(s, "%c %s [%s]\n\n", '#',
+				      cmd->desc ? cmd->desc : "",
+				      interp->peer->name);
+		    g_string_append(s, interp->result->str);
+		}
 	    }
 	} else {
-	    eval_all_cmd_node(interp, node);
+	    eval_all_cmd_node(interp, node, s);
 	}
     }
 
@@ -300,8 +326,15 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	    code = eval_cmd_node(interp, node, argc - i, argv + i);
 	    done = 1;
 	} else if (! G_NODE_IS_LEAF(node)) {
+	    GString *s;
 	    done = 1;
-	    code = eval_all_cmd_node(interp, node);
+	    interp->flags |= SCLI_INTERP_FLAG_RECURSIVE;
+	    s = g_string_new(NULL);
+	    code = eval_all_cmd_node(interp, node, s);
+	    page(s);
+	    g_string_free(s, 1);
+	    g_string_truncate(interp->result, 0);
+	    interp->flags &= ~SCLI_INTERP_FLAG_RECURSIVE;
 	}
     }
 
@@ -330,8 +363,8 @@ scli_eval_file_stream(scli_interp_t *interp, FILE *stream)
     char buffer[1024];
     int code = SCLI_OK;
     
-    g_assert(interp);
-    g_assert(stream);
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    g_return_val_if_fail(stream, SCLI_ERROR);
 
     while (code != SCLI_EXIT
 	   && code != SCLI_ERROR
@@ -350,8 +383,8 @@ scli_eval_file(scli_interp_t *interp, char *path)
     FILE *stream;
     int code;
 
-    g_assert(interp);
-    g_assert(path);
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    g_return_val_if_fail(path, SCLI_ERROR);
 
     stream = fopen(path, "r");
     if (! stream) {
@@ -371,7 +404,7 @@ scli_eval_init_file(scli_interp_t *interp)
     gchar *home, *path;
     int code = SCLI_OK;
 
-    g_assert(interp);
+    g_return_val_if_fail(interp, SCLI_ERROR);
 
     home = g_get_home_dir();
     if (! home) {
