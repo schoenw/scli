@@ -29,9 +29,30 @@
 #include "snmpv2-mib.h"
 
 #include <ctype.h>
+#include <sys/ioctl.h>
+#include <errno.h>
 
 
 char const scli_copyright[] = "(c) 2001 Juergen Schoenwaelder";
+
+
+
+static int
+get_lines()
+{
+    struct winsize size;
+    
+    do {
+	if (ioctl(fileno(stdout), TIOCGWINSZ, &size) < 0 && errno != EINTR) {
+	    goto failure;
+	}
+    } while (errno == EINTR);
+
+    return size.ws_row;
+
+ failure:
+    return 24;	/* best guess */
+}
 
 
 
@@ -42,7 +63,6 @@ page(GString *s)
     char cmd[1024];
     FILE *f = NULL;
     int i, cnt;
-    int const lines = 20;
 
     pager = getenv("PAGER");
     if (!pager) {
@@ -56,7 +76,7 @@ page(GString *s)
 	}
     }
 
-    if (cnt < lines) {
+    if (cnt < get_lines()) {
 	fputs(s->str, stdout);
 	return;
     }
