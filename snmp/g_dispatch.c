@@ -586,6 +586,8 @@ g_receive_message(int transportDomain, struct sockaddr *transportAddress,
       g_session_response_pdu(messageProcessingModel, securityModel,
         securityName, securityLevel, contextEngineID, contextName, 
         pduVersion, &PDU);
+      g_free(securityName->str);
+      g_free(securityName);
     }
   else
     {
