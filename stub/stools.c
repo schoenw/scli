@@ -180,10 +180,8 @@ stls_vb_lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     for (i = 0; attributes[i].label; i++) {
 	if (vb->id_len > base_len && vb->id[base_len] == attributes[i].subid) {
 	    if (vb->type != attributes[i].type) {
-		g_warning("illegal type tag 0x%02x for %s",
-			  attributes[i].type, attributes[i].label);
-		g_warning("vb->id_len = %d, base_len = %d, i = %d",
-			  vb->id_len, base_len, i);
+		g_warning("type tag 0x%02x does not match 0x%02x (%s)",
+			  vb->type, attributes[i].type, attributes[i].label);
 		return -3;
 	    }
 	    *idx = attributes[i].subid;
