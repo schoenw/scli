@@ -154,7 +154,6 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 		  "INDEX STAT   MTU SPEED I-BPS O-BPS I-PPS O-PPS I-ERR O-ERR  DESCR ...");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
-	sleep(1);
 	if (stats) {
 	    g_free(stats);
 	    stats = NULL;
