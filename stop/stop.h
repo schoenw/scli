@@ -92,4 +92,7 @@ stop_init_interface_mode();
 extern void
 stop_init_process_mode();
 
+extern void
+stop_init_disman_mode();
+
 #endif /* _STOP_H */
