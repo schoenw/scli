@@ -125,56 +125,64 @@ cmd_devices(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+show_process(GString *s, hrSWRunEntry_t *hrSWRunEntry,
+	     hrSWRunPerfEntry_t *hrSWRunPerfEntry)
+{
+    g_string_sprintfa(s, "%5d ", hrSWRunEntry->hrSWRunIndex);
+    fmt_run_state_and_type(s,
+			   hrSWRunEntry->hrSWRunStatus,
+			   hrSWRunEntry->hrSWRunType);
+    if (hrSWRunPerfEntry && hrSWRunPerfEntry
+	&& hrSWRunPerfEntry->hrSWRunPerfMem) {
+	fmt_x_kbytes(s, *(hrSWRunPerfEntry->hrSWRunPerfMem));
+    } else {
+	g_string_sprintfa(s, " %5s", "-----");
+    }
+    if (hrSWRunPerfEntry && hrSWRunPerfEntry
+	&& hrSWRunPerfEntry->hrSWRunPerfCPU) {
+	g_string_append(s, " ");
+	fmt_hsec32(s, *(hrSWRunPerfEntry->hrSWRunPerfCPU));
+    } else {
+	g_string_sprintfa(s, " %5s", "--:--");
+    }
+    if (hrSWRunEntry->hrSWRunPath
+	&& hrSWRunEntry->_hrSWRunPathLength) {
+	g_string_sprintfa(s, " %.*s",
+			  (int) hrSWRunEntry->_hrSWRunPathLength,
+			  hrSWRunEntry->hrSWRunPath);
+    }
+    if (hrSWRunEntry->hrSWRunParameters
+	&& hrSWRunEntry->_hrSWRunParametersLength) {
+	g_string_sprintfa(s, " %.*s",
+			  (int) hrSWRunEntry->_hrSWRunParametersLength,
+			  hrSWRunEntry->hrSWRunParameters);
+    }
+    g_string_append(s, "\n");
+}
+
+
+
 static int
 cmd_processes(scli_interp_t *interp, int argc, char **argv)
 {
     hrSWRunEntry_t **hrSWRunEntry = NULL;
     hrSWRunPerfEntry_t **hrSWRunPerfEntry = NULL;
-    GString *s;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (host_resources_mib_get_hrSWRunEntry(interp->peer,
-					    &hrSWRunEntry) == 0) {
-	(void) host_resources_mib_get_hrSWRunPerfEntry(interp->peer,
-						       &hrSWRunPerfEntry);
+    if (host_resources_mib_get_hrSWRunEntry(interp->peer, &hrSWRunEntry)) {
+	return SCLI_ERROR;
     }
+    (void) host_resources_mib_get_hrSWRunPerfEntry(interp->peer,
+						   &hrSWRunPerfEntry);
 
-    s = interp->result;
     if (hrSWRunEntry) {
-	g_string_append(s, "  PID S T MEMORY    TIME COMMAND\n");
+	g_string_append(interp->result, "  PID S T MEMORY    TIME COMMAND\n");
 	for (i = 0; hrSWRunEntry[i]; i++) {
-	    g_string_sprintfa(s, "%5d ", hrSWRunEntry[i]->hrSWRunIndex);
-	    fmt_run_state_and_type(s,
-				   hrSWRunEntry[i]->hrSWRunStatus,
-				   hrSWRunEntry[i]->hrSWRunType);
-	    if (hrSWRunPerfEntry && hrSWRunPerfEntry[i]
-		&& hrSWRunPerfEntry[i]->hrSWRunPerfMem) {
-		fmt_x_kbytes(s, *(hrSWRunPerfEntry[i]->hrSWRunPerfMem));
-	    } else {
-		g_string_sprintfa(s, " %5s", "-----");
-	    }
-	    if (hrSWRunPerfEntry && hrSWRunPerfEntry[i]
-		&& hrSWRunPerfEntry[i]->hrSWRunPerfCPU) {
-		g_string_append(s, " ");
-		fmt_hsec32(s, *(hrSWRunPerfEntry[i]->hrSWRunPerfCPU));
-	    } else {
-		g_string_sprintfa(s, " %5s", "--:--");
-	    }
-	    if (hrSWRunEntry[i]->hrSWRunPath
-		&& hrSWRunEntry[i]->_hrSWRunPathLength) {
-		g_string_sprintfa(s, " %.*s",
-			    (int) hrSWRunEntry[i]->_hrSWRunPathLength,
-				  hrSWRunEntry[i]->hrSWRunPath);
-	    }
-	    if (hrSWRunEntry[i]->hrSWRunParameters
-		&& hrSWRunEntry[i]->_hrSWRunParametersLength) {
-		g_string_sprintfa(s, " %.*s",
-			    (int) hrSWRunEntry[i]->_hrSWRunParametersLength,
-				  hrSWRunEntry[i]->hrSWRunParameters);
-	    }
-	    g_string_append(s, "\n");
+	    show_process(interp->result, hrSWRunEntry[i],
+			 hrSWRunPerfEntry ? hrSWRunPerfEntry[i] : NULL);
 	}
     }
 	
@@ -183,7 +191,6 @@ cmd_processes(scli_interp_t *interp, int argc, char **argv)
     if (hrSWRunPerfEntry)
 	host_resources_mib_free_hrSWRunPerfEntry(hrSWRunPerfEntry);
     
-    interp->result = s;
     return SCLI_OK;
 }
 
@@ -370,8 +377,17 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (snmpv2_mib_get_system(interp->peer, &system)) {
+	return SCLI_ERROR;
+    }
+    (void) host_resources_mib_get_hrSystem(interp->peer, &hrSystem);
+    (void) host_resources_mib_get_hrStorage(interp->peer, &hrStorage);
+    (void) if_mib_get_interfaces(interp->peer, &interfaces);
+    (void) bridge_mib_get_dot1dBase(interp->peer, &dot1dBase);
+    (void) disman_script_mib_get_smLangEntry(interp->peer, &smLangEntry);
+    
     s = interp->result;
-    if (snmpv2_mib_get_system(interp->peer, &system) == 0 && system) {
+    if (system) {
 	if (system->sysDescr && system->_sysDescrLength) {
 	    g_string_sprintfa(s, "%.*s\n",
 			      (int) system->_sysDescrLength,
@@ -424,23 +440,27 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 		}
 	    }
 	}
-	if (system->sysUpTime) {
-	    g_string_sprintfa(s, "\n%-*s ", indent, "Agent Boot Time:");
-	    fmt_time_ticks(s, *(system->sysUpTime));
-	}
-	snmpv2_mib_free_system(system);
     }
 
-    if (host_resources_mib_get_hrSystem(interp->peer, &hrSystem) == 0
-	&& hrSystem) {
-	if (hrSystem->hrSystemUptime) {
-	    g_string_sprintfa(s, "\n%-*s ", indent, "System Boot Time:");
-	    fmt_time_ticks(s, *(hrSystem->hrSystemUptime));
-	}
+    if (hrSystem) {
 	if (hrSystem->hrSystemDate && hrSystem->_hrSystemDateLength) {
 	    g_string_sprintfa(s, "\n%-*s ", indent, "Current Time:");
 	    fmt_date_and_time(s, hrSystem->hrSystemDate,
 			      hrSystem->_hrSystemDateLength);
+	}
+    }
+
+    if (system) {
+	if (system->sysUpTime) {
+	    g_string_sprintfa(s, "\n%-*s ", indent, "Agent Boot Time:");
+	    fmt_time_ticks(s, *(system->sysUpTime));
+	}
+    }
+    
+    if (hrSystem) {
+	if (hrSystem->hrSystemUptime) {
+	    g_string_sprintfa(s, "\n%-*s ", indent, "System Boot Time:");
+	    fmt_time_ticks(s, *(hrSystem->hrSystemUptime));
 	}
 	if (hrSystem->hrSystemNumUsers) {
 	    g_string_sprintfa(s, "\n%-*s %u", indent, "Users:", 
@@ -455,29 +475,23 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 	    g_string_sprintfa(s, " (%u maximum)",
 			      *(hrSystem->hrSystemMaxProcesses));
 	}
-	host_resources_mib_free_hrSystem(hrSystem);
     }
 
-    if (host_resources_mib_get_hrStorage(interp->peer, &hrStorage) == 0
-	&& hrStorage) {
+    if (hrStorage) {
 	if (hrStorage->hrMemorySize) {
 	    g_string_sprintfa(s, "\n%-*s ", indent, "Memory:");
 	    fmt_kbytes(s, *(hrStorage->hrMemorySize));	
-}
-	host_resources_mib_free_hrStorage(hrStorage);
+	}
     }
 
-    if (if_mib_get_interfaces(interp->peer, &interfaces) == 0
-	&& interfaces) {
+    if (interfaces) {
 	if (interfaces->ifNumber) {
 	    g_string_sprintfa(s, "\n%-*s %d", indent, "Interfaces:",
 			      *(interfaces->ifNumber));
 	}
-	if_mib_free_interfaces(interfaces);
     }
 
-    if (bridge_mib_get_dot1dBase(interp->peer, &dot1dBase) == 0
-	&& dot1dBase) {
+    if (dot1dBase) {
 	if (dot1dBase->dot1dBaseNumPorts) {
 	    g_string_sprintfa(s, "\n%-*s %d ", indent, "Bridge Ports:",
 			      *(dot1dBase->dot1dBaseNumPorts));
@@ -486,18 +500,28 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 			 dot1dBase->dot1dBaseType);
 	    }
 	}
-	bridge_mib_free_dot1dBase(dot1dBase);
     }
 
-    if (disman_script_mib_get_smLangEntry(interp->peer, &smLangEntry) == 0
-	&& smLangEntry) {
+    if (smLangEntry) {
 	for (i = 0; smLangEntry[i]; i++) ;
 	g_string_sprintfa(s, "\n%-*s %u", indent, "Script Languages:", i);
-	disman_script_mib_free_smLangEntry(smLangEntry);
     }
 
     g_string_append(s, "\n");
-    interp->result = s;
+
+    if (system)
+	snmpv2_mib_free_system(system);
+    if (hrSystem)
+	host_resources_mib_free_hrSystem(hrSystem);
+    if (hrStorage)
+	host_resources_mib_free_hrStorage(hrStorage);
+    if (interfaces)
+	if_mib_free_interfaces(interfaces);
+    if (dot1dBase)
+	bridge_mib_free_dot1dBase(dot1dBase);
+    if (smLangEntry)
+	disman_script_mib_free_smLangEntry(smLangEntry);
+
     return SCLI_OK;
 }
 
