@@ -27,7 +27,12 @@ GSnmpEnum const productmib_enums_a3ComVlanIfType[] = {
 };
 
 GSnmpEnum const productmib_enums_a3ComVlanIfStatus[] = {
-    { PRODUCTMIB_A3COMVLANIFSTATUS_ACTIVE, "active" },
+    { PRODUCTMIB_A3COMVLANIFSTATUS_ACTIVE,        "active" },
+    { PRODUCTMIB_A3COMVLANIFSTATUS_NOTINSERVICE,  "notInService" },
+    { PRODUCTMIB_A3COMVLANIFSTATUS_NOTREADY,      "notReady" },
+    { PRODUCTMIB_A3COMVLANIFSTATUS_CREATEANDGO,   "createAndGo" },
+    { PRODUCTMIB_A3COMVLANIFSTATUS_CREATEANDWAIT, "createAndWait" },
+    { PRODUCTMIB_A3COMVLANIFSTATUS_DESTROY,       "destroy" },
     { 0, NULL }
 };
 
