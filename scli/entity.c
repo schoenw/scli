@@ -340,7 +340,7 @@ scli_init_entity_mode(scli_interp_t *interp)
 	  show_system_entities },
 	{ "show system containment", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "physical entities's containment hierarchy",
+	  "physical entity containment hierarchy",
 	  show_system_containment },
 	{ NULL, NULL, 0, NULL, NULL }
     };

@@ -778,12 +778,72 @@ cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
 }
 
 
-/*
- * <man>
- *   show interface info [name]
- *   show interface details [name]
- * </man>
- */
+
+static void
+set_status(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry)
+{
+    (void) if_mib_set_ifEntry(interp->peer, ifEntry);
+    if (interp->peer->error_status) {
+	if (ifEntry->ifDescr && ifEntry->_ifDescrLength) {
+	    g_string_sprintfa(interp->result, "%.*s: ",
+			      (int) ifEntry->_ifDescrLength,
+			      ifEntry->ifDescr);
+	} else {
+	    g_string_sprintfa(interp->result, "%d: ",
+			      ifEntry->ifIndex);
+	}
+	scli_snmp_error(interp);
+	g_string_append(interp->result, "\n");
+    }
+}
+
+
+
+static int
+set_if_status(scli_interp_t *interp, int argc, char **argv)
+{
+    if_mib_ifEntry_t **ifTable = NULL;
+    regex_t _regex_iface, *regex_iface = NULL;
+    gint32 value;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 3) {
+	return SCLI_SYNTAX;
+    }
+
+    regex_iface = &_regex_iface;
+    if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	return SCLI_SYNTAX;
+    }
+
+    if (! gsnmp_enum_get_number(if_mib_enums_ifAdminStatus, argv[2], &value)) {
+	if (regex_iface) regfree(regex_iface);
+	return SCLI_SYNTAX;
+    }
+	
+    if (if_mib_get_ifTable(interp->peer, &ifTable)) {
+	if (regex_iface) regfree(regex_iface);
+	return SCLI_ERROR;
+    }
+
+    if (ifTable) {
+	for (i = 0; ifTable[i]; i++) {
+	    if (match_interface(regex_iface, ifTable[i])) {
+		ifTable[i]->ifAdminStatus = &value;
+		set_status(interp, ifTable[i]);
+	    }
+	}
+    }
+
+    if (ifTable) if_mib_free_ifTable(ifTable);
+
+    if (regex_iface) regfree(regex_iface);
+
+    return SCLI_OK;
+}
+
 
 
 void
@@ -810,6 +870,10 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "network interface statistics",
 	  cmd_if_stats },
+	{ "set interface status", "<regexp> <status>",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "set administrative interface status",
+	  set_if_status },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     

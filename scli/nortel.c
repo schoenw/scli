@@ -20,10 +20,6 @@
  * @(#) $Id$
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "scli.h"
 
 #include "rapidcity-vlan-mib.h"
@@ -325,8 +321,6 @@ delete_vlan(scli_interp_t *interp,
     rapidcity_vlan_mib_rcVlanEntry_t *xx;
     gint32 row_status = RAPIDCITY_VLAN_MIB_RCVLANROWSTATUS_DESTROY;
 
-    g_printerr("deleting vlan %d...\n", vlanEntry->rcVlanId);
-    
     xx = rapidcity_vlan_mib_new_rcVlanEntry();
     if (! xx) {
 	return SCLI_ERROR;
@@ -335,15 +329,18 @@ delete_vlan(scli_interp_t *interp,
     xx->rcVlanId = vlanEntry->rcVlanId;
     xx->rcVlanRowStatus = &row_status;
 
-#if 0
     (void) rapidcity_vlan_mib_set_rcVlanEntry(interp->peer, xx);
-#endif
+    if (interp->peer->error_status) {
+	g_string_sprintfa(interp->result, "%d: ",
+			  vlanEntry->rcVlanId);
+	scli_snmp_error(interp);
+	g_string_append(interp->result, "\n");
+    }
 
     rapidcity_vlan_mib_free_rcVlanEntry(xx);
 
     return SCLI_OK;
 }
-
 
 
 

@@ -89,6 +89,21 @@ scli_set_pager(scli_interp_t *interp, const char *pager)
 
 
 void
+scli_snmp_error(scli_interp_t *interp)
+{
+    if (interp->peer->error_status) {
+	const char *error;
+	error = gsnmp_enum_get_label(gsnmp_error_status_table,
+				     interp->peer->error_status);
+	g_string_sprintfa(interp->result, "%s@%d",
+			  error ? error : "genError",
+			  interp->peer->error_index);
+    }
+}
+
+
+
+void
 scli_get_screen(int *lines, int *columns)
 {
     int rows = 24, cols = 80;	/* best guess defaults */
@@ -269,6 +284,7 @@ next_token(char *string, char *out)
 		    p++;
 		    return NULL;
 		} else {
+		    p++;
 		    goto done;
 		}
 	    } else {
@@ -282,6 +298,7 @@ next_token(char *string, char *out)
 		    p++;
 		    return NULL;
 		} else {
+		    p++;
 		    goto done;
 		}
 	    } else {
@@ -313,6 +330,7 @@ next_token(char *string, char *out)
     }
 
  done:
+    while (*p && isspace((int) *p)) p++;	/* skip white space */
     *d = 0;
     return *p ? p : NULL;
 }
@@ -362,26 +380,6 @@ scli_split(char *string, int *argc, char ***argv)
 	}
     } while (p);
 
-#if 0
-    for (*argc = 0, p = string, d = ((char *) *argv) + size*sizeof(char *);
-	 *p != 0; ) {
-	(*argv)[*argc] = NULL;
-	while (*p && isspace((int) *p)) p++;
-	if (*argc == 0 && *p == '#') {
-	    break;
-	}
-	if (*p) {
-	    char *s = p;
-	    (*argv)[(*argc)++] = d;
-	    while (*p && !isspace((int) *p)) p++;
-	    memcpy(d, s, p-s);
-	    d += p-s;
-	    *d++ = 0;
-	    while (*p && isspace((int) *p)) p++;
-	}
-    }
-#endif
-    
     return SCLI_OK;
 }
 

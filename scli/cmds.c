@@ -381,7 +381,7 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-conf_scli_debugging(scli_interp_t *interp, int argc, char **argv)
+set_scli_debugging(scli_interp_t *interp, int argc, char **argv)
 {
     GSnmpDebugFlags flags = 0;
     SnmpDebugFlagToStringEntry *dft;
@@ -410,7 +410,7 @@ conf_scli_debugging(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-conf_scli_pager(scli_interp_t *interp, int argc, char **argv)
+set_scli_pager(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -431,7 +431,7 @@ conf_scli_pager(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-conf_scli_format(scli_interp_t *interp, int argc, char **argv)
+set_scli_format(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -498,18 +498,18 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  "delete an scli command alias",
 	  cmd_scli_unalias },
-	{ "config scli debugging", "<layer> ...",
+	{ "set scli debugging", "<layer> ...",
 	  0,
-	  "configure interpreter debugging options",
-	  conf_scli_debugging },
-	{ "config scli pager", "<pager>",
+	  "set interpreter debugging options",
+	  set_scli_debugging },
+	{ "set scli pager", "<pager>",
 	  0,
-	  "configure pager used by the interpreter",
-	  conf_scli_pager },
-	{ "config scli format", "<pager>",
+	  "set pager used by the interpreter",
+	  set_scli_pager },
+	{ "set scli format", "<pager>",
 	  0,
-	  "configure output format produced by the interpreter",
-	  conf_scli_format },
+	  "set output format of the interpreter",
+	  set_scli_format },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     

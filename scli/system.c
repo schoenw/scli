@@ -86,31 +86,6 @@ static GSnmpIdentity const storage_types[] = {
 
 
 
-static GSnmpEnum const error_strings[] = {
-    { 0, "noError" },
-    { 1, "tooBig" },
-    { 2, "noSuchName"},
-    { 3, "badValue" },
-    { 4, "readOnly" },
-    { 5, "genErr" },
-    { 6, "noAccess" },
-    { 7, "wrongType" },
-    { 8, "wrongLength" },
-    { 9, "wrongEncoding" },
-    { 10, "wrongValue" },
-    { 11, "noCreation" },
-    { 12, "inconsistentValue" },
-    { 13, "resourceUnavailable" },
-    { 14, "commitFailed" },
-    { 15, "undoFailed" },
-    { 16, "authorizationError" },
-    { 17, "notWritable" },
-    { 18, "inconsistentName" },
-    { 0, 0 }
-};
-
-
-
 static void
 strip_white(guchar *s, gsize *len)
 {
@@ -768,7 +743,7 @@ cmd_system_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-conf_system_contact(scli_interp_t *interp, int argc, char **argv)
+set_system_contact(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_system_t *system = NULL;
     int code;
@@ -783,6 +758,10 @@ conf_system_contact(scli_interp_t *interp, int argc, char **argv)
     system->sysContact = argv[1];
     system->_sysContactLength = strlen(system->sysContact);
     code = snmpv2_mib_set_system(interp->peer, system);
+    if (interp->peer->error_status) {
+	scli_snmp_error(interp);
+	g_string_append(interp->result, "\n");
+    }
     snmpv2_mib_free_system(system);
 
     return SCLI_OK;
@@ -791,7 +770,7 @@ conf_system_contact(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-conf_system_name(scli_interp_t *interp, int argc, char **argv)
+set_system_name(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_system_t *system = NULL;
     int code;
@@ -806,6 +785,10 @@ conf_system_name(scli_interp_t *interp, int argc, char **argv)
     system->sysName = argv[1];
     system->_sysNameLength = strlen(system->sysName);
     code = snmpv2_mib_set_system(interp->peer, system);
+    if (interp->peer->error_status) {
+	scli_snmp_error(interp);
+	g_string_append(interp->result, "\n");
+    }
     snmpv2_mib_free_system(system);
 
     return SCLI_OK;
@@ -814,7 +797,7 @@ conf_system_name(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-conf_system_location(scli_interp_t *interp, int argc, char **argv)
+set_system_location(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_system_t *system = NULL;
     int code;
@@ -829,15 +812,11 @@ conf_system_location(scli_interp_t *interp, int argc, char **argv)
     system->sysLocation = argv[1];
     system->_sysLocationLength = strlen(system->sysLocation);
     code = snmpv2_mib_set_system(interp->peer, system);
-    snmpv2_mib_free_system(system);
     if (interp->peer->error_status) {
-	const char *error;
-	error = gsnmp_enum_get_label(error_strings,
-				     interp->peer->error_status);
-	g_string_sprintfa(interp->result, "%s at varbind %d\n",
-			  error ? error : "oops",
-			  interp->peer->error_index);
+	scli_snmp_error(interp);
+	g_string_append(interp->result, "\n");
     }
+    snmpv2_mib_free_system(system);
 
     return SCLI_OK;
 }
@@ -912,18 +891,18 @@ scli_init_system_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "processes running on the system",
 	  cmd_system_processes },
-	{ "config system contact", "<contact>",
+	{ "set system contact", "<contact>",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "configure system contact",
-	  conf_system_contact },
-	{ "config system name", "<name>",
+	  "set system contact",
+	  set_system_contact },
+	{ "set system name", "<name>",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "configure system name",
-	  conf_system_name },
-	{ "config system location", "<location>",
+	  "set system name",
+	  set_system_name },
+	{ "set system location", "<location>",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "configure system location",
-	  conf_system_location },
+	  "set system location",
+	  set_system_location },
 #ifdef MEM_DEBUG
 	{ "xxx", "<repetitions>",
 	  SCLI_CMD_FLAG_NEED_PEER,

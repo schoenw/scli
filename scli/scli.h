@@ -184,6 +184,9 @@ scli_curses_off();
 extern int
 scli_set_pager(scli_interp_t *interp, const char *pager);
 
+extern void
+scli_snmp_error(scli_interp_t *interp);
+
 /*
  * Core scli commands:	XXX this should not be visible across modules XXX
  */
