@@ -145,7 +145,7 @@ show_scli_command_info_pass1(GNode *node, gpointer data)
 	}
     }
 
-    return false;
+    return FALSE;
 }
 
 
@@ -160,7 +160,7 @@ show_scli_command_info_pass2(GNode *node, gpointer data)
 	fmt_cmd_info(x->interp->result, cmd, x->width);
     }
 
-    return false;
+    return FALSE;
 }
 
 
@@ -237,7 +237,7 @@ show_scli_command_details_pass1(GNode *node, gpointer data)
 	x->cnt++;
     }
 
-    return false;
+    return FALSE;
 }
 
 
