@@ -211,13 +211,6 @@ fmt_ip_address(GString *s,
     char *name;
     int i;
 
-#if 0
-    if (ipAddrEntry->ipAdEntIfIndex) {
-	g_string_sprintfa(s, "%9u ", *(ipAddrEntry->ipAdEntIfIndex));
-    } else {
-	g_string_sprintfa(s, "%6s    ", "");
-    }
-#endif
     g_string_sprintfa(s, "%-17s ",
 	      fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_ADDR));
     if (ipAddrEntry->ipAdEntNetMask) {
@@ -230,22 +223,14 @@ fmt_ip_address(GString *s,
     g_string_sprintfa(s, "%-*s ", name_width, name ? name : "");
     
     if (ipAddrEntry->ipAdEntIfIndex) {
-#if 1
 	g_string_sprintfa(s, " %u", *(ipAddrEntry->ipAdEntIfIndex));
-#endif
 	if (ifXTable) {
 	    for (i = 0; ifXTable[i]; i++) {
 		if (ifXTable[i]->ifIndex == *ipAddrEntry->ipAdEntIfIndex
 		    && ifXTable[i]->ifName) {
-#if 1
 		    g_string_sprintfa(s, " (%.*s)",
 				      (int) ifXTable[i]->_ifNameLength,
 				      ifXTable[i]->ifName);
-#else
-		    g_string_sprintfa(s, "%.*s",
-				      (int) ifXTable[i]->_ifNameLength,
-				      ifXTable[i]->ifName);
-#endif
 		    break;
 		}
 	    }
@@ -253,15 +238,9 @@ fmt_ip_address(GString *s,
 	    for (i = 0; ifTable[i]; i++) {
 		if (ifTable[i]->ifIndex == *ipAddrEntry->ipAdEntIfIndex
 		    && ifTable[i]->ifDescr) {
-#if 1
 		    g_string_sprintfa(s, " (%.*s)",
 				      (int) ifTable[i]->_ifDescrLength,
 				      ifTable[i]->ifDescr);
-#else
-		    g_string_sprintfa(s, "%.*s",
-				      (int) ifTable[i]->_ifDescrLength,
-				      ifTable[i]->ifDescr);
-#endif
 		    break;
 		}
 	    }
@@ -307,11 +286,7 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 		}
 	    }
 	    g_string_sprintfa(interp->header,
-#if 0
-			      "INTERFACE ADDRESS         PREFIX %-*s DESCRIPTION",
-#else
 			      "ADDRESS         PREFIX %-*s INTERFACE",
-#endif
 			      name_width, "NAME");
 	}
 	for (i = 0; ipAddrTable[i]; i++) {
