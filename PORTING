@@ -1,0 +1,34 @@
+This files contains porting notes for various platforms submitted
+by various scli users. Note that this information is not updated
+regularily - if in doubt, ask on the scli mailing list.
+
+MacOS X 10.1.1 (aka Darwin 5.1) on a PowerBook G4
+=================================================
+
+1. Copied the newest 'config.guess' and 'config.sub' to the build directory,
+so that the configure script would recognize the OS release (which is
+'powerpc-apple-darwin5.1').  This would of course be fixed by using the
+latest autoconf package also.
+
+2. Installed glib, libxml (these are not normally included with a basic
+installation of OS X).  Instead of building these libs myself, I used the
+automated tool 'fink' (http://fink.sourceforge.net/) to download, compile,
+and install the latest versions - this is quite a useful tool.
+
+3. Installed the readline library using fink also.  However, for some reason
+the configure script will find the glib and libxml in the location where
+fink puts its installations (/sw/...) but does not find readline in the same
+location.  To temporarily fix this, I put symlinks under /usr/lib to point
+to /sw/lib/libreadline.*.  After this step, configure found libreadline with
+no problems.
+
+4. One final thing : Added -no-cpp-precomp to the CFLAGS in all Makefiles of
+the project.  For some reason the standard Apple precompiler doesn't compile
+all code properly with the precompiled headers (this is referenced at
+http://fink.sourceforge.net/doc/porting/basics.php).
+
+Everything built fine after the above steps and it works quite well.
+
+Shiloh Heurich <shiloh@comtechmobile.com>
+
+

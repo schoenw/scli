@@ -1,3 +1,3 @@
-EXTRA_DIST	= TODO
+EXTRA_DIST	= TODO PORTING
 
 SUBDIRS		= snmp stub proc scli doc
