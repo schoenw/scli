@@ -37,12 +37,12 @@ show_tcp_connection(GString *s, tcpConnEntry_t *tcpConnEntry)
 		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress, 1),
 		      fmt_port(tcpConnEntry->tcpConnLocalPort, 1),
 		      &pos);
-    g_string_sprintfa(s, "%*s", 32-pos, "");
+    g_string_sprintfa(s, "%*s", MAX(32-pos, 1), "");
     g_string_sprintfa(s, "%s:%s%n",
 		      fmt_ipv4_address(tcpConnEntry->tcpConnRemAddress, 1),
 		      fmt_port(tcpConnEntry->tcpConnRemPort, 1),
 		      &pos);
-    g_string_sprintfa(s, "%*s", 32-pos, "");
+    g_string_sprintfa(s, "%*s", MAX(32-pos, 1), "");
     if (tcpConnEntry->tcpConnState) {
 	fmt_enum(s, 1, tcp_mib_enums_tcpConnState,
 		 tcpConnEntry->tcpConnState);
