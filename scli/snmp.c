@@ -1,5 +1,5 @@
 /* 
- * entity.c -- scli snmp mode implementation
+ * snmp.c -- scli snmp mode implementation
  *
  * Copyright (C) 2001 Juergen Schoenwaelder
  *
@@ -25,6 +25,7 @@
 #include "snmpv2-mib.h"
 #include "snmp-framework-mib.h"
 #include "snmp-view-based-acm-mib.h"
+#include "snmp-user-based-sm-mib.h"
 
 
 static GSnmpEnum const security_model[] = {
@@ -52,6 +53,37 @@ static GSnmpEnum const view_tree_family_type[] = {
     { 0, NULL }
 };
 
+
+
+static guint32 const usmNoAuthProtocol[]
+	= { SNMP_USER_BASED_SM_MIB_USMNOAUTHPROTOCOL };
+static guint32 const usmHMACMD5AuthProtocol[]
+	= { SNMP_USER_BASED_SM_MIB_USMHMACMD5AUTHPROTOCOL };
+static guint32 const usmHMACSHAAuthProtocol[]
+	= { SNMP_USER_BASED_SM_MIB_USMHMACSHAAUTHPROTOCOL };
+static guint32 const usmNoPrivProtocol[]
+	= { SNMP_USER_BASED_SM_MIB_USMNOPRIVPROTOCOL };
+static guint32 const usmDESPrivProtocol[]
+	= { SNMP_USER_BASED_SM_MIB_USMDESPRIVPROTOCOL };
+
+GSnmpIdentity const sec_proto_identities[] = {
+    { usmNoAuthProtocol,
+      sizeof(usmNoAuthProtocol)/sizeof(guint32),
+      "none" },
+    { usmHMACMD5AuthProtocol,
+      sizeof(usmHMACMD5AuthProtocol)/sizeof(guint32),
+      "HMAC-MD5" },
+    { usmHMACSHAAuthProtocol,
+      sizeof(usmHMACSHAAuthProtocol)/sizeof(guint32),
+      "HMAC-SHA" },
+    { usmNoPrivProtocol,
+      sizeof(usmNoPrivProtocol)/sizeof(guint32),
+      "none" },
+    { usmDESPrivProtocol,
+      sizeof(usmDESPrivProtocol)/sizeof(guint32),
+      "DES" },
+    { 0, 0, NULL }
+};
 
 
 static void
@@ -115,23 +147,46 @@ fmt_snmp_engine(GString *s,
 		snmp_framework_mib_snmpEngine_t *snmpEngine,
 		snmpv2_mib_snmp_t *snmp)
 {
-    int const indent = 14;
+    int const indent = 22;
+    int i;
     const char *e;
     
     if (snmpEngine) {
-	if (snmpEngine->snmpEngineBoots) {
-	    g_string_sprintfa(s, "%-*s%u times\n",
-			      indent, "Boots:",
-			      *(snmpEngine->snmpEngineBoots));
+	if (snmpEngine->snmpEngineID) {
+	    guint32 enterp = 0;
+	    const scli_vendor_t *vendor;
+	    g_string_sprintfa(s, "%-*s", indent, "Engine Identifier:");
+	    for (i = 0; i < snmpEngine->_snmpEngineIDLength; i++) {
+		g_string_sprintfa(s, "%02x", snmpEngine->snmpEngineID[i]);
+	    }
+	    g_string_append(s, "\n");
+	    enterp = (enterp << 8) + (snmpEngine->snmpEngineID[0] & 0x7F);
+	    enterp = (enterp << 8) + snmpEngine->snmpEngineID[1];
+	    enterp = (enterp << 8) + snmpEngine->snmpEngineID[2];
+	    enterp = (enterp << 8) + snmpEngine->snmpEngineID[3];
+	    vendor = scli_get_vendor(enterp);
+	    if (vendor && vendor->name) {
+		g_string_sprintfa(s, "%-*s%s", indent, "Engine Vendor:",
+				  vendor->name);
+		if (vendor->url) {
+		    g_string_sprintfa(s, " <%s>", vendor->url);
+		}
+		g_string_append(s, "\n");
+	    }
 	}
 	if (snmpEngine->snmpEngineTime) {
-	    g_string_sprintfa(s, "%-*s%u seconds since last boot\n",
-			      indent, "Time:",
+	    g_string_sprintfa(s, "%-*s%u seconds\n",
+			      indent, "Engine Uptime:",
 			      *(snmpEngine->snmpEngineTime));
+	}
+	if (snmpEngine->snmpEngineBoots) {
+	    g_string_sprintfa(s, "%-*s%u\n",
+			      indent, "Number of Boots:",
+			      *(snmpEngine->snmpEngineBoots));
 	}
 	if (snmpEngine->snmpEngineMaxMessageSize) {
 	    g_string_sprintfa(s, "%-*s%u byte\n",
-			      indent, "Max Size:",
+			      indent, "Maximum Message Size:",
 			      *(snmpEngine->snmpEngineMaxMessageSize));
 	}
     }
@@ -140,7 +195,7 @@ fmt_snmp_engine(GString *s,
 		     snmp->snmpEnableAuthenTraps);
 	if (e) {
 	    g_string_sprintfa(s, "%-*s%s\n",
-			      indent, "Auth Traps:", e);
+			      indent, "Authentication Traps:", e);
 	}
     }
 }
@@ -167,7 +222,7 @@ show_snmp_engine(scli_interp_t *interp, int argc, char **argv)
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
-    snmpv2_mib_get_snmp(interp->peer, &snmp, 0);
+    snmpv2_mib_get_snmp(interp->peer, &snmp, SNMPV2_MIB_SNMPENABLEAUTHENTRAPS);
 
     fmt_snmp_engine(interp->result, snmpEngine, snmp);
     
@@ -259,15 +314,6 @@ fmt_snmp_vacm_group(GString *s,
 {
     char const *model;
     
-     /*
-	group
-	|- name (usm) (pa)
-	|- foo  (usm)
-	`- bar  (usm)
-	asdf
-	`- base (snmpc)
-     */
-
     fmt_storage_type(s, vacmGroupEntry->vacmSecurityToGroupStorageType);
     fmt_row_status(s, vacmGroupEntry->vacmSecurityToGroupStatus);
     
@@ -277,7 +323,7 @@ fmt_snmp_vacm_group(GString *s,
 		      model ? model : "", sec_name_width,
 		      (int) vacmGroupEntry->_vacmSecurityNameLength,
 		      vacmGroupEntry->vacmSecurityName);
-    g_string_sprintfa(s, " -> %-*.*s\n", sec_group_width,
+    g_string_sprintfa(s, " %-*.*s\n", sec_group_width,
 		      (int) vacmGroupEntry->_vacmGroupNameLength,
 		      vacmGroupEntry->vacmGroupName);
 }
@@ -315,7 +361,7 @@ show_snmp_vacm_groups(scli_interp_t *interp, int argc, char **argv)
 	    if (vacmGroupTable[i]->_vacmGroupNameLength > sec_group_width)
 		sec_group_width = vacmGroupTable[i]->_vacmGroupNameLength;
 	}
-	g_string_sprintfa(interp->header, "ROW MOD %-*s    GROUP",
+	g_string_sprintfa(interp->header, "ROW MOD %-*s GROUP",
 			  sec_name_width, "NAME");
 	for (i = 0; vacmGroupTable[i]; i++) {
 	    fmt_snmp_vacm_group(interp->result, vacmGroupTable[i],
@@ -450,7 +496,7 @@ show_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
 static void
 fmt_snmp_vacm_view(GString *s,
 	   snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t *vacmViewEntry,
-		   int new, int last)
+		   int view_width)
 {
     char const *type = NULL;
     int i;
@@ -459,15 +505,13 @@ fmt_snmp_vacm_view(GString *s,
 	&& vacmViewEntry->vacmViewTreeFamilyMask
 	&& vacmViewEntry->vacmViewTreeFamilyType) {
 
-	if (new) {
-	    g_string_sprintfa(s, "%*s\n",
-			      (int) vacmViewEntry->_vacmViewTreeFamilyViewNameLength,
-			      vacmViewEntry->vacmViewTreeFamilyViewName);
-	}
-
-	g_string_sprintfa(s, "%c- ", last ? '`' : '|');
 	fmt_storage_type(s, vacmViewEntry->vacmViewTreeFamilyStorageType);
 	fmt_row_status(s, vacmViewEntry->vacmViewTreeFamilyStatus);
+
+	g_string_sprintfa(s, "  %-*.*s", view_width,
+			  (int) vacmViewEntry->_vacmViewTreeFamilyViewNameLength,
+			  vacmViewEntry->vacmViewTreeFamilyViewName);
+
 	type = gsnmp_enum_get_label(view_tree_family_type,
 				   *vacmViewEntry->vacmViewTreeFamilyType);
 	g_string_sprintfa(s, " %-4s ", type ? type : "");
@@ -496,8 +540,7 @@ static int
 show_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t **vacmViewTable;
-    int new;
-    int last;
+    int view_width = 8;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -518,23 +561,14 @@ show_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
 
     if (vacmViewTable) {
 	for (i = 0; vacmViewTable[i]; i++) {
-	    new = 1;
-	    last = !vacmViewTable[i+1];
-	    if (i > 0) {
-		new = (vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength
-		       != vacmViewTable[i-1]->_vacmViewTreeFamilyViewNameLength)
-		    || (memcmp(vacmViewTable[i]->vacmViewTreeFamilyViewName,
-			       vacmViewTable[i-1]->vacmViewTreeFamilyViewName,
-			       vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength) != 0);
+	    if (vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength > view_width) {
+		view_width = vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength;
 	    }
-	    if (vacmViewTable[i+1]) {
-		last = (vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength
-			!= vacmViewTable[i+1]->_vacmViewTreeFamilyViewNameLength)
-		    || (memcmp(vacmViewTable[i]->vacmViewTreeFamilyViewName,
-			       vacmViewTable[i+1]->vacmViewTreeFamilyViewName,
-			       vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength) != 0);
-	    }
-	    fmt_snmp_vacm_view(interp->result, vacmViewTable[i], new, last);
+	}
+	g_string_sprintfa(interp->header, "ROW %-*s TYPE PREFIX",
+			  view_width, "VIEW");
+	for (i = 0; vacmViewTable[i]; i++) {
+	    fmt_snmp_vacm_view(interp->result, vacmViewTable[i], view_width);
 	}
     }
 
@@ -546,10 +580,174 @@ show_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+fmt_snmp_usm_user(GString *s, snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry,
+		  int user_width, int sec_width)
+{
+    const char *label;
+    
+    fmt_storage_type(s, usmUserEntry->usmUserStorageType);
+    fmt_row_status(s, usmUserEntry->usmUserStatus);
+
+    g_string_sprintfa(s, "  %-*.*s", user_width,
+		      (int) usmUserEntry->_usmUserNameLength,
+		      usmUserEntry->usmUserName);
+
+    if (usmUserEntry->usmUserSecurityName) {
+	g_string_sprintfa(s, " %-*.*s", sec_width,
+			  (int) usmUserEntry->_usmUserSecurityNameLength,
+			  usmUserEntry->usmUserSecurityName);
+    } else {
+	g_string_sprintfa(s, " %*s", sec_width, "");
+    }
+
+    label = gsnmp_identity_get_label(sec_proto_identities,
+				    usmUserEntry->usmUserAuthProtocol,
+				    usmUserEntry->_usmUserAuthProtocolLength);
+    if (label) {
+	g_string_sprintfa(s, " %-8s", label ? label : "");
+    }
+
+    label = gsnmp_identity_get_label(sec_proto_identities,
+				    usmUserEntry->usmUserPrivProtocol,
+				    usmUserEntry->_usmUserPrivProtocolLength);
+    if (label) {
+	g_string_sprintfa(s, " %-8s", label ? label : "");
+    }
+
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_snmp_usm_users(scli_interp_t *interp, int argc, char **argv)
+{
+    snmp_user_based_sm_mib_usmUserEntry_t **usmUserTable = NULL;
+    int i, user_width = 8, sec_width = 8;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    snmp_user_based_sm_mib_get_usmUserTable(interp->peer, &usmUserTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (usmUserTable) {
+	for (i = 0; usmUserTable[i]; i++) {
+	    if (usmUserTable[i]->_usmUserNameLength > user_width) {
+		user_width = usmUserTable[i]->_usmUserNameLength;
+	    }
+	    if (usmUserTable[i]->_usmUserSecurityNameLength > sec_width) {
+		sec_width = usmUserTable[i]->_usmUserSecurityNameLength;
+	    }
+	}
+	g_string_sprintfa(interp->header, "ROW %-*s %-*s AUTH     PRIV",
+			  user_width, "USER", sec_width, "NAME");
+	for (i = 0; usmUserTable[i]; i++) {
+	    fmt_snmp_usm_user(interp->result, usmUserTable[i],
+			      user_width, sec_width);
+	}
+    }
+
+    if (usmUserTable) {
+	snmp_user_based_sm_mib_free_usmUserTable(usmUserTable);
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+set_snmp_authentication_traps(scli_interp_t *interp, int argc, char **argv)
+{
+    snmpv2_mib_snmp_t *snmp = NULL;
+    gint32 value;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (! gsnmp_enum_get_number(snmpv2_mib_enums_snmpEnableAuthenTraps,
+				argv[1], &value)) {
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    snmp = snmpv2_mib_new_snmp();
+    snmp->snmpEnableAuthenTraps = &value;
+    snmpv2_mib_set_snmp(interp->peer, snmp, SNMPV2_MIB_SNMPENABLEAUTHENTRAPS);
+    snmpv2_mib_free_snmp(snmp);
+
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+dump_snmp(scli_interp_t *interp, int argc, char **argv)
+{
+    snmpv2_mib_snmp_t *snmp;
+    const char *e;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    snmpv2_mib_get_snmp(interp->peer, &snmp, SNMPV2_MIB_SNMPENABLEAUTHENTRAPS);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (snmp) {
+	e = fmt_enum(snmpv2_mib_enums_snmpEnableAuthenTraps,
+		     snmp->snmpEnableAuthenTraps);
+	if (e) {
+	    g_string_sprintfa(interp->result,
+			      "set snmp authentication traps %s\n", e);
+	}
+    }
+
+    if (snmp) snmpv2_mib_free_snmp(snmp);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_snmp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
+	{ "set snmp authentication traps", "<status>",
+	  "The set snmp authentication traps command controls whether the\n"
+	  "SNMP engine generates authentication failure notifications.\n"
+	  "The <value> parameter must be one of the strings \"enabled\"\n"
+	  "or \"disabled\".",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  set_snmp_authentication_traps },
 
 	{ "show snmp engine", NULL,
 	  "The show snmp engine command displays information about the\n"
@@ -571,10 +769,10 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  "security names to group names. The command generates a table\n"
 	  "with the following columns:\n"
 	  "\n"
-	  "  ROW   row storage type and status\n"
-	  "  MOD   security model\n"
-	  "  NAME  security name\n"
-	  "  GROUP security group name",
+	  "  ROW    row storage type and status\n"
+	  "  MOD    security model\n"
+	  "  NAME   security name\n"
+	  "  GROUP  security group name",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_snmp_vacm_groups },
@@ -598,10 +796,36 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  show_snmp_vacm_access },
 
 	{ "show snmp vacm views", NULL,
-	  "The show snmp vacm views command displays the view definitions.",
+	  "The show snmp vacm views command displays MIB view definitions.\n"
+	  "The command generates a table with the following columns:\n"
+	  "\n"
+	  "  ROW    row storage type and status\n"
+	  "  VIEW   view name\n"
+	  "  TYPE   access to the view subtree (incl/excl)\n"
+	  "  PREFIX object identifier wildcard prefix",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_snmp_vacm_views },
+
+	{ "show snmp usm users", NULL,
+	  "The show snmp usm users command displays the configured users.\n"
+	  "The command generates a table with the following columns:\n"
+	  "\n"
+	  "  ROW    row storage type and status\n"
+	  "  USER   USM user name\n"
+	  "  NAME   security name of the USM user\n"
+	  "  AUTH   authentication protocol\n"
+	  "  PRIV   privacy protocol",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_snmp_usm_users },
+
+	{ "dump snmp", NULL,
+	  "The dump snmp command generates a sequence of scli commands\n"
+	  "which can be used to restore the engine configuration.\n",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  dump_snmp },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
@@ -610,8 +834,9 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	"snmp",
 	
 	"The snmp scli mode is based on the SNMPv2-MIB as published\n"
-	"in RFC 1907, the SNMP-FRAMEWORK-MIB as published in RFC 2571\n"
-	"and the SNMP-VIEW-BASED-ACM-MIB as published in RFC 2575.",
+	"in RFC 1907, the SNMP-FRAMEWORK-MIB as published in RFC 2571,\n"
+	"the SNMP-USER-BASED-SM-MIB as published in RFC 2574, and the\n"
+	"SNMP-VIEW-BASED-ACM-MIB as published in RFC 2575.",
 	cmds
     };
     
