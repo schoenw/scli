@@ -1,3 +1,12 @@
+Changes in stools 0.1.16:
+
+- stop and scli now indicate how fast they retrieve data
+- stop suppors a new ether mode
+- scli supports a new "show ether mau" command
+- stubs now provide #defines for enumerations and identities
+- scli supports an improved disman mode
+- minor bug fixes
+
 Changes in stools 0.1.15:
 
 - stop supports a new tcp mode

@@ -18,8 +18,6 @@
 - Create some sort of a test suite (which is not that easy for highly
   interactive programs).
 
-- Complete the disman scli mode and add a disman stop mode.
-
 - Display processor load in the stop process mode summary line.
 
 - Make index members pointers again in the stub interface? (FS)
