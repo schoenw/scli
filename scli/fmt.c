@@ -85,7 +85,7 @@ fmt_timeticks(guint32 timeticks)
     int gmt_offset;
     
     now = time(NULL);
-    now -= timeticks/100;
+    now -= (timeticks+50)/100;
 
     /*
      * Get the UTC time (which is basically identically with GMT)
@@ -461,7 +461,7 @@ fmt_indent_string(GString *s, int indent, char *label, int len, char *string)
 	if (string[i] == '\n') {
 	    g_string_sprintfa(s, "\n%*s", indent, "");
 	} else {
-	    if (isprint(string[i])) {
+	    if (isprint((int) string[i])) {
 		g_string_append_c(s, string[i]);
 	    } else {
 		g_string_sprintfa(s, "\\%o", string[i]);
@@ -482,10 +482,10 @@ fmt_display_string(GString *s, int indent, char *label, int len, char *string)
 
     /* Remove leading and trailing white-space characters first. */
 
-    while (len && isspace(string[0])) {
+    while (len && isspace((int) string[0])) {
 	string++, len--;
     }
-    while (len && isspace(string[len-1])) {
+    while (len && isspace((int) string[len-1])) {
 	len--;
     }
 
@@ -495,10 +495,10 @@ fmt_display_string(GString *s, int indent, char *label, int len, char *string)
     
     for (i = 0; i < len; i++) {
 	if (string[i] == '\r') continue;
-	if (isspace(string[i])) {
+	if (isspace((int) string[i])) {
 	    int j, p;
 	    for (j = i+1, p = pos; p < 80 && j < len; p++, j++) {
-		if (string[j] != '\r' && isspace(string[j])) break;
+		if (string[j] != '\r' && isspace((int) string[j])) break;
 	    }
 	    if (p == 80) {
 		g_string_sprintfa(s, "\n%*s", indent, "");
@@ -507,7 +507,7 @@ fmt_display_string(GString *s, int indent, char *label, int len, char *string)
 	    }
 	}
 	if (string[i] != '\n') {
-	    if (isprint(string[i])) {
+	    if (isprint((int) string[i])) {
 		g_string_append_c(s, string[i]);
 		pos++;
 	    } else {
