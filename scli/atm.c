@@ -31,19 +31,42 @@
 
 
 static void
+xml_atm_interface(GString *s,
+		  atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry,
+		  if_mib_ifEntry_t *ifEntry,
+		  if_mib_ifXEntry_t *ifXEntry)
+{
+    g_string_sprintfa(s, "  <interface index=\"%d\">\n",
+		      atmInterfaceConfEntry->ifIndex);
+    if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
+	g_string_sprintfa(s, "    <max-vpcs>%d</max-vpcs>\n",
+			  *atmInterfaceConfEntry->atmInterfaceMaxVpcs);
+    }
+    if (atmInterfaceConfEntry->atmInterfaceMaxVccs) {
+	g_string_sprintfa(s, "    <max-vpcs>%d</max-vpcs>\n",
+			  *atmInterfaceConfEntry->atmInterfaceMaxVccs);
+    }
+    g_string_sprintfa(s, "  </interface>\n");
+}
+
+
+
+static void
 show_atm_interface(GString *s,
 		   atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry,
 		   if_mib_ifEntry_t *ifEntry,
 		   if_mib_ifXEntry_t *ifXEntry)
 {
+    g_string_sprintfa(s, "%6u     ", atmInterfaceConfEntry->ifIndex);
+
     if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
 	g_string_sprintfa(s, "%5d   ",
 			  *atmInterfaceConfEntry->atmInterfaceMaxVpcs);
     }
 
-    if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
+    if (atmInterfaceConfEntry->atmInterfaceMaxVccs) {
 	g_string_sprintfa(s, "%5d ",
-			  *atmInterfaceConfEntry->atmInterfaceMaxVpcs);
+			  *atmInterfaceConfEntry->atmInterfaceMaxVccs);
     }
 
     g_string_append(s, "\n");
@@ -61,18 +84,30 @@ cmd_atm_interface(scli_interp_t *interp, int argc, char **argv)
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (atm_mib_get_atmInterfaceConfTable(interp->peer, &atmInterfaceConfTable)) {
+    if (atm_mib_get_atmInterfaceConfTable(interp->peer,
+					  &atmInterfaceConfTable)) {
 	return SCLI_ERROR;
     }
-
     (void) if_mib_get_ifTable(interp->peer, &ifTable);
     (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
     
     if (atmInterfaceConfTable) {
-	g_string_append(interp->result, "MaxVpcs MaxVccs\n");
+	if (scli_interp_xml(interp)) {
+	    g_string_append(interp->result, "<atm>\n");
+	} else {
+	    g_string_append(interp->result, "Interface MaxVpcs MaxVccs\n");
+	}
 	for (i = 0; atmInterfaceConfTable[i]; i++) {
-	    show_atm_interface(interp->result, atmInterfaceConfTable[i],
-			       NULL, NULL);
+	    if (scli_interp_xml(interp)) {
+		xml_atm_interface(interp->result, atmInterfaceConfTable[i],
+				  NULL, NULL);
+	    } else {
+		show_atm_interface(interp->result, atmInterfaceConfTable[i],
+				   NULL, NULL);
+	    }
+	}
+	if (scli_interp_xml(interp)) {
+	    g_string_append(interp->result, "</atm>\n");
 	}
     }
 
