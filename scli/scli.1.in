@@ -69,11 +69,17 @@ Process commands from a file and exit.
 .B \-h, \-\-help
 Show summary of scli options.
 .TP
+.B \-i, \-\-inet
+Execute in inet mode. This option implies -q, -n and -x.
+.TP
 .B \-n, \-\-norc
 Do not evaluate ~/.sclirc on startup.
 .TP
 .B \-p number, \-\-port=number
 Set the SNMP port number. The default port number is 161.
+.TP
+.B \-q, \-\-quiet
+This flag causes scli to supress some informational messages.
 .TP
 .B \-r count, \-\-retries=count
 The number of SNMP retransmissions before we give up. The default

@@ -306,7 +306,7 @@ main(int argc, char **argv)
     int c;
     
     int norc = 0, port = 161, delay = 5000, retries = 3, timeout = 500000;
-    int xml = 0, dry = 0, proto = 0;
+    int xml = 0, dry = 0, proto = 0, quiet = 0;
     int snmp = -1;
 
     static struct option const long_options[] =
@@ -317,9 +317,10 @@ main(int argc, char **argv)
 	{ "dry-run", required_argument, 0, 's' },
         { "file",    required_argument, 0, 'f' },
         { "help",    no_argument,       0, 'h' },
-        { "inetd",   no_argument,       0, 'i' },
+        { "inet",    no_argument,       0, 'i' },
         { "norc",    no_argument,       0, 'n' },
         { "port",    required_argument, 0, 'p' },
+        { "quiet",   required_argument, 0, 'q' },
 	{ "retries", required_argument, 0, 'r' },
 	{ "timeout", required_argument, 0, 't' },
 	{ "snmp",    required_argument, 0, 'v' },
@@ -327,7 +328,7 @@ main(int argc, char **argv)
         { NULL, 0, NULL, 0}
     };
 
-    while ((c = getopt_long(argc, argv, "Vc:d:f:hinp:r:st:v:x", long_options,
+    while ((c = getopt_long(argc, argv, "Vc:d:f:hinp:qr:st:v:x", long_options,
                             (int *) 0)) != EOF) {
         switch (c) {
         case 'V':
@@ -353,6 +354,9 @@ main(int argc, char **argv)
             exit(0);
 	case 'i':
 	    proto = 1;
+	    norc = 1;
+	    xml = 1;
+	    quiet = 1;
 	    break;
 	case 'n':
 	    norc = 1;
@@ -362,6 +366,9 @@ main(int argc, char **argv)
                 port = atoi(optarg);
 	    }
             break;
+	case 'q':
+	    quiet = 1;
+	    break;
 	case 'r':
 	    if (atoi(optarg) > 0) {
 		retries = atoi(optarg);
@@ -463,11 +470,15 @@ main(int argc, char **argv)
 	interp->flags |= SCLI_INTERP_FLAG_DRY;
     }
 
-    if (scli_interp_interactive(interp)) {
-	g_print("scli version %s %s\n", VERSION, scli_copyright);
+    if (quiet) {
+	interp->flags |= SCLI_INTERP_FLAG_QUIET;
     }
 
-    if (scli_interp_interactive(interp)) {
+    if (scli_interp_interactive(interp) && !scli_interp_quiet(interp)) {
+	g_print("%3d-scli version %s %s\n", SCLI_MSG, VERSION, scli_copyright);
+    }
+
+    if (scli_interp_interactive(interp) && ! scli_interp_proto(interp)) {
 	if (scli_set_pager(interp, getenv("PAGER")) < 0) {
 	    g_warning("$PAGER contains unsafe characters - ignored\n");
 	}

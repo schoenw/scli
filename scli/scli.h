@@ -176,6 +176,7 @@ struct scli_alarm {
 #define SCLI_INTERP_FLAG_XML		0x10
 #define SCLI_INTERP_FLAG_DRY		0x20
 #define SCLI_INTERP_FLAG_PROTO		0x40
+#define SCLI_INTERP_FLAG_QUIET		0x80
 
 struct scli_interp {
     char *name;			/* name of the interpreter */
@@ -223,6 +224,8 @@ scli_interp_reset(scli_interp_t *interp);
 	(interp->flags & SCLI_INTERP_FLAG_DRY)
 #define scli_interp_proto(interp) \
 	(interp->flags & SCLI_INTERP_FLAG_PROTO)
+#define scli_interp_quiet(interp) \
+	(interp->flags & SCLI_INTERP_FLAG_QUIET)
 
 extern scli_alarm_t *
 scli_alarm_create(scli_interp_t *interp, char *desc);
