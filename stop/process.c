@@ -116,8 +116,6 @@ hr_sort (const void *arg1, const void *arg2)
     hr_sort_t *p = (hr_sort_t *) arg1;
     hr_sort_t *q = (hr_sort_t *) arg2;
     
-    /*  printf ("\rsee: %d %d  %d %d\n", p->idx, p->cpu, q->idx, q->cpu); */
-    
     if (p->cpu > q->cpu) {
 	return -1;
     } else if (p->cpu == q->cpu) {
@@ -218,11 +216,7 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 	GString *s;
         i = s_arr [j].idx;
 	s = g_string_new(NULL);
-	if (hrSWRunEntry[i]->hrSWRunIndex) {
-	    g_string_sprintfa(s, "%5d ", *(hrSWRunEntry[i]->hrSWRunIndex));
-	} else {
-	    g_string_append(s, "----- ");
-	}
+	g_string_sprintfa(s, "%5d ", hrSWRunEntry[i]->hrSWRunIndex);
 	fmt_run_state_and_type(s,
 			       hrSWRunEntry[i]->hrSWRunStatus,
 			       hrSWRunEntry[i]->hrSWRunType);

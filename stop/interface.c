@@ -217,11 +217,7 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	for (i = 0; ifEntry[i]; i++) {
 	    GString *s;
 	    s = g_string_new(NULL);
-	    if (ifEntry[i]->ifIndex) {
-		g_string_sprintfa(s, "%5u", *(ifEntry[i]->ifIndex));
-	    } else {
-		g_string_sprintfa(s, "%5u", i+1);
-	    }
+	    g_string_sprintfa(s, "%5u", ifEntry[i]->ifIndex);
 	    g_string_sprintfa(s, " %4s",
 			      fmt_ifStatus(ifEntry[i]->ifAdminStatus,
 					   ifEntry[i]->ifOperStatus));
