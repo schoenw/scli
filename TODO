@@ -23,7 +23,7 @@
 - Create some sort of a test suite (which is not that easy for highly
   interactive programs).
 
-- Cleanup the process display modes.
+- Finish the entity display mode.
 
 - Complete the disman scli mode and add a disman stop mode.
 
