@@ -16,8 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,  59 Temple Place - Suite 330, Cambridge, MA 02139, USA.
- *
- * Snmp session support
  */
 
 #ifndef lint
@@ -33,8 +31,6 @@ static char const rcsid[] =
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <string.h>                   /* Quite the memmove warning */
-
-extern int     errno;
 
 static GSList  *request_queue = NULL;   /* queue of active requests */
 
@@ -638,7 +634,7 @@ g_session_response_pdu(guint messageProcessingModel,
 
     if (request->callback(request->session, request->magic, PDU, vbl)) {
 	if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
-	    g_printerr("request %p: callback invoked\n");
+	    g_printerr("request %p: callback invoked\n", request);
 	}
 	/* g_snmp_vbl_free(vbl); */
     }
