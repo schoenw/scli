@@ -71,7 +71,7 @@ typedef struct __snmp_request {
 
 
 gpointer g_async_send        (host_snmp *host, 
-                              guint req, 
+                              GSnmpPduType type,
                               GSList *objs, 
                               guint arg1, 
                               guint arg2);

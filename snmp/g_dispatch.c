@@ -742,7 +742,7 @@ g_receive_message(int transportDomain, struct sockaddr *transportAddress,
  */
 
 gboolean
-g_lookup_address (guint model_nr, guchar *hostname, struct sockaddr **address)
+g_lookup_address (guint model_nr, gchar *hostname, struct sockaddr **address)
 {
   struct g_transport *trp_model;
 
@@ -752,10 +752,10 @@ g_lookup_address (guint model_nr, guchar *hostname, struct sockaddr **address)
   if (!(trp_model = g_hash_table_lookup(transport_models, &model_nr)))
     return FALSE;
 
-  return trp_model->resolveAddress(hostname, address);
+  return trp_model->resolveAddress((guchar *)hostname, address);
 }
 
-gboolean
+static gboolean
 transport_io_invoke(GIOChannel *source, GIOCondition condition, gpointer data)
 {
     void (*func)(void);

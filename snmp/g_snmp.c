@@ -619,7 +619,7 @@ g_snmp_request_decode ( ASN1_SCK *asn1, GSnmpRequest *request)
         return FALSE;
     if (cls != ASN1_UNI || con != ASN1_PRI || tag != ASN1_INT)
         return FALSE;
-    if (!g_asn1_uint32_decode (asn1, end, &request->error_status))
+    if (!g_asn1_uint32_decode (asn1, end, (guint32 *) &request->error_status))
         return FALSE;
     if (!g_asn1_header_decode (asn1, &end, &cls, &con, &tag))
         return FALSE;
@@ -878,7 +878,7 @@ g_snmp_pdu_v1_decode ( ASN1_SCK *asn1, GSnmpPdu *pdu)
     guint cls, con;
     guchar *eoc;
 
-    if (!g_asn1_header_decode (asn1, &eoc, &cls, &con, &pdu->type))
+    if (!g_asn1_header_decode (asn1, &eoc, &cls, &con, (guint32 *) &pdu->type))
         return FALSE;
     if (cls != ASN1_CTX || con != ASN1_CON)
         return FALSE;
@@ -925,7 +925,7 @@ g_snmp_pdu_v2_decode ( ASN1_SCK *asn1, GSnmpPdu *pdu)
     guint cls, con;
     guchar *eoc;
 
-    if (!g_asn1_header_decode (asn1, &eoc, &cls, &con, &pdu->type))
+    if (!g_asn1_header_decode (asn1, &eoc, &cls, &con, (guint32 *) &pdu->type))
         return FALSE;
     if (cls != ASN1_CTX || con != ASN1_CON)
         return FALSE;
@@ -970,7 +970,7 @@ g_snmp_pdu_v3_decode ( ASN1_SCK *asn1, GSnmpPdu *pdu, char **cenid,
     guint cls, con;
     guchar *eoc;
 
-    if (!g_asn1_header_decode (asn1, &eoc, &cls, &con, &pdu->type))
+    if (!g_asn1_header_decode (asn1, &eoc, &cls, &con, (guint32 *) &pdu->type))
         return FALSE;
     if (cls != ASN1_CTX || con != ASN1_CON)
         return FALSE;

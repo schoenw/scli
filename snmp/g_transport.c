@@ -74,7 +74,7 @@ ipv4_init(gboolean dobind)
           adr.sin_family  = AF_INET;
           adr.sin_port    = htons(161);
           adr.sin_addr.s_addr = INADDR_ANY;
-          if (bind(ipv4_socket, &adr, sizeof(struct sockaddr_in)) == -1)
+          if (bind(ipv4_socket, (struct sockaddr *) &adr, sizeof(struct sockaddr_in)) == -1)
             {
               close(ipv4_socket);
               g_warning("Can't bind IPv4 socket: %s", g_strerror(errno));
@@ -140,8 +140,8 @@ ipv4_receive_message()
 
   adrsize = sizeof (address);
 
-  len = recvfrom(ipv4_socket, buffer, sizeof(buffer), 0, 
-                 &address, &adrsize);
+  len = recvfrom(ipv4_socket, (char *) buffer, sizeof(buffer), 0, 
+                 (struct sockaddr *) &address, &adrsize);
 #ifdef SNMP_DEBUG
   printf("Received packet on IPv4, %d bytes\n", len);
   packet_dump (buffer, len);
