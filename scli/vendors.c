@@ -76,7 +76,7 @@ scli_get_iana_vendor(guint32 oid[], gsize len)
  * $Date$
  *
  * The list was subsequently cleaned up and modified to suit the
- * needs of the stools package.
+ * needs of the scli package.
  */
 
 static scli_vendor_t ieee802_vendor_table[] = {
