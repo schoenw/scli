@@ -1,3 +1,152 @@
+2001-12-19 12:33  schoenw
+
+	* scli/: cmds.c, scli.h: Made scli_cmd_open() unvisible across
+        modules.
+
+2001-12-19 12:30  schoenw
+
+	* scli/: basic.c, cmds.c, monitor.c, scli.c, scli.h, system.c:
+	Adapted the code to recent changes in the gsnmp API. Improved the
+	handling of scli command line arguments by letting the interpreter
+        handle an open command rather than calling the command directly.
+
+2001-12-19 12:27  schoenw
+
+	* snmp/: Makefile.am, g_dispatch.c, g_dispatch.h, g_session.c,
+	g_session.h, g_snmp.c, g_snmp.h, g_snmp_walk.c, g_snmp_walk.h,
+	g_transport.c, g_transport.h, g_utils.c, g_utils.h: Reworked the
+	name lookup code so that the name lookup happens when a new session
+	is created. Made it work on systems that do not have the service
+        name "snmp" defined. Added a new module that implements walks.
+
+2001-12-19 12:25  schoenw
+
+	* scli/fmt.c: Added code to handle unprintable characters in
+        fmt_display_string().
+
+2001-12-17 19:11  schoenw
+
+	* scli/: bridge.c, cmds.c: Minor code cleanups.
+
+2001-12-17 19:10  schoenw
+
+	* scli/snmp.c: Reworked the whole mode. Added 'show snmp usm
+        users', 'dump snmp' and 'set snmp authentication traps' commands.
+
+2001-12-17 19:08  schoenw
+
+	* scli/basic.c: Print the current time in recursive command mode.
+
+2001-12-17 19:07  schoenw
+
+	* scli/: disman.c, scli.h, system.c, vendors.c: Changed the API to
+        lookup vendor information.
+
+2001-12-17 19:06  schoenw
+
+	* scli/: interface.c, ip.c: Some speed improvements.
+
+2001-12-12 19:31  schoenw
+
+	* scli/: basic.c, interface.c, scli.h: Sitched to numeric error
+        codes as this is what operators want.
+
+2001-12-12 19:30  schoenw
+
+	* scli/nortel.c: Use strtol instead of sscanf.
+
+2001-12-11 21:49  schoenw
+
+	* scli/disman.c: Added support for dry mode.
+
+2001-12-11 21:30  schoenw
+
+	* scli/: printer.c, system.c: Added support for the dry mode.
+
+2001-12-11 17:54  schoenw
+
+	* scli/: bridge.c, ether.c: Added support for the dry run mode.
+
+2001-12-11 17:44  schoenw
+
+	* scli/: atm.c, scli.1.in: Fixed minor nits.
+
+2001-12-11 17:40  schoenw
+
+	* scli/ospf.c: Added support for the dry run mode.
+
+2001-12-11 17:39  schoenw
+
+	* scli/: cisco.c, nortel.c, ospf.c: Added support for the
+
+2001-12-11 05:14  schoenw
+
+	* scli/: monitor.c, system.c: Use strtol instead of atoi.
+
+2001-12-11 05:13  schoenw
+
+	* scli/: entity.c, snmp.c: Added support for dry runs.
+
+2001-12-11 04:17  schoenw
+
+	* scli/: atm.c, ip.c: Added support for dry runs.
+
+2001-12-11 03:57  schoenw
+
+	* scli/: interface.c, tcp.c, udp.c: Added support of the dry-run
+        mode.
+
+2001-12-11 03:50  schoenw
+
+	* scli/: basic.c, scli.h: Introduces the scli_interp_dry macro.
+
+2001-12-11 03:40  schoenw
+
+	* scli/scli.c: Changed the name of the command line option.
+
+2001-12-10 23:58  schoenw
+
+	* scli/: basic.c, interface.c, monitor.c, scli.c, scli.h:
+	Implemented a dry mode where we check the syntax of commands but do
+        not actually execute them.
+
+2001-12-10 19:50  schoenw
+
+	* snmp/g_snmp_table.c: Finish the table retrieval if we get a
+        noSuchName error.
+
+2001-12-09 22:35  schoenw
+
+	* snmp/: g_snmp.c, g_snmp.h: Editorial cleanups.
+
+2001-12-09 22:34  schoenw
+
+	* snmp/: g_snmp_table.c, g_snmp_table.h: Started to cleanup the
+        g_snmp_table module.
+
+2001-12-09 22:33  schoenw
+
+	* snmp/: g_session.c, g_session.h: Added g_snmp_session_clone() and
+        changed the deallocation of community strings to be consistent.
+
+2001-12-09 22:30  schoenw
+
+	* scli/basic.c: The SNMP library now deallocates the community
+        strings.
+
+2001-12-09 22:30  schoenw
+
+	* scli/: fmt.c, system.c: Generally strip leading/trailing white
+        space from display strings.
+
+2001-12-09 22:29  schoenw
+
+	* scli/: bridge.c, ip.c: Some performance improvements.
+
+2001-12-07 01:45  schoenw
+
+	* ChangeLog, NEWS: Updates for release 0.2.5.
+
 2001-12-07 01:43  schoenw
 
 	* README, TODO: Updated the support files.

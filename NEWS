@@ -1,3 +1,13 @@
+Changes in scli 0.2.6:
+
+- new "show snmp usm users" command
+- new "dump snmp" command
+- new "set snmp authentication traps" command
+- support for dry runs (parse commands without executing them)
+- support for numeric error codes ala SMTP/HTTP
+- reworked the gsnmp name lookup code
+- minor bug fixes
+
 Changes in scli 0.2.5:
 
 - new "show printer covers" command
