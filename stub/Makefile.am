@@ -6,6 +6,7 @@ MIBS			= IF-MIB \
 			  UDP-MIB \
 			  TCP-MIB \
 			  SNMPv2-MIB \
+			  SNMPv2-TM \
 			  HOST-RESOURCES-MIB \
 			  HOST-RESOURCES-TYPES \
 			  ENTITY-MIB \
@@ -34,6 +35,7 @@ STUBS			= if-mib.h if-mib.c \
 			  udp-mib.h udp-mib.c \
 			  tcp-mib.h tcp-mib.c \
 			  snmpv2-mib.h snmpv2-mib.c \
+			  snmpv2-tm.h snmpv2-tm.c \
 			  host-resources-mib.h host-resources-mib.c \
 			  host-resources-types.h host-resources-types.c \
 			  entity-mib.h entity-mib.c \
