@@ -143,7 +143,7 @@ show_runs(WINDOW *win, host_snmp *peer, int flags)
 	show_disman_summary(peer);
 	wattron(win, A_REVERSE);
 	mvwprintw(win, 0, 0, "%-*s", COLS, 
-		  "L-OWNER  L-NAME   RUNID STAT    TIME     LIFE   EXPIRE S-OWNER  S-NAME   ARGUMENT");
+		  "L-OWNER  L-NAME   RUNID STAT    TIME     LIFE   EXPIRE S-OWNER  S-NAME   ARGS");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
     }

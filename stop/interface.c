@@ -35,6 +35,8 @@ typedef struct {
     guint32 outOctets;
     guint32 inPkts;
     guint32 outPkts;
+    guint32 inErrors;
+    guint32 outErrors;
 } if_stats_t;
 
 
@@ -70,25 +72,6 @@ fmt_ifStatus(gint32 *admin, gint32 *oper)
 	strcat(buffer,"-");
     }
 
-    return buffer;
-}
-
-
-
-static char*
-fmt_kmg(guint32 number)
-{
-    static char buffer[80];
-
-    if (number > 999999999) {
-	g_snprintf(buffer, sizeof(buffer), "%3ug", number / 1000000);
-    } else if (number > 999999) {
-	g_snprintf(buffer, sizeof(buffer), "%3um", number / 1000000);
-    } else if (number > 9999) {
-	g_snprintf(buffer, sizeof(buffer), "%3uk", number / 1000);
-    } else {
-	g_snprintf(buffer, sizeof(buffer), "%4u", number);
-    }
     return buffer;
 }
 
@@ -168,7 +151,7 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	show_interface_summary(peer);
 	wattron(win, A_REVERSE);
 	mvwprintw(win, 0, 0, "%-*s", COLS,
-		  "INDEX STAT   MTU SPEED I-BPS O-BPS I-PPS O-PPS  DESCR ...");
+		  "INDEX STAT   MTU SPEED I-BPS O-BPS I-PPS O-PPS I-ERR O-ERR  DESCR ...");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
 	sleep(1);
@@ -187,7 +170,7 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	stats = (if_stats_t *) g_malloc0(i * sizeof(if_stats_t));
     }
 
-    gettimeofday (&now, NULL);
+    gettimeofday(&now, NULL);
     delta = TV_DIFF(last, now);
 
     if (ifTable) {
@@ -216,31 +199,11 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 		g_string_sprintfa(s, "  ----");
 	    }
 
-	    if (ifTable[i]->ifInOctets && delta > TV_DELTA) {
-		if (last.tv_sec && last.tv_usec) {
-		    double f_val = (*(ifTable[i]->ifInOctets) - stats[i].inOctets) / delta;
-		    g_string_sprintfa(s, " %5s",
-				      fmt_kmg((guint32) f_val));
-		} else {
-		    g_string_sprintfa(s, "  ----");
-		}
-		stats[i].inOctets = *(ifTable[i]->ifInOctets);
-	    } else {
-		g_string_sprintfa(s, "  ----");
-	    }
-	    
-	    if (ifTable[i]->ifOutOctets && delta > TV_DELTA) {
-		if (last.tv_sec && last.tv_usec) {
-		    double f_val = (*(ifTable[i]->ifOutOctets) - stats[i].outOctets) / delta;
-		    g_string_sprintfa(s, " %5s",
-				      fmt_kmg((guint32) f_val));
-		} else {
-		    g_string_sprintfa(s, "  ----");
-		}
-		stats[i].outOctets = *(ifTable[i]->ifOutOctets);
-	    } else {
-		g_string_sprintfa(s, "  ----");
-	    }
+	    fmt_counter_dt(s, ifTable[i]->ifInOctets, &(stats[i].inOctets),
+			   &last, delta);
+
+	    fmt_counter_dt(s, ifTable[i]->ifOutOctets, &(stats[i].outOctets),
+			   &last, delta);
 	    
 	    if (ifTable[i]->ifInUcastPkts && delta > TV_DELTA) {
 		guint32 pkts;
@@ -289,6 +252,12 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	    } else {
 		g_string_sprintfa(s, "  ----");
 	    }
+	    
+	    fmt_counter_dt(s, ifTable[i]->ifInErrors, &(stats[i].inErrors),
+			   &last, delta);
+
+	    fmt_counter_dt(s, ifTable[i]->ifOutErrors, &(stats[i].outErrors),
+			   &last, delta);
 	    
 	    if (ifTable[i]->ifDescr && ifTable[i]->_ifDescrLength) {
 		g_string_sprintfa(s, "  %.*s",

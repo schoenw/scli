@@ -78,3 +78,44 @@ fmt_seconds(guint32 number)
 
     return buffer;
 }
+
+
+
+char*
+fmt_kmg(guint32 number)
+{
+    static char buffer[80];
+
+    if (number > 999999999) {
+	g_snprintf(buffer, sizeof(buffer), "%3ug", number / 1000000);
+    } else if (number > 999999) {
+	g_snprintf(buffer, sizeof(buffer), "%3um", number / 1000000);
+    } else if (number > 9999) {
+	g_snprintf(buffer, sizeof(buffer), "%3uk", number / 1000);
+    } else {
+	g_snprintf(buffer, sizeof(buffer), "%4u", number);
+    }
+    return buffer;
+}
+
+
+
+void
+fmt_counter_dt(GString *s, guint32 *new_counter, guint32 *old_counter,
+	       struct timeval *last, double delta)
+{
+    if (new_counter && delta > TV_DELTA) {
+	if (last->tv_sec && last->tv_usec) {
+	    double f_val = (*new_counter - *old_counter) / delta;
+	    g_string_sprintfa(s, " %5s", fmt_kmg((guint32) f_val));
+	} else {
+	    g_string_sprintfa(s, "  ----");
+	}
+	*old_counter = *new_counter;
+    } else {
+	g_string_sprintfa(s, "  ----");
+    }
+}
+
+
+

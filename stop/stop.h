@@ -110,5 +110,12 @@ fmt_seconds(guint32 secs);
 
 extern char const *
 fmt_date_and_time_delta(guchar *date1, gsize len1, guchar *date2, gsize len2);
+
+extern char *
+fmt_kmg(guint32 number);
+
+extern void
+fmt_counter_dt(GString *s, guint32 *new_counter, guint32 *old_counter,
+	       struct timeval *last, double delta);
     
 #endif /* _STOP_H */
