@@ -44,7 +44,7 @@ bridge_mib_free_dot1dBase(dot1dBase_t *dot1dBase);
  */
 
 typedef struct dot1dBasePortEntry {
-    gint32   *dot1dBasePort;
+    gint32   dot1dBasePort;
     gint32   *dot1dBasePortIfIndex;
     guint32  *dot1dBasePortCircuit;
     gsize    _dot1dBasePortCircuitLength;
@@ -90,7 +90,7 @@ bridge_mib_free_dot1dStp(dot1dStp_t *dot1dStp);
  */
 
 typedef struct dot1dStpPortEntry {
-    gint32   *dot1dStpPort;
+    gint32   dot1dStpPort;
     gint32   *dot1dStpPortPriority;
     gint32   *dot1dStpPortState;
     gint32   *dot1dStpPortEnable;
@@ -128,7 +128,7 @@ bridge_mib_free_dot1dTp(dot1dTp_t *dot1dTp);
  */
 
 typedef struct dot1dTpFdbEntry {
-    guchar   *dot1dTpFdbAddress;
+    guchar   dot1dTpFdbAddress[6];
     gint32   *dot1dTpFdbPort;
     gint32   *dot1dTpFdbStatus;
 } dot1dTpFdbEntry_t;
@@ -144,7 +144,7 @@ bridge_mib_free_dot1dTpFdbEntry(dot1dTpFdbEntry_t **dot1dTpFdbEntry);
  */
 
 typedef struct dot1dTpPortEntry {
-    gint32   *dot1dTpPort;
+    gint32   dot1dTpPort;
     gint32   *dot1dTpPortMaxInfo;
     guint32  *dot1dTpPortInFrames;
     guint32  *dot1dTpPortOutFrames;
@@ -162,8 +162,8 @@ bridge_mib_free_dot1dTpPortEntry(dot1dTpPortEntry_t **dot1dTpPortEntry);
  */
 
 typedef struct dot1dStaticEntry {
-    guchar   *dot1dStaticAddress;
-    gint32   *dot1dStaticReceivePort;
+    guchar   dot1dStaticAddress[6];
+    gint32   dot1dStaticReceivePort;
     guchar   *dot1dStaticAllowedToGoTo;
     gsize    _dot1dStaticAllowedToGoToLength;
     gint32   *dot1dStaticStatus;

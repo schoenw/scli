@@ -68,7 +68,7 @@ host_resources_mib_free_hrStorage(hrStorage_t *hrStorage);
  */
 
 typedef struct hrStorageEntry {
-    gint32   *hrStorageIndex;
+    gint32   hrStorageIndex;
     guint32  *hrStorageType;
     gsize    _hrStorageTypeLength;
     guchar   *hrStorageDescr;
@@ -90,7 +90,7 @@ host_resources_mib_free_hrStorageEntry(hrStorageEntry_t **hrStorageEntry);
  */
 
 typedef struct hrDeviceEntry {
-    gint32   *hrDeviceIndex;
+    gint32   hrDeviceIndex;
     guint32  *hrDeviceType;
     gsize    _hrDeviceTypeLength;
     guchar   *hrDeviceDescr;
@@ -112,7 +112,7 @@ host_resources_mib_free_hrDeviceEntry(hrDeviceEntry_t **hrDeviceEntry);
  */
 
 typedef struct hrProcessorEntry {
-    gint32   *hrDeviceIndex;
+    gint32   hrDeviceIndex;
     guint32  *hrProcessorFrwID;
     gsize    _hrProcessorFrwIDLength;
     gint32   *hrProcessorLoad;
@@ -129,7 +129,7 @@ host_resources_mib_free_hrProcessorEntry(hrProcessorEntry_t **hrProcessorEntry);
  */
 
 typedef struct hrNetworkEntry {
-    gint32   *hrDeviceIndex;
+    gint32   hrDeviceIndex;
     gint32   *hrNetworkIfIndex;
 } hrNetworkEntry_t;
 
@@ -144,7 +144,7 @@ host_resources_mib_free_hrNetworkEntry(hrNetworkEntry_t **hrNetworkEntry);
  */
 
 typedef struct hrPrinterEntry {
-    gint32   *hrDeviceIndex;
+    gint32   hrDeviceIndex;
     gint32   *hrPrinterStatus;
     guchar   *hrPrinterDetectedErrorState;
     gsize    _hrPrinterDetectedErrorStateLength;
@@ -161,7 +161,7 @@ host_resources_mib_free_hrPrinterEntry(hrPrinterEntry_t **hrPrinterEntry);
  */
 
 typedef struct hrDiskStorageEntry {
-    gint32   *hrDeviceIndex;
+    gint32   hrDeviceIndex;
     gint32   *hrDiskStorageAccess;
     gint32   *hrDiskStorageMedia;
     gint32   *hrDiskStorageRemoveble;
@@ -179,8 +179,8 @@ host_resources_mib_free_hrDiskStorageEntry(hrDiskStorageEntry_t **hrDiskStorageE
  */
 
 typedef struct hrPartitionEntry {
-    gint32   *hrDeviceIndex;
-    gint32   *hrPartitionIndex;
+    gint32   hrDeviceIndex;
+    gint32   hrPartitionIndex;
     guchar   *hrPartitionLabel;
     gsize    _hrPartitionLabelLength;
     guchar   *hrPartitionID;
@@ -200,7 +200,7 @@ host_resources_mib_free_hrPartitionEntry(hrPartitionEntry_t **hrPartitionEntry);
  */
 
 typedef struct hrFSEntry {
-    gint32   *hrFSIndex;
+    gint32   hrFSIndex;
     guchar   *hrFSMountPoint;
     gsize    _hrFSMountPointLength;
     guchar   *hrFSRemoteMountPoint;
@@ -241,7 +241,7 @@ host_resources_mib_free_hrSWRun(hrSWRun_t *hrSWRun);
  */
 
 typedef struct hrSWRunEntry {
-    gint32   *hrSWRunIndex;
+    gint32   hrSWRunIndex;
     guchar   *hrSWRunName;
     gsize    _hrSWRunNameLength;
     guint32  *hrSWRunID;
@@ -265,7 +265,7 @@ host_resources_mib_free_hrSWRunEntry(hrSWRunEntry_t **hrSWRunEntry);
  */
 
 typedef struct hrSWRunPerfEntry {
-    gint32   *hrSWRunIndex;
+    gint32   hrSWRunIndex;
     gint32   *hrSWRunPerfCPU;
     gint32   *hrSWRunPerfMem;
 } hrSWRunPerfEntry_t;
@@ -296,7 +296,7 @@ host_resources_mib_free_hrSWInstalled(hrSWInstalled_t *hrSWInstalled);
  */
 
 typedef struct hrSWInstalledEntry {
-    gint32   *hrSWInstalledIndex;
+    gint32   hrSWInstalledIndex;
     guchar   *hrSWInstalledName;
     gsize    _hrSWInstalledNameLength;
     guint32  *hrSWInstalledID;

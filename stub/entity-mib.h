@@ -24,7 +24,7 @@ extern stls_table_t entity_mib_enums_entPhysicalIsFRU[];
  */
 
 typedef struct entPhysicalEntry {
-    gint32   *entPhysicalIndex;
+    gint32   entPhysicalIndex;
     guchar   *entPhysicalDescr;
     gsize    _entPhysicalDescrLength;
     guint32  *entPhysicalVendorType;
@@ -64,7 +64,7 @@ entity_mib_free_entPhysicalEntry(entPhysicalEntry_t **entPhysicalEntry);
  */
 
 typedef struct entLogicalEntry {
-    gint32   *entLogicalIndex;
+    gint32   entLogicalIndex;
     guchar   *entLogicalDescr;
     gsize    _entLogicalDescrLength;
     guint32  *entLogicalType;
@@ -92,8 +92,8 @@ entity_mib_free_entLogicalEntry(entLogicalEntry_t **entLogicalEntry);
  */
 
 typedef struct entLPMappingEntry {
-    gint32   *entLogicalIndex;
-    gint32   *entLPPhysicalIndex;
+    gint32   entLogicalIndex;
+    gint32   entLPPhysicalIndex;
 } entLPMappingEntry_t;
 
 extern int
@@ -107,8 +107,8 @@ entity_mib_free_entLPMappingEntry(entLPMappingEntry_t **entLPMappingEntry);
  */
 
 typedef struct entAliasMappingEntry {
-    gint32   *entPhysicalIndex;
-    gint32   *entAliasLogicalIndexOrZero;
+    gint32   entPhysicalIndex;
+    gint32   entAliasLogicalIndexOrZero;
     guint32  *entAliasMappingIdentifier;
     gsize    _entAliasMappingIdentifierLength;
 } entAliasMappingEntry_t;
@@ -124,8 +124,8 @@ entity_mib_free_entAliasMappingEntry(entAliasMappingEntry_t **entAliasMappingEnt
  */
 
 typedef struct entPhysicalContainsEntry {
-    gint32   *entPhysicalIndex;
-    gint32   *entPhysicalChildIndex;
+    gint32   entPhysicalIndex;
+    gint32   entPhysicalChildIndex;
 } entPhysicalContainsEntry_t;
 
 extern int

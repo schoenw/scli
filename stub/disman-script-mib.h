@@ -35,7 +35,7 @@ extern stls_table_t disman_script_mib_enums_smRunState[];
  */
 
 typedef struct smLangEntry {
-    gint32   *smLangIndex;
+    gint32   smLangIndex;
     guint32  *smLangLanguage;
     gsize    _smLangLanguageLength;
     guchar   *smLangVersion;
@@ -59,8 +59,8 @@ disman_script_mib_free_smLangEntry(smLangEntry_t **smLangEntry);
  */
 
 typedef struct smExtsnEntry {
-    gint32   *smLangIndex;
-    gint32   *smExtsnIndex;
+    gint32   smLangIndex;
+    gint32   smExtsnIndex;
     guint32  *smExtsnExtension;
     gsize    _smExtsnExtensionLength;
     guchar   *smExtsnVersion;
@@ -84,9 +84,9 @@ disman_script_mib_free_smExtsnEntry(smExtsnEntry_t **smExtsnEntry);
  */
 
 typedef struct smScriptEntry {
-    guchar   *smScriptOwner;
+    guchar   smScriptOwner[32];
     gsize    _smScriptOwnerLength;
-    guchar   *smScriptName;
+    guchar   smScriptName[128];
     gsize    _smScriptNameLength;
     guchar   *smScriptDescr;
     gsize    _smScriptDescrLength;
@@ -110,11 +110,11 @@ disman_script_mib_free_smScriptEntry(smScriptEntry_t **smScriptEntry);
  */
 
 typedef struct smCodeEntry {
-    guchar   *smScriptOwner;
+    guchar   smScriptOwner[32];
     gsize    _smScriptOwnerLength;
-    guchar   *smScriptName;
+    guchar   smScriptName[128];
     gsize    _smScriptNameLength;
-    guint32  *smCodeIndex;
+    guint32  smCodeIndex;
     guchar   *smCodeText;
     gsize    _smCodeTextLength;
     gint32   *smCodeRowStatus;
@@ -131,9 +131,9 @@ disman_script_mib_free_smCodeEntry(smCodeEntry_t **smCodeEntry);
  */
 
 typedef struct smLaunchEntry {
-    guchar   *smLaunchOwner;
+    guchar   smLaunchOwner[32];
     gsize    _smLaunchOwnerLength;
-    guchar   *smLaunchName;
+    guchar   smLaunchName[32];
     gsize    _smLaunchNameLength;
     guchar   *smLaunchScriptOwner;
     gsize    _smLaunchScriptOwnerLength;
@@ -165,11 +165,11 @@ disman_script_mib_free_smLaunchEntry(smLaunchEntry_t **smLaunchEntry);
  */
 
 typedef struct smRunEntry {
-    guchar   *smLaunchOwner;
+    guchar   smLaunchOwner[32];
     gsize    _smLaunchOwnerLength;
-    guchar   *smLaunchName;
+    guchar   smLaunchName[32];
     gsize    _smLaunchNameLength;
-    gint32   *smRunIndex;
+    gint32   smRunIndex;
     guchar   *smRunArgument;
     gsize    _smRunArgumentLength;
     guchar   *smRunStartTime;

@@ -34,8 +34,8 @@ udp_mib_free_udp(udp_t *udp);
  */
 
 typedef struct udpEntry {
-    guchar   *udpLocalAddress;
-    gint32   *udpLocalPort;
+    guchar   udpLocalAddress[4];
+    gint32   udpLocalPort;
 } udpEntry_t;
 
 extern int

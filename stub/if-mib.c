@@ -370,9 +370,15 @@ assign_ifEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 11) return NULL;
-        ifEntry->ifIndex = (gint32 *) &(vb->id[10]);
-        if (vb->id_len > 11) return NULL;
+        int idx = 10;
+        if (vb->id_len < idx) goto illegal;
+        ifEntry->ifIndex = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal ifEntry instance identifier");
+            g_free(ifEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -615,9 +621,15 @@ assign_ifXEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 12) return NULL;
-        ifXEntry->ifIndex = (gint32 *) &(vb->id[11]);
-        if (vb->id_len > 12) return NULL;
+        int idx = 11;
+        if (vb->id_len < idx) goto illegal;
+        ifXEntry->ifIndex = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal ifXEntry instance identifier");
+            g_free(ifXEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -794,10 +806,17 @@ assign_ifStackEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 12) return NULL;
-        ifStackEntry->ifStackHigherLayer = (gint32 *) &(vb->id[11]);
-        ifStackEntry->ifStackLowerLayer = (gint32 *) &(vb->id[12]);
-        if (vb->id_len > 13) return NULL;
+        int idx = 11;
+        if (vb->id_len < idx) goto illegal;
+        ifStackEntry->ifStackHigherLayer = vb->id[idx++];
+        if (vb->id_len < idx) goto illegal;
+        ifStackEntry->ifStackLowerLayer = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal ifStackEntry instance identifier");
+            g_free(ifStackEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -884,9 +903,15 @@ assign_ifTestEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 12) return NULL;
-        ifTestEntry->ifIndex = (gint32 *) &(vb->id[11]);
-        if (vb->id_len > 12) return NULL;
+        int idx = 11;
+        if (vb->id_len < idx) goto illegal;
+        ifTestEntry->ifIndex = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal ifTestEntry instance identifier");
+            g_free(ifTestEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -996,10 +1021,24 @@ assign_ifRcvAddressEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 12) return NULL;
-        ifRcvAddressEntry->ifIndex = (gint32 *) &(vb->id[11]);
-        /* XXX fix this ifRcvAddressEntry->ifRcvAddressAddress = ?; */
-        if (vb->id_len > 12) return NULL;
+        int idx = 11;
+        if (vb->id_len < idx) goto illegal;
+        ifRcvAddressEntry->ifIndex = vb->id[idx++];
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            ifRcvAddressEntry->_ifRcvAddressAddressLength = vb->id[idx++];
+            if (vb->id_len < idx + ifRcvAddressEntry->_ifRcvAddressAddressLength) goto illegal;
+            for (i = 0; i < ifRcvAddressEntry->_ifRcvAddressAddressLength; i++) {
+                ifRcvAddressEntry->ifRcvAddressAddress[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal ifRcvAddressEntry instance identifier");
+            g_free(ifRcvAddressEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

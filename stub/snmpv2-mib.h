@@ -49,7 +49,7 @@ snmpv2_mib_free_system(system_t *system);
  */
 
 typedef struct sysOREntry {
-    gint32   *sysORIndex;
+    gint32   sysORIndex;
     guint32  *sysORID;
     gsize    _sysORIDLength;
     guchar   *sysORDescr;

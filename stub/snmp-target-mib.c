@@ -150,9 +150,22 @@ assign_snmpTargetAddrEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 12) return NULL;
-        /* XXX fix this snmpTargetAddrEntry->snmpTargetAddrName = ?; */
-        if (vb->id_len > 11) return NULL;
+        int idx = 11;
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            snmpTargetAddrEntry->_snmpTargetAddrNameLength = vb->id[idx++];
+            if (vb->id_len < idx + snmpTargetAddrEntry->_snmpTargetAddrNameLength) goto illegal;
+            for (i = 0; i < snmpTargetAddrEntry->_snmpTargetAddrNameLength; i++) {
+                snmpTargetAddrEntry->snmpTargetAddrName[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal snmpTargetAddrEntry instance identifier");
+            g_free(snmpTargetAddrEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -271,9 +284,22 @@ assign_snmpTargetParamsEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 12) return NULL;
-        /* XXX fix this snmpTargetParamsEntry->snmpTargetParamsName = ?; */
-        if (vb->id_len > 11) return NULL;
+        int idx = 11;
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            snmpTargetParamsEntry->_snmpTargetParamsNameLength = vb->id[idx++];
+            if (vb->id_len < idx + snmpTargetParamsEntry->_snmpTargetParamsNameLength) goto illegal;
+            for (i = 0; i < snmpTargetParamsEntry->_snmpTargetParamsNameLength; i++) {
+                snmpTargetParamsEntry->snmpTargetParamsName[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal snmpTargetParamsEntry instance identifier");
+            g_free(snmpTargetParamsEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

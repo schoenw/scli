@@ -47,7 +47,7 @@ if_mib_free_interfaces(interfaces_t *interfaces);
  */
 
 typedef struct ifEntry {
-    gint32   *ifIndex;
+    gint32   ifIndex;
     guchar   *ifDescr;
     gsize    _ifDescrLength;
     gint32   *ifType;
@@ -100,7 +100,7 @@ if_mib_free_ifMIBObjects(ifMIBObjects_t *ifMIBObjects);
  */
 
 typedef struct ifXEntry {
-    gint32   *ifIndex;
+    gint32   ifIndex;
     guchar   *ifName;
     gsize    _ifNameLength;
     guint32  *ifInMulticastPkts;
@@ -135,8 +135,8 @@ if_mib_free_ifXEntry(ifXEntry_t **ifXEntry);
  */
 
 typedef struct ifStackEntry {
-    gint32   *ifStackHigherLayer;
-    gint32   *ifStackLowerLayer;
+    gint32   ifStackHigherLayer;
+    gint32   ifStackLowerLayer;
     gint32   *ifStackStatus;
 } ifStackEntry_t;
 
@@ -151,7 +151,7 @@ if_mib_free_ifStackEntry(ifStackEntry_t **ifStackEntry);
  */
 
 typedef struct ifTestEntry {
-    gint32   *ifIndex;
+    gint32   ifIndex;
     gint32   *ifTestId;
     gint32   *ifTestStatus;
     guint32  *ifTestType;
@@ -174,8 +174,8 @@ if_mib_free_ifTestEntry(ifTestEntry_t **ifTestEntry);
  */
 
 typedef struct ifRcvAddressEntry {
-    gint32   *ifIndex;
-    guchar   *ifRcvAddressAddress;
+    gint32   ifIndex;
+    guchar   ifRcvAddressAddress[128];
     gsize    _ifRcvAddressAddressLength;
     gint32   *ifRcvAddressStatus;
     gint32   *ifRcvAddressType;

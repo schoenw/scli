@@ -51,11 +51,11 @@ tcp_mib_free_tcp(tcp_t *tcp);
  */
 
 typedef struct tcpConnEntry {
+    guchar   tcpConnLocalAddress[4];
+    gint32   tcpConnLocalPort;
+    guchar   tcpConnRemAddress[4];
+    gint32   tcpConnRemPort;
     gint32   *tcpConnState;
-    guchar   *tcpConnLocalAddress;
-    gint32   *tcpConnLocalPort;
-    guchar   *tcpConnRemAddress;
-    gint32   *tcpConnRemPort;
 } tcpConnEntry_t;
 
 extern int

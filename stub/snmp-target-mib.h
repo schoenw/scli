@@ -43,7 +43,7 @@ snmp_target_mib_free_snmpTargetObjects(snmpTargetObjects_t *snmpTargetObjects);
  */
 
 typedef struct snmpTargetAddrEntry {
-    guchar   *snmpTargetAddrName;
+    guchar   snmpTargetAddrName[32];
     gsize    _snmpTargetAddrNameLength;
     guint32  *snmpTargetAddrTDomain;
     gsize    _snmpTargetAddrTDomainLength;
@@ -70,7 +70,7 @@ snmp_target_mib_free_snmpTargetAddrEntry(snmpTargetAddrEntry_t **snmpTargetAddrE
  */
 
 typedef struct snmpTargetParamsEntry {
-    guchar   *snmpTargetParamsName;
+    guchar   snmpTargetParamsName[32];
     gsize    _snmpTargetParamsNameLength;
     gint32   *snmpTargetParamsMPModel;
     gint32   *snmpTargetParamsSecurityModel;

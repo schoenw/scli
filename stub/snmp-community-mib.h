@@ -24,7 +24,7 @@ extern stls_table_t snmp_community_mib_enums_snmpCommunityStatus[];
  */
 
 typedef struct snmpCommunityEntry {
-    guchar   *snmpCommunityIndex;
+    guchar   snmpCommunityIndex[32];
     gsize    _snmpCommunityIndexLength;
     guchar   *snmpCommunityName;
     gsize    _snmpCommunityNameLength;
@@ -51,7 +51,7 @@ snmp_community_mib_free_snmpCommunityEntry(snmpCommunityEntry_t **snmpCommunityE
  */
 
 typedef struct snmpTargetAddrExtEntry {
-    guchar   *snmpTargetAddrName;
+    guchar   snmpTargetAddrName[32];
     gsize    _snmpTargetAddrNameLength;
     guchar   *snmpTargetAddrTMask;
     gsize    _snmpTargetAddrTMaskLength;

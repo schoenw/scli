@@ -205,10 +205,31 @@ assign_usmUserEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 13) return NULL;
-        /* XXX fix this usmUserEntry->usmUserEngineID = ?; */
-        /* XXX fix this usmUserEntry->usmUserName = ?; */
-        if (vb->id_len > 12) return NULL;
+        int idx = 12;
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            usmUserEntry->_usmUserEngineIDLength = vb->id[idx++];
+            if (vb->id_len < idx + usmUserEntry->_usmUserEngineIDLength) goto illegal;
+            for (i = 0; i < usmUserEntry->_usmUserEngineIDLength; i++) {
+                usmUserEntry->usmUserEngineID[i] = vb->id[idx++];
+            }
+        }
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            usmUserEntry->_usmUserNameLength = vb->id[idx++];
+            if (vb->id_len < idx + usmUserEntry->_usmUserNameLength) goto illegal;
+            for (i = 0; i < usmUserEntry->_usmUserNameLength; i++) {
+                usmUserEntry->usmUserName[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal usmUserEntry instance identifier");
+            g_free(usmUserEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

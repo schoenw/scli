@@ -42,9 +42,9 @@ disman_schedule_mib_free_schedObjects(schedObjects_t *schedObjects);
  */
 
 typedef struct schedEntry {
-    guchar   *schedOwner;
+    guchar   schedOwner[32];
     gsize    _schedOwnerLength;
-    guchar   *schedName;
+    guchar   schedName[32];
     gsize    _schedNameLength;
     guchar   *schedDescr;
     gsize    _schedDescrLength;

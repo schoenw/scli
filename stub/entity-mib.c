@@ -49,9 +49,15 @@ assign_entPhysicalEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 13) return NULL;
-        entPhysicalEntry->entPhysicalIndex = (gint32 *) &(vb->id[12]);
-        if (vb->id_len > 13) return NULL;
+        int idx = 12;
+        if (vb->id_len < idx) goto illegal;
+        entPhysicalEntry->entPhysicalIndex = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal entPhysicalEntry instance identifier");
+            g_free(entPhysicalEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -205,9 +211,15 @@ assign_entLogicalEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 13) return NULL;
-        entLogicalEntry->entLogicalIndex = (gint32 *) &(vb->id[12]);
-        if (vb->id_len > 13) return NULL;
+        int idx = 12;
+        if (vb->id_len < idx) goto illegal;
+        entLogicalEntry->entLogicalIndex = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal entLogicalEntry instance identifier");
+            g_free(entLogicalEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -325,10 +337,17 @@ assign_entLPMappingEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 13) return NULL;
-        entLPMappingEntry->entLogicalIndex = (gint32 *) &(vb->id[12]);
-        entLPMappingEntry->entLPPhysicalIndex = (gint32 *) &(vb->id[13]);
-        if (vb->id_len > 14) return NULL;
+        int idx = 12;
+        if (vb->id_len < idx) goto illegal;
+        entLPMappingEntry->entLogicalIndex = vb->id[idx++];
+        if (vb->id_len < idx) goto illegal;
+        entLPMappingEntry->entLPPhysicalIndex = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal entLPMappingEntry instance identifier");
+            g_free(entLPMappingEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -411,10 +430,17 @@ assign_entAliasMappingEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 13) return NULL;
-        entAliasMappingEntry->entPhysicalIndex = (gint32 *) &(vb->id[12]);
-        entAliasMappingEntry->entAliasLogicalIndexOrZero = (gint32 *) &(vb->id[13]);
-        if (vb->id_len > 14) return NULL;
+        int idx = 12;
+        if (vb->id_len < idx) goto illegal;
+        entAliasMappingEntry->entPhysicalIndex = vb->id[idx++];
+        if (vb->id_len < idx) goto illegal;
+        entAliasMappingEntry->entAliasLogicalIndexOrZero = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal entAliasMappingEntry instance identifier");
+            g_free(entAliasMappingEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -502,10 +528,17 @@ assign_entPhysicalContainsEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 13) return NULL;
-        entPhysicalContainsEntry->entPhysicalIndex = (gint32 *) &(vb->id[12]);
-        entPhysicalContainsEntry->entPhysicalChildIndex = (gint32 *) &(vb->id[13]);
-        if (vb->id_len > 14) return NULL;
+        int idx = 12;
+        if (vb->id_len < idx) goto illegal;
+        entPhysicalContainsEntry->entPhysicalIndex = vb->id[idx++];
+        if (vb->id_len < idx) goto illegal;
+        entPhysicalContainsEntry->entPhysicalChildIndex = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal entPhysicalContainsEntry instance identifier");
+            g_free(entPhysicalContainsEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

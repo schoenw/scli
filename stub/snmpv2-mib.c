@@ -136,9 +136,15 @@ assign_sysOREntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 11) return NULL;
-        sysOREntry->sysORIndex = (gint32 *) &(vb->id[10]);
-        if (vb->id_len > 11) return NULL;
+        int idx = 10;
+        if (vb->id_len < idx) goto illegal;
+        sysOREntry->sysORIndex = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal sysOREntry instance identifier");
+            g_free(sysOREntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

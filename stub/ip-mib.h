@@ -57,7 +57,7 @@ ip_mib_free_ip(ip_t *ip);
  */
 
 typedef struct ipAddrEntry {
-    guchar   *ipAdEntAddr;
+    guchar   ipAdEntAddr[4];
     gint32   *ipAdEntIfIndex;
     guchar   *ipAdEntNetMask;
     gint32   *ipAdEntBcastAddr;
@@ -75,10 +75,10 @@ ip_mib_free_ipAddrEntry(ipAddrEntry_t **ipAddrEntry);
  */
 
 typedef struct ipNetToMediaEntry {
-    gint32   *ipNetToMediaIfIndex;
+    gint32   ipNetToMediaIfIndex;
+    guchar   ipNetToMediaNetAddress[4];
     guchar   *ipNetToMediaPhysAddress;
     gsize    _ipNetToMediaPhysAddressLength;
-    guchar   *ipNetToMediaNetAddress;
     gint32   *ipNetToMediaType;
 } ipNetToMediaEntry_t;
 

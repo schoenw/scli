@@ -173,12 +173,31 @@ assign_tcpConnEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 11) return NULL;
-        /* XXX fix this tcpConnEntry->tcpConnLocalAddress = ?; */
-        tcpConnEntry->tcpConnLocalPort = (gint32 *) &(vb->id[10]);
-        /* XXX fix this tcpConnEntry->tcpConnRemAddress = ?; */
-        tcpConnEntry->tcpConnRemPort = (gint32 *) &(vb->id[11]);
-        if (vb->id_len > 12) return NULL;
+        int idx = 10;
+        if (vb->id_len < idx + 4) goto illegal;
+        {
+            int i;
+            for (i = 0; i < 4; i++) {
+                tcpConnEntry->tcpConnLocalAddress[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len < idx) goto illegal;
+        tcpConnEntry->tcpConnLocalPort = vb->id[idx++];
+        if (vb->id_len < idx + 4) goto illegal;
+        {
+            int i;
+            for (i = 0; i < 4; i++) {
+                tcpConnEntry->tcpConnRemAddress[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len < idx) goto illegal;
+        tcpConnEntry->tcpConnRemPort = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal tcpConnEntry instance identifier");
+            g_free(tcpConnEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

@@ -57,9 +57,9 @@ snmp_user_based_sm_mib_free_usmUser(usmUser_t *usmUser);
  */
 
 typedef struct usmUserEntry {
-    guchar   *usmUserEngineID;
+    guchar   usmUserEngineID[32];
     gsize    _usmUserEngineIDLength;
-    guchar   *usmUserName;
+    guchar   usmUserName[32];
     gsize    _usmUserNameLength;
     guchar   *usmUserSecurityName;
     gsize    _usmUserSecurityNameLength;

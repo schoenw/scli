@@ -47,9 +47,22 @@ assign_snmpCommunityEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 12) return NULL;
-        /* XXX fix this snmpCommunityEntry->snmpCommunityIndex = ?; */
-        if (vb->id_len > 11) return NULL;
+        int idx = 11;
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            snmpCommunityEntry->_snmpCommunityIndexLength = vb->id[idx++];
+            if (vb->id_len < idx + snmpCommunityEntry->_snmpCommunityIndexLength) goto illegal;
+            for (i = 0; i < snmpCommunityEntry->_snmpCommunityIndexLength; i++) {
+                snmpCommunityEntry->snmpCommunityIndex[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal snmpCommunityEntry instance identifier");
+            g_free(snmpCommunityEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -165,9 +178,22 @@ assign_snmpTargetAddrExtEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 12) return NULL;
-        /* XXX fix this snmpTargetAddrExtEntry->snmpTargetAddrName = ?; */
-        if (vb->id_len > 11) return NULL;
+        int idx = 11;
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            snmpTargetAddrExtEntry->_snmpTargetAddrNameLength = vb->id[idx++];
+            if (vb->id_len < idx + snmpTargetAddrExtEntry->_snmpTargetAddrNameLength) goto illegal;
+            for (i = 0; i < snmpTargetAddrExtEntry->_snmpTargetAddrNameLength; i++) {
+                snmpTargetAddrExtEntry->snmpTargetAddrName[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal snmpTargetAddrExtEntry instance identifier");
+            g_free(snmpTargetAddrExtEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

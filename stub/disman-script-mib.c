@@ -153,9 +153,15 @@ assign_smLangEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 12) return NULL;
-        smLangEntry->smLangIndex = (gint32 *) &(vb->id[11]);
-        if (vb->id_len > 12) return NULL;
+        int idx = 11;
+        if (vb->id_len < idx) goto illegal;
+        smLangEntry->smLangIndex = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal smLangEntry instance identifier");
+            g_free(smLangEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -263,10 +269,17 @@ assign_smExtsnEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 12) return NULL;
-        smExtsnEntry->smLangIndex = (gint32 *) &(vb->id[11]);
-        smExtsnEntry->smExtsnIndex = (gint32 *) &(vb->id[12]);
-        if (vb->id_len > 13) return NULL;
+        int idx = 11;
+        if (vb->id_len < idx) goto illegal;
+        smExtsnEntry->smLangIndex = vb->id[idx++];
+        if (vb->id_len < idx) goto illegal;
+        smExtsnEntry->smExtsnIndex = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal smExtsnEntry instance identifier");
+            g_free(smExtsnEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -374,10 +387,31 @@ assign_smScriptEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 13) return NULL;
-        /* XXX fix this smScriptEntry->smScriptOwner = ?; */
-        /* XXX fix this smScriptEntry->smScriptName = ?; */
-        if (vb->id_len > 12) return NULL;
+        int idx = 12;
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            smScriptEntry->_smScriptOwnerLength = vb->id[idx++];
+            if (vb->id_len < idx + smScriptEntry->_smScriptOwnerLength) goto illegal;
+            for (i = 0; i < smScriptEntry->_smScriptOwnerLength; i++) {
+                smScriptEntry->smScriptOwner[i] = vb->id[idx++];
+            }
+        }
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            smScriptEntry->_smScriptNameLength = vb->id[idx++];
+            if (vb->id_len < idx + smScriptEntry->_smScriptNameLength) goto illegal;
+            for (i = 0; i < smScriptEntry->_smScriptNameLength; i++) {
+                smScriptEntry->smScriptName[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal smScriptEntry instance identifier");
+            g_free(smScriptEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -490,11 +524,33 @@ assign_smCodeEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 13) return NULL;
-        /* XXX fix this smCodeEntry->smScriptOwner = ?; */
-        /* XXX fix this smCodeEntry->smScriptName = ?; */
-        smCodeEntry->smCodeIndex = &(vb->id[12]);
-        if (vb->id_len > 13) return NULL;
+        int idx = 12;
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            smCodeEntry->_smScriptOwnerLength = vb->id[idx++];
+            if (vb->id_len < idx + smCodeEntry->_smScriptOwnerLength) goto illegal;
+            for (i = 0; i < smCodeEntry->_smScriptOwnerLength; i++) {
+                smCodeEntry->smScriptOwner[i] = vb->id[idx++];
+            }
+        }
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            smCodeEntry->_smScriptNameLength = vb->id[idx++];
+            if (vb->id_len < idx + smCodeEntry->_smScriptNameLength) goto illegal;
+            for (i = 0; i < smCodeEntry->_smScriptNameLength; i++) {
+                smCodeEntry->smScriptName[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len < idx) goto illegal;
+        smCodeEntry->smCodeIndex = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal smCodeEntry instance identifier");
+            g_free(smCodeEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -586,10 +642,31 @@ assign_smLaunchEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 13) return NULL;
-        /* XXX fix this smLaunchEntry->smLaunchOwner = ?; */
-        /* XXX fix this smLaunchEntry->smLaunchName = ?; */
-        if (vb->id_len > 12) return NULL;
+        int idx = 12;
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            smLaunchEntry->_smLaunchOwnerLength = vb->id[idx++];
+            if (vb->id_len < idx + smLaunchEntry->_smLaunchOwnerLength) goto illegal;
+            for (i = 0; i < smLaunchEntry->_smLaunchOwnerLength; i++) {
+                smLaunchEntry->smLaunchOwner[i] = vb->id[idx++];
+            }
+        }
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            smLaunchEntry->_smLaunchNameLength = vb->id[idx++];
+            if (vb->id_len < idx + smLaunchEntry->_smLaunchNameLength) goto illegal;
+            for (i = 0; i < smLaunchEntry->_smLaunchNameLength; i++) {
+                smLaunchEntry->smLaunchName[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal smLaunchEntry instance identifier");
+            g_free(smLaunchEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -731,11 +808,33 @@ assign_smRunEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 13) return NULL;
-        /* XXX fix this smRunEntry->smLaunchOwner = ?; */
-        /* XXX fix this smRunEntry->smLaunchName = ?; */
-        smRunEntry->smRunIndex = (gint32 *) &(vb->id[12]);
-        if (vb->id_len > 13) return NULL;
+        int idx = 12;
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            smRunEntry->_smLaunchOwnerLength = vb->id[idx++];
+            if (vb->id_len < idx + smRunEntry->_smLaunchOwnerLength) goto illegal;
+            for (i = 0; i < smRunEntry->_smLaunchOwnerLength; i++) {
+                smRunEntry->smLaunchOwner[i] = vb->id[idx++];
+            }
+        }
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            smRunEntry->_smLaunchNameLength = vb->id[idx++];
+            if (vb->id_len < idx + smRunEntry->_smLaunchNameLength) goto illegal;
+            for (i = 0; i < smRunEntry->_smLaunchNameLength; i++) {
+                smRunEntry->smLaunchName[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len < idx) goto illegal;
+        smRunEntry->smRunIndex = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal smRunEntry instance identifier");
+            g_free(smRunEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

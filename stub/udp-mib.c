@@ -108,10 +108,22 @@ assign_udpEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 11) return NULL;
-        /* XXX fix this udpEntry->udpLocalAddress = ?; */
-        udpEntry->udpLocalPort = (gint32 *) &(vb->id[10]);
-        if (vb->id_len > 11) return NULL;
+        int idx = 10;
+        if (vb->id_len < idx + 4) goto illegal;
+        {
+            int i;
+            for (i = 0; i < 4; i++) {
+                udpEntry->udpLocalAddress[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len < idx) goto illegal;
+        udpEntry->udpLocalPort = vb->id[idx++];
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal udpEntry instance identifier");
+            g_free(udpEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {

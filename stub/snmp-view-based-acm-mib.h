@@ -31,7 +31,7 @@ extern stls_table_t snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStatus[];
  */
 
 typedef struct vacmContextEntry {
-    guchar   *vacmContextName;
+    guchar   vacmContextName[32];
     gsize    _vacmContextNameLength;
 } vacmContextEntry_t;
 
@@ -46,8 +46,8 @@ snmp_view_based_acm_mib_free_vacmContextEntry(vacmContextEntry_t **vacmContextEn
  */
 
 typedef struct vacmSecurityToGroupEntry {
-    gint32   *vacmSecurityModel;
-    guchar   *vacmSecurityName;
+    gint32   vacmSecurityModel;
+    guchar   vacmSecurityName[32];
     gsize    _vacmSecurityNameLength;
     guchar   *vacmGroupName;
     gsize    _vacmGroupNameLength;
@@ -66,12 +66,12 @@ snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(vacmSecurityToGroupEntry_t
  */
 
 typedef struct vacmAccessEntry {
-    guchar   *vacmGroupName;
+    guchar   vacmGroupName[32];
     gsize    _vacmGroupNameLength;
-    guchar   *vacmAccessContextPrefix;
+    guchar   vacmAccessContextPrefix[32];
     gsize    _vacmAccessContextPrefixLength;
-    gint32   *vacmAccessSecurityModel;
-    gint32   *vacmAccessSecurityLevel;
+    gint32   vacmAccessSecurityModel;
+    gint32   vacmAccessSecurityLevel;
     gint32   *vacmAccessContextMatch;
     guchar   *vacmAccessReadViewName;
     gsize    _vacmAccessReadViewNameLength;
@@ -108,9 +108,9 @@ snmp_view_based_acm_mib_free_vacmMIBViews(vacmMIBViews_t *vacmMIBViews);
  */
 
 typedef struct vacmViewTreeFamilyEntry {
-    guchar   *vacmViewTreeFamilyViewName;
+    guchar   vacmViewTreeFamilyViewName[32];
     gsize    _vacmViewTreeFamilyViewNameLength;
-    guint32  *vacmViewTreeFamilySubtree;
+    guint32  vacmViewTreeFamilySubtree[128];
     gsize    _vacmViewTreeFamilySubtreeLength;
     guchar   *vacmViewTreeFamilyMask;
     gsize    _vacmViewTreeFamilyMaskLength;

@@ -160,10 +160,31 @@ assign_schedEntry(GSList *vbl)
 
     {
         GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
-        if (vb->id_len < 12) return NULL;
-        /* XXX fix this schedEntry->schedOwner = ?; */
-        /* XXX fix this schedEntry->schedName = ?; */
-        if (vb->id_len > 11) return NULL;
+        int idx = 11;
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            schedEntry->_schedOwnerLength = vb->id[idx++];
+            if (vb->id_len < idx + schedEntry->_schedOwnerLength) goto illegal;
+            for (i = 0; i < schedEntry->_schedOwnerLength; i++) {
+                schedEntry->schedOwner[i] = vb->id[idx++];
+            }
+        }
+        {
+            int i;
+            if (vb->id_len < idx) goto illegal;
+            schedEntry->_schedNameLength = vb->id[idx++];
+            if (vb->id_len < idx + schedEntry->_schedNameLength) goto illegal;
+            for (i = 0; i < schedEntry->_schedNameLength; i++) {
+                schedEntry->schedName[i] = vb->id[idx++];
+            }
+        }
+        if (vb->id_len > idx) { 
+        illegal:
+            g_warning("illegal schedEntry instance identifier");
+            g_free(schedEntry);
+            return NULL;
+        }
     }
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
