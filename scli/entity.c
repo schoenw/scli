@@ -37,6 +37,46 @@ fmt_string(GString *s, char *label, int width, guchar *string, gsize len)
 }
 
 
+static void
+show_entities(GString *s, entPhysicalEntry_t **entPhysicalEntry,
+	      gint32 parent, int indent, char *prefix)
+{
+    int i;
+
+    if (! entPhysicalEntry) {
+	return;
+    }
+    
+    for (i = 0; entPhysicalEntry[i]; i++) {
+	if (entPhysicalEntry[i]->entPhysicalContainedIn
+	    && *(entPhysicalEntry[i]->entPhysicalContainedIn) == parent) {
+	    if (entPhysicalEntry[i]->entPhysicalIndex) {
+		g_string_sprintfa(s, "%3d:",
+				  *(entPhysicalEntry[i]->entPhysicalIndex));
+	    }
+	    fmt_string(s, "", indent,
+		       entPhysicalEntry[i]->entPhysicalDescr,
+		       entPhysicalEntry[i]->_entPhysicalDescrLength);
+	    g_string_append(s, "\n");
+	    if (entPhysicalEntry[i]->entPhysicalIndex) {
+		char *new_prefix = NULL;
+#if 1
+		new_prefix = g_malloc(strlen(prefix) + 4);
+		strcpy(new_prefix, prefix);
+		strcat(new_prefix, "+-");
+#endif
+		show_entities(s, entPhysicalEntry,
+			      *(entPhysicalEntry[i]->entPhysicalIndex),
+			      indent + 4, new_prefix);
+#if 1
+		g_free(new_prefix);
+#endif
+	    }
+	}
+    }
+}
+
+
 static int
 cmd_entities(scli_interp_t *interp, int argc, char **argv)
 {
@@ -59,6 +99,10 @@ cmd_entities(scli_interp_t *interp, int argc, char **argv)
     s = interp->result;
     if (entPhysicalEntry) {
 	for (i = 0; entPhysicalEntry[i]; i++) {
+	    if (entPhysicalEntry[i]->entPhysicalIndex) {
+		g_string_sprintfa(s, "%3d:",
+				  *(entPhysicalEntry[i]->entPhysicalIndex));
+	    }
 	    fmt_string(s, "\nName:", indent,
 		       entPhysicalEntry[i]->entPhysicalName,
 		       entPhysicalEntry[i]->_entPhysicalNameLength);
@@ -86,6 +130,7 @@ cmd_entities(scli_interp_t *interp, int argc, char **argv)
 
 	    g_string_append(s, "\n");
 	}
+	show_entities(s, entPhysicalEntry, 0, 0, "");
 	entity_mib_free_entPhysicalEntry(entPhysicalEntry);
     }
     
