@@ -149,6 +149,30 @@ fmt_isdn_bearer(GString *s, isdn_mib_isdnBearerEntry_t *bearerEntry)
 			  *bearerEntry->isdnBearerCallConnectTime ? e : "");
     }
 
+    if (bearerEntry->isdnBearerPeerAddress) {
+	g_string_sprintfa(s, "%-*s %*s\n", indent, "Peer Address:",
+			  bearerEntry->_isdnBearerPeerAddressLength,
+			  bearerEntry->isdnBearerPeerAddress);
+    }
+
+    if (bearerEntry->isdnBearerPeerSubAddress) {
+	g_string_sprintfa(s, "%-*s %*s\n", indent, "Peer SubAddress:",
+			  bearerEntry->_isdnBearerPeerSubAddressLength,
+			  bearerEntry->isdnBearerPeerSubAddress);
+    }
+
+    e = fmt_enum(isdn_mib_enums_isdnBearerCallOrigin,
+		 bearerEntry->isdnBearerCallOrigin);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Call Origin:", e);
+    }
+
+    e = fmt_enum(isdn_mib_enums_isdnBearerInfoType,
+		 bearerEntry->isdnBearerInfoType);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Transfer Capability:", e);
+    }
+
     if (bearerEntry->isdnBearerChargedUnits) {
 	g_string_sprintfa(s, "%-*s %u\n", indent, "Charged Units:",
 			  *bearerEntry->isdnBearerChargedUnits);
@@ -195,6 +219,114 @@ show_isdn_bearer(scli_interp_t * interp, int argc, char **argv)
 
 
 
+static void
+fmt_isdn_endpoint(GString *s, isdn_mib_isdnEndpointEntry_t *endpointEntry)
+{
+    int const indent = 18;
+    const char *e;
+
+    if (endpointEntry->isdnEndpointIfIndex) {
+	g_string_sprintfa(s, "%-*s %d\n", indent, "Interface:",
+			  endpointEntry->isdnEndpointIfIndex);
+    }
+
+#if 0
+
+    e = fmt_enum(isdn_mib_enums_isdnBearerChannelType,
+		 bearerEntry->isdnBearerChannelType);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Channel Type:", e);
+    }
+
+    e = fmt_enum(isdn_mib_enums_isdnBearerOperStatus,
+		 bearerEntry->isdnBearerOperStatus);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Call Status:", e);
+    }
+
+    if (bearerEntry->isdnBearerCallSetupTime) {
+	e = fmt_timeticks(*bearerEntry->isdnBearerCallSetupTime);
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Call Setup:",
+			  *bearerEntry->isdnBearerCallConnectTime ? e : "");
+    }
+
+    if (bearerEntry->isdnBearerCallConnectTime) {
+	e = fmt_timeticks(*bearerEntry->isdnBearerCallConnectTime);
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Call Connect:",
+			  *bearerEntry->isdnBearerCallConnectTime ? e : "");
+    }
+
+    if (bearerEntry->isdnBearerPeerAddress) {
+	g_string_sprintfa(s, "%-*s %*s\n", indent, "Peer Address:",
+			  bearerEntry->_isdnBearerPeerAddressLength,
+			  bearerEntry->isdnBearerPeerAddress);
+    }
+
+    if (bearerEntry->isdnBearerPeerSubAddress) {
+	g_string_sprintfa(s, "%-*s %*s\n", indent, "Peer SubAddress:",
+			  bearerEntry->_isdnBearerPeerSubAddressLength,
+			  bearerEntry->isdnBearerPeerSubAddress);
+    }
+
+    e = fmt_enum(isdn_mib_enums_isdnBearerCallOrigin,
+		 bearerEntry->isdnBearerCallOrigin);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Call Origin:", e);
+    }
+
+    e = fmt_enum(isdn_mib_enums_isdnBearerInfoType,
+		 bearerEntry->isdnBearerInfoType);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Transfer Capability:", e);
+    }
+
+    if (bearerEntry->isdnBearerChargedUnits) {
+	g_string_sprintfa(s, "%-*s %u\n", indent, "Charged Units:",
+			  *bearerEntry->isdnBearerChargedUnits);
+    }
+#endif
+}
+
+
+
+static int
+show_isdn_endpoints(scli_interp_t * interp, int argc, char **argv)
+{
+    isdn_mib_isdnEndpointEntry_t **endpointTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    isdn_mib_get_isdnEndpointTable(interp->peer, &endpointTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (endpointTable) {
+	for (i = 0; endpointTable[i]; i++) {
+	    if (i) {
+		g_string_append(interp->result, "\n");
+	    }
+	    fmt_isdn_endpoint(interp->result, endpointTable[i]);
+	}
+    }
+    
+    if (endpointTable)
+	isdn_mib_free_isdnEndpointTable(endpointTable);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_isdn_mode(scli_interp_t * interp)
 {
@@ -221,6 +353,13 @@ scli_init_isdn_mode(scli_interp_t * interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_isdn_bearer },
+
+	{ "show isdn endpoints", NULL,
+	  "The `show isdn endpoints' command shows information about\n"
+	  "the ISDN endpoints.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_isdn_endpoints },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
