@@ -26,6 +26,18 @@
 
 - Generally check strings for printable characters and trim white spaces.
 
+- Should TCP connections be sorted by connection state?
+
+- Should process lists be sorted by CPU usage?
+
+- What about sorting interface stats by number? Might be confusing if
+  things jump up and down.
+
+- Need to complete the printer mode.
+
+- Need to complete the ospf mode.
+
+- Need to add documentation and error reports on command options.
 
 ==== GXSNMP specific things ====
 
