@@ -401,7 +401,9 @@ fmt_bridge_stp_port(GString *s,
 		  dot1dStpPortEntry->dot1dStpPortState);
 
     if (dot1dStpPortEntry->dot1dStpPortPathCost) {
-	g_string_sprintfa(s, "%5u ", *dot1dStpPortEntry->dot1dStpPortPathCost);
+	g_string_sprintfa(s, "%6u  ", *dot1dStpPortEntry->dot1dStpPortPathCost);
+    } else {
+	g_string_sprintfa(s, "%6s  ", "");
     }
 
     if (dot1dStpPortEntry->dot1dStpPortDesignatedRoot) {
