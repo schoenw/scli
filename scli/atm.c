@@ -72,8 +72,13 @@ fmt_atm_interface_info(GString *s,
     }
 
     if (atmIfaceConfEntry->atmInterfaceMaxVccs) {
-	g_string_sprintfa(s, "%6d ",
+	g_string_sprintfa(s, "%6d  ",
 			  *atmIfaceConfEntry->atmInterfaceMaxVccs);
+    }
+
+    if (ifEntry && ifEntry->ifDescr && ifEntry->_ifDescrLength) {
+	g_string_sprintfa(s, "%.*s",
+			  (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);
     }
 
     g_string_append(s, "\n");
@@ -142,8 +147,7 @@ show_atm_interface_info(scli_interp_t *interp, int argc, char **argv)
 static void
 xml_atm_interface_details(xmlNodePtr root,
 			  atm_mib_atmInterfaceConfEntry_t *atmIfaceConfEntry,
-			  if_mib_ifEntry_t *ifEntry,
-			  if_mib_ifXEntry_t *ifXEntry)
+			  if_mib_ifEntry_t *ifEntry)
 {
     xmlNodePtr tree;
 
@@ -176,8 +180,7 @@ xml_atm_interface_details(xmlNodePtr root,
 static void
 fmt_atm_interface_details(GString *s,
 			  atm_mib_atmInterfaceConfEntry_t *atmIfaceConfEntry,
-			  if_mib_ifEntry_t *ifEntry,
-			  if_mib_ifXEntry_t *ifXEntry)
+			  if_mib_ifEntry_t *ifEntry)
 {
     const int indent = 18;
     
@@ -222,7 +225,11 @@ fmt_atm_interface_details(GString *s,
 			  *atmIfaceConfEntry->atmInterfaceIlmiVci);
     }
 
-    g_string_append(s, "\n");
+    if (ifEntry->ifDescr && ifEntry->_ifDescrLength) {
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Description:",
+			  (int) ifEntry->_ifDescrLength,
+			  ifEntry->ifDescr);
+    }
 }
 
 
@@ -233,7 +240,7 @@ show_atm_interface_details(scli_interp_t *interp, int argc, char **argv)
     atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfTable = NULL;
     if_mib_ifEntry_t *ifEntry = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
-    int i;
+    int i, c;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -260,7 +267,7 @@ show_atm_interface_details(scli_interp_t *interp, int argc, char **argv)
     }
     
     if (atmInterfaceConfTable) {
-	for (i = 0; atmInterfaceConfTable[i]; i++) {
+	for (i = 0, c= 0; atmInterfaceConfTable[i]; i++) {
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
 			       atmInterfaceConfTable[i]->ifIndex,
 			       IF_MIB_IFDESCR);
@@ -269,12 +276,16 @@ show_atm_interface_details(scli_interp_t *interp, int argc, char **argv)
 		if (scli_interp_xml(interp)) {
 		    xml_atm_interface_details(interp->xml_node,
 					      atmInterfaceConfTable[i],
-					      NULL, NULL);
+					      ifEntry);
 		} else {
+		    if (c) {
+			g_string_append(interp->result, "\n");
+		    }
 		    fmt_atm_interface_details(interp->result,
 					      atmInterfaceConfTable[i],
-					      NULL, NULL);
+					      ifEntry);
 		}
+		c++;
 	    }
 	    if_mib_free_ifEntry(ifEntry);
 	}
