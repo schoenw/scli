@@ -37,9 +37,9 @@ GSnmpEnum const snmp_community_mib_enums_snmpCommunityStatus[] = {
 };
 
 
-static guint16 snmpCommunitySecurityName_constraints[] = {1, 32, 0, 255, 0, 0};
+static guint16 snmpCommunitySecurityName_constraints[] = {1, 32, 0, 0};
 static guint16 snmpCommunityContextEngineID_constraints[] = {5, 32, 0, 0};
-static guint16 snmpCommunityContextName_constraints[] = {0, 32, 0, 255, 0, 0};
+static guint16 snmpCommunityContextName_constraints[] = {0, 32, 0, 0};
 static guint16 snmpCommunityTransportTag_constraints[] = {0, 255, 0, 0};
 static guint16 snmpTargetAddrTMask_constraints[] = {0, 255, 0, 0};
 static guint32 snmpTargetAddrMMS_constraints[] = {0L, 0L, 484L, 2147483647L, 0, 0};

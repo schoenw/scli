@@ -165,11 +165,11 @@ GSnmpEnum const disman_script_mib_enums_smRunState[] = {
 };
 
 
-static guint16 smLangVersion_constraints[] = {0, 32, 0, 255, 0, 0};
-static guint16 smLangRevision_constraints[] = {0, 32, 0, 255, 0, 0};
+static guint16 smLangVersion_constraints[] = {0, 32, 0, 0};
+static guint16 smLangRevision_constraints[] = {0, 32, 0, 0};
 static guint16 smLangDescr_constraints[] = {0, 255, 0, 0};
-static guint16 smExtsnVersion_constraints[] = {0, 32, 0, 255, 0, 0};
-static guint16 smExtsnRevision_constraints[] = {0, 32, 0, 255, 0, 0};
+static guint16 smExtsnVersion_constraints[] = {0, 32, 0, 0};
+static guint16 smExtsnRevision_constraints[] = {0, 32, 0, 0};
 static guint16 smExtsnDescr_constraints[] = {0, 255, 0, 0};
 static guint16 smScriptDescr_constraints[] = {0, 255, 0, 0};
 static guint32 smScriptLanguage_constraints[] = {0L, 2147483647L, 0, 0};
@@ -177,8 +177,8 @@ static guint16 smScriptSource_constraints[] = {0, 255, 0, 0};
 static guint16 smScriptError_constraints[] = {0, 255, 0, 0};
 static guint16 smScriptLastChange_constraints[] = {8, 8, 11, 11, 0, 0};
 static guint16 smCodeText_constraints[] = {1, 1024, 0, 0};
-static guint16 smLaunchScriptOwner_constraints[] = {0, 32, 0, 255, 0, 0};
-static guint16 smLaunchScriptName_constraints[] = {0, 32, 0, 255, 0, 0};
+static guint16 smLaunchScriptOwner_constraints[] = {0, 32, 0, 0};
+static guint16 smLaunchScriptName_constraints[] = {0, 32, 0, 0};
 static guint32 smLaunchMaxRunning_constraints[] = {1UL, 4294967295UL, 0, 0};
 static guint32 smLaunchMaxCompleted_constraints[] = {1UL, 4294967295UL, 0, 0};
 static guint32 smLaunchLifeTime_constraints[] = {0L, 2147483647L, 0, 0};

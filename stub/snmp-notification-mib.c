@@ -91,7 +91,7 @@ GSnmpEnum const snmp_notification_mib_enums_snmpNotifyFilterRowStatus[] = {
 
 
 static guint16 snmpNotifyTag_constraints[] = {0, 255, 0, 0};
-static guint16 snmpNotifyFilterProfileName_constraints[] = {1, 32, 0, 255, 0, 0};
+static guint16 snmpNotifyFilterProfileName_constraints[] = {1, 32, 0, 0};
 static guint16 snmpNotifyFilterMask_constraints[] = {0, 16, 0, 0};
 
 

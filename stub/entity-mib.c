@@ -49,11 +49,11 @@ static guint16 entPhysicalName_constraints[] = {0, 255, 0, 0};
 static guint16 entPhysicalHardwareRev_constraints[] = {0, 255, 0, 0};
 static guint16 entPhysicalFirmwareRev_constraints[] = {0, 255, 0, 0};
 static guint16 entPhysicalSoftwareRev_constraints[] = {0, 255, 0, 0};
-static guint16 entPhysicalSerialNum_constraints[] = {0, 32, 0, 255, 0, 0};
+static guint16 entPhysicalSerialNum_constraints[] = {0, 32, 0, 0};
 static guint16 entPhysicalMfgName_constraints[] = {0, 255, 0, 0};
 static guint16 entPhysicalModelName_constraints[] = {0, 255, 0, 0};
-static guint16 entPhysicalAlias_constraints[] = {0, 32, 0, 255, 0, 0};
-static guint16 entPhysicalAssetID_constraints[] = {0, 32, 0, 255, 0, 0};
+static guint16 entPhysicalAlias_constraints[] = {0, 32, 0, 0};
+static guint16 entPhysicalAssetID_constraints[] = {0, 32, 0, 0};
 static guint16 entLogicalDescr_constraints[] = {0, 255, 0, 0};
 static guint16 entLogicalCommunity_constraints[] = {0, 255, 0, 0};
 static guint16 entLogicalTAddress_constraints[] = {1, 255, 0, 0};
@@ -213,7 +213,7 @@ static GSnmpAttribute entLPMappingEntry_attr[] = {
     { 1, G_SNMP_INTEGER32,
       ENTITY_MIB_ENTLPPHYSICALINDEX, "entLPPhysicalIndex",
        entLPPhysicalIndex_constraints,
-      G_STRUCT_OFFSET(entity_mib_entLPMappingEntry_t, entLPPhysicalIndex),
+      -1,
       0,
       0 },
     { 0, 0, 0, NULL }
@@ -237,7 +237,7 @@ static GSnmpAttribute entPhysicalContainsEntry_attr[] = {
     { 1, G_SNMP_INTEGER32,
       ENTITY_MIB_ENTPHYSICALCHILDINDEX, "entPhysicalChildIndex",
        entPhysicalChildIndex_constraints,
-      G_STRUCT_OFFSET(entity_mib_entPhysicalContainsEntry_t, entPhysicalChildIndex),
+      -1,
       0,
       0 },
     { 0, 0, 0, NULL }

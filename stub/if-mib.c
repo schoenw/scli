@@ -300,7 +300,7 @@ GSnmpEnum const if_mib_enums_ifRcvAddressType[] = {
 
 static guint16 ifDescr_constraints[] = {0, 255, 0, 0};
 static guint16 ifName_constraints[] = {0, 255, 0, 0};
-static guint16 ifAlias_constraints[] = {0, 64, 0, 255, 0, 0};
+static guint16 ifAlias_constraints[] = {0, 64, 0, 0};
 static guint32 ifTestId_constraints[] = {0L, 2147483647L, 0, 0};
 static guint16 ifTestOwner_constraints[] = {0, 255, 0, 0};
 

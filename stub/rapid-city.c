@@ -123,7 +123,7 @@ GSnmpEnum const rapid_city_enums_rcVlanPortPerformTagging[] = {
 };
 
 
-static guint16 rcVlanName_constraints[] = {0, 20, 0, 255, 0, 0};
+static guint16 rcVlanName_constraints[] = {0, 20, 0, 0};
 static guint32 rcVlanColor_constraints[] = {0L, 32L, 0, 0};
 static guint32 rcVlanStgId_constraints[] = {0L, 128L, 0, 0};
 static guint16 rcVlanPortMembers_constraints[] = {32, 32, 0, 0};

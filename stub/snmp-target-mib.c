@@ -70,9 +70,9 @@ static guint16 snmpTargetAddrTAddress_constraints[] = {1, 255, 0, 0};
 static guint32 snmpTargetAddrTimeout_constraints[] = {0L, 2147483647L, 0, 0};
 static guint32 snmpTargetAddrRetryCount_constraints[] = {0L, 255L, 0, 0};
 static guint16 snmpTargetAddrTagList_constraints[] = {0, 255, 0, 0};
-static guint16 snmpTargetAddrParams_constraints[] = {1, 32, 0, 255, 0, 0};
+static guint16 snmpTargetAddrParams_constraints[] = {1, 32, 0, 0};
 static guint32 snmpTargetParamsMPModel_constraints[] = {0L, 2147483647L, 0, 0};
-static guint32 snmpTargetParamsSecurityModel_constraints[] = {1L, 2147483647L, 0L, 2147483647L, 0, 0};
+static guint32 snmpTargetParamsSecurityModel_constraints[] = {1L, 2147483647L, 0, 0};
 static guint16 snmpTargetParamsSecurityName_constraints[] = {0, 255, 0, 0};
 
 

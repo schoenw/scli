@@ -89,9 +89,9 @@ GSnmpEnum const disman_schedule_mib_enums_schedRowStatus[] = {
 };
 
 
-static guint16 schedLocalTime_constraints[] = {11, 11, 8, 8, 11, 11, 0, 0};
+static guint16 schedLocalTime_constraints[] = {11, 11, 0, 0};
 static guint16 schedDescr_constraints[] = {0, 255, 0, 0};
-static guint16 schedContextName_constraints[] = {0, 32, 0, 255, 0, 0};
+static guint16 schedContextName_constraints[] = {0, 32, 0, 0};
 static guint16 schedLastFailed_constraints[] = {8, 8, 11, 11, 0, 0};
 
 

@@ -95,11 +95,11 @@ GSnmpEnum const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStatus[] = {
 };
 
 
-static guint16 vacmContextName_constraints[] = {0, 32, 0, 255, 0, 0};
-static guint16 vacmGroupName_constraints[] = {1, 32, 0, 255, 0, 0};
-static guint16 vacmAccessReadViewName_constraints[] = {0, 32, 0, 255, 0, 0};
-static guint16 vacmAccessWriteViewName_constraints[] = {0, 32, 0, 255, 0, 0};
-static guint16 vacmAccessNotifyViewName_constraints[] = {0, 32, 0, 255, 0, 0};
+static guint16 vacmContextName_constraints[] = {0, 32, 0, 0};
+static guint16 vacmGroupName_constraints[] = {1, 32, 0, 0};
+static guint16 vacmAccessReadViewName_constraints[] = {0, 32, 0, 0};
+static guint16 vacmAccessWriteViewName_constraints[] = {0, 32, 0, 0};
+static guint16 vacmAccessNotifyViewName_constraints[] = {0, 32, 0, 0};
 static guint32 vacmViewSpinLock_constraints[] = {0L, 2147483647L, 0, 0};
 static guint16 vacmViewTreeFamilyMask_constraints[] = {0, 16, 0, 0};
 
@@ -110,7 +110,7 @@ static GSnmpAttribute vacmContextEntry_attr[] = {
     { 1, G_SNMP_OCTETSTRING,
       SNMP_VIEW_BASED_ACM_MIB_VACMCONTEXTNAME, "vacmContextName",
        vacmContextName_constraints,
-      G_STRUCT_OFFSET(snmp_view_based_acm_mib_vacmContextEntry_t, vacmContextName),
+      -1,
       G_STRUCT_OFFSET(snmp_view_based_acm_mib_vacmContextEntry_t, _vacmContextNameLength),
       0 },
     { 0, 0, 0, NULL }

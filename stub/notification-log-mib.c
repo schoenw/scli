@@ -63,7 +63,7 @@ GSnmpEnum const notification_log_mib_enums_nlmLogVariableValueType[] = {
 };
 
 
-static guint16 nlmConfigLogFilterName_constraints[] = {0, 32, 0, 255, 0, 0};
+static guint16 nlmConfigLogFilterName_constraints[] = {0, 32, 0, 0};
 static guint16 nlmLogDateAndTime_constraints[] = {8, 8, 11, 11, 0, 0};
 static guint16 nlmLogEngineID_constraints[] = {5, 32, 0, 0};
 static guint16 nlmLogEngineTAddress_constraints[] = {1, 255, 0, 0};
