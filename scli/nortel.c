@@ -904,6 +904,12 @@ dump_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 			      vlanTable[i]->rcVlanId,
 			      (int) vlanTable[i]->_rcVlanNameLength,
 			      vlanTable[i]->rcVlanName);
+	}
+	g_string_append(interp->result, "\n");
+	for (i = 0; vlanTable[i]; i++) {
+	    if (! vlanTable[i]->rcVlanName) {
+		continue;
+	    }
 	    if (vlanTable[i]->rcVlanPortMembers) {
 		g_string_sprintfa(interp->result,
 				  "set nortel bridge vlan ports \"%.*s\" \"",
