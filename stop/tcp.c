@@ -93,7 +93,7 @@ static void
 show_tcp_connection(GString *s, tcpConnEntry_t *tcpConnEntry)
 {
     int pos;
-    
+
     g_string_sprintfa(s, "%s:%s%n",
 		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress, 0),
 		      fmt_tcp_port(tcpConnEntry->tcpConnLocalPort, 0),
@@ -124,7 +124,20 @@ show_tcp_connections(WINDOW *win, host_snmp *peer, int flags)
 {
     tcpConnEntry_t **tcpConnTable = NULL;
     GString *s;
-    int i, p;
+    int i, k, p;
+    static gint32 const state_order[] = {
+	TCP_MIB_TCPCONNSTATE_SYNSENT,
+	TCP_MIB_TCPCONNSTATE_SYNRECEIVED,
+	TCP_MIB_TCPCONNSTATE_ESTABLISHED,
+	TCP_MIB_TCPCONNSTATE_FINWAIT1,
+	TCP_MIB_TCPCONNSTATE_FINWAIT2,
+	TCP_MIB_TCPCONNSTATE_CLOSEWAIT,
+	TCP_MIB_TCPCONNSTATE_LASTACK,
+	TCP_MIB_TCPCONNSTATE_CLOSING,
+	TCP_MIB_TCPCONNSTATE_TIMEWAIT,
+	TCP_MIB_TCPCONNSTATE_CLOSED,
+	0
+    };
 
     if (flags & STOP_FLAG_RESTART) {
 	show_tcp_summary(peer);
@@ -141,18 +154,21 @@ show_tcp_connections(WINDOW *win, host_snmp *peer, int flags)
     }
 
     wmove(win, 1, 0);
-    for (i = 0, p = 0; tcpConnTable[i]; i++) {
-	if (tcpConnTable[i]->tcpConnState &&
-	    *tcpConnTable[i]->tcpConnState == TCP_MIB_TCPCONNSTATE_LISTEN) {
-	    continue;
+    for (k = 0, p = 0; state_order[k]; k++) {
+	for (i = 0; tcpConnTable[i]; i++) {
+	    if (!tcpConnTable[i]->tcpConnState
+		|| (tcpConnTable[i]->tcpConnState &&
+		    *tcpConnTable[i]->tcpConnState != state_order[k])) {
+		continue;
+	    }
+	    p++;
+	    s = g_string_new(NULL);
+	    show_tcp_connection(s, tcpConnTable[i]);
+	    g_string_truncate(s, COLS);
+	    mvwprintw(win, p, 0, s->str);
+	    wclrtoeol(win);
+	    g_string_free(s, 1);
 	}
-	p++;
-	s = g_string_new(NULL);
-	show_tcp_connection(s, tcpConnTable[i]);
-	g_string_truncate(s, COLS);
-	mvwprintw(win, p, 0, s->str);
-	wclrtoeol(win);
-	g_string_free(s, 1);
     }
     wclrtobot(win);
 
