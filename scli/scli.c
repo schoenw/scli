@@ -377,6 +377,7 @@ main(int argc, char **argv)
     scli_init_bridge_mode(interp);
     scli_init_atm_mode(interp);
     scli_init_ether_mode(interp);
+    scli_init_ospf_mode(interp);
 
     if (! norc) {
 	(void) scli_eval_init_file(interp);

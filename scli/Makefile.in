@@ -72,7 +72,7 @@ VERSION = @VERSION@
 
 INCLUDES = -I$(top_srcdir)/stub -I$(top_srcdir)/snmp $(GLIB_CFLAGS)
 bin_PROGRAMS = scli
-scli_SOURCES = scli.c scli.h scli.1 vendors.c 		  getopt.h getopt.c getopt1.c basic.c cmds.c fmt.c 		  system.c entity.c interface.c disman.c snmp.c 		  ip.c udp.c tcp.c 		  bridge.c atm.c ether.c 
+scli_SOURCES = scli.c scli.h scli.1 vendors.c 		  getopt.h getopt.c getopt1.c basic.c cmds.c fmt.c 		  system.c entity.c interface.c disman.c snmp.c 		  ip.c udp.c tcp.c 		  bridge.c atm.c ether.c 		  ospf.c
 
 scli_LDADD = -L../stub -lstub -L../snmp -lsnmp $(GLIB_LIBS)
 man_MANS = scli.1
@@ -88,7 +88,7 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 scli_OBJECTS =  scli.o vendors.o getopt.o getopt1.o basic.o cmds.o fmt.o \
 system.o entity.o interface.o disman.o snmp.o ip.o udp.o tcp.o bridge.o \
-atm.o ether.o
+atm.o ether.o ospf.o
 scli_DEPENDENCIES = 
 scli_LDFLAGS = 
 CFLAGS = @CFLAGS@
@@ -108,8 +108,8 @@ TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/atm.P .deps/basic.P .deps/bridge.P .deps/cmds.P \
 .deps/disman.P .deps/entity.P .deps/ether.P .deps/fmt.P .deps/getopt.P \
-.deps/getopt1.P .deps/interface.P .deps/ip.P .deps/scli.P .deps/snmp.P \
-.deps/system.P .deps/tcp.P .deps/udp.P .deps/vendors.P
+.deps/getopt1.P .deps/interface.P .deps/ip.P .deps/ospf.P .deps/scli.P \
+.deps/snmp.P .deps/system.P .deps/tcp.P .deps/udp.P .deps/vendors.P
 SOURCES = $(scli_SOURCES)
 OBJECTS = $(scli_OBJECTS)
 
