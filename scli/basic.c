@@ -916,7 +916,7 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
     interp->peer->name = g_strdup(host);
     interp->peer->port = port;
     interp->peer->rcomm = g_strdup(community ? community : "public");
-    interp->peer->wcomm = interp->peer->rcomm;
+    interp->peer->wcomm = g_strdup(interp->peer->rcomm);
     interp->peer->retries = 3;
     interp->peer->timeout = 1;
     interp->peer->version = G_SNMP_V2C;
