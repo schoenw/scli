@@ -1,3 +1,132 @@
+2002-05-27 10:55  schoenw
+
+	* scli/3com.c: Indicate the vlan entry status.
+
+2002-05-27 10:14  schoenw
+
+	* doc/Makefile.am: Added modes.texinfo to the dependencies.
+
+2002-05-24 11:36  schoenw
+
+	* scli/: 3com.c, Makefile.am, scli.c, scli.h: Added the 3com mode
+	to scli.
+
+2002-05-24 11:36  schoenw
+
+	* stub/: Makefile.am, productmib.c, productmib.h: Added stubs for
+	the productmib to manage 3com vlans.
+
+2002-05-06 21:21  schoenw
+
+	* snmp/g_utils.c: Fixed the order of the type names in type
+	mismatch warnings.
+
+2002-05-06 21:16  schoenw
+
+	* snmp/g_utils.c: Be liberal on type mismatches if the types are of
+	the same "class".
+
+2002-05-02 12:00  schoenw
+
+	* scli/fmt.c: Fix by Urs to calculate correct timezone offsets.
+
+2002-04-30 17:41  schoenw
+
+	* scli/: Makefile.am, rs232.c, scli.c, scli.h: Added an RS 232 mode
+	which allows to configure RS 232 serial lines.
+
+2002-04-30 17:40  schoenw
+
+	* scli/ip.c: Fixed an off by one formatting bug.
+
+2002-04-30 17:39  schoenw
+
+	* stub/: Makefile.am, rs-232-mib.c, rs-232-mib.h: Added stubs for
+	the RS-232-MIB.
+
+2002-04-25 20:49  schoenw
+
+	* scli/bridge.c: show bridge filter now does something more useful.
+
+2002-04-25 20:30  schoenw
+
+	* scli/ether.c: Some cleanup to produce nicer output.
+
+2002-04-25 20:15  schoenw
+
+	* scli/bridge.c: Display more information about the spanning tree
+	parameters.
+
+2002-04-10 17:12  schoenw
+
+	* scli/scli.h: Added a transaction id counter to the scli_interp_t.
+
+2002-04-10 17:10  schoenw
+
+	* scli/basic.c: Increment the transaction id for each command
+	processed.
+
+2002-04-10 17:09  schoenw
+
+	* scli/vendors.c: Added Elsa GmbH to the vendors we recognize.
+
+2002-04-03 20:40  schoenw
+
+	* scli/interface.c: Use the caching procs for the ifTable.
+
+2002-04-03 20:40  schoenw
+
+	* proc/: if-mib-proc.c, if-mib-proc.h: Some experimental proc's to
+	cache ifTable data.
+
+2002-04-02 12:26  schoenw
+
+	* scli/: basic.c, cmds.c, scli.h: Introduced
+	SCLI_CMD_FLAG_NORECURSE which can be used to have commands that are
+	skipped during recursive command evaluation.
+
+2002-03-30 00:07  schoenw
+
+	* scli/isdn.c: Minor cleanups.
+
+2002-03-30 00:01  schoenw
+
+	* scli/: Makefile.am, isdn.c, scli.c, scli.h: Added a very
+	rudimentary isdn mode.
+
+2002-03-30 00:00  schoenw
+
+	* stub/: Makefile.am, isdn-mib.c, isdn-mib.h: Added stubs for the
+	ISDN-MIB.
+
+2002-03-29 23:39  schoenw
+
+	* snmp/g_utils.c: Do not set the length if the value is considered
+	invalid.
+
+2002-03-29 23:38  schoenw
+
+	* scli/: fmt.c, ip.c, system.c: Various minor bug fixes.
+
+2002-03-28 14:17  schoenw
+
+	* scli/printer.c: Added the "show printer channels" command.
+
+2002-03-28 14:00  schoenw
+
+	* scli/Makefile.am: Added support for magic quotes in the
+	documentation.
+
+2002-03-28 14:00  schoenw
+
+	* scli/: cmds.c, interface.c, netsnmp.c, printer.c, system.c: [no
+	log message]
+
+2002-03-27 16:34  schoenw
+
+	* ChangeLog, NEWS, TODO, config.h.in, configure.in: Updates for
+	release 0.2.8.
+
 2002-03-27 14:48  schoenw
 
 	* stub/: atm-mib.c, bridge-mib.c, disman-schedule-mib.c,
