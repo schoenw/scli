@@ -59,6 +59,15 @@ GSnmpEnum const gsnmp_error_status_table[] = {
 
 
 
+GSnmpEnum const gsnmp_enum_debug_table[] = {
+    { G_SNMP_DEBUG_REQUESTS,	"request" },
+    { G_SNMP_DEBUG_SESSION,	"session" },
+    { G_SNMP_DEBUG_TRANSPORT,	"transport" },
+    { 0, 0 }
+};
+
+
+
 char const *
 gsnmp_enum_get_label(GSnmpEnum const *table, gint32 const id)
 {
