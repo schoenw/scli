@@ -106,8 +106,10 @@ cmd_printer_info(scli_interp_t * interp, int argc, char **argv)
 		prtLocalTable[*prtGeneralTable[i]->prtConsoleLocalization]) {
 		j = *prtGeneralTable[i]->prtConsoleLocalization - 1;
 		g_string_sprintfa(interp->result,
-				  "Console Language: %s/%s\n",
+				  "Console Language: %.*s/%.*s\n",
+		  (int) prtLocalTable[j]->_prtLocalizationLanguageLength,
 				  prtLocalTable[j]->prtLocalizationLanguage,
+		  (int) prtLocalTable[j]->_prtLocalizationCountryLength,
 				  prtLocalTable[j]->prtLocalizationCountry);
 	    }
 
