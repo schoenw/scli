@@ -105,9 +105,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
     static scli_mode_t snmp_mode = {
 	"snmp",
 	"scli mode to display and configure snmp specific information",
-	cmds,
-	NULL,
-	NULL
+	cmds
     };
     
     scli_register_mode(interp, &snmp_mode);

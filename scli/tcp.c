@@ -198,9 +198,7 @@ scli_init_tcp_mode(scli_interp_t *interp)
     static scli_mode_t tcp_mode = {
 	"tcp",
 	"scli mode to display and configure TCP parameters",
-	cmds,
-	NULL,
-	NULL
+	cmds
     };
     
     scli_register_mode(interp, &tcp_mode);

@@ -36,33 +36,33 @@ static void
 fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 	     gint32 *conn, gint32 *prom)
 {
-    static stls_table_t const admin_states[] = {
-	{ 1, "U" },	/* up */
-	{ 2, "D" },	/* down */
-	{ 3, "T" },	/* testing */
+    static stls_enum_t const admin_states[] = {
+	{ IF_MIB_IFADMINSTATUS_UP,	"U" },
+	{ IF_MIB_IFADMINSTATUS_DOWN,	"D" },
+	{ IF_MIB_IFADMINSTATUS_TESTING,	"T" },
 	{ 0, NULL }
     };
 
-    static stls_table_t const oper_states[] = {
-	{ 1, "U" },	/* up */
-	{ 2, "D" },	/* down */
-	{ 3, "T" },	/* testing */
-	{ 4, "?" },	/* unknown */
-	{ 5, "O" },	/* dormant */
-	{ 6, "N" },	/* notPresent */
-	{ 7, "L" },	/* lowerLayerDown */
+    static stls_enum_t const oper_states[] = {
+	{ IF_MIB_IFOPERSTATUS_UP,		"U" },
+	{ IF_MIB_IFOPERSTATUS_DOWN,		"D" },
+	{ IF_MIB_IFOPERSTATUS_TESTING,		"T" },
+	{ IF_MIB_IFOPERSTATUS_UNKNOWN,		"?" },
+	{ IF_MIB_IFOPERSTATUS_DORMANT,		"O" },
+	{ IF_MIB_IFOPERSTATUS_NOTPRESENT,	"N" },
+	{ IF_MIB_IFOPERSTATUS_LOWERLAYERDOWN,	"L" },
 	{ 0, NULL }
     };
 
-    static stls_table_t const conn_states[] = {
-	{ 1, "C" },	/* connector present (true) */
-	{ 2, "N" },	/* no connector present (false) */
+    static stls_enum_t const conn_states[] = {
+	{ IF_MIB_IFCONNECTORPRESENT_TRUE,	"C" },
+	{ IF_MIB_IFCONNECTORPRESENT_FALSE,	"N" },
 	{ 0, NULL }
     };
 
-    static stls_table_t const prom_states[] = {
-	{ 1, "P" },	/* promiscuous (true) */
-	{ 2, "N" },	/* no promiscuous (false) */
+    static stls_enum_t const prom_states[] = {
+	{ IF_MIB_IFPROMISCUOUSMODE_TRUE,	"P" },
+	{ IF_MIB_IFPROMISCUOUSMODE_FALSE,	"N" },
 	{ 0, NULL }
     };
 
@@ -271,7 +271,6 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
     ifXEntry_t **ifXTable = NULL;
     int name_width = 6;
     int type_width = 6;
-    char *x;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -289,10 +288,11 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 		}
 	    }
 	    if (ifTable[i]->ifType) {
-		x = stls_table_get_value(if_mib_enums_ifType,
-					 *ifTable[i]->ifType);
-		if (x && strlen(x) > type_width) {
-		    type_width = strlen(x);
+		char const *label;
+		label = stls_enum_get_label(if_mib_enums_ifType,
+					*ifTable[i]->ifType);
+		if (label && strlen(label) > type_width) {
+		    type_width = strlen(label);
 		}
 	    }
 	}
@@ -339,16 +339,16 @@ scli_init_interface_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 	{ "show interface info",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "network interface summary information",
+	  "network interface summary",
 	  cmd_if_info },
 	{ "show interface details",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "detailed information about the network interfaces",
+	  "network interface details",
 	  cmd_if_details },
 #if 0
 	{ "show interface stack",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "interface stacking information",
+	  "network interface stacking",
 	  cmd_if_stack },
 #endif
 	{ NULL, 0, NULL, NULL }
@@ -357,9 +357,7 @@ scli_init_interface_mode(scli_interp_t *interp)
     static scli_mode_t if_mib_mode = {
 	"interface",
 	"scli mode to display and configure interface parameters",
-	cmds,
-	NULL,
-	NULL
+	cmds
     };
     
     scli_register_mode(interp, &if_mib_mode);

@@ -302,9 +302,9 @@ show_storage(GString *s, hrStorageEntry_t *hrStorageEntry, int descr_width)
 {
     static guint32 const hrStorageTypes[] = {1, 3, 6, 1, 2, 1, 25, 2, 1};
     guint const idx = sizeof(hrStorageTypes)/sizeof(guint32);
-    gchar *type = NULL;
+    gchar const *type = NULL;
 
-    static stls_table_t const storage_types[] = {
+    static stls_enum_t const storage_types[] = {
 	{ 2, "ram" },
 	{ 3, "virtual memory" },
 	{ 4, "fixed disk" },
@@ -323,8 +323,8 @@ show_storage(GString *s, hrStorageEntry_t *hrStorageEntry, int descr_width)
 	&& hrStorageEntry->_hrStorageTypeLength == idx + 1
 	&& memcmp(hrStorageEntry->hrStorageType,
 		  hrStorageTypes, sizeof(hrStorageTypes)) == 0) {
-	type = stls_table_get_value(storage_types,
-				    hrStorageEntry->hrStorageType[idx]);
+	type = stls_enum_get_label(storage_types,
+				   hrStorageEntry->hrStorageType[idx]);
     }
 
     if (hrStorageEntry->hrStorageDescr
@@ -603,9 +603,7 @@ scli_init_system_mode(scli_interp_t *interp)
     static scli_mode_t system_mode = {
 	"system",
 	"scli mode to display and configure system parameters",
-	cmds,
-	NULL,
-	NULL
+	cmds
     };
     
     scli_register_mode(interp, &system_mode);

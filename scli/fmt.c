@@ -75,11 +75,9 @@ fmt_time_ticks(GString *s, guint32 timeticks)
 
     /*
      * This code assumes that daylight savings time is always 1 hour,
-     * which is definitely not true everywhere on the world. I know
-     * from my trip to Australia that the they have regions with 30
-     * minute offsets. Now the real tough question is how you get the
-     * real offset in a portable way. (Every time I am time calculations,
-     * I am getting surprised how ugly these things still are.) /js
+     * which is probably not true everywhere on the world. I have no
+     * clue how you get the real daylight savings time offset in a
+     * portable way.
      */
     
     g_string_sprintfa(s, "%04d-%02d-%02d %02d:%02d:%02d %c%02d:%02d",
@@ -178,16 +176,16 @@ fmt_kbytes(GString *s, guint32 kbytes)
 
 
 void
-fmt_enum(GString *s, int width, stls_table_t const *table, gint32 *number)
+fmt_enum(GString *s, int width, stls_enum_t const *table, gint32 *number)
 {
-    gchar *name;
+    gchar const *name;
 
     if (! number) {
 	g_string_sprintfa(s, "%*s", width, "");
 	return;
     }
     
-    name = stls_table_get_value(table, *number);
+    name = stls_enum_get_label(table, *number);
     if (! name) {
 	g_string_sprintfa(s, "%-*d", width, *number);
     } else {

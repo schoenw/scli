@@ -326,9 +326,7 @@ scli_init_ip_mode(scli_interp_t *interp)
     static scli_mode_t ip_mode = {
 	"ip",
 	"scli mode to display and configure IP parameters",
-	cmds,
-	NULL,
-	NULL
+	cmds
     };
     
     scli_register_mode(interp, &ip_mode);

@@ -97,9 +97,7 @@ scli_init_udp_mode(scli_interp_t *interp)
     static scli_mode_t udp_mode = {
 	"udp",
 	"scli mode to display and configure UDP parameters",
-	cmds,
-	NULL,
-	NULL
+	cmds
     };
     
     scli_register_mode(interp, &udp_mode);

@@ -238,10 +238,8 @@ scli_init_entity_mode(scli_interp_t *interp)
     
     static scli_mode_t entity_mode = {
 	"entity",
-	"scli mode to display the entities that make up a system",
-	cmds,
-	NULL,
-	NULL
+	"scli mode to display and configure system entities",
+	cmds
     };
     
     scli_register_mode(interp, &entity_mode);

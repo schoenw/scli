@@ -67,10 +67,6 @@ struct scli_mode {
     char *name;			/* name of the mode */
     char *desc;			/* description of the mode */
     scli_cmd_t *cmds;		/* array of command provided by the mode */
-    void (*enter) (scli_interp_t *interp);
-				/* called when the mode is entered */
-    void (*leave) (scli_interp_t *interp);
-				/* called when the mode is left */
 };
 
 #define SCLI_INTERP_FLAG_INTERACTIVE	0x01
@@ -174,7 +170,7 @@ extern void
 scli_init_atm_mode(scli_interp_t *interp);
 
 extern void
-scli_init_mau_mode(scli_interp_t *interp);
+scli_init_ether_mode(scli_interp_t *interp);
 
 /* 
  * A data structure used to obtain vendor information from the
@@ -213,7 +209,7 @@ extern void
 fmt_kbytes(GString *s, guint32 kbytes);
 
 extern void
-fmt_enum(GString *s, int width, stls_table_t const *table, gint32 *number);
+fmt_enum(GString *s, int width, stls_enum_t const *table, gint32 *number);
 
 extern char*
 fmt_kmg(guint32 number);

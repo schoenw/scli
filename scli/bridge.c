@@ -315,9 +315,7 @@ scli_init_bridge_mode(scli_interp_t *interp)
     static scli_mode_t bridge_mode = {
 	"bridge",
 	"scli mode to display and configure bridge parameters",
-	cmds,
-	NULL,
-	NULL
+	cmds
     };
     
     scli_register_mode(interp, &bridge_mode);

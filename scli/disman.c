@@ -39,13 +39,7 @@ static guint32 const oid_srsl[]   = { IANA_LANGUAGE_MIB_IANALANGSRSL };
 static guint32 const oid_psl[]    = { IANA_LANGUAGE_MIB_IANALANGPSL };
 static guint32 const oid_smsl[]   = { IANA_LANGUAGE_MIB_IANALANGSMSL };
 
-typedef struct lang {
-    guint32 const *oid;
-    gsize const oidlen;
-    char const *name;
-} lang_t;
-
-static lang_t const languages[] = {
+static stls_identity_t const languages[] = {
     { oid_javabc,	sizeof(oid_javabc) / sizeof(guint32),	"Java" },
     { oid_tcl,		sizeof(oid_tcl) / sizeof(guint32),	"Tcl" },
     { oid_perl,		sizeof(oid_perl) / sizeof(guint32),	"Perl" },
@@ -67,7 +61,7 @@ get_lang_name(smLangEntry_t *smLangEntry)
 	if (languages[l].oidlen == smLangEntry->_smLangLanguageLength) {
 	    if (memcmp(languages[l].oid, smLangEntry->smLangLanguage,
 		       languages[l].oidlen) == 0) {
-		return languages[l].name;
+		return languages[l].label;
 	    }
 	}
     }
@@ -80,10 +74,10 @@ get_lang_name(smLangEntry_t *smLangEntry)
 static void
 fmt_script_admin_status(GString *s, gint32 *status)
 {
-    static stls_table_t const script_admin_states[] = {
-	{ 1, "e" },	/* enabled */
-	{ 2, "d" },	/* disabled */
-	{ 3, "t" },	/* editing */
+    static stls_enum_t const script_admin_states[] = {
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_ENABLED,	"e" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_DISABLED,	"d" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_EDITING,	"t" },
 	{ 0, NULL }
     };
 
@@ -95,21 +89,21 @@ fmt_script_admin_status(GString *s, gint32 *status)
 static void
 fmt_script_oper_status(GString *s, gint32 *status)
 {
-    static stls_table_t const script_oper_states[] = {
-	{ 1, "e" },	/* enabled */
-	{ 2, "d" },	/* disabled */
-	{ 3, "t" },	/* editing */
-	{ 4, "r" },	/* retrieving */
-	{ 5, "c" },	/* compiling */
-	{ 6, "n" },	/* noSuchScript */
-	{ 7, "a" },	/* accessDenied */
-	{ 8, "w" },	/* wrongLanguage */
-	{ 9, "v" },	/* wrongVersion */
-	{ 10, "f" },	/* compilationFailed */
-	{ 11, "o" },	/* noResourcesLeft */
-	{ 12, "u" },	/* unknownProtocol */
-	{ 13, "p" },	/* protocolFailure */
-	{ 14, "g" },	/* genericError */
+    static stls_enum_t const script_oper_states[] = {
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_ENABLED,		"e" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_DISABLED,	"d" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_EDITING,		"t" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_RETRIEVING,	"r" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_COMPILING,	"c" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_NOSUCHSCRIPT,	"n" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_ACCESSDENIED,	"a" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_WRONGLANGUAGE,	"w" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_WRONGVERSION,	"v" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_COMPILATIONFAILED, "f" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_NORESOURCESLEFT,	"o" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_UNKNOWNPROTOCOL,	"u" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_PROTOCOLFAILURE,	"p" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_GENERICERROR,	"g" },
 	{ 0, NULL }
     };
 
@@ -121,7 +115,7 @@ fmt_script_oper_status(GString *s, gint32 *status)
 static void
 fmt_storage_type(GString *s, gint32 *storage)
 {
-    static stls_table_t const storage_types[] = {
+    static stls_enum_t const storage_types[] = {
 	{ 1, "o" },	/* other */
 	{ 2, "v" },	/* volatile */
 	{ 3, "n" },	/* nonVolatile */
@@ -138,7 +132,7 @@ fmt_storage_type(GString *s, gint32 *storage)
 static void
 fmt_row_status(GString *s, gint32 *status)
 {
-    static stls_table_t const row_states[] = {
+    static stls_enum_t const row_states[] = {
 	{ 1, "a" },	/* active */
 	{ 2, "s" },	/* notInService */
 	{ 3, "r" },	/* notReady */
@@ -176,16 +170,16 @@ fmt_last_change(GString *s, guchar *data, gsize len)
 static void
 fmt_run_state(GString *s, gint32 *state)
 {
-    char *name;
+    char const *name;
 
-    static stls_table_t const run_states[] = {
-	{ 1, "I" },	/* initializing */
-	{ 2, "R" },	/* executing */
-	{ 3, "U" },	/* suspending */
-	{ 4, "S" },	/* suspended */
-	{ 5, "R" },	/* resuming */
-	{ 6, "A" },	/* aborting */
-	{ 7, "T" },	/* terminated */
+    static stls_enum_t const run_states[] = {
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_INITIALIZING,	"I" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_EXECUTING,	"R" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_SUSPENDING,	"U" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_SUSPENDED,	"S" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_RESUMING,	"R" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_ABORTING,	"A" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_TERMINATED,	"T" },
 	{ 0, NULL }
     };
     
@@ -194,7 +188,7 @@ fmt_run_state(GString *s, gint32 *state)
 	return;
     }
     
-    name = stls_table_get_value(run_states, *state);
+    name = stls_enum_get_label(run_states, *state);
     if (name) {
 	g_string_append(s, name);
     } else {
@@ -206,18 +200,18 @@ fmt_run_state(GString *s, gint32 *state)
 static void
 fmt_exit_code(GString *s, gint32 *code)
 {
-    char *name;
+    char const *name;
 
-    static stls_table_t const exit_codes[] = {
-	{ 1, "N" },	/* noError */
-	{ 2, "H" },	/* halted */
-	{ 3, "T" },	/* lifeTimeExceeded */
-	{ 4, "O" },	/* noResourcesLeft */
-	{ 5, "L" },	/* languageError */
-	{ 6, "R" },	/* runtimeError */
-	{ 7, "A" },	/* invalidArgument */
-	{ 8, "S" },	/* securityViolation */
-	{ 9, "G" },	/* genericError */
+    static stls_enum_t const exit_codes[] = {
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_NOERROR,		"N" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_HALTED,		"H" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_LIFETIMEEXCEEDED,	"T" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_NORESOURCESLEFT,	"O" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_LANGUAGEERROR,	"L" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_RUNTIMEERROR,		"R" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_INVALIDARGUMENT,	"A" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_SECURITYVIOLATION,	"S" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_GENERICERROR,		"G" },
 	{ 0, NULL }
     };
     
@@ -226,7 +220,7 @@ fmt_exit_code(GString *s, gint32 *code)
 	return;
     }
     
-    name = stls_table_get_value(exit_codes, *code);
+    name = stls_enum_get_label(exit_codes, *code);
     if (name) {
 	g_string_append(s, name);
     } else {
@@ -1086,9 +1080,7 @@ scli_init_disman_mode(scli_interp_t *interp)
     static scli_mode_t disman_mode = {
 	"disman",
 	"scli mode to display and configure distributed managers",
-	cmds,
-	NULL,
-	NULL
+	cmds
     };
     
     scli_register_mode(interp, &disman_mode);

@@ -98,9 +98,7 @@ scli_init_atm_mode(scli_interp_t *interp)
     static scli_mode_t atm_mode = {
 	"atm",
 	"scli mode to display and configure ATM parameters",
-	cmds,
-	NULL,
-	NULL
+	cmds
     };
     
     scli_register_mode(interp, &atm_mode);
