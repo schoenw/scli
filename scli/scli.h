@@ -175,6 +175,7 @@ struct scli_alarm {
 #define SCLI_INTERP_FLAG_LOOP		0x08
 #define SCLI_INTERP_FLAG_XML		0x10
 #define SCLI_INTERP_FLAG_DRY		0x20
+#define SCLI_INTERP_FLAG_PROTO		0x40
 
 struct scli_interp {
     char *name;			/* name of the interpreter */
@@ -220,6 +221,8 @@ scli_interp_reset(scli_interp_t *interp);
 	(interp->flags & SCLI_INTERP_FLAG_MONITOR)
 #define scli_interp_dry(interp) \
 	(interp->flags & SCLI_INTERP_FLAG_DRY)
+#define scli_interp_proto(interp) \
+	(interp->flags & SCLI_INTERP_FLAG_PROTO)
 
 extern scli_alarm_t *
 scli_alarm_create(scli_interp_t *interp, char *desc);
@@ -369,7 +372,8 @@ extern const scli_vendor_t*
 scli_get_ieee_vendor(guint32 prefix);
 
 /*
- * Formatting utilities that are used frequently by scli modes.
+ * Formatting and scanning utilities that are used frequently by scli
+ * modes.
  */
 
 extern const char *
@@ -439,6 +443,10 @@ fmt_storage_type(GString *s, gint32 *storage);
 
 extern void
 fmt_port_set(GString *s, guchar *bits, gsize bits_len);
+
+extern int
+scan_port_set(guchar *bits, gsize bits_len, char *string);
+
     
 /*
  * XML utilities.

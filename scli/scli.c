@@ -306,7 +306,7 @@ main(int argc, char **argv)
     int c;
     
     int norc = 0, port = 161, delay = 5000, retries = 3, timeout = 500000;
-    int xml = 0, dry = 0;
+    int xml = 0, dry = 0, proto = 0;
     int snmp = -1;
 
     static struct option const long_options[] =
@@ -317,6 +317,7 @@ main(int argc, char **argv)
 	{ "dry-run", required_argument, 0, 's' },
         { "file",    required_argument, 0, 'f' },
         { "help",    no_argument,       0, 'h' },
+        { "inetd",   no_argument,       0, 'i' },
         { "norc",    no_argument,       0, 'n' },
         { "port",    required_argument, 0, 'p' },
 	{ "retries", required_argument, 0, 'r' },
@@ -326,7 +327,7 @@ main(int argc, char **argv)
         { NULL, 0, NULL, 0}
     };
 
-    while ((c = getopt_long(argc, argv, "Vc:d:f:hnp:r:st:v:x", long_options,
+    while ((c = getopt_long(argc, argv, "Vc:d:f:hinp:r:st:v:x", long_options,
                             (int *) 0)) != EOF) {
         switch (c) {
         case 'V':
@@ -350,6 +351,9 @@ main(int argc, char **argv)
         case 'h':
             usage();
             exit(0);
+	case 'i':
+	    proto = 1;
+	    break;
 	case 'n':
 	    norc = 1;
 	    break;
@@ -429,7 +433,9 @@ main(int argc, char **argv)
     signal(SIGHUP, onsignal);
     signal(SIGQUIT, onsignal);
     signal(SIGWINCH, onwinch);
-    signal(SIGPIPE, SIG_IGN);
+    if (! proto) {
+	signal(SIGPIPE, SIG_IGN);
+    }
 
     /*
      * Initialize the interpreter. Register the toplevel commands.
@@ -444,6 +450,10 @@ main(int argc, char **argv)
     interp->delay = delay;
     interp->port = port;
     interp->snmp = snmp;
+
+    if (proto) {
+	interp->flags |= SCLI_INTERP_FLAG_PROTO;
+    }
 
     if (xml) {
 	interp->flags |= SCLI_INTERP_FLAG_XML;
