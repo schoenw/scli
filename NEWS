@@ -1,8 +1,15 @@
+Changes in stools 0.1.10:
+
+- optimized the size of the generated stub code plus simple index decoding
+- scli supports a new "show system processes" command
+- work on a disman mode for scli started
+- minor bug fixes
+
 Changes in stools 0.1.9:
 
 - added the -c command line option to scli
 - added history expansions to scli based on the GNU history library
-- rewrote the scli modes so that they not directly write to stdout
+- rewrote the scli modes so that they do not directly write to stdout
 - scli supports a new "show system mounts" command
 
 Changes in stools 0.1.8:

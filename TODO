@@ -8,6 +8,9 @@
 
 - Add reasonable error reporting to the stub code.
 
+- Change the configure setup so that stop is linked against curses and
+  scli against readline only.
+
 - Enhance the stub generator to properly decode INDEX elements.
 
 - Add a mechanism (perhaps based on fd_sets) to tell the stubs to retrieve
@@ -19,6 +22,12 @@
 
 - Create some sort of a test suite (which is not that easy for highly
   interactive programs).
+
+- Cleanup the process display modes.
+
+- Complete the disman scli mode and add a disman stop mode.
+
+- Add a mechanism to switch between agents without restarting scli/stop.
 
 ==== GXSNMP specific things ====
 

@@ -34,6 +34,7 @@ management tools.
 * History::                     History.
 * Project Design::              Project Design.
 * Software Aspects::            Software Aspects.
+* Writing New Modes::           Writing New Modes.
 * Problems::                    Reporting bugs.
 * Concept Index::               Index of concepts.
 
@@ -443,7 +444,7 @@ stub code should export simple C structures that every programmer can
 easily understand and handle.
 
 
-File: stools.info,  Node: Software Aspects,  Next: Problems,  Prev: Project Design,  Up: Top
+File: stools.info,  Node: Software Aspects,  Next: Writing New Modes,  Prev: Project Design,  Up: Top
 
 Software Aspects
 ****************
@@ -464,15 +465,46 @@ library to provide command line editing and history capabilities.
    MIB Stub Generator
 
 
-File: stools.info,  Node: Problems,  Next: Concept Index,  Prev: Software Aspects,  Up: Top
+File: stools.info,  Node: Writing New Modes,  Next: Problems,  Prev: Software Aspects,  Up: Top
+
+Writing New Modes
+*****************
+
+   This chapter explains how you can add functionality to `stools'
+programs.
+
+Adding MIB Stubs
+================
+
+   I might be necessary to add stubs for additional MIB modules. This
+process is very straightforward.
+
+  1. Edit `stubs/Makefile.am'
+
+  2. Run `make stubs' in the `stubs' directory. Note that you need a
+     version of `smidump' which is compatible with the `stools' release
+     you are using.
+
+  3. Edit `stubs/stools.h' by adding the new header file(s) to the
+     includes at the end of the file.
+
+Writing `stop' Modes
+====================
+
+Writing `scli' Modes
+====================
+
+
+File: stools.info,  Node: Problems,  Next: Concept Index,  Prev: Writing New Modes,  Up: Top
 
 Problems
 ********
 
    If you find a bug in `stools', please send electronic mail to
 `stools@ibr.cs.tu-bs.de'.  Include the version number, which you can
-find by running `stools --version'.  Also include in your message the
-output that the program produced and the output you expected.
+find by running `stop --version' or `scli --version'.  Also include in
+your message the output that the program produced and the output you
+expected.
 
    If you have other questions, comments or suggestions about `stools',
 contact the author via electronic mail to `schoenw@ibr.cs.tu-bs.de'.
@@ -505,13 +537,14 @@ Concept Index
 
 Tag Table:
 Node: Top870
-Node: Instructions1468
-Node: Copying1973
-Node: Overview18179
-Node: History19072
-Node: Project Design21687
-Node: Software Aspects22791
-Node: Problems23419
-Node: Concept Index24031
+Node: Instructions1519
+Node: Copying2024
+Node: Overview18230
+Node: History19123
+Node: Project Design21738
+Node: Software Aspects22842
+Node: Writing New Modes23479
+Node: Problems24217
+Node: Concept Index24848
 
 End Tag Table

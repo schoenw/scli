@@ -79,6 +79,7 @@ management tools.
 * History::                     History.
 * Project Design::              Project Design.
 * Software Aspects::            Software Aspects.
+* Writing New Modes::           Writing New Modes.
 * Problems::                    Reporting bugs.
 * Concept Index::               Index of concepts.
 @end menu
@@ -194,7 +195,7 @@ generates stub code for management applications from MIB modules. The
 stub code should export simple C structures that every programmer can
 easily understand and handle.
 
-@node Software Aspects, Problems, Project Design, Top
+@node Software Aspects, Writing New Modes, Project Design, Top
 @chapter Software Aspects
 
 I started to work on the framework of two tools. The first program
@@ -215,14 +216,44 @@ library to provide command line editing and history capabilities.
 MIB Stub Generator
 
 
-@node Problems, Concept Index, Software Aspects, Top
+@node Writing New Modes, Problems, Software Aspects, Top
+@chapter Writing New Modes
+
+This chapter explains how you can add functionality to @code{stools}
+programs.
+
+@section Adding MIB Stubs
+
+I might be necessary to add stubs for additional MIB modules. This
+process is very straightforward. 
+
+@enumerate
+@item
+Edit @code{stubs/Makefile.am}
+
+@item
+Run @code{make stubs} in the @code{stubs} directory. Note that you need
+a version of @code{smidump} which is compatible with the @code{stools}
+release you are using.
+
+@item
+Edit @code{stubs/stools.h} by adding the new header file(s) to the
+includes at the end of the file.
+@end enumerate
+
+@section Writing @code{stop} Modes
+
+@section Writing @code{scli} Modes
+
+
+@node Problems, Concept Index, Writing New Modes, Top
 @chapter Problems
 
 If you find a bug in @code{stools}, please send electronic mail to
 @w{@samp{stools@@ibr.cs.tu-bs.de}}.  Include the version number, which
-you can find by running @w{@samp{stools --version}}.  Also include in your
-message the output that the program produced and the output you
-expected.@refill
+you can find by running @w{@samp{stop --version}} or @w{@samp{scli
+--version}}.  Also include in your message the output that the program
+produced and the output you expected.@refill
 
 If you have other questions, comments or suggestions about
 @code{stools}, contact the author via electronic mail to
