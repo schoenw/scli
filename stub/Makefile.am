@@ -81,7 +81,6 @@ rmstubs:
 stubs: $(STUBS)
 	$(SMIDUMP) -f scli --scli-include="VlanEntry|VlanPortEntry" RAPID-CITY
 	$(SMIDUMP) -f scli --scli-include="ipRouteEntry" RFC1213-MIB
-	$(SMIDUMP) -f scli --scli-include="atmInterfaceConfEntry" ATM-MIB
 	$(SMIDUMP) -f scli --scli-include="a3ComVlanIfEntry|a3ComVirtualGroup" PRODUCTMIB
 	@for f in $(MIBS) ; do \
 	    echo "$(SMIDUMP) -f scli $$f" ; \
@@ -89,7 +88,39 @@ stubs: $(STUBS)
 	done
 
 if-mib.h if-mib.c:
-	$(SMIDUMP) -f scli --scli-exclude="ifTest" IF-MIB
+	$(SMIDUMP) -f scli --scli-exclude='ifTestEntry' IF-MIB
+
+ip-mib.h ip-mib.c:
+	$(SMIDUMP) -f scli --scli-exclude='icmp' IP-MIB
 
 ip-forward-mib.h ip-forward-mib.c:
-	$(SMIDUMP) -f scli --scli-exclude="ipForwardEntry" IF-FORWARD-MIB
+	$(SMIDUMP) -f scli --scli-exclude='ipForwardEntry' IF-FORWARD-MIB
+
+udp-mib.h udp-mib.c:
+	$(SMIDUMP) -f scli UDP-MIB
+
+tcp-mib.h tcp-mib.c:
+	$(SMIDUMP) -f scli TCP-MIB
+
+snmpv2-mib.h snmpv2-mib.c:
+	$(SMIDUMP) -f scli SNMPv2-MIB
+
+snmpv2-tm.h snmpv2-tm.c:
+	$(SMIDUMP) -f scli SNMPv2-TM
+
+host-resources-mib.h host-resources-mib.c:
+	$(SMIDUMP) -f scli --scli-exclude='hrSWInstalled' HOST-RESOURCES-MIB
+
+host-resources-types.h host-resources-types.c:
+	$(SMIDUMP) -f scli HOST-RESOURCES-TYPES
+
+entity-mib.h entity-mib.c:
+	$(SMIDUMP) -f scli ENTITY-MIB
+
+bridge-mib.h bridge-mib.c:
+	$(SMIDUMP) -f scli BRIDGE-MIB
+
+# add more stuff here ...
+
+atm-mib.h atm-mib.c:
+	$(SMIDUMP) -f scli --scli-include='atmInterfaceConfEntry' ATM-MIB

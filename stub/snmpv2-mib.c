@@ -319,7 +319,7 @@ snmpv2_mib_new_system()
     return system;
 }
 
-static snmpv2_mib_system_t *
+static inline snmpv2_mib_system_t *
 assign_system(GSList *vbl)
 {
     snmpv2_mib_system_t *system;
@@ -398,7 +398,7 @@ snmpv2_mib_new_sysOREntry()
     return sysOREntry;
 }
 
-static int
+static inline int
 unpack_sysOREntry(GSnmpVarBind *vb, snmpv2_mib_sysOREntry_t *sysOREntry)
 {
     guint8 idx = 10;
@@ -409,7 +409,7 @@ unpack_sysOREntry(GSnmpVarBind *vb, snmpv2_mib_sysOREntry_t *sysOREntry)
     return 0;
 }
 
-static int
+static inline int
 pack_sysOREntry(guint32 *base, gint32 sysORIndex)
 {
     guint8 idx = 10;
@@ -418,7 +418,7 @@ pack_sysOREntry(guint32 *base, gint32 sysORIndex)
     return idx;
 }
 
-static snmpv2_mib_sysOREntry_t *
+static inline snmpv2_mib_sysOREntry_t *
 assign_sysOREntry(GSList *vbl)
 {
     snmpv2_mib_sysOREntry_t *sysOREntry;
@@ -539,7 +539,7 @@ snmpv2_mib_new_snmp()
     return snmp;
 }
 
-static snmpv2_mib_snmp_t *
+static inline snmpv2_mib_snmp_t *
 assign_snmp(GSList *vbl)
 {
     snmpv2_mib_snmp_t *snmp;
@@ -618,7 +618,7 @@ snmpv2_mib_new_snmpSet()
     return snmpSet;
 }
 
-static snmpv2_mib_snmpSet_t *
+static inline snmpv2_mib_snmpSet_t *
 assign_snmpSet(GSList *vbl)
 {
     snmpv2_mib_snmpSet_t *snmpSet;
