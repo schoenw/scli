@@ -135,6 +135,23 @@ match_vlan(regex_t *regex_vlan,
 }
 
 
+static void
+get_default_port_set(guchar *bits,
+		     rapid_city_rcVlanPortEntry_t **vlanPortTable,
+		     guint32 vlanid)
+{
+    int i; 
+    
+    for (i = 0; vlanPortTable[i]; i++) {
+	if (vlanPortTable[i]->rcVlanPortDefaultVlanId
+	    && *vlanPortTable[i]->rcVlanPortDefaultVlanId == vlanid) {
+	    int p = vlanPortTable[i]->rcVlanPortIndex;
+	    bits[p/8] |= 1 << (7-(p%8));
+	}
+    }
+}
+
+
 
 static void
 xml_port_set(xmlNodePtr root, guchar *bits, gsize bits_len)
@@ -247,9 +264,9 @@ fmt_id_list(GString *s, guchar *ids, gint32 numids)
     }
 
     if (first == last) {
-	g_string_sprintfa(s, "%s%d", i ? "," : "", first);
+	g_string_sprintfa(s, "%s%d", cnt ? "," : "", first);
     } else {
-	g_string_sprintfa(s, "%s%d-%d", i ? "," : "", first, last);
+	g_string_sprintfa(s, "%s%d-%d", cnt ? "," : "", first, last);
     }
 }
 
@@ -274,7 +291,8 @@ get_vlan_name_width(rapid_city_rcVlanEntry_t **vlanTable)
 
 static void
 xml_nortel_bridge_vlan_details(xmlNodePtr root,
-			       rapid_city_rcVlanEntry_t *vlanEntry)
+			       rapid_city_rcVlanEntry_t *vlanEntry,
+			       rapid_city_rcVlanPortEntry_t **vlanPortTable)
 {
     xmlNodePtr tree, node;
     const char *s;
@@ -330,16 +348,26 @@ xml_nortel_bridge_vlan_details(xmlNodePtr root,
 	    xml_port_set(node, vlanEntry->rcVlanNotAllowToJoin, 32);
 	}
     }
+
+    if (vlanPortTable) {
+	guchar bits[32];
+	memset(bits, 0, sizeof(bits));
+	get_default_port_set(bits, vlanPortTable, vlanEntry->rcVlanId);
+	node = xmlNewChild(tree, NULL, "default", NULL);
+	xml_port_set(node, bits, sizeof(bits));
+    }
 }
 
 
 
 static void
 fmt_nortel_bridge_vlan_details(GString *s,
-			       rapid_city_rcVlanEntry_t *vlanEntry)
+			       rapid_city_rcVlanEntry_t *vlanEntry,
+			       rapid_city_rcVlanPortEntry_t **vlanPortTable)
 {
     const int width = 20;
     const char *e;
+    int i, c;
 
     g_string_sprintfa(s, "VLan:        %-*d", width, vlanEntry->rcVlanId);
     if (vlanEntry->rcVlanName && vlanEntry->_rcVlanNameLength) {
@@ -397,6 +425,15 @@ fmt_nortel_bridge_vlan_details(GString *s,
 	}
     }
 
+    if (vlanPortTable) {
+	guchar bits[32];
+	memset(bits, 0, sizeof(bits));
+	get_default_port_set(bits, vlanPortTable, vlanEntry->rcVlanId);
+	g_string_append(s, "Default:     ");
+	fmt_port_set(s, bits, sizeof(bits));
+	g_string_append(s, "\n");
+    }
+
     if (vlanEntry->rcVlanType
 	&& (*vlanEntry->rcVlanType
 	    == RAPID_CITY_RCVLANTYPE_BYPROTOCOLID)) {
@@ -416,6 +453,7 @@ static int
 show_nortel_bridge_vlan_details(scli_interp_t *interp, int argc, char **argv)
 {
     rapid_city_rcVlanEntry_t **vlanTable = NULL;
+    rapid_city_rcVlanPortEntry_t **vlanPortTable = NULL;
     regex_t _regex_vlan, *regex_vlan = NULL;
     int i, c;
     const int mask = (RAPID_CITY_RCVLANNAME
@@ -448,18 +486,22 @@ show_nortel_bridge_vlan_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SNMP;
     }
 
-    if (vlanTable) {	
+    if (vlanTable) {
+	rapid_city_get_rcVlanPortTable(interp->peer, &vlanPortTable,
+				       RAPID_CITY_RCVLANPORTDEFAULTVLANID);
 	for (i = 0, c = 0; vlanTable[i]; i++) {
 	    if (match_vlan(regex_vlan, vlanTable[i])) {
 		if (scli_interp_xml(interp)) {
 		    xml_nortel_bridge_vlan_details(interp->xml_node,
-						   vlanTable[i]);
+						   vlanTable[i],
+						   vlanPortTable);
 		} else {
 		    if (c) {
 			g_string_append(interp->result, "\n");
 		    }
 		    fmt_nortel_bridge_vlan_details(interp->result,
-						   vlanTable[i]);
+						   vlanTable[i],
+						   vlanPortTable);
 		    c++;
 		}
 	    }
