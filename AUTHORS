@@ -1,8 +1,8 @@
-Primary authors:
+Primary scli author:
 
 - Juergen Schoenwaelder <schoenw@ibr.cs.tu-bs.de>
 
-Many people contributed to the stools package by reporting problems,
+Many people contributed to the scli package by reporting problems,
 suggesting various improvements or submitting actual code:
 
 - Erik Schoenfelder <schoenfr@gaertner.de>
@@ -10,7 +10,7 @@ suggesting various improvements or submitting actual code:
 - Oliver Wellnitz <wellnitz@ibr.cs.tu-bs.de>
 - John Sellens <jsellens@generalconcepts.com>
 
-The SNMP engine was written by gxsnmp folks:
+The SNMP engine was originally written by gxsnmp folks:
 
 - Gregory McLean <?>
 - Jochen Friedrich <jochen@scram.de>

@@ -1,10 +1,11 @@
-Changes in stools 0.1.20:
+Changes in scli 0.2.0:
 
 - scli supports a mode for nortel baystack switches
 - scli supports a mode for cisco router
 - scli uses libxml2 to generate xml output
 - scli treats quoted strings as a single token
 - scli alias seem to work now
+- changed the package name to scli
 - minor bug fixes
 
 Changes in stools 0.1.19:

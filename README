@@ -1,14 +1,13 @@
-	stools - a collection of SNMP command line management tools
+	scli - SNMP command line management tools
 
 Description
 
-  The stools package (pronounced "s-tools") was written to address the
-  need for small and efficient command line utilities to monitor and
-  configure network devices and host systems. The stools package is
-  based on the SNMP management protocol. It utilizes a MIB compiler
-  called smidump to generate C stub code. In fact, virtually no SNMP
-  knowledge is required in order to extend the stools programs with
-  new features.
+  The scli package written to address the need for small and efficient
+  command line utilities to monitor and configure network devices and
+  host systems. The scli package is based on the SNMP management
+  protocol. It utilizes a MIB compiler called smidump to generate C
+  stub code. In fact, virtually no SNMP knowledge is required in order
+  to extend the scli program with new features.
 
   To summarize, the slogan for this little package is:
 
@@ -18,7 +17,7 @@ Description
 
 Compiling
 
-  To compile stools, you need the following packages:
+  To compile scli, you need the following packages:
 
   - GNU readline version 4.X
   - glib version 1.2.X
@@ -31,8 +30,8 @@ Compiling
 
 Reporting Bugs
 
-  Please report any bugs to the stools mailing list. A bug report
-  should at a minimum contain the version number of the stools
+  Please report any bugs to the scli mailing list. A bug report
+  should at a minimum contain the version number of the scli
   package, the operating system name and version number, plus
   everything needed to understand the problem. This includes a
   description why you actually believe that there is a bug.
@@ -47,16 +46,16 @@ Reporting Bugs
 
 Mailing List
 
-  The stools mailing list is <stools@ibr.cs.tu-bs.de>. For subscribing
+  The scli mailing list is <scli@ibr.cs.tu-bs.de>. For subscribing
   to the list, send a message containing the words ``subscribe
-  stools'' to <majordomo@ibr.cs.tu-bs.de>.
+  scli'' to <majordomo@ibr.cs.tu-bs.de>.
 
 
 Web Site
 
-  The Web site for the stools package is located at the following URL:
+  The Web site for the scli package is located at the following URL:
 
-  <http://www.ibr.cs.tu-bs.de/projects/stools/>
+  <http://www.ibr.cs.tu-bs.de/projects/scli/>
 
 
 Contacting Authors
