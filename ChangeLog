@@ -1,3 +1,266 @@
+2001-08-22 17:35  schoenw
+
+	* TODO: Minor housekeeping.
+
+2001-08-22 17:33  schoenw
+
+	* scli/scli.c: Make sure scli can be compiled with older readline
+        libraries.
+
+2001-08-22 17:07  schoenw
+
+	* scli/: Makefile.am, cisco.c, cmds.c, nortel.c, scli.c, scli.h:
+        Added modes for our CISCO and Nortel boxes.
+
+2001-08-22 17:04  schoenw
+
+	* stub/: Makefile.am, Makefile.in, old-cisco-ip-mib.c,
+	old-cisco-ip-mib.h, rapidcity-vlan-mib.c, rapidcity-vlan-mib.h:
+	Added some more stubs for things we need at the Technical
+        University of Braunschweig.
+
+2001-08-22 16:51  schoenw
+
+	* README: Note that we now require libxml2.
+
+2001-08-22 16:51  schoenw
+
+	* autogen.sh: Removed libtool stuff we do not really need right
+        now.
+
+2001-08-22 15:05  schoenw
+
+	* stub/: host-resources-types.c, host-resources-types.h,
+	iana-language-mib.c, iana-language-mib.h: Regenerated stubs after
+        fixing smidump to not generate dead code.
+
+2001-08-22 14:59  schoenw
+
+	* stub/: Makefile.am, atm-mib.c, atm-mib.h, bridge-mib.c,
+	bridge-mib.h, disman-schedule-mib.c, disman-schedule-mib.h,
+	disman-script-mib.c, disman-script-mib.h, entity-mib.c,
+	entity-mib.h, etherlike-mib.c, etherlike-mib.h,
+	host-resources-mib.c, host-resources-mib.h, host-resources-types.c,
+	host-resources-types.h, iana-language-mib.c, iana-language-mib.h,
+	if-mib.c, if-mib.h, ip-forward-mib.c, ip-forward-mib.h, ip-mib.c,
+	ip-mib.h, mau-mib.c, mau-mib.h, ospf-mib.c, ospf-mib.h,
+	printer-mib.c, printer-mib.h, rfc1213-mib.c, rfc1213-mib.h,
+	snmp-community-mib.c, snmp-community-mib.h, snmp-framework-mib.c,
+	snmp-framework-mib.h, snmp-mpd-mib.c, snmp-mpd-mib.h,
+	snmp-target-mib.c, snmp-target-mib.h, snmp-user-based-sm-mib.c,
+	snmp-user-based-sm-mib.h, snmp-view-based-acm-mib.c,
+	snmp-view-based-acm-mib.h, snmpv2-mib.c, snmpv2-mib.h, stools.c,
+	stools.h, tcp-mib.c, tcp-mib.h, tunnel-mib.c, tunnel-mib.h,
+	udp-mib.c, udp-mib.h: Several changes to get rid of the stools.h
+        module.
+
+2001-08-22 14:55  schoenw
+
+	* snmp/: Makefile.am, g_dispatch.c, g_md5.c, g_security.c,
+	g_session.c, g_sha.c, g_snmp.h, g_snmp_table.c, g_snmp_table.h,
+	g_transport.c, g_utils.c, g_utils.h: Added some stubs/stools.[ch]
+        functionality to the gsnmp engine.
+
+2001-08-22 14:54  schoenw
+
+	* scli/vendors.c: Do not mention stools anymore.
+
+2001-08-22 14:50  schoenw
+
+	* stop/Makefile.am, stop/disman.c, stop/fmt.c, stop/interface.c,
+	stop/stop.h, stop/tcp.c, scli/Makefile.am, scli/atm.c,
+	scli/basic.c, scli/bridge.c, scli/cmds.c, scli/disman.c,
+	scli/entity.c, scli/ether.c, scli/fmt.c, scli/interface.c,
+	scli/ip.c, scli/monitor.c, scli/ospf.c, scli/printer.c,
+	scli/scli.c, scli/scli.h, scli/snmp.c, scli/system.c, scli/tcp.c,
+	scli/udp.c, scli/vendors.c: Several changes to get rid of the
+        stools.h module.
+
+2001-08-21 18:48  schoenw
+
+	* scli/basic.c: Code cleanup to keep the compiler happy.
+
+2001-08-21 18:45  schoenw
+
+	* scli/: basic.c, cmds.c, scli.1, scli.c, scli.h: The tokenizer now
+        accepts quoted strings and aliases should work now.
+
+2001-08-16 17:42  schoenw
+
+	* autogen.sh: Added the autogen.sh script which should be used to
+        create the build environment from CVS.
+
+2001-08-16 17:40  schoenw
+
+	* aclocal.m4, config.guess, config.sub: Removed files that do not
+        belong into the CVS.
+
+2001-08-16 17:38  schoenw
+
+	* snmp/Makefile.in, stop/Makefile.in, stub/Makefile.in,
+	Makefile.in, configure, install-sh, missing, mkinstalldirs,
+	doc/Makefile.in, scli/Makefile.in: Removed files that are
+        auto-generated. Use autogen.sh instead.
+
+2001-08-16 16:17  schoenw
+
+	* scli/fmt.c: Fixed a bug that caused 1g switches to appear as 1t
+        switches.
+
+2001-08-16 14:25  schoenw
+
+	* scli/Makefile.am: Uncommented gscli rules since this is not yet
+        part of the CVS tree.
+
+2001-08-16 09:57  schoenw
+
+	* Makefile.in, aclocal.m4, config.h.in, configure, configure.in:
+        Added configure checks for libxml2 and gtk.
+
+2001-08-16 09:55  schoenw
+
+	* scli/: Makefile.am, Makefile.in, atm.c, basic.c, bridge.c,
+	cmds.c, disman.c, entity.c, ether.c, fmt.c, interface.c, ip.c,
+	ospf.c, printer.c, scli.h, snmp.c, system.c, tcp.c, udp.c: Use
+        libxml2 to generate XML output.
+
+2001-08-16 09:50  schoenw
+
+	* stub/stools.h: Removed obsolete struct definition.
+
+2001-08-15 12:51  schoenw
+
+	* scli/basic.c: Use putenv() instead of setenv() to be more
+        portable.
+
+2001-08-15 12:01  schoenw
+
+	* scli/basic.c: Added more characters we do not allow in a pager
+        value.
+
+2001-08-15 12:00  schoenw
+
+	* scli/: basic.c, cmds.c, scli.c, scli.h: Use a pipe instead of a
+	temporary file for the external pager. Validate the pager value so
+	that it does not contain magic shell characters. Added an scli
+        command to configure the pager.
+
+2001-08-14 16:00  schoenw
+
+	* scli/basic.c: Do not mis-use the string value as a format string.
+
+2001-08-14 15:52  schoenw
+
+	* scli/entity.c: Renamed "show system components" to "show system
+        entities" and wrote some XML formatting routines.
+
+2001-08-14 15:51  schoenw
+
+	* scli/interface.c: Some experimental code to retrieve the physical
+        entity which implements a certain logical network interface.
+
+2001-08-14 15:48  schoenw
+
+	* configure.in: Check for <termios.h> since it defines TIOCGWINSZ
+        under Solaris.
+
+2001-08-14 14:45  schoenw
+
+	* scli/basic.c, stop/stop.c: Conditionally include <termios.h>
+	which is needed on Solaris machines that have resizeterm (probably
+        ncurses) in order to get a definition of TIOCGWINSZ.
+
+2001-07-31 14:38  schoenw
+
+	* scli/: scli.c, scli.h: The --version option now better conforms
+        to GNU standards.
+
+2001-07-31 14:38  schoenw
+
+	* scli/ip.c: Removed dead code.
+
+2001-07-31 14:37  schoenw
+
+	* scli/: atm.c, tcp.c, udp.c: Minor code cleanup.
+
+2001-07-11 12:49  schoenw
+
+	* stub/: snmpv2-mib.c, snmpv2-mib.h, stools.c: Regenerated stubs so
+        that we can use the write stub.
+
+2001-07-11 12:48  schoenw
+
+	* snmp/: g_session.c, g_snmp.c, g_snmp.h: Improved debugging
+        support, added g_snmp_vbl_add() to the API.
+
+2001-07-11 12:47  schoenw
+
+	* scli/: cmds.c, scli.c, system.c: Added code to configure
+        SNMPv2-MIB::system variables.
+
+2001-06-29 15:07  schoenw
+
+	* configure, configure.in: Bumped version number and added
+        --enable-warnings configure option.
+
+2001-06-29 10:26  schoenw
+
+	* snmp/g_session.c: Added a missing argument.
+
+2001-06-29 10:22  schoenw
+
+	* scli/basic.c, snmp/g_dispatch.c, snmp/g_dispatch.h,
+	snmp/g_session.c, snmp/g_session.h, snmp/g_snmp.h,
+	snmp/g_snmp_table.c, snmp/g_transport.c, snmp/g_transport.h,
+        stop/stop.c: Cleaned up the SNMP transport implementation.
+
+2001-06-28 09:50  schoenw
+
+	* scli/: basic.c, cmds.c, scli.c: Updates to reflect recent gsnmp
+        API improvements.
+
+2001-06-28 09:49  schoenw
+
+	* snmp/: g_session.c, g_session.h, g_snmp.c, g_snmp.h,
+	g_snmp_table.c, g_transport.h: Fixed some more memory leaks,
+	reworked the session API, added debugging flags which allow to
+        enable/disable debugging output at runtime.
+
+2001-06-28 09:46  schoenw
+
+	* stub/: atm-mib.c, bridge-mib.c, disman-schedule-mib.c,
+	disman-script-mib.c, entity-mib.c, etherlike-mib.c,
+	host-resources-mib.c, if-mib.c, ip-forward-mib.c, ip-mib.c,
+	mau-mib.c, ospf-mib.c, printer-mib.c, rfc1213-mib.c,
+	snmp-community-mib.c, snmp-framework-mib.c, snmp-mpd-mib.c,
+	snmp-target-mib.c, snmp-user-based-sm-mib.c,
+	snmp-view-based-acm-mib.c, snmpv2-mib.c, stools.c, stools.h,
+	tcp-mib.c, tunnel-mib.c, udp-mib.c: Replaced some stls wrappers
+        with the original entry point into gsnmp.
+
+2001-06-27 17:12  schoenw
+
+	* snmp/g_session.c: Fixed another memory leak.
+
+2001-06-26 17:08  schoenw
+
+	* snmp/: g_dispatch.c, g_session.c: Fixed two more memory leaks.
+
+2001-06-22 09:41  schoenw
+
+	* scli/: atm.c, basic.c, bridge.c, cmds.c, disman.c, entity.c,
+	ether.c, interface.c, ip.c, monitor.c, ospf.c, printer.c, scli.h,
+	snmp.c, system.c, tcp.c, udp.c: Added code to properly handle
+        syntax errors.
+
+2001-06-20 17:12  schoenw
+
+	* NEWS: Updates for release 0.1.19.
+
+2001-06-20 17:11  schoenw
+
+	* ChangeLog: Generated the ChangeLog via cvs2cl.
+
 2001-06-20 17:06  schoenw
 
 	* scli/interface.c: Rewrote the interface stack display function.
