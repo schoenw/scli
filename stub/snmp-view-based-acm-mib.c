@@ -631,7 +631,7 @@ unpack_vacmViewTreeFamilyEntry(GSnmpVarBind *vb, snmp_view_based_acm_mib_vacmVie
     len = vb->id[idx++];
     if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
-        /* vacmViewTreeFamilyEntry->vacmViewTreeFamilySubtree[i] = vb->id[idx++]; */ idx++;
+        vacmViewTreeFamilyEntry->vacmViewTreeFamilySubtree[i] = vb->id[idx++];
     }
     vacmViewTreeFamilyEntry->_vacmViewTreeFamilySubtreeLength = len;
     if (vb->id_len > idx) return -1;
