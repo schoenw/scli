@@ -1,0 +1,136 @@
+.\"                              hey, Emacs:   -*- nroff -*-
+.\" stop is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; see the file COPYING.  If not, write to
+.\" the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.TH STOP 1 "January 26, 2001"
+.\" Please update the above date whenever this man page is modified.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins (default)
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+stop \- Display SNMP MIB data in a top-like format
+.SH SYNOPSIS
+.B stop
+.RI [ options ]
+.I hostname
+.RI [ community ]
+.SH DESCRIPTION
+\fBstop\fP provides an ongoing look at network device activities. The
+information is displayed in a compact human readable way and updated
+in regular intervals.
+.PP
+\fBstop\fP uses the Simple Network Management Protocol (SNMP) to read
+the data from the device. Hence, it relies on the capabilities of the
+devices to report accurate data.
+.PP
+The \fIhostname\fR argument is the name or the IP adress of the host
+to look at. \fBstop\fP talks to this host's SNMP agent on the default
+port number 161 using the SNMP over UDP transport mapping.
+.PP
+The optional \fIcommunity\fR argument is the community string used to
+communicate with the remote SNMP agent. The default string is
+\fIpublic\fR. Please check the configuration of the SNMP agent to get
+a clue about the community string to use, if the default community
+string does not work.
+.SH OPTIONS
+\fBstop\fP accepts the following options:
+.TP
+.B \-V, \-\-version
+Show version of program.
+.TP
+.B \-d seconds, \-\-delay=seconds
+Set delay between screen updates in seconds. The default delay between
+updates is 5 seconds.
+.TP
+.B \-h, \-\-help
+Show summary of stop options.
+.TP
+.B \-p number, \-\-port=number
+Set the SNMP port number. The default port number is 161.
+.TP
+.B \-m name, \-\-mode=name
+Select a display mode. The default display mode is the "interface" mode.
+.TP
+.B \-r count, \-\-retries=count
+The number of SNMP retransmissions before we give up. The default
+number of retries is 5.
+.TP
+.B \-t msec, \-\-timeout=msec
+The initial timeout in milli-seconds before an SNMP request is
+transmitted. The default initial timeout interval is 200 milli-seconds.
+.SH INTERACTIVE COMMANDS
+Several single-key commands are recognized while \fBstop\fP is
+running:
+.TP
+.B space
+Update the display.
+.TP
+.B ^L
+Redraw the screen.
+.TP
+.B h or ?
+Print a help page.
+.TP
+.B c
+Toggle display of contact summary information.
+.TP
+.B d
+Set the delay in seconds between updates.
+.TP
+.B m
+Toggle display of mode specific summary information.
+.TP
+.B n
+Toggle display of network layer summary information.
+.TP
+.B t
+Toggle display of transport layer summary information.
+.TP
+.B w
+Freeze the screen until someone hits a key.
+.TP
+.B q
+Quit
+.SH DISPLAY
+\fBstop\fP displays statistics in a compact format. It uses several
+abbreviations to explain what the numbers mean. Here are some
+explanations:
+.TP
+.B bps
+Bits per second.
+.TP
+.B pps
+Packets per second.
+.TP
+.B sps
+Segments per second.
+.PP
+Numbers are usually displayed using four digits. Numbers larger than
+9999 will be displayed using 3 digits plus a character which provides
+the scaling factor (k=10^3, m=10^6, g=10^9, t=10^10, p=10^11, K=2^10,
+M=2^20, G=2^30, T=2^31m, P=2^32).
+.SH "SEE ALSO"
+.\" .BR foo (1), 
+.\" .BR bar (1).
+.BR scli (1).
+.SH AUTHOR
+Juergen Schoenwaelder <schoenw@ibr.cs.tu-bs.de>.

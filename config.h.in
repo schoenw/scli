@@ -1,0 +1,41 @@
+/* config.h.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Define if you have the ANSI C header files.  */
+#undef STDC_HEADERS
+
+/* Define if you have the resizeterm function.  */
+#undef HAVE_RESIZETERM
+
+/* Define if you have the <dmalloc.h> header file.  */
+#undef HAVE_DMALLOC_H
+
+/* Define if you have the <sys/ioctl.h> header file.  */
+#undef HAVE_SYS_IOCTL_H
+
+/* Define if you have the <sys/time.h> header file.  */
+#undef HAVE_SYS_TIME_H
+
+/* Define if you have the <unistd.h> header file.  */
+#undef HAVE_UNISTD_H
+
+/* Define if you have the dmalloc library (-ldmalloc).  */
+#undef HAVE_LIBDMALLOC
+
+/* Define if you have the ncurses library (-lncurses).  */
+#undef HAVE_LIBNCURSES
+
+/* Define if you have the nsl library (-lnsl).  */
+#undef HAVE_LIBNSL
+
+/* Define if you have the readline library (-lreadline).  */
+#undef HAVE_LIBREADLINE
+
+/* Define if you have the socket library (-lsocket).  */
+#undef HAVE_LIBSOCKET
+
+/* Name of package */
+#undef PACKAGE
+
+/* Version number of package */
+#undef VERSION
+

@@ -1,0 +1,66 @@
+- Additional command line options:
+  -t --transport (udp/tcp)
+  -u --user
+  -c --context
+
+- Check ASN.1 tags in the responses to have some minimum type checking.
+  (Requires changes to the MIB stub generator.)
+
+- Add reasonable error reporting to the stub code.
+
+- Enhance the stub generator to properly decode INDEX elements.
+
+- Fix at least the biggest memory leaks in the SNMP code.
+
+- Add a mechanism (perhaps based on fd_sets) to tell the stubs to retrieve
+  only a subset of the members of a data structure. This would be more
+  friendly to the network - but why should be friendly? ;-)
+
+- Write some more substantial documentation including a cookbook on how
+  to extend the stools.
+
+- Change the scli code to build results in the interpreter instead of
+  writing directly to the output stream.
+
+==== GXSNMP specific things ====
+
++ 1. change the oid type from gulong to guint32
+
+  2. allow timeouts in ms rather than seconds
+
+  3. generate unused random request ids
+
+  4. do not use strcpy et al when dealing with octet strings - in fact,
+     the g_pdu_add_oid() function needs to have another parameter to pass
+     the value length down
+
+  5. asn1_int_decode -> g_asn1_int_decode
+
++ 6. make byteReverse static in g_md5.c
+
++ 7. get rid of the signed char in the syntax union
+
+  8. get rid of any printf's in the library code
+
++ 9. get rid of the idea of IPv6 addresses as a base type
+
++10. get rid of the timeticks printer (even if this means duplication)
+
+ 11. there was a missing #include somewhere
+
+ 12. add a sync table retrieval interface
+
+ 13. the g_sync_* functions do not return error code and error index
+
++14. add support for 64 bit counters
+
+ 15. port numbers passed to the library are ignored
+
++16. fix the type definitions to follow glib naming style
+
+ 17. turn #define enumerations into real enumerations
+
+ 18. there are several memory leaks in the code
+
+ 19. implement a coexistance layer to hide snmpv1/snmpv2 pdu differences
+

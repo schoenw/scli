@@ -1,0 +1,36 @@
+	stools - a collection of SNMP command line management tools
+
+Description
+
+  The stools package was written in order to have small and efficient
+  command line utility to monitor and configure network devices and
+  host systems. The stools package is based on the SNMP management
+  protocol and it utilizes a MIB compiler called smidump to generate C
+  stub code. In fact, virtually no SNMP knowledge is required in order
+  to extend the stools programs with new features.
+
+  In other words, the slogan for this little package is:
+
+    "After more than 10 years of SNMP, I felt it is time for really
+     useful command line SNMP monitoring and configuration tools. ;-)"
+
+
+Copyright (C) 2001 Juergen Schoenwaelder
+
+  stop is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Comments are welcome.
+
+	- Juergen Schoenwaelder <schoenw@ibr.cs.tu-bs.de>
