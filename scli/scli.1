@@ -92,6 +92,9 @@ organized in a hierarchy. This section only describes the top-level
 commands. Invoke the \fIhelp\fP command described below to get a
 complete list of all commands supported by \fBscli\fP.
 .TP 10
+.I open
+Establish an association to a remote SNMP agent.
+.TP
 .I close
 Close the association to a remote SNMP agent.
 .TP
@@ -105,8 +108,20 @@ including a full list of the \fBscli\fP command hierarchy.
 .I history
 Show the history of the last \fBscli\fP commands.
 .TP
-.I open
-Establish an association to a remote SNMP agent.
+.I create
+Create new object instances on the remote SNMP agent. This command
+has many sub-commands which are used to instantiate very different
+things.
+.TP
+.I delete
+Delete object instances from the remote SNMP agent. This command
+has many sub-commands which are used to delete very different
+things.
+.TP
+.I set
+Modify object instances on the remote SNMP agent by assigning new
+values. This command has many sub-commands which are used to set
+very different things.
 .TP
 .I show
 Show information provided by the remote SNMP agent. This command has
@@ -143,34 +158,74 @@ provides the following commands:
 .B monitor interface stats [<regexp>]
 .P
 The \fBshow interface info\fP command shows summary information about
-all selected interfaces. The regular expression <regexp> is matched
-against the interface descriptions to select the interfaces of interest.
-The command generates a table which displays the interface number, its
-status (administrative status, operational status, connector present,
-promiscuous mode), the maximum transfer unit (MTU) of the interface,
-the interface type and speed, the interface's local name and its
-description.
+all selected interfaces. The optional regular expression <regexp> is
+matched against the interface descriptions to select the interfaces of
+interest.  The command generates a table which displays the interface
+number, its status (administrative status, operational status,
+connector present, promiscuous mode), the maximum transfer unit (MTU)
+of the interface, the interface type and speed, the interface's local
+name and its description.
 .P
 The \fBshow interface details\fP command describes the selected
-interfaces in more details. The regular expression <regexp> is matched
-against the interface descriptions to select the interfaces of
-interest. <xxx>
+interfaces in more detail. The optional regular expression <regexp> is
+matched against the interface descriptions to select the interfaces of
+interest. <tbd>
 .P
-The \fBshow interface stats\fP command <xxx>
+The \fBshow interface stats\fP command <tbd>
 .P
 The \fBshow interface stack\fP command shows the stacking order of the
-interfaces. <xxx>
+interfaces. <tbd>
 .P
 THe \fBset interface status <regexp> <value>\fP command modifies the
-administrative status of all selected interfaces. The regular
+administrative status of all selected interfaces. The optional regular
 expression <regexp> is matched against the interface descriptions to
 select the interfaces of interest. The <value> parameter must be one
 of the strings "up", "down" or "testing".
 
+.SH NORTEL MODE
+The nortel mode allows to manipulate virtual lans (vlans) on nortel
+bridges. It is based on the RAPIDCITY-VLAN-MIB which is implemented at
+least on the baystack bridges.
+.TP
+.B create nortel bridge vlan <vlanid> <name>
+.TP
+.B delete nortel bridge vlan <regexp>
+.TP
+.B set nortel bridge vlan ports <regexp> <ports>
+.TP
+.B show nortel bridge vlan info [<regexp>]
+.TP
+.B show nortel bridge vlan details [<regexp>]
+.P
+The \fBcreate nortel bridge vlan\fP command is used to create a new
+vlan with the given vlanid and name.
+.P
+The \fBdelete nortel bridge vlan\fP command deletes all selected
+vlans.  The regular expression <regexp> is matched against the vlan
+names to select the vlans that should be deleted.
+.P
+The \fBset nortel bridge vlan ports\fP command allows to assign ports
+to port-based vlans. The regular expression <regexp> is matched
+against the vlan names to select the vlans that should be
+modified. The <ports> argument contains a comma separated list of port
+numbers or port number ranges, e.g. 1,5,7-8.
+.P
+The \fBshow nortel bridge vlan info\fP command shows summary
+information about all selected vlans.  The optional regular expression
+<regexp> is matched against the vlan names to select the vlans of
+interest. The command generates a table which displays the vlan
+number, the vlan name, the vlan type, the assigned vlan color, the
+vlan priority, whether routing is enabled and the status of the vlan.
+.P
+The \fBshow nortel bridge vlan details\fP command describes the
+selected vlans in more detail. The optional regular expression
+<regexp> is matched against the vlan names to select the vlans of
+interest. <tbd>
+
 .SH INTERACTIVE MONITOR COMMANDS
 Several single-key commands are recognized while \fBscli\fP is running
 in monitor mode:
-.TP
+.TP 8
 .B space
 Update the display.
 .TP
