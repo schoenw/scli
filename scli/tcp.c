@@ -263,6 +263,10 @@ scli_init_tcp_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "existing tcp connections",
 	  cmd_tcp_connections },
+	{ "monitor tcp connections",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  "existing tcp connections",
+	  cmd_tcp_connections },
 	{ NULL, 0, NULL, NULL }
     };
     

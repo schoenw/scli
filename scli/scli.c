@@ -53,7 +53,7 @@ static scli_interp_t *current_interp = NULL;
 static void
 onsignal(int n)
 {
-    (void) endwin();
+    if (! isendwin()) (void) endwin();
     exit(0);
 }
 

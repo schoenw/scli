@@ -406,9 +406,14 @@ cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifXEntry_t **ifXTable = NULL;
     static struct timeval last, now;
     double delta;
-    int i;
     static if_stats_t *stats = NULL;
     static time_t epoch = 0;
+    char *iface = NULL;
+    int i;
+
+    if (argc > 1) {
+	iface = argv[1];
+    }
 
     if (if_mib_get_ifTable(interp->peer, &ifTable)) {
 	return SCLI_ERROR;
@@ -434,7 +439,12 @@ cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
 	g_string_append(interp->header, "INDEX STAT SPEED "
 			"I-BPS O-BPS I-PPS O-PPS I-ERR O-ERR  DESCRIPTION");
 	for (i = 0; ifTable[i]; i++) {
-	    GString *s = interp->result;
+	    GString *s;
+	    if (! match_interface(iface, ifTable[i],
+				  ifXTable ? ifXTable[i] : NULL)) {
+		continue;
+	    }
+	    s = interp->result;
 	    g_string_sprintfa(s, "%5u ", ifTable[i]->ifIndex);
 	    fmt_ifStatus(s,
 			 ifTable[i]->ifAdminStatus, ifTable[i]->ifOperStatus,

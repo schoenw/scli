@@ -27,6 +27,9 @@
 #include "scli.h"
 
 #include "snmpv2-mib.h"
+#include "ip-mib.h"
+#include "udp-mib.h"
+#include "tcp-mib.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -72,6 +75,18 @@ static WINDOW *mode_win = NULL;
 
 
 static void
+fix_string(guchar *s, gsize *len)
+{
+    int i;
+
+    for (i = 0; i < *len; i++) {
+        if (s[i] == '\r' || s[i] == '\n') s[i] = ' ';
+    }
+}
+
+
+
+static void
 snmp_decode_hook(GSList *list)
 {
     static char x[] = { '-', '/', '-', '\\', '|' };
@@ -102,29 +117,21 @@ page(WINDOW *win, scli_interp_t *interp)
 {
     int y = 0;
 
-#if 0
-    if (!interp->header->len && !interp->result->len) {
-	stop_show_message("grrr");
-    }
-#endif
-    
-    if (interp->header->len) {
-	wattron(win, A_REVERSE);
-	mvwprintw(win, y++, 0, "%-*s", COLS, interp->header->str);
-	wattroff(win, A_REVERSE);
-    }
-
+    wattron(win, A_REVERSE);
+    mvwprintw(win, y++, 0, "%-*s", COLS,
+	      interp->header->len ? interp->header->str : " ");
+    wattroff(win, A_REVERSE);
     if (interp->result->len) {
 	mvwprintw(win, y, 0, interp->result->str);
-	wclrtobot(win);
     }
+    wclrtobot(win);
     wrefresh(win);
 }
 
 
 
-void
-stop_show_message(char *message)
+static void
+show_message(char *message)
 {
     move(status_line, 0);
     clrtoeol();
@@ -137,8 +144,19 @@ stop_show_message(char *message)
 
 
 
-char*
-stop_prompt(char *message)
+static void
+show_mode_summary(char *string)
+{
+    move(mode_line, 0);
+    mvprintw(mode_line, 0, "Monitor:  %.*s",
+	     MIN(strlen(string), COLS-10), string);
+    clrtoeol();
+}
+
+
+
+static char*
+prompt(char *message)
 {
     static char buffer[80];
 
@@ -179,14 +197,13 @@ show_system(GSnmpSession *peer, int flags)
         strcpy(timestr, "--:--:--");
     }
 
-#if 0
     if (snmpv2_mib_get_system(peer, &system) != 0 || system == NULL) {
-	gchar *address = g_snmp_session_address(peer);
         move(0, 10);
         clrtoeol();
-        mvprintw(0, 10, "%s", address);
+        mvprintw(0, 10, "%s:%d", peer->name, peer->port);
         attron(A_BOLD);
-        mvprintw(0, 10 + strlen(address) + 8, "SNMP communication problem");
+        mvprintw(0, 10 + strlen(peer->name) + 8,
+                 "SNMP communication problem");
         attroff(A_BOLD);
         mvaddstr(0, COLS-strlen(timestr)-1, timestr);
         return STOP_FLAG_SNMP_FAILURE;
@@ -207,8 +224,8 @@ show_system(GSnmpSession *peer, int flags)
 	seconds = secs % 60;
         move(0, 10);
         clrtoeol();
-        mvprintw(0, 10, "%s up %d %s %02d:%02d:%02d",
-                 g_snmp_session_address(peer),
+        mvprintw(0, 10, "%s:%d up %d %s %02d:%02d:%02d",
+                 peer->name, peer->port,
 		 days, (days == 1) ? "day" : "days",
 		 hours, minutes, seconds);
         sysUpTime = *(system->sysUpTime);
@@ -236,14 +253,216 @@ show_system(GSnmpSession *peer, int flags)
                  system->sysLocation);
 	clrtoeol();
     }
-#endif
     
     last = now;
-#if 0
-    snmpv2_mib_free_system(system);
-#endif
+    if (system) snmpv2_mib_free_system(system);
     mvaddstr(0, COLS-strlen(timestr)-1, timestr);
     return 0;
+}
+
+
+
+static void
+show_ip(GSnmpSession *peer, int flags)
+{
+    ip_mib_ip_t *ip = NULL;
+    static guint32 ipInReceives = 0;
+    static guint32 ipForwDatagrams = 0;
+    static guint32 ipReasmOKs = 0;
+    static guint32 ipFragOKs = 0;
+    static guint32 ipOutSent = 0;
+    static struct timeval last, now;
+    double delta;
+
+    if (flags & STOP_FLAG_RESTART) {
+        last.tv_sec = last.tv_usec = 0;
+    }
+
+    if (ip_mib_get_ip(peer, &ip) != 0 || ip == NULL) {
+        return;
+    }
+    
+    gettimeofday(&now, NULL);
+    delta = TV_DIFF(last, now);
+    if (ip->ipInReceives && delta > TV_DELTA) {
+        if (last.tv_sec && last.tv_usec) {
+	    double f_val = (*(ip->ipInReceives) - ipInReceives) / delta;
+            mvprintw(ipv4_line, 10, (char *) fmt_kmg((guint32) f_val));
+        }
+        ipInReceives = *(ip->ipInReceives);
+    } else {
+        mvprintw(ipv4_line, 10, "----");
+    }
+    
+    if (ip->ipForwDatagrams
+        && ip->ipOutRequests
+        && ip->ipOutDiscards
+        && ip->ipOutNoRoutes
+        && ip->ipFragOKs
+        && ip->ipFragFails
+        && ip->ipFragCreates && delta > TV_DELTA) {
+        guint32 ipOut;
+        ipOut = *(ip->ipOutRequests)
+            + *(ip->ipForwDatagrams)
+            - *(ip->ipOutDiscards)
+            - *(ip->ipOutNoRoutes)
+            - *(ip->ipFragOKs)
+            - *(ip->ipFragFails)
+            + *(ip->ipFragCreates);
+        if (last.tv_sec && last.tv_usec) {
+            mvprintw(ipv4_line, 22,
+	     (char *) fmt_kmg((guint32) ((ipOut - ipOutSent) / delta)));
+        }
+        ipOutSent = ipOut;
+    } else {
+        mvprintw(ipv4_line, 22, "----");
+    }
+    
+    if (ip->ipForwDatagrams && delta > TV_DELTA) {
+        if (last.tv_sec && last.tv_usec) {
+	    double f_val = (*(ip->ipForwDatagrams) - ipForwDatagrams) / delta;
+            mvprintw(ipv4_line, 35, (char *) fmt_kmg((guint32) f_val));
+        }
+        ipForwDatagrams = *(ip->ipForwDatagrams);
+    } else {
+        mvprintw(ipv4_line, 35, "----");
+    }
+    
+    if (ip->ipReasmOKs && delta > TV_DELTA) {
+        if (last.tv_sec && last.tv_usec) {
+	    double f_val = (*(ip->ipReasmOKs) - ipReasmOKs) / delta;
+            mvprintw(ipv4_line, 48, (char *) fmt_kmg((guint32) f_val));
+        }
+        ipReasmOKs = *(ip->ipReasmOKs);
+    } else {
+        mvprintw(ipv4_line, 48, "----");
+    }
+    
+    if (ip->ipFragOKs && delta > TV_DELTA) {
+        if (last.tv_sec && last.tv_usec) {
+	    double f_val = (*(ip->ipFragOKs) - ipFragOKs) / delta;
+	    mvprintw(ipv4_line, 62, (char *) fmt_kmg((guint32) f_val));
+        }
+        ipFragOKs = *(ip->ipFragOKs);
+    } else {
+        mvprintw(ipv4_line, 62, "----");
+    }
+    
+    last = now;
+    ip_mib_free_ip(ip);
+}
+
+
+static void
+show_udp(GSnmpSession *peer, int flags)
+{
+    udp_mib_udp_t *udp = NULL;
+    static guint32 udpInDatagrams = 0;
+    static guint32 udpOutDatagrams = 0;
+    static struct timeval last, now;
+    double delta;
+    
+    if (flags & STOP_FLAG_RESTART) {
+        last.tv_sec = last.tv_usec = 0;
+    }
+
+    if (udp_mib_get_udp(peer, &udp) != 0 || udp == NULL) {
+        return;
+    }
+
+    gettimeofday (&now, NULL);
+    delta = TV_DIFF(last, now);
+    if (udp->udpInDatagrams && delta > TV_DELTA) {
+        if (last.tv_sec && last.tv_usec) {
+	    double f_val = (*(udp->udpInDatagrams) - udpInDatagrams) / delta;
+            mvprintw(udp_line, 10, (char *) fmt_kmg((guint32) f_val));
+        }
+        udpInDatagrams = *(udp->udpInDatagrams);
+    } else {
+        mvprintw(udp_line, 10, "----");
+    }
+    if (udp->udpOutDatagrams && delta > TV_DELTA) {
+        if (last.tv_sec && last.tv_usec) {
+	    double f_val = (*(udp->udpOutDatagrams) - udpOutDatagrams) / delta;
+            mvprintw(udp_line, 22, (char *) fmt_kmg((guint32) f_val));
+        }
+        udpOutDatagrams = *(udp->udpOutDatagrams);
+    } else {
+        mvprintw(udp_line, 22, "----");
+    }
+
+    last = now;
+    udp_mib_free_udp(udp);
+}
+
+
+
+static void
+show_tcp(GSnmpSession *peer, int flags)
+{
+    tcp_mib_tcp_t *tcp = NULL;
+    static guint32 tcpInSegs = 0;
+    static guint32 tcpOutSegs = 0;
+    static guint32 tcpActiveOpens = 0;
+    static guint32 tcpPassiveOpens = 0; 
+    static struct timeval last, now;
+    double delta;
+
+    if (flags & STOP_FLAG_RESTART) {
+        last.tv_sec = last.tv_usec = 0;
+    }
+
+    if (tcp_mib_get_tcp(peer, &tcp) != 0 || tcp == NULL) {
+        return;
+        
+    }
+
+    gettimeofday (&now, NULL);
+    delta = TV_DIFF(last, now);
+    if (tcp->tcpInSegs && delta > TV_DELTA) {
+        if (last.tv_sec && last.tv_usec) {
+	    double f_val = (*(tcp->tcpInSegs) - tcpInSegs) / delta;
+            mvprintw(tcp_line, 10, (char *) fmt_kmg((guint32) f_val));
+        }
+        tcpInSegs = *(tcp->tcpInSegs);
+    } else {
+        mvprintw(tcp_line, 10, "----");
+    }
+    if (tcp->tcpOutSegs && delta > TV_DELTA) {
+        if (last.tv_sec && last.tv_usec) {
+	    double f_val = (*(tcp->tcpOutSegs) - tcpOutSegs) / delta;
+            mvprintw(tcp_line, 22, (char *) fmt_kmg((guint32) f_val));
+        }
+        tcpOutSegs = *(tcp->tcpOutSegs);
+    } else {
+        mvprintw(tcp_line, 22, "----");
+    }
+    if (tcp->tcpCurrEstab) {
+        mvprintw(tcp_line, 35, (char *) fmt_kmg(*(tcp->tcpCurrEstab)));
+    } else {
+        mvprintw(tcp_line, 35, "----");
+    }
+    if (tcp->tcpActiveOpens && delta > TV_DELTA) {
+        if (last.tv_sec && last.tv_usec) {
+	    double f_val = (*(tcp->tcpActiveOpens) - tcpActiveOpens) / delta;
+            mvprintw(tcp_line, 48, (char *) fmt_kmg((guint32) f_val));
+        }
+        tcpActiveOpens = *(tcp->tcpActiveOpens);
+    } else {
+        mvprintw(tcp_line, 48, "----");
+    }
+    if (tcp->tcpPassiveOpens && delta > TV_DELTA) {
+        if (last.tv_sec && last.tv_usec) {
+	    double f_val = (*(tcp->tcpPassiveOpens) - tcpPassiveOpens) / delta;
+            mvprintw(tcp_line, 62, (char *) fmt_kmg((guint32) f_val));
+        }
+	tcpPassiveOpens = *(tcp->tcpPassiveOpens);
+    } else {
+        mvprintw(tcp_line, 62, "----");
+    }
+
+    last = now;
+    tcp_mib_free_tcp(tcp);
 }
 
 
@@ -279,11 +498,9 @@ show_interior(GSnmpSession *peer)
         tcp_line = y;
         mvaddstr(y++, 0, "TCP:      ---- sps in ---- sps out ---- con est ---- con aopn ---- con popn");
     }
-#if 0
-    if (active_mode && do_mode_summary) {
+    if (do_mode_summary) {
 	mode_line = y++;
     }
-#endif
     status_line = y++;
 
     if (mode_win) {
@@ -333,13 +550,13 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
     
     flags |= STOP_FLAG_RESTART;
     flags |= STOP_FLAG_NODELAY;
+
     while (! (flags & STOP_FLAG_DONE)) {
         if (flags & STOP_FLAG_RESTART) {
             show_interior(interp->peer);
         }
         flags |= show_system(interp->peer, flags);
         if (! (flags & STOP_FLAG_SNMP_FAILURE)) {
-#if 0
             if (do_network_summary) {
                 show_ip(interp->peer, flags);
             }
@@ -347,7 +564,9 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
                 show_udp(interp->peer, flags);
                 show_tcp(interp->peer, flags);
             }
-#endif
+	    if (do_mode_summary) {
+		show_mode_summary(cmd->desc);
+	    }
         }
 	move(status_line, 0);
         refresh();
@@ -355,9 +574,10 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 	    g_string_truncate(interp->result, 0);
 	    g_string_truncate(interp->header, 0);
 	    code = (cmd->func) (interp, argc, argv);
-	    if (interp->result) {
-		page(mode_win, interp);
+	    if (! interp->result->len && ! interp->header->len) {
+		g_string_append(interp->header, "NO DATA AVAILABLE");
 	    }
+	    page(mode_win, interp);
 	}
         move(status_line, 0);
         clrtoeol();
@@ -399,32 +619,29 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
         case '\f':
             flags |= STOP_FLAG_RESTART;
             break;
-#if 0
         case 'c':
             do_contact_summary = ! do_contact_summary;
             g_snprintf(buffer, sizeof(buffer),
 		       "Display of contact summary information %s",
 		       do_contact_summary ? "on" : "off");
-            stop_show_message(buffer);
+            show_message(buffer);
             flags |= STOP_FLAG_RESTART;
             break;
-#endif
         case 'd':
-            input = stop_prompt("Delay between updates (seconds): ");
+            input = prompt("Delay between updates (seconds): ");
             if (atoi(input) > 0) {
                 interp->delay = atoi(input) * 1000;
             }
 	    g_snprintf(buffer, sizeof(buffer),
 		       "Delay changed to %d seconds.", interp->delay / 1000);
-	    stop_show_message(buffer);
+	    show_message(buffer);
             break;
-#if 0
 	case 'm':
             do_mode_summary = ! do_mode_summary;
             g_snprintf(buffer, sizeof(buffer),
 		       "Display of mode specific summary information %s",
 		       do_mode_summary ? "on" : "off");
-            stop_show_message(buffer);
+            show_message(buffer);
             flags |= STOP_FLAG_RESTART;
 	    break;
         case 'n':
@@ -432,7 +649,7 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
             g_snprintf(buffer, sizeof(buffer),
 		       "Display of network layer summary information %s",
 		       do_network_summary ? "on" : "off");
-            stop_show_message(buffer);
+            show_message(buffer);
             flags |= STOP_FLAG_RESTART;
             break;
         case 't':
@@ -440,19 +657,18 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
             g_snprintf(buffer, sizeof(buffer),
 		       "Display of transport layer summary information %s",
 		       do_transport_summary ? "on" : "off");
-            stop_show_message(buffer);
+            show_message(buffer);
             flags |= STOP_FLAG_RESTART;
             break;
-#endif
 	case 'w':
-            stop_show_message("Press any key to continue: ");
+            show_message("Press any key to continue: ");
 	    timeout(-1);
 	    (void) getch();
 	    break;
         default:
             g_snprintf(buffer, sizeof(buffer),
 		       "Unknown command `%c (%d)' -- hit `h' for help", c, c);
-            stop_show_message(buffer);
+            show_message(buffer);
             break;
         }
     }
