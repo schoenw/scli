@@ -1,7 +1,9 @@
 /*
- * GXSNMP -- An snmp mangament application
+ * GSNMP -- glib-based SNMP implementation
+ *
+ * Copyright (C) 2001 Juergen Schoenwaelder
  * Copyright (C) 1998 Gregory McLean & Jochen Friedrich
- * Beholder RMON ethernet network monitor, Copyright (C) 1993 DNPAP group
+ * Copyright (C) 1993 DNPAP Beholder Group
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
+ * $Id$
  */
 
 /*

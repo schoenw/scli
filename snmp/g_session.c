@@ -345,7 +345,7 @@ cb_time(GSnmpSession *session, void *magic)
 }
 
 static gboolean
-cb_done (GSnmpSession *session, void *magic, GSnmpPdu *spdu, GSList *objs)
+cb_done(GSnmpSession *session, void *magic, GSnmpPdu *spdu, GSList *objs)
 {
   struct syncmagic *sm = (struct syncmagic *) magic;
   sm->result = objs;
