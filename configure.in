@@ -1,8 +1,8 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(scli/scli.c)
-dnl Every other copy of the package version number gets its value from here
-AM_INIT_AUTOMAKE(scli, 0.2.12)
+AC_INIT(scli, 0.3.1)
+AC_CONFIG_SRCDIR(scli/scli.c)
+AM_INIT_AUTOMAKE()
 
 dnl create a config.h file (Automake will add -DHAVE_CONFIG_H)
 AM_CONFIG_HEADER(config.h)
@@ -32,9 +32,14 @@ AC_ARG_ENABLE(warnings,
 
 dnl Checks for libraries.
 
-AM_PATH_GLIB(1.2.0, [], AC_MSG_ERROR(scli needs GLIB), gmodule)
+AM_PATH_GLIB_2_0(2.0.0, [], AC_MSG_ERROR(scli needs GLIB), gmodule)
+AM_PATH_GNET_2_0(2.0.0, [], AC_MSG_ERROR(scli needs GNET))
+dnl AM_PATH_GLIB(1.2.0, [], AC_MSG_ERROR(scli needs GLIB), gmodule)
 dnl AM_PATH_GTK(1.2.0, [], AC_MSG_ERROR(scli needs GTK))
 AM_PATH_XML2(2.0.0, [], AC_MSG_ERROR(scli needs libxml2))
+PKG_CHECK_MODULES(GSNMP, gsnmp, have_gsnmp=true, have_gsnmp=false)
+AC_SUBST(GSNMP_CFLAGS)
+AC_SUBST(GSNMP_LIBS)
 AC_CHECK_LIB(ncurses, initscr, [],
   AC_CHECK_LIB(curses, initscr, [],
     AC_MSG_ERROR([scli requires curses functions; install curses first])
@@ -76,4 +81,4 @@ AC_ARG_ENABLE(dmalloc,
 
 dnl Create all the Makefiles we need and we are done.
 
-AC_OUTPUT(Makefile snmp/Makefile stub/Makefile proc/Makefile scli/Makefile doc/Makefile)
+AC_OUTPUT(Makefile stub/Makefile proc/Makefile lib/Makefile scli/Makefile doc/Makefile)

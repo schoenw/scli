@@ -2,6 +2,13 @@ This is just a bunch of ideas - completely unordered and there is no
 reason to assume I actually do the things mentioned below. Anyway, if
 you want to volunteer, you might find some ideas below. ;-)
 
+- The color element in the printer xml format should be moved below 
+  the marker entry. Perhaps this should also be reflected on the 
+  command line as well? Perhaps it would make more sense to just
+  display the colorant info as part of the "show printer marker"
+  command? Note that supplies and colorants may be associated with
+  no marker since the marker index component may be zero.
+
 - Transparently map RFC 1213 ipRouteTable in the CIDR routing table
   in the proc layer.
 
