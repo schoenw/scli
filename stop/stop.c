@@ -746,7 +746,7 @@ usage()
 int
 main(int argc, char **argv)
 {
-    GSnmpSession _peer, *peer = &_peer;
+    GSnmpSession *peer = NULL;
     snmpv2_mib_system_t *system = NULL;
     int c, port = 161, delay = 5000, retries = 5, timeout = 200000;
     char *mode_name = NULL;
@@ -828,9 +828,9 @@ main(int argc, char **argv)
      * SNMPv2c (since this protocol does much better error handling)
      * and we fall back to SNMPv1 only if this is necessary.
      */
-    
-    memset(peer, 0, sizeof(GSnmpSession));
-    peer->domain = AF_INET;
+
+    peer = g_snmp_session_new();
+    peer->domain = G_SNMP_TDOMAIN_UDP_IPV4;
     peer->name = g_strdup(argv[optind++]);
     peer->port = port;
     peer->rcomm = (argc-optind > 0) ? argv[optind++] : "public";

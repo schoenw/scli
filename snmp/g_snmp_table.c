@@ -151,7 +151,7 @@ g_snmp_table_new(GSnmpSession *session, GSList *objs,
     table->session->wcomm   = session->wcomm;
     table->session->retries = session->retries;
     table->session->name    = session->name;
-    table->session->status  = 0;
+    table->session->error_status  = 0;
     table->session->port    = session->port;
     table->session->timeout = session->timeout;
     table->session->version = session->version;

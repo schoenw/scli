@@ -20,6 +20,9 @@
  * Implementation of a SNMP dispatcher as of RFC2271
  */
 
+#ifndef _G_DISPATCH_H_
+#define _G_DISPATCH_H_
+
 #include "g_snmp.h"
 
 /* This module defines the API to the SNMP RFC layer. Requests are routed
@@ -53,11 +56,11 @@ gboolean g_snmp_init(gboolean dobind);
 
 gboolean g_register_message   (guint model_nr, struct g_message *msg);
 gboolean g_register_security  (guint model_nr, struct g_security *sec);
-gboolean g_register_transport (struct g_transport *tpt);
+gboolean g_register_transport (GSnmpTransport *tpt);
 GList  * g_transport_model_list (void);
 GList  * g_transport_name_list  (void);
 
 #define PDUV1 1
 #define PDUV2 2
 
-/* EOF */
+#endif /* _G_DISPATCH_H_ */

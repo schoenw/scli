@@ -16,8 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,  59 Temple Place - Suite 330, Cambridge, MA 02139, USA.
- *
- * Snmp transport modules
  */
 
 #ifndef lint
@@ -32,33 +30,28 @@ static char const rcsid[] =
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/socket.h>
-
-extern int     errno;
+#include <errno.h>
 
 #ifdef HAVE_INET
 
 #include <netinet/in.h>
 #include <netdb.h>
 
-#ifdef SNMP_DEBUG
-/* Subroutine to dump packet contents to the screen - jms */
-static void packet_dump (gpointer data, guint len)
+/*
+ * Subroutine to dump packet contents to the screen - jms
+ */
+
+static void
+dump_packet(guchar *data, guint len)
 {
-  guint i;
-  for (i = 0; i < len; i++)
-    {
-      if (i % 16 == 0)
-        g_print ("%8.8x:", i);
-      if (i % 4 == 0)
-        g_print (" ");
-        g_print ("%2.2x", ((guchar *)data)[i]);
-      if (i % 16 == 15)
-        g_print ("\n");
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_TRANSPORT) {
+	guint i;
+	for (i = 0; i < len; i++) {
+	    g_printerr("%2.2x%c", data[i], (i % 16 == 15) ? '\n' : ':');
+	}
+	if (i % 16 != 15) g_printerr("\n");
     }
-  if (i % 16 != 15)
-    g_print ("\n");
 }
-#endif
 
 static gint ipv4_socket = 0;      /* file handle for SNMP traffic */
 
@@ -115,46 +108,45 @@ ipv4_resolve_address (guchar *hostname, struct sockaddr **address)
 }
 
 static gboolean
-ipv4_send_message(struct sockaddr *transportAddress, gpointer outgoingMessage, 
+ipv4_send_message(struct sockaddr *transportAddress,
+		  guchar *outgoingMessage,
                   guint outgoingMessageLength)
 {
-#ifdef SNMP_DEBUG
-  printf("Sending packet on IPv4, %d bytes\n", outgoingMessageLength);
-  packet_dump (outgoingMessage, outgoingMessageLength);
-#endif
-  if (sendto(ipv4_socket, outgoingMessage, outgoingMessageLength, 0,
-             transportAddress, sizeof(struct sockaddr_in)))
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_TRANSPORT) {
+	g_printerr("Sending IPv4 packet, %d bytes\n", outgoingMessageLength);
+	dump_packet(outgoingMessage, outgoingMessageLength);
+    }
+    if (sendto(ipv4_socket, outgoingMessage, outgoingMessageLength, 0,
+	       transportAddress, sizeof(struct sockaddr_in)) < 0) {
+	return FALSE;
+    }
     return TRUE;
-#ifdef SNMP_DEBUG
-  printf("Sending packet on IPv4 FAILED with RC=%d\n", errno);
-#endif
-  return FALSE;
 }
 
 static void
 ipv4_receive_message()
 {
-  guchar              buffer[MAX_DGRAM_SIZE];
-  struct sockaddr_in  address;
-  int                 adrsize, len;
+    guchar              buffer[MAX_DGRAM_SIZE];
+    struct sockaddr_in  address;
+    int                 adrsize, len;
 
-  adrsize = sizeof (address);
+    adrsize = sizeof (address);
 
-  len = recvfrom(ipv4_socket, (char *) buffer, sizeof(buffer), 0, 
-                 (struct sockaddr *) &address, &adrsize);
-#ifdef SNMP_DEBUG
-  printf("Received packet on IPv4, %d bytes\n", len);
-  packet_dump (buffer, len);
-#endif
-  if (len>0)
-    g_receive_message(AF_INET, (struct sockaddr *)&address, buffer, len);
-
+    len = recvfrom(ipv4_socket, (char *) buffer, sizeof(buffer), 0, 
+		   (struct sockaddr *) &address, &adrsize);
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_TRANSPORT) {
+	g_printerr("Received IPv4 packet, %d bytes\n", len);
+	dump_packet(buffer, len);
+    }
+    if (len > 0) {
+	g_receive_message(AF_INET, (struct sockaddr *)&address, buffer, len);
+    }
 }
 
 static guint
 ipv4_get_socket()
 {
-  return ipv4_socket;
+    return ipv4_socket;
 }
 
 #endif
@@ -236,37 +228,43 @@ ipx_init(gboolean dobind)
 }
   
 static gboolean
-ipx_send_message(struct sockaddr *transportAddress, gpointer outgoingMessage, 
+ipx_send_message(struct sockaddr *transportAddress,
+		 guchar *outgoingMessage,
                  guint outgoingMessageLength)
 {
-#ifdef SNMP_DEBUG
-  printf("Sending packet on IPX\n");
-#endif
-  if (sendto(ipx_socket, outgoingMessage, outgoingMessageLength, 0,
-             transportAddress, sizeof(struct sockaddr_ipx)))
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_TRANSPORT) {
+	g_printerr("Sending IPX packet, %d bytes\n", outgoingMessageLength);
+    }
+    if (sendto(ipx_socket, outgoingMessage, outgoingMessageLength, 0,
+	       transportAddress, sizeof(struct sockaddr_ipx)) < 0) {
+	return FALSE;
+    }
     return TRUE;
-  else
-    return FALSE;
 }
 
 static void
 ipx_receive_message()
 {
-  guchar              buffer[MAX_DGRAM_SIZE];
-  struct sockaddr_ipx address;
-  int                 adrsize, len;
+    guchar              buffer[MAX_DGRAM_SIZE];
+    struct sockaddr_ipx address;
+    int                 adrsize, len;
 
-  adrsize = sizeof (address);
-  len = recvfrom(ipx_socket, buffer, sizeof(buffer), 0, 
-                 &address, &adrsize);
-  if (len>0)
-    g_receive_message(AF_IPX, (struct sockaddr *)&address, buffer, len);
+    adrsize = sizeof (address);
+    len = recvfrom(ipx_socket, buffer, sizeof(buffer), 0, 
+		   &address, &adrsize);
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_TRANSPORT) {
+	g_printerr("Received IPX packet, %d bytes\n", len);
+	dump_packet(buffer, len);
+    }
+    if (len > 0) {
+	g_receive_message(AF_IPX, (struct sockaddr *)&address, buffer, len);
+    }
 }
 
 static guint
 ipx_get_socket()
 {
-  return ipx_socket;
+    return ipx_socket;
 }
 
 #endif
@@ -310,100 +308,98 @@ ipv6_init(gboolean dobind)
 }
   
 static gboolean
-ipv6_send_message(struct sockaddr *transportAddress, gpointer outgoingMessage, 
-                 guint outgoingMessageLength)
+ipv6_send_message(struct sockaddr *transportAddress,
+		  guchar *outgoingMessage,
+		  guint outgoingMessageLength)
 {
-#ifdef SNMP_DEBUG
-  printf("Sending packet on IPv6\n");
-#endif
-  if (sendto(ipv6_socket, outgoingMessage, outgoingMessageLength, 0,
-             transportAddress, sizeof(struct sockaddr_in6)))
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_TRANSPORT) {
+	g_printerr("Sending IPv6 packet, %d bytes\n", outgoingMessageLength);
+	dump_packet(outgoingMessage, outgoingMessageLength);
+    }
+    if (sendto(ipv6_socket, outgoingMessage, outgoingMessageLength, 0,
+	       transportAddress, sizeof(struct sockaddr_in6)) < 0) {
+	return FALSE;
+    }
     return TRUE;
-  else
-    return FALSE;
 }
 
 static void
 ipv6_receive_message()
 {
-  guchar              buffer[MAX_DGRAM_SIZE];
-  struct sockaddr_in6 address;
-  int                 adrsize, len;
+    guchar              buffer[MAX_DGRAM_SIZE];
+    struct sockaddr_in6 address;
+    int                 adrsize, len;
 
-  adrsize = sizeof (address);
-  len = recvfrom(ipv6_socket, buffer, sizeof(buffer), 0, 
-                 &address, &adrsize);
-  if (len>0)
-    g_receive_message(AF_INET6, (struct sockaddr *)&address, buffer, len);
+    adrsize = sizeof (address);
+    len = recvfrom(ipv6_socket, buffer, sizeof(buffer), 0, 
+		   &address, &adrsize);
+    if (len > 0) {
+	g_receive_message(AF_INET6, (struct sockaddr *)&address, buffer, len);
+    }
 }
 
 static guint
 ipv6_get_socket()
 {
-  return ipv6_socket;
+    return ipv6_socket;
 }
 
 #endif
 
 gboolean
-g_transport_init(gboolean dobind)
+g_snmp_transport_init(gboolean dobind)
 {
-  struct g_transport *my_transport;
-  int success = 0;
+    GSnmpTransport *my_transport;
+    gboolean success = FALSE;
 
 #ifdef HAVE_INET
-  if (ipv4_init(dobind))
-    {
-      my_transport = g_malloc(sizeof(struct g_transport));
+    if (ipv4_init(dobind)) {
+	my_transport = g_malloc(sizeof(GSnmpTransport));
 
-      my_transport->model		   = AF_INET;
-      my_transport->name		   = "IP";
-      my_transport->sendMessage            = ipv4_send_message;
-      my_transport->receiveMessage         = ipv4_receive_message;
-      my_transport->resolveAddress         = ipv4_resolve_address;
-      my_transport->getSocket              = ipv4_get_socket;
-
-      g_register_transport (my_transport);
-      success = 1;
+	my_transport->domain		   = G_SNMP_TDOMAIN_UDP_IPV4;
+	my_transport->name		   = "udp/ipv4";
+	my_transport->sendMessage          = ipv4_send_message;
+	my_transport->receiveMessage       = ipv4_receive_message;
+	my_transport->resolveAddress       = ipv4_resolve_address;
+	my_transport->getSocket            = ipv4_get_socket;
+	
+	g_register_transport (my_transport);
+	success = TRUE;
     }
 #endif
 
 #ifdef HAVE_IPX
-  if (ipx_init(dobind))
-    {
-      my_transport = g_malloc(sizeof(struct g_transport));
+    if (ipx_init(dobind)) {
+	my_transport = g_malloc(sizeof(GSnmpTransport));
 
-      my_transport->model		   = AF_IPX;
-      my_transport->name		   = "IPX";
-      my_transport->sendMessage            = ipx_send_message;
-      my_transport->receiveMessage         = ipx_receive_message;
-      my_transport->resolveAddress         = ipx_resolve_address;
-      my_transport->getSocket              = ipx_get_socket;
-
-      g_register_transport (my_transport);
-      success = 1;
+	my_transport->domain		   = G_SNMP_TDOMAIN_IPX;
+	my_transport->name		   = "ipx";
+	my_transport->sendMessage          = ipx_send_message;
+	my_transport->receiveMessage       = ipx_receive_message;
+	my_transport->resolveAddress       = ipx_resolve_address;
+	my_transport->getSocket            = ipx_get_socket;
+	
+	g_register_transport (my_transport);
+	success = TRUE;
     }
 #endif
 
 #ifdef HAVE_INET6
-  if (ipv6_init(dobind))
-    {
-      my_transport = g_malloc(sizeof(struct g_transport));
-
-      my_transport->model 		   = AF_INET6;
-      my_transport->name		   = "IPv6";
-      my_transport->sendMessage            = ipv6_send_message;
-      my_transport->receiveMessage         = ipv6_receive_message;
-      my_transport->resolveAddress         = ipv6_resolve_address;
-      my_transport->getSocket              = ipv6_get_socket;
-
-      g_register_transport (my_transport);
-      success = 1;
+    if (ipv6_init(dobind)) {
+	my_transport = g_malloc(sizeof(GSnmpTransport));
+	
+	my_transport->domain 		   = G_SNMP_TDOMAIN_UDP_IPV6;
+	my_transport->name		   = "udp/ipv6";
+	my_transport->sendMessage          = ipv6_send_message;
+	my_transport->receiveMessage       = ipv6_receive_message;
+	my_transport->resolveAddress       = ipv6_resolve_address;
+	my_transport->getSocket            = ipv6_get_socket;
+	
+	g_register_transport (my_transport);
+	success = TRUE;
     }
 #endif
-  if (success)
-    return TRUE;
-  return FALSE;
+    return success;
 }
 
 /* EOF */

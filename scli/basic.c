@@ -587,7 +587,7 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
     }
 
     interp->peer = g_snmp_session_new();
-    interp->peer->domain = AF_INET;
+    interp->peer->domain = G_SNMP_TDOMAIN_UDP_IPV4;
     interp->peer->name = g_strdup(host);
     interp->peer->port = port;
     interp->peer->rcomm = g_strdup(community ? community : "public");

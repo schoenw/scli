@@ -16,34 +16,44 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,  59 Temple Place - Suite 330, Cambridge, MA 02139, USA.
- *
- * Defines and variables for snmp support
  */
 
-#ifndef __G_TRANSPORT_H__
-#define __G_TRANSPORT_H__
+#ifndef _G_TRANSPORT_H_
+#define _G_TRANSPORT_H_
 
 #include "g_snmp.h"
 
+/*
+ * Enumeration for the SNMP transport domains we care of.
+ */
+
+typedef enum {
+    G_SNMP_TDOMAIN_NONE		= 0,
+    G_SNMP_TDOMAIN_UDP_IPV4	= 1,
+    G_SNMP_TDOMAIN_UDP_IPV6	= 2,
+    G_SNMP_TDOMAIN_IPX		= 3
+} GSnmpTDomain;
+
+/*
+ * The maximum datagram size we are prepared to deal with.
+ */
+
 #define MAX_DGRAM_SIZE 32768
 
-struct g_transport
-  {
-     guint	 model;		/* Transport model number */
-     gchar     * name;		/* Name of transport method */
-     gboolean (*sendMessage) (
-                         struct sockaddr *transportAddress,
-                         gpointer outgoingMessage,
-                         guint outgoingMessageLength);
-     void     (*receiveMessage) ();
-     gboolean (*resolveAddress) (
-                         guchar *hostName,
-                         struct sockaddr **transportAddress);
-     guint    (*getSocket) ();
-  };
+typedef struct _GSnmpTransport {
+    GSnmpTDomain domain;	/* transport domain */
+    gchar	 *name;		/* name of the transport domain */
+    gboolean (*sendMessage) (
+	struct sockaddr *transportAddress,
+	guchar          *outgoingMessage,
+	guint           outgoingMessageLength);
+    void     (*receiveMessage) ();
+    gboolean (*resolveAddress) (
+	guchar          *hostName,
+	struct sockaddr **transportAddress);
+    guint    (*getSocket) ();
+} GSnmpTransport;
 
-gboolean g_transport_init(gboolean dobind);
+gboolean g_snmp_transport_init(gboolean dobind);
 
-#endif /* __G_TRANSPORT_H__ */
-
-/* EOF */
+#endif /* _G_TRANSPORT_H_ */

@@ -188,10 +188,11 @@ extern const char *SnmpTrap[];		/* xxx fix this - really needed ? */
 
 typedef enum
 {
-  G_SNMP_DEBUG_REQUESTS	= 1 << 0,
-  G_SNMP_DEBUG_SESSION	= 1 << 1,
-  G_SNMP_DEBUG_ALL	= G_SNMP_DEBUG_REQUESTS | G_SNMP_DEBUG_SESSION,
-  G_SNMP_DEBUG_MASK	= 0x03
+  G_SNMP_DEBUG_REQUESTS	 = 1 << 0,
+  G_SNMP_DEBUG_SESSION	 = 1 << 1,
+  G_SNMP_DEBUG_TRANSPORT = 1 << 2,
+  G_SNMP_DEBUG_ALL	 = G_SNMP_DEBUG_REQUESTS | G_SNMP_DEBUG_SESSION,
+  G_SNMP_DEBUG_MASK	 = 0x07
 } GSnmpDebugFlags;
 
 extern GSnmpDebugFlags g_snmp_debug_flags;

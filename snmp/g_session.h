@@ -18,38 +18,30 @@
  * Foundation, Inc.,  59 Temple Place - Suite 330, Cambridge, MA 02139, USA.
  */
 
-#ifndef __G_SESSION_H__
-#define __G_SESSION_H__
+#ifndef _G_SESSION_H_
+#define _G_SESSION_H_
 
 /*
- * In an effort to reduce the redundant code the callbacks from the
- * snmp lib callbacks are routed through one routine, that in turn will
- * match up the reqid and invoke the proper callback in the gui code.
- * This allows for a very clear separation of the snmp lib and the gui
- * interface. The queue routine will copy the return values from the 
- * snmp query to the per host structure and then invoke the callback.
- * the call back should return 1 and the queue entry will be purged.
- * This will also invalidate values returned.
- */
-
-/*
- * Basic snmp info on a per session basis.
+ * Basic snmp info on a per session basis. Note that status
+ * information of the last SNMP interaction is returned to the
+ * application as part of the session structure. (!)
  */
 
 typedef struct _GSnmpSession {
-  struct sockaddr *address;
-  guint         domain;
-  gchar        *rcomm;
-  gchar        *wcomm;
-  guint         retries;
-  gchar         *name;
-  guint         status;
-  guint         port;
-  guint         timeout;
-  GSnmpVersion  version;
-  gboolean      (*done_callback) (); /* what to call when complete */
-  void          (*time_callback) (); /* what to call on a timeout */
-  gpointer      magic;         /* can be used to pass additional data to cb */
+    struct sockaddr *address;
+    guint         domain;
+    gchar        *rcomm;
+    gchar        *wcomm;
+    guint         retries;
+    gchar         *name;
+    guint32       error_status;
+    guint32	  error_index;
+    guint         port;
+    guint         timeout;
+    GSnmpVersion  version;
+    gboolean      (*done_callback) (); /* what to call when complete */
+    void          (*time_callback) (); /* what to call on a timeout */
+    gpointer      magic;               /* additional data for callbacks */
 } GSnmpSession;
 
 GSnmpSession*	g_snmp_session_new();
@@ -101,7 +93,7 @@ void		g_snmp_request_dequeue(snmp_request *request);
 snmp_request*	g_snmp_request_find(gint32 request_id);
 
 /*
- * Session API
+ * Session API - the stuff below needs to be cleaned up. XXX
  */
 
 int g_snmp_timeout_cb        (gpointer    data);
@@ -112,6 +104,4 @@ void g_session_response_pdu (guint messageProcessingModel,
   GString *contextEngineID, GString *contextName, guint pduVersion,
   GSnmpPdu *PDU);
 
-#endif
-
-/* EOF */
+#endif /* _G_SESSION_H_ */

@@ -213,7 +213,7 @@ sendPdu(guint transportDomain, struct sockaddr *transportAddress,
   guint               outgoingMessageLength;
   guint               sendPduHandle;
   struct g_message   *msg_model;
-  struct g_transport *trp_model;
+  GSnmpTransport     *trp_model;
 
 /* Currently, we return 0 for error and the handle if everything worked OK.
    It might be a bit better to make the return code a struct to return a
@@ -341,7 +341,7 @@ returnResponsePdu(guint messageProcessingModel, guint securityModel,
   gpointer            outgoingMessage;
   guint               outgoingMessageLength;
   struct g_message   *msg_model;
-  struct g_transport *trp_model;
+  GSnmpTransport     *trp_model;
 
   if (!message_models || !(msg_model = g_hash_table_lookup(message_models,
       &messageProcessingModel)))
@@ -399,13 +399,13 @@ g_register_security(guint model_nr, struct g_security *sec)
 }
 
 gboolean
-g_register_transport(struct g_transport *tpt)
+g_register_transport(GSnmpTransport *tpt)
 {
-  if (g_hash_table_lookup(transport_models, &tpt->model)) return FALSE;
-  g_hash_table_insert(transport_models, &tpt->model, tpt);
+  if (g_hash_table_lookup(transport_models, &tpt->domain)) return FALSE;
+  g_hash_table_insert(transport_models, &tpt->domain, tpt);
 
   transport_model_list = g_list_append (transport_model_list,
-					(gpointer) tpt->model);
+					(gpointer) tpt->domain);
   transport_name_list  = g_list_append (transport_name_list, 
 				        tpt->name); 
   return TRUE;
@@ -746,7 +746,7 @@ g_receive_message(int transportDomain, struct sockaddr *transportAddress,
 gboolean
 g_lookup_address (guint model_nr, gchar *hostname, struct sockaddr **address)
 {
-  struct g_transport *trp_model;
+  GSnmpTransport *trp_model;
 
   if (!transport_models)
     return FALSE;
@@ -770,12 +770,12 @@ transport_io_invoke(GIOChannel *source, GIOCondition condition, gpointer data)
 static void
 fe_transport(gpointer key, gpointer value, gpointer userdata)
 {
-  struct g_transport *trp_model;
+  GSnmpTransport *trp_model;
   guint result, socket;
   GIOChannel *channel;
   GIOCondition cond;
 
-  trp_model = (struct g_transport *) value;
+  trp_model = (GSnmpTransport *) value;
   socket=trp_model->getSocket();
   cond = (G_IO_IN | G_IO_PRI); /* GDK_INPUT_READ */
   channel = g_io_channel_unix_new(socket);
@@ -800,7 +800,7 @@ g_snmp_init(gboolean dobind)
   if (!g_message_init())
     return FALSE;
 
-  if (!g_transport_init(dobind))
+  if (!g_snmp_transport_init(dobind))
     return FALSE;
 
   g_hash_table_foreach(transport_models, fe_transport, NULL);

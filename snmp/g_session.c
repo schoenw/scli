@@ -65,7 +65,7 @@ g_snmp_session_new()
     GSnmpSession *session;
 
     session = g_malloc0(sizeof(GSnmpSession));
-    session->domain = AF_INET;
+    session->domain = G_SNMP_TDOMAIN_UDP_IPV4;
     session->name = "localhost";
     session->port = 161;
     session->retries = 3;
@@ -628,7 +628,7 @@ g_session_response_pdu(guint messageProcessingModel,
     }
 
     g_snmp_request_dequeue(request);
-    request->session->status = PDU->request.error_status;
+    request->session->error_status = PDU->request.error_status;
     /* XXX what about the error index? */
     if (! request->callback) {
 	g_snmp_vbl_free(vbl);
