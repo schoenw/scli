@@ -32,26 +32,6 @@
 
 
 
-static char*
-get_if_name(ifEntry_t *ifEntry, ifXEntry_t *ifXEntry, int width)
-{
-    static char buffer[80];
-
-    buffer[0] = 0;
-    if (ifXEntry && ifXEntry->ifName && ifXEntry->_ifNameLength) {
-	g_snprintf(buffer, sizeof(buffer), "%.*s",
-		   (int) ifXEntry->_ifNameLength, ifXEntry->ifName);
-    } else if (ifEntry->ifDescr && ifEntry->_ifDescrLength
-	       && ifEntry->_ifDescrLength < width) {
-	g_snprintf(buffer, sizeof(buffer), "%.*s",
-		   (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);
-    }
-
-    return buffer;
-}
-
-
-
 static void
 fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 	     gint32 *conn, gint32 *prom)
@@ -103,9 +83,14 @@ show_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 
     g_string_sprintfa(s, "Interface:   %-*d", width,
 		      ifEntry->ifIndex);
-    g_string_sprintfa(s, " Name:    %-*s\n", width,
-		      get_if_name(ifEntry, ifXEntry, width));
-    
+    if (ifXEntry && ifXEntry->ifName) {
+	g_string_sprintfa(s, " Name:    %.*s\n",
+			  (int) ifXEntry->_ifNameLength,
+			  ifXEntry->ifName);
+    } else {
+	g_string_append(s, " Name:\n");
+    }
+	
     g_string_append(s, "OperStatus:  ");
     fmt_enum(s, width, if_mib_enums_ifOperStatus, ifEntry->ifOperStatus);
     if (ifEntry->ifPhysAddress && ifEntry->_ifPhysAddressLength) {
@@ -257,8 +242,13 @@ show_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 	g_string_append(s, "       ");
     }
 
-    g_string_sprintfa(s, "%-*s ", name_width,
-		      get_if_name(ifEntry, ifXEntry, 12));
+    if (ifXEntry && ifXEntry->ifName) {
+	g_string_sprintfa(s, "%-*.*s ", name_width,
+			  (int) ifXEntry->_ifNameLength,
+			  ifXEntry->ifName);
+    } else {
+	g_string_sprintfa(s, "%*s ", name_width, "");
+    }
 
     if (ifEntry->ifDescr) {
 	g_string_sprintfa(s, "%.*s",
@@ -276,8 +266,8 @@ cmd_info(scli_interp_t *interp, int argc, char **argv)
 {
     ifEntry_t **ifTable = NULL;
     ifXEntry_t **ifXTable = NULL;
-    int name_width = 8;
-    int type_width = 8;
+    int name_width = 6;
+    int type_width = 6;
     char *x;
     int i;
 
@@ -290,9 +280,10 @@ cmd_info(scli_interp_t *interp, int argc, char **argv)
 
     if (ifTable) {
 	for (i = 0; ifTable[i]; i++) {
-	    x = get_if_name(ifTable[i], ifXTable ? ifXTable[i] : NULL, 12);
-	    if (x && strlen(x) > name_width) {
-		name_width = strlen(x);
+	    if (ifXTable && ifXTable[i]) {
+		if (ifXTable[i]->_ifNameLength > name_width) {
+		    name_width = ifXTable[i]->_ifNameLength;
+		}
 	    }
 	    if (ifTable[i]->ifType) {
 		x = stls_table_get_value(if_mib_enums_ifType,
