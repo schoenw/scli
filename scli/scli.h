@@ -401,6 +401,13 @@ fmt_counter_dt(GString *s, guint32 *new_counter, guint32 *old_counter,
 	       struct timeval *last, double delta);
 extern void
 fmt_display_string(GString *s, int indent, char *label, int len, char *string);
+
+extern const char*
+fmt_tdomain(guint32 *tdomain, gsize tdomain_len);
+
+extern const char*
+fmt_taddress(guint32 *tdomain, gsize tdomain_len,
+	     guchar *taddress, gsize taddress_len);
     
 /*
  * XML utilities.

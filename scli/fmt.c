@@ -22,6 +22,9 @@
 
 #include "scli.h"
 
+#include "snmpv2-tm.h"
+
+
 #include <ctype.h>
 #include <time.h>
 #include <netdb.h>
@@ -33,6 +36,43 @@
 #ifdef HAVE_NETINET_ETHER_H
 #include <netinet/ether.h>
 #endif
+
+
+
+static guint32 const snmpUDPDomain[]
+	= { SNMPV2_TM_SNMPUDPDOMAIN };
+static guint32 const snmpCLNSDomain[]
+	= { SNMPV2_TM_SNMPCLNSDOMAIN };
+static guint32 const snmpCONSDomain[]
+	= { SNMPV2_TM_SNMPCONSDOMAIN };
+static guint32 const snmpDDPDomain[]
+	= { SNMPV2_TM_SNMPDDPDOMAIN };
+static guint32 const snmpIPXDomain[]
+	= { SNMPV2_TM_SNMPIPXDOMAIN };
+static guint32 const rfc1157Domain[]
+	= { SNMPV2_TM_RFC1157DOMAIN };
+
+static GSnmpIdentity const tdomain_identities[] = {
+    { snmpUDPDomain,
+      sizeof(snmpUDPDomain)/sizeof(guint32),
+      "udp" },
+    { snmpCLNSDomain,
+      sizeof(snmpCLNSDomain)/sizeof(guint32),
+      "clns" },
+    { snmpCONSDomain,
+      sizeof(snmpCONSDomain)/sizeof(guint32),
+      "cons" },
+    { snmpDDPDomain,
+      sizeof(snmpDDPDomain)/sizeof(guint32),
+      "ddp" },
+    { snmpIPXDomain,
+      sizeof(snmpIPXDomain)/sizeof(guint32),
+      "ipx" },
+    { rfc1157Domain,
+      sizeof(rfc1157Domain)/sizeof(guint32),
+      "rfc1157" },
+    { 0, 0, NULL }
+};
 
 
 
@@ -430,4 +470,58 @@ fmt_display_string(GString *s, int indent, char *label, int len, char *string)
 	}
     }
     g_string_append_c(s, '\n');
+}
+
+
+
+const char *
+fmt_tdomain(guint32 *tdomain, gsize tdomain_len)
+{
+    const char *e;
+
+    e = gsnmp_identity_get_label(tdomain_identities, tdomain, tdomain_len);
+
+    return e;
+}
+
+
+
+const char *
+fmt_taddress(guint32 *tdomain, gsize tdomain_len,
+	     guchar *taddress, gsize taddress_len)
+{
+    static char *e = NULL;
+    int i;
+
+    if (e) {
+	g_free(e);
+	e = NULL;
+    }
+
+    if (! tdomain && taddress) {
+	return NULL;
+    }
+
+    for (i = 0; tdomain_identities[i].label; i++) {
+	if (tdomain_identities[i].oidlen == tdomain_len
+	    && memcmp(tdomain_identities[i].oid, tdomain, tdomain_len * sizeof(guint32)) == 0) {
+	    break;
+	}
+    }
+
+    if (tdomain_identities[i].label) {
+	switch (i) {
+	case 0:
+	    if (taddress_len == 6) {
+		e = g_strdup_printf("%d.%d.%d.%d:%d",
+				    taddress[0], taddress[1], taddress[2], taddress[3],
+				    (taddress[4] << 8) + taddress[5]);
+	    }
+	    break;
+	default:
+	    e = g_strdup("?");
+	}
+    }
+
+    return e;
 }
