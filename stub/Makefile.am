@@ -82,7 +82,7 @@ stubs:
 	$(SMIDUMP) -f scli --scli-match="VlanEntry|VlanPortEntry" RAPID-CITY
 	$(SMIDUMP) -f scli --scli-match="ipRouteEntry" RFC1213-MIB
 	$(SMIDUMP) -f scli --scli-match="atmInterfaceConfEntry" ATM-MIB
-	$(SMIDUMP) -f scli --scli-match=a3ComVlanIfEntry PRODUCTMIB
+	$(SMIDUMP) -f scli --scli-match="a3ComVlanIfEntry|a3ComVirtualGroup" PRODUCTMIB
 	@for f in $(MIBS) ; do \
 	    echo "$(SMIDUMP) -f scli $$f" ; \
 	    $(SMIDUMP) -f scli $$f ; \

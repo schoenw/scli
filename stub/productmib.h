@@ -85,5 +85,23 @@ productmib_set_a3ComVlanIfEntry(GSnmpSession *s, productmib_a3ComVlanIfEntry_t *
 extern void
 productmib_free_a3ComVlanIfEntry(productmib_a3ComVlanIfEntry_t *a3ComVlanIfEntry);
 
+/*
+ * C type definitions for PRODUCTMIB::a3ComVirtualGroup.
+ */
+
+#define PRODUCTMIB_A3COMNEXTAVAILABLEVIRTIFINDEX (1 << 0) 
+typedef struct {
+    gint32   *a3ComNextAvailableVirtIfIndex;
+} productmib_a3ComVirtualGroup_t;
+
+extern productmib_a3ComVirtualGroup_t *
+productmib_new_a3ComVirtualGroup(void);
+
+extern void
+productmib_get_a3ComVirtualGroup(GSnmpSession *s, productmib_a3ComVirtualGroup_t **a3ComVirtualGroup, gint mask);
+
+extern void
+productmib_free_a3ComVirtualGroup(productmib_a3ComVirtualGroup_t *a3ComVirtualGroup);
+
 
 #endif /* _PRODUCTMIB_H_ */

@@ -77,6 +77,18 @@ static GSnmpAttribute a3ComVlanIfEntry_attr[] = {
     { 0, 0, 0, NULL }
 };
 
+static guint32 const a3ComVirtualGroup_oid[] = {1, 3, 6, 1, 4, 1, 43, 10, 1, 14, 3};
+
+static GSnmpAttribute a3ComVirtualGroup_attr[] = {
+    { 1, G_SNMP_INTEGER32,
+      PRODUCTMIB_A3COMNEXTAVAILABLEVIRTIFINDEX, "a3ComNextAvailableVirtIfIndex",
+       NULL,
+      G_STRUCT_OFFSET(productmib_a3ComVirtualGroup_t, a3ComNextAvailableVirtIfIndex),
+      0,
+      0 },
+    { 0, 0, 0, NULL }
+};
+
 
 productmib_a3ComVlanIfEntry_t *
 productmib_new_a3ComVlanIfEntry()
@@ -241,6 +253,70 @@ productmib_free_a3ComVlanIfTable(productmib_a3ComVlanIfEntry_t **a3ComVlanIfEntr
             productmib_free_a3ComVlanIfEntry(a3ComVlanIfEntry[i]);
         }
         g_free(a3ComVlanIfEntry);
+    }
+}
+
+productmib_a3ComVirtualGroup_t *
+productmib_new_a3ComVirtualGroup()
+{
+    productmib_a3ComVirtualGroup_t *a3ComVirtualGroup;
+
+    a3ComVirtualGroup = (productmib_a3ComVirtualGroup_t *) g_malloc0(sizeof(productmib_a3ComVirtualGroup_t) + sizeof(gpointer));
+    return a3ComVirtualGroup;
+}
+
+static productmib_a3ComVirtualGroup_t *
+assign_a3ComVirtualGroup(GSList *vbl)
+{
+    productmib_a3ComVirtualGroup_t *a3ComVirtualGroup;
+    char *p;
+
+    a3ComVirtualGroup = productmib_new_a3ComVirtualGroup();
+    if (! a3ComVirtualGroup) {
+        return NULL;
+    }
+
+    p = (char *) a3ComVirtualGroup + sizeof(productmib_a3ComVirtualGroup_t);
+    * (GSList **) p = vbl;
+
+    gsnmp_attr_assign(vbl, a3ComVirtualGroup_oid, sizeof(a3ComVirtualGroup_oid)/sizeof(guint32),
+                      a3ComVirtualGroup_attr, a3ComVirtualGroup);
+
+    return a3ComVirtualGroup;
+}
+
+void
+productmib_get_a3ComVirtualGroup(GSnmpSession *s, productmib_a3ComVirtualGroup_t **a3ComVirtualGroup, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    static guint32 base[] = {1, 3, 6, 1, 4, 1, 43, 10, 1, 14, 3, 0};
+
+    *a3ComVirtualGroup = NULL;
+
+    gsnmp_attr_get(s, &in, base, 12, 11, a3ComVirtualGroup_attr, mask);
+
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
+        *a3ComVirtualGroup = assign_a3ComVirtualGroup(out);
+    }
+}
+
+void
+productmib_free_a3ComVirtualGroup(productmib_a3ComVirtualGroup_t *a3ComVirtualGroup)
+{
+    GSList *vbl;
+    char *p;
+
+    if (a3ComVirtualGroup) {
+        p = (char *) a3ComVirtualGroup + sizeof(productmib_a3ComVirtualGroup_t);
+        vbl = * (GSList **) p;
+        g_snmp_vbl_free(vbl);
+        g_free(a3ComVirtualGroup);
     }
 }
 
