@@ -55,4 +55,13 @@ if_mib_proc_set_notifications(GSnmpSession *s,
 			      gint32 ifIndex,
 			      gint32 ifLinkUpDownTrapEnable);
     
+extern void
+if_mib_proc_get_ifTable(GSnmpSession *s,
+			if_mib_ifEntry_t ***ifEntry,
+			gint mask,
+			time_t epoch);
+
+extern void
+if_mib_proc_free_ifTable(if_mib_ifEntry_t **ifEntry);
+
 #endif /* _IF_MIB_PROC_H_ */

@@ -22,6 +22,10 @@
 
 #include "if-mib-proc.h"
 
+#include <time.h>
+
+#define CACHE_TIME	10
+
 void
 if_mib_proc_set_interface_status(GSnmpSession *s,
 				 gint32 ifIndex,
@@ -81,4 +85,44 @@ if_mib_proc_set_notifications(GSnmpSession *s,
     ifXEntry->ifLinkUpDownTrapEnable = &ifLinkUpDownTrapEnable;
     if_mib_set_ifXEntry(s, ifXEntry, IF_MIB_IFLINKUPDOWNTRAPENABLE);
     if_mib_free_ifXEntry(ifXEntry);
+}
+
+typedef struct {
+    gpointer data;
+    time_t time;
+    time_t epoch;
+} ifEntry_t;
+
+
+void
+if_mib_proc_get_ifTable(GSnmpSession *s,
+			if_mib_ifEntry_t ***ifEntry,
+			gint mask,
+			time_t epoch)
+{
+    static ifEntry_t cache = {NULL, 0};
+    time_t now = time(NULL);
+
+    if (cache.data) {
+	if (cache.epoch == epoch && (now - cache.time) < CACHE_TIME) {
+	    *ifEntry = cache.data;
+	    return;
+	}
+	if_mib_free_ifTable(cache.data);
+	cache.data = NULL;
+    }
+
+    if_mib_get_ifTable(s, ifEntry, mask);
+    if (! s->error_status) {
+	cache.data = *ifEntry;
+	cache.time = now;
+	cache.epoch = epoch;
+    }
+}
+
+
+
+void
+if_mib_proc_free_ifTable(if_mib_ifEntry_t **ifEntry)
+{
 }
