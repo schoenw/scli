@@ -285,9 +285,9 @@ usage()
 	"  -n, --norc        do not evaluate ~/.sclirc on startup\n"
 	"  -p, --port        port number of the SNMP agent (default 161)\n"
 	"  -r, --retries     number of retries (default 3)\n"
+	"  -s, --dry-run     parse commands but do not execute them\n"
 	"  -t, --timeout     timeout between retries in milliseconds (default 500)\n"
 	"  -x, --xml         produce machine readable XML output\n"
-	"  -y, --dry         parse commands but do not execute them (dry mode)\n"
 	);
 }
 
@@ -312,7 +312,7 @@ main(int argc, char **argv)
         { "version", no_argument,       0, 'V' },
 	{ "command", required_argument, 0, 'c' },
         { "delay",   required_argument, 0, 'd' },
-	{ "dry",     required_argument, 0, 'y' },
+	{ "dry-run", required_argument, 0, 's' },
         { "file",    required_argument, 0, 'f' },
         { "help",    no_argument,       0, 'h' },
         { "norc",    no_argument,       0, 'n' },
@@ -323,7 +323,7 @@ main(int argc, char **argv)
         { NULL, 0, NULL, 0}
     };
 
-    while ((c = getopt_long(argc, argv, "Vc:d:f:hnp:r:t:xy", long_options,
+    while ((c = getopt_long(argc, argv, "Vc:d:f:hnp:r:st:x", long_options,
                             (int *) 0)) != EOF) {
         switch (c) {
         case 'V':
@@ -370,7 +370,7 @@ main(int argc, char **argv)
 	case 'x':
 	    xml = 1;
 	    break;
-	case 'y':
+	case 's':
 	    dry = 1;
 	    break;
         default:
