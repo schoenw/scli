@@ -1267,10 +1267,32 @@ show_printer_interpreter(scli_interp_t * interp, int argc, char **argv)
 
 
 
+static printer_mib_prtInterpreterEntry_t*
+find_interp(printer_mib_prtInterpreterEntry_t **interpTable,
+	    gint32 hrDeviceIndex, gint32 interpIndex)
+{
+    int i;
+    
+    if (! interpTable) {
+	return NULL;
+    }
+
+    for (i = 0; interpTable[i]; i++) {
+	if (interpTable[i]->hrDeviceIndex == hrDeviceIndex
+	    && interpTable[i]->prtInterpreterIndex == interpIndex) {
+	    break;
+	}
+    }
+    return interpTable[i];
+}
+
+
 static void
 fmt_printer_channel(GString *s,
-			printer_mib_prtChannelEntry_t *channelEntry)
+		    printer_mib_prtChannelEntry_t *channelEntry,
+		    printer_mib_prtInterpreterEntry_t **interpTable)
 {
+    printer_mib_prtInterpreterEntry_t *interpEntry;
     int const indent = 14;
     const char *e;
 
@@ -1291,12 +1313,39 @@ fmt_printer_channel(GString *s,
 		       channelEntry->prtChannelProtocolVersion);
 
     /*
-      prtChannelCurrentJobCntlLangIndex
-      prtChannelDefaultPageDescLangIndex
       prtChannelState
       prtChannelIfIndex
     */
 
+    
+    if (channelEntry->prtChannelCurrentJobCntlLangIndex) {
+	interpEntry = find_interp(interpTable, channelEntry->hrDeviceIndex,
+			  *channelEntry->prtChannelCurrentJobCntlLangIndex);
+	e = (interpEntry) ?
+	    fmt_enum(printer_mib_enums_prtInterpreterLangFamily,
+		     interpEntry->prtInterpreterLangFamily) : NULL;
+	if (e) {
+	    g_string_sprintfa(s, "%-*s %s\n", indent, "Ctrl Language:", e);
+	} else {
+	    g_string_sprintfa(s, "%-*s %d\n", indent, "Ctrl Language:",
+			      *channelEntry->prtChannelCurrentJobCntlLangIndex);
+	}
+    }
+			      
+    if (channelEntry->prtChannelDefaultPageDescLangIndex) {
+	interpEntry = find_interp(interpTable, channelEntry->hrDeviceIndex,
+			  *channelEntry->prtChannelDefaultPageDescLangIndex);
+	e = (interpEntry) ?
+	    fmt_enum(printer_mib_enums_prtInterpreterLangFamily,
+		     interpEntry->prtInterpreterLangFamily) : NULL;
+	if (e) {
+	    g_string_sprintfa(s, "%-*s %s\n", indent, "Page Language:", e);
+	} else {
+	    g_string_sprintfa(s, "%-*s %d\n", indent, "Page Language:",
+			      *channelEntry->prtChannelDefaultPageDescLangIndex);
+	}
+    }
+    
     fmt_subunit(s, indent, channelEntry->prtChannelStatus);
 
     fmt_display_string(s, indent+1, "Information:",
@@ -1310,6 +1359,7 @@ static int
 show_printer_channels(scli_interp_t * interp, int argc, char **argv)
 {
     printer_mib_prtChannelEntry_t **channelTable = NULL;
+    printer_mib_prtInterpreterEntry_t **interpTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -1326,18 +1376,21 @@ show_printer_channels(scli_interp_t * interp, int argc, char **argv)
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
+    printer_mib_get_prtInterpreterTable(interp->peer, &interpTable, 0);
 
     if (channelTable) {
 	for (i = 0; channelTable[i]; i++) {
 	    if (i > 0) {
 		g_string_append(interp->result, "\n");
 	    }
-	    fmt_printer_channel(interp->result, channelTable[i]);
+	    fmt_printer_channel(interp->result, channelTable[i], interpTable);
 	}
     }
 
     if (channelTable)
 	printer_mib_free_prtChannelTable(channelTable);
+    if (interpTable)
+	printer_mib_free_prtInterpreterTable(interpTable);
 	
     return SCLI_OK;
 }
