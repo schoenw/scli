@@ -40,7 +40,7 @@ vlan_error(scli_interp_t *interp,
 	   rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry)
 {
     g_string_sprintfa(interp->result, "vlan %d: ", vlanEntry->rcVlanId);
-    if (vlanEntry->rcVlanName) {
+    if (vlanEntry->rcVlanName && vlanEntry->_rcVlanNameLength) {
 	g_string_sprintfa(interp->result, "%.*s: ",
 			  (int) vlanEntry->_rcVlanNameLength,
 			  vlanEntry->rcVlanName);
@@ -735,7 +735,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "<regexp> is matched against the vlan names to select the vlans\n"
 	  "of interest.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
+	  "nortel bridge vlans", NULL,
 	  show_nortel_baystack_vlan_details },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }

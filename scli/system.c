@@ -663,7 +663,7 @@ xml_system_storage(xmlNodePtr root,
     xmlNodePtr node, tree;
     gchar const *type = NULL;
 
-    tree = xmlNewChild(root, NULL, "storage", NULL);
+    tree = xmlNewChild(root, NULL, "area", NULL);
     xml_set_prop(tree, "index", "%d", hrStorageEntry->hrStorageIndex);
     
     if (hrStorageEntry->hrStorageDescr
@@ -697,11 +697,10 @@ xml_system_storage(xmlNodePtr root,
 	storage_used /= scale;
 
 	node = xml_new_child(tree, NULL, "size", "%llu", storage_size);
-	xml_set_prop(node, "unit", "kilobytes");
+	xml_set_prop(node, "unit", "kilobyte");
 
 	node = xml_new_child(tree, NULL, "used", "%llu", storage_used);
-	xml_set_prop(node, "unit", "kilobytes");
-
+	xml_set_prop(node, "unit", "kilobyte");
     }
 }
 
@@ -1222,7 +1221,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "The show system info command shows general information about the\n"
 	  "system.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
+	  "system info", NULL,
 	  show_system_info },
 
 	{ "show system devices", NULL,
@@ -1233,7 +1232,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "  STATUS      current status of the device\n"
 	  "  DESCRIPTION description of the device",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
+	  "system devices", NULL,
 	  show_system_devices },
 
 	{ "show system storage", NULL,
@@ -1249,7 +1248,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "  FREE        amount of storage available\n"
 	  "  USE%        used storage in percent",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
+	  "system storage", NULL,
 	  show_system_storage },
 
 	{ "show system mounts", NULL,
@@ -1263,7 +1262,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "  TYPE    filesytem type (if known)\n"
 	  "  OPTIONS access mode (ro/rw) and boot flag",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
+	  "system mounts", NULL,
 	  show_system_mounts },
 
 	{ "show system processes", NULL,
@@ -1282,7 +1281,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "S=not runnable, and Z=invalid. The process types values are\n"
 	  "?=unknown, O=operating system, D=device driver, and A=application.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
+	  "system processes", NULL,
 	  show_system_processes },
 
 	{ "monitor system storage", NULL,

@@ -260,7 +260,7 @@ scli_init_tcp_mode(scli_interp_t *interp)
 	  "The show tcp listener command displays the listening TCP\n"
 	  "endpoints.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
+	  "tcp", NULL,
 	  show_tcp_listener },
 
 	{ "show tcp connections", NULL,
@@ -268,7 +268,7 @@ scli_init_tcp_mode(scli_interp_t *interp)
 	  "endpoints including the current state of the connection as seen\n"
 	  "by the remote SNMP agent.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
+	  "tcp", NULL,
 	  show_tcp_connections },
 
 	{ "monitor tcp connections", NULL,

@@ -552,8 +552,8 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "The exit command terminates the scli interpreter. An end of file\n"
 	  "in the standard input stream will also terminate the the scli\n"
 	  "interpreter.",
-	  0,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_XML,
+	  "", NULL,
 	  cmd_scli_exit },
 
 	{ "help", NULL,
@@ -618,7 +618,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "format and described in this documentation. The \"xml\" output\n"
 	  "format is experimental and therefore not described here.",
 	  SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
+	  "", NULL,
 	  set_scli_format },
 	
 	{ "show scli info", NULL,

@@ -115,7 +115,7 @@ scli_init_udp_mode(scli_interp_t *interp)
 	  "The show udp listener command displays the listening UDP\n"
 	  "endpoints.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
+	  "udp", NULL,
 	  show_udp_listener },
 	
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }

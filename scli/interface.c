@@ -32,6 +32,30 @@
 
 
 static void
+interface_error(scli_interp_t *interp,
+		if_mib_ifEntry_t *ifEntry)
+{
+    g_string_sprintfa(interp->result, "interface %d: ", ifEntry->ifIndex);
+    if (ifEntry->ifDescr && ifEntry->_ifDescrLength) {
+	g_string_sprintfa(interp->result, "%.*s: ",
+			  (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);
+    }
+}
+
+
+
+static void
+interface_snmp_error(scli_interp_t *interp,
+		     if_mib_ifEntry_t *ifEntry)
+{
+    interface_error(interp, ifEntry);
+    scli_snmp_error(interp);
+    g_string_append(interp->result, "\n");
+}
+
+
+
+static void
 fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 	     gint32 *conn, gint32 *prom)
 {
@@ -89,10 +113,11 @@ match_interface(regex_t *regex_iface,
      */
 
     if (ifEntry->ifDescr) {
-	char *string = g_malloc0(ifEntry->_ifDescrLength + 1);
-	memcpy(string, ifEntry->ifDescr, ifEntry->_ifDescrLength);
-	status = regexec(regex_iface, string, (size_t) 0, NULL, 0);
-	g_free(string);
+	char *s = g_strdup_printf("%.*s",
+				  (int) ifEntry->_ifDescrLength,
+				  ifEntry->ifDescr);
+	status = regexec(regex_iface, s, (size_t) 0, NULL, 0);
+	g_free(s);
 	if (status == 0) {
 	    return 1;
 	}
@@ -916,50 +941,22 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 
 
 
-static void
-set_status(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry)
-{
-    (void) if_mib_set_ifEntry(interp->peer, ifEntry);
-    if (interp->peer->error_status) {
-	if (ifEntry->ifDescr && ifEntry->_ifDescrLength) {
-	    g_string_sprintfa(interp->result, "%.*s: ",
-			      (int) ifEntry->_ifDescrLength,
-			      ifEntry->ifDescr);
-	} else {
-	    g_string_sprintfa(interp->result, "%d: ",
-			      ifEntry->ifIndex);
-	}
-	scli_snmp_error(interp);
-	g_string_append(interp->result, "\n");
-    }
-}
-
-
+typedef void (*InterfaceForeachFunc)	(scli_interp_t    *interp,
+					 if_mib_ifEntry_t *ifEntry,
+					 gpointer	  user_data);
 
 static int
-set_interface_status(scli_interp_t *interp, int argc, char **argv)
+foreach_interface(scli_interp_t *interp, char *regex,
+		  InterfaceForeachFunc func, gpointer user_data)
 {
     if_mib_ifEntry_t **ifTable = NULL;
-    regex_t _regex_iface, *regex_iface = NULL;
-    gint32 value;
+    regex_t _regex_iface, *regex_iface = &_regex_iface;
     int i;
 
-    g_return_val_if_fail(interp, SCLI_ERROR);
-    
-    if (argc != 3) {
-	return SCLI_SYNTAX;
-    }
-
-    regex_iface = &_regex_iface;
-    if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+    if (regcomp(regex_iface, regex, REG_EXTENDED|REG_NOSUB) != 0) {
 	return SCLI_SYNTAX_REGEXP;
     }
 
-    if (! gsnmp_enum_get_number(if_mib_enums_ifAdminStatus, argv[2], &value)) {
-	regfree(regex_iface);
-	return SCLI_SYNTAX;
-    }
-	
     if (if_mib_get_ifTable(interp->peer, &ifTable)) {
 	regfree(regex_iface);
 	return SCLI_ERROR;
@@ -968,16 +965,179 @@ set_interface_status(scli_interp_t *interp, int argc, char **argv)
     if (ifTable) {
 	for (i = 0; ifTable[i]; i++) {
 	    if (match_interface(regex_iface, ifTable[i])) {
-		ifTable[i]->ifAdminStatus = &value;
-		set_status(interp, ifTable[i]);
+		g_printerr("** interface %d **\n", ifTable[i]->ifIndex);
+		(func) (interp, ifTable[i], user_data);
+		/* call function here */
 	    }
 	}
     }
-
+    
     if (ifTable) if_mib_free_ifTable(ifTable);
     regfree(regex_iface);
 
     return SCLI_OK;
+}
+
+
+
+static void
+set_status(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
+	   gpointer user_data)
+{
+    if_mib_ifEntry_t *ifXEntry;
+    gint32 *value = (gint32 *) user_data;
+
+    ifXEntry = if_mib_new_ifEntry();
+    ifXEntry->ifIndex = ifEntry->ifIndex;
+    ifXEntry->ifAdminStatus = value;
+    (void) if_mib_set_ifEntry(interp->peer, ifXEntry);
+    if (interp->peer->error_status) {
+	interface_snmp_error(interp, ifEntry);
+    }
+    if_mib_free_ifEntry(ifXEntry);
+}
+
+
+
+static int
+set_interface_status(scli_interp_t *interp, int argc, char **argv)
+{
+    gint32 value;
+    int status;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 3) {
+	return SCLI_SYNTAX;
+    }
+
+    if (! gsnmp_enum_get_number(if_mib_enums_ifAdminStatus, argv[2], &value)) {
+	return SCLI_SYNTAX;
+    }
+
+    status = foreach_interface(interp, argv[1], set_status, &value);
+    return status;
+}
+
+
+
+static void
+set_alias(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
+	  gpointer user_data)
+{
+    if_mib_ifXEntry_t *ifXEntry;
+    char *value = (char *) user_data;
+
+    ifXEntry = if_mib_new_ifXEntry();
+    ifXEntry->ifIndex = ifEntry->ifIndex;
+    ifXEntry->ifAlias = value;
+    ifXEntry->_ifAliasLength = strlen(value);
+    (void) if_mib_set_ifXEntry(interp->peer, ifXEntry);
+    if (interp->peer->error_status) {
+	interface_snmp_error(interp, ifEntry);
+    }
+    if_mib_free_ifXEntry(ifXEntry);
+}
+
+
+
+static int
+set_interface_alias(scli_interp_t *interp, int argc, char **argv)
+{
+    int status;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 3) {
+	return SCLI_SYNTAX;
+    }
+
+    status = foreach_interface(interp, argv[1], set_alias, argv[2]);
+    return status;
+}
+
+
+
+static void
+set_promiscuous(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
+		gpointer user_data)
+{
+    if_mib_ifXEntry_t *ifXEntry;
+    gint32 *value = (gint32 *) user_data;
+
+    ifXEntry = if_mib_new_ifXEntry();
+    ifXEntry->ifIndex = ifEntry->ifIndex;
+    ifXEntry->ifPromiscuousMode = value;
+    (void) if_mib_set_ifXEntry(interp->peer, ifXEntry);
+    if (interp->peer->error_status) {
+	interface_snmp_error(interp, ifEntry);
+    }
+    if_mib_free_ifXEntry(ifXEntry);
+}
+
+
+
+static int
+set_interface_promiscuous(scli_interp_t *interp, int argc, char **argv)
+{
+    gint32 value;
+    int status;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 3) {
+	return SCLI_SYNTAX;
+    }
+
+    if (! gsnmp_enum_get_number(if_mib_enums_ifPromiscuousMode,
+				argv[2], &value)) {
+	return SCLI_SYNTAX;
+    }
+
+    status = foreach_interface(interp, argv[1], set_promiscuous, &value);
+    return status;
+}
+
+
+
+static void
+set_notifications(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
+		  gpointer user_data)
+{
+    if_mib_ifXEntry_t *ifXEntry;
+    gint32 *value = (gint32 *) user_data;
+
+    ifXEntry = if_mib_new_ifXEntry();
+    ifXEntry->ifIndex = ifEntry->ifIndex;
+    ifXEntry->ifLinkUpDownTrapEnable = value;
+    (void) if_mib_set_ifXEntry(interp->peer, ifXEntry);
+    if (interp->peer->error_status) {
+	interface_snmp_error(interp, ifEntry);
+    }
+    if_mib_free_ifXEntry(ifXEntry);
+}
+
+
+
+static int
+set_interface_notifications(scli_interp_t *interp, int argc, char **argv)
+{
+    gint32 value;
+    int status;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 3) {
+	return SCLI_SYNTAX;
+    }
+
+    if (! gsnmp_enum_get_number(if_mib_enums_ifLinkUpDownTrapEnable,
+				argv[2], &value)) {
+	return SCLI_SYNTAX;
+    }
+
+    status = foreach_interface(interp, argv[1], set_notifications, &value);
+    return status;
 }
 
 
@@ -996,6 +1156,37 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  set_interface_status },
+
+	{ "set interface alias", "<regexp> <string>",
+	  "The set interface alias command assigns the alias name\n"
+	  "<string> to the selected interfaces. The alias name provies\n"
+	  "a non-volatile 'handle' which can be used by management\n"
+	  "applications to better identify interfaces. The regular\n"
+	  "expression <regexp> is matched against the interface\n"
+	  "descriptions to select the interfaces.",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  set_interface_alias },
+
+	{ "set interface notifications", "<regexp> <value>",
+	  "The set interface notifications command controls whether the\n"
+	  "selected interfaces generate linkUp and linkDown notifications.\n"
+	  "The regular expression <regexp> is matched against the interface\n"
+	  "descriptions to select the interfaces. The <value> parameter\n"
+	  "must be one of the strings \"enabled\" or \"disabled\".",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  set_interface_notifications },
+
+	{ "set interface promiscuous", "<regexp> <bool>",
+	  "The set interface promiscuous command controls whether the\n"
+	  "selected interfaces operate in promiscuous mode or not. The\n"
+	  "regular expression <regexp> is matched against the interface\n"
+	  "descriptions to select the interfaces. The <bool> parameter\n"
+	  "must be one of the strings \"true\" or \"false\".",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  set_interface_promiscuous },
 
 	{ "show interface info", "[<regexp>]",
 	  "The show interface info command displays summary information\n"
@@ -1030,7 +1221,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
+	  "interfaces", NULL,
 	  show_interface_details },
 	
 	{ "show interface stack", "[<regexp>]",
@@ -1069,25 +1260,6 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_interface_stats },
 	
-#if 0
-	{ "set interface alias", "<regexp> <value>",
-	  "set interface alias",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  NULL, NULL,
-	  set_if_alias },
-
-	{ "set interface notifications", "<regexp> <value>",
-	  "set interface notifications",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  NULL, NULL,
-	  set_if_notifications },
-
-	{ "set interface promiscuous", "<regexp> <bool>",
-	  "set interface promiscuous",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  NULL, NULL,
-	  set_if_promiscuous },
-#endif
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     

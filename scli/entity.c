@@ -434,7 +434,7 @@ scli_init_entity_mode(scli_interp_t *interp)
 	{ "show entity details ", NULL,
 	  "physical entities that compose the system",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  NULL, NULL,
+	  "entity details", NULL,
 	  show_entity_details },
 	
 	{ "show entity containment", NULL,

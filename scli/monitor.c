@@ -111,14 +111,20 @@ snmp_decode_hook(GSList *list)
 static void
 page(WINDOW *win, scli_interp_t *interp)
 {
+    char *s, *e;
     int y = 0;
 
     wattron(win, A_REVERSE);
     mvwprintw(win, y++, 0, "%-*s", COLS,
 	      interp->header->len ? interp->header->str : " ");
     wattroff(win, A_REVERSE);
+    wclrtobot(win);
     if (interp->result->len) {
-	mvwprintw(win, y, 0, interp->result->str);
+	for (s = interp->result->str; s; s = e ? ++e : NULL) {
+	    e = index(s, '\n');
+	    if (e) *e = 0;
+	    mvwprintw(win, y++, 0, "%s", s);
+	}
     }
     wclrtobot(win);
     wrefresh(win);
