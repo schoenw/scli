@@ -559,9 +559,61 @@ get_xml_tree(scli_interp_t *interp, char *xpath)
 
 
 static int
-eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
+eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 {
-    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
+    scli_cmd_t *cmd, *root_cmd;
+    int code;
+    
+    root_cmd = node->data;
+    
+    for (node = g_node_first_child(node);
+	 node && scli_interp_recursive(interp);
+	 node = g_node_next_sibling(node)) {
+	cmd = node->data;
+	if (G_NODE_IS_LEAF(node)) {
+	    scli_cmd_t *cmd = node->data;
+	    if (cmd
+		&& !(cmd->flags & SCLI_CMD_FLAG_NEED_PEER && !interp->peer)) {
+		code = scli_eval_cmd(interp, cmd, 0, NULL);
+		if (code == SCLI_OK && interp->result->len) {
+		    if (s->len) {
+			g_string_append(s, "\n");
+		    }
+		    if (! scli_interp_xml(interp)) {
+			g_string_sprintfa(s, "# %s",
+					  cmd->path ? cmd->path : "");
+			if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER) {
+			    g_string_sprintfa(s, " [%s]",
+			      (interp->peer) ? interp->peer->name : "?");
+			}
+			g_string_sprintfa(s, "\n\n");
+			if (interp->header->len) {
+			    g_string_prepend_c(interp->result, '\n');
+			    g_string_prepend(interp->result, interp->header->str);
+			}
+			g_string_append(s, interp->result->str);
+		    }
+		}
+		if (code == SCLI_EXIT) {
+		    return code;
+		}
+	    }
+	} else {
+	    code = eval_all_cmd_node(interp, node, s);
+	    if (code == SCLI_EXIT) {
+		return code;
+	    }
+	}
+    }
+
+    return SCLI_OK;
+}
+
+
+
+int
+scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
+{
     int code = SCLI_OK;
 
     g_return_val_if_fail(cmd && cmd->func, SCLI_OK);
@@ -588,11 +640,11 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 
     if (cmd->flags & SCLI_CMD_FLAG_MONITOR) {
 	interp->flags |= SCLI_INTERP_FLAG_MONITOR;
-	code = scli_monitor(interp, node, argc, argv);
+	code = scli_monitor(interp, cmd, argc, argv);
 	interp->flags &= ~SCLI_INTERP_FLAG_MONITOR;
     } else if (cmd->flags & SCLI_CMD_FLAG_LOOP) {
 	interp->flags |= SCLI_INTERP_FLAG_LOOP;
-	code = scli_loop(interp, node, argc, argv);
+	code = scli_loop(interp, cmd, argc, argv);
 	interp->flags &= ~SCLI_INTERP_FLAG_LOOP;
     } else {
 	code = (cmd->func) (interp, argc, argv);
@@ -608,8 +660,12 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
     case SCLI_SYNTAX_REGEXP:
 	g_printerr("syntax error: invalid regular expression\n");
 	break;
+    case SCLI_SYNTAX_NUMARGS:
+	g_printerr("syntax error: wrong number of arguments: %s %s\n",
+		   cmd->path, cmd->options ? cmd->options : "");
+	break;
     case SCLI_SYNTAX:
-	g_printerr("usage: %s %s\n", cmd->path,
+	g_printerr("syntax error: usage: %s %s\n", cmd->path,
 		   cmd->options ? cmd->options : "");
 	break;
     case SCLI_SNMP:
@@ -659,65 +715,13 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 
 
 
-static int
-eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
-{
-    scli_cmd_t *cmd, *root_cmd;
-    int code;
-    
-    root_cmd = node->data;
-    
-    for (node = g_node_first_child(node);
-	 node && scli_interp_recursive(interp);
-	 node = g_node_next_sibling(node)) {
-	cmd = node->data;
-	if (G_NODE_IS_LEAF(node)) {
-	    scli_cmd_t *cmd = node->data;
-	    if (cmd
-		&& !(cmd->flags & SCLI_CMD_FLAG_NEED_PEER && !interp->peer)) {
-		code = eval_cmd_node(interp, node, 0, NULL);
-		if (code == SCLI_OK && interp->result->len) {
-		    if (s->len) {
-			g_string_append(s, "\n");
-		    }
-		    if (! scli_interp_xml(interp)) {
-			g_string_sprintfa(s, "# %s",
-					  cmd->path ? cmd->path : "");
-			if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER) {
-			    g_string_sprintfa(s, " [%s]",
-			      (interp->peer) ? interp->peer->name : "?");
-			}
-			g_string_sprintfa(s, "\n\n");
-			if (interp->header->len) {
-			    g_string_prepend_c(interp->result, '\n');
-			    g_string_prepend(interp->result, interp->header->str);
-			}
-			g_string_append(s, interp->result->str);
-		    }
-		}
-		if (code == SCLI_EXIT) {
-		    return code;
-		}
-	    }
-	} else {
-	    code = eval_all_cmd_node(interp, node, s);
-	    if (code == SCLI_EXIT) {
-		return code;
-	    }
-	}
-    }
-
-    return SCLI_OK;
-}
-
-
-
 int
-scli_eval(scli_interp_t *interp, char *cmd)
+scli_eval_string(scli_interp_t *interp, char *cmd)
 {
     char **argv;
     char *expanded_cmd = NULL;
-    int i, done = 0, argc, code = SCLI_OK;
+    int i, argc, code = SCLI_OK;
+    gboolean done = FALSE;
     GNode *node = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -768,11 +772,11 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	    } else {
 		g_snmp_list_decode_hook = NULL;
 	    }
-	    code = eval_cmd_node(interp, node, argc - i, argv + i);
-	    done = 1;
+	    code = scli_eval_cmd(interp, (scli_cmd_t *) node->data, argc - i, argv + i);
+	    done = TRUE;
 	} else if (! G_NODE_IS_LEAF(node)) {
 	    GString *s;
-	    done = 1;
+	    done = TRUE;
 	    interp->flags |= SCLI_INTERP_FLAG_RECURSIVE;
 	    s = g_string_new(NULL);
 	    if (scli_interp_interactive(interp)) {
@@ -798,12 +802,12 @@ scli_eval(scli_interp_t *interp, char *cmd)
 
     if (! done) {
 	int j;
-	g_printerr("invalid command name \"");
+	g_printerr("syntax error: invalid command name \"");
 	for (j = 0; j <= i; j++) {
 	    g_printerr("%s%s", j ? " ": "", argv[j]);
 	}
 	g_printerr("\"\n");
-	code = SCLI_ERROR;
+	code = SCLI_SYNTAX;
     }
 
     if (argv) {
@@ -839,7 +843,7 @@ scli_eval_file_stream(scli_interp_t *interp, FILE *stream)
 	    g_string_append(s, buffer);
 	} else {
 	    g_string_append(s, buffer);
-	    code = scli_eval(interp, s->str);
+	    code = scli_eval_string(interp, s->str);
 	    g_string_truncate(s, 0);
 	}
     }

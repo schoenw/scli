@@ -476,7 +476,7 @@ show_nortel_bridge_vlan_details(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (argc == 2) {
@@ -564,7 +564,7 @@ show_nortel_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (argc == 2) {
@@ -674,7 +674,7 @@ show_nortel_bridge_vlan_ports(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     rapid_city_get_rcVlanPortTable(interp->peer, &vlanPortTable, 0);
@@ -706,7 +706,7 @@ delete_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     regex_vlan = &_regex_vlan;
@@ -748,11 +748,11 @@ create_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 3) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (sscanf(argv[1], "%d", &vlanId) != 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMBER;
     }
 
     rapid_city_proc_create_vlan(interp->peer, vlanId, argv[2],
@@ -778,7 +778,7 @@ set_nortel_bridge_vlan_ports(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 3) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     regex_vlan = &_regex_vlan;
@@ -788,7 +788,7 @@ set_nortel_bridge_vlan_ports(scli_interp_t *interp, int argc, char **argv)
 
     if (scan_port_set(ports, sizeof(ports), argv[2]) != SCLI_OK) {
 	if (regex_vlan) regfree(regex_vlan);
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_VALUE;
     }
 
     rapid_city_get_rcVlanTable(interp->peer, &vlanTable, RAPID_CITY_RCVLANNAME);
@@ -829,11 +829,11 @@ set_nortel_bridge_vlan_default(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 3) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (scan_port_set(ports, sizeof(ports), argv[2]) != SCLI_OK) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_VALUE;
     }
 
     rapid_city_get_rcVlanTable(interp->peer, &vlanTable, RAPID_CITY_RCVLANNAME);
@@ -886,7 +886,7 @@ dump_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     rapid_city_get_rcVlanTable(interp->peer, &vlanTable, mask);

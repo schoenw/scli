@@ -74,7 +74,7 @@ show_tcp_listener(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0);
@@ -193,7 +193,7 @@ show_tcp_connections(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0);

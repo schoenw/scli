@@ -111,7 +111,7 @@ mainloop(scli_interp_t *interp)
 	} else {
 	    g_string_append(s, input);
 	    add_history(s->str);
-	    code = scli_eval(interp, s->str);
+	    code = scli_eval_string(interp, s->str);
 	    g_string_truncate(s, 0);
 	}
 	free(input);
@@ -497,7 +497,7 @@ main(int argc, char **argv)
     } else if (file) {
 	(void) scli_eval_file(interp, file);
     } else if (cmd) {
-	(void) scli_eval(interp, cmd);
+	(void) scli_eval_string(interp, cmd);
     } else {
 	(void) scli_eval_file_stream(interp, stdin);
     }

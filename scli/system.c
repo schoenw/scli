@@ -363,7 +363,7 @@ show_system_devices(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable, 0);
@@ -503,7 +503,7 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     host_resources_mib_get_hrSWRunTable(interp->peer, &hrSWRunTable, 0);
@@ -641,7 +641,7 @@ show_system_mounts(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     host_resources_mib_get_hrFSTable(interp->peer, &hrFSTable, 0);
@@ -801,7 +801,7 @@ show_system_storage(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
     
     host_resources_mib_get_hrStorageTable(interp->peer,
@@ -882,6 +882,9 @@ xml_system_info(xmlNodePtr root, scli_interp_t *interp,
 					  system->_sysObjectIDLength);
 	    if (vendor && vendor->name) {
 		(void) xml_new_child(root, NULL, "vendor", "%s", vendor->name);
+	    }
+	    if (vendor && vendor->url) {
+		(void) xml_new_child(root, NULL, "url", "%s", vendor->url);
 	    }
 	}
 
@@ -990,7 +993,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     snmpv2_mib_get_system(interp->peer, &system, 0);
@@ -1125,7 +1128,7 @@ set_system_contact(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     system = snmpv2_mib_new_system();
@@ -1151,7 +1154,7 @@ set_system_name(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     system = snmpv2_mib_new_system();
@@ -1177,7 +1180,7 @@ set_system_location(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     system = snmpv2_mib_new_system();
@@ -1203,7 +1206,7 @@ dump_system(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     snmpv2_mib_get_system(interp->peer, &system, 0);
@@ -1250,7 +1253,7 @@ cmd_xxx(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
     n = atoi(argv[1]);
 

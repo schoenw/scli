@@ -345,7 +345,7 @@ show_printer_info(scli_interp_t * interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     host_resources_mib_get_hrPrinterTable(interp->peer, &hrPrinterTable, 0);
@@ -725,7 +725,7 @@ show_printer_inputs(scli_interp_t * interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     printer_mib_get_prtInputTable(interp->peer, &prtInputTable, 0);
@@ -788,7 +788,7 @@ show_printer_interpreter(scli_interp_t * interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     printer_mib_get_prtInterpreterTable(interp->peer, &interpTable, 0);
@@ -859,7 +859,7 @@ show_printer_console_display(scli_interp_t * interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     printer_mib_get_prtConsoleDisplayBufferTable(interp->peer,
@@ -978,7 +978,7 @@ show_printer_console_lights(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     printer_mib_get_prtConsoleLightTable(interp->peer,
@@ -1138,7 +1138,7 @@ show_printer_alert(scli_interp_t * interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     printer_mib_get_prtAlertTable(interp->peer, &alertTable, 0);

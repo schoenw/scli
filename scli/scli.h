@@ -72,9 +72,10 @@ extern char const scli_copyright[];	/* copyright message (surprise) */
 #define SCLI_EXIT		2	/* return and exit the command loop */
 #define SCLI_SNMP		3	/* snmp error return code */
 #define SCLI_SYNTAX		4	/* generic syntax error */
-#define SCLI_SYNTAX_REGEXP	5	/* syntax error in regexp */
-#define SCLI_SYNTAX_NUMBER	6	/* syntax error in number */
-#define SCLI_SYNTAX_VALUE	7	/* syntax error in value */
+#define SCLI_SYNTAX_NUMARGS	5	/* syntax error in number of args */
+#define SCLI_SYNTAX_REGEXP	6	/* syntax error in regexp */
+#define SCLI_SYNTAX_NUMBER	7	/* syntax error in number */
+#define SCLI_SYNTAX_VALUE	8	/* syntax error in value */
 
 
 typedef struct scli_interp	scli_interp_t;
@@ -155,13 +156,16 @@ extern int
 scli_split(char *string, int *argc, char ***argv);
 
 extern int
-scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv);
+scli_monitor(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv);
 
 extern int
-scli_loop(scli_interp_t *interp, GNode *node, int argc, char **argv);
+scli_loop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv);
 
 extern int
-scli_eval(scli_interp_t *interp, char *cmd);
+scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv);
+
+extern int
+scli_eval_string(scli_interp_t *interp, char *s);
 
 extern int
 scli_eval_file(scli_interp_t *interp, char *path);

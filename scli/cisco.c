@@ -154,6 +154,10 @@ cmd_cisco_ip_accounting_current(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
     old_cisco_ip_mib_get_lipAccountingTable(interp->peer,
 					    &lipAccountTable, 0);
     if (interp->peer->error_status) {
@@ -210,6 +214,10 @@ cmd_cisco_ip_accounting_snapshot(scli_interp_t *interp, int argc, char **argv)
     int i, j;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
 
     old_cisco_ip_mib_get_lipCkAccountingTable(interp->peer,
 					      &lipCkAccountTable, 0);
@@ -287,6 +295,10 @@ cmd_cisco_ip_accounting_info(scli_interp_t *interp, int argc, char **argv)
     old_cisco_ip_mib_lip_t *lip;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
 
     old_cisco_ip_mib_get_lip(interp->peer, &lip, 0);
     if (interp->peer->error_status) {

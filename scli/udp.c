@@ -68,7 +68,7 @@ show_udp_listener(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     udp_mib_get_udpTable(interp->peer, &udpTable, 0);

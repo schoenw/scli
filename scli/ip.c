@@ -1,4 +1,3 @@
-
 /* 
  * ip.c -- scli ip mode implementation
  *
@@ -124,7 +123,7 @@ show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     ip_forward_mib_get_ipCidrRouteTable(interp->peer, &ipCidrRouteTable, 0);
@@ -218,7 +217,7 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0);
@@ -341,7 +340,7 @@ show_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     tunnel_mib_get_tunnelIfTable(interp->peer, &tunnelIfTable, 0);
@@ -370,9 +369,9 @@ show_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-fmt_ip_arp(GString *s,
-	    ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry,
-	    if_mib_ifEntry_t *ifEntry)
+fmt_ip_mapping(GString *s,
+	       ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry,
+	       if_mib_ifEntry_t *ifEntry)
 {
     char *name;
     const char *e;
@@ -417,7 +416,7 @@ fmt_ip_arp(GString *s,
 
 
 static int
-show_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
+show_ip_mapping(scli_interp_t *interp, int argc, char **argv)
 {
     ip_mib_ipNetToMediaEntry_t **ipNetToMediaTable = NULL;
     if_mib_ifEntry_t **ifTable = NULL, *ifEntry = NULL;
@@ -426,7 +425,7 @@ show_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     ip_mib_get_ipNetToMediaTable(interp->peer, &ipNetToMediaTable, 0);
@@ -437,7 +436,7 @@ show_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
     if (ipNetToMediaTable) {
 	if_mib_get_ifTable(interp->peer, &ifTable, 0);
 	g_string_append(interp->header,
-		"INTERFACE TYPE     ADDRESS          LOWER LAYER ADDRESS");
+		"INTERFACE STATUS   ADDRESS          LOWER LAYER ADDRESS");
 	for (i = 0; ipNetToMediaTable[i]; i++) {
 	    if (ifTable) {
 		for (j = 0; ifTable[j]; j++) {
@@ -446,7 +445,7 @@ show_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
 		}
 		ifEntry = ifTable[j];
 	    }
-	    fmt_ip_arp(interp->result, ipNetToMediaTable[i], ifEntry);
+	    fmt_ip_mapping(interp->result, ipNetToMediaTable[i], ifEntry);
 	}
     }
 
@@ -491,7 +490,7 @@ show_ip_info(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     ip_mib_get_ip(interp->peer, &ip, 0);
@@ -519,7 +518,7 @@ set_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (! gsnmp_enum_get_number(forwarding, argv[1], &value)) {
@@ -549,7 +548,7 @@ set_ip_ttl(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     value = atoi(argv[1]);
@@ -580,7 +579,7 @@ dump_ip(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     ip_mib_get_ip(interp->peer, &ip, 0);
@@ -664,16 +663,24 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  show_ip_addresses },
 	
 	{ "show ip tunnel", NULL,
-	  "IP tunnels",
+	  "The show ip tunnel command displays information about existing\n"
+	  "IP tunnels.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  show_ip_tunnel },
 	
 	{ "show ip mapping", NULL,
-	  "IP address to lower layer address mappings",
+	  "The show ip mapping command displays the mapping of IP address\n"
+	  "to lower layer address (e.g., IEEE 802 addresses). The command\n"
+	  "generates a table with the following columns:\n"
+	  "\n"
+	  "  INTERFACE network interface number\n"
+	  "  STATUS    status of the mapping entry\n"
+	  "  ADDRESS   IP address\n"
+	  "  ADDRESS   lower layer address",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  show_ip_media_mapping },
+	  show_ip_mapping },
 	
 	{ "dump ip", NULL,
 	  "The dump ip command generates a sequence of scli commands\n"

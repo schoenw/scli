@@ -99,7 +99,7 @@ show_entity_containment(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
@@ -311,7 +311,7 @@ show_entity_details(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
@@ -384,7 +384,7 @@ show_entity_info(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);

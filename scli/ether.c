@@ -245,7 +245,7 @@ cmd_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     mau_mib_get_ifMauTable(interp->peer, &ifMauTable, 0);
@@ -298,7 +298,7 @@ cmd_ether_stats(scli_interp_t *interp, int argc, char **argv)
     static time_t epoch = 0;
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     etherlike_mib_get_dot3StatsTable(interp->peer, &dot3StatsTable, 0);

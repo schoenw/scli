@@ -696,9 +696,8 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 
 
 int
-scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv)
+scli_monitor(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 {
-    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
     int code = SCLI_OK;
 
     scli_curses_on();
@@ -750,9 +749,8 @@ loop_input(GIOChannel *source, GIOCondition condition, gpointer data)
 
 
 int
-scli_loop(scli_interp_t *interp, GNode *node, int argc, char **argv)
+scli_loop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 {
-    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
     GMainLoop *loop;
     GIOChannel *channel;
     struct loop_data loop_data;

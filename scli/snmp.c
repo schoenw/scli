@@ -547,7 +547,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  "  ROW    row storage type and status\n"
 	  "  GROUP  security group name\n"
 	  "  MOD    security model\n"
-	  "  SEC    security level (--, a-, ap)\n"
+	  "  LVL    security level (--, a-, ap)\n"
 	  "  CTX    context name\n"
 	  "  MATCH  match (exact or prefix)\n"
 	  "  READ   view name for read access\n"

@@ -160,7 +160,7 @@ show_bridge_info(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     bridge_mib_get_dot1dBase(interp->peer, &dot1dBase, 0);
@@ -251,7 +251,7 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     bridge_mib_get_dot1dBasePortTable(interp->peer, &dot1dBasePortTable, 0);
@@ -363,7 +363,7 @@ show_bridge_stp_ports(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     bridge_mib_get_dot1dStpPortTable(interp->peer, &dot1dStpPortTable, 0);
@@ -436,7 +436,7 @@ show_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     bridge_mib_get_dot1dTpFdbTable(interp->peer, &dot1dTpFdbTable, 0);
@@ -524,7 +524,7 @@ show_bridge_filter(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     bridge_mib_get_dot1dStaticTable(interp->peer, &dot1dStaticTable, 0);
@@ -565,7 +565,7 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
     int i;
     
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     bridge_mib_get_dot1dTpPortTable(interp->peer, &portTable, 0);

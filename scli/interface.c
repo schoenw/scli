@@ -542,7 +542,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (argc == 2) {
@@ -673,7 +673,7 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (argc == 2) {
@@ -784,7 +784,7 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
     int i, type_width;
 
     if (argc > 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (argc == 2) {
@@ -858,7 +858,7 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
     int i;
 
     if (argc > 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (argc == 2) {
@@ -1049,7 +1049,7 @@ set_interface_status(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
     
     if (argc != 3) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (! gsnmp_enum_get_number(if_mib_enums_ifAdminStatus, argv[2], &value)) {
@@ -1083,7 +1083,7 @@ set_interface_alias(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 3) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     status = foreach_interface(interp, argv[1], set_alias, argv[2]);
@@ -1115,7 +1115,7 @@ set_interface_promiscuous(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 3) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (! gsnmp_enum_get_number(if_mib_enums_ifPromiscuousMode,
@@ -1152,7 +1152,7 @@ set_interface_notifications(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 3) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (! gsnmp_enum_get_number(if_mib_enums_ifLinkUpDownTrapEnable,
@@ -1177,7 +1177,7 @@ dump_interface(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_PARAMS);

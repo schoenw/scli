@@ -44,7 +44,7 @@ cmd_scli_exit(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
         
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     return SCLI_EXIT;
@@ -94,7 +94,7 @@ show_scli_commands(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (interp->cmd_root) {
@@ -117,7 +117,7 @@ show_scli_modes(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (argc == 2) {
@@ -168,7 +168,7 @@ show_scli_schema(scli_interp_t *interp, int argc, char **argv)
     regex_t _regex_mode, *regex_mode = NULL;
 
     if (argc > 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (argc == 2) {
@@ -222,7 +222,7 @@ help(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     g_string_sprintfa(interp->result,
@@ -260,7 +260,7 @@ history(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     the_list = history_list();
@@ -286,7 +286,7 @@ scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
     } else if (argc == 3) {
 	scli_open_community(interp, argv[1], 161, argv[2]);
     } else {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     return SCLI_OK;
@@ -300,7 +300,7 @@ cmd_scli_close(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     scli_close(interp);
@@ -319,7 +319,7 @@ create_scli_alias(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
     
     if (argc != 3) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
@@ -353,7 +353,7 @@ delete_scli_alias(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
     
     if (argc != 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
     
     regex_name = &_regex_name;
@@ -392,7 +392,7 @@ show_scli_aliases(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (interp->alias_list) {
@@ -432,7 +432,7 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     g_string_sprintfa(interp->result, "%-*s %s\n", indent, "Version:",
@@ -503,7 +503,7 @@ set_scli_debugging(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (argc == 1) {
@@ -536,7 +536,7 @@ set_scli_pager(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
     
     if (argc != 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (scli_set_pager(interp, argv[1]) < 0) {
@@ -557,7 +557,7 @@ set_scli_format(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
     
     if (argc != 2) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (strcmp(argv[1], "xml") == 0) {

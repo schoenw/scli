@@ -84,7 +84,7 @@ show_atm_interface(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     atm_mib_get_atmInterfaceConfTable(interp->peer,

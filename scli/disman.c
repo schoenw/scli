@@ -72,6 +72,7 @@ static const char *days[] = {
     "r31", NULL
 };
 
+#if 0
 static const char *ddays[] = {
     "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10",
     "d11", "d12", "d13", "d14", "d15", "d16", "d17", "d18", "d19", "d20",
@@ -85,6 +86,7 @@ static const char *rdays[] = {
     "r21", "r22", "r23", "r24", "r25", "r26", "r27", "r28", "r29", "r30",
     "r31", NULL
 };
+#endif
 
 static const char *hours[] = {
     "h0", "h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8", "h9", "h10",
@@ -450,7 +452,7 @@ fmt_expression(disman_schedule_mib_schedEntry_t *schedEntry)
 		     schedEntry->schedWeekDay, schedEntry->_schedWeekDayLength);
 	o = fmt_item(s, months,
 		     schedEntry->schedMonth, schedEntry->_schedMonthLength);
-	d = fmt_item(s, ddays,
+	d = fmt_item(s, days,
 		     schedEntry->schedDay, schedEntry->_schedDayLength);
 	h = fmt_item(s, hours,
 		     schedEntry->schedHour, schedEntry->_schedHourLength);
@@ -640,7 +642,7 @@ cmd_languages(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0);
@@ -744,7 +746,7 @@ cmd_script_details(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0);
@@ -850,7 +852,7 @@ cmd_script_info(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0);
@@ -977,7 +979,7 @@ cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
@@ -1135,7 +1137,7 @@ cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
@@ -1211,7 +1213,7 @@ cmd_run_info(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     disman_script_mib_get_smRunTable(interp->peer, &smRunTable, 0);
@@ -1359,7 +1361,7 @@ cmd_run_details(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     disman_script_mib_get_smRunTable(interp->peer, &smRunTable, 0);
@@ -1422,7 +1424,7 @@ cmd_scheduler_info(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     disman_schedule_mib_get_schedTable(interp->peer, &schedTable, 0);
@@ -1541,7 +1543,7 @@ cmd_scheduler_details(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     disman_schedule_mib_get_schedTable(interp->peer, &schedTable, 0);
@@ -1571,7 +1573,7 @@ create_disman_script(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
     
     if (argc != 4) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (strlen(argv[1]) > 32
@@ -1597,7 +1599,7 @@ create_disman_run(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
     
     if (argc != 4) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_NUMARGS;
     }
 
     if (strlen(argv[1]) > 32
