@@ -954,15 +954,13 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
 				      ifStackTable[j]->ifStackHigherLayer);
 			    continue;
 			}
-			if (cnt == h/2) {
-			    fmt_interface_stack(interp->result, ifTable[i], type_width, "--+  ");
-			}
 			if (cnt == 0) {
-			    fmt_interface_stack(interp->result, ifEntry, type_width, "  .->");
-			} else if (cnt+1 == h) {
+			    fmt_interface_stack(interp->result, ifTable[i], type_width, "--.  ");
+			}
+			if (cnt+1 == h) {
 			    fmt_interface_stack(interp->result, ifEntry, type_width, "  `->");
 			} else {
-			    fmt_interface_stack(interp->result, ifEntry, type_width, "  +->");
+			    fmt_interface_stack(interp->result, ifEntry, type_width, "  |->");
 			}
 			cnt++;
 		    }
@@ -981,15 +979,13 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
 				      ifStackTable[j]->ifStackLowerLayer);
 			    continue;
 			}
-			if (cnt == l/2) {
-			    fmt_interface_stack(interp->result, ifTable[i], type_width, "  +->");
-			}
 			if (cnt == 0) {
 			    fmt_interface_stack(interp->result, ifEntry, type_width, "--.  ");
-			} else if (cnt+1 == l) {
-			    fmt_interface_stack(interp->result, ifEntry, type_width, "--'  ");
 			} else {
-			    fmt_interface_stack(interp->result, ifEntry, type_width, "--+  ");
+			    fmt_interface_stack(interp->result, ifEntry, type_width, "--|  ");
+			}
+			if (cnt == l-1) {
+			    fmt_interface_stack(interp->result, ifTable[i], type_width, "  `->");
 			}
 			cnt++;
 		    }
