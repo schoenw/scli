@@ -420,19 +420,19 @@ scli_init_ip_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 	{ "show ip forwarding",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "IP forwarding table",
+	  "IP forwarding data base",
 	  cmd_ip_forwarding },
 	{ "show ip addresses",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "list of assigned IP addresses",
+	  "assigned IP addresses",
 	  cmd_ip_addresses },
 	{ "show ip tunnel",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "list of IP tunnels",
+	  "IP tunnels",
 	  cmd_ip_tunnel },
 	{ "show ip mapping",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "list of IP to media mappings",
+	  "IP address to lower layer address mappings",
 	  cmd_ip_media_mapping },
 	{ NULL, 0, NULL, NULL }
     };
