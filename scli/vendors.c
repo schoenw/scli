@@ -30,6 +30,7 @@ static scli_vendor_t vendor_table[] = {
     {    9,	"Cisco Systems",	"http://www.cisco.com/" },
     {   11,	"Hewlett Packard",	"http://www.hp.com/" },
     {   42,	"Sun Microsystems",	"http://www.sun.com/" },
+    {   43,	"3Com",			"http://www.3com.com/" },
     {  253,	"Xerox",		"http://www.xerox.com/" },
     { 1575,	"TU Braunschweig",	NULL },
     { 2021,	"UCD-SNMP",		"http://ucd-snmp.ucdavis.edu/" },
@@ -42,6 +43,7 @@ scli_vendor_t*
 scli_get_vendor(guint32 oid[], gsize len)
 {
     static guint32 const enterprises[] = { 1, 3, 6, 1, 4, 1 };
+    static char buffer[80];
     int i, j;
     
     if (len <= sizeof(enterprises)/sizeof(guint32)) {
@@ -60,5 +62,8 @@ scli_get_vendor(guint32 oid[], gsize len)
 	}
     }
 
-    return NULL;
+    g_snprintf(buffer, sizeof(buffer), "enterprises.%u", oid[i]);
+    vendor_table[j].name = buffer;
+	
+    return &(vendor_table[j]);
 }

@@ -422,13 +422,15 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 	    scli_vendor_t *vendor;
 	    vendor = scli_get_vendor(system->sysObjectID,
 				     system->_sysObjectIDLength);
-	    if (vendor) {
+	    if (vendor && vendor->name) {
 		g_string_sprintfa(s, "\n%-*s ", indent, "Vendor:");
-		if (vendor->name) {
+		if (vendor->id) {
 		    g_string_append(s, vendor->name);
 		    if (vendor->url) {
 			g_string_sprintfa(s, " <%s>", vendor->url);
 		    }
+		} else {
+		    g_string_sprintfa(s, "unknown (%s)", vendor->name);
 		}
 	    }
 	}
