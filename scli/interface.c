@@ -163,7 +163,7 @@ match_interface(regex_t *regex_iface,
 
 
 static if_mib_ifEntry_t *
-get_if_entry(if_mib_ifEntry_t **ifTable, gint32 ifIndex)
+get_ifEntry(if_mib_ifEntry_t **ifTable, gint32 ifIndex)
 {
     int i;
     
@@ -177,6 +177,23 @@ get_if_entry(if_mib_ifEntry_t **ifTable, gint32 ifIndex)
     return NULL;
 }
     
+
+
+static if_mib_ifXEntry_t *
+get_ifXEntry(if_mib_ifXEntry_t **ifXTable, gint32 ifIndex)
+{
+    int i;
+
+    if (ifXTable) {
+	for (i = 0; ifXTable[i]; i++) {
+	    if (ifXTable[i]->ifIndex == ifIndex) {
+		return ifXTable[i];
+	    }
+	}
+    }
+    return NULL;
+}
+
 
 
 static int
@@ -540,23 +557,24 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
     }
-    if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS);
-    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
-    ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0);
-
-    entity_mib_get_entAliasMappingTable(interp->peer,
-					&entAliasMappingTable, 0);
-    if (!interp->peer->error_status && entAliasMappingTable) {
-	entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
-    }
 
     if (ifTable) {
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS);
+	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
+	ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0);
+	
+	entity_mib_get_entAliasMappingTable(interp->peer,
+					    &entAliasMappingTable, 0);
+	if (!interp->peer->error_status && entAliasMappingTable) {
+	    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
+	}
 	for (i = 0, c = 0; ifTable[i]; i++) {
 	    if (match_interface(regex_iface, ifTable[i])) {
+		if_mib_ifXEntry_t *ifXEntry;
+		ifXEntry = get_ifXEntry(ifXTable, ifTable[i]->ifIndex);
 		if (scli_interp_xml(interp)) {
 		    xml_interface_details(interp->xml_node, ifTable[i],
-					  ifXTable ? ifXTable[i] : NULL,
-					  system, ipAddrTable);
+					  ifXEntry, system, ipAddrTable);
 		} else {
 		    if (c) {
 			g_string_append(interp->result, "\n");
@@ -564,8 +582,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 		    (void) get_entity_index(ifTable[i]->ifIndex,
 					    entAliasMappingTable, entPhysicalTable);
 		    fmt_interface_details(interp->result, ifTable[i],
-					  ifXTable ? ifXTable[i] : NULL,
-					  system, ipAddrTable);
+					  ifXEntry, system, ipAddrTable);
 		}
 		c++;
 	    }
@@ -671,21 +688,21 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
     }
-    if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS);
-
-    type_width = get_if_type_width(ifTable);
-    name_width = get_if_name_width(ifXTable);
 
     if (ifTable) {
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS);
+	type_width = get_if_type_width(ifTable);
+	name_width = get_if_name_width(ifXTable);
 	g_string_sprintfa(interp->header,
 		  "INTERFACE STATUS  MTU %-*s  SPEED %-*s DESCRIPTION",
 			  type_width, "TYPE",
 			  name_width, "NAME");
 	for (i = 0; ifTable[i]; i++) {
 	    if (match_interface(regex_iface, ifTable[i])) {
+		if_mib_ifXEntry_t *ifXEntry;
+		ifXEntry = get_ifXEntry(ifXTable, ifTable[i]->ifIndex);
 		fmt_interface_info(interp->result, ifTable[i],
-				   ifXTable ? ifXTable[i] : NULL,
-				   type_width, name_width);
+				   ifXEntry, type_width, name_width);
 	    }
 	}
     }
@@ -728,7 +745,7 @@ fmt_interface_stack(GString *s,
 	return;
     }
     
-    ifEntry = get_if_entry(ifTable, ifStackEntry->ifStackHigherLayer);
+    ifEntry = get_ifEntry(ifTable, ifStackEntry->ifStackHigherLayer);
 
     if (ifEntry->ifDescr) {
 	ifDescr = ifEntry->ifDescr;
@@ -791,8 +808,8 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
 			  type_width, "TYPE");
 	for (i = 0; ifStackTable[i]; i++) {
 	    if (ifStackTable[i]->ifStackLowerLayer == 0) {
-		ifEntry = get_if_entry(ifTable,
-				       ifStackTable[i]->ifStackHigherLayer);
+		ifEntry = get_ifEntry(ifTable,
+				      ifStackTable[i]->ifStackHigherLayer);
 		if (! ifEntry) {
 		    g_warning("stacked interface %d does not exist "
 			      "in the ifTable",
@@ -878,15 +895,17 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 			"I-BPS O-BPS I-PPS O-PPS I-ERR O-ERR  DESCRIPTION");
 	for (i = 0; ifTable[i]; i++) {
 	    GString *s;
+	    if_mib_ifXEntry_t *ifXEntry;
 	    if (! match_interface(regex_iface, ifTable[i])) {
 		continue;
 	    }
 	    s = interp->result;
 	    g_string_sprintfa(s, "%9u  ", ifTable[i]->ifIndex);
+	    ifXEntry = get_ifXEntry(ifXTable, ifTable[i]->ifIndex);
 	    fmt_ifStatus(s,
 			 ifTable[i]->ifAdminStatus, ifTable[i]->ifOperStatus,
-	 (ifXTable && ifXTable[i]) ? ifXTable[i]->ifConnectorPresent : NULL,
-	 (ifXTable && ifXTable[i]) ? ifXTable[i]->ifPromiscuousMode : NULL);
+			 ifXEntry ? ifXEntry->ifConnectorPresent : NULL,
+			 ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
 
 	    g_string_sprintfa(s, " ");
 
@@ -899,10 +918,10 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 	    if (ifTable[i]->ifInUcastPkts && delta > TV_DELTA) {
 		guint32 pkts;
 		pkts = *(ifTable[i]->ifInUcastPkts);
-		if (ifXTable && ifXTable[i]->ifInMulticastPkts
-		    && ifXTable[i]->ifInBroadcastPkts) {
-		    pkts += *(ifXTable[i]->ifInMulticastPkts);
-		    pkts += *(ifXTable[i]->ifInBroadcastPkts);
+		if (ifXEntry && ifXEntry->ifInMulticastPkts
+		    && ifXEntry->ifInBroadcastPkts) {
+		    pkts += *(ifXEntry->ifInMulticastPkts);
+		    pkts += *(ifXEntry->ifInBroadcastPkts);
 		} else if (ifTable[i]->ifInNUcastPkts) {
 		    pkts += *(ifTable[i]->ifInNUcastPkts);
 		} else {
@@ -923,10 +942,10 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 	    if (ifTable[i]->ifOutUcastPkts && delta > TV_DELTA) {
 		guint32 pkts;
 		pkts = *(ifTable[i]->ifOutUcastPkts);
-		if (ifXTable && ifXTable[i]->ifOutMulticastPkts
-		    && ifXTable[i]->ifOutBroadcastPkts) {
-		    pkts += *(ifXTable[i]->ifOutMulticastPkts);
-		    pkts += *(ifXTable[i]->ifOutBroadcastPkts);
+		if (ifXEntry && ifXEntry->ifOutMulticastPkts
+		    && ifXEntry->ifOutBroadcastPkts) {
+		    pkts += *(ifXEntry->ifOutMulticastPkts);
+		    pkts += *(ifXEntry->ifOutBroadcastPkts);
 		} else if (ifTable[i]->ifOutNUcastPkts) {
 		    pkts += *(ifTable[i]->ifOutNUcastPkts);
 		} else {

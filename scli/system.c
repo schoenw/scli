@@ -279,6 +279,22 @@ fmt_kbytes(GString *s, guint32 bytes)
 
 
 
+static host_resources_mib_hrSWRunPerfEntry_t*
+get_hrSWRunPerfEntry(host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfTable,
+		     gint32 hrSWRunIndex)
+{
+    int i;
+
+    for (i = 0; hrSWRunPerfTable[i]; i++) {
+	if (hrSWRunPerfTable[i]->hrSWRunIndex == hrSWRunIndex) {
+	    return hrSWRunPerfTable[i];
+	}
+    }
+    return NULL;
+}
+
+
+
 static void
 xml_system_device(xmlNodePtr root,
 		  host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
@@ -503,12 +519,15 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 			    "  PID S T MEMORY     TIME COMMAND");
 	}
 	for (i = 0; hrSWRunTable[i]; i++) {
+	    host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry;
+	    hrSWRunPerfEntry = get_hrSWRunPerfEntry(hrSWRunPerfTable,
+					    hrSWRunTable[i]->hrSWRunIndex);
 	    if (scli_interp_xml(interp)) {
 		xml_system_process(interp->xml_node, hrSWRunTable[i],
-			   hrSWRunPerfTable ? hrSWRunPerfTable[i] : NULL);
+				   hrSWRunPerfEntry);
 	    } else {
 		fmt_system_process(interp->result, hrSWRunTable[i],
-			    hrSWRunPerfTable ? hrSWRunPerfTable[i] : NULL);
+				   hrSWRunPerfEntry);
 	    }
 	}
     }
@@ -1313,7 +1332,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  NULL, NULL,
 	  show_system_storage },
-
+#if 0
 	{ "loop system storage", NULL,
 	  "The monitor system storage command shows the same\n"
 	  "information as the show system storage command. The\n"
@@ -1321,7 +1340,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_LOOP | SCLI_CMD_FLAG_XML,
 	  NULL, NULL,
 	  show_system_storage },
-
+#endif
 	{ "monitor system processes", NULL,
 	  "The monitor system processes command show the same\n"
 	  "information as the show system processes command. The\n"
