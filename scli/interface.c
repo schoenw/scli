@@ -1253,7 +1253,7 @@ set_status(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
 {
     gint32 *value = (gint32 *) user_data;
 
-    if_mib_proc_set_interface_status(interp->peer, ifEntry->ifIndex, *value);
+    if_mib_set_ifAdminStatus(interp->peer, ifEntry->ifIndex, *value);
     if (interp->peer->error_status) {
 	interface_snmp_error(interp, ifEntry);
     }
@@ -1288,8 +1288,8 @@ static void
 set_alias(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
 	  gpointer user_data)
 {
-    if_mib_proc_set_interface_alias(interp->peer, ifEntry->ifIndex,
-				    (char *) user_data, strlen((char *) user_data));
+    if_mib_set_ifAlias(interp->peer, ifEntry->ifIndex,
+		       (char *) user_data, strlen((char *) user_data));
     if (interp->peer->error_status) {
 	interface_snmp_error(interp, ifEntry);
     }
@@ -1320,7 +1320,7 @@ set_promiscuous(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
 {
     gint32 *value = (gint32 *) user_data;
 
-    if_mib_proc_set_interface_promiscuous(interp->peer, ifEntry->ifIndex, *value);
+    if_mib_set_ifPromiscuousMode(interp->peer, ifEntry->ifIndex, *value);
     if (interp->peer->error_status) {
 	interface_snmp_error(interp, ifEntry);
     }
@@ -1358,7 +1358,7 @@ set_notifications(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
 {
     gint32 *value = (gint32 *) user_data;
 
-    if_mib_proc_set_notifications(interp->peer, ifEntry->ifIndex, *value);
+    if_mib_set_ifLinkUpDownTrapEnable(interp->peer, ifEntry->ifIndex, *value);
     if (interp->peer->error_status) {
 	interface_snmp_error(interp, ifEntry);
     }

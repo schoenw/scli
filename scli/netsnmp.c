@@ -277,7 +277,6 @@ show_netsnmp_proc(scli_interp_t *interp, int argc, char **argv)
 static int
 set_netsnmp_debugging(scli_interp_t *interp, int argc, char **argv)
 {
-    ucd_snmp_mib_version_t *version = NULL;
     gint32 value = 1;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -296,11 +295,7 @@ set_netsnmp_debugging(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    version = ucd_snmp_mib_new_version();
-    version->versionDoDebugging = &value;
-    ucd_snmp_mib_set_version(interp->peer, version,
-			     UCD_SNMP_MIB_VERSIONDODEBUGGING);
-    ucd_snmp_mib_free_version(version);
+    ucd_snmp_mib_set_versionDoDebugging(interp->peer, value);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
@@ -313,7 +308,6 @@ set_netsnmp_debugging(scli_interp_t *interp, int argc, char **argv)
 static int
 set_netsnmp_restart(scli_interp_t *interp, int argc, char **argv)
 {
-    ucd_snmp_mib_version_t *version = NULL;
     gint32 value = 1;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -326,11 +320,7 @@ set_netsnmp_restart(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    version = ucd_snmp_mib_new_version();
-    version->versionRestartAgent = &value;
-    ucd_snmp_mib_set_version(interp->peer, version,
-			     UCD_SNMP_MIB_VERSIONRESTARTAGENT);
-    ucd_snmp_mib_free_version(version);
+    ucd_snmp_mib_set_versionRestartAgent(interp->peer, value);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }

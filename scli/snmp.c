@@ -1098,7 +1098,6 @@ show_snmp_notification_targets(scli_interp_t *interp, int argc, char **argv)
 static int
 set_snmp_authentication_traps(scli_interp_t *interp, int argc, char **argv)
 {
-    snmpv2_mib_snmp_t *snmp = NULL;
     gint32 value;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -1117,11 +1116,7 @@ set_snmp_authentication_traps(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmp = snmpv2_mib_new_snmp();
-    snmp->snmpEnableAuthenTraps = &value;
-    snmpv2_mib_set_snmp(interp->peer, snmp, SNMPV2_MIB_SNMPENABLEAUTHENTRAPS);
-    snmpv2_mib_free_snmp(snmp);
-
+    snmpv2_mib_set_snmpEnableAuthenTraps(interp->peer, value);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }

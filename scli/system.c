@@ -1255,7 +1255,6 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 static int
 set_system_contact(scli_interp_t *interp, int argc, char **argv)
 {
-    snmpv2_mib_system_t *system = NULL;
     gchar *contact;
     gsize contact_len;
 
@@ -1277,12 +1276,7 @@ set_system_contact(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    system = snmpv2_mib_new_system();
-    system->sysContact = contact;
-    system->_sysContactLength = contact_len;
-    snmpv2_mib_set_system(interp->peer, system, SNMPV2_MIB_SYSCONTACT);
-    snmpv2_mib_free_system(system);
-
+    snmpv2_mib_set_sysContact(interp->peer, contact, contact_len);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
@@ -1295,7 +1289,6 @@ set_system_contact(scli_interp_t *interp, int argc, char **argv)
 static int
 set_system_name(scli_interp_t *interp, int argc, char **argv)
 {
-    snmpv2_mib_system_t *system = NULL;
     gchar *name;
     gsize name_len;
 
@@ -1317,12 +1310,7 @@ set_system_name(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    system = snmpv2_mib_new_system();
-    system->sysName = name;
-    system->_sysNameLength = name_len;
-    snmpv2_mib_set_system(interp->peer, system, SNMPV2_MIB_SYSNAME);
-    snmpv2_mib_free_system(system);
-    
+    snmpv2_mib_set_sysName(interp->peer, name, name_len);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
@@ -1335,7 +1323,6 @@ set_system_name(scli_interp_t *interp, int argc, char **argv)
 static int
 set_system_location(scli_interp_t *interp, int argc, char **argv)
 {
-    snmpv2_mib_system_t *system = NULL;
     gchar *location;
     gsize location_len;
 
@@ -1357,12 +1344,7 @@ set_system_location(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    system = snmpv2_mib_new_system();
-    system->sysLocation = location;
-    system->_sysLocationLength = location_len;
-    snmpv2_mib_set_system(interp->peer, system, SNMPV2_MIB_SYSLOCATION);
-    snmpv2_mib_free_system(system);
-
+    snmpv2_mib_set_sysLocation(interp->peer, location, location_len);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
@@ -1469,7 +1451,7 @@ scli_init_system_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "set system contact", "<string>",
-	  "The set system contact command configures the system contact\n"
+	  "The `set system contact' command configures the system contact\n"
 	  "information. The <string> argument should include information\n"
 	  "on how to contact a person who is responsible for this system.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
@@ -1477,28 +1459,28 @@ scli_init_system_mode(scli_interp_t *interp)
 	  set_system_contact },
 
 	{ "set system name", "<string>",
-	  "The set system name command configures the name of the system.\n"
+	  "The `set system name' command configures the name of the system.\n"
 	  "By convention, this is the fully-qualified domain name.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_system_name },
 
 	{ "set system location", "<string>",
-	  "The set system location command configures the physical\n"
+	  "The `set system location' command configures the physical\n"
 	  "location of the system.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_system_location },
 
 	{ "show system info", NULL,
-	  "The show system info command shows general information about the\n"
+	  "The `show system info' command shows general information about the\n"
 	  "system.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "system info", NULL,
 	  show_system_info },
 
 	{ "show system devices", NULL,
-	  "The show system devices command shows a list of system devices.\n"
+	  "The `show system devices' command shows a list of system devices.\n"
 	  "The command generates a table with the following columns:\n"
 	  "\n"
 	  "  INDEX       device number\n"
@@ -1509,7 +1491,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  show_system_devices },
 
 	{ "show system storage", NULL,
-	  "The show system storage command displays information about the\n"
+	  "The `show system storage' command displays information about the\n"
 	  "logical areas attached in the system. The command generates a\n"
 	  "table with the following columns:\n"
 	  "\n"
@@ -1525,7 +1507,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  show_system_storage },
 
 	{ "show system mounts", NULL,
-	  "The show system mounts command shows the list of filesystems\n"
+	  "The `show system mounts' command shows the list of filesystems\n"
 	  "mounted on the system. The command generates a table with the\n"
 	  "following columns:\n"
 	  "\n"
@@ -1539,7 +1521,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  show_system_mounts },
 
 	{ "show system processes", "[<regexp>]",
-	  "The show system processes command display information about the\n"
+	  "The `show system processes' command display information about the\n"
 	  "processes currently running on the system. The regular expression\n"
 	  "<regexp> is matched against the command executed by the process\n"
 	  "to select the processes of interest.The command generates a table\n"
@@ -1560,7 +1542,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  show_system_processes },
 
 	{ "monitor system storage", NULL,
-	  "The monitor system storage command shows the same\n"
+	  "The `monitor system storage' command shows the same\n"
 	  "information as the show system storage command. The\n"
 	  "information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
@@ -1568,7 +1550,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  show_system_storage },
 #if 0
 	{ "loop system storage", NULL,
-	  "The monitor system storage command shows the same\n"
+	  "The `monitor system storage' command shows the same\n"
 	  "information as the show system storage command. The\n"
 	  "information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_LOOP | SCLI_CMD_FLAG_XML,
@@ -1576,7 +1558,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  show_system_storage },
 #endif
 	{ "monitor system processes", "[<regexp>]",
-	  "The monitor system processes command show the same\n"
+	  "The `monitor system processes' command show the same\n"
 	  "information as the show system processes command. The\n"
 	  "information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
@@ -1591,7 +1573,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  cmd_xxx },
 #endif
 	{ "dump system", NULL,
-	  "The dump system command generates a sequence of scli commands\n"
+	  "The `dump system' command generates a sequence of scli commands\n"
 	  "which can be used to restore the system configuration.\n",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
