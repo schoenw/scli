@@ -13,6 +13,9 @@
 /* Define if your <sys/time.h> declares struct tm.  */
 #undef TM_IN_SYS_TIME
 
+/* Define if you have the getaddrinfo function.  */
+#undef HAVE_GETADDRINFO
+
 /* Define if you have the resizeterm function.  */
 #undef HAVE_RESIZETERM
 
