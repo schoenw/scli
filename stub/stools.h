@@ -92,6 +92,7 @@ stls_snmp_gettable(host_snmp *s, GSList *vbl);
 #include "snmp-community-mib.h"
 #include "snmp-view-based-acm-mib.h"
 #include "snmp-target-mib.h"
+#include "tunnel-mib.h"
 
 #endif
 
