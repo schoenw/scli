@@ -145,18 +145,10 @@ show_printer_info(GString *s,
     g_string_sprintfa(s, "%-*s %d\n", indent, "Device:",
 		      hrPrinterEntry->hrDeviceIndex);
 
-    if (hrDeviceEntry && hrDeviceEntry->hrDeviceStatus) {
-	g_string_sprintfa(s, "%-*s ", indent, "Device Status:");
-	fmt_enum(s, 0, host_resources_mib_enums_hrDeviceStatus,
-		 hrDeviceEntry->hrDeviceStatus);
-	g_string_append(s, "\n");
-    }
-    
-    if (hrPrinterEntry->hrPrinterStatus) {
-	g_string_sprintfa(s, "%-*s ", indent, "Printer Status:");
-	fmt_enum(s, 0, host_resources_mib_enums_hrPrinterStatus,
-		 hrPrinterEntry->hrPrinterStatus);
-	g_string_append(s, "\n");
+    if (hrDeviceEntry && hrDeviceEntry->hrDeviceDescr) {
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:", 
+			  (int) hrDeviceEntry->_hrDeviceDescrLength,
+			  hrDeviceEntry->hrDeviceDescr);
     }
 
     if (hrDeviceEntry && hrDeviceEntry->hrDeviceType) {
@@ -169,10 +161,18 @@ show_printer_info(GString *s,
 	}
     }
 	
-    if (hrDeviceEntry && hrDeviceEntry->hrDeviceDescr) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:", 
-			  (int) hrDeviceEntry->_hrDeviceDescrLength,
-			  hrDeviceEntry->hrDeviceDescr);
+    if (hrDeviceEntry && hrDeviceEntry->hrDeviceStatus) {
+	g_string_sprintfa(s, "%-*s ", indent, "Device Status:");
+	fmt_enum(s, 0, host_resources_mib_enums_hrDeviceStatus,
+		 hrDeviceEntry->hrDeviceStatus);
+	g_string_append(s, "\n");
+    }
+    
+    if (hrPrinterEntry->hrPrinterStatus) {
+	g_string_sprintfa(s, "%-*s ", indent, "Printer Status:");
+	fmt_enum(s, 0, host_resources_mib_enums_hrPrinterStatus,
+		 hrPrinterEntry->hrPrinterStatus);
+	g_string_append(s, "\n");
     }
 
     if (hrPrinterEntry->hrPrinterDetectedErrorState) {
@@ -193,38 +193,45 @@ show_printer_general(GString *s,
 		     printer_mib_prtGeneralEntry_t *prtGeneralEntry,
 		     printer_mib_prtLocalizationEntry_t **prtLocalTable)
 {
+    int const indent = 18;
+
     /* MISSING: prtGeneralCurrentLocalization */
     /* MISSING: prtAuxiliarySheetStartupPage */
     /* MISSING: prtAuxiliarySheetBannerPage */
     /* Write-only-variable: prtGeneralReset */
     
     if (prtGeneralEntry->prtGeneralPrinterName) {
-	g_string_sprintfa(s, "Printer name:     %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent,
+			  "Printer Name:",
 		    (int) prtGeneralEntry->_prtGeneralPrinterNameLength,
 			  prtGeneralEntry->prtGeneralPrinterName);
     }
 
     if (prtGeneralEntry->prtGeneralSerialNumber) {
-	g_string_sprintfa(s, "Serial number:    %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent,
+			  "Serial Number:",
 		    (int) prtGeneralEntry->_prtGeneralSerialNumberLength,
 			  prtGeneralEntry->prtGeneralSerialNumber);
     }
     
     if (prtGeneralEntry->prtGeneralCurrentOperator) {
-	g_string_sprintfa(s, "Current Operator: %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent,
+			  "Current Operator:",
 		    (int) prtGeneralEntry->_prtGeneralCurrentOperatorLength,
 			  prtGeneralEntry->prtGeneralCurrentOperator);
     }
     
     if (prtGeneralEntry->prtGeneralServicePerson) {
-	g_string_sprintfa(s, "Service Person:   %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent,
+			  "Service Person",
 		    (int) prtGeneralEntry->_prtGeneralServicePersonLength,
 			  prtGeneralEntry->prtGeneralServicePerson);
     }
     
     if (prtGeneralEntry->prtConsoleNumberOfDisplayLines &&
 	prtGeneralEntry->prtConsoleNumberOfDisplayChars) {
-	g_string_sprintfa(s, "Display:          %u line(s) a %u chars\n",
+	g_string_sprintfa(s, "%-*s %u line(s) a %u chars\n", indent,
+			  "Console Display:",
 			  *prtGeneralEntry->prtConsoleNumberOfDisplayLines,
 			  *prtGeneralEntry->prtConsoleNumberOfDisplayChars);
     }
@@ -234,22 +241,23 @@ show_printer_general(GString *s,
 	prtLocalEntry = get_console_local_entry(prtGeneralEntry,
 						prtLocalTable);
 	if (prtLocalEntry) {
-	g_string_sprintfa(s, "Console Language: %.*s/%.*s\n",
-		    (int) prtLocalEntry->_prtLocalizationLanguageLength,
-			  prtLocalEntry->prtLocalizationLanguage,
-		    (int) prtLocalEntry->_prtLocalizationCountryLength,
-			  prtLocalEntry->prtLocalizationCountry);
+	    g_string_sprintfa(s, "%-*s %.*s/%.*s\n", indent,
+			      "Console Language:",
+		        (int) prtLocalEntry->_prtLocalizationLanguageLength,
+			      prtLocalEntry->prtLocalizationLanguage,
+		        (int) prtLocalEntry->_prtLocalizationCountryLength,
+			      prtLocalEntry->prtLocalizationCountry);
 	}
     }
     
     if (prtGeneralEntry->prtConsoleDisable) {
-	g_string_append(s, "Console access:   ");
+	g_string_sprintfa(s, "%-*s ", indent, "Console Access:");
 	fmt_enum(s, 8, printer_mib_enums_prtConsoleDisable,
 		 prtGeneralEntry->prtConsoleDisable);
 	g_string_append(s, "\n");
     }
     
-    g_string_append(s, "Defaults:         ");
+    g_string_sprintfa(s, "%-*s ", indent, "Defaults:");
     if (prtGeneralEntry->prtInputDefaultIndex) {
 	switch (*prtGeneralEntry->prtInputDefaultIndex) {
 	case -1:
@@ -262,7 +270,7 @@ show_printer_general(GString *s,
     } 
     
     if (prtGeneralEntry->prtOutputDefaultIndex) {
-	g_string_append(s, "                  ");
+	g_string_sprintfa(s, "%-*s ", indent, "");
 	switch (*prtGeneralEntry->prtOutputDefaultIndex) {
 	case -1:
 	    g_string_append(s, "no default output\n");
@@ -274,28 +282,28 @@ show_printer_general(GString *s,
     }
     
     if (prtGeneralEntry->prtMarkerDefaultIndex) {
-	g_string_sprintfa(s, "                  marker #%u\n",
+	g_string_sprintfa(s, "%-*s marker #%u\n", indent, "",
 			  *prtGeneralEntry->prtMarkerDefaultIndex);
     }
     
     if (prtGeneralEntry->prtMediaPathDefaultIndex) {
-	g_string_sprintfa(s, "                  media path #%u",
+	g_string_sprintfa(s, "%-*s media path #%u", indent, "",
 			  *prtGeneralEntry->prtMediaPathDefaultIndex);
     }
     g_string_append(s, "\n");
     
     if (prtGeneralEntry->prtAlertAllEvents) {
-	g_string_sprintfa(s, "Alerts total:          %u\n",
+	g_string_sprintfa(s, "%-*s %u\n", indent, "Total Alerts:",
 			  *prtGeneralEntry->prtAlertAllEvents);
     }
     
     if (prtGeneralEntry->prtAlertCriticalEvents) {
-	g_string_sprintfa(s, "Critical alerts:       %u\n",
+	g_string_sprintfa(s, "%-*s %u\n", indent, "Critical Alerts:",
 			  *prtGeneralEntry->prtAlertCriticalEvents);
     }
     
     if (prtGeneralEntry->prtGeneralConfigChanges) {
-	g_string_sprintfa(s, "Configuration changes: %u\n",
+	g_string_sprintfa(s, "%-*s %u\n", indent, "Config Changes:",
 			  *prtGeneralEntry->prtGeneralConfigChanges);
     }
 }
