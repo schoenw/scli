@@ -64,60 +64,59 @@ static const char *error_states[] = {
 
 
 typedef struct {
-    const int x;
-    const int y;
-    const char *unit;
+    const int um_x, um_y;	/* micrometer x/y */
+    const int ttin_x, ttin_y;   /* tenthousandths of inches */
     const char *name;
 } media_names_t;
 
 static media_names_t media_names[] = {
-    {  841, 1189, "mm", "iso-a0" },
-    {  594,  841, "mm", "iso-a1" },
-    {  420,  594, "mm", "iso-a2" },
-    {  297,  420, "mm", "iso-a3" },
-    {  210,  297, "mm", "iso-a4" },
-    {  148,  210, "mm", "iso-a5" },
-    {  105,  148, "mm", "iso-a6" },
-    {   74,  105, "mm", "iso-a7" },
-    {   52,   74, "mm", "iso-a8" },
-    {   37,   52, "mm", "iso-a9" },
-    {   26,   37, "mm", "iso-a10" },
+    {  841000, 1189000,      0,      0, "iso-a0" },
+    {  594000,  841000,      0,      0, "iso-a1" },
+    {  420000,  594000,      0,      0, "iso-a2" },
+    {  297000,  420000, 116900, 165300, "iso-a3" },
+    {  210000,  297000,  82600, 116900, "iso-a4" },
+    {  148000,  210000,      0,      0, "iso-a5" },
+    {  105000,  148000,      0,      0, "iso-a6" },
+    {   74000,  105000,      0,      0, "iso-a7" },
+    {   52000,   74000,      0,      0, "iso-a8" },
+    {   37000,   52000,      0,      0, "iso-a9" },
+    {   26000,   37000,      0,      0, "iso-a10" },
 
-    { 1000, 1414, "mm", "iso-b0" },
-    {  707, 1000, "mm", "iso-b1" },
-    {  500,  707, "mm", "iso-b2" },
-    {  353,  500, "mm", "iso-b3" },
-    {  250,  353, "mm", "iso-b4" },
-    {  176,  250, "mm", "iso-b5" },
-    {  125,  176, "mm", "iso-b6" },
-    {   88,  125, "mm", "iso-b7" },
-    {   62,   88, "mm", "iso-b8" },
-    {   44,   62, "mm", "iso-b9" },
-    {   31,   44, "mm", "iso-b10" },
-    {  917, 1297, "mm", "iso-c0" },
-    {  648,  917, "mm", "iso-c1" },
-    {  458,  648, "mm", "iso-c2" },
-    {  324,  458, "mm", "iso-c3" },
-    {  229,  324, "mm", "iso-c4" },
-    {  162,  229, "mm", "iso-c5" },
-    {  114,  162, "mm", "iso-c6" },
-    {   81,  114, "mm", "iso-c7" },
-    {   57,   81, "mm", "iso-c8" },
-    {  110,  220, "mm", "iso-designated" },
+    { 1000000, 1414000,      0,      0, "iso-b0" },
+    {  707000, 1000000,      0,      0, "iso-b1" },
+    {  500000,  707000,      0,      0, "iso-b2" },
+    {  353000,  500000,      0,      0, "iso-b3" },
+    {  250000,  353000,      0,      0, "iso-b4" },
+    {  176000,  250000,      0,      0, "iso-b5" },
+    {  125000,  176000,      0,      0, "iso-b6" },
+    {   88000,  125000,      0,      0, "iso-b7" },
+    {   62000,   88000,      0,      0, "iso-b8" },
+    {   44000,   62000,      0,      0, "iso-b9" },
+    {   31000,   44000,      0,      0, "iso-b10" },
+    {  917000, 1297000,      0,      0, "iso-c0" },
+    {  648000,  917000,      0,      0, "iso-c1" },
+    {  458000,  648000,      0,      0, "iso-c2" },
+    {  324000,  458000,      0,      0, "iso-c3" },
+    {  229000,  324000,      0,      0, "iso-c4" },
+    {  162000,  229000,      0,      0, "iso-c5" },
+    {  114000,  162000,      0,      0, "iso-c6" },
+    {   81000,  114000,      0,      0, "iso-c7" },
+    {   57000,   81000,      0,      0, "iso-c8" },
+    {  110000,  220000,      0,      0, "iso-designated" },
     
-    { 1030, 1456, "mm", "jis-b0" },
-    {  728, 1030, "mm", "jis-b1" },
-    {  515,  728, "mm", "jis-b2" },
-    {  364,  515, "mm", "jis-b3" },
-    {  257,  364, "mm", "jis-b4" },
-    {  182,  257, "mm", "jis-b5" },
-    {  128,  182, "mm", "jis-b6" },
-    {   91,  128, "mm", "jis-b7" },
-    {   64,   91, "mm", "jis-b8" },
-    {   45,   64, "mm", "jis-b9" },
-    {   32,   45, "mm", "jis-b10" },
+    { 1030000, 1456000,      0,      0, "jis-b0" },
+    {  728000, 1030000,      0,      0, "jis-b1" },
+    {  515000,  728000,      0,      0, "jis-b2" },
+    {  364000,  515000,      0,      0, "jis-b3" },
+    {  257000,  364000,      0,      0, "jis-b4" },
+    {  182000,  257000,      0,      0, "jis-b5" },
+    {  128000,  182000,      0,      0, "jis-b6" },
+    {   91000,  128000,      0,      0, "jis-b7" },
+    {   64000,   91000,      0,      0, "jis-b8" },
+    {   45000,   64000,      0,      0, "jis-b9" },
+    {   32000,   45000,      0,      0, "jis-b10" },
 
-    { 0, 0, NULL, NULL }
+    { 0, 0, 0, 0, NULL }
 };
 
 
@@ -129,7 +128,8 @@ static const char *
 lookup_media_name(gint32 dir, gint32 xdir, gint32 unit)
 {
     gint32 x, y;
-    char *s = NULL;
+    static char buffer[80];
+    const char *name = NULL;
     int i;
   
 #define TENTHOUSANDTHSOFINCHES 3
@@ -140,31 +140,39 @@ lookup_media_name(gint32 dir, gint32 xdir, gint32 unit)
     
     switch (unit) {
     case TENTHOUSANDTHSOFINCHES:
-	s = "in";
-	x /= 10000;
-	y /= 10000;
 	break;
     case MICROMETERS:
-	s = "mm";
-	x /= 1000;
-	y /= 1000;
 	break;
     }
 
-    if (s) {
-	for (i = 0; media_names[i].name; i++) {
-	    if (x == media_names[i].x
-		&& y == media_names[i].y
-		&& strcmp(s, media_names[i].unit) == 0) {
-		break;
-	    }
-	}
-	if (media_names[i].name) {
-	    return media_names[i].name;
-	}
+    for (i = 0; media_names[i].name; i++) {
+	 if ((unit == MICROMETERS
+	      && x == media_names[i].um_x && media_names[i].um_x
+	      && y == media_names[i].um_y && media_names[i].um_y)
+	     || (unit == TENTHOUSANDTHSOFINCHES
+		 && x == media_names[i].ttin_x && media_names[i].ttin_x
+		 && y == media_names[i].ttin_y && media_names[i].ttin_y)) {
+	      name = media_names[i].name;
+	      break;
+	 }
     }
 
-    return NULL;
+    if (! name) {
+	 switch (unit) {
+	 case MICROMETERS:
+	      g_snprintf(buffer, sizeof(buffer), "%.3f x %.3f mm",
+			 x / 1000.0, y / 1000.0);
+	      name = buffer;
+	      break;
+	 case TENTHOUSANDTHSOFINCHES:
+	      g_snprintf(buffer, sizeof(buffer), "%.3f x %.3f in",
+			 x / 10000.0, y / 10000.0);
+	      name = buffer;
+	      break;
+	 }
+    }
+    
+    return name;
 }
 
 
@@ -2107,7 +2115,7 @@ xml_printer_supplies(xmlNodePtr root,
 
     if (prtSuppliesEntry->prtMarkerSuppliesMarkerIndex
 	&& *prtSuppliesEntry->prtMarkerSuppliesMarkerIndex) {
-	(void) xml_new_child(tree, NULL, "description", "%d",
+	(void) xml_new_child(tree, NULL, "marker", "%d",
 			  *prtSuppliesEntry->prtMarkerSuppliesMarkerIndex);
     }
 
