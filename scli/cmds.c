@@ -1029,6 +1029,28 @@ set_scli_format(scli_interp_t *interp, int argc, char **argv)
 }
 
 
+static int
+set_scli_mode(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (strcmp(argv[1], "protocol") == 0) {
+	interp->flags |= SCLI_INTERP_FLAG_PROTO;
+    } else if (strcmp(argv[1], "normal") == 0) {
+	interp->flags &= ~SCLI_INTERP_FLAG_PROTO;
+    } else {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_VALUE;	
+    }
+
+    return SCLI_OK;
+}
+
+
 #if 0
 static int
 cmd_scli_probe(scli_interp_t *interp, int argc, char **argv)
@@ -1331,6 +1353,16 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_NORECURSE,
 	  "", NULL,
 	  set_scli_format },
+	
+	{ "set scli mode", "<mode>",
+	  "The `set scli mode' command defines the scli mode used by\n"
+	  "subsequent scli commands. Setting the mode to \"protocol\"\n"
+	  "will force scli to work in protocol mode. Setting the mode to\n"
+	  "\"normal\" causes scli to work in normal mode where certain\n"
+	  "status messages are suppressed.",
+	  SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_NORECURSE,
+	  "", NULL,
+	  set_scli_mode },
 	
 	{ "show scli info", NULL,
 	  "The `show scli info' command displays the current status of the\n"
