@@ -48,6 +48,9 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/tree.h>
 
+#include <glib.h>
+#include <gmodule.h>
+
 #include "g_snmp.h"
 
 
@@ -105,6 +108,7 @@ struct scli_mode {
     char *name;			/* name of the mode */
     char *desc;			/* description of the mode */
     scli_cmd_t *cmds;		/* array of command provided by the mode */
+    GModule *module;		/* module handle (if any) */
 };
 
 struct scli_alias {
@@ -315,10 +319,10 @@ fmt_gtp(guint32 number);
 #define SCLI_FMT_NAME_OR_ADDR	(SCLI_FMT_ADDR | SCLI_FMT_NAME)
 
 extern char*
-fmt_udp_port(int port, int flags);
+fmt_udp_port(unsigned short int port, int flags);
 
 extern char*
-fmt_tcp_port(int port, int flags);
+fmt_tcp_port(unsigned short int port, int flags);
 
 extern char*
 fmt_ipv4_address(guchar *addr, int flags);
