@@ -772,28 +772,27 @@ fe_transport(gpointer key, gpointer value, gpointer userdata)
 gboolean
 g_snmp_init(gboolean dobind)
 {
-  message_models   = g_hash_table_new (g_int_hash, g_int_equal);
-  security_models  = g_hash_table_new (g_int_hash, g_int_equal);
-  access_models    = g_hash_table_new (g_int_hash, g_int_equal);
-  transport_models = g_hash_table_new (g_int_hash, g_int_equal);
+    message_models   = g_hash_table_new (g_int_hash, g_int_equal);
+    security_models  = g_hash_table_new (g_int_hash, g_int_equal);
+    access_models    = g_hash_table_new (g_int_hash, g_int_equal);
+    transport_models = g_hash_table_new (g_int_hash, g_int_equal);
+    
+    /* Init all required models by RFC 2571. Any private model should
+     * be initialized after calling snmp_init().  */
 
-/* Init all required models by RFC2271. Any private model should be
- * initialized after calling snmp_init().
- */ 
-
-  if (!g_message_init())
-    return FALSE;
-
-  if (!g_snmp_transport_init(dobind))
-    return FALSE;
-
-  g_hash_table_foreach(transport_models, fe_transport, NULL);
+    if (!g_message_init())
+	return FALSE;
+    
+    if (!g_snmp_transport_init(dobind))
+	return FALSE;
+    
+    g_hash_table_foreach(transport_models, fe_transport, NULL);
 #if 0
-  g_security_init() &&
-  g_access_init();
+    g_security_init() &&
+	g_access_init();
 #endif
-  g_timeout_add(1000, g_snmp_timeout_cb, NULL);
-  return TRUE;
+    g_timeout_add(1000, g_snmp_timeout_cb, NULL);
+    return TRUE;
 }
 
 /* EOF */
