@@ -350,7 +350,7 @@ fmt_interface_details(GString *s,
     e = fmt_enum(if_mib_enums_ifLinkUpDownTrapEnable,
 		 ifXEntry ? ifXEntry->ifLinkUpDownTrapEnable : NULL);
     g_string_sprintfa(s, "Traps:       %-*s", width, e ? e : "");
-    if (ifEntry->ifMtu) {
+    if (ifEntry->ifMtu && *ifEntry->ifMtu != 0x7fffffff) {
 	g_string_sprintfa(s, " MTU:     %d bytes\n", *(ifEntry->ifMtu));
     } else {
 	g_string_append(s, " MTU:\n");
@@ -483,7 +483,7 @@ xml_interface_details(xmlNodePtr root,
 	g_free(a);
     }
 
-    if (ifEntry->ifMtu) {
+    if (ifEntry->ifMtu && *ifEntry->ifMtu != 0x7fffffff) {
 	node = xml_new_child(tree, NULL, "mtu", "%d", *ifEntry->ifMtu);
 	xml_set_prop(node, "unit", "bytes");	
     }
@@ -715,7 +715,7 @@ fmt_interface_info(GString *s,
 		 ifXEntry ? ifXEntry->ifConnectorPresent : NULL,
 		 ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
 
-    if (ifEntry->ifMtu) {
+    if (ifEntry->ifMtu && *ifEntry->ifMtu != 0x7fffffff) {
 	g_string_sprintfa(s, " %5d", *(ifEntry->ifMtu));
     } else {
 	g_string_sprintfa(s, "      ");
