@@ -261,33 +261,181 @@ show_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 
 
 
+typedef struct tcp_state {
+    guint16 port;
+    gchar  *name;
+    guint32 count;
+} tcp_state_t;
+
+
+
+static void
+fmt_tcp_state(GString *s, gint32 state , guint32 count, GSList *ports)
+{
+    const char *e;
+    GSList *elem;
+    gint len;
+
+    e = fmt_enum(tcp_mib_enums_tcpConnState, &state);
+    if (e) {
+	g_string_sprintfa(s, "%-12s%5u ", e, count);
+	len = 12 + 5 + 1;
+	for (elem = ports; elem; elem = g_slist_next(elem)) {
+	    tcp_state_t *t = (tcp_state_t *) elem->data;
+	    if (t->count > 1) {
+		g_string_sprintfa(s, "%s/%u ", t->name, t->count);
+		len += strlen(t->name) + 2 + 4;
+	    } else {
+		g_string_sprintfa(s, "%s ", t->name);
+		len += strlen(t->name) + 1;
+	    }
+	    if (len > 70) {
+		g_string_sprintfa(s, "\n%17s ", "");
+		len = 12 + 5 + 1;
+	    }
+	}
+	g_string_sprintfa(s, "\n");
+    }
+}
+
+
+
+static int
+show_tcp_states(scli_interp_t *interp, int argc, char **argv)
+{
+    tcp_mib_tcpConnEntry_t **tcpConnTable = NULL;
+    int i, t;
+
+    const gint32 tcp_states[] = { TCP_MIB_TCPCONNSTATE_CLOSED,
+				  TCP_MIB_TCPCONNSTATE_LISTEN,
+				  TCP_MIB_TCPCONNSTATE_SYNSENT,
+				  TCP_MIB_TCPCONNSTATE_SYNRECEIVED,
+				  TCP_MIB_TCPCONNSTATE_ESTABLISHED,
+				  TCP_MIB_TCPCONNSTATE_FINWAIT1,
+				  TCP_MIB_TCPCONNSTATE_FINWAIT2,
+				  TCP_MIB_TCPCONNSTATE_CLOSEWAIT,
+				  TCP_MIB_TCPCONNSTATE_LASTACK,
+				  TCP_MIB_TCPCONNSTATE_CLOSING,
+				  TCP_MIB_TCPCONNSTATE_TIMEWAIT };
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (tcpConnTable) {
+	g_string_sprintfa(interp->header, "STATE       COUNT PORTS");
+
+	for (t = 0; t < sizeof(tcp_states) / sizeof(gint32); t++) {
+
+	    gint32 s = tcp_states[t];
+	    gint32 c = 0;
+	    const char *name;
+	    guint16 port;
+	    GSList *list = NULL, *elem;
+	    tcp_state_t *p;
+		
+	    for (i = 0; tcpConnTable[i]; i++) {
+		if (! tcpConnTable[i]->tcpConnState
+		    || *tcpConnTable[i]->tcpConnState != s) {
+		    continue;
+		}
+		c++;
+		port = tcpConnTable[i]->tcpConnLocalPort;
+		name = fmt_tcp_port(port, SCLI_FMT_NAME);
+		if (! name && *tcpConnTable[i]->tcpConnState
+		    != TCP_MIB_TCPCONNSTATE_LISTEN) {
+		    port = tcpConnTable[i]->tcpConnRemPort;
+		    name = fmt_tcp_port(port, SCLI_FMT_NAME);
+		}
+		if (! name) {
+		    name = "other";
+		}
+
+		for (elem = list; elem; elem = g_slist_next(elem)) {
+		    tcp_state_t *t = (tcp_state_t *) elem->data;
+		    if (strcmp(t->name, name) == 0) {
+			break;
+		    }
+		}
+		if (! elem) {
+		    p = g_new0(tcp_state_t, 1);
+		    p->name = g_strdup(name);
+		    p->port = port;
+		    list = g_slist_append(list, p);
+		} else {
+		    p = (tcp_state_t *) elem->data;
+		}
+		p->count++;
+	    }
+	    fmt_tcp_state(interp->result, s, c, list);
+	    for (elem = list; elem; elem = g_slist_next(elem)) {
+		tcp_state_t *t = (tcp_state_t *) elem->data;
+		g_free(t->name);
+		g_free(t);
+	    }
+	    g_slist_free_1(list);
+	}
+    }
+
+    if (tcpConnTable) tcp_mib_free_tcpConnTable(tcpConnTable);
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_tcp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 
 	{ "show tcp listener", NULL,
-	  "The show tcp listener command displays the listening TCP\n"
+	  "The `show tcp listener' command displays the listening TCP\n"
 	  "endpoints.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "tcp", NULL,
 	  show_tcp_listener },
 
 	{ "show tcp connections", NULL,
-	  "The show tcp connections command displays the connected TCP\n"
+	  "The `show tcp connections' command displays the connected TCP\n"
 	  "endpoints including the current state of the connection as seen\n"
 	  "by the remote SNMP agent.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "tcp", NULL,
 	  show_tcp_connections },
 
+	{ "show tcp states", NULL,
+	  "The `show tcp states' command displays the distribution of TCP\n"
+	  "connection states together with a list of known port names in\n"
+           "each state.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "tcp", NULL,
+	  show_tcp_states },
+
 	{ "monitor tcp connections", NULL,
-	  "The monitor tcp connections command displays the connected TCP\n"
+	  "The `monitor tcp connections' command displays the connected TCP\n"
 	  "endpoints including the current state of the connection as seen\n"
 	  "by the remote SNMP agent. The information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_tcp_connections },
+
+	{ "monitor tcp states", NULL,
+	  "The `monitor tcp states' command displays the distribution of TCP\n"
+	  "connection states. The information is updated periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_tcp_states },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
