@@ -34,6 +34,16 @@
 
 
 static void
+strip_white(char *s, gsize *len)
+{
+    while (*len && isspace(s[(*len)-1])) {
+	(*len)--;
+    }
+}
+
+
+
+static void
 fmt_hsec32(GString *s, guint32 number)
 {
     guint32 min, hour;
@@ -153,12 +163,16 @@ show_process(GString *s, hrSWRunEntry_t *hrSWRunEntry,
     }
     if (hrSWRunEntry->hrSWRunPath
 	&& hrSWRunEntry->_hrSWRunPathLength) {
+	strip_white(hrSWRunEntry->hrSWRunPath,
+		    &hrSWRunEntry->_hrSWRunPathLength);
 	g_string_sprintfa(s, " %.*s",
 			  (int) hrSWRunEntry->_hrSWRunPathLength,
 			  hrSWRunEntry->hrSWRunPath);
     }
     if (hrSWRunEntry->hrSWRunParameters
 	&& hrSWRunEntry->_hrSWRunParametersLength) {
+	strip_white(hrSWRunEntry->hrSWRunParameters,
+		    &hrSWRunEntry->_hrSWRunParametersLength);
 	g_string_sprintfa(s, " %.*s",
 			  (int) hrSWRunEntry->_hrSWRunParametersLength,
 			  hrSWRunEntry->hrSWRunParameters);
@@ -272,7 +286,7 @@ cmd_mounts(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_storage(GString *s, hrStorageEntry_t *hrStorageEntry)
+show_storage(GString *s, hrStorageEntry_t *hrStorageEntry, int descr_width)
 {
     static guint32 const hrStorageTypes[] = {1, 3, 6, 1, 2, 1, 25, 2, 1};
     guint const idx = sizeof(hrStorageTypes)/sizeof(guint32);
@@ -303,7 +317,8 @@ show_storage(GString *s, hrStorageEntry_t *hrStorageEntry)
 
     if (hrStorageEntry->hrStorageDescr
 	&& hrStorageEntry->_hrStorageDescrLength) {
-	g_string_sprintfa(s, "%-20.*s",
+	g_string_sprintfa(s, "%-*.*s",
+			  descr_width,
 			  (int) MIN(25, hrStorageEntry->_hrStorageDescrLength),
 			  hrStorageEntry->hrStorageDescr);
     } else {
@@ -344,6 +359,7 @@ static int
 cmd_storage(scli_interp_t *interp, int argc, char **argv)
 {
     hrStorageEntry_t **hrStorageTable = NULL;
+    int descr_width = 16;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -354,10 +370,18 @@ cmd_storage(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (hrStorageTable) {
-	g_string_append(interp->result, "Storage Area          "
-	       "Size [K]   Used [K]   Free [K] Use%\n");
 	for (i = 0; hrStorageTable[i]; i++) {
-	    show_storage(interp->result, hrStorageTable[i]);
+	    if (hrStorageTable[i]->hrStorageDescr
+		&& hrStorageTable[i]->_hrStorageDescrLength > descr_width) {
+		descr_width = hrStorageTable[i]->_hrStorageDescrLength;
+	    }
+	}
+	g_string_sprintfa(interp->result,
+			  "%-*s  Size [K]   Used [K]   Free [K] Use%\n",
+			  descr_width, "Storage Area");
+	for (i = 0; hrStorageTable[i]; i++) {
+	    show_storage(interp->result, hrStorageTable[i],
+			 descr_width);
 	}
 	host_resources_mib_free_hrStorageTable(hrStorageTable);
     }
