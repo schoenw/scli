@@ -34,12 +34,12 @@ typedef struct _GSnmpSession {
     struct sockaddr *address;
     GSnmpTDomain  tdomain;
     gchar        *taddress;
+    guint16       port;
     gchar        *rcomm;
     gchar        *wcomm;
     guint         retries;
     gint32        error_status;
     guint32	  error_index;
-    guint         port;
     guint         timeout;
     GSnmpVersion  version;
     gboolean      (*done_callback) (); /* what to call when complete */
@@ -47,7 +47,7 @@ typedef struct _GSnmpSession {
     gpointer      magic;               /* additional data for callbacks */
 } GSnmpSession;
 
-GSnmpSession*	g_snmp_session_new(GSnmpTDomain domain, gchar *address);
+GSnmpSession*	g_snmp_session_new(GSnmpTDomain domain, gchar *address, guint16 port);
 GSnmpSession*	g_snmp_session_clone(GSnmpSession *s);
 void		g_snmp_session_destroy(GSnmpSession *s);
 

@@ -36,19 +36,20 @@ static GSList  *request_queue = NULL;   /* queue of active requests */
  */
 
 GSnmpSession*
-g_snmp_session_new(GSnmpTDomain tdomain, gchar *taddress)
+g_snmp_session_new(GSnmpTDomain tdomain, gchar *hostname, guint16 port)
 {
     GSnmpSession *session;
 
     session = g_malloc0(sizeof(GSnmpSession));
     session->tdomain = tdomain;
-    session->taddress = taddress ? g_strdup(taddress) : NULL;
-    session->port = 161;
+    session->taddress = hostname ? g_strdup(hostname) : NULL;
+    session->port = port;
     session->retries = 3;
     session->timeout = 1;
     session->version = G_SNMP_V2C;
 
-    if (! g_lookup_address(session->tdomain, session->taddress, &session->address)) {
+    if (! g_lookup_address(session->tdomain, session->taddress,
+			   session->port, &session->address)) {
 	if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
 	    g_printerr("session %p: lookup failed\n", session);
 	}
@@ -71,7 +72,7 @@ g_snmp_session_clone(GSnmpSession *session)
 {
     GSnmpSession *clone;
 
-    clone = g_snmp_session_new(session->tdomain, session->taddress);
+    clone = g_snmp_session_new(session->tdomain, session->taddress, session->port);
     clone->port    = session->port;
     clone->retries = session->retries;
     clone->timeout = session->timeout;

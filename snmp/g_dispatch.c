@@ -726,7 +726,8 @@ g_receive_message(int transportDomain, struct sockaddr *transportAddress,
  */
 
 gboolean
-g_lookup_address(GSnmpTDomain tdomain, gchar *taddress, struct sockaddr **address)
+g_lookup_address(GSnmpTDomain tdomain, gchar *taddress, guint16 port,
+		 struct sockaddr **address)
 {
     GSnmpTransport *trp_model;
     
@@ -739,7 +740,7 @@ g_lookup_address(GSnmpTDomain tdomain, gchar *taddress, struct sockaddr **addres
 	return FALSE;
     }
 
-    return trp_model->resolveAddress(taddress, address);
+    return trp_model->resolveAddress(taddress, port, address);
 }
 
 static gboolean

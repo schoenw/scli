@@ -49,8 +49,8 @@ gboolean returnResponsePdu(guint messageProcessingModel, guint securityModel,
 void g_receive_message(int transportDomain, struct sockaddr *transportAddress,
             gpointer wholeMsg, guint wholeMsgLength);
 
-gboolean g_lookup_address(GSnmpTDomain tdomain, gchar *taddress, 
-            struct sockaddr **address);
+gboolean g_lookup_address(GSnmpTDomain tdomain, gchar *taddress,
+	    guint16 port, struct sockaddr **address);
 
 gboolean g_snmp_init(gboolean dobind);
 
