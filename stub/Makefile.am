@@ -23,7 +23,8 @@ MIBS			= IF-MIB \
 			  ATM-MIB \
 			  EtherLike-MIB \
 			  MAU-MIB \
-			  RFC1213-MIB
+			  RFC1213-MIB \
+			  OSPF-MIB
 
 STUBS			= if-mib.h if-mib.c \
 			  ip-mib.h ip-mib.c \
@@ -48,7 +49,8 @@ STUBS			= if-mib.h if-mib.c \
 			  atm-mib.h atm-mib.c \
 			  etherlike-mib.h etherlike-mib.c \
 			  mau-mib.h mau-mib.c \
-			  rfc1213-mib.h rfc1213-mib.c
+			  rfc1213-mib.h rfc1213-mib.c \
+			  ospf-mib.h ospf-mib.c
 
 noinst_LIBRARIES	= libstub.a
 libstub_a_SOURCES	= stools.h stools.c $(STUBS)
