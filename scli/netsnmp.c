@@ -288,6 +288,7 @@ set_netsnmp_debugging(scli_interp_t *interp, int argc, char **argv)
 
     if (! gsnmp_enum_get_number(ucd_snmp_mib_enums_versionDoDebugging,
 				argv[1], &value)) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;
     }
 

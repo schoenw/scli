@@ -30,6 +30,7 @@
 #include "snmp-notification-mib.h"
 
 #include "snmp-view-based-acm-mib-proc.h"
+#include "snmp-user-based-sm-mib-proc.h"
 
 
 static GSnmpEnum const mp_model[] = {
@@ -121,16 +122,21 @@ create_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    if (strlen(argv[1]) < 1 || strlen(argv[1]) > 32) {
+    if (strlen(argv[1]) < SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYNAMEMINLENGTH
+	|| strlen(argv[1]) > SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYNAMEMAXLENGTH) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;
     }
 
-    if (strlen(argv[2]) < 1 || strlen(argv[2]) > 32) {
+    if (strlen(argv[2]) < SNMP_VIEW_BASED_ACM_MIB_VACMGROUPNAMEMINLENGTH
+	|| strlen(argv[2]) > SNMP_VIEW_BASED_ACM_MIB_VACMGROUPNAMEMAXLENGTH) {
+	g_string_assign(interp->result, argv[2]);
 	return SCLI_SYNTAX_VALUE;
     }
 
     if (argc == 4) {
 	if (! gsnmp_enum_get_number(security_model, argv[3], &model)) {
+	    g_string_assign(interp->result, argv[3]);
 	    return SCLI_SYNTAX_VALUE;
 	}
     }
@@ -168,12 +174,14 @@ delete_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
 
     regex_name = &_regex_name;
     if (regcomp(regex_name, argv[1], interp->regex_flags) != 0) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_REGEXP;
     }
 
     regex_group = &_regex_group;
     if (regcomp(regex_group, argv[2], interp->regex_flags) != 0) {
 	if (regex_name) regfree(regex_name);
+	g_string_assign(interp->result, argv[2]);
 	return SCLI_SYNTAX_REGEXP;
     }
 
@@ -181,6 +189,7 @@ delete_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
 	if (! gsnmp_enum_get_number(security_model, argv[3], &model)) {
 	    if (regex_name) regfree(regex_name);
 	    if (regex_group) regfree(regex_group);
+	    g_string_assign(interp->result, argv[3]);
 	    return SCLI_SYNTAX_VALUE;
 	}
     }
@@ -236,6 +245,43 @@ delete_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
     
     if (regex_name) regfree(regex_name);
     if (regex_group) regfree(regex_group);
+    
+    return SCLI_OK;
+}
+
+
+
+static int
+create_snmp_usm_user(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 3) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (strlen(argv[1]) < SNMP_USER_BASED_SM_MIB_USMUSERNAMEMINLENGTH
+	|| strlen(argv[1]) > SNMP_USER_BASED_SM_MIB_USMUSERNAMEMAXLENGTH) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (strlen(argv[2]) < SNMP_USER_BASED_SM_MIB_USMUSERNAMEMINLENGTH
+	|| strlen(argv[2]) > SNMP_USER_BASED_SM_MIB_USMUSERNAMEMAXLENGTH) {
+	g_string_assign(interp->result, argv[2]);
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+    
+    snmp_user_based_sm_mib_proc_clone_user(interp->peer,
+					   argv[1], strlen(argv[1]),
+					   argv[2], strlen(argv[2]));
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
     
     return SCLI_OK;
 }
@@ -1063,6 +1109,7 @@ set_snmp_authentication_traps(scli_interp_t *interp, int argc, char **argv)
 
     if (! gsnmp_enum_get_number(snmpv2_mib_enums_snmpEnableAuthenTraps,
 				argv[1], &value)) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;
     }
 
@@ -1170,6 +1217,13 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  delete_snmp_vacm_member },
+
+	{ "create snmp usm user", "<name> <template>",
+	  "The `create snmp usm user' commands can be used to create a\n"
+	  "new user by cloning an existing template.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  create_snmp_usm_user },
 
 	{ "set snmp authentication traps", "<status>",
 	  "The `set snmp authentication traps' command controls whether the\n"

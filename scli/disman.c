@@ -1556,9 +1556,14 @@ create_disman_script(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    if (strlen(argv[1]) > 32
-	|| strlen(argv[2]) < 1
-	|| strlen(argv[2]) > 32) {
+    if (strlen(argv[1]) < DISMAN_SCRIPT_MIB_SMSCRIPTOWNERMINLENGTH
+	|| strlen(argv[1]) > DISMAN_SCRIPT_MIB_SMSCRIPTOWNERMAXLENGTH) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_VALUE;
+    }
+    if (strlen(argv[2]) < DISMAN_SCRIPT_MIB_SMSCRIPTNAMEMINLENGTH
+	|| strlen(argv[2]) > DISMAN_SCRIPT_MIB_SMSCRIPTNAMEMAXLENGTH) {
+	g_string_assign(interp->result, argv[2]);
 	return SCLI_SYNTAX_VALUE;
     }
 
@@ -1582,9 +1587,15 @@ create_disman_run(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    if (strlen(argv[1]) > 32
-	|| strlen(argv[2]) < 1
-	|| strlen(argv[2]) > 32) {
+    if (strlen(argv[1]) < DISMAN_SCRIPT_MIB_SMLAUNCHOWNERMINLENGTH
+	|| strlen(argv[1]) > DISMAN_SCRIPT_MIB_SMLAUNCHOWNERMAXLENGTH) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (strlen(argv[2]) < DISMAN_SCRIPT_MIB_SMLAUNCHNAMEMINLENGTH
+	|| strlen(argv[2]) > DISMAN_SCRIPT_MIB_SMLAUNCHNAMEMAXLENGTH) {
+	g_string_assign(interp->result, argv[2]);
 	return SCLI_SYNTAX_VALUE;
     }
 

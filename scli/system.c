@@ -572,6 +572,7 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_path = &_regex_path;
 	if (regcomp(regex_path, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -1243,6 +1244,8 @@ static int
 set_system_contact(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_system_t *system = NULL;
+    gchar *contact;
+    gsize contact_len;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1250,13 +1253,21 @@ set_system_contact(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    contact = argv[1];
+    contact_len = strlen(contact);
+    if (contact_len < SNMPV2_MIB_SYSCONTACTMINLENGTH
+	|| contact_len > SNMPV2_MIB_SYSCONTACTMAXLENGTH) {
+	g_string_assign(interp->result, contact);
+	return SCLI_SYNTAX_VALUE;
+    }
+
     if (scli_interp_dry(interp)) {
 	return SCLI_OK;
     }
 
     system = snmpv2_mib_new_system();
-    system->sysContact = argv[1];
-    system->_sysContactLength = strlen(system->sysContact);
+    system->sysContact = contact;
+    system->_sysContactLength = contact_len;
     snmpv2_mib_set_system(interp->peer, system, SNMPV2_MIB_SYSCONTACT);
     snmpv2_mib_free_system(system);
 
@@ -1273,6 +1284,8 @@ static int
 set_system_name(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_system_t *system = NULL;
+    gchar *name;
+    gsize name_len;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1280,13 +1293,21 @@ set_system_name(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    name = argv[1];
+    name_len = strlen(name);
+    if (name_len < SNMPV2_MIB_SYSNAMEMINLENGTH
+	|| name_len > SNMPV2_MIB_SYSNAMEMAXLENGTH) {
+	g_string_assign(interp->result, name);
+	return SCLI_SYNTAX_VALUE;
+    }
+
     if (scli_interp_dry(interp)) {
 	return SCLI_OK;
     }
 
     system = snmpv2_mib_new_system();
-    system->sysName = argv[1];
-    system->_sysNameLength = strlen(system->sysName);
+    system->sysName = name;
+    system->_sysNameLength = name_len;
     snmpv2_mib_set_system(interp->peer, system, SNMPV2_MIB_SYSNAME);
     snmpv2_mib_free_system(system);
     
@@ -1303,6 +1324,8 @@ static int
 set_system_location(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_system_t *system = NULL;
+    gchar *location;
+    gsize location_len;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1310,13 +1333,21 @@ set_system_location(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    location = argv[1];
+    location_len = strlen(location);
+    if (location_len < SNMPV2_MIB_SYSLOCATIONMINLENGTH
+	|| location_len > SNMPV2_MIB_SYSLOCATIONMAXLENGTH) {
+	g_string_assign(interp->result, location);
+	return SCLI_SYNTAX_VALUE;
+    }
+
     if (scli_interp_dry(interp)) {
 	return SCLI_OK;
     }
 
     system = snmpv2_mib_new_system();
-    system->sysLocation = argv[1];
-    system->_sysLocationLength = strlen(system->sysLocation);
+    system->sysLocation = location;
+    system->_sysLocationLength = location_len;
     snmpv2_mib_set_system(interp->peer, system, SNMPV2_MIB_SYSLOCATION);
     snmpv2_mib_free_system(system);
 
@@ -1394,6 +1425,7 @@ cmd_xxx(scli_interp_t *interp, int argc, char **argv)
 
     n = strtol(argv[1], &end, 0);
     if (*end) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_NUMBER;
     }
 

@@ -678,7 +678,12 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
     case SCLI_SYNTAX_VALUE:
     case SCLI_SYNTAX_NUMBER:
     case SCLI_SYNTAX_REGEXP:
-	reason = g_strdup(error_infos[i].fmt);
+	if (interp->result->len) {
+	    reason = g_strdup_printf("%s \"%s\"", error_infos[i].fmt,
+				     interp->result->str);
+	} else {
+	    reason = g_strdup(error_infos[i].fmt);
+	}
 	break;
     case SCLI_SYNTAX_NUMARGS:
 	reason = g_strdup_printf("wrong number of arguments: "

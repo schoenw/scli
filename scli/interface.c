@@ -629,6 +629,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -775,6 +776,7 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -860,6 +862,7 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -1034,6 +1037,7 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -1176,6 +1180,7 @@ foreach_interface(scli_interp_t *interp, char *regex,
     int i;
 
     if (regcomp(regex_iface, regex, interp->regex_flags) != 0) {
+	g_string_assign(interp->result, regex);
 	return SCLI_SYNTAX_REGEXP;
     }
 
@@ -1234,6 +1239,7 @@ set_interface_status(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (! gsnmp_enum_get_number(if_mib_enums_ifAdminStatus, argv[2], &value)) {
+	g_string_assign(interp->result, argv[2]);
 	return SCLI_SYNTAX_VALUE;
     }
 
@@ -1301,6 +1307,7 @@ set_interface_promiscuous(scli_interp_t *interp, int argc, char **argv)
 
     if (! gsnmp_enum_get_number(if_mib_enums_ifPromiscuousMode,
 				argv[2], &value)) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;
     }
 
@@ -1338,6 +1345,7 @@ set_interface_notifications(scli_interp_t *interp, int argc, char **argv)
 
     if (! gsnmp_enum_get_number(if_mib_enums_ifLinkUpDownTrapEnable,
 				argv[2], &value)) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;
     }
 
@@ -1435,6 +1443,7 @@ alert_interface_status(scli_interp_t *interp, int argc, char **argv)
 
     regex_status = &_regex_status;
     if (regcomp(regex_status, argv[1], interp->regex_flags) != 0) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_REGEXP;
     }
 
@@ -1442,6 +1451,7 @@ alert_interface_status(scli_interp_t *interp, int argc, char **argv)
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[2], interp->regex_flags) != 0) {
 	    if (regex_status) regfree(regex_status);
+	    g_string_assign(interp->result, argv[2]);
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -1488,10 +1498,42 @@ alert_interface_status(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+create_interface_stack(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    return SCLI_OK;
+}
+
+
+
+static int
+delete_interface_stack(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_interface_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
+	{ "create interface stack", "<lower-regexp> <higher-regexp>",
+	  "",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  create_interface_stack },
+
+	{ "delete interface stack", "<lower-regexp> <higher-regexp>",
+	  "",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  delete_interface_stack },
 
 	{ "set interface status", "<regexp> <status>",
 	  "The `set interface status' command modifies the administrative\n"

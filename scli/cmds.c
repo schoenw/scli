@@ -179,6 +179,7 @@ show_scli_command_info(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_cmd = &_regex_cmd;
 	if (regcomp(regex_cmd, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -256,6 +257,7 @@ show_scli_command_details(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_cmd = &_regex_cmd;
 	if (regcomp(regex_cmd, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -295,6 +297,7 @@ show_scli_modes(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_mode = &_regex_mode;
 	if (regcomp(regex_mode, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -346,6 +349,7 @@ show_scli_schema(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_mode = &_regex_mode;
 	if (regcomp(regex_mode, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -607,6 +611,7 @@ delete_scli_alias(scli_interp_t *interp, int argc, char **argv)
     
     regex_name = &_regex_name;
     if (regcomp(regex_name, argv[1], interp->regex_flags) != 0) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_REGEXP;
     }
     
@@ -724,6 +729,7 @@ delete_scli_interp(scli_interp_t *interp, int argc, char **argv)
     
     regex_name = &_regex_name;
     if (regcomp(regex_name, argv[1], interp->regex_flags) != 0) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_REGEXP;
     }
     
@@ -924,6 +930,7 @@ set_scli_regex(scli_interp_t *interp, int argc, char **argv)
     
     regex_flags = &_regex_flags;
     if (regcomp(regex_flags, argv[1], interp->regex_flags) != 0) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_REGEXP;
     }
 
@@ -961,6 +968,7 @@ set_scli_debugging(scli_interp_t *interp, int argc, char **argv)
     
     regex_flags = &_regex_flags;
     if (regcomp(regex_flags, argv[1], interp->regex_flags) != 0) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_REGEXP;
     }
     
@@ -1013,8 +1021,7 @@ set_scli_format(scli_interp_t *interp, int argc, char **argv)
     } else if (strcmp(argv[1], "scli") == 0) {
 	interp->flags &= ~SCLI_INTERP_FLAG_XML;
     } else {
-	g_string_sprintfa(interp->result,
-			  "unknown format `%s'", argv[1]);
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;	
     }
 
@@ -1131,12 +1138,14 @@ cmd_scli_walk(scli_interp_t *interp, int argc, char **argv)
 		    p++;
 		} else {
 		    g_snmp_vbl_free(in);
+		    g_string_assign(interp->result, argv[i]);
 		    return SCLI_SYNTAX_VALUE;
 		}
 	    }
 	}
 	if ((p && *p) || len < 2 || base[0] > 2 || base[1] > 40) {
 	    g_snmp_vbl_free(in);
+	    g_string_assign(interp->result, argv[i]);
 	    return SCLI_SYNTAX_VALUE;
 	}
 	g_snmp_vbl_add_null(&in, base, len);

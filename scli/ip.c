@@ -563,6 +563,7 @@ set_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (! gsnmp_enum_get_number(forwarding, argv[1], &value)) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;
     }
 
@@ -599,6 +600,7 @@ set_ip_ttl(scli_interp_t *interp, int argc, char **argv)
 
     value = strtol(argv[1], &end, 0);
     if (*end || value < 1 || value > 255) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_NUMBER;
     }
 

@@ -197,6 +197,7 @@ show_3com_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_vlan = &_regex_vlan;
 	if (regcomp(regex_vlan, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
@@ -267,7 +268,8 @@ create_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     }
 
     vlanId = strtol(argv[1], &end, 0);
-    if (*end) {
+    if (*end || vlanId < 0) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_NUMBER;
     }
 
@@ -275,6 +277,7 @@ create_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     name_len = strlen(name);
     if (name_len < PRODUCTMIB_A3COMVLANIFDESCRMINLENGTH
 	|| name_len > PRODUCTMIB_A3COMVLANIFDESCRMAXLENGTH) {
+	g_string_assign(interp->result, name);
 	return SCLI_SYNTAX_VALUE;
     }
 
@@ -294,11 +297,13 @@ create_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 	    if (vlanTable[i]->a3ComVlanIfGlobalIdentifier
 		&& *vlanTable[i]->a3ComVlanIfGlobalIdentifier == vlanId) {
 		productmib_free_a3ComVlanIfTable(vlanTable);
+		g_string_sprintf(interp->result, "%d", vlanId);
 		return SCLI_SYNTAX_VALUE;
 	    }
 	    if (vlanTable[i]->_a3ComVlanIfDescrLength == name_len
 		&& memcmp(vlanTable[i]->a3ComVlanIfDescr, name, name_len)==0) {
 		productmib_free_a3ComVlanIfTable(vlanTable);
+		g_string_assign(interp->result, name);
 		return SCLI_SYNTAX_VALUE;
 	    }
 	}
@@ -332,6 +337,7 @@ delete_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 
     regex_vlan = &_regex_vlan;
     if (regcomp(regex_vlan, argv[1], interp->regex_flags) != 0) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_REGEXP;
     }
 
@@ -382,7 +388,8 @@ set_3com_bridge_vlan_name(scli_interp_t *interp, int argc, char **argv)
     }
 
     vlanId = strtol(argv[1], &end, 0);
-    if (*end) {
+    if (*end || vlanId < 0) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_NUMBER;
     }
 
@@ -390,6 +397,7 @@ set_3com_bridge_vlan_name(scli_interp_t *interp, int argc, char **argv)
     name_len = strlen(name);
     if (name_len < PRODUCTMIB_A3COMVLANIFDESCRMINLENGTH
 	|| name_len > PRODUCTMIB_A3COMVLANIFDESCRMAXLENGTH) {
+	g_string_assign(interp->result, name);
 	return SCLI_SYNTAX_VALUE;
     }
 
@@ -441,11 +449,13 @@ set_3com_bridge_vlan_ports(scli_interp_t *interp, int argc, char **argv)
 
     regex_vlan = &_regex_vlan;
     if (regcomp(regex_vlan, argv[1], interp->regex_flags) != 0) {
+	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_REGEXP;
     }
 
     if (scan_port_set(ports, sizeof(ports), argv[2]) != SCLI_OK) {
 	if (regex_vlan) regfree(regex_vlan);
+	g_string_assign(interp->result, argv[2]);
 	return SCLI_SYNTAX_VALUE;
     }
 
