@@ -28,6 +28,42 @@
 
 
 
+static time_t
+date_to_time(guchar *date, gsize len)
+{
+    struct tm tm;
+    time_t t = 0;
+    
+    if (len == 8 || len == 11) {
+	memset(&tm, 0, sizeof(struct tm));
+	tm.tm_year = ((date[0] << 8) + date[1]) - 1900;
+	tm.tm_mon  = date[2];
+	tm.tm_mday = date[3];
+	tm.tm_hour = date[4];
+	tm.tm_min  = date[5];
+	tm.tm_sec  = date[6];
+	t = mktime(&tm);
+    }
+
+    return t;
+}
+
+
+
+char const *
+fmt_date_and_time_delta(guchar *date1, gsize len1,
+			guchar *date2, gsize len2)
+{
+    time_t a, b;
+    
+    a = date_to_time(date1, len1);
+    b = date_to_time(date2, len2);
+
+    return fmt_seconds((a && b && b > a) ? b-a : 0);
+}
+
+
+
 char const *
 fmt_seconds(guint32 number)
 {
@@ -40,18 +76,5 @@ fmt_seconds(guint32 number)
 
     g_snprintf(buffer, sizeof(buffer), "%2d:%02d:%02d", hour, min, sec);
 
-#if 0
-    if (number > 99900) {
-      g_snprintf(buffer, sizeof(buffer), "%3dh", number / 3600 / 100);
-    } else if (number > 5900) {
-      g_snprintf(buffer, sizeof(buffer), "%3dm", number / 60 / 100);
-    } else if (number < 100) {
-      g_snprintf(buffer, sizeof(buffer), ".%02ds", number);
-    } else if (number < 1000) {
-      g_snprintf(buffer, sizeof(buffer), "%3.1fs", number / 100.0);
-    } else {
-      g_snprintf(buffer, sizeof(buffer), "%3ds", number / 100);
-    }
-#endif
     return buffer;
 }

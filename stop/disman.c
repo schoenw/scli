@@ -27,6 +27,7 @@
 #include "stop.h"
 
 #include "disman-script-mib.h"
+#include "disman-schedule-mib.h"
 
 
 
@@ -135,13 +136,14 @@ show_runs(WINDOW *win, host_snmp *peer, int flags)
 {
     smLaunchEntry_t **smLaunchTable = NULL;
     smRunEntry_t **smRunTable = NULL;
+    schedObjects_t *schedObjects = NULL;
     int i;
 
     if (flags & STOP_FLAG_RESTART) {
 	show_disman_summary(peer);
 	wattron(win, A_REVERSE);
 	mvwprintw(win, 0, 0, "%-*s", COLS, 
-		  "L-OWNER  L-NAME   RUNID STAT    LIFE   EXPIRE S-OWNER  S-NAME   ARGUMENT");
+		  "L-OWNER  L-NAME   RUNID STAT    TIME     LIFE   EXPIRE S-OWNER  S-NAME   ARGUMENT");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
     }
@@ -152,6 +154,7 @@ show_runs(WINDOW *win, host_snmp *peer, int flags)
     }
 
     (void) disman_script_mib_get_smLaunchTable(peer, &smLaunchTable);
+    (void) disman_schedule_mib_get_schedObjects(peer, &schedObjects);
 
     wmove(win, 1, 0);
     for (i = 0; smRunTable[i]; i++) {
@@ -169,6 +172,28 @@ show_runs(WINDOW *win, host_snmp *peer, int flags)
 	fmt_run_state(s, smRunTable[i]->smRunState);
 	fmt_exit_code(s, smRunTable[i]->smRunExitCode);
 	g_string_append(s, " ");
+
+	if (smRunTable[i]->smRunStartTime && schedObjects->schedLocalTime
+	    && smRunTable[i]->smRunState
+	    && (*smRunTable[i]->smRunState
+		!= DISMAN_SCRIPT_MIB_SMRUNSTATE_TERMINATED)) {
+	    g_string_sprintfa(s, "%7s ", 
+		      fmt_date_and_time_delta(smRunTable[i]->smRunStartTime,
+				      smRunTable[i]->_smRunStartTimeLength,
+				      schedObjects->schedLocalTime,
+				      11));
+	} else if (smRunTable[i]->smRunStartTime && smRunTable[i]->smRunEndTime
+	    && smRunTable[i]->smRunState
+	    && (*smRunTable[i]->smRunState
+		== DISMAN_SCRIPT_MIB_SMRUNSTATE_TERMINATED)) {
+	    g_string_sprintfa(s, "%7s ", 
+		      fmt_date_and_time_delta(smRunTable[i]->smRunStartTime,
+				      smRunTable[i]->_smRunStartTimeLength,
+				      smRunTable[i]->smRunEndTime,
+				      smRunTable[i]->_smRunEndTimeLength));
+	} else {
+	    g_string_sprintfa(s, "%7s ", "");
+	}
 
 	if (smRunTable[i]->smRunLifeTime) {
 	    g_string_sprintfa(s, "%7s ",
@@ -221,6 +246,7 @@ show_runs(WINDOW *win, host_snmp *peer, int flags)
     }
     wclrtobot(win);
 
+    if (schedObjects) disman_schedule_mib_free_schedObjects(schedObjects);
     if (smLaunchTable) disman_script_mib_free_smLaunchTable(smLaunchTable);
     if (smRunTable) disman_script_mib_free_smRunTable(smRunTable);
 }

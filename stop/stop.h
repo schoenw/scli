@@ -104,5 +104,8 @@ stop_init_tcp_mode();
 
 extern char const *
 fmt_seconds(guint32 secs);
+
+extern char const *
+fmt_date_and_time_delta(guchar *date1, gsize len1, guchar *date2, gsize len2);
     
 #endif /* _STOP_H */
