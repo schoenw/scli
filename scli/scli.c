@@ -461,6 +461,7 @@ main(int argc, char **argv)
     scli_init_ether_mode(interp);
     scli_init_ospf_mode(interp);
     scli_init_printer_mode(interp);
+    scli_init_isdn_mode(interp);
     scli_init_cisco_mode(interp);
     scli_init_nortel_mode(interp);
     scli_init_netsnmp_mode(interp);
