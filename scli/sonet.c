@@ -20,6 +20,12 @@
  * @(#) $Id$
  */
 
+/*
+ * TODO: - add xml output for show sonet section history
+ *       - add interval length to show sonet section stats
+ *       - add show sonet line stats/history commands
+ */
+
 #include "scli.h"
 
 #include "if-mib.h"
@@ -181,50 +187,50 @@ INTERFACE INTERVAL LOST   ES  SES SEFS   CV DESCRIPTION
 
 static void
 fmt_sonet_section_stats(GString *s,
-			sonet_mib_sonetSectionCurrentEntry_t *sonetSectionEntry,
+			sonet_mib_sonetSectionCurrentEntry_t *sectionEntry,
 			if_mib_ifEntry_t *ifEntry)
 {
     const char *e;
     
-    g_string_sprintfa(s, "%9u ", sonetSectionEntry->ifIndex);
+    g_string_sprintfa(s, "%9u ", sectionEntry->ifIndex);
 
     g_string_sprintfa(s, "%8s ", "");
 
-    if (sonetSectionEntry->sonetSectionCurrentStatus) {
-	gint32 t = *sonetSectionEntry->sonetSectionCurrentStatus;
+    if (sectionEntry->sonetSectionCurrentESs) {
+	e = fmt_kmg(*sectionEntry->sonetSectionCurrentESs);
+	g_string_sprintfa(s, "%5s ", e);
+    } else {
+	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    if (sectionEntry->sonetSectionCurrentSESs) {
+	e = fmt_kmg(*sectionEntry->sonetSectionCurrentSESs);
+	g_string_sprintfa(s, "%5s ", e);
+    } else {
+	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    if (sectionEntry->sonetSectionCurrentSEFSs) {
+	e = fmt_kmg(*sectionEntry->sonetSectionCurrentSEFSs);
+	g_string_sprintfa(s, "%5s ", e);
+    } else {
+	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    if (sectionEntry->sonetSectionCurrentCVs) {
+	e = fmt_kmg(*sectionEntry->sonetSectionCurrentCVs);
+	g_string_sprintfa(s, "%5s ", e);
+    } else {
+	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    if (sectionEntry->sonetSectionCurrentStatus) {
+	gint32 t = *sectionEntry->sonetSectionCurrentStatus;
 	g_string_sprintfa(s, " %c%c  ",
 			  (t == 0x02) ? 'S' : '-',
 			  (t == 0x04) ? 'F' : '-');
     } else {
 	g_string_sprintfa(s, " %2s  ", "");
-    }
-
-    if (sonetSectionEntry->sonetSectionCurrentESs) {
-	e = fmt_kmg(*sonetSectionEntry->sonetSectionCurrentESs);
-	g_string_sprintfa(s, "%5s ", e);
-    } else {
-	g_string_sprintfa(s, "%5s ", "");
-    }
-
-    if (sonetSectionEntry->sonetSectionCurrentSESs) {
-	e = fmt_kmg(*sonetSectionEntry->sonetSectionCurrentSESs);
-	g_string_sprintfa(s, "%5s ", e);
-    } else {
-	g_string_sprintfa(s, "%5s ", "");
-    }
-
-    if (sonetSectionEntry->sonetSectionCurrentSESs) {
-	e = fmt_kmg(*sonetSectionEntry->sonetSectionCurrentSESs);
-	g_string_sprintfa(s, "%5s ", e);
-    } else {
-	g_string_sprintfa(s, "%5s ", "");
-    }
-
-    if (sonetSectionEntry->sonetSectionCurrentSEFSs) {
-	e = fmt_kmg(*sonetSectionEntry->sonetSectionCurrentSEFSs);
-	g_string_sprintfa(s, "%5s ", e);
-    } else {
-	g_string_sprintfa(s, "%5s ", "");
     }
 
     if (ifEntry && ifEntry->ifDescr) {
@@ -263,7 +269,8 @@ show_sonet_section_stats(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    sonet_mib_get_sonetSectionCurrentTable(interp->peer, &sonetSectionTable, 0);
+    sonet_mib_get_sonetSectionCurrentTable(interp->peer,
+					   &sonetSectionTable, 0);
     if (interp->peer->error_status) {
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
@@ -271,13 +278,15 @@ show_sonet_section_stats(scli_interp_t *interp, int argc, char **argv)
 
     if (sonetSectionTable) {
 	g_string_sprintfa(interp->header,
-			  "INTERFACE INTERVAL LOSS    ES   SES  SEFS    CV DESCRIPTION");
+			  "INTERFACE INTERVAL "
+			  "   ES   SES  SEFS    CV LOSS DESCRIPTION");
 	for (i = 0; sonetSectionTable[i]; i++) {
             if_mib_ifEntry_t *ifEntry;
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
 			       sonetSectionTable[i]->ifIndex, IF_MIB_IFDESCR);
 	    if (interface_match(regex_iface, ifEntry)) {
-                fmt_sonet_section_stats(interp->result, sonetSectionTable[i], ifEntry);
+                fmt_sonet_section_stats(interp->result, sonetSectionTable[i],
+					ifEntry);
 	    }
 	    if (ifEntry) if_mib_free_ifEntry(ifEntry);
 	}
@@ -292,6 +301,122 @@ show_sonet_section_stats(scli_interp_t *interp, int argc, char **argv)
 }
 
 
+
+static void
+fmt_sonet_section_history(GString *s,
+			  sonet_mib_sonetSectionIntervalEntry_t *sectionEntry,
+			  if_mib_ifEntry_t *ifEntry)
+{
+    const char *e;
+
+    if (sectionEntry->sonetSectionIntervalValidData
+	&& (*sectionEntry->sonetSectionIntervalValidData
+	    != SONET_MIB_SONETSECTIONINTERVALVALIDDATA_TRUE)) {
+	return;
+    }
+    
+    g_string_sprintfa(s, "%9u ", sectionEntry->ifIndex);
+
+    g_string_sprintfa(s, "%7dm ",
+		      sectionEntry->sonetSectionIntervalNumber * 15);
+
+    if (sectionEntry->sonetSectionIntervalESs) {
+	e = fmt_kmg(*sectionEntry->sonetSectionIntervalESs);
+	g_string_sprintfa(s, "%5s ", e);
+    } else {
+	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    if (sectionEntry->sonetSectionIntervalSESs) {
+	e = fmt_kmg(*sectionEntry->sonetSectionIntervalSESs);
+	g_string_sprintfa(s, "%5s ", e);
+    } else {
+	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    if (sectionEntry->sonetSectionIntervalSEFSs) {
+	e = fmt_kmg(*sectionEntry->sonetSectionIntervalSEFSs);
+	g_string_sprintfa(s, "%5s ", e);
+    } else {
+	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    if (sectionEntry->sonetSectionIntervalCVs) {
+	e = fmt_kmg(*sectionEntry->sonetSectionIntervalCVs);
+	g_string_sprintfa(s, "%5s ", e);
+    } else {
+	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    if (ifEntry && ifEntry->ifDescr) {
+	g_string_sprintfa(s, "%.*s",
+			  (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);
+    }
+
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_sonet_section_history(scli_interp_t *interp, int argc, char **argv)
+{
+    sonet_mib_sonetSectionIntervalEntry_t **sonetSectionTable = NULL;
+    regex_t _regex_iface, *regex_iface = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (argc == 2) {
+	regex_iface = &_regex_iface;
+	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_iface) regfree(regex_iface);
+	return SCLI_OK;
+    }
+
+    sonet_mib_get_sonetSectionIntervalTable(interp->peer,
+					    &sonetSectionTable, 0);
+    if (interp->peer->error_status) {
+	if (regex_iface) regfree(regex_iface);
+	return SCLI_SNMP;
+    }
+
+    if (sonetSectionTable) {
+	g_string_sprintfa(interp->header,
+			  "INTERFACE INTERVAL "
+			  "   ES   SES  SEFS    CV DESCRIPTION");
+	for (i = 0; sonetSectionTable[i]; i++) {
+            if_mib_ifEntry_t *ifEntry;
+	    if_mib_get_ifEntry(interp->peer, &ifEntry,
+			       sonetSectionTable[i]->ifIndex, IF_MIB_IFDESCR);
+	    if (interface_match(regex_iface, ifEntry)) {
+                fmt_sonet_section_history(interp->result,
+					  sonetSectionTable[i], ifEntry);
+	    }
+	    if (ifEntry) if_mib_free_ifEntry(ifEntry);
+	}
+    }
+
+    if (sonetSectionTable)
+	sonet_mib_free_sonetSectionIntervalTable(sonetSectionTable);
+
+    if (regex_iface) regfree(regex_iface);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_sonet_mode(scli_interp_t *interp)
 {
@@ -299,8 +424,8 @@ scli_init_sonet_mode(scli_interp_t *interp)
 
 	{ "show sonet media", "[<regexp>]",
 	  "The `show sonet media' command displays information about the\n"
-	  "configuration of SONET/SDH interfaces. The command outputs a table\n"
-	  "which has the following columns:\n"
+	  "configuration of SONET/SDH interfaces. The command outputs a\n"
+	  "table which has the following columns:\n"
 	  "\n"
 	  "  INTERFACE   network interface number\n"
 	  "  SIGNAL      type of the signal (SONET/SDH)\n"
@@ -318,7 +443,23 @@ scli_init_sonet_mode(scli_interp_t *interp)
           "\n"
           "  INTERFACE   network interface number\n"
           "  INTERVAL    measurement interval\n"
+          "  ES          errored seconds\n"
+          "  SES         severely errored seconds\n"
+          "  SEFS        severely errored framing seconds\n"
+          "  CV          coding violations\n"
           "  LOSS        flags indicating loss of signal/frame\n"
+          "  DESCRIPTION description of the network interface",
+          SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+          NULL, NULL,
+	  show_sonet_section_stats },
+
+	{ "show sonet section history", "[<regexp>]",
+	  "The `show sonet section history' command displays 15 minute\n"
+	  "history statistics about SONET/SDH section errors. The command\n"
+	  "outputs a table which has the following columns:\n"
+          "\n"
+          "  INTERFACE   network interface number\n"
+          "  INTERVAL    measurement interval start offset\n"
           "  ES          errored seconds\n"
           "  SES         severely errored seconds\n"
           "  SEFS        severely errored framing seconds\n"
@@ -326,7 +467,7 @@ scli_init_sonet_mode(scli_interp_t *interp)
           "  DESCRIPTION description of the network interface",
           SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
           NULL, NULL,
-	  show_sonet_section_stats },
+	  show_sonet_section_history },
 
 	{ "monitor sonet section stats", "[<regexp>]",
 	  "The `monitor sonet section stats' command shows the same\n"
