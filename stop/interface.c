@@ -272,7 +272,7 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	    if (ifEntry[i]->ifInUcastPkts && delta > TV_DELTA) {
 		guint32 pkts;
 		pkts = *(ifEntry[i]->ifInUcastPkts);
-		if (ifXEntry[i]->ifInMulticastPkts
+		if (ifXEntry && ifXEntry[i]->ifInMulticastPkts
 		    && ifXEntry[i]->ifInBroadcastPkts) {
 		    pkts += *(ifXEntry[i]->ifInMulticastPkts);
 		    pkts += *(ifXEntry[i]->ifInBroadcastPkts);
@@ -296,7 +296,7 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	    if (ifEntry[i]->ifOutUcastPkts && delta > TV_DELTA) {
 		guint32 pkts;
 		pkts = *(ifEntry[i]->ifOutUcastPkts);
-		if (ifXEntry[i]->ifOutMulticastPkts
+		if (ifXEntry && ifXEntry[i]->ifOutMulticastPkts
 		    && ifXEntry[i]->ifOutBroadcastPkts) {
 		    pkts += *(ifXEntry[i]->ifOutMulticastPkts);
 		    pkts += *(ifXEntry[i]->ifOutBroadcastPkts);
