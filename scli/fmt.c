@@ -403,7 +403,8 @@ fmt_display_string(GString *s, int indent, char *label, int len, char *string)
     }
 
     /* Split long strings into chunks so that the text fits on
-       a 80 column display. */
+       a 80 column display. Display non-printable characters as
+       special sequences such as \245. */
     
     for (i = 0; i < len; i++) {
 	if (string[i] == '\r') continue;
@@ -413,7 +414,11 @@ fmt_display_string(GString *s, int indent, char *label, int len, char *string)
 	    continue;
 	}
 	if (string[i] != '\n') {
-	    g_string_append_c(s, string[i]);
+	    if (isprint(string[i])) {
+		g_string_append_c(s, string[i]);
+	    } else {
+		g_string_sprintfa(s, "\\%o", string[i]);
+	    }
 	    pos++;
 	}
     }
