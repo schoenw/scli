@@ -31,6 +31,10 @@
 
 - Finish the implementation of the "show system devices" scli command.
 
+- Make index members pointers again in the stub interface? (FS)
+
+- Add a mechanism to retrieve only selections of a table? (FS)
+
 ==== GXSNMP specific things ====
 
 + 1. change the oid type from gulong to guint32

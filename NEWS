@@ -1,3 +1,10 @@
+Changes in stools 0.1.13:
+
+- scli supports a new "show interface tunnel" command
+- scli supports a new "show ip addresses" command
+- scli "show interface info" command displays IPv4 address prefixes
+- minor bug fixes
+
 Changes in stools 0.1.12:
 
 - improved instance identifier decoding in the stubs
