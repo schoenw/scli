@@ -711,14 +711,14 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
     case SCLI_SNMP_NAME:
 	reason = g_strdup(error_infos[i].fmt);
 	break;
-    case SCLI_ERROR:	/* xxx put the code into the output format */
+    case SCLI_ERROR:
 	reason = g_strdup_printf(error_infos[i].fmt,
 			 interp->result->str ? interp->result->str : "");
 	break;
     case SCLI_ERROR_NOPEER: 
 	reason = g_strdup(error_infos[i].fmt);
 	break;
-    case SCLI_ERROR_NOXML: /* xxx put the code into the output format */
+    case SCLI_ERROR_NOXML:
 	reason = g_strdup_printf(error_infos[i].fmt, cmd->path);
 	break;
     case SCLI_OK:
