@@ -22,6 +22,7 @@
 
 #include "scli.h"
 
+#include <ctype.h>
 #include <time.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -399,3 +400,27 @@ fmt_counter_dt(GString *s, guint32 *new_counter, guint32 *old_counter,
     }
 }
 
+
+
+void
+fmt_display_string(GString *s, int indent, char *label, int len, char *string)
+{
+    int i, pos;
+    
+    g_string_sprintfa(s, "%-*s ", indent, label);
+    pos = indent;
+
+    for (i = 0; i < len; i++) {
+	if (string[i] == '\r') continue;
+	if (pos > 70 && isspace(string[i])) {
+	    g_string_sprintfa(s, "\n%*s ", indent, "");
+	    pos = indent;
+	    continue;
+	}
+	if (string[i] != '\n') {
+	    g_string_append_c(s, string[i]);
+	    pos++;
+	}
+    }
+    g_string_append_c(s, '\n');
+}

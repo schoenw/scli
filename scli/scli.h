@@ -318,7 +318,9 @@ fmt_ether_address(guchar *addr, int flags);
 extern void
 fmt_counter_dt(GString *s, guint32 *new_counter, guint32 *old_counter,
 	       struct timeval *last, double delta);
-
+extern void
+fmt_display_string(GString *s, int indent, char *label, int len, char *string);
+    
 /*
  * XML utilities.
  */
