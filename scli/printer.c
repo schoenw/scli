@@ -26,8 +26,42 @@
 
 #include "scli.h"
 
+#include "host-resources-mib.h"
+#include "host-resources-types.h"
 #include "printer-mib.h"
 
+
+static const char *error_states[] = {
+    "low paper", "no paper", "low toner", "no toner", "door open",
+    "jammed", "offline", "service requested", "input tray missing",
+    "output tray missing", "marker supply missing", "output near full",
+    "output full", "input tray empty", "overdue prevent maint", NULL
+};
+
+
+
+static char const *
+fmt_bits(const char **labels, guchar *bits, gsize bits_len)
+{
+    int i, bit;
+    int cnt = 0;
+    
+    if (! bits) {
+	return 0;
+    }
+    
+    for (i = 0; labels[i]; i++) {
+	bit = (i/8 < bits_len) ? bits[i/8] & 1 <<(7-(i%8)) : 0;
+	if (bit) cnt++;
+    }
+    if (cnt == i) {
+	return NULL;
+    }
+
+    return labels[i];
+}
+
+    
 
 static void
 misc_printer_printInputDimension(GString *s, gint32 * dim)
@@ -35,6 +69,108 @@ misc_printer_printInputDimension(GString *s, gint32 * dim)
     if (dim) {
 	fmt_enum(s, 22, printer_mib_enums_prtInputDimUnit, dim);
     }
+}
+
+
+
+static host_resources_mib_hrDeviceEntry_t*
+get_device_entry(host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
+		 host_resources_mib_hrDeviceEntry_t **hrDeviceTable)
+{
+    int l;
+
+    if (hrDeviceTable) {
+	for (l = 0; hrDeviceTable[l]; l++) {
+	    if (hrDeviceTable[l]->hrDeviceIndex
+		== hrPrinterEntry->hrDeviceIndex) {
+		return hrDeviceTable[l];
+	    }
+	}
+    }
+
+    return NULL;
+}
+
+
+
+static void
+show_printer_xxx(GString *s,
+		 host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
+		 host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
+{
+    int const indent = 18;
+
+    g_string_sprintfa(s, "%-*s %d\n", indent, "Device:",
+		      hrPrinterEntry->hrDeviceIndex);
+
+    if (hrDeviceEntry && hrDeviceEntry->hrDeviceStatus) {
+	g_string_sprintfa(s, "%-*s ", indent, "Device Status:");
+	fmt_enum(s, 0, host_resources_mib_enums_hrDeviceStatus,
+		 hrDeviceEntry->hrDeviceStatus);
+	g_string_append(s, "\n");
+    }
+    
+    if (hrPrinterEntry->hrPrinterStatus) {
+	g_string_sprintfa(s, "%-*s ", indent, "Printer Status:");
+	fmt_enum(s, 0, host_resources_mib_enums_hrPrinterStatus,
+		 hrPrinterEntry->hrPrinterStatus);
+	g_string_append(s, "\n");
+    }
+
+    if (hrDeviceEntry && hrDeviceEntry->hrDeviceType) {
+	char const *type;
+	type = stls_identity_get_label(host_resources_types_identities,
+				       hrDeviceEntry->hrDeviceType,
+				       hrDeviceEntry->_hrDeviceDescrLength);
+	if (type) {
+	    g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", type);
+	}
+    }
+	
+    if (hrDeviceEntry && hrDeviceEntry->hrDeviceDescr) {
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:", 
+			  (int) hrDeviceEntry->_hrDeviceDescrLength,
+			  hrDeviceEntry->hrDeviceDescr);
+    }
+
+    if (hrPrinterEntry->hrPrinterDetectedErrorState) {
+	char const *state;
+	state = fmt_bits(error_states,
+			 hrPrinterEntry->hrPrinterDetectedErrorState,
+			 hrPrinterEntry->_hrPrinterDetectedErrorStateLength);
+	if (state) {
+	    g_string_sprintfa(s, "%-*s %s\n", indent, "Error State:", state);
+	}
+    }
+}
+
+
+
+static int
+cmd_printer_xxx(scli_interp_t * interp, int argc, char **argv)
+{
+    host_resources_mib_hrPrinterEntry_t **hrPrinterTable;
+    host_resources_mib_hrDeviceEntry_t **hrDeviceTable;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (host_resources_mib_get_hrPrinterTable(interp->peer, &hrPrinterTable)) {
+	return SCLI_ERROR;
+    }
+    (void) host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable);
+
+    if (hrPrinterTable) {
+	for (i = 0; hrPrinterTable[i]; i++) {
+	    show_printer_xxx(interp->result, hrPrinterTable[i],
+		     get_device_entry(hrPrinterTable[i], hrDeviceTable));
+	}
+    }
+
+    if (hrPrinterTable)
+	host_resources_mib_free_hrPrinterTable(hrPrinterTable);
+
+    return SCLI_OK;
 }
 
 
@@ -641,10 +777,54 @@ cmd_printer_inputs(scli_interp_t * interp, int argc, char **argv)
 
 
 
+static void
+show_printer_console(GString *s,
+     printer_mib_prtConsoleDisplayBufferEntry_t *prtConsoleDisplayEntry)
+{
+    if (prtConsoleDisplayEntry->prtConsoleDisplayBufferText) {
+	g_string_sprintfa(s, "%.*s\n",
+	    (int) prtConsoleDisplayEntry->_prtConsoleDisplayBufferTextLength,
+		  prtConsoleDisplayEntry->prtConsoleDisplayBufferText);
+    }
+}
+
+
+
+static int
+cmd_printer_console(scli_interp_t * interp, int argc, char **argv)
+{
+    printer_mib_prtConsoleDisplayBufferEntry_t **prtConsoleDisplayTable;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (printer_mib_get_prtConsoleDisplayBufferTable(interp->peer,
+					     &prtConsoleDisplayTable)) {
+	return SCLI_ERROR;
+    }
+
+    if (prtConsoleDisplayTable) {
+	for (i = 0; prtConsoleDisplayTable[i]; i++) {
+	    show_printer_console(interp->result, prtConsoleDisplayTable[i]);
+	}
+    }
+
+    if (prtConsoleDisplayTable)
+	printer_mib_free_prtConsoleDisplayBufferTable(prtConsoleDisplayTable);
+	
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_printer_mode(scli_interp_t * interp)
 {
     static scli_cmd_t cmds[] = {
+	{ "show printer xxx",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "general printer information",
+	  cmd_printer_xxx },
 	{ "show printer info",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "general printer information",
@@ -657,6 +837,10 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "printer input information",
 	  cmd_printer_inputs },
+	{ "show printer console",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "printer console information",
+	  cmd_printer_console },
 	{ NULL, 0, NULL, NULL }
     };
 
