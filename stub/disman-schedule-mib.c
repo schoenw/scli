@@ -79,6 +79,7 @@ assign_schedObjects(GSList *vbl)
     GSList *elem;
     schedObjects_t *schedObjects;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 63, 1};
 
     schedObjects = (schedObjects_t *) g_malloc0(sizeof(schedObjects_t) + sizeof(GSList *));
     if (! schedObjects) {
@@ -95,6 +96,9 @@ assign_schedObjects(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
         if (vb->id_len > 9 && vb->id[8] == 1) {
             schedObjects->schedLocalTime = vb->syntax.uc;
         }
@@ -107,11 +111,11 @@ int
 disman_schedule_mib_get_schedObjects(host_snmp *s, schedObjects_t **schedObjects)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 63, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 63, 1, 0};
 
     *schedObjects = NULL;
 
-    var[8] = 1; stls_vbl_add_null(&in, var, 9);
+    base[8] = 1; stls_vbl_add_null(&in, base, 9);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -144,6 +148,7 @@ assign_schedEntry(GSList *vbl)
     GSList *elem;
     schedEntry_t *schedEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1};
 
     schedEntry = (schedEntry_t *) g_malloc0(sizeof(schedEntry_t) + sizeof(GSList *));
     if (! schedEntry) {
@@ -166,6 +171,9 @@ assign_schedEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
@@ -242,28 +250,28 @@ disman_schedule_mib_get_schedEntry(host_snmp *s, schedEntry_t ***schedEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 0};
 
     *schedEntry = NULL;
 
-    var[10] = 3; stls_vbl_add_null(&in, var, 11);
-    var[10] = 4; stls_vbl_add_null(&in, var, 11);
-    var[10] = 5; stls_vbl_add_null(&in, var, 11);
-    var[10] = 6; stls_vbl_add_null(&in, var, 11);
-    var[10] = 7; stls_vbl_add_null(&in, var, 11);
-    var[10] = 8; stls_vbl_add_null(&in, var, 11);
-    var[10] = 9; stls_vbl_add_null(&in, var, 11);
-    var[10] = 10; stls_vbl_add_null(&in, var, 11);
-    var[10] = 11; stls_vbl_add_null(&in, var, 11);
-    var[10] = 12; stls_vbl_add_null(&in, var, 11);
-    var[10] = 13; stls_vbl_add_null(&in, var, 11);
-    var[10] = 14; stls_vbl_add_null(&in, var, 11);
-    var[10] = 15; stls_vbl_add_null(&in, var, 11);
-    var[10] = 16; stls_vbl_add_null(&in, var, 11);
-    var[10] = 17; stls_vbl_add_null(&in, var, 11);
-    var[10] = 18; stls_vbl_add_null(&in, var, 11);
-    var[10] = 19; stls_vbl_add_null(&in, var, 11);
-    var[10] = 20; stls_vbl_add_null(&in, var, 11);
+    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    base[10] = 4; stls_vbl_add_null(&in, base, 11);
+    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    base[10] = 6; stls_vbl_add_null(&in, base, 11);
+    base[10] = 7; stls_vbl_add_null(&in, base, 11);
+    base[10] = 8; stls_vbl_add_null(&in, base, 11);
+    base[10] = 9; stls_vbl_add_null(&in, base, 11);
+    base[10] = 10; stls_vbl_add_null(&in, base, 11);
+    base[10] = 11; stls_vbl_add_null(&in, base, 11);
+    base[10] = 12; stls_vbl_add_null(&in, base, 11);
+    base[10] = 13; stls_vbl_add_null(&in, base, 11);
+    base[10] = 14; stls_vbl_add_null(&in, base, 11);
+    base[10] = 15; stls_vbl_add_null(&in, base, 11);
+    base[10] = 16; stls_vbl_add_null(&in, base, 11);
+    base[10] = 17; stls_vbl_add_null(&in, base, 11);
+    base[10] = 18; stls_vbl_add_null(&in, base, 11);
+    base[10] = 19; stls_vbl_add_null(&in, base, 11);
+    base[10] = 20; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

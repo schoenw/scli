@@ -40,6 +40,7 @@ assign_tcp(GSList *vbl)
     GSList *elem;
     tcp_t *tcp;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 6};
 
     tcp = (tcp_t *) g_malloc0(sizeof(tcp_t) + sizeof(GSList *));
     if (! tcp) {
@@ -54,6 +55,9 @@ assign_tcp(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 8 && vb->id[7] == 1) {
@@ -107,24 +111,24 @@ int
 tcp_mib_get_tcp(host_snmp *s, tcp_t **tcp)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 6, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 6, 0};
 
     *tcp = NULL;
 
-    var[7] = 1; stls_vbl_add_null(&in, var, 8);
-    var[7] = 2; stls_vbl_add_null(&in, var, 8);
-    var[7] = 3; stls_vbl_add_null(&in, var, 8);
-    var[7] = 4; stls_vbl_add_null(&in, var, 8);
-    var[7] = 5; stls_vbl_add_null(&in, var, 8);
-    var[7] = 6; stls_vbl_add_null(&in, var, 8);
-    var[7] = 7; stls_vbl_add_null(&in, var, 8);
-    var[7] = 8; stls_vbl_add_null(&in, var, 8);
-    var[7] = 9; stls_vbl_add_null(&in, var, 8);
-    var[7] = 10; stls_vbl_add_null(&in, var, 8);
-    var[7] = 11; stls_vbl_add_null(&in, var, 8);
-    var[7] = 12; stls_vbl_add_null(&in, var, 8);
-    var[7] = 14; stls_vbl_add_null(&in, var, 8);
-    var[7] = 15; stls_vbl_add_null(&in, var, 8);
+    base[7] = 1; stls_vbl_add_null(&in, base, 8);
+    base[7] = 2; stls_vbl_add_null(&in, base, 8);
+    base[7] = 3; stls_vbl_add_null(&in, base, 8);
+    base[7] = 4; stls_vbl_add_null(&in, base, 8);
+    base[7] = 5; stls_vbl_add_null(&in, base, 8);
+    base[7] = 6; stls_vbl_add_null(&in, base, 8);
+    base[7] = 7; stls_vbl_add_null(&in, base, 8);
+    base[7] = 8; stls_vbl_add_null(&in, base, 8);
+    base[7] = 9; stls_vbl_add_null(&in, base, 8);
+    base[7] = 10; stls_vbl_add_null(&in, base, 8);
+    base[7] = 11; stls_vbl_add_null(&in, base, 8);
+    base[7] = 12; stls_vbl_add_null(&in, base, 8);
+    base[7] = 14; stls_vbl_add_null(&in, base, 8);
+    base[7] = 15; stls_vbl_add_null(&in, base, 8);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -157,6 +161,7 @@ assign_tcpConnEntry(GSList *vbl)
     GSList *elem;
     tcpConnEntry_t *tcpConnEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 6, 13, 1};
 
     tcpConnEntry = (tcpConnEntry_t *) g_malloc0(sizeof(tcpConnEntry_t) + sizeof(GSList *));
     if (! tcpConnEntry) {
@@ -183,6 +188,9 @@ assign_tcpConnEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
         if (vb->id_len > 10 && vb->id[9] == 1) {
             tcpConnEntry->tcpConnState = &(vb->syntax.i32[0]);
         }
@@ -197,11 +205,11 @@ tcp_mib_get_tcpConnEntry(host_snmp *s, tcpConnEntry_t ***tcpConnEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 6, 13, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 6, 13, 1, 0};
 
     *tcpConnEntry = NULL;
 
-    var[9] = 1; stls_vbl_add_null(&in, var, 10);
+    base[9] = 1; stls_vbl_add_null(&in, base, 10);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

@@ -15,6 +15,7 @@ assign_udp(GSList *vbl)
     GSList *elem;
     udp_t *udp;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 7};
 
     udp = (udp_t *) g_malloc0(sizeof(udp_t) + sizeof(GSList *));
     if (! udp) {
@@ -29,6 +30,9 @@ assign_udp(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 8 && vb->id[7] == 1) {
@@ -52,14 +56,14 @@ int
 udp_mib_get_udp(host_snmp *s, udp_t **udp)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 7, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 7, 0};
 
     *udp = NULL;
 
-    var[7] = 1; stls_vbl_add_null(&in, var, 8);
-    var[7] = 2; stls_vbl_add_null(&in, var, 8);
-    var[7] = 3; stls_vbl_add_null(&in, var, 8);
-    var[7] = 4; stls_vbl_add_null(&in, var, 8);
+    base[7] = 1; stls_vbl_add_null(&in, base, 8);
+    base[7] = 2; stls_vbl_add_null(&in, base, 8);
+    base[7] = 3; stls_vbl_add_null(&in, base, 8);
+    base[7] = 4; stls_vbl_add_null(&in, base, 8);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -92,6 +96,7 @@ assign_udpEntry(GSList *vbl)
     GSList *elem;
     udpEntry_t *udpEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 7, 5, 1};
 
     udpEntry = (udpEntry_t *) g_malloc0(sizeof(udpEntry_t) + sizeof(GSList *));
     if (! udpEntry) {
@@ -116,6 +121,9 @@ assign_udpEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
     }
 
     return udpEntry;
@@ -127,7 +135,7 @@ udp_mib_get_udpEntry(host_snmp *s, udpEntry_t ***udpEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 7, 5, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 7, 5, 1, 0};
 
     *udpEntry = NULL;
 

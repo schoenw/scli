@@ -94,6 +94,7 @@ assign_hrSystem(GSList *vbl)
     GSList *elem;
     hrSystem_t *hrSystem;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 1};
 
     hrSystem = (hrSystem_t *) g_malloc0(sizeof(hrSystem_t) + sizeof(GSList *));
     if (! hrSystem) {
@@ -108,6 +109,9 @@ assign_hrSystem(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 1) {
@@ -142,17 +146,17 @@ int
 host_resources_mib_get_hrSystem(host_snmp *s, hrSystem_t **hrSystem)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 1, 0};
 
     *hrSystem = NULL;
 
-    var[8] = 1; stls_vbl_add_null(&in, var, 9);
-    var[8] = 2; stls_vbl_add_null(&in, var, 9);
-    var[8] = 3; stls_vbl_add_null(&in, var, 9);
-    var[8] = 4; stls_vbl_add_null(&in, var, 9);
-    var[8] = 5; stls_vbl_add_null(&in, var, 9);
-    var[8] = 6; stls_vbl_add_null(&in, var, 9);
-    var[8] = 7; stls_vbl_add_null(&in, var, 9);
+    base[8] = 1; stls_vbl_add_null(&in, base, 9);
+    base[8] = 2; stls_vbl_add_null(&in, base, 9);
+    base[8] = 3; stls_vbl_add_null(&in, base, 9);
+    base[8] = 4; stls_vbl_add_null(&in, base, 9);
+    base[8] = 5; stls_vbl_add_null(&in, base, 9);
+    base[8] = 6; stls_vbl_add_null(&in, base, 9);
+    base[8] = 7; stls_vbl_add_null(&in, base, 9);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -185,6 +189,7 @@ assign_hrStorage(GSList *vbl)
     GSList *elem;
     hrStorage_t *hrStorage;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 2};
 
     hrStorage = (hrStorage_t *) g_malloc0(sizeof(hrStorage_t) + sizeof(GSList *));
     if (! hrStorage) {
@@ -201,6 +206,9 @@ assign_hrStorage(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
         if (vb->id_len > 9 && vb->id[8] == 2) {
             hrStorage->hrMemorySize = &(vb->syntax.i32[0]);
         }
@@ -213,11 +221,11 @@ int
 host_resources_mib_get_hrStorage(host_snmp *s, hrStorage_t **hrStorage)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 2, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 2, 0};
 
     *hrStorage = NULL;
 
-    var[8] = 2; stls_vbl_add_null(&in, var, 9);
+    base[8] = 2; stls_vbl_add_null(&in, base, 9);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -250,6 +258,7 @@ assign_hrStorageEntry(GSList *vbl)
     GSList *elem;
     hrStorageEntry_t *hrStorageEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1};
 
     hrStorageEntry = (hrStorageEntry_t *) g_malloc0(sizeof(hrStorageEntry_t) + sizeof(GSList *));
     if (! hrStorageEntry) {
@@ -271,6 +280,9 @@ assign_hrStorageEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
@@ -304,16 +316,16 @@ host_resources_mib_get_hrStorageEntry(host_snmp *s, hrStorageEntry_t ***hrStorag
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1, 0};
 
     *hrStorageEntry = NULL;
 
-    var[10] = 2; stls_vbl_add_null(&in, var, 11);
-    var[10] = 3; stls_vbl_add_null(&in, var, 11);
-    var[10] = 4; stls_vbl_add_null(&in, var, 11);
-    var[10] = 5; stls_vbl_add_null(&in, var, 11);
-    var[10] = 6; stls_vbl_add_null(&in, var, 11);
-    var[10] = 7; stls_vbl_add_null(&in, var, 11);
+    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    base[10] = 4; stls_vbl_add_null(&in, base, 11);
+    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    base[10] = 6; stls_vbl_add_null(&in, base, 11);
+    base[10] = 7; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -357,6 +369,7 @@ assign_hrDeviceEntry(GSList *vbl)
     GSList *elem;
     hrDeviceEntry_t *hrDeviceEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1};
 
     hrDeviceEntry = (hrDeviceEntry_t *) g_malloc0(sizeof(hrDeviceEntry_t) + sizeof(GSList *));
     if (! hrDeviceEntry) {
@@ -378,6 +391,9 @@ assign_hrDeviceEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
@@ -409,15 +425,15 @@ host_resources_mib_get_hrDeviceEntry(host_snmp *s, hrDeviceEntry_t ***hrDeviceEn
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1, 0};
 
     *hrDeviceEntry = NULL;
 
-    var[10] = 2; stls_vbl_add_null(&in, var, 11);
-    var[10] = 3; stls_vbl_add_null(&in, var, 11);
-    var[10] = 4; stls_vbl_add_null(&in, var, 11);
-    var[10] = 5; stls_vbl_add_null(&in, var, 11);
-    var[10] = 6; stls_vbl_add_null(&in, var, 11);
+    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    base[10] = 4; stls_vbl_add_null(&in, base, 11);
+    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    base[10] = 6; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -461,6 +477,7 @@ assign_hrProcessorEntry(GSList *vbl)
     GSList *elem;
     hrProcessorEntry_t *hrProcessorEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 3, 1};
 
     hrProcessorEntry = (hrProcessorEntry_t *) g_malloc0(sizeof(hrProcessorEntry_t) + sizeof(GSList *));
     if (! hrProcessorEntry) {
@@ -484,6 +501,9 @@ assign_hrProcessorEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
         if (vb->id_len > 11 && vb->id[10] == 1) {
             hrProcessorEntry->_hrProcessorFrwIDLength = vb->syntax_len / sizeof(guint32);
             hrProcessorEntry->hrProcessorFrwID = vb->syntax.ui32;
@@ -502,12 +522,12 @@ host_resources_mib_get_hrProcessorEntry(host_snmp *s, hrProcessorEntry_t ***hrPr
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 3, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 3, 3, 1, 0};
 
     *hrProcessorEntry = NULL;
 
-    var[10] = 1; stls_vbl_add_null(&in, var, 11);
-    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    base[10] = 1; stls_vbl_add_null(&in, base, 11);
+    base[10] = 2; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -551,6 +571,7 @@ assign_hrNetworkEntry(GSList *vbl)
     GSList *elem;
     hrNetworkEntry_t *hrNetworkEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 4, 1};
 
     hrNetworkEntry = (hrNetworkEntry_t *) g_malloc0(sizeof(hrNetworkEntry_t) + sizeof(GSList *));
     if (! hrNetworkEntry) {
@@ -574,6 +595,9 @@ assign_hrNetworkEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
         if (vb->id_len > 11 && vb->id[10] == 1) {
             hrNetworkEntry->hrNetworkIfIndex = &(vb->syntax.i32[0]);
         }
@@ -588,11 +612,11 @@ host_resources_mib_get_hrNetworkEntry(host_snmp *s, hrNetworkEntry_t ***hrNetwor
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 4, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 3, 4, 1, 0};
 
     *hrNetworkEntry = NULL;
 
-    var[10] = 1; stls_vbl_add_null(&in, var, 11);
+    base[10] = 1; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -636,6 +660,7 @@ assign_hrPrinterEntry(GSList *vbl)
     GSList *elem;
     hrPrinterEntry_t *hrPrinterEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 5, 1};
 
     hrPrinterEntry = (hrPrinterEntry_t *) g_malloc0(sizeof(hrPrinterEntry_t) + sizeof(GSList *));
     if (! hrPrinterEntry) {
@@ -659,6 +684,9 @@ assign_hrPrinterEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
         if (vb->id_len > 11 && vb->id[10] == 1) {
             hrPrinterEntry->hrPrinterStatus = &(vb->syntax.i32[0]);
         }
@@ -677,12 +705,12 @@ host_resources_mib_get_hrPrinterEntry(host_snmp *s, hrPrinterEntry_t ***hrPrinte
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 5, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 3, 5, 1, 0};
 
     *hrPrinterEntry = NULL;
 
-    var[10] = 1; stls_vbl_add_null(&in, var, 11);
-    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    base[10] = 1; stls_vbl_add_null(&in, base, 11);
+    base[10] = 2; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -726,6 +754,7 @@ assign_hrDiskStorageEntry(GSList *vbl)
     GSList *elem;
     hrDiskStorageEntry_t *hrDiskStorageEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 6, 1};
 
     hrDiskStorageEntry = (hrDiskStorageEntry_t *) g_malloc0(sizeof(hrDiskStorageEntry_t) + sizeof(GSList *));
     if (! hrDiskStorageEntry) {
@@ -747,6 +776,9 @@ assign_hrDiskStorageEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 1) {
@@ -772,14 +804,14 @@ host_resources_mib_get_hrDiskStorageEntry(host_snmp *s, hrDiskStorageEntry_t ***
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 6, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 3, 6, 1, 0};
 
     *hrDiskStorageEntry = NULL;
 
-    var[10] = 1; stls_vbl_add_null(&in, var, 11);
-    var[10] = 2; stls_vbl_add_null(&in, var, 11);
-    var[10] = 3; stls_vbl_add_null(&in, var, 11);
-    var[10] = 4; stls_vbl_add_null(&in, var, 11);
+    base[10] = 1; stls_vbl_add_null(&in, base, 11);
+    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    base[10] = 4; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -823,6 +855,7 @@ assign_hrPartitionEntry(GSList *vbl)
     GSList *elem;
     hrPartitionEntry_t *hrPartitionEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1};
 
     hrPartitionEntry = (hrPartitionEntry_t *) g_malloc0(sizeof(hrPartitionEntry_t) + sizeof(GSList *));
     if (! hrPartitionEntry) {
@@ -845,6 +878,9 @@ assign_hrPartitionEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
@@ -872,14 +908,14 @@ host_resources_mib_get_hrPartitionEntry(host_snmp *s, hrPartitionEntry_t ***hrPa
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1, 0};
 
     *hrPartitionEntry = NULL;
 
-    var[10] = 2; stls_vbl_add_null(&in, var, 11);
-    var[10] = 3; stls_vbl_add_null(&in, var, 11);
-    var[10] = 4; stls_vbl_add_null(&in, var, 11);
-    var[10] = 5; stls_vbl_add_null(&in, var, 11);
+    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    base[10] = 4; stls_vbl_add_null(&in, base, 11);
+    base[10] = 5; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -923,6 +959,7 @@ assign_hrFSEntry(GSList *vbl)
     GSList *elem;
     hrFSEntry_t *hrFSEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1};
 
     hrFSEntry = (hrFSEntry_t *) g_malloc0(sizeof(hrFSEntry_t) + sizeof(GSList *));
     if (! hrFSEntry) {
@@ -944,6 +981,9 @@ assign_hrFSEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
@@ -986,18 +1026,18 @@ host_resources_mib_get_hrFSEntry(host_snmp *s, hrFSEntry_t ***hrFSEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1, 0};
 
     *hrFSEntry = NULL;
 
-    var[10] = 2; stls_vbl_add_null(&in, var, 11);
-    var[10] = 3; stls_vbl_add_null(&in, var, 11);
-    var[10] = 4; stls_vbl_add_null(&in, var, 11);
-    var[10] = 5; stls_vbl_add_null(&in, var, 11);
-    var[10] = 6; stls_vbl_add_null(&in, var, 11);
-    var[10] = 7; stls_vbl_add_null(&in, var, 11);
-    var[10] = 8; stls_vbl_add_null(&in, var, 11);
-    var[10] = 9; stls_vbl_add_null(&in, var, 11);
+    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    base[10] = 4; stls_vbl_add_null(&in, base, 11);
+    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    base[10] = 6; stls_vbl_add_null(&in, base, 11);
+    base[10] = 7; stls_vbl_add_null(&in, base, 11);
+    base[10] = 8; stls_vbl_add_null(&in, base, 11);
+    base[10] = 9; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1041,6 +1081,7 @@ assign_hrSWRun(GSList *vbl)
     GSList *elem;
     hrSWRun_t *hrSWRun;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 4};
 
     hrSWRun = (hrSWRun_t *) g_malloc0(sizeof(hrSWRun_t) + sizeof(GSList *));
     if (! hrSWRun) {
@@ -1057,6 +1098,9 @@ assign_hrSWRun(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
         if (vb->id_len > 9 && vb->id[8] == 1) {
             hrSWRun->hrSWOSIndex = &(vb->syntax.i32[0]);
         }
@@ -1069,11 +1113,11 @@ int
 host_resources_mib_get_hrSWRun(host_snmp *s, hrSWRun_t **hrSWRun)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 4, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 4, 0};
 
     *hrSWRun = NULL;
 
-    var[8] = 1; stls_vbl_add_null(&in, var, 9);
+    base[8] = 1; stls_vbl_add_null(&in, base, 9);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -1106,6 +1150,7 @@ assign_hrSWRunEntry(GSList *vbl)
     GSList *elem;
     hrSWRunEntry_t *hrSWRunEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1};
 
     hrSWRunEntry = (hrSWRunEntry_t *) g_malloc0(sizeof(hrSWRunEntry_t) + sizeof(GSList *));
     if (! hrSWRunEntry) {
@@ -1127,6 +1172,9 @@ assign_hrSWRunEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
@@ -1162,16 +1210,16 @@ host_resources_mib_get_hrSWRunEntry(host_snmp *s, hrSWRunEntry_t ***hrSWRunEntry
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1, 0};
 
     *hrSWRunEntry = NULL;
 
-    var[10] = 2; stls_vbl_add_null(&in, var, 11);
-    var[10] = 3; stls_vbl_add_null(&in, var, 11);
-    var[10] = 4; stls_vbl_add_null(&in, var, 11);
-    var[10] = 5; stls_vbl_add_null(&in, var, 11);
-    var[10] = 6; stls_vbl_add_null(&in, var, 11);
-    var[10] = 7; stls_vbl_add_null(&in, var, 11);
+    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    base[10] = 4; stls_vbl_add_null(&in, base, 11);
+    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    base[10] = 6; stls_vbl_add_null(&in, base, 11);
+    base[10] = 7; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1215,6 +1263,7 @@ assign_hrSWRunPerfEntry(GSList *vbl)
     GSList *elem;
     hrSWRunPerfEntry_t *hrSWRunPerfEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 5, 1, 1};
 
     hrSWRunPerfEntry = (hrSWRunPerfEntry_t *) g_malloc0(sizeof(hrSWRunPerfEntry_t) + sizeof(GSList *));
     if (! hrSWRunPerfEntry) {
@@ -1238,6 +1287,9 @@ assign_hrSWRunPerfEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
         if (vb->id_len > 11 && vb->id[10] == 1) {
             hrSWRunPerfEntry->hrSWRunPerfCPU = &(vb->syntax.i32[0]);
         }
@@ -1255,12 +1307,12 @@ host_resources_mib_get_hrSWRunPerfEntry(host_snmp *s, hrSWRunPerfEntry_t ***hrSW
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 5, 1, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 5, 1, 1, 0};
 
     *hrSWRunPerfEntry = NULL;
 
-    var[10] = 1; stls_vbl_add_null(&in, var, 11);
-    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    base[10] = 1; stls_vbl_add_null(&in, base, 11);
+    base[10] = 2; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1304,6 +1356,7 @@ assign_hrSWInstalled(GSList *vbl)
     GSList *elem;
     hrSWInstalled_t *hrSWInstalled;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 6};
 
     hrSWInstalled = (hrSWInstalled_t *) g_malloc0(sizeof(hrSWInstalled_t) + sizeof(GSList *));
     if (! hrSWInstalled) {
@@ -1318,6 +1371,9 @@ assign_hrSWInstalled(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 1) {
@@ -1335,12 +1391,12 @@ int
 host_resources_mib_get_hrSWInstalled(host_snmp *s, hrSWInstalled_t **hrSWInstalled)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 6, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 6, 0};
 
     *hrSWInstalled = NULL;
 
-    var[8] = 1; stls_vbl_add_null(&in, var, 9);
-    var[8] = 2; stls_vbl_add_null(&in, var, 9);
+    base[8] = 1; stls_vbl_add_null(&in, base, 9);
+    base[8] = 2; stls_vbl_add_null(&in, base, 9);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -1373,6 +1429,7 @@ assign_hrSWInstalledEntry(GSList *vbl)
     GSList *elem;
     hrSWInstalledEntry_t *hrSWInstalledEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1};
 
     hrSWInstalledEntry = (hrSWInstalledEntry_t *) g_malloc0(sizeof(hrSWInstalledEntry_t) + sizeof(GSList *));
     if (! hrSWInstalledEntry) {
@@ -1394,6 +1451,9 @@ assign_hrSWInstalledEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
@@ -1422,14 +1482,14 @@ host_resources_mib_get_hrSWInstalledEntry(host_snmp *s, hrSWInstalledEntry_t ***
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1, 0};
 
     *hrSWInstalledEntry = NULL;
 
-    var[10] = 2; stls_vbl_add_null(&in, var, 11);
-    var[10] = 3; stls_vbl_add_null(&in, var, 11);
-    var[10] = 4; stls_vbl_add_null(&in, var, 11);
-    var[10] = 5; stls_vbl_add_null(&in, var, 11);
+    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    base[10] = 4; stls_vbl_add_null(&in, base, 11);
+    base[10] = 5; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

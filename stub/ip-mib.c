@@ -30,6 +30,7 @@ assign_ip(GSList *vbl)
     GSList *elem;
     ip_t *ip;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4};
 
     ip = (ip_t *) g_malloc0(sizeof(ip_t) + sizeof(GSList *));
     if (! ip) {
@@ -44,6 +45,9 @@ assign_ip(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 8 && vb->id[7] == 1) {
@@ -115,30 +119,30 @@ int
 ip_mib_get_ip(host_snmp *s, ip_t **ip)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 4, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 4, 0};
 
     *ip = NULL;
 
-    var[7] = 1; stls_vbl_add_null(&in, var, 8);
-    var[7] = 2; stls_vbl_add_null(&in, var, 8);
-    var[7] = 3; stls_vbl_add_null(&in, var, 8);
-    var[7] = 4; stls_vbl_add_null(&in, var, 8);
-    var[7] = 5; stls_vbl_add_null(&in, var, 8);
-    var[7] = 6; stls_vbl_add_null(&in, var, 8);
-    var[7] = 7; stls_vbl_add_null(&in, var, 8);
-    var[7] = 8; stls_vbl_add_null(&in, var, 8);
-    var[7] = 9; stls_vbl_add_null(&in, var, 8);
-    var[7] = 10; stls_vbl_add_null(&in, var, 8);
-    var[7] = 11; stls_vbl_add_null(&in, var, 8);
-    var[7] = 12; stls_vbl_add_null(&in, var, 8);
-    var[7] = 13; stls_vbl_add_null(&in, var, 8);
-    var[7] = 14; stls_vbl_add_null(&in, var, 8);
-    var[7] = 15; stls_vbl_add_null(&in, var, 8);
-    var[7] = 16; stls_vbl_add_null(&in, var, 8);
-    var[7] = 17; stls_vbl_add_null(&in, var, 8);
-    var[7] = 18; stls_vbl_add_null(&in, var, 8);
-    var[7] = 19; stls_vbl_add_null(&in, var, 8);
-    var[7] = 23; stls_vbl_add_null(&in, var, 8);
+    base[7] = 1; stls_vbl_add_null(&in, base, 8);
+    base[7] = 2; stls_vbl_add_null(&in, base, 8);
+    base[7] = 3; stls_vbl_add_null(&in, base, 8);
+    base[7] = 4; stls_vbl_add_null(&in, base, 8);
+    base[7] = 5; stls_vbl_add_null(&in, base, 8);
+    base[7] = 6; stls_vbl_add_null(&in, base, 8);
+    base[7] = 7; stls_vbl_add_null(&in, base, 8);
+    base[7] = 8; stls_vbl_add_null(&in, base, 8);
+    base[7] = 9; stls_vbl_add_null(&in, base, 8);
+    base[7] = 10; stls_vbl_add_null(&in, base, 8);
+    base[7] = 11; stls_vbl_add_null(&in, base, 8);
+    base[7] = 12; stls_vbl_add_null(&in, base, 8);
+    base[7] = 13; stls_vbl_add_null(&in, base, 8);
+    base[7] = 14; stls_vbl_add_null(&in, base, 8);
+    base[7] = 15; stls_vbl_add_null(&in, base, 8);
+    base[7] = 16; stls_vbl_add_null(&in, base, 8);
+    base[7] = 17; stls_vbl_add_null(&in, base, 8);
+    base[7] = 18; stls_vbl_add_null(&in, base, 8);
+    base[7] = 19; stls_vbl_add_null(&in, base, 8);
+    base[7] = 23; stls_vbl_add_null(&in, base, 8);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -171,6 +175,7 @@ assign_ipAddrEntry(GSList *vbl)
     GSList *elem;
     ipAddrEntry_t *ipAddrEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4, 20, 1};
 
     ipAddrEntry = (ipAddrEntry_t *) g_malloc0(sizeof(ipAddrEntry_t) + sizeof(GSList *));
     if (! ipAddrEntry) {
@@ -192,6 +197,9 @@ assign_ipAddrEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 10 && vb->id[9] == 2) {
@@ -217,14 +225,14 @@ ip_mib_get_ipAddrEntry(host_snmp *s, ipAddrEntry_t ***ipAddrEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 4, 20, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 4, 20, 1, 0};
 
     *ipAddrEntry = NULL;
 
-    var[9] = 2; stls_vbl_add_null(&in, var, 10);
-    var[9] = 3; stls_vbl_add_null(&in, var, 10);
-    var[9] = 4; stls_vbl_add_null(&in, var, 10);
-    var[9] = 5; stls_vbl_add_null(&in, var, 10);
+    base[9] = 2; stls_vbl_add_null(&in, base, 10);
+    base[9] = 3; stls_vbl_add_null(&in, base, 10);
+    base[9] = 4; stls_vbl_add_null(&in, base, 10);
+    base[9] = 5; stls_vbl_add_null(&in, base, 10);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -268,6 +276,7 @@ assign_ipNetToMediaEntry(GSList *vbl)
     GSList *elem;
     ipNetToMediaEntry_t *ipNetToMediaEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4, 22, 1};
 
     ipNetToMediaEntry = (ipNetToMediaEntry_t *) g_malloc0(sizeof(ipNetToMediaEntry_t) + sizeof(GSList *));
     if (! ipNetToMediaEntry) {
@@ -292,6 +301,9 @@ assign_ipNetToMediaEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
         if (vb->id_len > 10 && vb->id[9] == 2) {
             ipNetToMediaEntry->_ipNetToMediaPhysAddressLength = vb->syntax_len;
             ipNetToMediaEntry->ipNetToMediaPhysAddress = vb->syntax.uc;
@@ -310,12 +322,12 @@ ip_mib_get_ipNetToMediaEntry(host_snmp *s, ipNetToMediaEntry_t ***ipNetToMediaEn
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 4, 22, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 4, 22, 1, 0};
 
     *ipNetToMediaEntry = NULL;
 
-    var[9] = 2; stls_vbl_add_null(&in, var, 10);
-    var[9] = 4; stls_vbl_add_null(&in, var, 10);
+    base[9] = 2; stls_vbl_add_null(&in, base, 10);
+    base[9] = 4; stls_vbl_add_null(&in, base, 10);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -359,6 +371,7 @@ assign_icmp(GSList *vbl)
     GSList *elem;
     icmp_t *icmp;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 5};
 
     icmp = (icmp_t *) g_malloc0(sizeof(icmp_t) + sizeof(GSList *));
     if (! icmp) {
@@ -373,6 +386,9 @@ assign_icmp(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 8 && vb->id[7] == 1) {
@@ -462,36 +478,36 @@ int
 ip_mib_get_icmp(host_snmp *s, icmp_t **icmp)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 5, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 5, 0};
 
     *icmp = NULL;
 
-    var[7] = 1; stls_vbl_add_null(&in, var, 8);
-    var[7] = 2; stls_vbl_add_null(&in, var, 8);
-    var[7] = 3; stls_vbl_add_null(&in, var, 8);
-    var[7] = 4; stls_vbl_add_null(&in, var, 8);
-    var[7] = 5; stls_vbl_add_null(&in, var, 8);
-    var[7] = 6; stls_vbl_add_null(&in, var, 8);
-    var[7] = 7; stls_vbl_add_null(&in, var, 8);
-    var[7] = 8; stls_vbl_add_null(&in, var, 8);
-    var[7] = 9; stls_vbl_add_null(&in, var, 8);
-    var[7] = 10; stls_vbl_add_null(&in, var, 8);
-    var[7] = 11; stls_vbl_add_null(&in, var, 8);
-    var[7] = 12; stls_vbl_add_null(&in, var, 8);
-    var[7] = 13; stls_vbl_add_null(&in, var, 8);
-    var[7] = 14; stls_vbl_add_null(&in, var, 8);
-    var[7] = 15; stls_vbl_add_null(&in, var, 8);
-    var[7] = 16; stls_vbl_add_null(&in, var, 8);
-    var[7] = 17; stls_vbl_add_null(&in, var, 8);
-    var[7] = 18; stls_vbl_add_null(&in, var, 8);
-    var[7] = 19; stls_vbl_add_null(&in, var, 8);
-    var[7] = 20; stls_vbl_add_null(&in, var, 8);
-    var[7] = 21; stls_vbl_add_null(&in, var, 8);
-    var[7] = 22; stls_vbl_add_null(&in, var, 8);
-    var[7] = 23; stls_vbl_add_null(&in, var, 8);
-    var[7] = 24; stls_vbl_add_null(&in, var, 8);
-    var[7] = 25; stls_vbl_add_null(&in, var, 8);
-    var[7] = 26; stls_vbl_add_null(&in, var, 8);
+    base[7] = 1; stls_vbl_add_null(&in, base, 8);
+    base[7] = 2; stls_vbl_add_null(&in, base, 8);
+    base[7] = 3; stls_vbl_add_null(&in, base, 8);
+    base[7] = 4; stls_vbl_add_null(&in, base, 8);
+    base[7] = 5; stls_vbl_add_null(&in, base, 8);
+    base[7] = 6; stls_vbl_add_null(&in, base, 8);
+    base[7] = 7; stls_vbl_add_null(&in, base, 8);
+    base[7] = 8; stls_vbl_add_null(&in, base, 8);
+    base[7] = 9; stls_vbl_add_null(&in, base, 8);
+    base[7] = 10; stls_vbl_add_null(&in, base, 8);
+    base[7] = 11; stls_vbl_add_null(&in, base, 8);
+    base[7] = 12; stls_vbl_add_null(&in, base, 8);
+    base[7] = 13; stls_vbl_add_null(&in, base, 8);
+    base[7] = 14; stls_vbl_add_null(&in, base, 8);
+    base[7] = 15; stls_vbl_add_null(&in, base, 8);
+    base[7] = 16; stls_vbl_add_null(&in, base, 8);
+    base[7] = 17; stls_vbl_add_null(&in, base, 8);
+    base[7] = 18; stls_vbl_add_null(&in, base, 8);
+    base[7] = 19; stls_vbl_add_null(&in, base, 8);
+    base[7] = 20; stls_vbl_add_null(&in, base, 8);
+    base[7] = 21; stls_vbl_add_null(&in, base, 8);
+    base[7] = 22; stls_vbl_add_null(&in, base, 8);
+    base[7] = 23; stls_vbl_add_null(&in, base, 8);
+    base[7] = 24; stls_vbl_add_null(&in, base, 8);
+    base[7] = 25; stls_vbl_add_null(&in, base, 8);
+    base[7] = 26; stls_vbl_add_null(&in, base, 8);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);

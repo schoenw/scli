@@ -37,6 +37,7 @@ assign_entPhysicalEntry(GSList *vbl)
     GSList *elem;
     entPhysicalEntry_t *entPhysicalEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1};
 
     entPhysicalEntry = (entPhysicalEntry_t *) g_malloc0(sizeof(entPhysicalEntry_t) + sizeof(GSList *));
     if (! entPhysicalEntry) {
@@ -58,6 +59,9 @@ assign_entPhysicalEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 12 && vb->id[11] == 2) {
@@ -127,25 +131,25 @@ entity_mib_get_entPhysicalEntry(host_snmp *s, entPhysicalEntry_t ***entPhysicalE
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 0};
 
     *entPhysicalEntry = NULL;
 
-    var[11] = 2; stls_vbl_add_null(&in, var, 12);
-    var[11] = 3; stls_vbl_add_null(&in, var, 12);
-    var[11] = 4; stls_vbl_add_null(&in, var, 12);
-    var[11] = 5; stls_vbl_add_null(&in, var, 12);
-    var[11] = 6; stls_vbl_add_null(&in, var, 12);
-    var[11] = 7; stls_vbl_add_null(&in, var, 12);
-    var[11] = 8; stls_vbl_add_null(&in, var, 12);
-    var[11] = 9; stls_vbl_add_null(&in, var, 12);
-    var[11] = 10; stls_vbl_add_null(&in, var, 12);
-    var[11] = 11; stls_vbl_add_null(&in, var, 12);
-    var[11] = 12; stls_vbl_add_null(&in, var, 12);
-    var[11] = 13; stls_vbl_add_null(&in, var, 12);
-    var[11] = 14; stls_vbl_add_null(&in, var, 12);
-    var[11] = 15; stls_vbl_add_null(&in, var, 12);
-    var[11] = 16; stls_vbl_add_null(&in, var, 12);
+    base[11] = 2; stls_vbl_add_null(&in, base, 12);
+    base[11] = 3; stls_vbl_add_null(&in, base, 12);
+    base[11] = 4; stls_vbl_add_null(&in, base, 12);
+    base[11] = 5; stls_vbl_add_null(&in, base, 12);
+    base[11] = 6; stls_vbl_add_null(&in, base, 12);
+    base[11] = 7; stls_vbl_add_null(&in, base, 12);
+    base[11] = 8; stls_vbl_add_null(&in, base, 12);
+    base[11] = 9; stls_vbl_add_null(&in, base, 12);
+    base[11] = 10; stls_vbl_add_null(&in, base, 12);
+    base[11] = 11; stls_vbl_add_null(&in, base, 12);
+    base[11] = 12; stls_vbl_add_null(&in, base, 12);
+    base[11] = 13; stls_vbl_add_null(&in, base, 12);
+    base[11] = 14; stls_vbl_add_null(&in, base, 12);
+    base[11] = 15; stls_vbl_add_null(&in, base, 12);
+    base[11] = 16; stls_vbl_add_null(&in, base, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -189,6 +193,7 @@ assign_entLogicalEntry(GSList *vbl)
     GSList *elem;
     entLogicalEntry_t *entLogicalEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1};
 
     entLogicalEntry = (entLogicalEntry_t *) g_malloc0(sizeof(entLogicalEntry_t) + sizeof(GSList *));
     if (! entLogicalEntry) {
@@ -210,6 +215,9 @@ assign_entLogicalEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 12 && vb->id[11] == 2) {
@@ -251,17 +259,17 @@ entity_mib_get_entLogicalEntry(host_snmp *s, entLogicalEntry_t ***entLogicalEntr
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1, 0};
 
     *entLogicalEntry = NULL;
 
-    var[11] = 2; stls_vbl_add_null(&in, var, 12);
-    var[11] = 3; stls_vbl_add_null(&in, var, 12);
-    var[11] = 4; stls_vbl_add_null(&in, var, 12);
-    var[11] = 5; stls_vbl_add_null(&in, var, 12);
-    var[11] = 6; stls_vbl_add_null(&in, var, 12);
-    var[11] = 7; stls_vbl_add_null(&in, var, 12);
-    var[11] = 8; stls_vbl_add_null(&in, var, 12);
+    base[11] = 2; stls_vbl_add_null(&in, base, 12);
+    base[11] = 3; stls_vbl_add_null(&in, base, 12);
+    base[11] = 4; stls_vbl_add_null(&in, base, 12);
+    base[11] = 5; stls_vbl_add_null(&in, base, 12);
+    base[11] = 6; stls_vbl_add_null(&in, base, 12);
+    base[11] = 7; stls_vbl_add_null(&in, base, 12);
+    base[11] = 8; stls_vbl_add_null(&in, base, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -305,6 +313,7 @@ assign_entLPMappingEntry(GSList *vbl)
     GSList *elem;
     entLPMappingEntry_t *entLPMappingEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 1, 1};
 
     entLPMappingEntry = (entLPMappingEntry_t *) g_malloc0(sizeof(entLPMappingEntry_t) + sizeof(GSList *));
     if (! entLPMappingEntry) {
@@ -329,6 +338,9 @@ assign_entLPMappingEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
     }
 
     return entLPMappingEntry;
@@ -340,7 +352,7 @@ entity_mib_get_entLPMappingEntry(host_snmp *s, entLPMappingEntry_t ***entLPMappi
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 1, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 1, 1, 0};
 
     *entLPMappingEntry = NULL;
 
@@ -387,6 +399,7 @@ assign_entAliasMappingEntry(GSList *vbl)
     GSList *elem;
     entAliasMappingEntry_t *entAliasMappingEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 2, 1};
 
     entAliasMappingEntry = (entAliasMappingEntry_t *) g_malloc0(sizeof(entAliasMappingEntry_t) + sizeof(GSList *));
     if (! entAliasMappingEntry) {
@@ -411,6 +424,9 @@ assign_entAliasMappingEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
         if (vb->id_len > 12 && vb->id[11] == 2) {
             entAliasMappingEntry->_entAliasMappingIdentifierLength = vb->syntax_len / sizeof(guint32);
             entAliasMappingEntry->entAliasMappingIdentifier = vb->syntax.ui32;
@@ -426,11 +442,11 @@ entity_mib_get_entAliasMappingEntry(host_snmp *s, entAliasMappingEntry_t ***entA
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 2, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 2, 1, 0};
 
     *entAliasMappingEntry = NULL;
 
-    var[11] = 2; stls_vbl_add_null(&in, var, 12);
+    base[11] = 2; stls_vbl_add_null(&in, base, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -474,6 +490,7 @@ assign_entPhysicalContainsEntry(GSList *vbl)
     GSList *elem;
     entPhysicalContainsEntry_t *entPhysicalContainsEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 3, 1};
 
     entPhysicalContainsEntry = (entPhysicalContainsEntry_t *) g_malloc0(sizeof(entPhysicalContainsEntry_t) + sizeof(GSList *));
     if (! entPhysicalContainsEntry) {
@@ -498,6 +515,9 @@ assign_entPhysicalContainsEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
     }
 
     return entPhysicalContainsEntry;
@@ -509,7 +529,7 @@ entity_mib_get_entPhysicalContainsEntry(host_snmp *s, entPhysicalContainsEntry_t
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 3, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 3, 1, 0};
 
     *entPhysicalContainsEntry = NULL;
 
@@ -556,6 +576,7 @@ assign_entityGeneral(GSList *vbl)
     GSList *elem;
     entityGeneral_t *entityGeneral;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 4};
 
     entityGeneral = (entityGeneral_t *) g_malloc0(sizeof(entityGeneral_t) + sizeof(GSList *));
     if (! entityGeneral) {
@@ -572,6 +593,9 @@ assign_entityGeneral(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
         if (vb->id_len > 10 && vb->id[9] == 1) {
             entityGeneral->entLastChangeTime = &(vb->syntax.ui32[0]);
         }
@@ -584,11 +608,11 @@ int
 entity_mib_get_entityGeneral(host_snmp *s, entityGeneral_t **entityGeneral)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 47, 1, 4, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 47, 1, 4, 0};
 
     *entityGeneral = NULL;
 
-    var[9] = 1; stls_vbl_add_null(&in, var, 10);
+    base[9] = 1; stls_vbl_add_null(&in, base, 10);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);

@@ -141,6 +141,7 @@ assign_smLangEntry(GSList *vbl)
     GSList *elem;
     smLangEntry_t *smLangEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1};
 
     smLangEntry = (smLangEntry_t *) g_malloc0(sizeof(smLangEntry_t) + sizeof(GSList *));
     if (! smLangEntry) {
@@ -162,6 +163,9 @@ assign_smLangEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
@@ -195,15 +199,15 @@ disman_script_mib_get_smLangEntry(host_snmp *s, smLangEntry_t ***smLangEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1, 0};
 
     *smLangEntry = NULL;
 
-    var[10] = 2; stls_vbl_add_null(&in, var, 11);
-    var[10] = 3; stls_vbl_add_null(&in, var, 11);
-    var[10] = 4; stls_vbl_add_null(&in, var, 11);
-    var[10] = 5; stls_vbl_add_null(&in, var, 11);
-    var[10] = 6; stls_vbl_add_null(&in, var, 11);
+    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    base[10] = 4; stls_vbl_add_null(&in, base, 11);
+    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    base[10] = 6; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -247,6 +251,7 @@ assign_smExtsnEntry(GSList *vbl)
     GSList *elem;
     smExtsnEntry_t *smExtsnEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1};
 
     smExtsnEntry = (smExtsnEntry_t *) g_malloc0(sizeof(smExtsnEntry_t) + sizeof(GSList *));
     if (! smExtsnEntry) {
@@ -269,6 +274,9 @@ assign_smExtsnEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
@@ -302,15 +310,15 @@ disman_script_mib_get_smExtsnEntry(host_snmp *s, smExtsnEntry_t ***smExtsnEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1, 0};
 
     *smExtsnEntry = NULL;
 
-    var[10] = 2; stls_vbl_add_null(&in, var, 11);
-    var[10] = 3; stls_vbl_add_null(&in, var, 11);
-    var[10] = 4; stls_vbl_add_null(&in, var, 11);
-    var[10] = 5; stls_vbl_add_null(&in, var, 11);
-    var[10] = 6; stls_vbl_add_null(&in, var, 11);
+    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    base[10] = 4; stls_vbl_add_null(&in, base, 11);
+    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    base[10] = 6; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -354,6 +362,7 @@ assign_smScriptEntry(GSList *vbl)
     GSList *elem;
     smScriptEntry_t *smScriptEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1};
 
     smScriptEntry = (smScriptEntry_t *) g_malloc0(sizeof(smScriptEntry_t) + sizeof(GSList *));
     if (! smScriptEntry) {
@@ -376,6 +385,9 @@ assign_smScriptEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 12 && vb->id[11] == 3) {
@@ -412,17 +424,17 @@ disman_script_mib_get_smScriptEntry(host_snmp *s, smScriptEntry_t ***smScriptEnt
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 0};
 
     *smScriptEntry = NULL;
 
-    var[11] = 3; stls_vbl_add_null(&in, var, 12);
-    var[11] = 4; stls_vbl_add_null(&in, var, 12);
-    var[11] = 5; stls_vbl_add_null(&in, var, 12);
-    var[11] = 6; stls_vbl_add_null(&in, var, 12);
-    var[11] = 7; stls_vbl_add_null(&in, var, 12);
-    var[11] = 8; stls_vbl_add_null(&in, var, 12);
-    var[11] = 9; stls_vbl_add_null(&in, var, 12);
+    base[11] = 3; stls_vbl_add_null(&in, base, 12);
+    base[11] = 4; stls_vbl_add_null(&in, base, 12);
+    base[11] = 5; stls_vbl_add_null(&in, base, 12);
+    base[11] = 6; stls_vbl_add_null(&in, base, 12);
+    base[11] = 7; stls_vbl_add_null(&in, base, 12);
+    base[11] = 8; stls_vbl_add_null(&in, base, 12);
+    base[11] = 9; stls_vbl_add_null(&in, base, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -466,6 +478,7 @@ assign_smCodeEntry(GSList *vbl)
     GSList *elem;
     smCodeEntry_t *smCodeEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 2, 1};
 
     smCodeEntry = (smCodeEntry_t *) g_malloc0(sizeof(smCodeEntry_t) + sizeof(GSList *));
     if (! smCodeEntry) {
@@ -491,6 +504,9 @@ assign_smCodeEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
+            continue;
+        }
         if (vb->id_len > 12 && vb->id[11] == 2) {
             smCodeEntry->_smCodeTextLength = vb->syntax_len;
             smCodeEntry->smCodeText = vb->syntax.uc;
@@ -509,12 +525,12 @@ disman_script_mib_get_smCodeEntry(host_snmp *s, smCodeEntry_t ***smCodeEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 2, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 2, 1, 0};
 
     *smCodeEntry = NULL;
 
-    var[11] = 2; stls_vbl_add_null(&in, var, 12);
-    var[11] = 3; stls_vbl_add_null(&in, var, 12);
+    base[11] = 2; stls_vbl_add_null(&in, base, 12);
+    base[11] = 3; stls_vbl_add_null(&in, base, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -558,6 +574,7 @@ assign_smLaunchEntry(GSList *vbl)
     GSList *elem;
     smLaunchEntry_t *smLaunchEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1};
 
     smLaunchEntry = (smLaunchEntry_t *) g_malloc0(sizeof(smLaunchEntry_t) + sizeof(GSList *));
     if (! smLaunchEntry) {
@@ -580,6 +597,9 @@ assign_smLaunchEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 12 && vb->id[11] == 3) {
@@ -638,24 +658,24 @@ disman_script_mib_get_smLaunchEntry(host_snmp *s, smLaunchEntry_t ***smLaunchEnt
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 0};
 
     *smLaunchEntry = NULL;
 
-    var[11] = 3; stls_vbl_add_null(&in, var, 12);
-    var[11] = 4; stls_vbl_add_null(&in, var, 12);
-    var[11] = 5; stls_vbl_add_null(&in, var, 12);
-    var[11] = 6; stls_vbl_add_null(&in, var, 12);
-    var[11] = 7; stls_vbl_add_null(&in, var, 12);
-    var[11] = 8; stls_vbl_add_null(&in, var, 12);
-    var[11] = 9; stls_vbl_add_null(&in, var, 12);
-    var[11] = 10; stls_vbl_add_null(&in, var, 12);
-    var[11] = 11; stls_vbl_add_null(&in, var, 12);
-    var[11] = 12; stls_vbl_add_null(&in, var, 12);
-    var[11] = 13; stls_vbl_add_null(&in, var, 12);
-    var[11] = 14; stls_vbl_add_null(&in, var, 12);
-    var[11] = 15; stls_vbl_add_null(&in, var, 12);
-    var[11] = 16; stls_vbl_add_null(&in, var, 12);
+    base[11] = 3; stls_vbl_add_null(&in, base, 12);
+    base[11] = 4; stls_vbl_add_null(&in, base, 12);
+    base[11] = 5; stls_vbl_add_null(&in, base, 12);
+    base[11] = 6; stls_vbl_add_null(&in, base, 12);
+    base[11] = 7; stls_vbl_add_null(&in, base, 12);
+    base[11] = 8; stls_vbl_add_null(&in, base, 12);
+    base[11] = 9; stls_vbl_add_null(&in, base, 12);
+    base[11] = 10; stls_vbl_add_null(&in, base, 12);
+    base[11] = 11; stls_vbl_add_null(&in, base, 12);
+    base[11] = 12; stls_vbl_add_null(&in, base, 12);
+    base[11] = 13; stls_vbl_add_null(&in, base, 12);
+    base[11] = 14; stls_vbl_add_null(&in, base, 12);
+    base[11] = 15; stls_vbl_add_null(&in, base, 12);
+    base[11] = 16; stls_vbl_add_null(&in, base, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -699,6 +719,7 @@ assign_smRunEntry(GSList *vbl)
     GSList *elem;
     smRunEntry_t *smRunEntry;
     char *p;
+    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1};
 
     smRunEntry = (smRunEntry_t *) g_malloc0(sizeof(smRunEntry_t) + sizeof(GSList *));
     if (! smRunEntry) {
@@ -722,6 +743,9 @@ assign_smRunEntry(GSList *vbl)
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+            continue;
+        }
+        if (memcmp(vb->id, base, sizeof(base)) != 0) {
             continue;
         }
         if (vb->id_len > 12 && vb->id[11] == 2) {
@@ -770,20 +794,20 @@ disman_script_mib_get_smRunEntry(host_snmp *s, smRunEntry_t ***smRunEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
-    static guint32 var[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 0};
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 0};
 
     *smRunEntry = NULL;
 
-    var[11] = 2; stls_vbl_add_null(&in, var, 12);
-    var[11] = 3; stls_vbl_add_null(&in, var, 12);
-    var[11] = 4; stls_vbl_add_null(&in, var, 12);
-    var[11] = 5; stls_vbl_add_null(&in, var, 12);
-    var[11] = 6; stls_vbl_add_null(&in, var, 12);
-    var[11] = 7; stls_vbl_add_null(&in, var, 12);
-    var[11] = 8; stls_vbl_add_null(&in, var, 12);
-    var[11] = 9; stls_vbl_add_null(&in, var, 12);
-    var[11] = 10; stls_vbl_add_null(&in, var, 12);
-    var[11] = 11; stls_vbl_add_null(&in, var, 12);
+    base[11] = 2; stls_vbl_add_null(&in, base, 12);
+    base[11] = 3; stls_vbl_add_null(&in, base, 12);
+    base[11] = 4; stls_vbl_add_null(&in, base, 12);
+    base[11] = 5; stls_vbl_add_null(&in, base, 12);
+    base[11] = 6; stls_vbl_add_null(&in, base, 12);
+    base[11] = 7; stls_vbl_add_null(&in, base, 12);
+    base[11] = 8; stls_vbl_add_null(&in, base, 12);
+    base[11] = 9; stls_vbl_add_null(&in, base, 12);
+    base[11] = 10; stls_vbl_add_null(&in, base, 12);
+    base[11] = 11; stls_vbl_add_null(&in, base, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
