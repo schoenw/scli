@@ -135,8 +135,8 @@ show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (ipCidrRouteTable || ipRouteTable) {
-	if_mib_get_ifTable(interp->peer, &ifTable, 0);
-	if_mib_get_ifXTable(interp->peer, &ifXTable, 0);
+	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFNAME);
 	g_string_sprintfa(interp->header, "%-20s%-16s%-10s%-10s%s",
 		  "DESTINATION", "NEXT HOP", "TYPE", "PROTO", "INTERFACE");
 	if (ipCidrRouteTable) {
@@ -366,8 +366,8 @@ show_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
     }
     
     if (tunnelIfTable) {
-	if_mib_get_ifTable(interp->peer, &ifTable, 0);
-	if_mib_get_ifXTable(interp->peer, &ifXTable, 0);
+	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFNAME);
 	g_string_append(interp->header,
 	"LOCAL ADDRESS    REMOTE ADDRESS   TYPE    SEC.  TTL TOS INTERFACE");
 	for (i = 0; tunnelIfTable[i]; i++) {
@@ -451,7 +451,7 @@ show_ip_mapping(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (ipNetToMediaTable) {
-	if_mib_get_ifTable(interp->peer, &ifTable, 0);
+	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFTYPE);
 	g_string_append(interp->header,
 		"INTERFACE STATUS   ADDRESS          LOWER LAYER ADDRESS");
 	for (i = 0; ipNetToMediaTable[i]; i++) {
@@ -460,7 +460,9 @@ show_ip_mapping(scli_interp_t *interp, int argc, char **argv)
 		    if (ipNetToMediaTable[i]->ipNetToMediaIfIndex
 			== ifTable[j]->ifIndex) break;
 		}
-		ifEntry = ifTable[j];
+		if (ifTable[j]) {
+		    ifEntry = ifTable[j];
+		}
 	    }
 	    fmt_ip_mapping(interp->result, ipNetToMediaTable[i], ifEntry);
 	}

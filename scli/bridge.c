@@ -258,8 +258,10 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
-    if_mib_get_ifTable(interp->peer, &ifTable, 0);
-    if_mib_get_ifXTable(interp->peer, &ifXTable, 0);
+    if_mib_get_ifTable(interp->peer, &ifTable,
+		       IF_MIB_IFTYPE | IF_MIB_IFSPEED | IF_MIB_IFDESCR);
+    if_mib_get_ifXTable(interp->peer, &ifXTable,
+			IF_MIB_IFNAME | IF_MIB_IFHIGHSPEED);
     
     if (dot1dBasePortTable) {
 	for (i = 0; ifTable[i]; i++) {
@@ -557,35 +559,32 @@ typedef struct {
 static char*
 get_port_description(scli_interp_t *interp, gint32 dot1dTpPort)
 {
-    bridge_mib_dot1dBasePortEntry_t **dot1dBasePortTable = NULL;
-    if_mib_ifEntry_t **ifTable = NULL;
-    int i, j;
+    bridge_mib_dot1dBasePortEntry_t *dot1dBasePortEntry = NULL;
+    if_mib_ifEntry_t *ifEntry = NULL;
+    char *descr = NULL;
 
-    bridge_mib_get_dot1dBasePortTable(interp->peer, &dot1dBasePortTable,
-				      BRIDGE_MIB_DOT1DBASEPORT
-				      | BRIDGE_MIB_DOT1DBASEPORTIFINDEX);
+    bridge_mib_get_dot1dBasePortEntry(interp->peer, &dot1dBasePortEntry,
+				      dot1dTpPort,
+				      BRIDGE_MIB_DOT1DBASEPORTIFINDEX);
     if (interp->peer->error_status) {
 	return NULL;
     }
 
-    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFINDEX | IF_MIB_IFDESCR);
-    if (interp->peer->error_status) {
-	return NULL;
-    }
-
-    for (i = 0; dot1dBasePortTable[i]; i++) {
-	if (dot1dBasePortTable[i]->dot1dBasePort == dot1dTpPort
-	    && dot1dBasePortTable[i]->dot1dBasePortIfIndex) {
-	    for (j = 0; ifTable[j]; j++) {
-		if (ifTable[j]->ifIndex
-		    == *dot1dBasePortTable[i]->dot1dBasePortIfIndex) {
-		    return g_strdup_printf("%.*s", ifTable[j]->_ifDescrLength, ifTable[j]->ifDescr);
-		}
-	    }
+    if (dot1dBasePortEntry && dot1dBasePortEntry->dot1dBasePortIfIndex) {
+	if_mib_get_ifEntry(interp->peer, &ifEntry,
+			   *dot1dBasePortEntry->dot1dBasePortIfIndex,
+			   IF_MIB_IFDESCR);
+	if (! interp->peer->error_status && ifEntry) {
+	    descr = g_strdup_printf("%.*s", ifEntry->_ifDescrLength,
+				    ifEntry->ifDescr);
 	}
     }
+
+    if (ifEntry) if_mib_free_ifEntry(ifEntry);
+    if (dot1dBasePortEntry)
+	bridge_mib_free_dot1dBasePortEntry(dot1dBasePortEntry);
     
-    return NULL;
+    return descr;
 }
 
 
