@@ -45,26 +45,27 @@ g_snmp_table_done_callback(host_snmp *host, gpointer data,
     {
       obj  = (GSnmpVarBind *) g_slist_nth_data(table->objs, i);
       cobj = (GSnmpVarBind *) g_slist_nth_data(objs, i);
-      if (!memcmp (cobj->id, obj->id, obj->id_len * sizeof (gulong)))
+      if (cobj->id_len >= obj->id_len
+	  && !memcmp (cobj->id, obj->id, obj->id_len * sizeof (guint32)))
         {
           if (!index_len)
             {
               index_len = cobj->id_len - obj->id_len;
               g_memmove(index, cobj->id+obj->id_len, 
-                        index_len * sizeof (gulong));
+                        index_len * sizeof (guint32));
             }
           else
             {
               if ((j=memcmp(index, cobj->id+obj->id_len, 
                             MIN(index_len, cobj->id_len - obj->id_len)
-                            * sizeof (gulong))))
+                            * sizeof (guint32))))
                 {
 		    /* g_warning("Non-regular SNMP table"); (js) */
                   if (j>0)
                     {
                        index_len = cobj->id_len - obj->id_len;
                        g_memmove(index, cobj->id+obj->id_len,
-                                 index_len * sizeof (gulong));
+                                 index_len * sizeof (guint32));
                     }
                 }
               if (cobj->id_len - obj->id_len < index_len)
@@ -91,11 +92,11 @@ g_snmp_table_done_callback(host_snmp *host, gpointer data,
     {
       obj  = (GSnmpVarBind *) g_slist_nth_data(table->objs, i);
       cobj = (GSnmpVarBind *) g_slist_nth_data(objs, i);
-      if (!memcmp (cobj->id, obj->id, obj->id_len * sizeof (gulong)))
+      if (!memcmp (cobj->id, obj->id, obj->id_len * sizeof (guint32)))
         {
           if (cobj->id_len - obj->id_len == index_len)
             if (!memcmp(cobj->id + obj->id_len, index, 
-                        index_len * sizeof (gulong)))
+                        index_len * sizeof (guint32)))
               {
                 p = g_malloc(sizeof(int));
                 *p = i;
@@ -106,9 +107,9 @@ g_snmp_table_done_callback(host_snmp *host, gpointer data,
       nobj->type       = G_SNMP_NULL;
       nobj->syntax_len = 0;
       nobj->id_len     = obj->id_len + index_len;
-      nobj->id         = g_malloc(nobj->id_len * sizeof(gulong));
-      g_memmove (nobj->id, obj->id, obj->id_len * sizeof(gulong));
-      g_memmove (nobj->id + obj->id_len, index, index_len * sizeof(gulong));
+      nobj->id         = g_malloc(nobj->id_len * sizeof(guint32));
+      g_memmove (nobj->id, obj->id, obj->id_len * sizeof(guint32));
+      g_memmove (nobj->id + obj->id_len, index, index_len * sizeof(guint32));
       nobjs            = g_slist_append(nobjs, nobj);
     }
   if (table->cb_row)
