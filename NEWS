@@ -1,3 +1,9 @@
+Changes in stools 0.1.19:
+
+- scli supports a new printer mode
+- scli now supports multiple "show scli" commands
+- minor bug fixes
+
 Changes in stools 0.1.18:
 
 - scli supports a new ospf mode
