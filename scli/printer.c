@@ -181,12 +181,12 @@ lookup_media_name(gint32 dir, gint32 xdir, gint32 unit)
 	 switch (unit) {
 	 case MICROMETERS:
 	      g_snprintf(buffer, sizeof(buffer), "%.3f x %.3f mm",
-			 x / 1000.0, y / 1000.0);
+			 dir / 1000.0, xdir / 1000.0);
 	      name = buffer;
 	      break;
 	 case TENTHOUSANDTHSOFINCHES:
 	      g_snprintf(buffer, sizeof(buffer), "%.3f x %.3f in",
-			 x / 10000.0, y / 10000.0);
+			 dir / 10000.0, xdir / 10000.0);
 	      name = buffer;
 	      break;
 	 }
@@ -2605,9 +2605,9 @@ fmt_printer_channel(GString *s,
 	g_string_sprintfa(s, "%-*s %s\n", indent, "State:", e);
     }
 
-    if (channelEntry->prtChannelIndex) {
+    if (channelEntry->prtChannelIfIndex) {
 	g_string_sprintfa(s, "%-*s %d\n", indent, "Interface:",
-			  *channelEntry->prtChannelIfIndex);
+			 *channelEntry->prtChannelIfIndex);
     }
     
     if (channelEntry->prtChannelCurrentJobCntlLangIndex) {
@@ -2678,7 +2678,7 @@ xml_printer_channel(xmlNodePtr root,
 	(void) xml_new_child(tree, NULL, "state", "%s", e);
     }
 
-    if (channelEntry->prtChannelIndex) {
+    if (channelEntry->prtChannelIfIndex) {
 	(void) xml_new_child(tree, NULL, "interface", "%d",
 			     *channelEntry->prtChannelIfIndex);
     }
