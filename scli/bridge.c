@@ -139,23 +139,23 @@ fmt_bridge_stp_info(GString *s,
     }
 
     if (dot1dStp->dot1dStpMaxAge) {
-	g_string_sprintfa(s, "%-*s%d0 milliseconds\n", indent,
-			  "Stp Aging Time:", *dot1dStp->dot1dStpMaxAge);
+	g_string_sprintfa(s, "%-*s%d milliseconds\n", indent,
+			  "Stp Aging Time:", *dot1dStp->dot1dStpMaxAge * 10);
     }
 
     if (dot1dStp->dot1dStpHelloTime) {
-	g_string_sprintfa(s, "%-*s%d0 milliseconds\n", indent,
-			  "Stp Hello Time:", *dot1dStp->dot1dStpHelloTime);
+	g_string_sprintfa(s, "%-*s%d milliseconds\n", indent,
+			  "Stp Hello Time:", *dot1dStp->dot1dStpHelloTime * 10);
     }
 
     if (dot1dStp->dot1dStpHoldTime) {
-	g_string_sprintfa(s, "%-*s%d0 milliseconds\n", indent,
-			  "Stp Hold  Time:", *dot1dStp->dot1dStpHoldTime);
+	g_string_sprintfa(s, "%-*s%d milliseconds\n", indent,
+			  "Stp Hold  Time:", *dot1dStp->dot1dStpHoldTime * 10);
     }
 
     if (dot1dStp->dot1dStpForwardDelay) {
-	g_string_sprintfa(s, "%-*s%d0 milliseconds\n", indent,
-			  "Stp Fwd Delay:", *dot1dStp->dot1dStpForwardDelay);
+	g_string_sprintfa(s, "%-*s%d milliseconds\n", indent,
+			  "Stp Fwd Delay:", *dot1dStp->dot1dStpForwardDelay * 10);
     }
 
     if (dot1dStp->dot1dStpTimeSinceTopologyChange) {
