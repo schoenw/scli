@@ -115,7 +115,7 @@ designed to be read by programs rather than humans.
 
 The tools contained in the @code{stools} package are designed to be
 specific rather than generic. In other words, the tools are designed to
-understand the data they are manipulated. It is not uncommon that the
+understand the data they are manipulating. It is not uncommon that the
 tools use information from different MIB modules in order to display
 data in a format which is easy to understand for human beings.
 
@@ -129,27 +129,27 @@ The @code{stools} package was written because of the author's continued
 frustration about how complex it is to configure and troubleshoot SNMP
 manageable devices. In fact, the author tried several approaches to
 tackle this problem before. In the 1990's, I did some work on scripting
-language API extensions do simplify the interaction with networked
+language API extensions to simplify the interaction with networked
 devices. The result of these efforts was the Tnm extension for Tcl [],
-which is been widely deployed these days, especially for testing and
+which is widely deployed these days, especially for testing and
 device emulation purposes.
 
 In the 1990's, I also followed the network management platform idea
 and wrote tkined, which is some kind of a light-weight management
 platform. It provides generic services and is highly extensible. All
 you need to do is to write a Tcl script in order to implement new
-management functionailies. Although this sounds nice in principle, the
+management functionalities. Although this sounds nice in principle, the
 reality is that most people do not want to write management scripts.
 Although the package has been openly available for many years, only
 few script contributions went back into the source distribution.
 
 I also wrote several generic MIB browsers. A very old one is still
 running on our Web server and being used regularly by people to
-browser MIBs and agents. But even with this Web-based solution, I an
+browse MIBs and agents. But even with this Web-based solution, I am
 personally not very happy. I just do not want to fire up a complex Web
-browser just to look at (potentially big) HTML page which display data
+browser just to look at (potentially big) HTML pages which display data
 at the abstraction level of an API between elements in a distributed
-system. Nobody would like to look at raw data in a CORBA based
+system. Similarly, nobody would like to look at raw data in a CORBA based
 environment - except people who need to debug such systems.
 
 In the last years, I was involved in the specification and
@@ -158,12 +158,12 @@ functions. Very early in the project, it became clear that we need to
 have a good front-end. Again, we tried several approaches. The first
 one was a Java based applet running in a Web browser. This was usable
 for demos, but nothing for everyday work. The second front-end was a
-Java stand-alone program. It provides a better user interface. But it
+Java stand-alone program. It provides a better user interface, but it
 eats up so many resources (and refuses to run on my 256 color display)
 so that people again used the old Web-based solution I wrote years
 ago.
 
-So I started to think what is wrong with all this and I came to the
+So I started to think what is wrong with all these tools and I came to the
 conclusion that the approach to build generic tools is fundamentally
 flawed. Instead, it is necessary to build very specific tools and
 representations. But how can this be done efficiently if the available
@@ -179,17 +179,17 @@ resources are limited?
 @cindex getting help
 
 It is only possible to build specific tools rather than generic tools
-by investing lots of time. Someone who understand specific MIBs must
+by investing lots of time. Someone who understands specific MIBs must
 design highly usable management interfaces on top of them. The only
 reasonable way to tackle this is to start an open source project and
 to get lots of programmers involved. This leads to the requirement
-that the source code must be modular so that specific extension for
+that the source code must be modular so that specific extensions for
 e.g. modem management can be easily integrated.
 
 However, my experience with past projects shows that the number of
 SNMP programmers is really not that huge. So this leads to another
 important requirement: It must be possible to perform SNMP operations
-without any intimidate knowledge of the SNMP protocol. To technical
+without any intimidate knowledge of the SNMP protocol. The technical
 mechanism to address this requirement is to use a MIB compiler which
 generates stub code for management applications from MIB modules. The
 stub code should export simple C structures that every programmer can
