@@ -30,6 +30,7 @@
 #include "disman-script-mib.h"
 
 #include <ctype.h>
+#include <regex.h>
 
 
 static GSnmpEnum const dot1dBaseType[] = {
@@ -247,6 +248,37 @@ strip_white(guchar *s, gsize *len)
     while (*len && isspace(s[(*len)-1])) {
 	(*len)--;
     }
+}
+
+
+
+static int
+match_process(regex_t *regex_path,
+	      host_resources_mib_hrSWRunEntry_t *hrSWRunEntry)
+{
+    int status;
+    
+    if (! regex_path) {
+	return 1;
+    }
+
+    /*
+     * Does it really make sense to filter only on the description?
+     * This way, we do not need to read the ifXTable at all...
+     */
+
+    if (hrSWRunEntry->hrSWRunPath) {
+	char *s = g_strdup_printf("%.*s",
+				  (int) hrSWRunEntry->_hrSWRunPathLength,
+				  hrSWRunEntry->hrSWRunPath);
+	status = regexec(regex_path, s, (size_t) 0, NULL, 0);
+	g_free(s);
+	if (status == 0) {
+	    return 1;
+	}
+    }
+
+    return 0;
 }
 
 
@@ -502,15 +534,24 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 {
     host_resources_mib_hrSWRunEntry_t **hrSWRunTable = NULL;
     host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfTable = NULL;
+    regex_t _regex_path, *regex_path = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (argc > 1) {
+    if (argc > 2) {
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (argc == 2) {
+	regex_path = &_regex_path;
+	if (regcomp(regex_path, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
     if (scli_interp_dry(interp)) {
+	if (regex_path) regfree(regex_path);
 	return SCLI_OK;
     }
 
@@ -527,15 +568,17 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 			    "  PID S T MEMORY     TIME COMMAND");
 	}
 	for (i = 0; hrSWRunTable[i]; i++) {
-	    host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry;
-	    hrSWRunPerfEntry = get_hrSWRunPerfEntry(hrSWRunPerfTable,
-					    hrSWRunTable[i]->hrSWRunIndex);
-	    if (scli_interp_xml(interp)) {
-		xml_system_process(interp->xml_node, hrSWRunTable[i],
-				   hrSWRunPerfEntry);
-	    } else {
-		fmt_system_process(interp->result, hrSWRunTable[i],
-				   hrSWRunPerfEntry);
+	    if (match_process(regex_path, hrSWRunTable[i])) {
+		host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry;
+		hrSWRunPerfEntry = get_hrSWRunPerfEntry(hrSWRunPerfTable,
+						hrSWRunTable[i]->hrSWRunIndex);
+		if (scli_interp_xml(interp)) {
+		    xml_system_process(interp->xml_node, hrSWRunTable[i],
+				       hrSWRunPerfEntry);
+		} else {
+		    fmt_system_process(interp->result, hrSWRunTable[i],
+				       hrSWRunPerfEntry);
+		}
 	    }
 	}
     }
@@ -544,6 +587,8 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 	host_resources_mib_free_hrSWRunTable(hrSWRunTable);
     if (hrSWRunPerfTable)
 	host_resources_mib_free_hrSWRunPerfTable(hrSWRunPerfTable);
+
+    if (regex_path) regfree(regex_path);
     
     return SCLI_OK;
 }
@@ -1399,10 +1444,12 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "system mounts", NULL,
 	  show_system_mounts },
 
-	{ "show system processes", NULL,
+	{ "show system processes", "[<regexp>]",
 	  "The show system processes command display information about the\n"
-	  "processes currently running on the system. The command generates\n"
-	  "a table with the following columns:\n"
+	  "processes currently running on the system. The regular expression\n"
+	  "<regexp> is matched against the command executed by the process\n"
+	  "to select the processes of interest.The command generates a table\n"
+	  "with the following columns:\n"
 	  "\n"
 	  "  PID     process identification number\n"
 	  "  S       status of the process (see below)\n"
@@ -1434,7 +1481,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_system_storage },
 #endif
-	{ "monitor system processes", NULL,
+	{ "monitor system processes", "[<regexp>]",
 	  "The monitor system processes command show the same\n"
 	  "information as the show system processes command. The\n"
 	  "information is updated periodically.",
