@@ -77,13 +77,13 @@ static host_resources_mib_hrDeviceEntry_t*
 get_device_entry(host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
 		 host_resources_mib_hrDeviceEntry_t **hrDeviceTable)
 {
-    int l;
+    int i;
 
     if (hrDeviceTable) {
-	for (l = 0; hrDeviceTable[l]; l++) {
-	    if (hrDeviceTable[l]->hrDeviceIndex
+	for (i = 0; hrDeviceTable[i]; i++) {
+	    if (hrDeviceTable[i]->hrDeviceIndex
 		== hrPrinterEntry->hrDeviceIndex) {
-		return hrDeviceTable[l];
+		return hrDeviceTable[i];
 	    }
 	}
     }
@@ -93,10 +93,52 @@ get_device_entry(host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
 
 
 
+static printer_mib_prtGeneralEntry_t*
+get_general_entry(host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
+		  printer_mib_prtGeneralEntry_t **prtGeneralTable)
+{
+    int i;
+
+    if (prtGeneralTable) {
+	for (i = 0; prtGeneralTable[i]; i++) {
+	    if (prtGeneralTable[i]->hrDeviceIndex
+		== hrPrinterEntry->hrDeviceIndex) {
+		return prtGeneralTable[i];
+	    }
+	}
+    }
+
+    return NULL;
+}
+
+
+
+printer_mib_prtLocalizationEntry_t *
+get_console_local_entry(printer_mib_prtGeneralEntry_t *prtGeneralEntry,
+			printer_mib_prtLocalizationEntry_t **prtLocalTable)
+{
+    int i;
+    
+    if (prtGeneralEntry->prtConsoleLocalization && prtLocalTable) {
+	for (i = 0; prtLocalTable[i]; i++) {
+	    if ((prtLocalTable[i]->hrDeviceIndex
+		 == prtGeneralEntry->hrDeviceIndex)
+		&& (prtLocalTable[i]->prtLocalizationIndex
+		    == *prtGeneralEntry->prtConsoleLocalization)) {
+		return prtLocalTable[i];
+	    }
+	}
+    }
+    
+    return NULL;
+}
+
+
+
 static void
-show_printer_xxx(GString *s,
-		 host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
-		 host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
+show_printer_info(GString *s,
+		  host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
+		  host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
 {
     int const indent = 18;
 
@@ -146,13 +188,129 @@ show_printer_xxx(GString *s,
 
 
 
+static void
+show_printer_general(GString *s,
+		     printer_mib_prtGeneralEntry_t *prtGeneralEntry,
+		     printer_mib_prtLocalizationEntry_t **prtLocalTable)
+{
+    /* MISSING: prtGeneralCurrentLocalization */
+    /* MISSING: prtAuxiliarySheetStartupPage */
+    /* MISSING: prtAuxiliarySheetBannerPage */
+    /* Write-only-variable: prtGeneralReset */
+    
+    if (prtGeneralEntry->prtGeneralPrinterName) {
+	g_string_sprintfa(s, "Printer name:     %.*s\n",
+		    (int) prtGeneralEntry->_prtGeneralPrinterNameLength,
+			  prtGeneralEntry->prtGeneralPrinterName);
+    }
+
+    if (prtGeneralEntry->prtGeneralSerialNumber) {
+	g_string_sprintfa(s, "Serial number:    %.*s\n",
+		    (int) prtGeneralEntry->_prtGeneralSerialNumberLength,
+			  prtGeneralEntry->prtGeneralSerialNumber);
+    }
+    
+    if (prtGeneralEntry->prtGeneralCurrentOperator) {
+	g_string_sprintfa(s, "Current Operator: %.*s\n",
+		    (int) prtGeneralEntry->_prtGeneralCurrentOperatorLength,
+			  prtGeneralEntry->prtGeneralCurrentOperator);
+    }
+    
+    if (prtGeneralEntry->prtGeneralServicePerson) {
+	g_string_sprintfa(s, "Service Person:   %.*s\n",
+		    (int) prtGeneralEntry->_prtGeneralServicePersonLength,
+			  prtGeneralEntry->prtGeneralServicePerson);
+    }
+    
+    if (prtGeneralEntry->prtConsoleNumberOfDisplayLines &&
+	prtGeneralEntry->prtConsoleNumberOfDisplayChars) {
+	g_string_sprintfa(s, "Display:          %u line(s) a %u chars\n",
+			  *prtGeneralEntry->prtConsoleNumberOfDisplayLines,
+			  *prtGeneralEntry->prtConsoleNumberOfDisplayChars);
+    }
+
+    if (prtGeneralEntry->prtConsoleLocalization && prtLocalTable) {
+	printer_mib_prtLocalizationEntry_t *prtLocalEntry;
+	prtLocalEntry = get_console_local_entry(prtGeneralEntry,
+						prtLocalTable);
+	if (prtLocalEntry) {
+	g_string_sprintfa(s, "Console Language: %.*s/%.*s\n",
+		    (int) prtLocalEntry->_prtLocalizationLanguageLength,
+			  prtLocalEntry->prtLocalizationLanguage,
+		    (int) prtLocalEntry->_prtLocalizationCountryLength,
+			  prtLocalEntry->prtLocalizationCountry);
+	}
+    }
+    
+    if (prtGeneralEntry->prtConsoleDisable) {
+	g_string_append(s, "Console access:   ");
+	fmt_enum(s, 8, printer_mib_enums_prtConsoleDisable,
+		 prtGeneralEntry->prtConsoleDisable);
+	g_string_append(s, "\n");
+    }
+    
+    g_string_append(s, "Defaults:         ");
+    if (prtGeneralEntry->prtInputDefaultIndex) {
+	switch (*prtGeneralEntry->prtInputDefaultIndex) {
+	case -1:
+	    g_string_append(s, "No default input\n");
+	    break;
+	default:
+	    g_string_sprintfa(s, "input #%u\n",
+			      *prtGeneralEntry->prtInputDefaultIndex);
+	}
+    } 
+    
+    if (prtGeneralEntry->prtOutputDefaultIndex) {
+	g_string_append(s, "                  ");
+	switch (*prtGeneralEntry->prtOutputDefaultIndex) {
+	case -1:
+	    g_string_append(s, "no default output\n");
+	    break;
+	default:
+	    g_string_sprintfa(s, "output #%u\n",
+			      *prtGeneralEntry->prtOutputDefaultIndex);
+	}
+    }
+    
+    if (prtGeneralEntry->prtMarkerDefaultIndex) {
+	g_string_sprintfa(s, "                  marker #%u\n",
+			  *prtGeneralEntry->prtMarkerDefaultIndex);
+    }
+    
+    if (prtGeneralEntry->prtMediaPathDefaultIndex) {
+	g_string_sprintfa(s, "                  media path #%u",
+			  *prtGeneralEntry->prtMediaPathDefaultIndex);
+    }
+    g_string_append(s, "\n");
+    
+    if (prtGeneralEntry->prtAlertAllEvents) {
+	g_string_sprintfa(s, "Alerts total:          %u\n",
+			  *prtGeneralEntry->prtAlertAllEvents);
+    }
+    
+    if (prtGeneralEntry->prtAlertCriticalEvents) {
+	g_string_sprintfa(s, "Critical alerts:       %u\n",
+			  *prtGeneralEntry->prtAlertCriticalEvents);
+    }
+    
+    if (prtGeneralEntry->prtGeneralConfigChanges) {
+	g_string_sprintfa(s, "Configuration changes: %u\n",
+			  *prtGeneralEntry->prtGeneralConfigChanges);
+    }
+}
+
+
+
 static int
-cmd_printer_xxx(scli_interp_t * interp, int argc, char **argv)
+cmd_printer_info(scli_interp_t * interp, int argc, char **argv)
 {
     host_resources_mib_hrPrinterEntry_t **hrPrinterTable;
     host_resources_mib_hrDeviceEntry_t **hrDeviceTable;
-    int i;
+    printer_mib_prtGeneralEntry_t **prtGeneralTable = NULL;
+    printer_mib_prtLocalizationEntry_t **prtLocalTable = NULL;
     gint32 last = 0;
+    int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -160,6 +318,8 @@ cmd_printer_xxx(scli_interp_t * interp, int argc, char **argv)
 	return SCLI_ERROR;
     }
     (void) host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable);
+    (void) printer_mib_get_prtGeneralTable(interp->peer, &prtGeneralTable);
+    (void) printer_mib_get_prtLocalizationTable(interp->peer, &prtLocalTable);
 
     if (hrPrinterTable) {
 	for (i = 0; hrPrinterTable[i]; i++) {
@@ -168,172 +328,25 @@ cmd_printer_xxx(scli_interp_t * interp, int argc, char **argv)
 		    g_string_append(interp->result, "\n");
 		}
 	    }
-	    show_printer_xxx(interp->result, hrPrinterTable[i],
-			     get_device_entry(hrPrinterTable[i],
-					      hrDeviceTable));
+	    show_printer_info(interp->result, hrPrinterTable[i],
+			      get_device_entry(hrPrinterTable[i],
+					       hrDeviceTable));
+	    if (prtGeneralTable) {
+		show_printer_general(interp->result,
+				     get_general_entry(hrPrinterTable[i],
+						       prtGeneralTable),
+				     prtLocalTable);
+	    }
 	    last = hrPrinterTable[i]->hrDeviceIndex;
 	}
     }
 
     if (hrPrinterTable)
 	host_resources_mib_free_hrPrinterTable(hrPrinterTable);
-
-    return SCLI_OK;
-}
-
-
-
-static int
-cmd_printer_info(scli_interp_t * interp, int argc, char **argv)
-{
-    printer_mib_prtGeneralEntry_t **prtGeneralTable = NULL;
-    printer_mib_prtLocalizationEntry_t **prtLocalTable = NULL;
-    int i, j;
-
-    g_return_val_if_fail(interp, SCLI_ERROR);
-
-    if (printer_mib_get_prtGeneralTable(interp->peer, &prtGeneralTable)) {
-	return SCLI_ERROR;
-    }
-
-    printer_mib_get_prtLocalizationTable(interp->peer, &prtLocalTable);
-
-    if (prtGeneralTable) {
-	for (i = 0; prtGeneralTable[i]; i++) {
-
-	    /* MISSING: prtGeneralCurrentLocalization */
-	    /* MISSING: prtAuxiliarySheetStartupPage */
-	    /* MISSING: prtAuxiliarySheetBannerPage */
-	    /* Write-only-variable: prtGeneralReset */
-
-	    if (prtGeneralTable[i]->prtGeneralPrinterName) {
-		g_string_sprintfa(interp->result, "Printer name:     %.*s\n",
-				  (int) prtGeneralTable [i]->
-				  _prtGeneralPrinterNameLength,
-				  prtGeneralTable[i]->prtGeneralPrinterName);
-	    }
-
-	    if (prtGeneralTable[i]->prtGeneralSerialNumber) {
-		g_string_sprintfa(interp->result, "Serial number:    %.*s\n",
-				  (int) prtGeneralTable [i]->
-				  _prtGeneralSerialNumberLength,
-				  prtGeneralTable[i]->prtGeneralSerialNumber);
-	    }
-
-	    if (prtGeneralTable[i]->prtGeneralCurrentOperator) {
-		g_string_sprintfa(interp->result, "Current Operator: %.*s\n",
-				  (int) prtGeneralTable [i]->
-				  _prtGeneralCurrentOperatorLength,
-				  prtGeneralTable[i]
-				  ->prtGeneralCurrentOperator);
-	    }
-
-	    if (prtGeneralTable[i]->prtGeneralServicePerson) {
-		g_string_sprintfa(interp->result, "Service Person:   %.*s\n",
-				  (int) prtGeneralTable [i]->
-				  _prtGeneralServicePersonLength,
-				  prtGeneralTable[i]->
-				  prtGeneralServicePerson);
-	    }
-
-	    if (prtGeneralTable[i]->prtConsoleNumberOfDisplayLines &&
-		prtGeneralTable[i]->prtConsoleNumberOfDisplayChars) {
-		g_string_sprintfa(interp->result,
-				  "Display:          %u line(s) a %u chars\n",
-				  *prtGeneralTable[i]->
-				  prtConsoleNumberOfDisplayLines,
-				  *prtGeneralTable[i]->
-				  prtConsoleNumberOfDisplayChars);
-	    }
-
-	    if (prtGeneralTable[i]->prtConsoleLocalization &&
-		prtLocalTable &&
-		prtLocalTable[*prtGeneralTable[i]->prtConsoleLocalization]) {
-		j = *prtGeneralTable[i]->prtConsoleLocalization - 1;
-		g_string_sprintfa(interp->result,
-				  "Console Language: %.*s/%.*s\n",
-		  (int) prtLocalTable[j]->_prtLocalizationLanguageLength,
-				  prtLocalTable[j]->prtLocalizationLanguage,
-		  (int) prtLocalTable[j]->_prtLocalizationCountryLength,
-				  prtLocalTable[j]->prtLocalizationCountry);
-	    }
-
-	    if (prtGeneralTable[i]->prtConsoleDisable) {
-		g_string_append(interp->result, "Console access:   ");
-		fmt_enum(interp->result, 8,
-			 printer_mib_enums_prtConsoleDisable,
-			 prtGeneralTable[i]->prtConsoleDisable);
-		g_string_append(interp->result, "\n");
-	    }
-
-	    g_string_append(interp->result, "Defaults:         ");
-	    if (prtGeneralTable[i]->prtInputDefaultIndex) {
-		switch (*prtGeneralTable[i]->prtInputDefaultIndex) {
-		case -1:
-		    g_string_append(interp->result, "No default input\n");
-		    break;
-		default:
-		    g_string_sprintfa(interp->result,
-				      "input #%u\n",
-				      *prtGeneralTable[i]->
-				      prtInputDefaultIndex);
-		}
-	    } 
-
-	    if (prtGeneralTable[i]->prtOutputDefaultIndex) {
-	        g_string_append(interp->result, "                  ");
-		switch (*prtGeneralTable[i]->prtOutputDefaultIndex) {
-		case -1:
-		    g_string_append(interp->result, "no default output\n");
-		    break;
-		default:
-		    g_string_sprintfa(interp->result,
-				      "output #%u\n",
-				      *prtGeneralTable[i]->
-				      prtOutputDefaultIndex);
-		}
-	    }
-
-	    if (prtGeneralTable[i]->prtMarkerDefaultIndex) {
-		g_string_sprintfa(interp->result, 
-				  "                  marker #%u\n",
-				  *prtGeneralTable[i]->prtMarkerDefaultIndex);
-	    }
-
-	    if (prtGeneralTable[i]->prtMediaPathDefaultIndex) {
-		g_string_sprintfa(interp->result, 
-				  "                  media path #%u",
-				  *prtGeneralTable[i]->
-				  prtMediaPathDefaultIndex);
-	    }
-	    g_string_append(interp->result, "\n");
-
-	    if (prtGeneralTable[i]->prtAlertAllEvents) {
-		g_string_sprintfa(interp->result,
-				  "Alerts total:          %u\n",
-				  *prtGeneralTable[i]->prtAlertAllEvents);
-	    }
-
-	    if (prtGeneralTable[i]->prtAlertCriticalEvents) {
-		g_string_sprintfa(interp->result,
-				  "Critical alerts:       %u\n",
-				  *prtGeneralTable[i]->
-				  prtAlertCriticalEvents);
-	    }
-
-	    if (prtGeneralTable[i]->prtGeneralConfigChanges) {
-		g_string_sprintfa(interp->result,
-				  "Configuration changes: %u\n",
-				  *prtGeneralTable [i]->
-				  prtGeneralConfigChanges);
-	    }
-
-	}
-    }
-
+    if (hrDeviceTable)
+	host_resources_mib_free_hrDeviceTable(hrDeviceTable);
     if (prtGeneralTable)
 	printer_mib_free_prtGeneralTable(prtGeneralTable);
-
     if (prtLocalTable)
 	printer_mib_free_prtLocalizationTable(prtLocalTable);
 
@@ -926,10 +939,6 @@ void
 scli_init_printer_mode(scli_interp_t * interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show printer xxx",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "general printer information",
-	  cmd_printer_xxx },
 	{ "show printer info",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "general printer information",
