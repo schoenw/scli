@@ -6,7 +6,7 @@
 @setchapternewpage odd
 @c %**end of header
 
-@set VERSION 0.2.12
+@set VERSION 0.3.1
 
 @ifinfo
 
@@ -19,7 +19,7 @@
 
 This file documents the @code{scli} SNMP command line interface.
 
-Copyright (C) 2001-2002 J@"urgen Sch@"onw@"alder
+Copyright (C) 2001-2004 J@"urgen Sch@"onw@"alder
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice

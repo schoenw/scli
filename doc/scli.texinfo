@@ -6,20 +6,20 @@
 @setchapternewpage odd
 @c %**end of header
 
-@set VERSION 0.2.12
+@set VERSION 0.3.1
 
 @ifinfo
 
 @format
-@dircategory Net utilities:
+@dircategory Net Utilities:
 @direntry
-* scli: (scli).				SNMP Command Line Interface
+* scli: (scli).                                SNMP Command Line Interface
 @end direntry
 @end format
 
 This file documents the @code{scli} SNMP command line interface.
 
-Copyright (C) 2001-2002 J@"urgen Sch@"onw@"alder
+Copyright (C) 2001-2004 J@"urgen Sch@"onw@"alder
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
@@ -391,28 +391,80 @@ information as the show bridge stats command. Theinformation is updated periodic
 @section CISCO MODE
 
 The cisco scli mode is used to display and configure cisco
-parameters.
+parameters. It also supports retrieval of accounting data
+from devices that support the old cisco accounting mib. This
+mode is based on the OLD-CISCO-IP-MIB published in May 1994.
 
 @example
+@command{show cisco processes}
 @command{show cisco ip accounting info}
-@command{show cisco ip accounting current}
-@command{show cisco ip accounting snapshot}
+@command{show cisco ip accounting current sorted}
+@command{show cisco ip accounting current raw}
+@command{show cisco ip accounting snapshot sorted}
+@command{show cisco ip accounting snapshot raw}
 @command{monitor cisco ip accounting current}
-@command{monitor cisco ip accounting snapshot}
+@command{monitor cisco ip accounting snapshot sorted}
+@command{set cisco ip accounting checkpoint}
 @end example
 
-cisco IP accounting info
+The @command{show cisco processes} command displays information about
+all processes running on a CISCO device. The command generates
+a table with the following columns:
+
+@verbatim
+  CPU     processor executing a given process
+  PID     process indentification number on a CPU
+  P       priority of the process
+  MEMORY  memory used by the process
+  TIME    CPU time used by the process
+  COMMAND command executed by the process
+@end verbatim
+
+The @command{show cisco ip accounting info} command displays general
+status information concerning the simple cisco IPv4 accounting
+mechanism supported by many older cisco devices. In particular,
+it displays the starting point of the current and snapshot data
+tables, information about the available accounting capacity,
+and statistics about lost bytes and packets.
+
+cisco IP current accounting data
+
+The @command{show cisco ip accounting current raw} command displays
+the raw accounting data retrieved from the current table. The
+command generates a table with the following columns:
+
+@verbatim
+  SOURCE      source IPv4 address in dotted notation 
+  DESTINATION destination IPv4 address in dotted notation
+  PACKETS     packets sent from source to destination
+  BYTES       bytes sent from source to destination
+@end verbatim
+
+cisco IP snapshot accounting data
+
+The @command{show cisco ip accounting snapshot raw} command displays
+the raw accounting data retrieved from the snapshot table. The
+command generates a table with the following columns:
+
+@verbatim
+  SOURCE      source IPv4 address in dotted notation 
+  DESTINATION destination IPv4 address in dotted notation
+  PACKETS     packets sent from source to destination
+  BYTES       bytes sent from source to destination
+@end verbatim
 
 cisco IP current accounting data
 
 cisco IP snapshot accounting data
 
-cisco IP current accounting data
-
-cisco IP snapshot accounting data
+The @command{set cisco ip accounting checkpoint} command takes a
+snapshot of the current accounting table by copying it to
+the snapshot accounting table. The current accounting table
+is reinitialized before it is updated again. The command
+returns the serial number of the snapshot.
 @section DISMAN MODE
 
-The disman scli mode is based on the DISMAN-SCRIPT-MIB as
+The scli disman mode is based on the DISMAN-SCRIPT-MIB as
 published in RFC 3165 and the DISMAN-SCHEDULE-MIB as
 published in RFC 3231. It allows to browse and configure
 distributed managers.
@@ -427,8 +479,12 @@ distributed managers.
 @command{show disman launch details}
 @command{show disman run info}
 @command{show disman run details}
-@command{show disman scheduler info}
-@command{show disman scheduler details}
+@command{show schedule info}
+@command{show schedule details}
+@command{create schedule <owner> <name> <expression>}
+@command{delete schedule <owner> <name>}
+@command{dump schedule}
+@command{monitor schedule info}
 @command{monitor disman run}
 @end example
 
@@ -450,9 +506,19 @@ summary information about running scripts
 
 running scripts on the distributed manager
 
-scheduler information
+The @command{show schedule info} command displays summary
+information about the scheduled actions.
 
 schedules on the distributed manager
+
+...
+
+...
+
+The @command{dump schedule} command generates a sequence of scli
+commands which can be used to restore the schedule configuration.
+
+scheduler information
 
 monitor running scripts
 @section ENTITY MODE
@@ -465,6 +531,7 @@ or physical components that make up a managed system.
 @command{show entity info}
 @command{show entity details}
 @command{show entity containment}
+@command{show entity sensors}
 @end example
 
 The @command{show entity info} command displays summary information about
@@ -483,6 +550,9 @@ in more detail.
 
 The @command{show entity containment} command displays the physical entity
 containment hierarchy.
+
+The @command{show entity sensors} command describes the physical sensor
+entities in more detail.
 @section ETHERNET MODE
 
 The ethernet scli mode is based on the EtherLike-MIB as published
@@ -491,6 +561,7 @@ in RFC 2665 and the MAU-MIB as published in RFC 2668.
 @example
 @command{show ethernet mau}
 @command{show ethernet stats}
+@command{show ethernet history}
 @command{monitor ethernet stats}
 @end example
 
@@ -527,6 +598,8 @@ a table which has the following columns:
   CARR      carrier sense errors per second
 @end verbatim
 
+...
+
 The @command{monitor ethernet stats} command shows the same information
 as the show ethernet stats command. The information is updated
 periodically.
@@ -548,7 +621,7 @@ arbitrary network interfaces.
 @command{show interface stack [<regexp>]}
 @command{show interface stats [<regexp>]}
 @command{monitor interface stats [<regexp>]}
-@command{alert interface status <regexp> [<regexp>]}
+@command{check interface status [<regexp>]}
 @command{dump interface}
 @end example
 
@@ -607,7 +680,7 @@ character indicates whether the interface is in promiscuous
 mode (P=promiscuous, N=normal).
 
 The @command{show interface details} command describes the selected
-interfaces in more detail. The optional regular expression
+interfaces in detail. The optional regular expression
 <regexp> is matched against the interface descriptions to
 select the interfaces of interest.
 
@@ -638,6 +711,9 @@ the following columns:
   O-PPS       output packets per second
   I-ERR       input errors per second
   O-ERR       output errors per second
+  I-DIS       input packets discarded per second
+  O-DIS       output packets discarded per second
+  I-UNK       input packets with unknown protocols per second
   DESCRIPTION description of the network interface
 @end verbatim
 
@@ -645,12 +721,17 @@ The @command{monitor interface stats} command shows the same
 information as the show interface stats command. The
 information is updated periodically.
 
-The @command{alarm interface status} command generates alerts for
-interfaces that are in given status.
+The @command{check interface status} command checks the status of
+interfaces. The optional regular expression <regexp> is matched
+against the interface description to select the interfaces
+In particular, the check interface status commands detects
+fault conditions if (a) ifAdminStatus is not down and
+ifOperStatus is down or (b) ifAdminStatus is down and
+ifOperStatus is not down and not notPresent
 
-The @command{dump interface} command generates a sequence of scli commands
-which can be used to restore the interface configuration.
-
+The @command{dump interface} command generates a sequence of scli
+commands which can be used to restore the interface
+configuration.
 @section IP MODE
 
 The ip scli mode is based on the IP-MIB as published in
@@ -699,10 +780,11 @@ assigned to network interfaces. The command generates a table
 with the following columns:
 
 @verbatim
-  INTERFACE network interface number
-  ADDRESS   IP address
-  PREFIX    IP address prefix length
-  NAME      name of the IP address
+  ADDRESS     IP address
+  PREFIX      IP address prefix length
+  NAME        name of the IP address
+  INTERFACE   network interface number
+  DESCRIPTION description of the network interface
 @end verbatim
 
 The @command{show ip tunnel} command displays information about existing
@@ -902,19 +984,22 @@ IETF Printer MIB working group.
 @example
 @command{set printer operator <string>}
 @command{show printer info}
-@command{show printer covers}
+@command{show printer paths}
 @command{show printer inputs}
 @command{show printer outputs}
 @command{show printer markers}
+@command{show printer colorants}
 @command{show printer supplies}
-@command{show printer interpreter}
+@command{show printer interpreters}
 @command{show printer channels}
-@command{show printer console display}
-@command{show printer console lights}
+@command{show printer covers}
+@command{show printer display}
+@command{show printer lights}
 @command{show printer alerts}
-@command{monitor printer console display}
-@command{monitor printer console lights}
+@command{monitor printer display}
+@command{monitor printer lights}
 @command{monitor printer alerts}
+@command{run printer reboot}
 @end example
 
 The @command{set printer operator} command configures the name of the
@@ -925,8 +1010,8 @@ indicated by the tel:, fax: and mailto: URL schemes.
 The @command{show printer info} command shows general information about
 the printer including global status information.
 
-The @command{show printer covers} command shows information about the
-covers of a printer.
+The @command{show printer paths} command shows information about the
+media paths of a printer.
 
 The @command{show printer inputs} command shows information about the
 input sub-units of a printer which provide media for input to
@@ -940,18 +1025,25 @@ The @command{show printer markers} command shows information about the
 marker sub-units of a printer which produce marks on the print
 media.
 
+The @command{show printer colorants} command shows information about the
+colorant sub-units of a printer which produce marks on the print
+media.
+
 The @command{show printer supplies} command shows information about the
 supplies which are consumed and the waste produced by the
 markers of a printer.
 
-The @command{show printer interpreter} command shows information about
+The @command{show printer interpreters} command shows information about
 the page description language and control language interpreters
 supported by the printer.
 
 The @command{show printer channels} command shows information about
 the channels which can be used to submit data to the printer.
 
-The @command{show printer console display} command shows the current
+The @command{show printer covers} command shows information about the
+covers of a printer.
+
+The @command{show printer display} command shows the current
 contents of the display attached to the printer. The command
 generates a table with the following columns:
 
@@ -961,7 +1053,7 @@ generates a table with the following columns:
   TEXT    contents of the display line
 @end verbatim
 
-The @command{show printer console lights} command shows the current
+The @command{show printer lights} command shows the current
 status of the lights attached to the printer. The command
 generates a table with the following columns:
 
@@ -978,17 +1070,19 @@ printer alerts including the alert code, the alert severity,
 the alert description, the alert time, the alert location and
 the personel required to handle the alert.
 
-The @command{monitor printer console display} command shows the same
-information as the show printer console display command. The
+The @command{monitor printer display} command shows the same
+information as the show printer display command. The
 information is updated periodically.
 
-The @command{monitor printer console lights} command shows the same
-information as the show printer console lights command. The
+The @command{monitor printer lights} command shows the same
+information as the show printer lights command. The
 information is updated periodically.
 
 The @command{monitor printer alerts} command shows the same information
 as the show printer alerts command. The information is updated
 periodically.
+
+The @command{run printer reboot} command resets the printed.
 RS232 MODE
 
 The rs232 scli mode is based on the RS-232-MIB as published
@@ -998,7 +1092,8 @@ in RFC 1659.
 @command{show rs232 details}
 @end example
 
-
+The @command{show rs232 details} command describes the selected RS 232
+interfaces in detail.
 @section SCLI MODE
 
 The scli mode provides commands that can be used to display and
@@ -1007,6 +1102,8 @@ manipulate the internal state of the scli interpreter.
 @example
 @command{open <nodename> [<community>]}
 @command{close}
+@command{run scli walk <oid> [<oid> ...]}
+@command{run scli scan <network> [community]}
 @command{create scli plugin <module>}
 @command{delete scli plugin <module>}
 @command{exit}
@@ -1019,6 +1116,8 @@ manipulate the internal state of the scli interpreter.
 @command{set scli regex [<regexp>]}
 @command{set scli debugging [<regexp>]}
 @command{set scli pager <pager>}
+@command{set scli retries <retries>}
+@command{set scli timeout <milliseconds>}
 @command{set scli format <fmt>}
 @command{set scli mode <mode>}
 @command{show scli info}
@@ -1048,6 +1147,17 @@ is started.
 The @command{close} command closes an established association to a remote
 SNMP agent. Invoking the close command when no association is
 established is not considered an error and will do just nothing.
+
+The @command{run scli walk} command is a debugging utility which simply
+performs a MIB walk. Note that scli does not have general MIB
+knowledge and hence the output requires some post-processing.
+
+The @command{run scli scan} command is a utility which scans an IPv4
+address space identified by the <network> argument. The <network>
+must be specified in the format <ipv4address>/<prefix>.
+The optional <community> argument is the community string
+needed to communicate with the remote SNMP agent. The default
+community string is "public".
 
 The @command{create scli plugin} command dynamically loads an scli mode
 into a running scli process. This can be used to dynamically
@@ -1111,6 +1221,12 @@ The @command{set scli pager} command defines the shell command which is
 used as a pager if the output produced by an scli command does
 not fit on a single screen. The output is passed to the <pager>
 shell command via its standard input stream.
+
+The @command{set scli retries} command defines the number of SNMP
+request retries before giving up requesting a certain object.
+
+The @command{set scli timeout} command defines the number milliseconds
+between subsequent SNMP request retries.
 
 The @command{set scli format} command defines the output format used by
 subsequent scli commands. The currently supported formats are
@@ -1181,6 +1297,8 @@ SNMP-NOTIFICATION-MIB as published in RFC 2573.
 @command{show snmp target addresses}
 @command{show snmp target parameters}
 @command{show snmp notification targets}
+@command{show snmp contexts}
+@command{show snmp csm}
 @command{dump snmp}
 @end example
 
@@ -1291,6 +1409,12 @@ generates a table with the following columns:
   TAG      tag reference to targets
 @end verbatim
 
+The @command{show snmp contexts} command displays information
+about the available SNMP contexts.
+
+The @command{show snmp csm communities} command displays information
+about the configured SNMP communities.
+
 The @command{dump snmp} command generates a sequence of scli commands
 which can be used to restore the engine configuration.
 
@@ -1367,8 +1491,12 @@ parameters and characteristics.
 @command{show system storage}
 @command{show system mounts}
 @command{show system processes [<regexp>]}
+@command{show system software [<regexp>]}
 @command{monitor system storage}
 @command{monitor system processes [<regexp>]}
+@command{check system contact}
+@command{check system storage}
+@command{check system process [<regexp>] [<n>*<m>]}
 @command{dump system}
 @end example
 
@@ -1423,7 +1551,7 @@ following columns:
 The @command{show system processes} command display information about the
 processes currently running on the system. The regular expression
 <regexp> is matched against the command executed by the process
-to select the processes of interest.The command generates a table
+to select the processes of interest. The command generates a table
 with the following columns:
 
 @verbatim
@@ -1439,6 +1567,21 @@ The process status values are C=running, R=runnable,
 S=not runnable, and Z=invalid. The process types values are
 ?=unknown, O=operating system, D=device driver, and A=application.
 
+The @command{show system software} command display information about the
+software installed on the system. The regular expression <regexp>
+is matched against the software name to select the software of
+interest. The command generates a table with the following columns:
+
+@verbatim
+  SID     software identification number
+  T       type of the software (see below)
+  DATE    software installation date
+  NAME    software name
+@end verbatim
+
+The software type values are ?=unknown, O=operating system, 
+D=device driver, and A=application.
+
 The @command{monitor system storage} command shows the same
 information as the show system storage command. The
 information is updated periodically.
@@ -1446,6 +1589,12 @@ information is updated periodically.
 The @command{monitor system processes} command show the same
 information as the show system processes command. The
 information is updated periodically.
+
+The @command{check system contact} command xxx.
+
+The @command{check system storage} command checks xxx.
+
+The @command{check system process} command checks xxx.
 
 The @command{dump system} command generates a sequence of scli commands
 which can be used to restore the system configuration.
