@@ -126,6 +126,10 @@ show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     ip_forward_mib_get_ipCidrRouteTable(interp->peer, &ipCidrRouteTable, 0);
     if (interp->peer->error_status || !ipCidrRouteTable) {
 	rfc1213_mib_get_ipRouteTable(interp->peer, &ipRouteTable, 0);
@@ -229,6 +233,10 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0);
@@ -360,6 +368,10 @@ show_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     tunnel_mib_get_tunnelIfTable(interp->peer, &tunnelIfTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -445,6 +457,10 @@ show_ip_mapping(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     ip_mib_get_ipNetToMediaTable(interp->peer, &ipNetToMediaTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -512,6 +528,10 @@ show_ip_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     ip_mib_get_ip(interp->peer, &ip, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -544,6 +564,10 @@ set_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_VALUE;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     ip = ip_mib_new_ip();
     ip->ipForwarding = &value;
     ip_mib_set_ip(interp->peer, ip, IP_MIB_IPFORWARDING);
@@ -563,6 +587,7 @@ set_ip_ttl(scli_interp_t *interp, int argc, char **argv)
 {
     ip_mib_ip_t *ip;
     gint32 value;
+    char *end;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -570,9 +595,13 @@ set_ip_ttl(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    value = atoi(argv[1]);
-    if (value < 1 || value > 255) {
+    value = strtol(argv[1], &end, 0);
+    if (*end || value < 1 || value > 255) {
 	return SCLI_SYNTAX_NUMBER;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     ip = ip_mib_new_ip();
@@ -599,6 +628,10 @@ dump_ip(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     ip_mib_get_ip(interp->peer, &ip, 0);
@@ -635,7 +668,7 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "The set ip forwarding command controls whether the IP protocol\n"
 	  "engine forwards IP datagrams or not. The <value> parameter must\n"
 	  "be one of the strings \"enabled\" or \"disabled\".",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_ip_forwarding },
 	
@@ -643,7 +676,7 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "The set ip ttl command can be used to change the default\n"
 	  "time to live (TTL) value used by the IP protocol engine. The\n"
 	  "<number> parameter must be a number between 1 and 255 inclusive.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_ip_ttl },
 	
@@ -651,7 +684,7 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "The show ip info command displays paramters of the IP\n"
 	  "protocol engine, such as the default TTL or whether the\n"
 	  "node is forwarding IP packets.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_ip_info },
 	
@@ -664,7 +697,7 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "  TYPE\n"
 	  "  PROTO\n"
 	  "  INTERFACE",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_ip_forwarding },
 	
@@ -677,14 +710,14 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "  ADDRESS   IP address\n"
 	  "  PREFIX    IP address prefix length\n"
 	  "  NAME      name of the IP address",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "ip", NULL,
 	  show_ip_addresses },
 	
 	{ "show ip tunnel", NULL,
 	  "The show ip tunnel command displays information about existing\n"
 	  "IP tunnels.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_ip_tunnel },
 	
@@ -697,14 +730,14 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "  STATUS    status of the mapping entry\n"
 	  "  ADDRESS   IP address\n"
 	  "  ADDRESS   lower layer address",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_ip_mapping },
 	
 	{ "dump ip", NULL,
 	  "The dump ip command generates a sequence of scli commands\n"
 	  "which can be used to restore the IP configuration.\n",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  dump_ip },
 

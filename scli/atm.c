@@ -87,6 +87,10 @@ show_atm_interface(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     atm_mib_get_atmInterfaceConfTable(interp->peer,
 				      &atmInterfaceConfTable, 0);
     if (interp->peer->error_status) {
@@ -126,7 +130,7 @@ scli_init_atm_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 	{ "show atm interface", NULL,
 	  "atm interfaces",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "atm interfaces", NULL,
 	  show_atm_interface },
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
