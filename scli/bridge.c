@@ -732,7 +732,7 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  show_bridge_forwarding },
 
 	{ "show bridge filter", NULL,
-	  "The show bridge filte command shows filtering information.",
+	  "The show bridge filter command shows filtering information.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_bridge_filter },

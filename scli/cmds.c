@@ -236,7 +236,7 @@ help(scli_interp_t *interp, int argc, char **argv)
       " - exit         Exit the scli command interpreter.\n"
       " - help         Show this help information.\n"
       " - history      Show the history of the last scli commands.\n"
-      " - create       Create new object instance on the remote SNMP agent.\n"
+      " - create       Create object instances on the remote SNMP agent.\n"
       " - delete       Delete object instances from the remote SNMP agent.\n"
       " - set          Modify object instances on the remote SNMP agent.\n"
       " - show         Show information provided by the remote SNMP agent.\n"
@@ -814,16 +814,16 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "error. The existing established association will be closed\n"
 	  "automatically before an attempt to create a new association\n"
 	  "is started.",
-	  0,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_XML,
+	  "", NULL,
 	  scli_cmd_open },
 
 	{ "close", NULL,
 	  "The close command closes an established association to a remote\n"
 	  "SNMP agent. Invoking the close command when no association is\n"
 	  "established is not considered an error and will do just nothing.",
-	  0,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_XML,
+	  "", NULL,
 	  cmd_scli_close },
 #if 0
 	{ "probe", NULL,
