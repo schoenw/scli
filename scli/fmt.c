@@ -41,6 +41,7 @@ date_to_time(guchar *date, gsize len)
     time_t t = 0;
     
     if (len == 8 || len == 11) {
+	memset(&tm, 0, sizeof(struct tm));
 	tm.tm_year = ((date[0] << 8) + date[1]) - 1900;
 	tm.tm_mon  = date[2];
 	tm.tm_mday = date[3];
@@ -64,18 +65,29 @@ fmt_time_ticks(GString *s, guint32 timeticks)
     
     now = time(NULL);
     now -= timeticks/100;
-    tm = gmtime(&now);
+    tm = localtime(&now);
 
 #ifdef HAVE_TM_ZONE
     gmt_offset = tm->tm_gmtoff;
 #else
     gmt_offset = timezone;
 #endif
+
+    /*
+     * This code assumes that daylight savings time is always 1 hour,
+     * which is definitely not true everywhere on the world. I know
+     * from my trip to Australia that the they have regions with 30
+     * minute offsets. Now the real tough question is how you get the
+     * real offset in a portable way. (Every time I am time calculations,
+     * I am getting surprised how ugly these things still are.) /js
+     */
+    
     g_string_sprintfa(s, "%04d-%02d-%02d %02d:%02d:%02d %c%02d:%02d",
 		      tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
 		      tm->tm_hour, tm->tm_min, tm->tm_sec,
 		      gmt_offset <= 0 ? '+' : '-',
-		      (int) ABS(gmt_offset) / 3600,
+		      (int) ABS(gmt_offset) / 3600
+		      + ((tm->tm_isdst > 0) ? 1 : 0),
 		      (int) (ABS(gmt_offset) / 60) % 60);
 }
 
