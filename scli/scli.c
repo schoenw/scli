@@ -161,7 +161,7 @@ generator(char const *text, int state)
 	    }
 	    last_node = g_node_first_child(last_node);
 	}
-	if (argc < 2 && !isspace((int) text[strlen(text)-1])) {
+	if (argc == 0 || (argc < 2 && len && !isspace((int) text[len-1]))) {
 	    last_elem = interp->alias_list;
 	} else {
 	    last_elem = NULL;
