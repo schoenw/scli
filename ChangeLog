@@ -1,3 +1,281 @@
+2001-04-10 10:26  schoenw
+
+	* NEWS, TODO: Updates for release 0.1.16.
+
+2001-04-10 10:24  schoenw
+
+	* scli/basic.c: Added hooks which indicate how fast we retrieve
+        SNMP variables.
+
+2001-04-10 10:23  schoenw
+
+	* scli/scli.c: Stifle the history file to contain only
+        $HISTFILESIZE entries.
+
+2001-04-10 10:15  schoenw
+
+	* stop/stop.c: Added a hook to indicate when stop is busy
+        retrieving data.
+
+2001-04-10 10:14  schoenw
+
+	* stop/interface.c: Removed an unnecessary delay.
+
+2001-04-10 10:14  schoenw
+
+	* stop/ether.c: Discard any old statistics if the ether mode is
+        restarted.
+
+2001-04-10 10:13  schoenw
+
+	* snmp/: g_snmp.c, g_snmp.h: Added hooks which are called when a
+        varbind list is decoded/encoded.
+
+2001-04-09 12:58  schoenw
+
+	* scli/ip.c: The "show ip tunnel" command now shows interface names
+        (patch provided by Oliver Wellnitz <wellnitz@ibr.cs.tu-bs.de>).
+
+2001-04-09 11:23  schoenw
+
+	* scli/: disman.c, entity.c, interface.c, system.c: Minor code
+        cleanups.
+
+2001-04-09 11:02  schoenw
+
+	* stub/: host-resources-types.h, stools.c, stools.h: Implemented
+        stls_identity_get_label().
+
+2001-04-06 17:47  schoenw
+
+	* scli/disman.c: Even nicer output for "show disman languages".
+
+2001-04-06 17:05  schoenw
+
+	* scli/disman.c: More updates to support the RFC 2592 revision.
+
+2001-04-06 15:48  schoenw
+
+	* stub/: Makefile.am, Makefile.in, atm-mib.c, bridge-mib.c,
+	disman-schedule-mib.c, disman-schedule-mib.h, disman-script-mib.c,
+	disman-script-mib.h, entity-mib.c, etherlike-mib.c,
+	host-resources-mib.c, host-resources-types.c, iana-language-mib.c,
+	if-mib.c, ip-forward-mib.c, ip-mib.c, mau-mib.c,
+	snmp-community-mib.c, snmp-framework-mib.c, snmp-mpd-mib.c,
+	snmp-target-mib.c, snmp-user-based-sm-mib.c,
+	snmp-view-based-acm-mib.c, snmpv2-mib.c, stools.c, stools.h,
+	tcp-mib.c, tunnel-mib.c, udp-mib.c: Regenerated stubs to make the
+        resulting C code more compact.
+
+2001-04-06 15:45  schoenw
+
+	* scli/disman.c: Updates to support the upcoming RFC 2592 revision.
+
+2001-04-04 23:32  schoenw
+
+	* stub/stools.c: Use mktime() to get the gmt offset computation
+        right.
+
+2001-04-03 10:12  schoenw
+
+	* stop/: disman.c, ether.c, fmt.c, interface.c, stop.h: Completed
+	the stop ether mode and moved some common formatting utilities into
+	the fmt.c module. Added ifInErrors and ifOutErrors to the interface
+        display mode.
+
+2001-04-03 10:11  schoenw
+
+	* stop/: stop.1, stop.c: Added support for moving forward and
+        backward in the list of display modes.
+
+2001-03-30 15:38  schoenw
+
+	* stub/stools.c, stub/stools.h, stop/interface.c, scli/fmt.c,
+	scli/interface.c, scli/system.c: Reworked the timeticks formatting
+	code and started to move it into the stools library so that it can
+        be reused easily.
+
+2001-03-30 10:47  schoenw
+
+	* stop/stop.1: Removed some garbage characters at the end.
+
+2001-03-30 10:43  schoenw
+
+	* scli/: Makefile.am, Makefile.in, atm.c, bridge.c, disman.c,
+	entity.c, ether.c, fmt.c, interface.c, ip.c, mau.c, scli.c, scli.h,
+	snmp.c, system.c, tcp.c, udp.c: Renamed mau.c to ether.c and
+        updated various modules to reflect internal API changes.
+
+2001-03-30 10:21  schoenw
+
+	* stop/: disman.c, tcp.c: Updates to reflect changes in the stools
+        API.
+
+2001-03-30 10:21  schoenw
+
+	* stub/: atm-mib.c, atm-mib.h, bridge-mib.c, bridge-mib.h,
+	disman-schedule-mib.c, disman-schedule-mib.h, disman-script-mib.c,
+	disman-script-mib.h, entity-mib.c, entity-mib.h, etherlike-mib.c,
+	etherlike-mib.h, host-resources-mib.c, host-resources-mib.h,
+	if-mib.c, if-mib.h, ip-forward-mib.c, ip-forward-mib.h, ip-mib.c,
+	ip-mib.h, mau-mib.c, mau-mib.h, snmp-community-mib.c,
+	snmp-community-mib.h, snmp-target-mib.c, snmp-target-mib.h,
+	snmp-user-based-sm-mib.c, snmp-user-based-sm-mib.h,
+	snmp-view-based-acm-mib.c, snmp-view-based-acm-mib.h, snmpv2-mib.c,
+	snmpv2-mib.h, stools.c, stools.h, tcp-mib.c, tcp-mib.h,
+	tunnel-mib.c, tunnel-mib.h: Regenerated stubs to reflect changes in
+        the stls API.
+
+2001-03-30 10:17  schoenw
+
+	* stop/: Makefile.am, Makefile.in, ether.c, stop.c, stop.h: Added a
+        new ether stop mode to display ethernet specific statistics.
+
+2001-03-30 10:16  schoenw
+
+	* stop/interface.c: Added code to handle daylight saving times.
+
+2001-03-29 17:47  schoenw
+
+	* scli/: Makefile.am, Makefile.in, mau.c, scli.c, scli.h: Added a
+	media attachement (mau) mode. This probably needs all to be merged
+        at some time into an IEEE 802.3 mode which does all of this.
+
+2001-03-29 16:46  schoenw
+
+	* stub/: Makefile.am, Makefile.in, etherlike-mib.c,
+	etherlike-mib.h, mau-mib.c, mau-mib.h: Added stubs for the MAU-MIB
+        and the EtherLike-MIB.
+
+2001-03-29 14:45  schoenw
+
+	* scli/disman.c: Import the IANA language OIDs from the
+        iana-language-mib.h stub.
+
+2001-03-29 14:44  schoenw
+
+	* scli/fmt.c: Fixed again some time formatting/computation
+        problems.
+
+2001-03-29 14:41  schoenw
+
+	* stub/: Makefile.am, Makefile.in, iana-language-mib.c,
+        iana-language-mib.h: Added stubs for the IANA-LANGUAGE-MIB.
+
+2001-03-29 14:35  schoenw
+
+	* scli/disman.c: Many improvements to produce more useful output.
+
+2001-03-29 14:34  schoenw
+
+	* stop/: disman.c, fmt.c, stop.h: Added code to display the time a
+        script is/was running.
+
+2001-03-29 14:33  schoenw
+
+	* stop/stop.1: Added text to briefly describe the stop modes.
+
+2001-03-29 12:33  schoenw
+
+	* scli/scli.1: Added some more documentation to bring new users up
+        to speed.
+
+2001-03-29 10:51  schoenw
+
+	* config.h.in, configure, configure.in: Added a check for
+        getaddrinfo().
+
+2001-03-29 10:49  schoenw
+
+	* stop/tcp.c: Show tcp connections in a more reasonable order
+        (sorted by state).
+
+2001-03-28 12:58  schoenw
+
+	* scli/scli.1: Documented the way scli interprets the PAGER
+        environment variable.
+
+2001-03-28 12:12  schoenw
+
+	* scli/scli.c: Call scli_cmd_open() to handle arguments so that we
+        can benefit from any error handling in scli_cmd_open().
+
+2001-03-28 12:11  schoenw
+
+	* scli/tcp.c: Use #defines rather than numbers for enumerated
+        values.
+
+2001-03-28 12:10  schoenw
+
+	* stop/tcp.c: Use #defines rather than numbers to identify
+        enumerated values.
+
+2001-03-28 12:08  schoenw
+
+	* stub/: Makefile.am, Makefile.in, atm-mib.c, atm-mib.h,
+	bridge-mib.c, bridge-mib.h, disman-schedule-mib.c,
+	disman-schedule-mib.h, disman-script-mib.c, disman-script-mib.h,
+	entity-mib.c, entity-mib.h, host-resources-mib.c,
+	host-resources-mib.h, host-resources-types.c,
+	host-resources-types.h, if-mib.c, if-mib.h, ip-forward-mib.c,
+	ip-forward-mib.h, ip-mib.c, ip-mib.h, snmp-community-mib.c,
+	snmp-community-mib.h, snmp-framework-mib.h, snmp-target-mib.c,
+	snmp-target-mib.h, snmp-user-based-sm-mib.c,
+	snmp-user-based-sm-mib.h, snmp-view-based-acm-mib.c,
+	snmp-view-based-acm-mib.h, snmpv2-mib.c, snmpv2-mib.h, tcp-mib.c,
+	tcp-mib.h, tunnel-mib.c, tunnel-mib.h: Regenerated stubs to include
+	#defines for enumerations and identities.  Added the
+        host-resources-types stubs.
+
+2001-03-28 10:18  schoenw
+
+	* scli/system.c: Improved the "show system devices" command.
+
+2001-03-28 09:39  schoenw
+
+	* snmp/g_session.c: Do not lookup the address with each and every
+        request.
+
+2001-03-27 17:26  schoenw
+
+	* scli/basic.c: Some portability fixes. I am sure this is not the
+	right solution. Need to study the POSIX termios specification to
+        get it "right".
+
+2001-03-27 17:17  schoenw
+
+	* stop/: disman.c, fmt.c, tcp.c: Minor bug fixes.
+
+2001-03-27 17:16  schoenw
+
+	* configure, configure.in: Bumped the version number.
+
+2001-03-27 17:14  schoenw
+
+	* scli/: disman.c, fmt.c, scli.h: Added code to display information
+        about running disman scripts.
+
+2001-03-27 17:14  schoenw
+
+	* scli/basic.c: Added code to get the number of columns on the
+        terminal.
+
+2001-03-27 10:55  schoenw
+
+	* scli/basic.c: Make sure we use the pager only if we are
+        interactive.
+
+2001-03-27 10:48  schoenw
+
+	* scli/: atm.c, basic.c, bridge.c, disman.c, entity.c, interface.c,
+	ip.c, scli.c, scli.h, snmp.c, system.c, tcp.c, udp.c: Reworked the
+	command creation interface. Intermediate nodes are now created
+        automatically.
+
+2001-03-26 15:41  schoenw
+
+	* ChangeLog: Generated the ChangeLog via cvs2cl.
+
 2001-03-26 15:35  schoenw
 
 	* NEWS, TODO: Updates for release 0.1.15.
