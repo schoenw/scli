@@ -123,7 +123,7 @@ show_scli_command_details(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_mode_t *mode;
-    int i, c;
+    int i, j, c;
     regex_t _regex_cmd, *regex_cmd = NULL;
     char *cmd;
 
@@ -154,8 +154,14 @@ show_scli_command_details(scli_interp_t *interp, int argc, char **argv)
 		g_string_append(interp->result, "\n");
 	    }
 	    g_string_sprintfa(interp->result, "Command:     %s\n", cmd);
-	    g_string_sprintfa(interp->result, "Description: %s\n",
-			      mode->cmds[i].desc);
+	    g_string_append(interp->result, "Description: ");
+	    for (j = 0; mode->cmds[i].desc[j]; j++) {
+		g_string_append_c(interp->result, mode->cmds[i].desc[j]);
+		if (mode->cmds[i].desc[j] == '\n') {
+		    g_string_append(interp->result, "             ");
+		}
+	    }
+	    g_string_append_c(interp->result, '\n');
 	    g_string_sprintfa(interp->result, "Formats:     scli%s\n",
 		      (mode->cmds[i].flags & SCLI_CMD_FLAG_XML) ? ",xml" : "");
 	    g_string_sprintfa(interp->result, "Mode:        %s\n",
@@ -233,7 +239,7 @@ show_scli_mode_details(scli_interp_t *interp, int argc, char **argv)
     GSList *elem;
     scli_mode_t *mode;
     char *s, *cmd;
-    int i;
+    int i, c;
     regex_t _regex_mode, *regex_mode = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -249,16 +255,19 @@ show_scli_mode_details(scli_interp_t *interp, int argc, char **argv)
 	}
     }
     
-    for (elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
+    for (c = 0, elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
 	mode = (scli_mode_t *) elem->data;
 	if (regex_mode) {
 	    if (regexec(regex_mode, mode->name, (size_t) 0, NULL, 0) != 0) {
 		continue;
 	    }
 	}
+	if (c) {
+	    g_string_append(interp->result, " \n");
+	}
 	s = g_strdup_printf("%s MODE", mode->name);
 	g_strup(s);
-	g_string_sprintfa(interp->result, "%s\n\n%s\n\n", s, mode->desc);
+	g_string_sprintfa(interp->result, "%s\n\n%s\n \n", s, mode->desc);
 	g_free(s);
 	for (i = 0; mode->cmds[i].path; i++) {
 	    cmd = g_strdup_printf("%s %s",
@@ -268,9 +277,9 @@ show_scli_mode_details(scli_interp_t *interp, int argc, char **argv)
 	    g_free(cmd);
 	}
 	for (i = 0; mode->cmds[i].path; i++) {
-	    g_string_sprintfa(interp->result, "\n\n%s\n", mode->cmds[i].desc);
+	    g_string_sprintfa(interp->result, "\n%s\n", mode->cmds[i].desc);
 	}
-	g_string_append(interp->result, "\n");
+	c++;
     }
 
     if (regex_mode) regfree(regex_mode); 

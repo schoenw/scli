@@ -1,5 +1,5 @@
 .\"                              hey, Emacs:   -*- nroff -*-
-.\" stop is free software; you can redistribute it and/or modify
+.\" scli is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
 .\" the Free Software Foundation; either version 2 of the License, or
 .\" (at your option) any later version.
@@ -13,7 +13,7 @@
 .\" along with this program; see the file COPYING.  If not, write to
 .\" the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 .\"
-.TH SCLI 1 "August 26, 2001"
+.TH SCLI 1 "August 28, 2001"
 .\" Please update the above date whenever this man page is modified.
 .\"
 .\" Some roff macros, for reference:
@@ -141,140 +141,7 @@ will recursively invoke all commands in the subtree identified by the
 entered command. In particular, entering \fIshow\fR will cause
 \fBscli\fP to retrieve and display all information accessible from the
 remote SNMP agent.
-
-.SH SYSTEM MODE
-The system mode provides information about general system capabilities
-and it provides core system configuration commands. It is primarily
-based on the SNMPv2-MIB as published in RFC 1907, the
-HOST-RESOURCES-MIB as published in RFC 2790, and the ENTITY-MIB as
-published in RFC 2737. Some commands which probe for certain features
-rely on additional MIBs.
-.TP
-.B set system name <string>
-.TP
-.B set system contact <string>
-.TP
-.B set system location <string>
-.TP
-.B show system info
-.TP
-.B show system devices
-.TP
-.B show system storage
-.TP
-.B show system mounts
-.TP
-.B show system processes
-.TP
-.B show system entity details
-.TP
-.B show system entity containment
-.TP
-.B monitor system storage
-.TP
-.B monitor system processes
-
-.SH INTERFACE MODE
-The interface mode is based on the IF-MIB as published in RFC 2863 and
-provides the following commands:
-.TP
-.B show interface info [<regexp>]
-.TP
-.B show interface details [<regexp>]
-.TP
-.B show interface stats [<regexp>]
-.TP
-.B show interface stack
-.TP
-.B set interface status <regexp> <value>
-.TP
-.B monitor interface stats [<regexp>]
-.P
-The \fBshow interface info\fP command shows summary information about
-all selected interfaces. The optional regular expression <regexp> is
-matched against the interface descriptions to select the interfaces of
-interest.  The command generates a table which displays the interface
-number, its status (administrative status, operational status,
-connector present, promiscuous mode), the maximum transfer unit (MTU)
-of the interface, the interface type and speed, the interface's local
-name and its description.
-.P
-The \fBshow interface details\fP command describes the selected
-interfaces in more detail. The optional regular expression <regexp> is
-matched against the interface descriptions to select the interfaces of
-interest. <tbd>
-.P
-The \fBshow interface stats\fP command <tbd>
-.P
-The \fBshow interface stack\fP command shows the stacking order of the
-interfaces. <tbd>
-.P
-THe \fBset interface status <regexp> <value>\fP command modifies the
-administrative status of all selected interfaces. The optional regular
-expression <regexp> is matched against the interface descriptions to
-select the interfaces of interest. The <value> parameter must be one
-of the strings "up", "down" or "testing".
-
-.SH NORTEL MODE
-The nortel mode allows to manipulate virtual lans (vlans) on nortel
-bridges. It is based on the RAPIDCITY-VLAN-MIB which is implemented at
-least on the baystack bridges.
-.TP
-.B create nortel bridge vlan <vlanid> <name>
-.TP
-.B delete nortel bridge vlan <regexp>
-.TP
-.B set nortel bridge vlan ports <regexp> <ports>
-.TP
-.B show nortel bridge vlan info [<regexp>]
-.TP
-.B show nortel bridge vlan details [<regexp>]
-.P
-The \fBcreate nortel bridge vlan\fP command is used to create a new
-vlan with the given vlanid and name.
-.P
-The \fBdelete nortel bridge vlan\fP command deletes all selected
-vlans.  The regular expression <regexp> is matched against the vlan
-names to select the vlans that should be deleted.
-.P
-The \fBset nortel bridge vlan ports\fP command allows to assign ports
-to port-based vlans. The regular expression <regexp> is matched
-against the vlan names to select the vlans that should be
-modified. The <ports> argument contains a comma separated list of port
-numbers or port number ranges, e.g. 1,5,7-8.
-.P
-The \fBshow nortel bridge vlan info\fP command shows summary
-information about all selected vlans.  The optional regular expression
-<regexp> is matched against the vlan names to select the vlans of
-interest. The command generates a table which displays the vlan
-number, the vlan name, the vlan type, the assigned vlan color, the
-vlan priority, whether routing is enabled and the status of the vlan.
-.P
-The \fBshow nortel bridge vlan details\fP command describes the
-selected vlans in more detail. The optional regular expression
-<regexp> is matched against the vlan names to select the vlans of
-interest. <tbd>
-
-.SH SCLI MODE
-The scli mode can be used to inspect and modify the status of the scli
-interpreter.
-.TP
-.B set scli debugging [<layer> [<layer> [...]]]
-.TP
-.B set scli pager <string>
-.TP
-.B set scli format <fmt>
-.TP
-.B create scli alias <name> <value>
-.TP
-.B delete scli alias <name>
-.TP
-.B show scli aliases
-.TP
-.B show scli info
-.TP
-.B show scli modes
-
+m4_include(scli.1.modes)m4_dnl
 .SH INTERACTIVE MONITOR COMMANDS
 Several single-key commands are recognized while \fBscli\fP is running
 in monitor mode:
@@ -325,6 +192,9 @@ explanations:
 .B bps
 Bits per second.
 .TP
+.B fps
+Frames per second.
+.TP
 .B pps
 Packets per second.
 .TP
@@ -354,7 +224,7 @@ detailed description of the readline features.
 .SH HISTORY
 \fBscli\fP supports the GNU history library. The GNU history library
 provides a history expansion feature that is similar to the history
-expansion provided by `csh'. Please consult the GNU history library
+expansion provided by 'csh'. Please consult the GNU history library
 documentation for a detailed description of the history features.
 .SH PAGER
 \fBscli\fP respects the PAGER environment variable when running
