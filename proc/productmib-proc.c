@@ -26,7 +26,7 @@
 
 void
 productmib_proc_create_vlan(GSnmpSession *s, gint32 vlanId,
-			    guchar *name, guint32 type)
+			    guchar *name, gsize name_len, guint32 type)
 {
     productmib_a3ComVirtualGroup_t *vg = NULL;
     productmib_a3ComVlanIfEntry_t *vlanEntry;
@@ -43,7 +43,7 @@ productmib_proc_create_vlan(GSnmpSession *s, gint32 vlanId,
     }
     vlanEntry->a3ComVlanIfIndex = *vg->a3ComNextAvailableVirtIfIndex;
     vlanEntry->a3ComVlanIfDescr = name;
-    vlanEntry->_a3ComVlanIfDescrLength = strlen(name);
+    vlanEntry->_a3ComVlanIfDescrLength = name_len;
     vlanEntry->a3ComVlanIfGlobalIdentifier = &vlanId;
     vlanEntry->a3ComVlanIfType = &type;
     vlanEntry->a3ComVlanIfStatus = &createAndGo;
@@ -88,8 +88,8 @@ productmib_proc_set_vlan_port_member(GSnmpSession *s,
 		int bit = bits[ll/8] & 1 << (7-(ll%8));
 		if (! bit) {
 		    if_mib_proc_unstack_interface(s,
-						  ifStackTable[i]->ifStackLowerLayer,
-						  ifStackTable[i]->ifStackHigherLayer);
+					  ifStackTable[i]->ifStackLowerLayer,
+					  ifStackTable[i]->ifStackHigherLayer);
 		    /* xxx error handling ? xxx */
 		}
 	    }

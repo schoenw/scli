@@ -27,6 +27,7 @@ void
 rapid_city_proc_create_vlan(GSnmpSession *s,
 			    gint32 vlanid,
 			    guchar *name,
+			    gsize name_len,
 			    guint32 type)
 {
     rapid_city_rcVlanEntry_t *vlanEntry;
@@ -36,7 +37,7 @@ rapid_city_proc_create_vlan(GSnmpSession *s,
     if (vlanEntry) {
 	vlanEntry->rcVlanId = vlanid;
 	vlanEntry->rcVlanName = name;
-	vlanEntry->_rcVlanNameLength = strlen(name);
+	vlanEntry->_rcVlanNameLength = name_len;
 	vlanEntry->rcVlanType = &type;
 	vlanEntry->rcVlanRowStatus = &createAndGo;
 	rapid_city_set_rcVlanEntry(s, vlanEntry,

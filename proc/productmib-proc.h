@@ -30,7 +30,7 @@
 
 extern void
 productmib_proc_create_vlan(GSnmpSession *s, gint32 vlanid,
-			    guchar *name, guint32 type);
+			    guchar *name, gsize name_len, guint32 type);
 extern void
 productmib_proc_delete_vlan(GSnmpSession *s, gint32 ifIndex);
 
