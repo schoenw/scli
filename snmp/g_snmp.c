@@ -50,8 +50,8 @@ static gboolean g_snmp_object_encode(ASN1_SCK *asn1, GSnmpVarBind *object);
 static gboolean g_snmp_object_decode(ASN1_SCK *asn1, GSnmpVarBind **object);
 static gboolean g_snmp_list_encode(ASN1_SCK *asn1, GSList *list);
 static gboolean g_snmp_list_decode(ASN1_SCK *asn1, GSList **list);
-static gboolean g_snmp_request_encode(ASN1_SCK *asn1, GSnmpRequest *request);
-static gboolean g_snmp_request_decode(ASN1_SCK *asn1, GSnmpRequest *request);
+static gboolean g_snmp_request_encode(ASN1_SCK *asn1, GSnmpReqResp *request);
+static gboolean g_snmp_request_decode(ASN1_SCK *asn1, GSnmpReqResp *request);
 static gboolean g_snmp_trap_encode(ASN1_SCK *asn1, GSnmpV1Trap *trap);
 static gboolean g_snmp_trap_decode(ASN1_SCK *asn1, GSnmpV1Trap *trap);
 
@@ -651,7 +651,7 @@ g_snmp_list_decode (ASN1_SCK *asn1, GSList **list)
  */
 
 static gboolean 
-g_snmp_request_encode ( ASN1_SCK *asn1, GSnmpRequest *request)
+g_snmp_request_encode(ASN1_SCK *asn1, GSnmpReqResp *request)
 {
     guchar *end;
 
@@ -682,7 +682,7 @@ g_snmp_request_encode ( ASN1_SCK *asn1, GSnmpRequest *request)
  */
 
 static gboolean 
-g_snmp_request_decode ( ASN1_SCK *asn1, GSnmpRequest *request)
+g_snmp_request_decode(ASN1_SCK *asn1, GSnmpReqResp *request)
 {
     guint cls, con, tag;
     guchar *end;

@@ -128,7 +128,7 @@ typedef enum {
 
 /* Typedefs */
 
-typedef struct  _GSnmpRequest		GSnmpRequest;
+typedef struct  _GSnmpReqResp		GSnmpReqResp;
 typedef struct  _GSnmpV1Trap		GSnmpV1Trap;
 typedef union   _GSnmpPdu		GSnmpPdu;
 typedef union   _GSnmpVarBindSyntax     GSnmpVarBindSyntax;
@@ -152,7 +152,7 @@ struct _GSnmpVarBind
     GSnmpVarBindSyntax	syntax;
 };
 
-struct _GSnmpRequest
+struct _GSnmpReqResp
 {
     GSnmpPduType type;
     gint32       id;
@@ -177,7 +177,7 @@ union _GSnmpPdu			/* xxx are three structures really needed */
 {
     GSnmpPduType type;
     GSnmpV1Trap  trap;
-    GSnmpRequest request;
+    GSnmpReqResp request;
 };
 
 /* Include other SNMP headers */
@@ -185,11 +185,12 @@ union _GSnmpPdu			/* xxx are three structures really needed */
 #include "g_asn1.h"
 #include "g_message.h"
 #include "g_security.h"
-#include "g_session.h"
 #include "g_transport.h"
+#include "g_session.h"
 #include "g_dispatch.h"
 #include "g_utils.h"
 #include "g_snmp_table.h"
+#include "g_snmp_walk.h"
 
 /* SNMP V1 trap names */
 

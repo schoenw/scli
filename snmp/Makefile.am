@@ -21,6 +21,8 @@ libgsnmp_a_SOURCES =	\
 	g_snmp.h	\
 	g_snmp_table.c	\
 	g_snmp_table.h	\
+	g_snmp_walk.c	\
+	g_snmp_walk.h	\
 	g_transport.c	\
 	g_transport.h	\
 	g_utils.c	\

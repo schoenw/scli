@@ -35,27 +35,27 @@ GSnmpEnum const gsnmp_enum_version_table[] = {
 
 
 GSnmpEnum const gsnmp_error_status_table[] = {
-    { G_SNMP_ERR_PROCEDURE,	"procedureError" },
-    { G_SNMP_ERR_INTERNAL,	"internalError" },
-    { G_SNMP_ERR_NORESPONSE,	"noResponse" },
-    { G_SNMP_ERR_NOERROR,	"noError" },
-    { G_SNMP_ERR_TOOBIG,	"tooBig" },
-    { G_SNMP_ERR_NOSUCHNAME,	"noSuchName"},
-    { G_SNMP_ERR_BADVALUE,	"badValue" },
-    { G_SNMP_ERR_READONLY,	"readOnly" },
-    { G_SNMP_ERR_GENERROR,	"genErr" },
-    { G_SNMP_ERR_NOACCESS,	"noAccess" },
-    { G_SNMP_ERR_WRONGTYPE,	"wrongType" },
-    { G_SNMP_ERR_WRONGLENGTH,	"wrongLength" },
-    { G_SNMP_ERR_WRONGENCODING,	"wrongEncoding" },
-    { G_SNMP_ERR_WRONGVALUE,	"wrongValue" },
-    { G_SNMP_ERR_NOCREATION,	"noCreation" },
+    { G_SNMP_ERR_PROCEDURE,		"procedureError" },
+    { G_SNMP_ERR_INTERNAL,		"internalError" },
+    { G_SNMP_ERR_NORESPONSE,		"noResponse" },
+    { G_SNMP_ERR_NOERROR,		"noError" },
+    { G_SNMP_ERR_TOOBIG,		"tooBig" },
+    { G_SNMP_ERR_NOSUCHNAME,		"noSuchName"},
+    { G_SNMP_ERR_BADVALUE,		"badValue" },
+    { G_SNMP_ERR_READONLY,		"readOnly" },
+    { G_SNMP_ERR_GENERROR,		"genErr" },
+    { G_SNMP_ERR_NOACCESS,		"noAccess" },
+    { G_SNMP_ERR_WRONGTYPE,		"wrongType" },
+    { G_SNMP_ERR_WRONGLENGTH,		"wrongLength" },
+    { G_SNMP_ERR_WRONGENCODING,		"wrongEncoding" },
+    { G_SNMP_ERR_WRONGVALUE,		"wrongValue" },
+    { G_SNMP_ERR_NOCREATION,		"noCreation" },
     { G_SNMP_ERR_INCONSISTENTVALUE,	"inconsistentValue" },
     { G_SNMP_ERR_RESOURCEUNAVAILABLE,	"resourceUnavailable" },
-    { G_SNMP_ERR_COMMITFAILED,	"commitFailed" },
-    { G_SNMP_ERR_UNDOFAILED,	"undoFailed" },
+    { G_SNMP_ERR_COMMITFAILED,		"commitFailed" },
+    { G_SNMP_ERR_UNDOFAILED,		"undoFailed" },
     { G_SNMP_ERR_AUTHORIZATIONERROR,	"authorizationError" },
-    { G_SNMP_ERR_NOTWRITABLE,	"notWritable" },
+    { G_SNMP_ERR_NOTWRITABLE,		"notWritable" },
     { G_SNMP_ERR_INCONSISTENTNAME,	"inconsistentName" },
     { 0, 0 }
 };
@@ -66,6 +66,16 @@ GSnmpEnum const gsnmp_enum_debug_table[] = {
     { G_SNMP_DEBUG_REQUESTS,	"request" },
     { G_SNMP_DEBUG_SESSION,	"session" },
     { G_SNMP_DEBUG_TRANSPORT,	"transport" },
+    { 0, 0 }
+};
+
+
+
+GSnmpEnum const gsnmp_enum_tdomain_table[] = {
+    { G_SNMP_TDOMAIN_NONE,	"none" },
+    { G_SNMP_TDOMAIN_UDP_IPV4,	"udp/ipv4" },
+    { G_SNMP_TDOMAIN_UDP_IPV6,	"udp/ipv6" },
+    { G_SNMP_TDOMAIN_IPX,	"ipx" },
     { 0, 0 }
 };
 

@@ -67,5 +67,6 @@ gsnmp_identity_get_identity(GSnmpIdentity const *table,
 extern GSnmpEnum const gsnmp_enum_version_table[];
 extern GSnmpEnum const gsnmp_error_status_table[];
 extern GSnmpEnum const gsnmp_enum_debug_table[];
+extern GSnmpEnum const gsnmp_enum_tdomain_table[];
 
 #endif

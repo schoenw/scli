@@ -50,58 +50,60 @@ dump_packet(guchar *data, guint len)
     }
 }
 
+/*
+ * The SNMP over UDP transport mapping as defined in RFC 1906
+ * section 3.
+ */
+
 static gint ipv4_socket = 0;      /* file handle for SNMP traffic */
 
 static gboolean
 ipv4_init(gboolean dobind)
 {
-  struct sockaddr_in adr;
+    struct sockaddr_in adr;
 
-  if ((ipv4_socket = socket(AF_INET, SOCK_DGRAM, 0)) != -1)
-    {
-      if (dobind)
-        {
-          adr.sin_family  = AF_INET;
-          adr.sin_port    = htons(161);
-          adr.sin_addr.s_addr = INADDR_ANY;
-          if (bind(ipv4_socket, (struct sockaddr *) &adr, sizeof(struct sockaddr_in)) == -1)
-            {
-              close(ipv4_socket);
-              g_warning("Can't bind IPv4 socket: %s", g_strerror(errno));
-            }
-        }
-      return TRUE;
+    ipv4_socket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (ipv4_socket == -1) {
+	g_warning("Open socket for transport AF_INET failed: %s", g_strerror(errno));
+	return FALSE;
     }
-  g_warning("Open socket for transport AF_INET failed: %s", g_strerror(errno));
-  return FALSE;
+
+    if (dobind) {
+	adr.sin_family  = AF_INET;
+	adr.sin_port    = htons(161);
+	adr.sin_addr.s_addr = INADDR_ANY;
+	if (bind(ipv4_socket, (struct sockaddr *) &adr, sizeof(struct sockaddr_in)) == -1) {
+	    close(ipv4_socket);
+	    g_warning("Can't bind IPv4 socket: %s", g_strerror(errno));
+	}
+    }
+
+    return TRUE;
 }
 
 static gboolean
-ipv4_resolve_address (guchar *hostname, struct sockaddr **address)
+ipv4_resolve_address(gchar *taddress, struct sockaddr **address)
 {
-  struct servent *port;
-  struct hostent *hp;
-  struct sockaddr_in *adr;
+    struct servent *port;
+    struct hostent *hp;
+    struct sockaddr_in *adr;
+    
+    *address = NULL;
+    adr = (struct sockaddr_in *) g_malloc(sizeof(struct sockaddr_in)); 
+    adr->sin_family = AF_INET;
+    hp = gethostbyname((char *) taddress);
+    if (!hp) {
+	g_free(adr);
+	return FALSE;
+    }
+    g_memmove((char *)&adr->sin_addr, (char *)hp->h_addr, hp->h_length);
 
-  *address = NULL;
-  adr = (struct sockaddr_in *) g_malloc(sizeof(struct sockaddr_in)); 
-  adr->sin_family = AF_INET;
-  hp = gethostbyname((char *) hostname);
-  if (!hp)
-    {
-      g_free(adr);
-      return FALSE;
-    }
-  g_memmove((char *)&adr->sin_addr, (char *)hp->h_addr, hp->h_length);
-  port = getservbyname("snmp","udp");
-  if (!port)
-    {
-      g_free(adr);
-      return FALSE;
-    }
-  adr->sin_port = port->s_port;
-  *address = (struct sockaddr *)adr;
-  return TRUE;
+    /* XXX we should allow the application to provide the port number */
+    
+    port = getservbyname("snmp","udp");
+    adr->sin_port = port ? port->s_port : htons(161);
+    *address = (struct sockaddr *)adr;
+    return TRUE;
 }
 
 static gboolean
@@ -353,14 +355,14 @@ g_snmp_transport_init(gboolean dobind)
     if (ipv4_init(dobind)) {
 	my_transport = g_malloc(sizeof(GSnmpTransport));
 
-	my_transport->domain		   = G_SNMP_TDOMAIN_UDP_IPV4;
+	my_transport->tdomain		   = G_SNMP_TDOMAIN_UDP_IPV4;
 	my_transport->name		   = "udp/ipv4";
 	my_transport->sendMessage          = ipv4_send_message;
 	my_transport->receiveMessage       = ipv4_receive_message;
 	my_transport->resolveAddress       = ipv4_resolve_address;
 	my_transport->getSocket            = ipv4_get_socket;
 	
-	g_register_transport (my_transport);
+	g_register_transport(my_transport);
 	success = TRUE;
     }
 #endif
@@ -376,7 +378,7 @@ g_snmp_transport_init(gboolean dobind)
 	my_transport->resolveAddress       = ipx_resolve_address;
 	my_transport->getSocket            = ipx_get_socket;
 	
-	g_register_transport (my_transport);
+	g_register_transport(my_transport);
 	success = TRUE;
     }
 #endif
@@ -392,7 +394,7 @@ g_snmp_transport_init(gboolean dobind)
 	my_transport->resolveAddress       = ipv6_resolve_address;
 	my_transport->getSocket            = ipv6_get_socket;
 	
-	g_register_transport (my_transport);
+	g_register_transport(my_transport);
 	success = TRUE;
     }
 #endif

@@ -126,8 +126,6 @@ static GHashTable *message_models        = NULL;
 static GHashTable *security_models       = NULL;
 static GHashTable *access_models         = NULL;
 static GHashTable *transport_models      = NULL;
-static GList	  *transport_name_list   = NULL;
-static GList	  *transport_model_list  = NULL;
 
 /* 4.1.1.  Sending a Request or Notification 
  *
@@ -401,26 +399,10 @@ g_register_security(guint model_nr, struct g_security *sec)
 gboolean
 g_register_transport(GSnmpTransport *tpt)
 {
-  if (g_hash_table_lookup(transport_models, &tpt->domain)) return FALSE;
-  g_hash_table_insert(transport_models, &tpt->domain, tpt);
+  if (g_hash_table_lookup(transport_models, &tpt->tdomain)) return FALSE;
+  g_hash_table_insert(transport_models, &tpt->tdomain, tpt);
 
-  transport_model_list = g_list_append (transport_model_list,
-					(gpointer) tpt->domain);
-  transport_name_list  = g_list_append (transport_name_list, 
-				        tpt->name); 
   return TRUE;
-}
-
-GList *
-g_transport_model_list (void)
-{
-  return transport_model_list;
-}
-
-GList *
-g_transport_name_list (void)
-{
-  return transport_name_list;
 }
 
 /* 4.2.1.  Message Dispatching of received SNMP Messages
@@ -744,17 +726,20 @@ g_receive_message(int transportDomain, struct sockaddr *transportAddress,
  */
 
 gboolean
-g_lookup_address (guint model_nr, gchar *hostname, struct sockaddr **address)
+g_lookup_address(GSnmpTDomain tdomain, gchar *taddress, struct sockaddr **address)
 {
-  GSnmpTransport *trp_model;
+    GSnmpTransport *trp_model;
+    
+    if (! transport_models) {
+	return FALSE;
+    }
 
-  if (!transport_models)
-    return FALSE;
+    trp_model = g_hash_table_lookup(transport_models, &tdomain);
+    if (! trp_model) {
+	return FALSE;
+    }
 
-  if (!(trp_model = g_hash_table_lookup(transport_models, &model_nr)))
-    return FALSE;
-
-  return trp_model->resolveAddress((guchar *)hostname, address);
+    return trp_model->resolveAddress(taddress, address);
 }
 
 static gboolean

@@ -41,7 +41,7 @@ typedef enum {
 #define MAX_DGRAM_SIZE 32768
 
 typedef struct _GSnmpTransport {
-    GSnmpTDomain domain;	/* transport domain */
+    GSnmpTDomain tdomain;	/* transport domain */
     gchar	 *name;		/* name of the transport domain */
     gboolean (*sendMessage) (
 	struct sockaddr *transportAddress,
@@ -49,8 +49,8 @@ typedef struct _GSnmpTransport {
 	guint           outgoingMessageLength);
     void     (*receiveMessage) ();
     gboolean (*resolveAddress) (
-	guchar          *hostName,
-	struct sockaddr **transportAddress);
+	gchar           *taddress,
+	struct sockaddr **address);
     guint    (*getSocket) ();
 } GSnmpTransport;
 

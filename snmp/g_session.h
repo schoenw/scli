@@ -32,11 +32,11 @@
 
 typedef struct _GSnmpSession {
     struct sockaddr *address;
-    guint         domain;
+    GSnmpTDomain  tdomain;
+    gchar        *taddress;
     gchar        *rcomm;
     gchar        *wcomm;
     guint         retries;
-    gchar         *name;
     gint32        error_status;
     guint32	  error_index;
     guint         port;
@@ -47,7 +47,7 @@ typedef struct _GSnmpSession {
     gpointer      magic;               /* additional data for callbacks */
 } GSnmpSession;
 
-GSnmpSession*	g_snmp_session_new(void);
+GSnmpSession*	g_snmp_session_new(GSnmpTDomain domain, gchar *address);
 GSnmpSession*	g_snmp_session_clone(GSnmpSession *s);
 void		g_snmp_session_destroy(GSnmpSession *s);
 
@@ -73,28 +73,29 @@ GSList* g_snmp_session_sync_getbulk  (GSnmpSession *session,
 				      guint32 nonrep,
 				      guint32 maxrep);
 
-typedef struct _snmp_request {
-  gboolean            (*callback) ();
-  void                (*timeout) ();
-  GSnmpSession        *session;
-  GString             *auth;
-  GSnmpPdu             pdu;
-  struct sockaddr     *address;
-  guint                domain;
-  time_t               time;
-  guint                retries;
-  guint                timeoutval;
-  GSnmpVersion         version;
-  gpointer             magic;
-} snmp_request;
+typedef struct _GSnmpRequest {
+    gboolean            (*callback) ();
+    void                (*timeout) ();
+    GSnmpSession        *session;
+    GString             *auth;
+    GSnmpPdu             pdu;
+    struct sockaddr	*address;
+    GSnmpTDomain         tdomain;
+    gchar               *taddress;
+    time_t               time;
+    guint                retries;
+    guint                timeoutval;
+    GSnmpVersion         version;
+    gpointer             magic;
+} GSnmpRequest;
 
 
-snmp_request*	g_snmp_request_new(void);
-void		g_snmp_request_destroy(snmp_request *request);
+GSnmpRequest*	g_snmp_request_new(void);
+void		g_snmp_request_destroy(GSnmpRequest *request);
 
-void		g_snmp_request_queue(snmp_request *request);
-void		g_snmp_request_dequeue(snmp_request *request);
-snmp_request*	g_snmp_request_find(gint32 request_id);
+void		g_snmp_request_queue(GSnmpRequest *request);
+void		g_snmp_request_dequeue(GSnmpRequest *request);
+GSnmpRequest*	g_snmp_request_find(gint32 request_id);
 
 /*
  * Session API - the stuff below needs to be cleaned up. XXX

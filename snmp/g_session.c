@@ -32,40 +32,30 @@
 static GSList  *request_queue = NULL;   /* queue of active requests */
 
 /*
- * lookup address of node and set port number or default.
- * Maybe this one should be nuked completely. gnome has a nice async
- * dns helper and the collector might use cached IP addresses for speedup
- * anyways.
- *
- */
-
-gboolean
-g_setup_address(GSnmpSession *session)
-{
-    if (! g_lookup_address(session->domain, session->name, &session->address)) {
-	return FALSE;
-    }
-    
-    return TRUE;
-}
-
-/*
  * Allocate a new session data structure.
  */
 
 GSnmpSession*
-g_snmp_session_new()
+g_snmp_session_new(GSnmpTDomain tdomain, gchar *taddress)
 {
     GSnmpSession *session;
 
     session = g_malloc0(sizeof(GSnmpSession));
-    session->domain = G_SNMP_TDOMAIN_UDP_IPV4;
-    session->name = NULL;
+    session->tdomain = tdomain;
+    session->taddress = taddress ? g_strdup(taddress) : NULL;
     session->port = 161;
     session->retries = 3;
     session->timeout = 1;
     session->version = G_SNMP_V2C;
 
+    if (! g_lookup_address(session->tdomain, session->taddress, &session->address)) {
+	if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	    g_printerr("session %p: lookup failed\n", session);
+	}
+	g_snmp_session_destroy(session);
+	return NULL;
+    }
+    
     if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
 	g_printerr("session %p: new\n", session);
     }
@@ -81,8 +71,7 @@ g_snmp_session_clone(GSnmpSession *session)
 {
     GSnmpSession *clone;
 
-    clone = g_snmp_session_new();
-    clone->domain  = session->domain;
+    clone = g_snmp_session_new(session->tdomain, session->taddress);
     clone->port    = session->port;
     clone->retries = session->retries;
     clone->timeout = session->timeout;
@@ -92,9 +81,6 @@ g_snmp_session_clone(GSnmpSession *session)
     }
     if (session->wcomm) {
 	clone->wcomm = g_strdup(session->wcomm);
-    }
-    if (session->name) {
-	clone->name  = g_strdup(session->name);
     }
 
     return clone;
@@ -109,7 +95,7 @@ g_snmp_session_destroy(GSnmpSession *session)
 {
     /* XXX delete all requests that refer to this session first */
 
-    if (session->name) g_free(session->name);
+    if (session->taddress) g_free(session->taddress);
     if (session->rcomm) g_free(session->rcomm);
     if (session->wcomm) g_free(session->wcomm);
     if (session->address) g_free(session->address);
@@ -124,12 +110,12 @@ g_snmp_session_destroy(GSnmpSession *session)
  * Allocate a new request data structure.
  */
 
-snmp_request*
+GSnmpRequest*
 g_snmp_request_new()
 {
-    snmp_request *request;
+    GSnmpRequest *request;
 
-    request = g_malloc0(sizeof(snmp_request));
+    request = g_malloc0(sizeof(GSnmpRequest));
     request->auth = g_string_new(NULL);
     
     if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
@@ -144,7 +130,7 @@ g_snmp_request_new()
  */
 
 void
-g_snmp_request_destroy(snmp_request *request)
+g_snmp_request_destroy(GSnmpRequest *request)
 {
     g_return_if_fail(request);
     
@@ -164,7 +150,7 @@ g_snmp_request_destroy(snmp_request *request)
  */
 
 void
-g_snmp_request_queue(snmp_request *request)
+g_snmp_request_queue(GSnmpRequest *request)
 {
     g_return_if_fail(request);
     
@@ -180,7 +166,7 @@ g_snmp_request_queue(snmp_request *request)
  */
 
 void
-g_snmp_request_dequeue(snmp_request *request)
+g_snmp_request_dequeue(GSnmpRequest *request)
 {
     g_return_if_fail(request);
 
@@ -196,13 +182,13 @@ g_snmp_request_dequeue(snmp_request *request)
  * XXX This is not thread-safe.
  */
 
-snmp_request*
+GSnmpRequest*
 g_snmp_request_find(gint32 id)
 {
     GSList *elem;
 
     for (elem = request_queue; elem; elem = g_slist_next(elem)) {
-	snmp_request *request = (snmp_request *) elem->data;
+	GSnmpRequest *request = (GSnmpRequest *) elem->data;
 	if (request->pdu.request.id == id) {
 	    if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
 		g_printerr("request %p: found\n", request);
@@ -229,7 +215,7 @@ static gpointer
 g_async_send(GSnmpSession *session, GSnmpPduType type,
 	     GSList *objs, guint32 arg1, guint32 arg2)
 {
-    snmp_request *request;
+    GSnmpRequest *request;
     time_t        now;
     int           model = 0, pduv = 0;
     static gint32 id = -1;
@@ -243,12 +229,6 @@ g_async_send(GSnmpSession *session, GSnmpPduType type,
 #ifdef SNMP_DEBUG
     printf("g_async_send for %s\n", host->name);
 #endif
-    
-    if (!session->address) {
-	if (!g_setup_address(session)) {
-	    return NULL;
-	}
-    }
 
     session->error_status = G_SNMP_ERR_NOERROR;
     session->error_index = 0;
@@ -270,7 +250,8 @@ g_async_send(GSnmpSession *session, GSnmpPduType type,
     request->timeoutval             = session->timeout;
     request->magic                  = session->magic;
     request->version                = session->version;
-    request->domain                 = session->domain;
+    request->tdomain                = session->tdomain;
+    request->taddress               = session->taddress;
     request->address                = session->address;
     request->session                = session;
     request->time                   = now + request->timeoutval;
@@ -294,7 +275,7 @@ g_async_send(GSnmpSession *session, GSnmpPduType type,
 #ifdef SNMP_DEBUG 
     printf("sending Pdu for %s, version %d\n", session->name, request->version);
 #endif
-    sendPdu(request->domain, request->address, model, SMODEL_ANY, 
+    sendPdu(request->tdomain, request->address, model, SMODEL_ANY, 
 	    request->auth, SLEVEL_NANP, NULL, NULL, pduv, &request->pdu, TRUE);
     
     g_snmp_request_queue(request);
@@ -536,7 +517,7 @@ g_snmp_timeout_cb (gpointer data)
 {
   GSList       *mylist;
   time_t        now;
-  snmp_request *request;
+  GSnmpRequest *request;
   int           model = 0, pduv = 0;
 
 #ifdef SNMP_DEBUG
@@ -549,7 +530,7 @@ again:
 
   while(mylist)
     {
-      request = (snmp_request *) mylist->data;
+      request = (GSnmpRequest *) mylist->data;
       mylist = mylist->next;
       if (request->time <= now)
         {
@@ -576,7 +557,7 @@ again:
                     break;
                 }
  
-              sendPdu(request->domain, request->address, model, SMODEL_ANY, 
+              sendPdu(request->tdomain, request->address, model, SMODEL_ANY, 
                 request->auth, SLEVEL_NANP, NULL, NULL, pduv, 
                 &request->pdu, TRUE);
             }
@@ -609,7 +590,7 @@ g_session_response_pdu(guint messageProcessingModel,
 		       GSnmpPdu *PDU)
 {
     GSList       *vbl;
-    snmp_request *request;
+    GSnmpRequest *request;
 
     if (PDU->type == G_SNMP_PDU_TRAP1) {
 	vbl = PDU->trap.variables;
