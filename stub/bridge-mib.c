@@ -190,8 +190,8 @@ bridge_mib_get_dot1dBase(GSnmpSession *s, bridge_mib_dot1dBase_t **dot1dBase)
 
     stls_vbl_attributes(s, &in, base, 8, _dot1dBase);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -210,7 +210,7 @@ bridge_mib_free_dot1dBase(bridge_mib_dot1dBase_t *dot1dBase)
     if (dot1dBase) {
         p = (char *) dot1dBase + sizeof(bridge_mib_dot1dBase_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(dot1dBase);
     }
 }
@@ -297,7 +297,7 @@ bridge_mib_get_dot1dBasePortTable(GSnmpSession *s, bridge_mib_dot1dBasePortEntry
     stls_vbl_attributes(s, &in, base, 10, _dot1dBasePortEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -323,7 +323,7 @@ bridge_mib_free_dot1dBasePortEntry(bridge_mib_dot1dBasePortEntry_t *dot1dBasePor
     if (dot1dBasePortEntry) {
         p = (char *) dot1dBasePortEntry + sizeof(bridge_mib_dot1dBasePortEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(dot1dBasePortEntry);
     }
 }
@@ -432,8 +432,8 @@ bridge_mib_get_dot1dStp(GSnmpSession *s, bridge_mib_dot1dStp_t **dot1dStp)
 
     stls_vbl_attributes(s, &in, base, 8, _dot1dStp);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -452,7 +452,7 @@ bridge_mib_free_dot1dStp(bridge_mib_dot1dStp_t *dot1dStp)
     if (dot1dStp) {
         p = (char *) dot1dStp + sizeof(bridge_mib_dot1dStp_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(dot1dStp);
     }
 }
@@ -553,7 +553,7 @@ bridge_mib_get_dot1dStpPortTable(GSnmpSession *s, bridge_mib_dot1dStpPortEntry_t
     stls_vbl_attributes(s, &in, base, 10, _dot1dStpPortEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -579,7 +579,7 @@ bridge_mib_free_dot1dStpPortEntry(bridge_mib_dot1dStpPortEntry_t *dot1dStpPortEn
     if (dot1dStpPortEntry) {
         p = (char *) dot1dStpPortEntry + sizeof(bridge_mib_dot1dStpPortEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(dot1dStpPortEntry);
     }
 }
@@ -652,8 +652,8 @@ bridge_mib_get_dot1dTp(GSnmpSession *s, bridge_mib_dot1dTp_t **dot1dTp)
 
     stls_vbl_attributes(s, &in, base, 8, _dot1dTp);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -672,7 +672,7 @@ bridge_mib_free_dot1dTp(bridge_mib_dot1dTp_t *dot1dTp)
     if (dot1dTp) {
         p = (char *) dot1dTp + sizeof(bridge_mib_dot1dTp_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(dot1dTp);
     }
 }
@@ -755,7 +755,7 @@ bridge_mib_get_dot1dTpFdbTable(GSnmpSession *s, bridge_mib_dot1dTpFdbEntry_t ***
     stls_vbl_attributes(s, &in, base, 10, _dot1dTpFdbEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -781,7 +781,7 @@ bridge_mib_free_dot1dTpFdbEntry(bridge_mib_dot1dTpFdbEntry_t *dot1dTpFdbEntry)
     if (dot1dTpFdbEntry) {
         p = (char *) dot1dTpFdbEntry + sizeof(bridge_mib_dot1dTpFdbEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(dot1dTpFdbEntry);
     }
 }
@@ -880,7 +880,7 @@ bridge_mib_get_dot1dTpPortTable(GSnmpSession *s, bridge_mib_dot1dTpPortEntry_t *
     stls_vbl_attributes(s, &in, base, 10, _dot1dTpPortEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -906,7 +906,7 @@ bridge_mib_free_dot1dTpPortEntry(bridge_mib_dot1dTpPortEntry_t *dot1dTpPortEntry
     if (dot1dTpPortEntry) {
         p = (char *) dot1dTpPortEntry + sizeof(bridge_mib_dot1dTpPortEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(dot1dTpPortEntry);
     }
 }
@@ -1005,7 +1005,7 @@ bridge_mib_get_dot1dStaticTable(GSnmpSession *s, bridge_mib_dot1dStaticEntry_t *
     stls_vbl_attributes(s, &in, base, 10, _dot1dStaticEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1031,7 +1031,7 @@ bridge_mib_free_dot1dStaticEntry(bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry
     if (dot1dStaticEntry) {
         p = (char *) dot1dStaticEntry + sizeof(bridge_mib_dot1dStaticEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(dot1dStaticEntry);
     }
 }

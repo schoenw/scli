@@ -168,8 +168,8 @@ disman_schedule_mib_get_schedObjects(GSnmpSession *s, disman_schedule_mib_schedO
 
     stls_vbl_attributes(s, &in, base, 8, _schedObjects);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -188,7 +188,7 @@ disman_schedule_mib_free_schedObjects(disman_schedule_mib_schedObjects_t *schedO
     if (schedObjects) {
         p = (char *) schedObjects + sizeof(disman_schedule_mib_schedObjects_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(schedObjects);
     }
 }
@@ -340,7 +340,7 @@ disman_schedule_mib_get_schedTable(GSnmpSession *s, disman_schedule_mib_schedEnt
     stls_vbl_attributes(s, &in, base, 10, _schedEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -366,7 +366,7 @@ disman_schedule_mib_free_schedEntry(disman_schedule_mib_schedEntry_t *schedEntry
     if (schedEntry) {
         p = (char *) schedEntry + sizeof(disman_schedule_mib_schedEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(schedEntry);
     }
 }

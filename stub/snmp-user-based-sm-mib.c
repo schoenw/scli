@@ -167,8 +167,8 @@ snmp_user_based_sm_mib_get_usmStats(GSnmpSession *s, snmp_user_based_sm_mib_usmS
 
     stls_vbl_attributes(s, &in, base, 9, _usmStats);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -187,7 +187,7 @@ snmp_user_based_sm_mib_free_usmStats(snmp_user_based_sm_mib_usmStats_t *usmStats
     if (usmStats) {
         p = (char *) usmStats + sizeof(snmp_user_based_sm_mib_usmStats_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(usmStats);
     }
 }
@@ -244,8 +244,8 @@ snmp_user_based_sm_mib_get_usmUser(GSnmpSession *s, snmp_user_based_sm_mib_usmUs
 
     stls_vbl_attributes(s, &in, base, 9, _usmUser);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -264,7 +264,7 @@ snmp_user_based_sm_mib_free_usmUser(snmp_user_based_sm_mib_usmUser_t *usmUser)
     if (usmUser) {
         p = (char *) usmUser + sizeof(snmp_user_based_sm_mib_usmUser_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(usmUser);
     }
 }
@@ -392,7 +392,7 @@ snmp_user_based_sm_mib_get_usmUserTable(GSnmpSession *s, snmp_user_based_sm_mib_
     stls_vbl_attributes(s, &in, base, 11, _usmUserEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -418,7 +418,7 @@ snmp_user_based_sm_mib_free_usmUserEntry(snmp_user_based_sm_mib_usmUserEntry_t *
     if (usmUserEntry) {
         p = (char *) usmUserEntry + sizeof(snmp_user_based_sm_mib_usmUserEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(usmUserEntry);
     }
 }

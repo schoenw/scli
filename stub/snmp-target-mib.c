@@ -153,8 +153,8 @@ snmp_target_mib_get_snmpTargetObjects(GSnmpSession *s, snmp_target_mib_snmpTarge
 
     stls_vbl_attributes(s, &in, base, 8, _snmpTargetObjects);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -173,7 +173,7 @@ snmp_target_mib_free_snmpTargetObjects(snmp_target_mib_snmpTargetObjects_t *snmp
     if (snmpTargetObjects) {
         p = (char *) snmpTargetObjects + sizeof(snmp_target_mib_snmpTargetObjects_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(snmpTargetObjects);
     }
 }
@@ -279,7 +279,7 @@ snmp_target_mib_get_snmpTargetAddrTable(GSnmpSession *s, snmp_target_mib_snmpTar
     stls_vbl_attributes(s, &in, base, 10, _snmpTargetAddrEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -305,7 +305,7 @@ snmp_target_mib_free_snmpTargetAddrEntry(snmp_target_mib_snmpTargetAddrEntry_t *
     if (snmpTargetAddrEntry) {
         p = (char *) snmpTargetAddrEntry + sizeof(snmp_target_mib_snmpTargetAddrEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(snmpTargetAddrEntry);
     }
 }
@@ -415,7 +415,7 @@ snmp_target_mib_get_snmpTargetParamsTable(GSnmpSession *s, snmp_target_mib_snmpT
     stls_vbl_attributes(s, &in, base, 10, _snmpTargetParamsEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -441,7 +441,7 @@ snmp_target_mib_free_snmpTargetParamsEntry(snmp_target_mib_snmpTargetParamsEntry
     if (snmpTargetParamsEntry) {
         p = (char *) snmpTargetParamsEntry + sizeof(snmp_target_mib_snmpTargetParamsEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(snmpTargetParamsEntry);
     }
 }

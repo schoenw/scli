@@ -338,8 +338,8 @@ host_resources_mib_get_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t *
 
     stls_vbl_attributes(s, &in, base, 8, _hrSystem);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -358,7 +358,7 @@ host_resources_mib_free_hrSystem(host_resources_mib_hrSystem_t *hrSystem)
     if (hrSystem) {
         p = (char *) hrSystem + sizeof(host_resources_mib_hrSystem_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrSystem);
     }
 }
@@ -415,8 +415,8 @@ host_resources_mib_get_hrStorage(GSnmpSession *s, host_resources_mib_hrStorage_t
 
     stls_vbl_attributes(s, &in, base, 8, _hrStorage);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -435,7 +435,7 @@ host_resources_mib_free_hrStorage(host_resources_mib_hrStorage_t *hrStorage)
     if (hrStorage) {
         p = (char *) hrStorage + sizeof(host_resources_mib_hrStorage_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrStorage);
     }
 }
@@ -529,7 +529,7 @@ host_resources_mib_get_hrStorageTable(GSnmpSession *s, host_resources_mib_hrStor
     stls_vbl_attributes(s, &in, base, 10, _hrStorageEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -555,7 +555,7 @@ host_resources_mib_free_hrStorageEntry(host_resources_mib_hrStorageEntry_t *hrSt
     if (hrStorageEntry) {
         p = (char *) hrStorageEntry + sizeof(host_resources_mib_hrStorageEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrStorageEntry);
     }
 }
@@ -660,7 +660,7 @@ host_resources_mib_get_hrDeviceTable(GSnmpSession *s, host_resources_mib_hrDevic
     stls_vbl_attributes(s, &in, base, 10, _hrDeviceEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -686,7 +686,7 @@ host_resources_mib_free_hrDeviceEntry(host_resources_mib_hrDeviceEntry_t *hrDevi
     if (hrDeviceEntry) {
         p = (char *) hrDeviceEntry + sizeof(host_resources_mib_hrDeviceEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrDeviceEntry);
     }
 }
@@ -780,7 +780,7 @@ host_resources_mib_get_hrProcessorTable(GSnmpSession *s, host_resources_mib_hrPr
     stls_vbl_attributes(s, &in, base, 10, _hrProcessorEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -806,7 +806,7 @@ host_resources_mib_free_hrProcessorEntry(host_resources_mib_hrProcessorEntry_t *
     if (hrProcessorEntry) {
         p = (char *) hrProcessorEntry + sizeof(host_resources_mib_hrProcessorEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrProcessorEntry);
     }
 }
@@ -896,7 +896,7 @@ host_resources_mib_get_hrNetworkTable(GSnmpSession *s, host_resources_mib_hrNetw
     stls_vbl_attributes(s, &in, base, 10, _hrNetworkEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -922,7 +922,7 @@ host_resources_mib_free_hrNetworkEntry(host_resources_mib_hrNetworkEntry_t *hrNe
     if (hrNetworkEntry) {
         p = (char *) hrNetworkEntry + sizeof(host_resources_mib_hrNetworkEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrNetworkEntry);
     }
 }
@@ -1016,7 +1016,7 @@ host_resources_mib_get_hrPrinterTable(GSnmpSession *s, host_resources_mib_hrPrin
     stls_vbl_attributes(s, &in, base, 10, _hrPrinterEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1042,7 +1042,7 @@ host_resources_mib_free_hrPrinterEntry(host_resources_mib_hrPrinterEntry_t *hrPr
     if (hrPrinterEntry) {
         p = (char *) hrPrinterEntry + sizeof(host_resources_mib_hrPrinterEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrPrinterEntry);
     }
 }
@@ -1141,7 +1141,7 @@ host_resources_mib_get_hrDiskStorageTable(GSnmpSession *s, host_resources_mib_hr
     stls_vbl_attributes(s, &in, base, 10, _hrDiskStorageEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1167,7 +1167,7 @@ host_resources_mib_free_hrDiskStorageEntry(host_resources_mib_hrDiskStorageEntry
     if (hrDiskStorageEntry) {
         p = (char *) hrDiskStorageEntry + sizeof(host_resources_mib_hrDiskStorageEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrDiskStorageEntry);
     }
 }
@@ -1270,7 +1270,7 @@ host_resources_mib_get_hrPartitionTable(GSnmpSession *s, host_resources_mib_hrPa
     stls_vbl_attributes(s, &in, base, 10, _hrPartitionEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1296,7 +1296,7 @@ host_resources_mib_free_hrPartitionEntry(host_resources_mib_hrPartitionEntry_t *
     if (hrPartitionEntry) {
         p = (char *) hrPartitionEntry + sizeof(host_resources_mib_hrPartitionEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrPartitionEntry);
     }
 }
@@ -1412,7 +1412,7 @@ host_resources_mib_get_hrFSTable(GSnmpSession *s, host_resources_mib_hrFSEntry_t
     stls_vbl_attributes(s, &in, base, 10, _hrFSEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1438,7 +1438,7 @@ host_resources_mib_free_hrFSEntry(host_resources_mib_hrFSEntry_t *hrFSEntry)
     if (hrFSEntry) {
         p = (char *) hrFSEntry + sizeof(host_resources_mib_hrFSEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrFSEntry);
     }
 }
@@ -1508,8 +1508,8 @@ host_resources_mib_get_hrSWRun(GSnmpSession *s, host_resources_mib_hrSWRun_t **h
 
     stls_vbl_attributes(s, &in, base, 8, _hrSWRun);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -1528,7 +1528,7 @@ host_resources_mib_free_hrSWRun(host_resources_mib_hrSWRun_t *hrSWRun)
     if (hrSWRun) {
         p = (char *) hrSWRun + sizeof(host_resources_mib_hrSWRun_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrSWRun);
     }
 }
@@ -1624,7 +1624,7 @@ host_resources_mib_get_hrSWRunTable(GSnmpSession *s, host_resources_mib_hrSWRunE
     stls_vbl_attributes(s, &in, base, 10, _hrSWRunEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1650,7 +1650,7 @@ host_resources_mib_free_hrSWRunEntry(host_resources_mib_hrSWRunEntry_t *hrSWRunE
     if (hrSWRunEntry) {
         p = (char *) hrSWRunEntry + sizeof(host_resources_mib_hrSWRunEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrSWRunEntry);
     }
 }
@@ -1743,7 +1743,7 @@ host_resources_mib_get_hrSWRunPerfTable(GSnmpSession *s, host_resources_mib_hrSW
     stls_vbl_attributes(s, &in, base, 10, _hrSWRunPerfEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1769,7 +1769,7 @@ host_resources_mib_free_hrSWRunPerfEntry(host_resources_mib_hrSWRunPerfEntry_t *
     if (hrSWRunPerfEntry) {
         p = (char *) hrSWRunPerfEntry + sizeof(host_resources_mib_hrSWRunPerfEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrSWRunPerfEntry);
     }
 }
@@ -1842,8 +1842,8 @@ host_resources_mib_get_hrSWInstalled(GSnmpSession *s, host_resources_mib_hrSWIns
 
     stls_vbl_attributes(s, &in, base, 8, _hrSWInstalled);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -1862,7 +1862,7 @@ host_resources_mib_free_hrSWInstalled(host_resources_mib_hrSWInstalled_t *hrSWIn
     if (hrSWInstalled) {
         p = (char *) hrSWInstalled + sizeof(host_resources_mib_hrSWInstalled_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrSWInstalled);
     }
 }
@@ -1951,7 +1951,7 @@ host_resources_mib_get_hrSWInstalledTable(GSnmpSession *s, host_resources_mib_hr
     stls_vbl_attributes(s, &in, base, 10, _hrSWInstalledEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1977,7 +1977,7 @@ host_resources_mib_free_hrSWInstalledEntry(host_resources_mib_hrSWInstalledEntry
     if (hrSWInstalledEntry) {
         p = (char *) hrSWInstalledEntry + sizeof(host_resources_mib_hrSWInstalledEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(hrSWInstalledEntry);
     }
 }

@@ -510,8 +510,8 @@ ospf_mib_get_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t **osp
 
     stls_vbl_attributes(s, &in, base, 8, _ospfGeneralGroup);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -530,7 +530,7 @@ ospf_mib_free_ospfGeneralGroup(ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup)
     if (ospfGeneralGroup) {
         p = (char *) ospfGeneralGroup + sizeof(ospf_mib_ospfGeneralGroup_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfGeneralGroup);
     }
 }
@@ -634,7 +634,7 @@ ospf_mib_get_ospfAreaTable(GSnmpSession *s, ospf_mib_ospfAreaEntry_t ***ospfArea
     stls_vbl_attributes(s, &in, base, 9, _ospfAreaEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -660,7 +660,7 @@ ospf_mib_free_ospfAreaEntry(ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
     if (ospfAreaEntry) {
         p = (char *) ospfAreaEntry + sizeof(ospf_mib_ospfAreaEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfAreaEntry);
     }
 }
@@ -761,7 +761,7 @@ ospf_mib_get_ospfStubAreaTable(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t ***
     stls_vbl_attributes(s, &in, base, 9, _ospfStubAreaEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -787,7 +787,7 @@ ospf_mib_free_ospfStubAreaEntry(ospf_mib_ospfStubAreaEntry_t *ospfStubAreaEntry)
     if (ospfStubAreaEntry) {
         p = (char *) ospfStubAreaEntry + sizeof(ospf_mib_ospfStubAreaEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfStubAreaEntry);
     }
 }
@@ -902,7 +902,7 @@ ospf_mib_get_ospfLsdbTable(GSnmpSession *s, ospf_mib_ospfLsdbEntry_t ***ospfLsdb
     stls_vbl_attributes(s, &in, base, 9, _ospfLsdbEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -928,7 +928,7 @@ ospf_mib_free_ospfLsdbEntry(ospf_mib_ospfLsdbEntry_t *ospfLsdbEntry)
     if (ospfLsdbEntry) {
         p = (char *) ospfLsdbEntry + sizeof(ospf_mib_ospfLsdbEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfLsdbEntry);
     }
 }
@@ -1032,7 +1032,7 @@ ospf_mib_get_ospfAreaRangeTable(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t *
     stls_vbl_attributes(s, &in, base, 9, _ospfAreaRangeEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1058,7 +1058,7 @@ ospf_mib_free_ospfAreaRangeEntry(ospf_mib_ospfAreaRangeEntry_t *ospfAreaRangeEnt
     if (ospfAreaRangeEntry) {
         p = (char *) ospfAreaRangeEntry + sizeof(ospf_mib_ospfAreaRangeEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfAreaRangeEntry);
     }
 }
@@ -1159,7 +1159,7 @@ ospf_mib_get_ospfHostTable(GSnmpSession *s, ospf_mib_ospfHostEntry_t ***ospfHost
     stls_vbl_attributes(s, &in, base, 9, _ospfHostEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1185,7 +1185,7 @@ ospf_mib_free_ospfHostEntry(ospf_mib_ospfHostEntry_t *ospfHostEntry)
     if (ospfHostEntry) {
         p = (char *) ospfHostEntry + sizeof(ospf_mib_ospfHostEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfHostEntry);
     }
 }
@@ -1332,7 +1332,7 @@ ospf_mib_get_ospfIfTable(GSnmpSession *s, ospf_mib_ospfIfEntry_t ***ospfIfEntry)
     stls_vbl_attributes(s, &in, base, 9, _ospfIfEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1358,7 +1358,7 @@ ospf_mib_free_ospfIfEntry(ospf_mib_ospfIfEntry_t *ospfIfEntry)
     if (ospfIfEntry) {
         p = (char *) ospfIfEntry + sizeof(ospf_mib_ospfIfEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfIfEntry);
     }
 }
@@ -1458,7 +1458,7 @@ ospf_mib_get_ospfIfMetricTable(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t ***
     stls_vbl_attributes(s, &in, base, 9, _ospfIfMetricEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1484,7 +1484,7 @@ ospf_mib_free_ospfIfMetricEntry(ospf_mib_ospfIfMetricEntry_t *ospfIfMetricEntry)
     if (ospfIfMetricEntry) {
         p = (char *) ospfIfMetricEntry + sizeof(ospf_mib_ospfIfMetricEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfIfMetricEntry);
     }
 }
@@ -1607,7 +1607,7 @@ ospf_mib_get_ospfVirtIfTable(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t ***ospf
     stls_vbl_attributes(s, &in, base, 9, _ospfVirtIfEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1633,7 +1633,7 @@ ospf_mib_free_ospfVirtIfEntry(ospf_mib_ospfVirtIfEntry_t *ospfVirtIfEntry)
     if (ospfVirtIfEntry) {
         p = (char *) ospfVirtIfEntry + sizeof(ospf_mib_ospfVirtIfEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfVirtIfEntry);
     }
 }
@@ -1752,7 +1752,7 @@ ospf_mib_get_ospfNbrTable(GSnmpSession *s, ospf_mib_ospfNbrEntry_t ***ospfNbrEnt
     stls_vbl_attributes(s, &in, base, 9, _ospfNbrEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1778,7 +1778,7 @@ ospf_mib_free_ospfNbrEntry(ospf_mib_ospfNbrEntry_t *ospfNbrEntry)
     if (ospfNbrEntry) {
         p = (char *) ospfNbrEntry + sizeof(ospf_mib_ospfNbrEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfNbrEntry);
     }
 }
@@ -1891,7 +1891,7 @@ ospf_mib_get_ospfVirtNbrTable(GSnmpSession *s, ospf_mib_ospfVirtNbrEntry_t ***os
     stls_vbl_attributes(s, &in, base, 9, _ospfVirtNbrEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1917,7 +1917,7 @@ ospf_mib_free_ospfVirtNbrEntry(ospf_mib_ospfVirtNbrEntry_t *ospfVirtNbrEntry)
     if (ospfVirtNbrEntry) {
         p = (char *) ospfVirtNbrEntry + sizeof(ospf_mib_ospfVirtNbrEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfVirtNbrEntry);
     }
 }
@@ -2026,7 +2026,7 @@ ospf_mib_get_ospfExtLsdbTable(GSnmpSession *s, ospf_mib_ospfExtLsdbEntry_t ***os
     stls_vbl_attributes(s, &in, base, 9, _ospfExtLsdbEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -2052,7 +2052,7 @@ ospf_mib_free_ospfExtLsdbEntry(ospf_mib_ospfExtLsdbEntry_t *ospfExtLsdbEntry)
     if (ospfExtLsdbEntry) {
         p = (char *) ospfExtLsdbEntry + sizeof(ospf_mib_ospfExtLsdbEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfExtLsdbEntry);
     }
 }
@@ -2160,7 +2160,7 @@ ospf_mib_get_ospfAreaAggregateTable(GSnmpSession *s, ospf_mib_ospfAreaAggregateE
     stls_vbl_attributes(s, &in, base, 9, _ospfAreaAggregateEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -2186,7 +2186,7 @@ ospf_mib_free_ospfAreaAggregateEntry(ospf_mib_ospfAreaAggregateEntry_t *ospfArea
     if (ospfAreaAggregateEntry) {
         p = (char *) ospfAreaAggregateEntry + sizeof(ospf_mib_ospfAreaAggregateEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ospfAreaAggregateEntry);
     }
 }

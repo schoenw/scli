@@ -106,8 +106,8 @@ snmp_framework_mib_get_snmpEngine(GSnmpSession *s, snmp_framework_mib_snmpEngine
 
     stls_vbl_attributes(s, &in, base, 9, _snmpEngine);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -126,7 +126,7 @@ snmp_framework_mib_free_snmpEngine(snmp_framework_mib_snmpEngine_t *snmpEngine)
     if (snmpEngine) {
         p = (char *) snmpEngine + sizeof(snmp_framework_mib_snmpEngine_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(snmpEngine);
     }
 }

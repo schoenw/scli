@@ -161,8 +161,8 @@ snmpv2_mib_get_system(GSnmpSession *s, snmpv2_mib_system_t **system)
 
     stls_vbl_attributes(s, &in, base, 7, _system);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -181,7 +181,7 @@ snmpv2_mib_free_system(snmpv2_mib_system_t *system)
     if (system) {
         p = (char *) system + sizeof(snmpv2_mib_system_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(system);
     }
 }
@@ -266,7 +266,7 @@ snmpv2_mib_get_sysORTable(GSnmpSession *s, snmpv2_mib_sysOREntry_t ***sysOREntry
     stls_vbl_attributes(s, &in, base, 9, _sysOREntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -292,7 +292,7 @@ snmpv2_mib_free_sysOREntry(snmpv2_mib_sysOREntry_t *sysOREntry)
     if (sysOREntry) {
         p = (char *) sysOREntry + sizeof(snmpv2_mib_sysOREntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(sysOREntry);
     }
 }
@@ -449,8 +449,8 @@ snmpv2_mib_get_snmp(GSnmpSession *s, snmpv2_mib_snmp_t **snmp)
 
     stls_vbl_attributes(s, &in, base, 7, _snmp);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -469,7 +469,7 @@ snmpv2_mib_free_snmp(snmpv2_mib_snmp_t *snmp)
     if (snmp) {
         p = (char *) snmp + sizeof(snmpv2_mib_snmp_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(snmp);
     }
 }
@@ -526,8 +526,8 @@ snmpv2_mib_get_snmpSet(GSnmpSession *s, snmpv2_mib_snmpSet_t **snmpSet)
 
     stls_vbl_attributes(s, &in, base, 9, _snmpSet);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -546,7 +546,7 @@ snmpv2_mib_free_snmpSet(snmpv2_mib_snmpSet_t *snmpSet)
     if (snmpSet) {
         p = (char *) snmpSet + sizeof(snmpv2_mib_snmpSet_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(snmpSet);
     }
 }

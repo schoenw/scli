@@ -157,8 +157,8 @@ tcp_mib_get_tcp(GSnmpSession *s, tcp_mib_tcp_t **tcp)
 
     stls_vbl_attributes(s, &in, base, 7, _tcp);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -177,7 +177,7 @@ tcp_mib_free_tcp(tcp_mib_tcp_t *tcp)
     if (tcp) {
         p = (char *) tcp + sizeof(tcp_mib_tcp_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(tcp);
     }
 }
@@ -266,7 +266,7 @@ tcp_mib_get_tcpConnTable(GSnmpSession *s, tcp_mib_tcpConnEntry_t ***tcpConnEntry
     stls_vbl_attributes(s, &in, base, 9, _tcpConnEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -292,7 +292,7 @@ tcp_mib_free_tcpConnEntry(tcp_mib_tcpConnEntry_t *tcpConnEntry)
     if (tcpConnEntry) {
         p = (char *) tcpConnEntry + sizeof(tcp_mib_tcpConnEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(tcpConnEntry);
     }
 }

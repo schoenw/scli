@@ -82,8 +82,8 @@ snmp_mpd_mib_get_snmpMPDStats(GSnmpSession *s, snmp_mpd_mib_snmpMPDStats_t **snm
 
     stls_vbl_attributes(s, &in, base, 9, _snmpMPDStats);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -102,7 +102,7 @@ snmp_mpd_mib_free_snmpMPDStats(snmp_mpd_mib_snmpMPDStats_t *snmpMPDStats)
     if (snmpMPDStats) {
         p = (char *) snmpMPDStats + sizeof(snmp_mpd_mib_snmpMPDStats_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(snmpMPDStats);
     }
 }

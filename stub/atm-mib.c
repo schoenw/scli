@@ -425,8 +425,8 @@ atm_mib_get_atmMIBObjects(GSnmpSession *s, atm_mib_atmMIBObjects_t **atmMIBObjec
 
     stls_vbl_attributes(s, &in, base, 8, _atmMIBObjects);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -445,7 +445,7 @@ atm_mib_free_atmMIBObjects(atm_mib_atmMIBObjects_t *atmMIBObjects)
     if (atmMIBObjects) {
         p = (char *) atmMIBObjects + sizeof(atm_mib_atmMIBObjects_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(atmMIBObjects);
     }
 }
@@ -567,7 +567,7 @@ atm_mib_get_atmInterfaceConfTable(GSnmpSession *s, atm_mib_atmInterfaceConfEntry
     stls_vbl_attributes(s, &in, base, 10, _atmInterfaceConfEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -593,7 +593,7 @@ atm_mib_free_atmInterfaceConfEntry(atm_mib_atmInterfaceConfEntry_t *atmInterface
     if (atmInterfaceConfEntry) {
         p = (char *) atmInterfaceConfEntry + sizeof(atm_mib_atmInterfaceConfEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(atmInterfaceConfEntry);
     }
 }
@@ -689,7 +689,7 @@ atm_mib_get_atmInterfaceDs3PlcpTable(GSnmpSession *s, atm_mib_atmInterfaceDs3Plc
     stls_vbl_attributes(s, &in, base, 10, _atmInterfaceDs3PlcpEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -715,7 +715,7 @@ atm_mib_free_atmInterfaceDs3PlcpEntry(atm_mib_atmInterfaceDs3PlcpEntry_t *atmInt
     if (atmInterfaceDs3PlcpEntry) {
         p = (char *) atmInterfaceDs3PlcpEntry + sizeof(atm_mib_atmInterfaceDs3PlcpEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(atmInterfaceDs3PlcpEntry);
     }
 }
@@ -808,7 +808,7 @@ atm_mib_get_atmInterfaceTCTable(GSnmpSession *s, atm_mib_atmInterfaceTCEntry_t *
     stls_vbl_attributes(s, &in, base, 10, _atmInterfaceTCEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -834,7 +834,7 @@ atm_mib_free_atmInterfaceTCEntry(atm_mib_atmInterfaceTCEntry_t *atmInterfaceTCEn
     if (atmInterfaceTCEntry) {
         p = (char *) atmInterfaceTCEntry + sizeof(atm_mib_atmInterfaceTCEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(atmInterfaceTCEntry);
     }
 }
@@ -952,7 +952,7 @@ atm_mib_get_atmTrafficDescrParamTable(GSnmpSession *s, atm_mib_atmTrafficDescrPa
     stls_vbl_attributes(s, &in, base, 10, _atmTrafficDescrParamEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -978,7 +978,7 @@ atm_mib_free_atmTrafficDescrParamEntry(atm_mib_atmTrafficDescrParamEntry_t *atmT
     if (atmTrafficDescrParamEntry) {
         p = (char *) atmTrafficDescrParamEntry + sizeof(atm_mib_atmTrafficDescrParamEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(atmTrafficDescrParamEntry);
     }
 }
@@ -1094,7 +1094,7 @@ atm_mib_get_atmVplTable(GSnmpSession *s, atm_mib_atmVplEntry_t ***atmVplEntry)
     stls_vbl_attributes(s, &in, base, 10, _atmVplEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1120,7 +1120,7 @@ atm_mib_free_atmVplEntry(atm_mib_atmVplEntry_t *atmVplEntry)
     if (atmVplEntry) {
         p = (char *) atmVplEntry + sizeof(atm_mib_atmVplEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(atmVplEntry);
     }
 }
@@ -1250,7 +1250,7 @@ atm_mib_get_atmVclTable(GSnmpSession *s, atm_mib_atmVclEntry_t ***atmVclEntry)
     stls_vbl_attributes(s, &in, base, 10, _atmVclEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1276,7 +1276,7 @@ atm_mib_free_atmVclEntry(atm_mib_atmVclEntry_t *atmVclEntry)
     if (atmVclEntry) {
         p = (char *) atmVclEntry + sizeof(atm_mib_atmVclEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(atmVclEntry);
     }
 }
@@ -1389,7 +1389,7 @@ atm_mib_get_atmVpCrossConnectTable(GSnmpSession *s, atm_mib_atmVpCrossConnectEnt
     stls_vbl_attributes(s, &in, base, 10, _atmVpCrossConnectEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1415,7 +1415,7 @@ atm_mib_free_atmVpCrossConnectEntry(atm_mib_atmVpCrossConnectEntry_t *atmVpCross
     if (atmVpCrossConnectEntry) {
         p = (char *) atmVpCrossConnectEntry + sizeof(atm_mib_atmVpCrossConnectEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(atmVpCrossConnectEntry);
     }
 }
@@ -1532,7 +1532,7 @@ atm_mib_get_atmVcCrossConnectTable(GSnmpSession *s, atm_mib_atmVcCrossConnectEnt
     stls_vbl_attributes(s, &in, base, 10, _atmVcCrossConnectEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1558,7 +1558,7 @@ atm_mib_free_atmVcCrossConnectEntry(atm_mib_atmVcCrossConnectEntry_t *atmVcCross
     if (atmVcCrossConnectEntry) {
         p = (char *) atmVcCrossConnectEntry + sizeof(atm_mib_atmVcCrossConnectEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(atmVcCrossConnectEntry);
     }
 }
@@ -1658,7 +1658,7 @@ atm_mib_get_aal5VccTable(GSnmpSession *s, atm_mib_aal5VccEntry_t ***aal5VccEntry
     stls_vbl_attributes(s, &in, base, 10, _aal5VccEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1684,7 +1684,7 @@ atm_mib_free_aal5VccEntry(atm_mib_aal5VccEntry_t *aal5VccEntry)
     if (aal5VccEntry) {
         p = (char *) aal5VccEntry + sizeof(atm_mib_aal5VccEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(aal5VccEntry);
     }
 }

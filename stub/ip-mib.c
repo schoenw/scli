@@ -211,8 +211,8 @@ ip_mib_get_ip(GSnmpSession *s, ip_mib_ip_t **ip)
 
     stls_vbl_attributes(s, &in, base, 7, _ip);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -231,7 +231,7 @@ ip_mib_free_ip(ip_mib_ip_t *ip)
     if (ip) {
         p = (char *) ip + sizeof(ip_mib_ip_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ip);
     }
 }
@@ -320,7 +320,7 @@ ip_mib_get_ipAddrTable(GSnmpSession *s, ip_mib_ipAddrEntry_t ***ipAddrEntry)
     stls_vbl_attributes(s, &in, base, 9, _ipAddrEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -346,7 +346,7 @@ ip_mib_free_ipAddrEntry(ip_mib_ipAddrEntry_t *ipAddrEntry)
     if (ipAddrEntry) {
         p = (char *) ipAddrEntry + sizeof(ip_mib_ipAddrEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ipAddrEntry);
     }
 }
@@ -445,7 +445,7 @@ ip_mib_get_ipNetToMediaTable(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t ***ipNe
     stls_vbl_attributes(s, &in, base, 9, _ipNetToMediaEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -471,7 +471,7 @@ ip_mib_free_ipNetToMediaEntry(ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry)
     if (ipNetToMediaEntry) {
         p = (char *) ipNetToMediaEntry + sizeof(ip_mib_ipNetToMediaEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ipNetToMediaEntry);
     }
 }
@@ -616,8 +616,8 @@ ip_mib_get_icmp(GSnmpSession *s, ip_mib_icmp_t **icmp)
 
     stls_vbl_attributes(s, &in, base, 7, _icmp);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -636,7 +636,7 @@ ip_mib_free_icmp(ip_mib_icmp_t *icmp)
     if (icmp) {
         p = (char *) icmp + sizeof(ip_mib_icmp_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(icmp);
     }
 }

@@ -81,12 +81,6 @@ typedef struct {
 } stls_stut_obj_t;
 
 extern void
-stls_vbl_add_null(GSList **vbl, guint32 const *oid, gsize const len);
-
-extern void
-stls_vbl_free(GSList *vbl);
-
-extern void
 stls_vbl_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
 		    stls_stub_attr_t *attributes);
 
@@ -97,9 +91,6 @@ stls_vb_lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
 /*
  * SNMP toolkit independent API functions used by the stub code.
  */
-
-extern GSList *
-stls_snmp_getnext(GSnmpSession *s, GSList *vbl);
 
 extern GSList *
 stls_snmp_gettable(GSnmpSession *s, GSList *vbl);

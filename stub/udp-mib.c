@@ -93,8 +93,8 @@ udp_mib_get_udp(GSnmpSession *s, udp_mib_udp_t **udp)
 
     stls_vbl_attributes(s, &in, base, 7, _udp);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -113,7 +113,7 @@ udp_mib_free_udp(udp_mib_udp_t *udp)
     if (udp) {
         p = (char *) udp + sizeof(udp_mib_udp_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(udp);
     }
 }
@@ -192,7 +192,7 @@ udp_mib_get_udpTable(GSnmpSession *s, udp_mib_udpEntry_t ***udpEntry)
     stls_vbl_attributes(s, &in, base, 9, _udpEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -218,7 +218,7 @@ udp_mib_free_udpEntry(udp_mib_udpEntry_t *udpEntry)
     if (udpEntry) {
         p = (char *) udpEntry + sizeof(udp_mib_udpEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(udpEntry);
     }
 }

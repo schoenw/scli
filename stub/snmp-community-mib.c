@@ -154,7 +154,7 @@ snmp_community_mib_get_snmpCommunityTable(GSnmpSession *s, snmp_community_mib_sn
     stls_vbl_attributes(s, &in, base, 10, _snmpCommunityEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -180,7 +180,7 @@ snmp_community_mib_free_snmpCommunityEntry(snmp_community_mib_snmpCommunityEntry
     if (snmpCommunityEntry) {
         p = (char *) snmpCommunityEntry + sizeof(snmp_community_mib_snmpCommunityEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(snmpCommunityEntry);
     }
 }
@@ -278,7 +278,7 @@ snmp_community_mib_get_snmpTargetAddrExtTable(GSnmpSession *s, snmp_community_mi
     stls_vbl_attributes(s, &in, base, 10, _snmpTargetAddrExtEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -304,7 +304,7 @@ snmp_community_mib_free_snmpTargetAddrExtEntry(snmp_community_mib_snmpTargetAddr
     if (snmpTargetAddrExtEntry) {
         p = (char *) snmpTargetAddrExtEntry + sizeof(snmp_community_mib_snmpTargetAddrExtEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(snmpTargetAddrExtEntry);
     }
 }

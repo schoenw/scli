@@ -162,7 +162,7 @@ tunnel_mib_get_tunnelIfTable(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t ***tunn
     stls_vbl_attributes(s, &in, base, 12, _tunnelIfEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -188,7 +188,7 @@ tunnel_mib_free_tunnelIfEntry(tunnel_mib_tunnelIfEntry_t *tunnelIfEntry)
     if (tunnelIfEntry) {
         p = (char *) tunnelIfEntry + sizeof(tunnel_mib_tunnelIfEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(tunnelIfEntry);
     }
 }
@@ -293,7 +293,7 @@ tunnel_mib_get_tunnelConfigTable(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t
     stls_vbl_attributes(s, &in, base, 12, _tunnelConfigEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -319,7 +319,7 @@ tunnel_mib_free_tunnelConfigEntry(tunnel_mib_tunnelConfigEntry_t *tunnelConfigEn
     if (tunnelConfigEntry) {
         p = (char *) tunnelConfigEntry + sizeof(tunnel_mib_tunnelConfigEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(tunnelConfigEntry);
     }
 }

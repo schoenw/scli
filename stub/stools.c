@@ -120,32 +120,6 @@ stls_identity_get_label(stls_identity_t const *table,
 
 
 void
-stls_vbl_add_null(GSList **vbl, guint32 const *oid, gsize const len)
-{
-    GSnmpVarBind *vb;
-
-    vb = g_snmp_varbind_new(oid, len, G_SNMP_NULL, NULL, 0);
-    *vbl = g_slist_append(*vbl, vb);
-}
-
-
-
-void
-stls_vbl_free(GSList *vbl)
-{
-    GSList *elem;
-
-    if (vbl) {
-	for (elem = vbl; elem; elem = g_slist_next(elem)) {
-	    g_snmp_varbind_free((GSnmpVarBind *) elem->data);
-	}
-	g_slist_free(vbl);
-    }
-}
-
-
-
-void
 stls_vbl_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
 		    stls_stub_attr_t *attributes)
 {
@@ -154,7 +128,7 @@ stls_vbl_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
     for (i = 0; attributes[i].label; i++) {
 	if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
 	    base[idx] = attributes[i].subid;
-	    stls_vbl_add_null(vbl, base, idx + 1);
+	    g_snmp_vbl_add_null(vbl, base, idx + 1);
 	}
     }
 }
@@ -194,11 +168,23 @@ stls_vb_lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
 
 
 
-GSList *
-stls_snmp_getnext(GSnmpSession *s, GSList *vbl)
+#if 0
+void
+stls_hello(GSnmpSession *s)
 {
-    return g_sync_getnext(s, vbl);
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 1, 0};
+    GSList *in = NULL, *out = NULL;
+
+    base[7] = 1
+    g_snmp_vbl_add_null(&in, base, 8);
+
+    base[7] = 3
+    g_snmp_vbl_add_null(&in, base, 8);
+
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
 }
+#endif
 
 
 

@@ -245,7 +245,7 @@ etherlike_mib_get_dot3StatsTable(GSnmpSession *s, etherlike_mib_dot3StatsEntry_t
     stls_vbl_attributes(s, &in, base, 10, _dot3StatsEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -271,7 +271,7 @@ etherlike_mib_free_dot3StatsEntry(etherlike_mib_dot3StatsEntry_t *dot3StatsEntry
     if (dot3StatsEntry) {
         p = (char *) dot3StatsEntry + sizeof(etherlike_mib_dot3StatsEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(dot3StatsEntry);
     }
 }
@@ -363,7 +363,7 @@ etherlike_mib_get_dot3CollTable(GSnmpSession *s, etherlike_mib_dot3CollEntry_t *
     stls_vbl_attributes(s, &in, base, 10, _dot3CollEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -389,7 +389,7 @@ etherlike_mib_free_dot3CollEntry(etherlike_mib_dot3CollEntry_t *dot3CollEntry)
     if (dot3CollEntry) {
         p = (char *) dot3CollEntry + sizeof(etherlike_mib_dot3CollEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(dot3CollEntry);
     }
 }
@@ -483,7 +483,7 @@ etherlike_mib_get_dot3ControlTable(GSnmpSession *s, etherlike_mib_dot3ControlEnt
     stls_vbl_attributes(s, &in, base, 10, _dot3ControlEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -509,7 +509,7 @@ etherlike_mib_free_dot3ControlEntry(etherlike_mib_dot3ControlEntry_t *dot3Contro
     if (dot3ControlEntry) {
         p = (char *) dot3ControlEntry + sizeof(etherlike_mib_dot3ControlEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(dot3ControlEntry);
     }
 }
@@ -608,7 +608,7 @@ etherlike_mib_get_dot3PauseTable(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t
     stls_vbl_attributes(s, &in, base, 10, _dot3PauseEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -634,7 +634,7 @@ etherlike_mib_free_dot3PauseEntry(etherlike_mib_dot3PauseEntry_t *dot3PauseEntry
     if (dot3PauseEntry) {
         p = (char *) dot3PauseEntry + sizeof(etherlike_mib_dot3PauseEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(dot3PauseEntry);
     }
 }

@@ -172,8 +172,8 @@ ip_forward_mib_get_ipForward(GSnmpSession *s, ip_forward_mib_ipForward_t **ipFor
 
     stls_vbl_attributes(s, &in, base, 8, _ipForward);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -192,7 +192,7 @@ ip_forward_mib_free_ipForward(ip_forward_mib_ipForward_t *ipForward)
     if (ipForward) {
         p = (char *) ipForward + sizeof(ip_forward_mib_ipForward_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ipForward);
     }
 }
@@ -312,7 +312,7 @@ ip_forward_mib_get_ipForwardTable(GSnmpSession *s, ip_forward_mib_ipForwardEntry
     stls_vbl_attributes(s, &in, base, 10, _ipForwardEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -338,7 +338,7 @@ ip_forward_mib_free_ipForwardEntry(ip_forward_mib_ipForwardEntry_t *ipForwardEnt
     if (ipForwardEntry) {
         p = (char *) ipForwardEntry + sizeof(ip_forward_mib_ipForwardEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ipForwardEntry);
     }
 }
@@ -477,7 +477,7 @@ ip_forward_mib_get_ipCidrRouteTable(GSnmpSession *s, ip_forward_mib_ipCidrRouteE
     stls_vbl_attributes(s, &in, base, 10, _ipCidrRouteEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -503,7 +503,7 @@ ip_forward_mib_free_ipCidrRouteEntry(ip_forward_mib_ipCidrRouteEntry_t *ipCidrRo
     if (ipCidrRouteEntry) {
         p = (char *) ipCidrRouteEntry + sizeof(ip_forward_mib_ipCidrRouteEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ipCidrRouteEntry);
     }
 }

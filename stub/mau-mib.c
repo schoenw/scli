@@ -506,7 +506,7 @@ mau_mib_get_rpMauTable(GSnmpSession *s, mau_mib_rpMauEntry_t ***rpMauEntry)
     stls_vbl_attributes(s, &in, base, 10, _rpMauEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -532,7 +532,7 @@ mau_mib_free_rpMauEntry(mau_mib_rpMauEntry_t *rpMauEntry)
     if (rpMauEntry) {
         p = (char *) rpMauEntry + sizeof(mau_mib_rpMauEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(rpMauEntry);
     }
 }
@@ -628,7 +628,7 @@ mau_mib_get_rpJackTable(GSnmpSession *s, mau_mib_rpJackEntry_t ***rpJackEntry)
     stls_vbl_attributes(s, &in, base, 10, _rpJackEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -654,7 +654,7 @@ mau_mib_free_rpJackEntry(mau_mib_rpJackEntry_t *rpJackEntry)
     if (rpJackEntry) {
         p = (char *) rpJackEntry + sizeof(mau_mib_rpJackEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(rpJackEntry);
     }
 }
@@ -779,7 +779,7 @@ mau_mib_get_ifMauTable(GSnmpSession *s, mau_mib_ifMauEntry_t ***ifMauEntry)
     stls_vbl_attributes(s, &in, base, 10, _ifMauEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -805,7 +805,7 @@ mau_mib_free_ifMauEntry(mau_mib_ifMauEntry_t *ifMauEntry)
     if (ifMauEntry) {
         p = (char *) ifMauEntry + sizeof(mau_mib_ifMauEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ifMauEntry);
     }
 }
@@ -899,7 +899,7 @@ mau_mib_get_ifJackTable(GSnmpSession *s, mau_mib_ifJackEntry_t ***ifJackEntry)
     stls_vbl_attributes(s, &in, base, 10, _ifJackEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -925,7 +925,7 @@ mau_mib_free_ifJackEntry(mau_mib_ifJackEntry_t *ifJackEntry)
     if (ifJackEntry) {
         p = (char *) ifJackEntry + sizeof(mau_mib_ifJackEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ifJackEntry);
     }
 }
@@ -1023,7 +1023,7 @@ mau_mib_get_broadMauBasicTable(GSnmpSession *s, mau_mib_broadMauBasicEntry_t ***
     stls_vbl_attributes(s, &in, base, 10, _broadMauBasicEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1049,7 +1049,7 @@ mau_mib_free_broadMauBasicEntry(mau_mib_broadMauBasicEntry_t *broadMauBasicEntry
     if (broadMauBasicEntry) {
         p = (char *) broadMauBasicEntry + sizeof(mau_mib_broadMauBasicEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(broadMauBasicEntry);
     }
 }
@@ -1177,7 +1177,7 @@ mau_mib_get_ifMauAutoNegTable(GSnmpSession *s, mau_mib_ifMauAutoNegEntry_t ***if
     stls_vbl_attributes(s, &in, base, 10, _ifMauAutoNegEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1203,7 +1203,7 @@ mau_mib_free_ifMauAutoNegEntry(mau_mib_ifMauAutoNegEntry_t *ifMauAutoNegEntry)
     if (ifMauAutoNegEntry) {
         p = (char *) ifMauAutoNegEntry + sizeof(mau_mib_ifMauAutoNegEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ifMauAutoNegEntry);
     }
 }

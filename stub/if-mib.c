@@ -431,8 +431,8 @@ if_mib_get_interfaces(GSnmpSession *s, if_mib_interfaces_t **interfaces)
 
     stls_vbl_attributes(s, &in, base, 7, _interfaces);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -451,7 +451,7 @@ if_mib_free_interfaces(if_mib_interfaces_t *interfaces)
     if (interfaces) {
         p = (char *) interfaces + sizeof(if_mib_interfaces_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(interfaces);
     }
 }
@@ -591,7 +591,7 @@ if_mib_get_ifTable(GSnmpSession *s, if_mib_ifEntry_t ***ifEntry)
     stls_vbl_attributes(s, &in, base, 9, _ifEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -617,7 +617,7 @@ if_mib_free_ifEntry(if_mib_ifEntry_t *ifEntry)
     if (ifEntry) {
         p = (char *) ifEntry + sizeof(if_mib_ifEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ifEntry);
     }
 }
@@ -690,8 +690,8 @@ if_mib_get_ifMIBObjects(GSnmpSession *s, if_mib_ifMIBObjects_t **ifMIBObjects)
 
     stls_vbl_attributes(s, &in, base, 8, _ifMIBObjects);
 
-    out = stls_snmp_getnext(s, in);
-    stls_vbl_free(in);
+    out = g_snmp_session_sync_getnext(s, in);
+    g_snmp_vbl_free(in);
     if (! out) {
         return -2;
     }
@@ -710,7 +710,7 @@ if_mib_free_ifMIBObjects(if_mib_ifMIBObjects_t *ifMIBObjects)
     if (ifMIBObjects) {
         p = (char *) ifMIBObjects + sizeof(if_mib_ifMIBObjects_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ifMIBObjects);
     }
 }
@@ -843,7 +843,7 @@ if_mib_get_ifXTable(GSnmpSession *s, if_mib_ifXEntry_t ***ifXEntry)
     stls_vbl_attributes(s, &in, base, 10, _ifXEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -869,7 +869,7 @@ if_mib_free_ifXEntry(if_mib_ifXEntry_t *ifXEntry)
     if (ifXEntry) {
         p = (char *) ifXEntry + sizeof(if_mib_ifXEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ifXEntry);
     }
 }
@@ -961,7 +961,7 @@ if_mib_get_ifStackTable(GSnmpSession *s, if_mib_ifStackEntry_t ***ifStackEntry)
     stls_vbl_attributes(s, &in, base, 10, _ifStackEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -987,7 +987,7 @@ if_mib_free_ifStackEntry(if_mib_ifStackEntry_t *ifStackEntry)
     if (ifStackEntry) {
         p = (char *) ifStackEntry + sizeof(if_mib_ifStackEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ifStackEntry);
     }
 }
@@ -1095,7 +1095,7 @@ if_mib_get_ifTestTable(GSnmpSession *s, if_mib_ifTestEntry_t ***ifTestEntry)
     stls_vbl_attributes(s, &in, base, 10, _ifTestEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1121,7 +1121,7 @@ if_mib_free_ifTestEntry(if_mib_ifTestEntry_t *ifTestEntry)
     if (ifTestEntry) {
         p = (char *) ifTestEntry + sizeof(if_mib_ifTestEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ifTestEntry);
     }
 }
@@ -1221,7 +1221,7 @@ if_mib_get_ifRcvAddressTable(GSnmpSession *s, if_mib_ifRcvAddressEntry_t ***ifRc
     stls_vbl_attributes(s, &in, base, 10, _ifRcvAddressEntry);
 
     out = stls_snmp_gettable(s, in);
-    /* stls_vbl_free(in); */
+    /* g_snmp_vbl_free(in); */
     if (! out) {
         return -2;
     }
@@ -1247,7 +1247,7 @@ if_mib_free_ifRcvAddressEntry(if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry)
     if (ifRcvAddressEntry) {
         p = (char *) ifRcvAddressEntry + sizeof(if_mib_ifRcvAddressEntry_t);
         vbl = * (GSList **) p;
-        stls_vbl_free(vbl);
+        g_snmp_vbl_free(vbl);
         g_free(ifRcvAddressEntry);
     }
 }
