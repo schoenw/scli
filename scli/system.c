@@ -1132,7 +1132,7 @@ fmt_system_info(GString *s, scli_interp_t *interp,
 	uri = gnet_snmp_get_uri(interp->peer);
 	if (uri) {
 	    gchar *name = gnet_uri_get_string(uri);
-	    g_string_sprintfa(s, "%-*s%s\n", indent, "SNMP-URI:", name);
+	    g_string_sprintfa(s, "%-*s%s\n", indent, "Agent:", name);
 	    g_free(name);
 	}
 	if (system->sysDescr && system->_sysDescrLength) {
