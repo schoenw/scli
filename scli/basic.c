@@ -467,6 +467,8 @@ scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd)
 	node = g_node_append(node, g_node_new(cmd));
     }
 
+    g_free(argv);
+
     return SCLI_OK;
 }
 
@@ -496,6 +498,33 @@ snmp_decode_hook(GSList *list)
 
 
 
+static xmlNodePtr
+get_xml_tree(scli_interp_t *interp, char *xpath)
+{
+    int i, argc;
+    char **argv;
+    xmlNodePtr tree, sibling;
+
+    g_return_val_if_fail(interp && xpath, NULL);
+    
+    (void) scli_split(xpath, &argc, &argv);
+    
+    tree = xmlDocGetRootElement(interp->xml_doc);
+    for (i = 0; i < argc; i++) {
+	for (sibling = tree->children; sibling; sibling = sibling->next) {
+	    if (strcmp(sibling->name, argv[i]) == 0) {
+		break;
+	    }
+	}
+	tree = sibling ? sibling : xmlNewChild(tree, NULL, argv[i], NULL);
+    }
+
+    g_free(argv);
+    return tree;
+}
+
+
+
 static int
 eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 {
@@ -518,6 +547,10 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 	} else {
 	    return SCLI_OK;
 	}
+    }
+
+    if (scli_interp_xml(interp)) {
+	interp->xml_node = get_xml_tree(interp, cmd->xpath);
     }
 
     if (cmd->flags & SCLI_CMD_FLAG_MONITOR) {
@@ -547,7 +580,7 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 	    if (scli_interp_xml(interp)) {
 		xmlChar *buffer;
 		int len;
-		xmlDocDumpFormatMemory(interp->xml_doc, &buffer, &len, 2);
+		xmlDocDumpFormatMemory(interp->xml_doc, &buffer, &len, 1);
 		g_string_truncate(interp->header, 0);
 		g_string_assign(interp->result, buffer);
 		xmlFree(buffer);
@@ -572,13 +605,8 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 {
     scli_cmd_t *cmd, *root_cmd;
     int code;
-    xmlNodePtr current_xml_node = NULL;
     
     root_cmd = node->data;
-    if (scli_interp_xml(interp)) {
-	current_xml_node = interp->xml_node;
-	interp->xml_node = xmlNewChild(interp->xml_node, NULL, root_cmd->name, NULL);
-    }
     
     for (node = g_node_first_child(node);
 	 node; node = g_node_next_sibling(node)) {
@@ -611,10 +639,6 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 	} else {
 	    eval_all_cmd_node(interp, node, s);
 	}
-    }
-
-    if (scli_interp_xml(interp)) {
-	interp->xml_node = current_xml_node;
     }
 
     return SCLI_OK;
@@ -665,10 +689,6 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	    break;
 	}
 	if (i < argc-1 && ! G_NODE_IS_LEAF(node)) {
-	    if (scli_interp_xml(interp)) {
-		scli_cmd_t *cmd = (scli_cmd_t *) node->data;
-		interp->xml_node = xmlNewChild(interp->xml_node, NULL, cmd->name, NULL);
-	    }
 	    node = g_node_first_child(node);
 	} else if (G_NODE_IS_LEAF(node)) {
 	    if (scli_interp_interactive(interp)) {
@@ -694,7 +714,7 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	    if (scli_interp_xml(interp)) {
 		xmlChar *buffer;
 		int len;
-		xmlDocDumpFormatMemory(interp->xml_doc, &buffer, &len, 2);
+		xmlDocDumpFormatMemory(interp->xml_doc, &buffer, &len, 1);
 		g_string_append(s, buffer);
 		xmlFree(buffer);
 	    }
