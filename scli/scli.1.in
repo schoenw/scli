@@ -79,6 +79,10 @@ Set the SNMP port number. The default port number is 161.
 The number of SNMP retransmissions before we give up. The default
 number of retries is 5.
 .TP
+.B \-s, \-\-dry-run
+Parse scli commands but do not actually execute them. This allows to
+perform syntax checking on scli scripts.
+.TP
 .B \-t msec, \-\-timeout=msec
 The initial timeout in milli-seconds before an SNMP request is
 transmitted. The default initial timeout interval is 200 milli-seconds.
