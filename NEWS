@@ -1,3 +1,14 @@
+Changes in scli 0.2.4:
+
+- added a new "dump" toplevel command to generate scli scripts
+- new "dump system" command
+- new "dump ip" command
+- new "dump interface" command
+- new "dump nortel bridge vlan" command
+- new "show printer outputs" command
+- implemented backslash processing as one might expect
+- minor bug fixes
+
 Changes in scli 0.2.3:
 
 - new "set nortel bridge vlan default" command
