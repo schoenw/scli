@@ -1,3 +1,9 @@
+Changes in stools 0.1.8:
+
+- scli supports a new "show system storage" command
+- bug fixes and better portability (fixed some ANSI C violations)
+- some improvements in the documentation
+
 Overview of stools 0.1.7:
 
-* First public version of the stools package.
+- first public version of the stools package

@@ -33,7 +33,11 @@
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
+#ifdef HAVE_NCURSES_H
+#include <ncurses.h>
+#else
 #include <curses.h>
+#endif
 #include <time.h>
 
 /*
