@@ -103,11 +103,12 @@ typedef struct scli_alias	scli_alias_t;
 typedef struct scli_alarm	scli_alarm_t;
 
 
-#define SCLI_CMD_FLAG_NEED_PEER	0x01
-#define SCLI_CMD_FLAG_MONITOR	0x02
-#define SCLI_CMD_FLAG_LOOP	0x04
-#define SCLI_CMD_FLAG_XML	0x08
-#define SCLI_CMD_FLAG_DRY	0x10
+#define SCLI_CMD_FLAG_NEED_PEER	(1 << 0)
+#define SCLI_CMD_FLAG_MONITOR	(1 << 1)
+#define SCLI_CMD_FLAG_LOOP	(1 << 2)
+#define SCLI_CMD_FLAG_XML	(1 << 3)
+#define SCLI_CMD_FLAG_DRY	(1 << 4)
+#define SCLI_CMD_FLAG_NORECURSE	(1 << 5)
 
 struct scli_cmd {
     char *path;			/* absolute command name */

@@ -1036,14 +1036,14 @@ scli_init_scli_mode(scli_interp_t *interp)
 	{ "show scli info", NULL,
 	  "The show scli info command displays the current status of the\n"
 	  "scli interpreter.",
-	  0,
+	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  show_scli_info },
 
 	{ "show scli commands", NULL,
 	  "The show scli commands command displays the scli command tree.\n"
 	  "The full command syntax is displayed for each leaf node.",
-	  0,
+	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  show_scli_commands },
 
@@ -1051,7 +1051,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "The show scli aliases command lists all scli command aliases.\n"
 	  "The first column in the generated table lists the aliase names\n"
 	  "while the second column shows the alias values.",
-	  0,
+	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  show_scli_aliases },
 
@@ -1061,7 +1061,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "(e.g., all commands that deal with printers). The optional\n"
 	  "regular expression <regex> can be use to select a subset of\n"
 	  "the available scli modes.",
-	  0,
+	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  show_scli_modes },
 
@@ -1071,7 +1071,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "related commands (e.g., all commands that deal with printers).\n"
 	  "The optional regular expression <regex> can be use to select a\n"
 	  "subset of the available scli modes.",
-	  0,
+	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  show_scli_schema },
 

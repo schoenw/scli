@@ -748,6 +748,7 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 	if (G_NODE_IS_LEAF(node)) {
 	    scli_cmd_t *cmd = node->data;
 	    if (cmd
+		&& !(cmd->flags & SCLI_CMD_FLAG_NORECURSE)
 		&& !(cmd->flags & SCLI_CMD_FLAG_NEED_PEER && !interp->peer)) {
 		code = scli_eval_cmd(interp, cmd, 0, NULL);
 		if (code == SCLI_OK && interp->result->len) {
