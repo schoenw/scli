@@ -704,6 +704,10 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 	    if (reason) {
 		xml_set_prop(top, "reason", "%s", reason);
 	    }
+	    if (interp->peer) {
+		xml_set_prop(top, "peer", interp->peer->taddress);
+	    }
+	    xml_set_prop(top, "date", "%s", fmt_timeticks(0));
 	}
 	if (! (scli_interp_recursive(interp))) {
 	    show_result(interp, code);
