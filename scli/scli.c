@@ -391,20 +391,18 @@ main(int argc, char **argv)
 
     interp->delay = delay;
 
-    if (scli_interp_interactive(interp)) {
-	char *pager = getenv("PAGER");
-	if (pager) {
-	    /* xxx do a sanity-check here ? */
-	    interp->pager = g_strdup(pager);
-	}
-    }
-
     if (xml) {
 	interp->flags |= SCLI_INTERP_FLAG_XML;
     }
 
     if (scli_interp_interactive(interp)) {
 	g_print("scli version %s %s\n", VERSION, scli_copyright);
+    }
+
+    if (scli_interp_interactive(interp)) {
+	if (scli_set_pager(interp, getenv("PAGER")) < 0) {
+	    g_warning("$PAGER contains unsafe characters - ignored\n");
+	}
     }
 
     if (scli_cmd_open(interp, argc-optind+1, argv+optind-1) != SCLI_OK) {

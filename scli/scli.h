@@ -173,6 +173,9 @@ scli_curses_on();
 extern void
 scli_curses_off();
 
+extern int
+scli_set_pager(scli_interp_t *interp, const char *pager);
+
 /*
  * Core scli commands:	XXX this should not be visible across modules XXX
  */

@@ -334,39 +334,10 @@ cmd_scli_peer(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-cmd_scli_term(scli_interp_t *interp, int argc, char **argv)
-{
-    int const indent = 18;
-    int rows, cols;
-
-    g_return_val_if_fail(interp, SCLI_ERROR);
-
-    if (argc > 1) {
-	return SCLI_SYNTAX;
-    }
-
-    /* show terminal type ? */
-
-    scli_get_screen(&rows, &cols);
-    g_string_sprintfa(interp->result, "%-*s %d\n", indent,
-		      "Rows:", rows);
-    g_string_sprintfa(interp->result, "%-*s %d\n", indent,
-		      "Columns:", cols);
-
-    if (interp->pager) {
-	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
-			  "Pager:", interp->pager);
-    }
-
-    return SCLI_OK;
-}
-
-
-
-static int
 cmd_scli_interp(scli_interp_t *interp, int argc, char **argv)
 {
     int const indent = 18;
+    int rows, cols;
     SnmpDebugFlagToStringEntry *dft;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -394,6 +365,14 @@ cmd_scli_interp(scli_interp_t *interp, int argc, char **argv)
 	}
     }
     g_string_append(interp->result, "\n");
+
+    scli_get_screen(&rows, &cols);
+    g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+		      "Rows:", rows);
+    g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+		      "Columns:", cols);
+    g_string_sprintfa(interp->result, "%-*s %s\n", indent,
+		      "Pager:", interp->pager ? interp->pager : "scli");
 
     return SCLI_OK;
 }
@@ -424,6 +403,27 @@ conf_scli_debugging(scli_interp_t *interp, int argc, char **argv)
     }
 
     g_snmp_debug_flags = flags;
+    return SCLI_OK;
+}
+
+
+
+static int
+conf_scli_pager(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 2) {
+	return SCLI_SYNTAX;
+    }
+
+    if (scli_set_pager(interp, argv[1]) < 0) {
+	g_string_sprintfa(interp->result,
+			  "pager `%s' contains unsafe characters",
+			  argv[1]);
+	return SCLI_ERROR;	
+    }
+
     return SCLI_OK;
 }
 
@@ -465,10 +465,6 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  "show information about the current SNMP agent",
 	  cmd_scli_peer },
-	{ "show scli term", NULL,
-	  0,
-	  "show information about the terminal parameters",
-	  cmd_scli_term },
 	{ "show scli interp", NULL,
 	  0,
 	  "show information about the interpreter",
@@ -477,7 +473,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  "show information about the available modes",
 	  cmd_scli_modes },
-	{ "delete an scli alias", "<name>",
+	{ "delete scli alias", "<name>",
 	  0,
 	  "delete an scli command alias",
 	  cmd_scli_unalias },
@@ -485,6 +481,10 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  "configure scli interpreter debugging options",
 	  conf_scli_debugging },
+	{ "config scli interp pager", "<pager>",
+	  0,
+	  "configure scli interpreter pager",
+	  conf_scli_pager },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     

@@ -68,6 +68,29 @@ scli_curses_off()
 
 
 
+int
+scli_set_pager(scli_interp_t *interp, const char *pager)
+{
+    char *unsafe = "; '\\\"";
+
+    if (pager) {
+	if (strpbrk(pager, unsafe)) {
+	    return -1;
+	}
+    }
+
+    if (interp->pager) {
+	g_free(interp->pager);
+	interp->pager = NULL;
+    }
+    if (pager) {
+	interp->pager=g_strdup(pager);
+    }
+    return 0;
+}
+
+
+
 void
 scli_get_screen(int *lines, int *columns)
 {
@@ -113,8 +136,6 @@ mode_compare(gconstpointer a, gconstpointer b)
 static void
 page(scli_interp_t *interp, GString *s)
 {
-    char *file_name;
-    char cmd[1024];
     FILE *f = NULL;
     int i, cnt, cols, rows;
 
@@ -144,20 +165,16 @@ page(scli_interp_t *interp, GString *s)
 	goto nopager;
     }
 
-    file_name = tmpnam(NULL);
-    if (! file_name) {
-	goto nopager;
-    }
-    f = fopen(file_name, "w");
+    /* Do not get fooled by nasty IFS tricks. */
+    setenv("IFS", " \t", 1);
+    
+    f = popen(interp->pager, "w");
     if (! f) {
 	goto nopager;
     }
     fputs(s->str, f);
     fflush(f);
-    g_snprintf(cmd, sizeof(cmd), "less %s", file_name);
-    (void) system(cmd);
-    (void) fclose(f);
-    (void) unlink(file_name);
+    (void) pclose(f);
 }
 
 
