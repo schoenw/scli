@@ -55,7 +55,7 @@ STUBS			= if-mib.h if-mib.c \
 			  printer-mib.h printer-mib.c
 
 noinst_LIBRARIES	= libstub.a
-libstub_a_SOURCES	= stools.h stools.c $(STUBS)
+libstub_a_SOURCES	= $(STUBS)
 
 SMIDUMP			= ../../libsmi/tools/smidump
 
@@ -64,6 +64,6 @@ rmstubs:
 
 stubs:
 	@for f in $(MIBS) ; do \
-	    echo "$(SMIDUMP) -f stools $$f" ; \
-	    $(SMIDUMP) -f stools $$f ; \
+	    echo "$(SMIDUMP) -f scli $$f" ; \
+	    $(SMIDUMP) -f scli $$f ; \
 	done
