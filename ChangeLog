@@ -1,3 +1,119 @@
+2001-03-26 15:35  schoenw
+
+	* NEWS, TODO: Updates for release 0.1.15.
+
+2001-03-26 15:33  schoenw
+
+	* snmp/g_snmp_table.c: General cleanup and fixed a memory leak.
+
+2001-03-26 15:04  schoenw
+
+	* stub/udp-mib.c: Updated to handle tables which only have
+        auxilliary columns.
+
+2001-03-26 15:02  schoenw
+
+	* scli/: Makefile.am, Makefile.in, entity.c, fmt.c, scli.c, scli.h,
+	tcp.c, udp.c: Added new "show tcp listener" and "show udp listener"
+        commands.
+
+2001-03-26 14:59  schoenw
+
+	* stop/: Makefile.am, Makefile.in, disman.c, stop.c, stop.h, tcp.c:
+        Added a tcp mode to view the list of current tcp connections.
+
+2001-03-23 04:27  schoenw
+
+	* stub/bridge-mib.c: Regenerated stubs to get the RFC 1155 counters
+        right.
+
+2001-03-23 04:09  schoenw
+
+	* scli/: atm.c, bridge.c, cmds.c, disman.c, entity.c, interface.c,
+	ip.c, scli.c, snmp.c, system.c, tcp.c: Cleaned up the code in the
+	help command which displays the command tree. Shortened the command
+	descriptions so that they can be used as headers in recursive
+        command evaluations.
+
+2001-03-21 18:39  schoenw
+
+	* scli/basic.c: Added simple $PAGER support. Improved the output
+        format produced by recursive command invocations.
+
+2001-03-20 16:17  schoenw
+
+	* config.h.in: Regenerated.
+
+2001-03-20 16:15  schoenw
+
+	* scli/interface.c: Added a missing check whether the IP address
+        entries are really valid.
+
+2001-03-19 21:45  schoenw
+
+	* stub/: atm-mib.c, bridge-mib.c, disman-schedule-mib.c,
+	disman-script-mib.c, entity-mib.c, host-resources-mib.c, if-mib.c,
+	ip-forward-mib.c, ip-mib.c, snmp-community-mib.c,
+	snmp-framework-mib.c, snmp-mpd-mib.c, snmp-target-mib.c,
+	snmp-user-based-sm-mib.c, snmp-view-based-acm-mib.c, snmpv2-mib.c,
+	tcp-mib.c, tunnel-mib.c, udp-mib.c: Regenerated the stubs to
+        include type checking code.
+
+2001-03-19 17:57  schoenw
+
+	* AUTHORS, README: Updated the list of contributors and clarified
+        the pronounciation of the package name.
+
+2001-03-19 17:55  schoenw
+
+	* config.h.in, configure, configure.in, scli/fmt.c,
+	stop/interface.c: Integrated a freebsd patch from John Sellens
+        <jsellens@generalconcepts.com>.
+
+2001-03-16 17:01  schoenw
+
+	* scli/tcp.c: Dynamically adjust the width of the columns.
+
+2001-03-16 16:31  schoenw
+
+	* scli/interface.c: Do not try to guess interface names since this
+        can lead to confusion.
+
+2001-03-16 16:30  schoenw
+
+	* scli/bridge.c: Fixed a bug in the "show bridge ports" command.
+
+2001-03-16 10:11  schoenw
+
+	* stop/stop.1: Improved some wordings.
+
+2001-03-16 10:10  schoenw
+
+	* NEWS, TODO, configure, configure.in: Bumped version number to
+        0.1.15.
+
+2001-03-16 10:04  schoenw
+
+	* scli/: atm.c, basic.c, bridge.c, cmds.c, disman.c, entity.c,
+	interface.c, ip.c, scli.1, scli.c, scli.h, snmp.c, system.c, tcp.c:
+	Added "open" and "close" commands. Changed the command registration
+	so that modes can pass command specific flags. Moved the peer
+	initialization code to the basic.c module and made the host scli
+	argument optional.  Changed the scli prompt to show the name of the
+        remote peer.
+
+2001-03-15 18:04  schoenw
+
+	* scli/system.c: Dynamically adjust the width of the "Storage Area"
+	column in the "show system storage" command. Strip trailing white
+	space in the "show system processes" command. (Perhaps we should
+	invent a generic mechanism to validate printable strings before
+        they are actuall passed to the screen).
+
+2001-03-15 14:29  schoenw
+
+	* ChangeLog: Generated the ChangeLog via cvs2cl.
+
 2001-03-15 14:27  schoenw
 
 	* NEWS, aclocal.m4, configure, configure.in: Preparing for the
