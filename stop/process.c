@@ -39,7 +39,11 @@ fmt_hsec32(guint32 number)
     min  = (number / 100 / 60) % 60;
     hour = (number / 100 / 60 / 60);
 
-    g_snprintf(buffer, sizeof(buffer), "%02d:%02d", hour, min);
+    if (hour) {
+	g_snprintf(buffer, sizeof(buffer), "%2d:%02d:%02d", hour, min, sec);
+    } else {
+	g_snprintf(buffer, sizeof(buffer), "   %02d:%02d", min, sec);
+    }
 
 #if 0
     if (number > 99900) {
@@ -185,7 +189,7 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 	show_process_summary(peer);
 	wattron(win, A_REVERSE);
 	mvwprintw(win, 0, 0, "%-*s", COLS, 
-		  "  PID S T    MEM    TIME COMMAND");
+		  "  PID S T    MEM     TIME COMMAND");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
 	sleep(1);
@@ -236,6 +240,7 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 	}
 	g_string_truncate(s, COLS);
 	mvwprintw(win, j + 1, 0, s->str);
+	clrtoeol();
 	g_string_free(s, 1);
     }
 
