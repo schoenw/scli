@@ -1,5 +1,5 @@
 /* 
- * disman-script-mib-proc.h -- DISMAN-SCRIPT-MIB procedures
+ * rapid-city-proc.h -- RAPID-CITY procedures
  *
  * Copyright (C) 2001 Juergen Schoenwaelder
  *
@@ -20,31 +20,25 @@
  * @(#) $Id$
  */
 
-#ifndef _DISMAN_SCRIPT_MIB_PROC_H_
-#define _DISMAN_SCRIPT_MIB_PROC_H_
+#ifndef _RAPID_CITY_PROC_H_
+#define _RAPID_CITY_PROC_H_
 
 #include "g_snmp.h"
 
-#include "disman-script-mib.h"
+#include "rapid-city.h"
 
-/*
- *  proc create_script(smScriptOwner, smScriptName, smScriptDescr)
- *  {
- *      set(smScriptDescr, smScriptRowStatus=createAndGo);
- *  }
- */
 
 extern void
-disman_script_mib_proc_create_script(GSnmpSession *s,
-				     guchar *owner,
-				     guchar *name,
-				     guchar *descr);
+rapid_city_proc_create_vlan(GSnmpSession *s, gint32 vlanid,
+			    guchar *name, guint32 type);
+extern void
+rapid_city_proc_delete_vlan(GSnmpSession *s, gint32 vlanid);
 
-void
-disman_script_mib_proc_create_run(GSnmpSession *s,
-				  guchar *lowner,
-				  guchar *lname,
-				  guchar *args);
-
-
-#endif /* _DISMAN_SCRIPT_MIB_PROC_H_ */
+extern void
+rapid_city_proc_set_vlan_port_default(GSnmpSession *s, gint32 port,
+				      gint32 vlanid);
+extern void
+rapid_city_proc_set_vlan_port_member(GSnmpSession *s, gint32 vlanid,
+				     guchar *ports);
+    
+#endif /* _RAPID_CITY_PROC_H_ */
