@@ -211,7 +211,7 @@ fmt_ip_address(GString *s, ip_mib_ipAddrEntry_t *ipAddrEntry)
     g_string_sprintfa(s, "%-16s ",
 	      fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_ADDR));
     if (ipAddrEntry->ipAdEntNetMask) {
-	g_string_sprintfa(s, "/%-6s",
+	g_string_sprintfa(s, "/%-5s",
 			  fmt_ipv4_mask(ipAddrEntry->ipAdEntNetMask));;
     } else {
 	g_string_sprintfa(s, "%-6s", "");
