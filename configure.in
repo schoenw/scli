@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(scli/scli.c)
 dnl Every other copy of the package version number gets its value from here
-AM_INIT_AUTOMAKE(scli, 0.2.4)
+AM_INIT_AUTOMAKE(scli, 0.2.5)
 
 dnl create a config.h file (Automake will add -DHAVE_CONFIG_H)
 AM_CONFIG_HEADER(config.h)
@@ -21,6 +21,8 @@ AC_PROG_RANLIB
 AC_CHECK_PROG(SMIDUMP, smidump, smidump)
 AC_SUBST(SMIDUMP)
 
+AC_DEFINE_UNQUOTED(SCLI_PLUGIN_PATH, "${exec_prefix}/lib/scli")
+
 AC_MSG_CHECKING([whether to enable -Wall])
 AC_ARG_ENABLE(warnings,
 [  --enable-warnings       Enable -Wall if using gcc.],
@@ -32,7 +34,7 @@ AC_ARG_ENABLE(warnings,
 
 dnl Checks for libraries.
 
-AM_PATH_GLIB(1.2.0,,AC_MSG_ERROR(scli needs GLIB))dnl
+AM_PATH_GLIB(1.2.0,,AC_MSG_ERROR(scli needs GLIB),gmodule)dnl
 dnl AM_PATH_GTK(1.2.0,,AC_MSG_ERROR(scli needs GTK))dnl
 AM_PATH_XML2(2.0.0,,AC_MSG_ERROR(scli needs libxml2))dnl
 AC_CHECK_LIB(ncurses, initscr, , 

@@ -1,4 +1,4 @@
-/* config.h.in.  Generated automatically from configure.in by autoheader.  */
+/* config.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
 
 /* Define if your struct tm has tm_zone.  */
 #undef HAVE_TM_ZONE
@@ -12,6 +12,9 @@
 
 /* Define if your <sys/time.h> declares struct tm.  */
 #undef TM_IN_SYS_TIME
+
+/* The full pathname of the directory containing scli plugins. */
+#define SCLI_PLUGIN_PATH "/usr/local/lib/scli"
 
 /* Define if you have the ether_ntohost function.  */
 #undef HAVE_ETHER_NTOHOST
