@@ -1,3 +1,12 @@
+Changes in stools 0.1.12:
+
+- improved instance identifier decoding in the stubs
+- scli supports a new "show tcp connections" command
+- scli supports a new "show disman languages" command
+- scli supports a new "show disman scripts" command
+- scli "show interface info" command displays IPv4 addresses
+- minor bug fixes
+
 Changes in stools 0.1.11:
 
 - recursive command evaluation on non-leaf nodes of the command tree
