@@ -403,6 +403,12 @@ main(int argc, char **argv)
 		close(creat(path, 0600));
 	    }
 	    if (access(path, W_OK) == 0) {
+		int history_file_size = 1000;	/* arbitrary choice */
+		char *histfilesize = getenv("HISTFILESIZE");
+		if (histfilesize) {
+		    history_file_size = atoi(histfilesize);
+		}
+		stifle_history(history_file_size);
 		if (write_history(path) != 0) {
 		    perror("scli: writing history failed");
 		}
