@@ -171,6 +171,23 @@ fmt_subunit(GString *s, int indent, gint32 *status)
 
 
 
+static void
+xml_subunit(xmlNodePtr tree, gint32 *status)
+{
+    if (! status) {
+	return;
+    }
+
+    xml_new_child(tree, NULL, "availability", "%s",
+		  fmt_subunit_availability(status));
+    xml_new_child(tree, NULL, "alerts", "%s",
+		  fmt_subunit_alerts(status));
+    xml_new_child(tree, NULL, "status", "%s",
+		  fmt_subunit_status(status));
+}
+
+
+
 static const char *
 fmt_dimensions(gint32 *dim)
 {
@@ -190,6 +207,54 @@ fmt_dimensions(gint32 *dim)
 
     g_snprintf(s, sizeof(s), "%d", *dim);
     return s;
+}
+
+
+
+static void
+fmt_media_dimensions(GString *s, gint indent, gchar *label,
+		     gint32 *dir, gint32 *xdir,
+		     gint32 *unit, const GSnmpEnum *enums)
+{
+    const char *e;
+    
+    if (! dir || ! xdir || ! unit) {
+	return;
+    }
+
+    e = fmt_enum(enums, unit);
+	
+    g_string_sprintfa(s, "%-*s %s", indent, label,
+		      fmt_dimensions(dir));
+    g_string_sprintfa(s, " x %s ",
+		      fmt_dimensions(xdir));
+    g_string_sprintfa(s, "%s\n", e ? e : "");
+}
+
+
+
+static void
+xml_media_dimensions(xmlNodePtr tree, gchar *label,
+		     gint32 *dir, gint32 *xdir,
+		     gint32 *unit, const GSnmpEnum *enums)
+{
+    const char *e;
+    gchar *s;
+    xmlNodePtr node;
+    
+    if (! dir || ! xdir || ! unit) {
+	return;
+    }
+
+    s = g_strdup(fmt_dimensions(dir));
+    node = xml_new_child(tree, NULL, label, "%sx%s", s, 
+			 fmt_dimensions(xdir));
+    g_free(s);
+
+    e = fmt_enum(enums, unit);
+    if (e) {
+	xml_set_prop(node, "unit", e);
+    }
 }
 
 
@@ -720,28 +785,17 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 	g_string_append(s, "\n");
     }
 
-    e = fmt_enum(printer_mib_enums_prtInputDimUnit,
-		 prtInputEntry->prtInputDimUnit);
+    fmt_media_dimensions(s, indent, "Media Dimensions:",
+			 prtInputEntry->prtInputMediaDimFeedDirDeclared,
+			 prtInputEntry->prtInputMediaDimXFeedDirDeclared,
+			 prtInputEntry->prtInputDimUnit,
+			 printer_mib_enums_prtInputDimUnit);
 
-    if (prtInputEntry->prtInputMediaDimFeedDirDeclared &&
-	prtInputEntry->prtInputMediaDimXFeedDirDeclared) {
-	
-	g_string_sprintfa(s, "%-*s %s", indent, "Media Dimensions:",
-	  fmt_dimensions(prtInputEntry->prtInputMediaDimFeedDirDeclared));
-	g_string_sprintfa(s, " x %s ",
-	  fmt_dimensions(prtInputEntry->prtInputMediaDimXFeedDirDeclared));
-	g_string_sprintfa(s, "%s\n", e ? e : "");
-    }
-    
-    if (prtInputEntry->prtInputMediaDimFeedDirChosen &&
-	prtInputEntry->prtInputMediaDimXFeedDirChosen) {
-
-	g_string_sprintfa(s, "%-*s %s", indent, "Chosen Dimensions:",
-	  fmt_dimensions(prtInputEntry->prtInputMediaDimFeedDirChosen));
-	g_string_sprintfa(s, " x %s ",
-	  fmt_dimensions(prtInputEntry->prtInputMediaDimXFeedDirChosen));
-	g_string_sprintfa(s, "%s\n", e ? e : "");
-    }
+    fmt_media_dimensions(s, indent, "Chosen Dimensions:",
+			 prtInputEntry->prtInputMediaDimFeedDirChosen,
+			 prtInputEntry->prtInputMediaDimXFeedDirChosen,
+			 prtInputEntry->prtInputDimUnit,
+			 printer_mib_enums_prtInputDimUnit);
     
     if (prtInputEntry->prtInputMediaLoadTimeout) {
 	g_string_sprintfa(s, "%-*s ", indent, "Media Load Timeout:");
@@ -758,6 +812,186 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 			      *prtInputEntry->prtInputMediaLoadTimeout);
 	}
 	g_string_append(s, "\n");
+    }
+}
+
+
+
+static void
+xml_printer_inputs(xmlNodePtr root,
+		   printer_mib_prtInputEntry_t *prtInputEntry)
+{
+    xmlNodePtr tree, node;
+    const char *e;
+
+    tree = xmlNewChild(root, NULL, "input", NULL);
+    xml_set_prop(tree, "printer", "%d",
+		 prtInputEntry->hrDeviceIndex);
+    xml_set_prop(tree, " number", "%d",
+		 prtInputEntry->prtInputIndex);
+
+    if (prtInputEntry->prtInputName) {
+	(void) xml_new_child(tree, NULL, "name", "%.*s",
+			     (int) prtInputEntry->_prtInputNameLength,
+			     prtInputEntry->prtInputName);
+    }
+
+    if (prtInputEntry->prtInputDescription) {
+	(void) xml_new_child(tree, NULL, "description", "%.*s",
+			     (int) prtInputEntry->_prtInputDescriptionLength,
+			     prtInputEntry->prtInputDescription);
+    }
+
+    if (prtInputEntry->prtInputVendorName) {
+	(void) xml_new_child(tree, NULL, "vendor", "%.*s",
+			     (int) prtInputEntry->_prtInputVendorNameLength,
+			     prtInputEntry->prtInputVendorName);
+    }
+    
+    e = fmt_enum(printer_mib_enums_prtInputType, prtInputEntry->prtInputType);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "type", "%s", e);
+    }
+
+    if (prtInputEntry->prtInputModel) {
+	(void) xml_new_child(tree, NULL, "model", "%.*s",
+			     (int) prtInputEntry->_prtInputModelLength,
+			     prtInputEntry->prtInputModel);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtInputCapacityUnit,
+		 prtInputEntry->prtInputCapacityUnit);
+    if (prtInputEntry->prtInputMaxCapacity) {
+	switch (*prtInputEntry->prtInputMaxCapacity) {
+	case -1:
+	    node = xml_new_child(tree, NULL, "capacity", "unlimited");
+	    break;
+	case -2:
+	    node = xml_new_child(tree, NULL, "capacity", "unknown");
+	    break;
+	default:
+	    node = xml_new_child(tree, NULL, "capacity", "%d",
+				 *prtInputEntry->prtInputMaxCapacity);
+	}
+	xml_set_prop(node, "unit", "%s", e);
+    }
+
+    if (prtInputEntry->prtInputCurrentLevel) {
+	switch (*prtInputEntry->prtInputCurrentLevel) {
+	case -1:
+	    node = xml_new_child(tree, NULL, "level", "unlimited");
+	    break;
+	case -2:
+	    node = xml_new_child(tree, NULL, "level", "unknown");
+	    break;
+	case -3:
+	    node = xml_new_child(tree, NULL, "level", ">0");
+	    break;
+	default:
+	    node = xml_new_child(tree, NULL, "level", "%d",
+				 *prtInputEntry->prtInputCurrentLevel);
+	}
+	xml_set_prop(node, "unit", "%s", e);
+    }
+
+    xml_subunit(tree, prtInputEntry->prtInputStatus);
+
+    if (prtInputEntry->prtInputSerialNumber) {
+	(void) xml_new_child(tree, NULL, "serial", "%.*s",
+			     (int) prtInputEntry->_prtInputSerialNumberLength,
+			     prtInputEntry->prtInputSerialNumber);
+    }
+    
+    if (prtInputEntry->prtInputVersion) {
+	(void) xml_new_child(tree, NULL, "version", "%.*s",
+			     (int) prtInputEntry->_prtInputVersionLength,
+			     prtInputEntry->prtInputVersion);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtInputSecurity,
+		 prtInputEntry->prtInputSecurity);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "security", "%s", e);
+    }
+
+    /* ...media specific stuff begins here... */
+
+    tree = xmlNewChild(tree, NULL, "media", NULL);
+    
+    if (prtInputEntry->prtInputMediaName) {
+	(void) xml_new_child(tree, NULL, "name", "%.*s",
+			     (int) prtInputEntry->_prtInputMediaNameLength,
+			     prtInputEntry->prtInputMediaName);
+    }
+    
+    if (prtInputEntry->prtInputMediaType) {
+	(void) xml_new_child(tree, NULL, "type", "%.*s",
+			     (int) prtInputEntry->_prtInputMediaTypeLength,
+			     prtInputEntry->prtInputMediaType);
+    }
+
+    if (prtInputEntry->prtInputMediaWeight) {
+	switch (*prtInputEntry->prtInputMaxCapacity) {
+	case -2:
+	    (void) xml_new_child(tree, NULL, "weight", "%s", "unknown");
+	    break;
+	default:
+	    node = xml_new_child(tree, NULL, "weight",
+				 "%u", *prtInputEntry->prtInputMediaWeight);
+	    xml_set_prop(node, "unit", "%s", "g/m^2");
+	}
+    }
+
+    if (prtInputEntry->prtInputMediaColor) {
+	(void) xml_new_child(tree, NULL, "color", "%.*s",
+			     (int) prtInputEntry->_prtInputMediaColorLength,
+			     prtInputEntry->prtInputMediaColor);
+    }
+
+    if (prtInputEntry->prtInputMediaFormParts) {
+	switch (*prtInputEntry->prtInputMediaFormParts) {
+	case -1:
+	    (void) xml_new_child(tree, NULL, "parts", "%s", "other");
+	    break;
+	case -2:
+	    (void) xml_new_child(tree, NULL, "parts", "%s", "unknown");
+	    break;
+	default:
+	    (void) xml_new_child(tree, NULL, "parts",
+				 "%u", *prtInputEntry->prtInputMediaFormParts);
+	}
+     }
+
+    e = fmt_enum(printer_mib_enums_prtInputDimUnit,
+		 prtInputEntry->prtInputDimUnit);
+
+    xml_media_dimensions(tree, "dimensions",
+			 prtInputEntry->prtInputMediaDimFeedDirDeclared,
+			 prtInputEntry->prtInputMediaDimXFeedDirDeclared,
+			 prtInputEntry->prtInputDimUnit,
+			 printer_mib_enums_prtInputDimUnit);
+
+    xml_media_dimensions(tree, "chosen",
+			 prtInputEntry->prtInputMediaDimFeedDirChosen,
+			 prtInputEntry->prtInputMediaDimXFeedDirChosen,
+			 prtInputEntry->prtInputDimUnit,
+			 printer_mib_enums_prtInputDimUnit);
+    
+    if (prtInputEntry->prtInputMediaLoadTimeout) {
+	switch (*prtInputEntry->prtInputMediaLoadTimeout) {
+	case -1:
+	    (void) xml_new_child(tree, NULL, "load-timeout",
+				 "%s", "wait forever");
+	    break;
+	case -2:
+	    (void) xml_new_child(tree, NULL, "load-timeout",
+				 "%s", "unknown");
+	    break;
+	default:
+	    node = xml_new_child(tree, NULL, "load-timeout",
+			 "%u", *prtInputEntry->prtInputMediaLoadTimeout);
+	    xml_set_prop(node, "unit", "%s", "seconds");
+	}
     }
 }
 
@@ -786,10 +1020,14 @@ show_printer_inputs(scli_interp_t *interp, int argc, char **argv)
 
     if (prtInputTable) {
 	for (i = 0; prtInputTable[i]; i++) {
-	    if (i > 0) {
-		g_string_append(interp->result, "\n");
+	    if (scli_interp_xml(interp)) {
+		xml_printer_inputs(interp->xml_node, prtInputTable[i]);
+	    } else {
+		if (i > 0) {
+		    g_string_append(interp->result, "\n");
+		}
+		fmt_printer_inputs(interp->result, prtInputTable[i]);
 	    }
-	    fmt_printer_inputs(interp->result, prtInputTable[i]);
 	}
     }
 
@@ -905,28 +1143,17 @@ fmt_printer_outputs(GString *s, printer_mib_prtOutputEntry_t *prtOutputEntry)
 	g_string_sprintfa(s, "%-*s %s\n", indent, "Security:", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputDimUnit,
-		 prtOutputEntry->prtOutputDimUnit);
+    fmt_media_dimensions(s, indent, "Min. Dimensions:",
+			 prtOutputEntry->prtOutputMinDimFeedDir,
+			 prtOutputEntry->prtOutputMinDimXFeedDir,
+			 prtOutputEntry->prtOutputDimUnit,
+			 printer_mib_enums_prtOutputDimUnit);
 
-    if (prtOutputEntry->prtOutputMinDimFeedDir &&
-	prtOutputEntry->prtOutputMinDimXFeedDir) {
-	
-	g_string_sprintfa(s, "%-*s %s", indent, "Min. Dimensions:",
-	  fmt_dimensions(prtOutputEntry->prtOutputMinDimFeedDir));
-	g_string_sprintfa(s, " x %s ",
-	  fmt_dimensions(prtOutputEntry->prtOutputMinDimXFeedDir));
-	g_string_sprintfa(s, "%s\n", e ? e : "");
-    }
-    
-    if (prtOutputEntry->prtOutputMaxDimFeedDir &&
-	prtOutputEntry->prtOutputMaxDimXFeedDir) {
-
-	g_string_sprintfa(s, "%-*s %s", indent, "Max. Dimension:",
-	  fmt_dimensions(prtOutputEntry->prtOutputMaxDimFeedDir));
-	g_string_sprintfa(s, " x %s ",
-	  fmt_dimensions(prtOutputEntry->prtOutputMaxDimXFeedDir));
-	g_string_sprintfa(s, "%s\n", e ? e : "");
-    }
+    fmt_media_dimensions(s, indent, "Max. Dimensions:",
+			 prtOutputEntry->prtOutputMaxDimFeedDir,
+			 prtOutputEntry->prtOutputMaxDimXFeedDir,
+			 prtOutputEntry->prtOutputDimUnit,
+			 printer_mib_enums_prtOutputDimUnit);
 
     e = fmt_enum(printer_mib_enums_prtOutputStackingOrder,
 		 prtOutputEntry->prtOutputStackingOrder);
@@ -1829,8 +2056,9 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "The `show printer inputs' command shows information about the\n"
 	  "input sub-units of a printer which provide media for input to\n"
 	  "the printing process.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "printer inputs",
+	  NULL,
 	  show_printer_inputs },
 
 	{ "show printer outputs", NULL,
