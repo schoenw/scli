@@ -1,7 +1,8 @@
 /*
- * $Id$
- * GXSNMP -- An snmp management application
- * Copyright (C) 1998 Gregory McLean & Jochen Friedrich
+ * g_session.c -- session layer of the glib based snmp library
+ *
+ * Copyright (c) 1998 Gregory McLean & Jochen Friedrich
+ * Copyright (c) 2001 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,  59 Temple Place - Suite 330, Cambridge, MA 02139, USA.
+ *
+ * $Id$
  */
 
 #include "g_snmp.h"
@@ -24,7 +27,6 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#include <string.h>                   /* Quite the memmove warning */
 #include <time.h>
 
 static GSList  *request_queue = NULL;   /* queue of active requests */
@@ -38,12 +40,13 @@ static GSList  *request_queue = NULL;   /* queue of active requests */
  */
 
 gboolean
-g_setup_address (GSnmpSession *session)
+g_setup_address(GSnmpSession *session)
 {
-  if (!g_lookup_address(session->domain, session->name, &session->address))
-    return FALSE;
- 
-  return TRUE;
+    if (! g_lookup_address(session->domain, session->name, &session->address)) {
+	return FALSE;
+    }
+    
+    return TRUE;
 }
 
 /*
@@ -57,7 +60,7 @@ g_snmp_session_new()
 
     session = g_malloc0(sizeof(GSnmpSession));
     session->domain = G_SNMP_TDOMAIN_UDP_IPV4;
-    session->name = "localhost";
+    session->name = NULL;
     session->port = 161;
     session->retries = 3;
     session->timeout = 1;
@@ -67,6 +70,34 @@ g_snmp_session_new()
 	g_printerr("session %p: new\n", session);
     }
     return session;
+}
+
+/*
+ * Clone a session data structure.
+ */
+
+GSnmpSession*
+g_snmp_session_clone(GSnmpSession *session)
+{
+    GSnmpSession *clone;
+
+    clone = g_snmp_session_new();
+    clone->domain  = session->domain;
+    clone->port    = session->port;
+    clone->retries = session->retries;
+    clone->timeout = session->timeout;
+    clone->version = session->version;
+    if (session->rcomm) {
+	clone->rcomm = g_strdup(session->rcomm);
+    }
+    if (session->wcomm) {
+	clone->wcomm = g_strdup(session->wcomm);
+    }
+    if (session->name) {
+	clone->name  = g_strdup(session->name);
+    }
+
+    return clone;
 }
 
 /*
@@ -80,6 +111,7 @@ g_snmp_session_destroy(GSnmpSession *session)
 
     if (session->name) g_free(session->name);
     if (session->rcomm) g_free(session->rcomm);
+    if (session->wcomm) g_free(session->wcomm);
     if (session->address) g_free(session->address);
     g_free(session);
 
@@ -298,8 +330,8 @@ g_snmp_session_async_getnext(GSnmpSession *session, GSList *pdu)
 }
 
 gpointer
-g_snmp_session_async_bulk(GSnmpSession *session, GSList *pdu,
-			  guint32 nonrep, guint32 maxrep)
+g_snmp_session_async_getbulk(GSnmpSession *session, GSList *pdu,
+			     guint32 nonrep, guint32 maxrep)
 {
     if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
 	g_printerr("session %p: g_async_getbulk pdu %p\n", session, pdu);
@@ -404,8 +436,8 @@ g_snmp_session_sync_getnext(GSnmpSession *session, GSList *pdu)
 }
 
 GSList *
-g_snmp_session_sync_bulk(GSnmpSession *session, GSList *pdu,
-			 guint32 nonrep, guint32 maxrep)
+g_snmp_session_sync_getbulk(GSnmpSession *session, GSList *pdu,
+			    guint32 nonrep, guint32 maxrep)
 {
     if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
 	g_printerr("session %p: g_sync_getbulk pdu %p\n", session, pdu);

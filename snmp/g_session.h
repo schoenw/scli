@@ -1,7 +1,8 @@
 /*
- * $Id$
- * GXSNMP -- An snmp management application
- * Copyright (C) 1998 Gregory McLean & Jochen Friedrich
+ * g_session.h -- session layer of the glib based snmp library
+ *
+ * Copyright (c) 1998 Gregory McLean & Jochen Friedrich
+ * Copyright (c) 2001 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,  59 Temple Place - Suite 330, Cambridge, MA 02139, USA.
+ *
+ * $Id$
  */
 
 #ifndef _G_SESSION_H_
@@ -45,6 +48,7 @@ typedef struct _GSnmpSession {
 } GSnmpSession;
 
 GSnmpSession*	g_snmp_session_new(void);
+GSnmpSession*	g_snmp_session_clone(GSnmpSession *s);
 void		g_snmp_session_destroy(GSnmpSession *s);
 
 gpointer g_snmp_session_async_set    (GSnmpSession *session,
