@@ -124,7 +124,7 @@ page(scli_interp_t *interp, GString *s)
 	}
     } else {
     nopager:
-	g_print(s->str);
+	g_print("%s", s->str);
 	return;
     }
 
