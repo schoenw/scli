@@ -11,7 +11,12 @@ scli_SOURCES	= scli.c scli.h scli.1 vendors.c \
 		  ospf.c printer.c \
 		  isdn.c rs232.c sonet.c \
 		  cisco.c nortel.c netsnmp.c 3com.c
-scli_LDADD	= -L../proc -lproc -L../stub -lstub -L../snmp -lgsnmp $(GLIB_LIBS) $(XML_LIBS)
+
+scli_LDADD	= $(top_builddir)/proc/libproc.a \
+		  $(top_builddir)/stub/libstub.a \
+		  $(top_builddir)/snmp/libgsnmp.a \
+		  $(GLIB_LIBS) $(XML_LIBS)
+
 #gscli_SOURCES	= gscli.c scli.h scli.1 vendors.c \
 #		  getopt.h getopt.c getopt1.c basic.c monitor.c cmds.c \
 #		  fmt.c xml.c \
@@ -21,7 +26,12 @@ scli_LDADD	= -L../proc -lproc -L../stub -lstub -L../snmp -lgsnmp $(GLIB_LIBS) $(
 #		  ospf.c printer.c \
 #		  isdn.c rs232.c sonet.c \
 #		  cisco.c nortel.c netsnmp.c 3com.c
-#gscli_LDADD	= -L../proc -lproc -L../stub -lstub -L../snmp -lgsnmp $(GTK_LIBS) $(GLIB_LIBS) $(XML_LIBS)
+#
+#gscli_LDADD	= $(top_builddir)/proc/libproc.a \
+#		  $(top_builddir)/stub/libstub.a \
+#		  $(top_builddir)/snmp/libgsnmp.a \
+#		  $(GTK_LIBS) $(GLIB_LIBS) $(XML_LIBS)
+
 man_MANS	= scli.1
 
 scli.1:
