@@ -418,7 +418,7 @@ help(scli_interp_t *interp, int argc, char **argv)
       " - monitor      Monitor information provided by the remote SNMP agent.\n"
       " - dump         Dump scli command sequences to restore configurations.\n"
       "\n"
-      "Use the \"show scli commands\" command to browse the complete\n"
+      "Use the \"show scli command tree\" command to browse the complete\n"
       "scli command tree and the \"show scli modes\" command to obtain\n"
       "a detailed description of the various scli commands.\n");
     
