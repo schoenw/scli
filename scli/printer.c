@@ -1016,6 +1016,21 @@ fmt_printer_marker(GString *s, printer_mib_prtMarkerEntry_t *prtMarkerEntry)
     g_string_sprintfa(s, "%-*s %u\n", indent, "Marker:",
 		      prtMarkerEntry->prtMarkerIndex);
 
+    e = fmt_enum(printer_mib_enums_prtMarkerCounterUnit,
+		 prtMarkerEntry->prtMarkerCounterUnit);
+
+    if (prtMarkerEntry->prtMarkerLifeCount) {
+	g_string_sprintfa(s, "%-*s %u %s\n", indent, "Life Count:",
+			  *prtMarkerEntry->prtMarkerLifeCount,
+			  e ? e : "");
+    }
+
+    if (prtMarkerEntry->prtMarkerPowerOnCount) {
+	g_string_sprintfa(s, "%-*s %u %s\n", indent, "Power On Count:",
+			  *prtMarkerEntry->prtMarkerPowerOnCount,
+			  e ? e : "");
+    }
+
     e = fmt_enum(printer_mib_enums_prtMarkerMarkTech,
 		 prtMarkerEntry->prtMarkerMarkTech);
     if (e) {
