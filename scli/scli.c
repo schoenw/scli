@@ -281,6 +281,7 @@ usage()
 	"  -c, --command     process the given command and exit\n"
 	"  -d, --delay       delay in seconds between screen updates (default 5)\n"
 	"  -f, --file        process commands from a file and exit\n"
+	"  -i, --inet        execute in inet protocol mode\n"
 	"  -h, --help        display this help and exit\n"
 	"  -n, --norc        do not evaluate ~/.sclirc on startup\n"
 	"  -p, --port        port number of the SNMP agent (default 161)\n"
