@@ -249,8 +249,8 @@ cmd_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
     (void) mau_mib_get_ifJackTable(interp->peer, &ifJackTable);
 
     if (ifMauTable) {
-	g_string_sprintfa(interp->result,
-		  "Interface   Mau Status      Media         Jabber   AutoNeg Type\n");
+	g_string_sprintfa(interp->header,
+		  "INTERFACE   MAU STATUS      MEDIA         JABBER   AUTONEG TYPE");
 	for (i = 0; ifMauTable[i]; i++) {
 	    show_ether_mau_info(interp->result, ifMauTable[i]);
 	}
@@ -316,8 +316,8 @@ cmd_ether_stats(scli_interp_t *interp, int argc, char **argv)
 
     if (dot3StatsTable) {
 	g_string_append(interp->header,
-			"INTERFACE | ALIGN   FCS   MAC  LONG | "
-			"DEFER  SCOL  MCOL  XCOL  LCOL   MAC  CARR");
+			"INTERFACE | ALIGN   FCS   RCV  LONG | "
+			"DEFER  SCOL  MCOL  XCOL  LCOL  XMIT  CARR");
 	for (i = 0; dot3StatsTable[i]; i++) {
 	    GString *s = interp->result;
 
@@ -375,24 +375,52 @@ void
 scli_init_ether_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
 	{ "show ethernet mau", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "ethernet medium attachment unit parameters",
+	  "The show ethernet mau command displays information about the\n"
+	  "medium attachment units for each ethernet port. The command\n"
+	  "generates a table which displays the interface number, the\n"
+	  "medium attachment unit number for this interface, the status\n"
+	  "of the medium attachment unit, whether media is available, the\n"
+	  "jabber state, the autonegotiation state, and the type of the\n"
+	  "medium attachment unit.",
 	  cmd_ether_mau_info },
+
 	{ "show ethernet stats", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "ethernet statistics",
+	  "The show ethernet stats command displays ethernet specific\n"
+	  "statistics for each ethernet interface. The command outputs\n"
+	  "a table which has the following columns:\n"
+	  "\n"
+          "  INTERFACE interface number\n"
+          "  ALIGN     alignement errors per second\n"
+          "  FCS       frame check sequence errors per second\n"
+          "  RCV       MAC receive errors per second\n"
+          "  LONG      frames exceeding maximum frame size per second\n"
+          "  DEFER     deferred transmission per second\n"
+          "  SCOL      single collisions per second\n"
+          "  MCOLR     multiple collisions per second\n"
+          "  XCOL      excessive collisions per second\n"
+          "  LCOL      late collisions per second\n"
+          "  XMIT      MAC transmit errors per second\n"
+          "  CARR      carrier sense errors per second",
 	  cmd_ether_stats },
+
 	{ "monitor ethernet stats", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  "ethernet statistics",
+	  "The monitor ethernet stats command shows the same information\n"
+	  "as the show ethernet stats command. The information is updated\n"
+	  "periodically.",
 	  cmd_ether_stats },
+
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t ether_mode = {
-	"ether",
-	"scli mode to display and configure ethernet parameters",
+	"ethernet",
+	"The ethernet scli mode is based on the EtherLike-MIB as published\n"
+	"in RFC 2665 and the MAU-MIB as published in RFC 2668.",
 	cmds
     };
     

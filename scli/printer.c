@@ -944,32 +944,40 @@ void
 scli_init_printer_mode(scli_interp_t * interp)
 {
     static scli_cmd_t cmds[] = {
+
 	{ "show printer info", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "general printer information",
 	  cmd_printer_info },
+
 	{ "show printer inputs", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "printer input information",
 	  cmd_printer_inputs },
+
 	{ "show printer console", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "printer console information",
 	  cmd_printer_console },
+
 	{ "show printer lights", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "printer console light information",
 	  cmd_printer_lights },
+
 	{ "show printer alerts", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "printer alert information",
 	  cmd_printer_alert },
+
 	{ NULL, NULL, 0, NULL, NULL }
     };
 
     static scli_mode_t printer_mode = {
-	"pinter",
-	"scli mode to display and configure printers",
+	"printer",
+	"The scli printer mode is based on the Printer-MIB as published\n"
+	"in RFC 1759 and some updates currently being worked on in the\n"
+	"IETF Printer MIB working group.",
 	cmds
     };
 

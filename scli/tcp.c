@@ -25,6 +25,7 @@
 #include "tcp-mib.h"
 
 
+
 static void
 xml_tcp_listener(xmlNodePtr root, tcp_mib_tcpConnEntry_t *tcpConnEntry, int width)
 {
@@ -254,24 +255,35 @@ void
 scli_init_tcp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
 	{ "show tcp listener", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  "show existing tcp listener",
+	  "The show tcp listener command displays the listening TCP\n"
+	  "endpoints.",
 	  show_tcp_listener },
+
 	{ "show tcp connections", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  "show existing tcp connections",
+	  "The show tcp connections command displays the connected TCP\n"
+	  "endpoints including the current state of the connection as seen\n"
+	  "by the remote SNMP agent.",
 	  show_tcp_connections },
+
 	{ "monitor tcp connections", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  "monitor existing tcp connections",
+	  "The monitor tcp connections command displays the connected TCP\n"
+	  "endpoints including the current state of the connection as seen\n"
+	  "by the remote SNMP agent.",
 	  show_tcp_connections },
+
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t tcp_mode = {
 	"tcp",
-	"scli mode to display and configure TCP parameters",
+	"The scli tcp mode is based on the TCP-MIB as published in\n"
+	"RFC 2012. It provides commands to browse information specific\n"
+	"to the TCP transport protocol.",
 	cmds
     };
     

@@ -654,7 +654,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "ports to port-based vlans. The regular expression <regexp>\n"
 	  "is matched against the vlan names to select the vlans that\n"
 	  "should be modified. The <ports> argument contains a comma\n"
-	  "separated list of port numbers or port number ranges, e.g\n"
+	  "separated list of port numbers or port number ranges, e.g.\n"
 	  "1,5,7-8.",
 	  set_nortel_baystack_vlan_ports },
 

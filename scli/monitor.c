@@ -670,7 +670,7 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 }
 
 
-
+#if 1
 int
 scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv)
 {
@@ -689,3 +689,22 @@ scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv)
     return code;
 }
 
+#else
+
+int
+scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv)
+{
+    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
+    int code = SCLI_OK;
+
+    while (1) {
+	g_string_truncate(interp->result, 0);
+	code = (cmd->func) (interp, argc, argv);
+	g_print("%s", interp->result->str);
+	sleep(1);
+    }
+    
+    return code;
+}
+
+#endif

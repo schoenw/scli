@@ -110,16 +110,21 @@ void
 scli_init_udp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
 	{ "show udp listener", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  "show existing udp listener",
+	  "The show udp listener command displays the listening UDP\n"
+	  "endpoints.",
 	  show_udp_listener },
+	
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t udp_mode = {
 	"udp",
-	"scli mode to display and configure UDP parameters",
+	"The scli udp mode is based on the UDP-MIB as published in\n"
+	"RFC 2013. It provides commands to browse information specific\n"
+	"to the UDP transport protocol.",
 	cmds
     };
     

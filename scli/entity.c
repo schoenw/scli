@@ -26,9 +26,9 @@
 
 
 static void
-show_containment(GString *s, char *prefix,
-		 entity_mib_entPhysicalEntry_t **entPhysicalEntry,
-		 gint32 parent, int class_width)
+fmt_containment(GString *s, char *prefix,
+		entity_mib_entPhysicalEntry_t **entPhysicalEntry,
+		gint32 parent, int class_width)
 {
     int i, j, len;
     const char *class;
@@ -77,9 +77,9 @@ show_containment(GString *s, char *prefix,
 		} else {
 		    strcat(new_prefix, len ? "   " : " ");
 		}
-		show_containment(s, new_prefix, entPhysicalEntry,
-				 entPhysicalEntry[i]->entPhysicalIndex,
-				 class_width);
+		fmt_containment(s, new_prefix, entPhysicalEntry,
+				entPhysicalEntry[i]->entPhysicalIndex,
+				class_width);
 		g_free(new_prefix);
 	    }
 	}
@@ -89,7 +89,7 @@ show_containment(GString *s, char *prefix,
 
 
 static int
-show_system_entity_containment(scli_interp_t *interp, int argc, char **argv)
+show_entity_containment(scli_interp_t *interp, int argc, char **argv)
 {
     entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
     int class_width = 6;
@@ -116,7 +116,7 @@ show_system_entity_containment(scli_interp_t *interp, int argc, char **argv)
 	}
 	g_string_sprintfa(interp->header, "ENTITY %-*s CONTAINMENT",
 			  class_width, "CLASS");
-	show_containment(interp->result, "", entPhysicalTable, 0, class_width);
+	fmt_containment(interp->result, "", entPhysicalTable, 0, class_width);
     }
 
     if (entPhysicalTable) entity_mib_free_entPhysicalTable(entPhysicalTable);
@@ -304,7 +304,7 @@ xml_entity_details(xmlNodePtr root,
 
 
 static int
-show_system_entity_details(scli_interp_t *interp, int argc, char **argv)
+show_entity_details(scli_interp_t *interp, int argc, char **argv)
 {
     entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
     int i;
@@ -374,7 +374,7 @@ fmt_entity_info(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry,
 
 
 static int
-show_system_entity_info(scli_interp_t *interp, int argc, char **argv)
+show_entity_info(scli_interp_t *interp, int argc, char **argv)
 {
     entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
     int class_width = 6, name_width = 6;
@@ -424,24 +424,46 @@ void
 scli_init_entity_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show system entity info ", NULL,
+
+	{ "show entity info ", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "physical entities that compose the system",
-	  show_system_entity_info },
-	{ "show system entity details ", NULL,
+	  show_entity_info },
+	
+	{ "show entity details ", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "physical entities that compose the system",
-	  show_system_entity_details },
-	{ "show system entity containment", NULL,
+	  show_entity_details },
+	
+	{ "show entity containment", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "physical entity containment hierarchy",
-	  show_system_entity_containment },
+	  show_entity_containment },
+
+#if 0
+	{ "set entity serial", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "xxx",
+	  set_entity_serial },
+
+	{ "set entity alias", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "xxx",
+	  set_entity_alias },
+
+	{ "set entity asset", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "xxx",
+	  set_entity_serial },
+#endif
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t entity_mode = {
 	"entity",
-	"scli mode to display and configure system entities",
+	"The entity scli mode is based on the ENTITY-MIB as published in\n"
+	"RFC 2737. It provides commands to browse the physical entities\n"
+	"or physical components what make up a managed system.",
 	cmds
     };
     
