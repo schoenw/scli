@@ -31,7 +31,8 @@ MIBS			= IF-MIB \
 			  RS-232-MIB \
 			  OLD-CISCO-IP-MIB \
 			  RAPID-CITY \
-			  UCD-SNMP-MIB
+			  UCD-SNMP-MIB \
+			  PRODUCTMIB
 
 STUBS			= if-mib.h if-mib.c \
 			  ip-mib.h ip-mib.c \
@@ -66,7 +67,8 @@ STUBS			= if-mib.h if-mib.c \
 			  rs-232-mib.h rs-232-mib.c \
 			  old-cisco-ip-mib.h old-cisco-ip-mib.c \
 			  rapid-city.h rapid-city.c \
-			  ucd-snmp-mib.h ucd-snmp-mib.c
+			  ucd-snmp-mib.h ucd-snmp-mib.c \
+			  productmib.h productmib.c
 
 noinst_LIBRARIES	= libstub.a
 libstub_a_SOURCES	= $(STUBS)
@@ -80,6 +82,7 @@ stubs:
 	$(SMIDUMP) -f scli --scli-match="VlanEntry|VlanPortEntry" RAPID-CITY
 	$(SMIDUMP) -f scli --scli-match="ipRouteEntry" RFC1213-MIB
 	$(SMIDUMP) -f scli --scli-match="atmInterfaceConfEntry" ATM-MIB
+	$(SMIDUMP) -f scli --scli-match=a3ComVlanIfEntry PRODUCTMIB
 	@for f in $(MIBS) ; do \
 	    echo "$(SMIDUMP) -f scli $$f" ; \
 	    $(SMIDUMP) -f scli $$f ; \
