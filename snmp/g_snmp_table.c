@@ -47,6 +47,13 @@ g_snmp_table_done_callback(GSnmpSession *session, gpointer data,
     table->request = 0;
     
   rows = g_slist_length(table->objs);
+  if (spdu->request.error_status == G_SNMP_ERR_NOSUCHNAME) {
+      if (table->cb_finish)
+        table->cb_finish(table->data);
+      else
+        g_snmp_table_destroy(table);
+      return TRUE;
+  }
 /* We got error back. */
   if (spdu->request.error_status)
     {
