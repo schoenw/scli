@@ -107,13 +107,21 @@ show_device(GString *s, hrDeviceEntry_t *hrDeviceEntry)
 {
     g_return_if_fail(hrDeviceEntry);
 
-    g_string_sprintfa(s, "%5d: ", hrDeviceEntry->hrDeviceIndex);
+    g_string_sprintfa(s, "%5u ", hrDeviceEntry->hrDeviceIndex);
+    
+    if (hrDeviceEntry->hrDeviceStatus) {
+	fmt_enum(s, 8, host_resources_mib_enums_hrDeviceStatus,
+		 hrDeviceEntry->hrDeviceStatus);
+    } else {
+	g_string_append(s, "        ");
+    }
     
     if (hrDeviceEntry->hrDeviceDescr) {
 	g_string_sprintfa(s, "%.*s\n",
 			  (int) hrDeviceEntry->_hrDeviceDescrLength,
 			  hrDeviceEntry->hrDeviceDescr);
     }
+
 }
 
 
@@ -131,11 +139,13 @@ cmd_devices(scli_interp_t *interp, int argc, char **argv)
     }
     
     if (hrDeviceTable) {
+	g_string_sprintfa(interp->result, "Index Status  Description\n");
 	for (i = 0; hrDeviceTable[i]; i++) {
 	    show_device(interp->result, hrDeviceTable[i]);
 	}
-	host_resources_mib_free_hrDeviceTable(hrDeviceTable);
     }
+
+    if (hrDeviceTable) host_resources_mib_free_hrDeviceTable(hrDeviceTable);
 
     return SCLI_OK;
 }
