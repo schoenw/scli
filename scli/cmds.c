@@ -584,7 +584,7 @@ create_scli_alias(scli_interp_t *interp, int argc, char **argv)
 	g_free(alias->value);
 	alias->value = g_strdup_printf(argv[2]);
     } else {
-	alias = (scli_alias_t *) g_malloc0(sizeof(scli_alias_t));
+	alias = g_new0(scli_alias_t, 1);
 	alias->name = g_strdup(argv[1]);
 	alias->value = g_strdup(argv[2]);
 	interp->alias_list = g_slist_insert_sorted(interp->alias_list,

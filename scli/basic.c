@@ -46,8 +46,8 @@ struct error_info {
 
 static const struct error_info error_infos[] = {
     { SCLI_MSG,			"%s" },
-    { SCLI_OK,			"ok" },
-    { SCLI_EXIT,		"exiting" },
+    { SCLI_OK,			"ok; scli " VERSION " ready" },
+    { SCLI_EXIT,		"ok; scli " VERSION " exiting" },
     { SCLI_ERROR,		"%s" },
     { SCLI_ERROR_NOPEER,	"no association to a remote SNMP agent" },
     { SCLI_ERROR_NOXML,		"command `%s' does not support xml" },
@@ -226,7 +226,7 @@ scli_interp_create(char *name)
 {
     scli_interp_t *interp;
 
-    interp = g_malloc0(sizeof(scli_interp_t));
+    interp = g_new0(scli_interp_t, 1);
     interp->name = name ? g_strdup(name) : NULL;
     interp->cmd_root = g_node_new(NULL);
     interp->result = g_string_new(NULL);
@@ -332,7 +332,7 @@ scli_alarm_create(scli_interp_t *interp, char *desc)
 {
     scli_alarm_t *alarm;
 
-    alarm = g_malloc0(sizeof(scli_alarm_t));
+    alarm = g_new0(scli_alarm_t, 1);
     alarm->detected = time(NULL);
     alarm->verified = alarm->detected;
     if (desc) alarm->desc = g_strdup(desc);
@@ -523,7 +523,7 @@ expand_alias(scli_interp_t *interp, char *cmd)
     if (token) {
 	for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
 	    scli_alias_t *alias = (scli_alias_t *) elem->data;
-	    if (strcmp(alias->name, token) == 0) {
+	    if (strcasecmp(alias->name, token) == 0) {
 		new_cmd = g_strdup_printf("%s %s",
 					  alias->value, rest ? rest : "");
 		return new_cmd;
@@ -565,14 +565,18 @@ scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd)
 	     child;
 	     child = g_node_next_sibling(child)) {
 	    scli_cmd_t *this_cmd = (scli_cmd_t *) child->data;
-	    if (strcmp(this_cmd->name, argv[i]) == 0) {
+	    if (strcasecmp(this_cmd->name, argv[i]) == 0) {
 		break;
 	    }
 	}
 	if (! child) {
 	    scli_cmd_t *newcmd;
-	    newcmd = (scli_cmd_t *) g_malloc0(sizeof(scli_cmd_t));
+	    int j;
+	    newcmd = g_new0(scli_cmd_t, 1);
 	    newcmd->name = g_strdup(argv[i]);
+	    for (j = 0; newcmd->name[j]; j++) {
+		newcmd->name[j] = tolower(newcmd->name[j]);
+	    }
 	    child = g_node_append(node, g_node_new(newcmd));
 	}
 	node = child;
@@ -737,17 +741,22 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 	}
 	if (interp->xml_doc && interp->xml_doc->children) {
 	    xmlNodePtr top = interp->xml_doc->children;
+#if 0
 	    xml_set_prop(top, "code", "%3d", code);
 	    if (reason) {
 		xml_set_prop(top, "reason", "%s", reason);
 	    }
+#endif
 	    if (interp->peer) {
 		xml_set_prop(top, "peer", interp->peer->taddress);
 	    }
 	    xml_set_prop(top, "date", "%s", fmt_timeticks(0));
 	}
 	if (! (scli_interp_recursive(interp))) {
-	    show_result(interp, code);
+	    if (interp->xml_doc->children
+		&& interp->xml_doc->children->children) {
+		show_result(interp, code);
+	    }
 	    if (scli_interp_proto(interp)) {
 		g_printerr("%3d %s\n", code, reason);
 	    }
@@ -896,7 +905,7 @@ scli_eval_argc_argv(scli_interp_t *interp, int argc, char **argv)
     for (i = 0; i < argc && ! done; i++) {
 	while (node) {
 	    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
-	    if (cmd && strcmp(cmd->name, argv[i]) == 0) {
+	    if (cmd && strcasecmp(cmd->name, argv[i]) == 0) {
 		break;
 	    }
 	    node = g_node_next_sibling(node);
@@ -1087,6 +1096,7 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 		    char *community)
 {
     snmpv2_mib_system_t *system = NULL;
+    int verbose;
 
     if (interp->peer) {
 	scli_close(interp);
@@ -1113,32 +1123,34 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 
     g_snmp_list_decode_hook = NULL;
 
+    verbose = scli_interp_interactive(interp) && !scli_interp_quiet(interp);
+
     if (interp->snmp == G_SNMP_V1
 	|| interp->snmp == G_SNMP_V2C
 	|| interp->snmp == G_SNMP_V3) {
 	interp->peer->version = interp->snmp;
     } else {
-	if (scli_interp_interactive(interp)) {
-	    g_print("%3d Trying SNMPv2c ... ", SCLI_MSG);
+	if (verbose) {
+	    g_print("%3d-trying SNMPv2c ... ", SCLI_MSG);
 	}
 	interp->peer->version = G_SNMP_V2C;
 	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
 	if (interp->peer->error_status == 0) {
-	    if (scli_interp_interactive(interp)) {
-		g_print("good!\n");
+	    if (verbose) {
+		g_print("good\n");
 	    }
 	} else {
-	    if (scli_interp_interactive(interp)) {
-		g_print("timeout.\n%d Trying SNMPv1  ... ", SCLI_MSG);
+	    if (verbose) {
+		g_print("timeout\n%3d-trying SNMPv1  ... ", SCLI_MSG);
 	    }
 	    interp->peer->version = G_SNMP_V1;
 	    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
 	    if (interp->peer->error_status == 0) {
-		if (scli_interp_interactive(interp)) {
+		if (verbose) {
 		    g_print("ok.\n");
 		}
 	    } else {
-		if (scli_interp_interactive(interp)) {
+		if (verbose) {
 		    g_print("timeout.\n");
 		}
 		scli_close(interp);
@@ -1177,6 +1189,10 @@ char*
 scli_prompt(scli_interp_t *interp)
 {
     char *prompt;
+
+    if (scli_interp_proto(interp)) {
+	return NULL;
+    }
     
     if (interp->peer) {
 	prompt = g_strdup_printf("(%s) scli > ", interp->peer->taddress);

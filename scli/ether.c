@@ -322,7 +322,7 @@ show_ether_stats(scli_interp_t *interp, int argc, char **argv)
 
     if (! stats && dot3StatsTable) {
 	for (i = 0; dot3StatsTable[i]; i++) ;
-	stats = (ether_stats_t *) g_malloc0(i * sizeof(ether_stats_t));
+	stats = g_new0(ether_stats_t, i);
     }
 
     epoch = time(NULL);

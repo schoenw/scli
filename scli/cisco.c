@@ -174,7 +174,7 @@ show_cisco_ip_accounting_current(scli_interp_t *interp, int argc, char **argv)
 			  " PKTS > BYTS   PKTS < BYTS   TPKTS  TBYTS");
 
 	for (n = 0; lipAccountTable[n]; n++) ;
-	stats = g_malloc0(n * sizeof(act_stats_t));
+	stats = g_new0(act_stats_t, n);
 	
 	for (i = 0; lipAccountTable[i]; i++) {
 	    for (j = 0; lipAccountTable[j]; j++) {

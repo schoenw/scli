@@ -983,7 +983,7 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifStackEntry_t **ifStackTable = NULL;
     if_mib_ifEntry_t **ifTable = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
-    int i, j, type_width;
+    int i, type_width;
 
     if (argc > 2) {
 	return SCLI_SYNTAX_NUMARGS;
@@ -1097,7 +1097,7 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 
     if (! stats && ifTable) {
 	for (i = 0; ifTable[i]; i++) ;
-	stats = (if_stats_t *) g_malloc0(i * sizeof(if_stats_t));
+	stats = g_new0(if_stats_t, i);
     }
 
     epoch = time(NULL);

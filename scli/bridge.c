@@ -713,7 +713,7 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
     if (! stats && portTable) {
 	for (i = 0; portTable[i]; i++) ;
 	stats_size = i;
-	stats = (bridge_stats_t *) g_malloc0(i * sizeof(bridge_stats_t));
+	stats = g_new0(bridge_stats_t, i);
 	for (i = 0; portTable[i]; i++) {
 	    stats[i].descr = get_port_description(interp,
 						  portTable[i]->dot1dTpPort);
