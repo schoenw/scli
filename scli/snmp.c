@@ -24,16 +24,16 @@
 
 #include "snmpv2-mib.h"
 #include "snmp-framework-mib.h"
-#include "snmp-view-based-acm-mib.h"
-#include "snmp-user-based-sm-mib.h"
 #include "snmp-target-mib.h"
 #include "snmp-notification-mib.h"
-
+#include "snmp-community-mib.h"
 #include "snmp-view-based-acm-mib-proc.h"
 #include "snmp-user-based-sm-mib-proc.h"
 
+#include "entity-mib.h"
 
-static GSnmpEnum const mp_model[] = {
+
+static GNetSnmpEnum const mp_model[] = {
     { 0,	"SNMPv1" },
     { 1,	"SNMPv2c" },
     { 2,	"SNMPv2u/*" },
@@ -43,7 +43,7 @@ static GSnmpEnum const mp_model[] = {
 
 
 
-static GSnmpEnum const security_model[] = {
+static GNetSnmpEnum const security_model[] = {
     { 0,	"any" },
     { 1,	"v1" },
     { 2,	"v2c" },
@@ -53,16 +53,16 @@ static GSnmpEnum const security_model[] = {
 
 
 
-static GSnmpEnum const security_level[] = {
-    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_NOAUTHNOPRIV,	"--" },
-    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_AUTHNOPRIV,	"a-" },
-    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_AUTHPRIV,		"ap" },
+static GNetSnmpEnum const security_level[] = {
+    { SNMP_FRAMEWORK_MIB_SNMPSECURITYLEVEL_NOAUTHNOPRIV,	"--" },
+    { SNMP_FRAMEWORK_MIB_SNMPSECURITYLEVEL_AUTHNOPRIV,		"a-" },
+    { SNMP_FRAMEWORK_MIB_SNMPSECURITYLEVEL_AUTHPRIV,		"ap" },
     { 0, NULL }
 };
 
 
 
-static GSnmpEnum const view_tree_family_type[] = {
+static GNetSnmpEnum const view_tree_family_type[] = {
     { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE_INCLUDED,	"incl" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE_EXCLUDED,	"excl" },
     { 0, NULL }
@@ -81,7 +81,7 @@ static guint32 const usmNoPrivProtocol[]
 static guint32 const usmDESPrivProtocol[]
 	= { SNMP_USER_BASED_SM_MIB_USMDESPRIVPROTOCOL };
 
-GSnmpIdentity const sec_proto_identities[] = {
+GNetSnmpIdentity const sec_proto_identities[] = {
     { usmNoAuthProtocol,
       sizeof(usmNoAuthProtocol)/sizeof(guint32),
       "none" },
@@ -135,7 +135,7 @@ create_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (argc == 4) {
-	if (! gsnmp_enum_get_number(security_model, argv[3], &model)) {
+	if (! gnet_snmp_enum_get_number(security_model, argv[3], &model)) {
 	    g_string_assign(interp->result, argv[3]);
 	    return SCLI_SYNTAX_VALUE;
 	}
@@ -186,7 +186,7 @@ delete_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (argc == 4) {
-	if (! gsnmp_enum_get_number(security_model, argv[3], &model)) {
+	if (! gnet_snmp_enum_get_number(security_model, argv[3], &model)) {
 	    if (regex_name) regfree(regex_name);
 	    if (regex_group) regfree(regex_group);
 	    g_string_assign(interp->result, argv[3]);
@@ -331,7 +331,7 @@ fmt_snmp_engine(GString *s,
 			      *(snmpEngine->snmpEngineBoots));
 	}
 	if (snmpEngine->snmpEngineMaxMessageSize) {
-	    g_string_sprintfa(s, "%-*s%u byte\n",
+	    g_string_sprintfa(s, "%-*s%u bytes\n",
 			      indent, "Maximum Message Size:",
 			      *(snmpEngine->snmpEngineMaxMessageSize));
 	}
@@ -463,8 +463,8 @@ fmt_snmp_vacm_member(GString *s,
     fmt_storage_type(s, vacmGroupEntry->vacmSecurityToGroupStorageType);
     fmt_row_status(s, vacmGroupEntry->vacmSecurityToGroupStatus);
     
-    model = gsnmp_enum_get_label(security_model,
-				 vacmGroupEntry->vacmSecurityModel);
+    model = gnet_snmp_enum_get_label(security_model,
+				     vacmGroupEntry->vacmSecurityModel);
     g_string_sprintfa(s, "  %-3s %-*.*s",
 		      model ? model : "", sec_name_width,
 		      (int) vacmGroupEntry->_vacmSecurityNameLength,
@@ -534,13 +534,13 @@ fmt_snmp_vacm_access(GString *s,
     fmt_storage_type(s, vacmAccessEntry->vacmAccessStorageType);
     fmt_row_status(s, vacmAccessEntry->vacmAccessStatus);
 
-    model = gsnmp_enum_get_label(security_model,
-				vacmAccessEntry->vacmAccessSecurityModel);
-    level = gsnmp_enum_get_label(security_level,
-				vacmAccessEntry->vacmAccessSecurityLevel);
+    model = gnet_snmp_enum_get_label(security_model,
+				     vacmAccessEntry->vacmAccessSecurityModel);
+    level = gnet_snmp_enum_get_label(security_level,
+				     vacmAccessEntry->vacmAccessSecurityLevel);
     if (vacmAccessEntry->vacmAccessContextMatch) {
-	match = gsnmp_enum_get_label(snmp_view_based_acm_mib_enums_vacmAccessContextMatch,
-				    *vacmAccessEntry->vacmAccessContextMatch);
+	match = gnet_snmp_enum_get_label(snmp_view_based_acm_mib_enums_vacmAccessContextMatch,
+					 *vacmAccessEntry->vacmAccessContextMatch);
     }
         
     g_string_sprintfa(s, "  %-*.*s", group_width,
@@ -658,7 +658,7 @@ fmt_snmp_vacm_view(GString *s,
 			  (int) vacmViewEntry->_vacmViewTreeFamilyViewNameLength,
 			  vacmViewEntry->vacmViewTreeFamilyViewName);
 
-	type = gsnmp_enum_get_label(view_tree_family_type,
+	type = gnet_snmp_enum_get_label(view_tree_family_type,
 				   *vacmViewEntry->vacmViewTreeFamilyType);
 	g_string_sprintfa(s, " %-4s ", type ? type : "");
 
@@ -1091,6 +1091,131 @@ show_snmp_notification_targets(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+fmt_snmp_context(GString *s,
+		 entity_mib_entLogicalEntry_t *logEntEntry)
+{
+    int const indent = 22;
+    const char *e;
+
+    fmt_display_string(s, indent, "Description:",
+		       (int) logEntEntry->_entLogicalDescrLength,
+		       logEntEntry->entLogicalDescr);
+    
+    fmt_display_string(s, indent, "Community:",
+		       (int) logEntEntry->_entLogicalCommunityLength,
+		       logEntEntry->entLogicalCommunity);
+
+    e = fmt_tdomain(logEntEntry->entLogicalTDomain,
+		    logEntEntry->_entLogicalTDomainLength);
+    g_string_sprintfa(s, " %-6s", e ? e : "?");
+
+    e = fmt_taddress(logEntEntry->entLogicalTDomain,
+		     logEntEntry->_entLogicalTDomainLength,
+		     logEntEntry->entLogicalTAddress,
+		     logEntEntry->_entLogicalTAddressLength);
+    g_string_sprintfa(s, " %-*s", 32, e ? e : "?");
+    g_string_sprintfa(s, "\n");
+
+}
+
+
+    
+static int
+show_snmp_contexts(scli_interp_t *interp, int argc, char **argv)
+{
+    entity_mib_entLogicalEntry_t **logEntTable = NULL;
+    int i;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    entity_mib_get_entLogicalTable(interp->peer, &logEntTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (logEntTable) {
+	for (i = 0; logEntTable[i]; i++) {
+	    fmt_snmp_context(interp->result, logEntTable[i]);
+	}
+    }
+
+    if (logEntTable) {
+	entity_mib_free_entLogicalTable(logEntTable);
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_snmp_csm_community(GString *s,
+		       snmp_community_mib_snmpCommunityEntry_t *snmpCommunityEntry)
+{
+    int const indent = 22;
+
+    fmt_display_string(s, indent, "Index:",
+		       (int) snmpCommunityEntry->_snmpCommunityIndexLength,
+		       snmpCommunityEntry->snmpCommunityIndex);
+    
+    fmt_display_string(s, indent, "Name:",
+		       (int) snmpCommunityEntry->_snmpCommunityNameLength,
+		       snmpCommunityEntry->snmpCommunityName);
+
+    fmt_display_string(s, indent, "SecurityName:",
+		       (int) snmpCommunityEntry->_snmpCommunitySecurityNameLength,
+		       snmpCommunityEntry->snmpCommunitySecurityName);
+
+    g_string_sprintfa(s, "\n");
+}
+
+
+    
+static int
+show_snmp_csm_communities(scli_interp_t *interp, int argc, char **argv)
+{
+    snmp_community_mib_snmpCommunityEntry_t **snmpCommunityTable;
+    int i;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    snmp_community_mib_get_snmpCommunityTable(interp->peer, &snmpCommunityTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (snmpCommunityTable) {
+	for (i = 0; snmpCommunityTable[i]; i++) {
+	    fmt_snmp_csm_community(interp->result, snmpCommunityTable[i]);
+	}
+    }
+
+    if (snmpCommunityTable) {
+	snmp_community_mib_free_snmpCommunityTable(snmpCommunityTable);
+    }
+
+    return SCLI_OK;
+}
+
+
+
 static int
 set_snmp_authentication_traps(scli_interp_t *interp, int argc, char **argv)
 {
@@ -1102,8 +1227,8 @@ set_snmp_authentication_traps(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    if (! gsnmp_enum_get_number(snmpv2_mib_enums_snmpEnableAuthenTraps,
-				argv[1], &value)) {
+    if (! gnet_snmp_enum_get_number(snmpv2_mib_enums_snmpEnableAuthenTraps,
+				    argv[1], &value)) {
 	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;
     }
@@ -1166,8 +1291,8 @@ dump_snmp(scli_interp_t *interp, int argc, char **argv)
 	    if (! creatable(vacmGroupTable[i]->vacmSecurityToGroupStorageType)) {
 		continue;
 	    }
-	    e  = gsnmp_enum_get_label(security_model,
-				      vacmGroupTable[i]->vacmSecurityModel);
+	    e  = gnet_snmp_enum_get_label(security_model,
+					  vacmGroupTable[i]->vacmSecurityModel);
 	    g_string_sprintfa(interp->result,
 		      "create snmp vacm member \"%.*s\" \"%.*s\" \"%s\"\n",
 			      vacmGroupTable[i]->_vacmSecurityNameLength,
@@ -1337,6 +1462,20 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_snmp_notification_targets },
+
+	{ "show snmp contexts", NULL,
+	  "The `show snmp contexts' command displays information\n"
+	  "about the available SNMP contexts.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_snmp_contexts },
+
+	{ "show snmp csm", NULL,
+	  "The `show snmp csm communities' command displays information\n"
+	  "about the configured SNMP communities.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_snmp_csm_communities },
 
 	{ "dump snmp", NULL,
 	  "The `dump snmp' command generates a sequence of scli commands\n"
