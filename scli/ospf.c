@@ -429,19 +429,19 @@ scli_init_ospf_mode(scli_interp_t *interp)
 
         { "show ospf area", NULL,
 	  "show OSPF areas",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_ospf_area },
 
 	{ "show ospf info", NULL,
 	  "general OSPF information",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_ospf_info },
 
 	{ "show ospf interface", NULL,
 	  "show OSPF interfaces",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_ospf_interfaces },
 
