@@ -74,12 +74,6 @@ typedef struct {
     gchar		*label;
 } stls_stub_attr_t;
 
-typedef struct {
-    guint32 const	*base;
-    gsize		size;
-    stls_stub_attr_t	*attributes;
-} stls_stut_obj_t;
-
 extern void
 stls_vbl_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
 		    stls_stub_attr_t *attributes);
