@@ -947,7 +947,7 @@ xml_printer_inputs(xmlNodePtr root,
 	    node = xml_new_child(tree, NULL, "capacity", "%d",
 				 *prtInputEntry->prtInputMaxCapacity);
 	}
-	xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, "unit", "%s", e);
     }
 
     if (prtInputEntry->prtInputCurrentLevel) {
@@ -965,7 +965,7 @@ xml_printer_inputs(xmlNodePtr root,
 	    node = xml_new_child(tree, NULL, "level", "%d",
 				 *prtInputEntry->prtInputCurrentLevel);
 	}
-	xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, "unit", "%s", e);
     }
 
     xml_subunit(tree, prtInputEntry->prtInputStatus);
@@ -1327,7 +1327,7 @@ xml_printer_outputs(xmlNodePtr root,
 	    node = xml_new_child(tree, NULL, "capacity", "%d",
 				 *prtOutputEntry->prtOutputMaxCapacity);
 	}
-	xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, "unit", "%s", e);
     }
 
     if (prtOutputEntry->prtOutputRemainingCapacity) {
@@ -1345,7 +1345,7 @@ xml_printer_outputs(xmlNodePtr root,
 	    node = xml_new_child(tree, NULL, "level", "%d",
 				 *prtOutputEntry->prtOutputRemainingCapacity);
 	}
-	xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, "unit", "%s", e);
     }
 
     xml_subunit(tree, prtOutputEntry->prtOutputStatus);
@@ -1622,6 +1622,86 @@ fmt_printer_supplies(GString *s, printer_mib_prtMarkerSuppliesEntry_t *prtSuppli
 
 
     
+static void
+xml_printer_supplies(xmlNodePtr root,
+		     printer_mib_prtMarkerSuppliesEntry_t *prtSuppliesEntry)
+{
+    xmlNodePtr tree, node;
+    const char *e;
+
+    tree = xmlNewChild(root, NULL, "supply", NULL);
+    xml_set_prop(tree, "number", "%d",
+		 prtSuppliesEntry->prtMarkerSuppliesIndex);
+
+    if (prtSuppliesEntry->prtMarkerSuppliesMarkerIndex
+	&& *prtSuppliesEntry->prtMarkerSuppliesMarkerIndex) {
+	(void) xml_new_child(tree, NULL, "description", "%d",
+			  *prtSuppliesEntry->prtMarkerSuppliesMarkerIndex);
+    }
+
+    if (prtSuppliesEntry->prtMarkerSuppliesColorantIndex
+	&& *prtSuppliesEntry->prtMarkerSuppliesColorantIndex) {
+	(void) xml_new_child(tree, NULL, "colorant", "%d",
+			  *prtSuppliesEntry->prtMarkerSuppliesColorantIndex);
+    }
+
+    if (prtSuppliesEntry->prtMarkerSuppliesDescription) {
+	(void) xml_new_child(tree, NULL, "description", "%.*s",
+			     (int) prtSuppliesEntry->_prtMarkerSuppliesDescriptionLength,
+			     prtSuppliesEntry->prtMarkerSuppliesDescription);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtMarkerSuppliesType,
+		 prtSuppliesEntry->prtMarkerSuppliesType);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "type", "%s", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtMarkerSuppliesClass,
+		 prtSuppliesEntry->prtMarkerSuppliesClass);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "class", "%s", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtMarkerSuppliesSupplyUnit,
+		 prtSuppliesEntry->prtMarkerSuppliesSupplyUnit);
+
+    if (prtSuppliesEntry->prtMarkerSuppliesMaxCapacity) {
+	switch (*prtSuppliesEntry->prtMarkerSuppliesMaxCapacity) {
+	case -1:
+	    node = xml_new_child(tree, NULL, "capacity", "unlimited");
+	    break;
+	case -2:
+	    node = xml_new_child(tree, NULL, "capacity", "unknown");
+	    break;
+	default:
+	    node = xml_new_child(tree, NULL, "capacity", "%d",
+			 *prtSuppliesEntry->prtMarkerSuppliesMaxCapacity);
+	}
+	if (e) xml_set_prop(node, "unit", "%s", e);
+    }
+
+    if (prtSuppliesEntry->prtMarkerSuppliesLevel) {
+	switch (*prtSuppliesEntry->prtMarkerSuppliesLevel) {
+	case -1:
+	    node = xml_new_child(tree, NULL, "level", "unlimited");
+	    break;
+	case -2:
+	    node = xml_new_child(tree, NULL, "level", "unknown");
+	    break;
+	case -3:
+	    node = xml_new_child(tree, NULL, "level", ">0");
+	    break;
+	default:
+	    node = xml_new_child(tree, NULL, "level", "%d",
+				 *prtSuppliesEntry->prtMarkerSuppliesLevel);
+	}
+	if (e) xml_set_prop(node, "unit", "%s", e);
+    }
+}
+
+
+    
 static int
 show_printer_supplies(scli_interp_t *interp, int argc, char **argv)
 {
@@ -1645,10 +1725,18 @@ show_printer_supplies(scli_interp_t *interp, int argc, char **argv)
 
     if (prtMarkerSuppliesTable) {
 	for (i = 0; prtMarkerSuppliesTable[i]; i++) {
-	    if (i > 0) {
-		g_string_append(interp->result, "\n");
+	    if (scli_interp_xml(interp)) {
+		xmlNodePtr node = get_printer_node(interp->xml_node,
+				   prtMarkerSuppliesTable[i]->hrDeviceIndex,
+						   "supplies");
+		xml_printer_supplies(node, prtMarkerSuppliesTable[i]);
+	    } else {		
+	        if (i > 0) {
+		    g_string_append(interp->result, "\n");
+		}
+		fmt_printer_supplies(interp->result,
+				     prtMarkerSuppliesTable[i]);
 	    }
-	    fmt_printer_supplies(interp->result, prtMarkerSuppliesTable[i]);
 	}
     }
 
@@ -2320,8 +2408,8 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "The `show printer supplies' command shows information about the\n"
 	  "supplies which are consumed and the waste produced by the\n"
 	  "markers of a printer.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "devices", NULL,
 	  show_printer_supplies },
 
 	{ "show printer interpreter", NULL,
