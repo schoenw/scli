@@ -150,12 +150,12 @@ fmt_port(int port, int name)
     static char buffer[12];
 
     if (name) {
+	if (! port) {
+	    return "*";
+	}
 	s = getservbyport(htons(port), "tcp");
 	if (s) {
 	    return s->s_name;
-	}
-	if (! port) {
-	    return "*";
 	}
     }
     sprintf(buffer, "%d", port);
@@ -171,12 +171,12 @@ fmt_ipv4_address(guchar *addr, int name)
     struct hostent *h;
 
     if (name) {
+	if (! addr[0] && ! addr[1] && ! addr[2] && ! addr[3]) {
+	    return "*";
+	}
 	h = gethostbyaddr((char *) addr, 4, AF_INET);
 	if (h) {
 	    return h->h_name;
-	}
-	if (! addr[0] && ! addr[1] && ! addr[2] && ! addr[3]) {
-	    return "*";
 	}
     }
     sprintf(buffer, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
