@@ -32,6 +32,9 @@ g_snmp_walk_done_callback(GSnmpSession *session, gpointer data,
     GSList	*elem, *orig_elem;
     int		endofviews = 0;
     
+    session->error_status = spdu->request.error_status;
+    session->error_index = spdu->request.error_index;
+    
     if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
 	g_printerr("session %p: error-status = %d, error-index = %d\n",
 		   session, session->error_status, session->error_index);
@@ -236,6 +239,9 @@ g_snmp_session_sync_walk(GSnmpSession *s, GSList *in)
     }
     g_main_destroy(loop);
     loop = NULL;
+
+    s->error_status = walk->session->error_status;
+    s->error_index = walk->session->error_index;
 
     g_snmp_walk_destroy(walk);
     

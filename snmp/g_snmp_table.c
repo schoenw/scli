@@ -38,6 +38,9 @@ g_snmp_table_done_callback(GSnmpSession *session, gpointer data,
     guint32       index[SNMP_SIZE_OBJECTID];
     int           index_len;
     
+    session->error_status = spdu->request.error_status;
+    session->error_index = spdu->request.error_index;
+    
     if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
 	g_printerr("session %p: error-status = %d, error-index = %d\n",
 		   session, session->error_status, session->error_index);
@@ -284,6 +287,9 @@ gsnmp_gettable(GSnmpSession *s, GSList *in)
     }
     g_main_destroy(loop);
     loop = NULL;
+
+    s->error_status = table->session->error_status;
+    s->error_index = table->session->error_index;
 
     g_snmp_table_destroy(table);
     
