@@ -211,9 +211,9 @@ show_system(GSnmpSession *peer, int flags)
 				     peer->error_status);
         move(0, 10);
         clrtoeol();
-        mvprintw(0, 10, "%s:%d", peer->name, peer->port);
+        mvprintw(0, 10, "%s:%d", peer->taddress, peer->port);
         attron(A_BOLD);
-        mvprintw(0, (int) (10 + strlen(peer->name) + 8),
+        mvprintw(0, (int) (10 + strlen(peer->taddress) + 8),
 		 error ? error : "internalError");
         attroff(A_BOLD);
         mvaddstr(0, (int) (COLS-strlen(timestr)-1), timestr);
@@ -238,7 +238,7 @@ show_system(GSnmpSession *peer, int flags)
 	    move(0, 10);
 	    clrtoeol();
 	    mvprintw(0, 10, "%s:%d up %d %s %02d:%02d:%02d",
-		     peer->name, peer->port,
+		     peer->taddress, peer->port,
 		     days, (days == 1) ? "day" : "days",
 		     hours, minutes, seconds);
 	    sysUpTime = *(system->sysUpTime);
@@ -494,7 +494,7 @@ show_interior(GSnmpSession *peer)
     
     clear();
     y = 0;
-    mvprintw(y, 10, "%s:%d", peer->name, peer->port);
+    mvprintw(y, 10, "%s:%d", peer->taddress, peer->port);
     mvaddstr(y++, 0, "Agent:");
     sys_des_line = y;
     mvaddstr(y++, 0, "Descr:");

@@ -875,9 +875,9 @@ xml_system_info(xmlNodePtr root, scli_interp_t *interp,
 				 (int) system->_sysNameLength,
 				 system->sysName);
 	}
-	if (interp->peer->name) {
-	    (void) xml_new_child(root, NULL, "address", "%s:%d",
-				 interp->peer->name,
+	if (interp->peer->taddress) {
+	    (void) xml_new_child(root, NULL, "taddress", "%s:%d",
+				 interp->peer->taddress,
 				 interp->peer->port);
 	}
 	if (system->sysDescr && system->_sysDescrLength) {
@@ -940,9 +940,9 @@ fmt_system_info(GString *s, scli_interp_t *interp,
 			       (int) system->_sysNameLength,
 			       system->sysName);
 	}
-	if (interp->peer->name) {
+	if (interp->peer->taddress) {
 	    g_string_sprintfa(s, "%-*s", indent, "Address:");
-	    g_string_sprintfa(s, "%s:%d\n", interp->peer->name,
+	    g_string_sprintfa(s, "%s:%d\n", interp->peer->taddress,
 			      interp->peer->port);
 	}
 	if (system->sysDescr && system->_sysDescrLength) {

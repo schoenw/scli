@@ -584,7 +584,7 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 					  cmd->path ? cmd->path : "");
 			if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER) {
 			    g_string_sprintfa(s, " [%s]",
-			      (interp->peer) ? interp->peer->name : "?");
+			      (interp->peer) ? interp->peer->taddress : "?");
 			    g_string_sprintfa(s, " [%s]", fmt_timeticks(0));
 			}
 			g_string_sprintfa(s, "\n\n");
@@ -688,8 +688,13 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 	    if ((int) (interp->peer->error_status) > 0) {
 		g_print("@%d", interp->peer->error_index);
 	    }
+	} else {
+	    g_print(" SNMP communication error (timeout)");
 	}
 	g_print("\n");
+	break;
+    case SCLI_SNMP_NAME:
+	g_print("%3d name lookup failed\n", SCLI_SNMP_NAME);
 	break;
     case SCLI_ERROR:
 	g_print("%3d %s\n", code,
@@ -727,38 +732,11 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 
 
 int
-scli_eval_string(scli_interp_t *interp, char *cmd)
+scli_eval_argc_argv(scli_interp_t *interp, int argc, char **argv)
 {
-    char **argv;
-    char *expanded_cmd = NULL;
-    int i, argc, code = SCLI_OK;
-    gboolean done = FALSE;
     GNode *node = NULL;
-    
-    g_return_val_if_fail(interp, SCLI_ERROR);
-    g_return_val_if_fail(interp->cmd_root, SCLI_ERROR);
-
-    if (! cmd) {
-	return SCLI_OK;
-    }
-
-    if (scli_interp_interactive(interp)
-	&& (expanded_cmd = expand_alias(interp, cmd))) {
-	code = scli_split(expanded_cmd, &argc, &argv);
-	g_free(expanded_cmd);
-    } else {
-	code = scli_split(cmd, &argc, &argv);
-    }
-
-    if (code != SCLI_OK) {
-	g_print("%3d failed to tokenize input\n", SCLI_SYNTAX_TOKENIZER);
-	return SCLI_ERROR;
-    }
-
-    if (argc == 0) {
-	if (argv) g_free(argv);
-	return SCLI_OK;
-    }
+    gboolean done = FALSE;
+    int i, code = SCLI_OK;
 
     scli_interp_reset(interp);
 
@@ -820,6 +798,45 @@ scli_eval_string(scli_interp_t *interp, char *cmd)
 	g_print("\"\n");
 	code = SCLI_SYNTAX;
     }
+
+    return code;
+}
+
+
+
+int
+scli_eval_string(scli_interp_t *interp, char *cmd)
+{
+    char **argv;
+    char *expanded_cmd = NULL;
+    int argc, code = SCLI_OK;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    g_return_val_if_fail(interp->cmd_root, SCLI_ERROR);
+
+    if (! cmd) {
+	return SCLI_OK;
+    }
+
+    if (scli_interp_interactive(interp)
+	&& (expanded_cmd = expand_alias(interp, cmd))) {
+	code = scli_split(expanded_cmd, &argc, &argv);
+	g_free(expanded_cmd);
+    } else {
+	code = scli_split(cmd, &argc, &argv);
+    }
+
+    if (code != SCLI_OK) {
+	g_print("%3d failed to tokenize input\n", SCLI_SYNTAX_TOKENIZER);
+	return SCLI_ERROR;
+    }
+
+    if (argc == 0) {
+	if (argv) g_free(argv);
+	return SCLI_OK;
+    }
+
+    code = scli_eval_argc_argv(interp, argc, argv);
 
     if (argv) {
 	g_free(argv);
@@ -922,9 +939,11 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 	scli_close(interp);
     }
 
-    interp->peer = g_snmp_session_new();
-    interp->peer->domain = G_SNMP_TDOMAIN_UDP_IPV4;
-    interp->peer->name = g_strdup(host);
+    interp->peer = g_snmp_session_new(G_SNMP_TDOMAIN_UDP_IPV4, host);
+    if (! interp->peer) {
+	return SCLI_SNMP_NAME;
+    }
+    
     interp->peer->port = port;
     interp->peer->rcomm = g_strdup(community ? community : "public");
     interp->peer->wcomm = g_strdup(interp->peer->rcomm);
@@ -960,7 +979,7 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 	    }
 	} else {
 	    if (scli_interp_interactive(interp)) {
-		g_print("timeout.\n%3d Giving up!\n", SCLI_SNMP);
+		g_print("timeout.\n");
 	    }
 	    scli_close(interp);
 	}
@@ -969,8 +988,12 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 	snmpv2_mib_free_system(system);
     }
 
+    if (! interp->peer) {
+	return SCLI_SNMP;
+    }
+    
     interp->epoch = time(NULL);
-    return 0;
+    return SCLI_OK;
 }
 
 
@@ -995,10 +1018,10 @@ scli_prompt(scli_interp_t *interp)
     char *prompt;
     
     prompt = g_malloc0(20
-		       + (interp->peer ? strlen(interp->peer->name) : 0));
+		       + (interp->peer ? strlen(interp->peer->taddress) : 0));
     if (interp->peer) {
 	strcat(prompt, "(");
-	strcat(prompt, interp->peer->name);
+	strcat(prompt, interp->peer->taddress);
 	strcat(prompt, ") scli > ");
     } else {
 	strcat(prompt, "scli > ");

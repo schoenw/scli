@@ -280,17 +280,19 @@ history(scli_interp_t *interp, int argc, char **argv)
 int
 scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
 {
+    int code;
+    
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc == 2) {
-	scli_open_community(interp, argv[1], 161, NULL);
+	code = scli_open_community(interp, argv[1], 161, NULL);
     } else if (argc == 3) {
-	scli_open_community(interp, argv[1], 161, argv[2]);
+	code = scli_open_community(interp, argv[1], 161, argv[2]);
     } else {
-	return SCLI_SYNTAX_NUMARGS;
+	code = SCLI_SYNTAX_NUMARGS;
     }
 
-    return SCLI_OK;
+    return code;
 }
 
 
@@ -545,8 +547,14 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 		      "Pager:", interp->pager ? interp->pager : "scli");
 
     if (interp->peer) {
+	label = gsnmp_enum_get_label(gsnmp_enum_tdomain_table,
+				     (gint32) interp->peer->tdomain);
+	if (label) {
+	    g_string_sprintfa(interp->result, "%-*s %s\n", indent,
+			      "TDomain:", label);
+	}
 	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
-			  "Host:", interp->peer->name);
+			  "TAddress:", interp->peer->taddress);
 	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
 			  "Port:", interp->peer->port);
 	g_string_sprintfa(interp->result, "%-*s %d\n", indent,

@@ -90,6 +90,7 @@ extern char const scli_copyright[];	/* copyright message (surprise) */
 #define SCLI_SYNTAX_TOKENIZER	405	/* syntax error in tokenizer */
 #define SCLI_SYNTAX_COMMAND	406	/* syntax error unknown command */
 #define SCLI_SNMP		500	/* snmp error return code */
+#define SCLI_SNMP_NAME		501	/* snmp name lookup error */
 
 
 typedef struct scli_interp	scli_interp_t;
@@ -182,6 +183,9 @@ scli_loop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv);
 
 extern int
 scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv);
+
+extern int
+scli_eval_argc_argv(scli_interp_t *interp, int argc, char **argv);
 
 extern int
 scli_eval_string(scli_interp_t *interp, char *s);

@@ -446,10 +446,6 @@ main(int argc, char **argv)
 	}
     }
 
-    if (scli_cmd_open(interp, argc-optind+1, argv+optind-1) != SCLI_OK) {
-	g_printerr(interp->result->str);
-    }
-
     scli_init_scli_mode(interp);
     scli_init_system_mode(interp);
     scli_init_entity_mode(interp);
@@ -466,6 +462,13 @@ main(int argc, char **argv)
     scli_init_printer_mode(interp);
     scli_init_cisco_mode(interp);
     scli_init_nortel_mode(interp);
+
+    if (argc > 1) {
+	char *margv[] = { "open", NULL, NULL, NULL };
+	margv[1] = argv[optind];
+	margv[2] = argv[optind+1];
+	(void) scli_eval_argc_argv(interp, argc-optind+1, margv);
+    }
 
     if (! norc) {
 	(void) scli_eval_init_file(interp);
