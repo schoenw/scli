@@ -172,8 +172,8 @@ void
 scli_init_interface_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "interface",
-	  "show interface information", cmd_interface },
+	{ "show", "interfaces",
+	  "show information about the network interfaces", cmd_interface },
 	{ NULL, NULL, NULL, NULL }
     };
     
