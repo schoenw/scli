@@ -678,17 +678,17 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
     case SCLI_SYNTAX_VALUE:
     case SCLI_SYNTAX_NUMBER:
     case SCLI_SYNTAX_REGEXP:
-	reason = g_strdup_printf("%3d %s", code, error_infos[i].fmt);
+	reason = g_strdup(error_infos[i].fmt);
 	break;
     case SCLI_SYNTAX_NUMARGS:
-	reason = g_strdup_printf("%3d wrong number of arguments: should be `%s%s%s'",
-				 code,
+	reason = g_strdup_printf("wrong number of arguments: "
+				 "should be `%s%s%s'",
 				 cmd->path,
 				 cmd->options ? " " : "",
 				 cmd->options ? cmd->options : "");
 	break;
     case SCLI_SYNTAX:
-	reason = g_strdup_printf("%3d usage: %s %s", code, cmd->path,
+	reason = g_strdup_printf("usage: %s %s", cmd->path,
 				 cmd->options ? cmd->options : "");
 	break;
     case SCLI_SNMP:
@@ -696,34 +696,34 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 	    const char *error;
 	    error = gsnmp_enum_get_label(gsnmp_enum_error_table,
 					 interp->peer->error_status);
-	    reason = g_strdup_printf("%3d %s", code,
-				     error ? error : "internalError");
-#if 0
 	    if ((int) (interp->peer->error_status) > 0) {
-		g_print("@%d", interp->peer->error_index);
+		reason = g_strdup_printf("%s @ varbind %d",
+					 error ? error : "internalError",
+					 interp->peer->error_index);
+	    } else {
+		reason = g_strdup(error ? error : "internalError");
 	    }
-#endif
 	} else {
-	    reason = g_strdup_printf("%3d %s", code, error_infos[i].fmt);
+	    reason = g_strdup(error_infos[i].fmt);
 	}
 	break;
 
     case SCLI_SNMP_NAME:
-	reason = g_strdup_printf("%3d %s", code, error_infos[i].fmt);
+	reason = g_strdup(error_infos[i].fmt);
 	break;
     case SCLI_ERROR:	/* xxx put the code into the output format */
 	reason = g_strdup_printf(error_infos[i].fmt,
 			 interp->result->str ? interp->result->str : "");
 	break;
     case SCLI_ERROR_NOPEER: 
-	reason = g_strdup_printf("%3d %s", code, error_infos[i].fmt);
+	reason = g_strdup(error_infos[i].fmt);
 	break;
     case SCLI_ERROR_NOXML: /* xxx put the code into the output format */
 	reason = g_strdup_printf(error_infos[i].fmt, cmd->path);
 	break;
     case SCLI_OK:
     case SCLI_EXIT:
-	reason = g_strdup_printf("%3d %s", code, error_infos[i].fmt);
+	reason = g_strdup(error_infos[i].fmt);
 	break;
     }
 
@@ -752,7 +752,7 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 		show_result(interp, code);
 	    }
 	} else {
-	    g_printerr("%s\n", reason);
+	    g_printerr("%3d %s\n", code, reason);
 	}
     }
 
