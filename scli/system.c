@@ -110,6 +110,55 @@ print_string(char *label, guchar *string, gsize len)
 
 
 static void
+stls_string_append_string(GString *s, gint width, guchar *str, gsize len)
+{
+    /* XXX add code here to make sure the characters are displayable */
+     
+    if (str && len) {
+	g_string_sprintfa(s, width < 0 ? "%-*.*s" : "%*.*s",
+			  ABS(width), (int) MIN(len, ABS(width)), str);
+    } else {
+	g_string_sprintfa(s, "%*s", ABS(width), "");
+    }
+}
+
+
+
+static int
+cmd_mounts(scli_interp_t *interp, int argc, char **argv)
+{
+    hrFSEntry_t **hrFSEntry = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (host_resources_mib_get_hrFSEntry(interp->peer, &hrFSEntry)) {
+	return SCLI_OK;
+    }
+
+    if (hrFSEntry) {
+	GString *s;
+	s = g_string_new("Mount Point              Remote Mount Point\n");
+	for (i = 0; hrFSEntry[i]; i++) {
+	    stls_string_append_string(s, -25,
+			      hrFSEntry[i]->hrFSMountPoint,
+			      hrFSEntry[i]->_hrFSMountPointLength);
+	    stls_string_append_string(s, -50,
+			      hrFSEntry[i]->hrFSRemoteMountPoint,
+			      hrFSEntry[i]->_hrFSRemoteMountPointLength);
+	    s = g_string_append(s, "\n");
+	}
+	puts(s->str);
+	g_string_free(s, 1);
+	host_resources_mib_free_hrFSEntry(hrFSEntry);
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static void
 storage(hrStorageEntry_t *hrStorageEntry)
 {
     static guint32 const hrStorageTypes[] = {1, 3, 6, 1, 2, 1, 25, 2, 1};
@@ -329,6 +378,8 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "show the entities that make up the system", cmd_entities },
 	{ "show system", "storage",
 	  "show storage areas attached to the system", cmd_storage },
+	{ "show system", "mounts",
+	  "show file systems mounted on the system", cmd_mounts },
 	{ NULL, NULL, NULL, NULL }
     };
     
