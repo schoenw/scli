@@ -34,7 +34,7 @@ GSnmpEnum const gsnmp_enum_version_table[] = {
 
 
 
-GSnmpEnum const gsnmp_error_status_table[] = {
+GSnmpEnum const gsnmp_enum_error_table[] = {
     { G_SNMP_ERR_PROCEDURE,		"procedureError" },
     { G_SNMP_ERR_INTERNAL,		"internalError" },
     { G_SNMP_ERR_NORESPONSE,		"noResponse" },
@@ -62,10 +62,45 @@ GSnmpEnum const gsnmp_error_status_table[] = {
 
 
 
+GSnmpEnum const gsnmp_enum_type_table[] = {
+    { G_SNMP_NULL,		"NULL" },
+    { G_SNMP_OCTETSTRING,	"OCTET STRING" },
+    { G_SNMP_OBJECTID,		"OBJECT IDENTIFIER" },
+    { G_SNMP_IPADDRESS,		"IpAddress" },
+    { G_SNMP_INTEGER32,		"Integer32" },
+    { G_SNMP_UNSIGNED32,	"Unsigned32" },
+    { G_SNMP_COUNTER32,		"Counter32" },
+    { G_SNMP_TIMETICKS,		"TimeTicks" },
+    { G_SNMP_OPAQUE,		"Opaque" },
+    { G_SNMP_COUNTER64,		"Counter64" },
+    { G_SNMP_NOSUCHOBJECT,	"NoSuchObject" },
+    { G_SNMP_NOSUCHINSTANCE,	"NoSuchInstance" },
+    { G_SNMP_ENDOFMIBVIEW,	"EndOfMibView" },
+    { 0, 0 }
+};
+
+
+
+GSnmpEnum const gsnmp_enum_pdu_table[] = {
+    { G_SNMP_PDU_GET,		"get" },
+    { G_SNMP_PDU_NEXT,		"get-next" },
+    { G_SNMP_PDU_RESPONSE,	"response" },
+    { G_SNMP_PDU_SET,		"set" },
+    { G_SNMP_PDU_TRAP1,		"trap1" },
+    { G_SNMP_PDU_BULK,		"get-bulk" },
+    { G_SNMP_PDU_INFORM,	"inform" },
+    { G_SNMP_PDU_TRAP2,		"trap2" },
+    { 0, 0 }
+};
+
+
+
 GSnmpEnum const gsnmp_enum_debug_table[] = {
     { G_SNMP_DEBUG_REQUESTS,	"request" },
     { G_SNMP_DEBUG_SESSION,	"session" },
     { G_SNMP_DEBUG_TRANSPORT,	"transport" },
+    { G_SNMP_DEBUG_PACKET,	"packet" },
+    { G_SNMP_DEBUG_ASN1,	"asn1" },
     { 0, 0 }
 };
 

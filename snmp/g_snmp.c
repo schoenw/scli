@@ -92,8 +92,8 @@ static SNMP_CNV SnmpCnv [] =
 {
   {ASN1_UNI, ASN1_NUL, G_SNMP_NULL},
   {ASN1_UNI, ASN1_INT, G_SNMP_INTEGER32},
-  {ASN1_UNI, ASN1_OTS, G_SNMP_OCTET_STRING},
-  {ASN1_UNI, ASN1_OJI, G_SNMP_OBJECT_ID},
+  {ASN1_UNI, ASN1_OTS, G_SNMP_OCTETSTRING},
+  {ASN1_UNI, ASN1_OJI, G_SNMP_OBJECTID},
   {ASN1_APL, SNMP_IPA, G_SNMP_IPADDRESS},
   {ASN1_APL, SNMP_CNT, G_SNMP_COUNTER32},         /* Counter32 */
   {ASN1_APL, SNMP_GGE, G_SNMP_UNSIGNED32},        /* Gauge32 == Unsigned32  */
@@ -217,14 +217,14 @@ g_snmp_varbind_new(guint32 const *oid, gsize oid_len, GSnmpVarBindType type,
 	obj = g_malloc(sizeof(GSnmpVarBind));
 	obj->syntax.ui64[0] = *((guint64 *) value);
 	break;
-      case G_SNMP_OCTET_STRING:
+      case G_SNMP_OCTETSTRING:
       case G_SNMP_IPADDRESS:
       case G_SNMP_OPAQUE:
         len = value_len;
         obj = g_malloc(sizeof(GSnmpVarBind) + len);
         memcpy(obj->syntax.uc, value, len);
         break;
-      case G_SNMP_OBJECT_ID:
+      case G_SNMP_OBJECTID:
 	len = value_len;
 	len *= sizeof(guint32);
         obj = g_malloc(sizeof(GSnmpVarBind) + len);
@@ -357,7 +357,7 @@ g_snmp_object_encode ( ASN1_SCK *asn1, GSnmpVarBind *obj)
             if (!g_asn1_int32_encode (asn1, &end, obj->syntax.i32[0]))
                 return FALSE;
             break;
-        case G_SNMP_OCTET_STRING:
+        case G_SNMP_OCTETSTRING:
         case G_SNMP_OPAQUE:
             if (!g_asn1_octets_encode (asn1, &end, obj->syntax.uc, 
                                        obj->syntax_len))
@@ -370,7 +370,7 @@ g_snmp_object_encode ( ASN1_SCK *asn1, GSnmpVarBind *obj)
             if (!g_asn1_null_encode (asn1, &end))
                 return FALSE;
             break;
-        case G_SNMP_OBJECT_ID:
+        case G_SNMP_OBJECTID:
             if (!g_asn1_oid_encode (asn1, &end, obj->syntax.ui32, 
                                     obj->syntax_len))
                 return FALSE;
@@ -469,7 +469,7 @@ g_snmp_object_decode ( ASN1_SCK *asn1, GSnmpVarBind **obj)
           }
 	value = &l;
         break;
-      case G_SNMP_OCTET_STRING:
+      case G_SNMP_OCTETSTRING:
       case G_SNMP_OPAQUE:
         if (!g_asn1_octets_decode (asn1, end, &p, &len))
           {
@@ -489,7 +489,7 @@ g_snmp_object_decode ( ASN1_SCK *asn1, GSnmpVarBind **obj)
             return FALSE;
           }
         break;
-      case G_SNMP_OBJECT_ID:
+      case G_SNMP_OBJECTID:
         if (!g_asn1_oid_decode (asn1, end, (guint32 **)&lp, &len))
           {
             g_free(id);

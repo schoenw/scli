@@ -111,8 +111,8 @@ typedef enum {
 
 typedef enum {
     G_SNMP_NULL		  = 0,
-    G_SNMP_OCTET_STRING   = 1,
-    G_SNMP_OBJECT_ID	  = 2,
+    G_SNMP_OCTETSTRING	  = 1,
+    G_SNMP_OBJECTID	  = 2,
     G_SNMP_IPADDRESS	  = 3,
     G_SNMP_INTEGER32	  = 4,
     G_SNMP_UNSIGNED32	  = 5,	/* also used for Gauge32 */
@@ -203,10 +203,14 @@ typedef enum
   G_SNMP_DEBUG_REQUESTS	 = 1 << 0,
   G_SNMP_DEBUG_SESSION	 = 1 << 1,
   G_SNMP_DEBUG_TRANSPORT = 1 << 2,
+  G_SNMP_DEBUG_PACKET	 = 1 << 3,
+  G_SNMP_DEBUG_ASN1	 = 1 << 4,
   G_SNMP_DEBUG_ALL	 = G_SNMP_DEBUG_REQUESTS
 			 | G_SNMP_DEBUG_SESSION
-			 | G_SNMP_DEBUG_TRANSPORT,
-  G_SNMP_DEBUG_MASK	 = 0x07
+			 | G_SNMP_DEBUG_TRANSPORT
+			 | G_SNMP_DEBUG_PACKET
+			 | G_SNMP_DEBUG_ASN1,
+  G_SNMP_DEBUG_MASK	 = 0x1f
 } GSnmpDebugFlags;
 
 extern GSnmpDebugFlags g_snmp_debug_flags;
