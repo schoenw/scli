@@ -395,7 +395,7 @@ fmt_display_string(GString *s, int indent, char *label, int len, char *string)
 
     /* Remove leading and trailing white-space characters first. */
 
-    while (isspace(string[0]) && len) {
+    while (len && isspace(string[0])) {
 	string++, len--;
     }
     while (len && isspace(string[len-1])) {

@@ -213,10 +213,10 @@ fmt_entity_details(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 	g_string_append(s, "\n");
     }
     
-    fmt_display_string(s, 7, "Alias:",
+    fmt_display_string(s, 8, "Alias:",
 		       (int) entPhysicalEntry->_entPhysicalAliasLength,
 		       entPhysicalEntry->entPhysicalAlias);
-    fmt_display_string(s, 7, "Descr:",
+    fmt_display_string(s, 8, "Descr:",
 		       (int) entPhysicalEntry->_entPhysicalDescrLength,
 		       entPhysicalEntry->entPhysicalDescr);
 }
