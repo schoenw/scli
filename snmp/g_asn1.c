@@ -132,14 +132,13 @@ g_asn1_close(ASN1_SCK *asn1, guchar **buf, guint *len)
  * RETURNS:     gboolean success.
  */
 
-gboolean 
+static inline gboolean 
 g_asn1_octet_encode(ASN1_SCK *asn1, guchar ch)
 {
-    if (asn1->pointer <= asn1->begin)
-	{
-		asn1->error = ASN1_ERR_ENC_FULL;
+    if (asn1->pointer <= asn1->begin) {
+	asn1->error = ASN1_ERR_ENC_FULL;
         return FALSE;
-	}
+    }
     *--(asn1->pointer) = ch;
     return TRUE;
 }
@@ -155,14 +154,13 @@ g_asn1_octet_encode(ASN1_SCK *asn1, guchar ch)
  * RETURNS:     gboolean success.
  */
 
-gboolean 
+static inline gboolean 
 g_asn1_octet_decode(ASN1_SCK *asn1, guchar *ch)
 {
-    if (asn1->pointer >= asn1->end)
-	{
-		asn1->error = ASN1_ERR_DEC_EMPTY;
+    if (asn1->pointer >= asn1->end) {
+	asn1->error = ASN1_ERR_DEC_EMPTY;
         return FALSE;
-	}
+    }
     *ch = *(asn1->pointer)++;
     return TRUE;
 }
@@ -187,8 +185,7 @@ g_asn1_tag_encode(ASN1_SCK *asn1, guint tag)
     tag >>= 7;
     if (!g_asn1_octet_encode(asn1, ch))
         return FALSE;
-    while (tag > 0)
-    {
+    while (tag > 0) {
         ch = (guchar) (tag | 0x80);
         tag >>= 7;
         if (!g_asn1_octet_encode(asn1, ch))
@@ -214,8 +211,7 @@ g_asn1_tag_decode(ASN1_SCK *asn1, guint *tag)
     guchar ch;
 
     *tag = 0;
-    do
-    {
+    do {
         if (!g_asn1_octet_decode(asn1, &ch))
             return FALSE;
         *tag <<= 7;
@@ -243,8 +239,7 @@ g_asn1_id_encode(ASN1_SCK *asn1, guint cls, guint con, guint tag)
 {
     guint ch;
 
-    if (tag >= 0x1F)
-    {
+    if (tag >= 0x1F) {
         if (!g_asn1_tag_encode (asn1, tag))
             return FALSE;
         tag = 0x1F;
@@ -303,17 +298,14 @@ g_asn1_length_encode(ASN1_SCK *asn1, guint def, guint len)
 {
     guchar ch, cnt;
 
-    if (!def)
+    if (!def) {
         ch = 0x80;
-    else
-    {
-        if (len < 0x80)
+    } else {
+        if (len < 0x80) {
             ch = (guchar) len;
-        else
-        {
+	} else {
             cnt = 0;
-            while (len > 0)
-            {
+            while (len > 0) {
                 ch = (guchar) len;
                 len >>= 8;
                 if (!g_asn1_octet_encode (asn1, ch))
@@ -344,22 +336,19 @@ gboolean
 g_asn1_length_decode(ASN1_SCK *asn1, guint *def, guint *len)
 {
     guchar ch, cnt;
-
+    
     if (!g_asn1_octet_decode (asn1, &ch))
         return FALSE;
-    if (ch == 0x80)
+    if (ch == 0x80) {
         *def = 0;
-    else
-    {
+    } else {
         *def = 1;
-        if (ch < 0x80)
+        if (ch < 0x80) {
             *len = ch;
-        else
-        {
+	} else {
             cnt = (guchar) (ch & 0x7F);
             *len = 0;
-            while (cnt > 0)
-            {
+            while (cnt > 0) {
                 if (!g_asn1_octet_decode (asn1, &ch))
                     return FALSE;
                 *len <<= 8;
@@ -398,13 +387,10 @@ g_asn1_header_encode(ASN1_SCK *asn1, guchar *eoc, guint cls,
 {
     guint def, len;
 
-    if (eoc == 0)
-    {
+    if (eoc == 0) {
         def = 0;
         len = 0;
-    }
-    else
-    {
+    } else {
         def = 1;
         len = eoc - asn1->pointer;
     }
@@ -412,6 +398,9 @@ g_asn1_header_encode(ASN1_SCK *asn1, guchar *eoc, guint cls,
         return FALSE;
     if (!g_asn1_id_encode (asn1, cls, con, tag))
         return FALSE;
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_ASN1) {
+	g_printerr("asn1enc %p: SEQUENCE (OF)\n", asn1);
+    }
     return TRUE;
 }
 
@@ -451,7 +440,7 @@ g_asn1_header_decode(ASN1_SCK *asn1, guchar **eoc, guint *cls,
     else
         *eoc = 0;
     if (g_snmp_debug_flags & G_SNMP_DEBUG_ASN1 && *con) {
-	g_printerr("asn1dec %p: CONSTRUCTED\n", asn1);
+	g_printerr("asn1dec %p: SEQUENCE (OF)\n", asn1);
     }
     return TRUE;
 }
@@ -475,10 +464,11 @@ g_asn1_header_decode(ASN1_SCK *asn1, guchar **eoc, guint *cls,
 gboolean 
 g_asn1_eoc ( ASN1_SCK *asn1, guchar *eoc)
 {
-  if (eoc == 0)
-    return (asn1->pointer [0] == 0x00 && asn1->pointer [1] == 0x00);
-  else
-    return (asn1->pointer >= eoc);
+    if (eoc == 0) {
+	return (asn1->pointer [0] == 0x00 && asn1->pointer [1] == 0x00);
+    } else {
+	return (asn1->pointer >= eoc);
+    }
 }
 
 /*
@@ -507,18 +497,15 @@ g_asn1_eoc ( ASN1_SCK *asn1, guchar *eoc)
 gboolean 
 g_asn1_eoc_encode ( ASN1_SCK *asn1, guchar **eoc )        
 {
-  if (eoc == 0)
-    {
-      if (!g_asn1_octet_encode (asn1, 0x00))
-	return FALSE;
-      if (!g_asn1_octet_encode (asn1, 0x00))
-	return FALSE;
-      return TRUE;
-    }
-  else
-    {
-      *eoc = asn1->pointer;
-      return TRUE;
+    if (eoc == 0) {
+	if (!g_asn1_octet_encode (asn1, 0x00))
+	    return FALSE;
+	if (!g_asn1_octet_encode (asn1, 0x00))
+	    return FALSE;
+	return TRUE;
+    } else {
+	*eoc = asn1->pointer;
+	return TRUE;
     }
 }
 
@@ -549,34 +536,28 @@ g_asn1_eoc_encode ( ASN1_SCK *asn1, guchar **eoc )
 gboolean 
 g_asn1_eoc_decode (ASN1_SCK *asn1, guchar   *eoc)
 {
-  guchar ch;
+    guchar ch;
     
-  if (eoc == 0)
-    {
-      if (!g_asn1_octet_decode (asn1, &ch))
-	return FALSE;
-      if (ch != 0x00)
-	{
-	  asn1->error = ASN1_ERR_DEC_EOC_MISMATCH;
-	  return FALSE;
+    if (eoc == 0) {
+	if (!g_asn1_octet_decode (asn1, &ch))
+	    return FALSE;
+	if (ch != 0x00) {
+	    asn1->error = ASN1_ERR_DEC_EOC_MISMATCH;
+	    return FALSE;
 	}
-      if (!g_asn1_octet_decode (asn1, &ch))
-	return FALSE;
-      if (ch != 0x00)
-	{
-	  asn1->error = ASN1_ERR_DEC_EOC_MISMATCH;
-	  return FALSE;
+	if (!g_asn1_octet_decode (asn1, &ch))
+	    return FALSE;
+	if (ch != 0x00) {
+	    asn1->error = ASN1_ERR_DEC_EOC_MISMATCH;
+	    return FALSE;
 	}
-      return TRUE;
-    }
-  else
-    {
-      if (asn1->pointer != eoc)
-	{
-	  asn1->error = ASN1_ERR_DEC_LENGTH_MISMATCH;
-	  return FALSE;
+	return TRUE;
+    } else {
+	if (asn1->pointer != eoc) {
+	    asn1->error = ASN1_ERR_DEC_LENGTH_MISMATCH;
+	    return FALSE;
 	}
-      return TRUE;
+	return TRUE;
     }
 }
 
@@ -599,6 +580,9 @@ gboolean
 g_asn1_null_encode ( ASN1_SCK *asn1, guchar **eoc )
 {
     *eoc = asn1->pointer;
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_ASN1) {
+	g_printerr("asn1enc %p: NULL\n", asn1);
+    }
     return TRUE;
 }
 
@@ -1027,7 +1011,7 @@ g_asn1_octets_decode ( ASN1_SCK *asn1, guchar *eoc, guchar **octets, guint *len)
  * RETURNS:     gboolean success.
  */
 
-gboolean 
+static inline gboolean 
 g_asn1_subid_encode ( ASN1_SCK *asn1, guint32 subid)
 {
     guchar ch;
@@ -1059,7 +1043,7 @@ g_asn1_subid_encode ( ASN1_SCK *asn1, guint32 subid)
  * RETURNS:     gboolean success.
  */
 
-gboolean 
+static inline gboolean 
 g_asn1_subid_decode ( ASN1_SCK *asn1, guint32 *subid)
 {
     guchar ch;

@@ -83,8 +83,10 @@ struct _ASN1_SCK
 
 void g_asn1_open (ASN1_SCK *asn1, guchar *buf, guint len, guint mode);
 void g_asn1_close (ASN1_SCK *asn1, guchar **buf, guint *len);
+#if 0
 gboolean g_asn1_octet_encode (ASN1_SCK *asn1, guchar ch);
 gboolean g_asn1_octet_decode (ASN1_SCK *asn1, guchar *ch);
+#endif
 gboolean g_asn1_tag_encode (ASN1_SCK *asn1, guint tag);
 gboolean g_asn1_tag_decode (ASN1_SCK *asn1, guint *tag);
 gboolean g_asn1_id_encode (ASN1_SCK *asn1, guint cls, guint con, guint tag);
@@ -112,8 +114,10 @@ gboolean g_asn1_octets_encode (ASN1_SCK *asn1, guchar **eoc, guchar *octs,
                                guint len);
 gboolean g_asn1_octets_decode (ASN1_SCK *asn1, guchar *eoc, guchar **octs,
                                guint *len);
+#if 0
 gboolean g_asn1_subid_encode (ASN1_SCK *asn1, guint32 subid);
 gboolean g_asn1_subid_decode (ASN1_SCK *asn1, guint32 *subid);
+#endif
 gboolean g_asn1_oid_encode (ASN1_SCK *asn1, guchar **eoc, 
                             guint32 *oid, guint len);
 gboolean g_asn1_oid_decode (ASN1_SCK *asn1, guchar *eoc, 
