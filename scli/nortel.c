@@ -384,6 +384,48 @@ delete_nortel_baystack_vlan(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+create_nortel_baystack_vlan(scli_interp_t *interp, int argc, char **argv)
+{
+    rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry;
+    int i, vlanId;
+    gint32 status, type;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 3) {
+	return SCLI_SYNTAX;
+    }
+
+    vlanId = atoi(argv[1]);
+
+    vlanEntry = rapidcity_vlan_mib_new_rcVlanEntry();
+    if (! vlanEntry) {
+	return SCLI_ERROR;
+    }
+
+    vlanEntry->rcVlanId = vlanId;
+    vlanEntry->rcVlanName = argv[2];
+    type = RAPIDCITY_VLAN_MIB_RCVLANTYPE_BYPORT;
+    vlanEntry->rcVlanType = &type;
+    vlanEntry->_rcVlanNameLength = strlen(argv[2]);
+    status = RAPIDCITY_VLAN_MIB_RCVLANROWSTATUS_CREATEANDGO;
+    vlanEntry->rcVlanRowStatus = &status;
+    rapidcity_vlan_mib_set_rcVlanEntry(interp->peer, vlanEntry);
+    if (interp->peer->error_status) {
+	g_string_sprintfa(interp->result, "%d: ",
+			  vlanEntry->rcVlanId);
+	scli_snmp_error(interp);
+	g_string_append(interp->result, "\n");
+    }
+
+    (void) rapidcity_vlan_mib_free_rcVlanEntry(vlanEntry);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_nortel_mode(scli_interp_t *interp)
 {
@@ -400,6 +442,10 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "delete vlans on nortel (baystack) bridges",
 	  delete_nortel_baystack_vlan },
+	{ "create nortel bridge vlan", "<vlanid> <name>",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "create a vlan on nortel (baystack) bridges",
+	  create_nortel_baystack_vlan },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
