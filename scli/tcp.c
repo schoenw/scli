@@ -106,7 +106,7 @@ show_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 	if (cnt) {
 	    if (! scli_interp_xml(interp)) {
 		g_string_sprintfa(interp->header, "%-*s %s",
-				  width, "LOCAL ADDRESS", "STATE");
+				  width, "LOCAL", "STATE");
 	    }
 	    for (i = 0; tcpConnTable[i]; i++) {
 		if (tcpConnTable[i]->tcpConnState
@@ -237,8 +237,8 @@ show_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 	if (cnt) {
 	    if (! scli_interp_xml(interp)) {
 		g_string_sprintfa(interp->header, "%-*s %-*s %s",
-				  local_width, "LOCAL ADDRESS",
-				  remote_width, "REMOTE ADDRESS", "STATE");
+				  local_width, "LOCAL",
+				  remote_width, "REMOTE", "STATE");
 	    }
 	    for (i = 0; tcpConnTable[i]; i++) {
 		if (tcpConnTable[i]->tcpConnState
@@ -342,12 +342,12 @@ xml_tcp_state(xmlNodePtr root, gint32 state, guint32 count, GSList *ports)
     if (! e) return;
 		 
     tree = xmlNewChild(root, NULL, "state", NULL);
-    xmlSetProp(tree, "state", e);
+    xmlSetProp(tree, "name", e);
 
     for (elem = ports; elem; elem = g_slist_next(elem)) {
 	tcp_state_t *t = (tcp_state_t *) elem->data;
 	node = xml_new_child(tree, NULL, "count", "%u", t->count);
-	xml_set_prop(node, "port", "%s", t->name);
+	xml_set_prop(node, "service", "%s", t->name);
     }
 }
 
@@ -429,6 +429,7 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 	    const char *name;
 	    guint16 port;
 	    GSList *list = NULL;
+	    GSList *listen = NULL;
 	    tcp_state_t *t;
 		
 	    for (i = 0; tcpConnTable[i]; i++) {
@@ -438,13 +439,33 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 		}
 		c++;
 		port = tcpConnTable[i]->tcpConnLocalPort;
+#if 1
 		name = fmt_tcp_port(port, SCLI_FMT_NAME);
+#else
+		if (s == TCP_MIB_TCPCONNSTATE_LISTEN) {
+		    name = fmt_tcp_port(port, SCLI_FMT_NAME_OR_ADDR);
+		    (void) tcp_state_lookup(&listen, name, port);
+		} else {
+		    name = fmt_tcp_port(port, SCLI_FMT_NAME);
+		}
+#endif
 		if (! name && s != TCP_MIB_TCPCONNSTATE_LISTEN) {
 		    port = tcpConnTable[i]->tcpConnRemPort;
 		    name = fmt_tcp_port(port, SCLI_FMT_NAME);
 		}
 		if (! name) {
-		    name = "other";
+#if 1
+		    name = "?";
+#else
+		    gchar *x, *y;
+		    port = tcpConnTable[i]->tcpConnLocalPort;
+		    x = fmt_tcp_port(port, SCLI_FMT_NAME_OR_ADDR);
+		    y = g_strdup(x);
+		    port = tcpConnTable[i]->tcpConnRemPort;
+		    x = fmt_tcp_port(port, SCLI_FMT_NAME_OR_ADDR);
+		    name = g_strdup_printf("%s-%s", x, y);
+		    g_free(y);
+#endif
 		    port = 0xffff;
 		}
 
@@ -459,10 +480,107 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 	    }
 	    g_slist_foreach(list, tcp_state_free, NULL);
 	    g_slist_free(list);
+	    g_slist_foreach(listen, tcp_state_free, NULL);
+	    g_slist_free(listen);
 	}
     }
 
     if (tcpConnTable) tcp_mib_free_tcpConnTable(tcpConnTable);
+    return SCLI_OK;
+}
+
+
+
+static void
+xml_tcp_info(xmlNodePtr root, tcp_mib_tcp_t *tcp)
+{
+    xmlNodePtr tree, node;
+    const char *e;
+
+    tree = xmlNewChild(root, NULL, "rto", NULL);
+    e = fmt_enum(tcp_mib_enums_tcpRtoAlgorithm, tcp->tcpRtoAlgorithm);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "algorithm", "%s", e);
+    }
+    if (tcp->tcpRtoMin) {
+	node = xml_new_child(tree, NULL, "minimum", "%d", *tcp->tcpRtoMin);
+	xml_set_prop(node, "unit", "milliseconds");
+    }
+    if (tcp->tcpRtoMax) {
+	node = xml_new_child(tree, NULL, "maximum", "%d", *tcp->tcpRtoMax);
+	xml_set_prop(node, "unit", "milliseconds");
+    }
+    if (tcp->tcpCurrEstab) {
+	(void) xml_new_child(root, NULL, "established", "%u", *tcp->tcpCurrEstab);
+    }
+}
+
+
+
+static void
+fmt_tcp_info(GString *s, tcp_mib_tcp_t *tcp)
+{
+    int const indent = 16;
+    const char *e;
+
+    e = fmt_enum(tcp_mib_enums_tcpRtoAlgorithm, tcp->tcpRtoAlgorithm);
+    if (e) {
+	g_string_sprintfa(s, "%-*s%s\n", indent, "RTO Algorithm:", e);
+    }
+    if (tcp->tcpRtoMin) {
+	g_string_sprintfa(s, "%-*s%d milliseconds\n",
+			  indent, "RTO Minimum:", *tcp->tcpRtoMin);
+    }
+    if (tcp->tcpRtoMax) {
+	g_string_sprintfa(s, "%-*s%d milliseconds\n",
+			  indent, "RTO Maximum:", *tcp->tcpRtoMax);
+    }
+    if (tcp->tcpMaxConn && *tcp->tcpMaxConn) {
+	if (*tcp->tcpMaxConn < 0) {
+	    g_string_sprintfa(s, "%-*sdynamic\n", indent, "TCB Limit:");
+	} else {
+	    g_string_sprintfa(s, "%-*s%d connections\n",
+			      indent, "TCB Limit:", *tcp->tcpMaxConn);
+	}
+    }
+    if (tcp->tcpCurrEstab) {
+	g_string_sprintfa(s, "%-*s%u\n",
+			  indent, "Established:", *tcp->tcpCurrEstab);
+    }
+}
+
+
+
+static int
+show_tcp_info(scli_interp_t *interp, int argc, char **argv)
+{
+    tcp_mib_tcp_t *tcp;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    tcp_mib_get_tcp(interp->peer, &tcp, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (tcp) {
+	if (scli_interp_xml(interp)) {
+	    xml_tcp_info(interp->xml_node, tcp);
+	} else {
+	    fmt_tcp_info(interp->result, tcp);
+	}
+    }
+
+    if (tcp) tcp_mib_free_tcp(tcp);
+
     return SCLI_OK;
 }
 
@@ -473,27 +591,52 @@ scli_init_tcp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 
-	{ "show tcp listener", NULL,
-	  "The `show tcp listener' command displays the listening TCP\n"
-	  "endpoints.",
+	{ "show tcp info", NULL,
+	  "The `show tcp info' command displays parameters of the TCP\n"
+	  "protocol engine.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "tcp", NULL,
+	  show_tcp_info },
+
+	{ "show tcp listener", NULL,
+	  "The `show tcp listener' command displays the listening TCP\n"
+	  "endpoints. The command generates a table with the following\n"
+	  "columns:\n"
+	  "\n"
+	  "  LOCAL  local TCP endpoint\n"
+	  "  STATE  transmission control block state (listen)",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "tcp listeners", NULL,
 	  show_tcp_listener },
 
 	{ "show tcp connections", NULL,
 	  "The `show tcp connections' command displays the connected TCP\n"
 	  "endpoints including the current state of the connection as seen\n"
-	  "by the remote SNMP agent.",
+	  "by the remote SNMP agent. The command generates a table with\n"
+	  "the following columns:\n"
+	  "\n"
+	  "  LOCAL  local  TCP endpoint\n"
+	  "  REMOTE remote TCP endpoint\n"
+	  "  STATE  transmission control block state\n"
+	  "\n"
+	  "The transmission control block state is either closed, synSent,\n"
+	  "synReceived, established, finWait1, finWait2, closeWait, lastAck,\n"
+	  "closing, or timeWait.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
-	  "tcp", NULL,
+	  "tcp connections", NULL,
 	  show_tcp_connections },
 
 	{ "show tcp states", NULL,
 	  "The `show tcp states' command displays the distribution of TCP\n"
-	  "connection states together with a list of known port names in\n"
-           "each state.",
+	  "transmission control block states together with a list of known\n"
+	  "port names in each state. The command generates a table with\n"
+	  "the following columns:\n"
+	  "\n"
+	  "  COUNT number of transmission control blocks per state\n"
+	  "  STATE transmission control block state\n"
+	  "  PORTS well-known ports associated with the state",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
-	  "tcp", NULL,
+	  "tcp states", NULL,
 	  show_tcp_states },
 
 	{ "monitor tcp connections", NULL,
