@@ -332,10 +332,10 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 
     s = interp->result;
     if (snmpv2_mib_get_system(interp->peer, &system) == 0 && system) {
-	if (system->sysDescr) {
-	    g_string_sprintfa(s, "%.*s", (int) system->_sysDescrLength,
+	if (system->sysDescr && system->_sysDescrLength) {
+	    g_string_sprintfa(s, "%.*s\n",
+			      (int) system->_sysDescrLength,
 			      system->sysDescr);
-	    g_string_append(s, "\n");
 	}
 	if (system->sysName) {
 	    g_string_sprintfa(s, "\n%-*s ", indent, "Name:");
