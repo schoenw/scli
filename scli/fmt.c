@@ -216,6 +216,26 @@ fmt_seconds(guint32 seconds)
 
 
 
+char const *
+fmt_enum(GSnmpEnum const *table, gint32 *number)
+{
+    static char buffer[80];
+    gchar const *name;
+
+    if (! number) {
+	return NULL;
+    }
+
+    name = gsnmp_enum_get_label(table, *number);
+    if (! name) {
+	g_snprintf(buffer, sizeof(buffer), "%d", *number);
+	name = buffer;
+    }
+    return name;
+}
+
+
+
 void
 xxx_enum(GString *s, int width, GSnmpEnum const *table, gint32 *number)
 {
@@ -232,22 +252,25 @@ xxx_enum(GString *s, int width, GSnmpEnum const *table, gint32 *number)
 
 
 char const *
-fmt_enum(GSnmpEnum const *table, gint32 *number)
+fmt_identity(GSnmpIdentity const *table,
+	     guint32 const *oid, gsize oidlen)
 {
+#if 0
     static char buffer[80];
+#endif
     gchar const *name;
 
-    if (! number) {
+    if (! oid) {
 	return NULL;
     }
 
-    name = gsnmp_enum_get_label(table, *number);
+    name = gsnmp_identity_get_label(table, oid, oidlen);
+#if 0
     if (! name) {
-	g_snprintf(buffer, sizeof(buffer), "%d", *number);
-	return buffer;
-    } else {
-	return name;
+	/* xxx */
     }
+#endif
+    return name;
 }
 
 
@@ -503,7 +526,7 @@ fmt_tdomain(guint32 *tdomain, gsize tdomain_len)
 {
     const char *e;
 
-    e = gsnmp_identity_get_label(tdomain_identities, tdomain, tdomain_len);
+    e = fmt_identity(tdomain_identities, tdomain, tdomain_len);
 
     return e;
 }

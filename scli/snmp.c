@@ -730,7 +730,7 @@ static void
 fmt_snmp_usm_user(GString *s, snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry,
 		  int user_width, int sec_width)
 {
-    const char *label;
+    const char *e;
     
     fmt_storage_type(s, usmUserEntry->usmUserStorageType);
     fmt_row_status(s, usmUserEntry->usmUserStatus);
@@ -747,19 +747,15 @@ fmt_snmp_usm_user(GString *s, snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntr
 	g_string_sprintfa(s, " %*s", sec_width, "");
     }
 
-    label = gsnmp_identity_get_label(sec_proto_identities,
-				    usmUserEntry->usmUserAuthProtocol,
-				    usmUserEntry->_usmUserAuthProtocolLength);
-    if (label) {
-	g_string_sprintfa(s, " %-8s", label ? label : "");
-    }
+    e = fmt_identity(sec_proto_identities,
+		     usmUserEntry->usmUserAuthProtocol,
+		     usmUserEntry->_usmUserAuthProtocolLength);
+    g_string_sprintfa(s, " %-8s", e ? e : "");
 
-    label = gsnmp_identity_get_label(sec_proto_identities,
-				    usmUserEntry->usmUserPrivProtocol,
-				    usmUserEntry->_usmUserPrivProtocolLength);
-    if (label) {
-	g_string_sprintfa(s, " %-8s", label ? label : "");
-    }
+    e = fmt_identity(sec_proto_identities,
+		     usmUserEntry->usmUserPrivProtocol,
+		     usmUserEntry->_usmUserPrivProtocolLength);
+    g_string_sprintfa(s, " %-8s", e ? e : "");
 
     g_string_append(s, "\n");
 }

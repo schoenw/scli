@@ -345,7 +345,7 @@ xml_system_device(xmlNodePtr root,
 		  host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
 {
     xmlNodePtr tree;
-    char const *type;
+    char const *e;
     
     tree = xmlNewChild(root, NULL, "device", NULL);
     xml_set_prop(tree, "index", "%d", hrDeviceEntry->hrDeviceIndex);
@@ -356,11 +356,11 @@ xml_system_device(xmlNodePtr root,
 				    hrDeviceEntry->hrDeviceStatus));
     }
 
-    type = gsnmp_identity_get_label(host_resources_types_identities,
-				    hrDeviceEntry->hrDeviceType,
-				    hrDeviceEntry->_hrDeviceDescrLength);
-    if (type) {
-	(void) xmlNewChild(tree, NULL, "type", type);
+    e = fmt_identity(host_resources_types_identities,
+		     hrDeviceEntry->hrDeviceType,
+		     hrDeviceEntry->_hrDeviceDescrLength);
+    if (e) {
+	(void) xmlNewChild(tree, NULL, "type", e);
     }
 	
     if (hrDeviceEntry->hrDeviceDescr && hrDeviceEntry->_hrDeviceDescrLength) {
@@ -377,19 +377,18 @@ fmt_system_device(GString *s,
 		  host_resources_mib_hrDeviceEntry_t *hrDeviceEntry,
 		  int type_width)
 {
-    char const *status;
-    char const *type;
+    char const *e;
     
     g_string_sprintfa(s, "%5u ", hrDeviceEntry->hrDeviceIndex);
 
-    status = fmt_enum(host_resources_mib_enums_hrDeviceStatus,
-		      hrDeviceEntry->hrDeviceStatus);
-    g_string_sprintfa(s, "%-8s", status ? status : "");
+    e = fmt_enum(host_resources_mib_enums_hrDeviceStatus,
+		 hrDeviceEntry->hrDeviceStatus);
+    g_string_sprintfa(s, "%-8s", e ? e : "");
 
-    type = gsnmp_identity_get_label(host_resources_types_identities,
-				    hrDeviceEntry->hrDeviceType,
-				    hrDeviceEntry->_hrDeviceDescrLength);
-    g_string_sprintfa(s, "%*s ", type_width, type ? type : "");
+    e = fmt_identity(host_resources_types_identities,
+		     hrDeviceEntry->hrDeviceType,
+		     hrDeviceEntry->_hrDeviceDescrLength);
+    g_string_sprintfa(s, "%*s ", type_width, e ? e : "");
 	
     if (hrDeviceEntry->hrDeviceDescr) {
 	g_string_sprintfa(s, "%.*s\n",
@@ -426,9 +425,9 @@ show_system_devices(scli_interp_t *interp, int argc, char **argv)
     if (hrDeviceTable) {
 	if (! scli_interp_xml(interp)) {
 	    for (i = 0; hrDeviceTable[i]; i++) {
-		type = gsnmp_identity_get_label(host_resources_types_identities,
-					hrDeviceTable[i]->hrDeviceType,
-					hrDeviceTable[i]->_hrDeviceDescrLength);
+		type = fmt_identity(host_resources_types_identities,
+				    hrDeviceTable[i]->hrDeviceType,
+				    hrDeviceTable[i]->_hrDeviceDescrLength);
 		if (type) {
 		    type_width = MAX(type_width, strlen(type));
 		}
@@ -627,7 +626,6 @@ xml_system_mount(xmlNodePtr root,
 		 host_resources_mib_hrFSEntry_t *fsEntry)
 {
     const char *e;
-    const char *type;
     xmlNodePtr tree;
     
     tree = xmlNewChild(root, NULL, "filesystem", NULL);
@@ -647,11 +645,10 @@ xml_system_mount(xmlNodePtr root,
 			     fsEntry->hrFSRemoteMountPoint);
     }
 
-    type = gsnmp_identity_get_label(filesystem_types,
-				    fsEntry->hrFSType,
-				    fsEntry->_hrFSTypeLength);
-    if (type) {
-	(void) xml_new_child(tree, NULL, "type", "%s", type);
+    e = fmt_identity(filesystem_types,
+		     fsEntry->hrFSType, fsEntry->_hrFSTypeLength);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "type", "%s", e);
     }
 
     e = fmt_enum(host_resources_mib_enums_hrFSAccess,
@@ -674,7 +671,6 @@ fmt_system_mount(GString *s,
 		 int loc_len, int rem_len, int type_len)
 {
     const char *e;
-    const char *type;
 
     g_string_sprintfa(s, "%5d ", fsEntry->hrFSIndex);
 
@@ -693,10 +689,10 @@ fmt_system_mount(GString *s,
 	g_string_sprintfa(s, "%*s", rem_len, "");
     }
 
-    type = gsnmp_identity_get_label(filesystem_types,
-				    fsEntry->hrFSType,
-				    fsEntry->_hrFSTypeLength);
-    g_string_sprintfa(s, "%-*s", type_len, type ? type : "");
+    e = fmt_identity(filesystem_types,
+		     fsEntry->hrFSType,
+		     fsEntry->_hrFSTypeLength);
+    g_string_sprintfa(s, "%-*s", type_len, e ? e : "");
 
     e = fmt_enum(hrFSAccess, fsEntry->hrFSAccess);
     g_string_sprintfa(s, "%s", e ? e : "");
@@ -743,9 +739,9 @@ show_system_mounts(scli_interp_t *interp, int argc, char **argv)
 		rem_len = MAX(rem_len,
 			      hrFSTable[i]->_hrFSRemoteMountPointLength);
 	    }
-	    type = gsnmp_identity_get_label(filesystem_types,
-					    hrFSTable[i]->hrFSType,
-					    hrFSTable[i]->_hrFSTypeLength);
+	    type = fmt_identity(filesystem_types,
+				hrFSTable[i]->hrFSType,
+				hrFSTable[i]->_hrFSTypeLength);
 	    if (type) {
 		type_len = MAX(type_len, strlen(type));
 	    }
@@ -777,7 +773,7 @@ xml_system_storage(xmlNodePtr root,
 		   host_resources_mib_hrStorageEntry_t *hrStorageEntry)
 {
     xmlNodePtr node, tree;
-    gchar const *type = NULL;
+    gchar const *e;
 
     tree = xmlNewChild(root, NULL, "area", NULL);
     xml_set_prop(tree, "index", "%d", hrStorageEntry->hrStorageIndex);
@@ -789,11 +785,11 @@ xml_system_storage(xmlNodePtr root,
 			     hrStorageEntry->hrStorageDescr);
     }
 
-    type = gsnmp_identity_get_label(storage_types,
-				    hrStorageEntry->hrStorageType,
-				    hrStorageEntry->_hrStorageTypeLength);
-    if (type) {
-	(void) xmlNewChild(tree, NULL, "type", type);
+    e = fmt_identity(storage_types,
+		     hrStorageEntry->hrStorageType,
+		     hrStorageEntry->_hrStorageTypeLength);
+    if (e) {
+	(void) xmlNewChild(tree, NULL, "type", e);
     }
 
     if (hrStorageEntry->hrStorageAllocationUnits
@@ -827,7 +823,7 @@ fmt_system_storage(GString *s,
 		   host_resources_mib_hrStorageEntry_t *hrStorageEntry,
 		   int descr_width, int type_width)
 {
-    gchar const *type = NULL;
+    gchar const *e = NULL;
 
     g_string_sprintfa(s, "%5d ", hrStorageEntry->hrStorageIndex);
 
@@ -841,10 +837,10 @@ fmt_system_storage(GString *s,
 	g_string_sprintfa(s, "%*s", descr_width, "");
     }
 
-    type = gsnmp_identity_get_label(storage_types,
-				    hrStorageEntry->hrStorageType,
-				    hrStorageEntry->_hrStorageTypeLength);
-    g_string_sprintfa(s, "%-*s", type_width, type ? type : "");
+    e = fmt_identity(storage_types,
+		     hrStorageEntry->hrStorageType,
+		     hrStorageEntry->_hrStorageTypeLength);
+    g_string_sprintfa(s, "%-*s", type_width, e ? e : "");
 
     if (hrStorageEntry->hrStorageAllocationUnits
 	&& hrStorageEntry->hrStorageSize
@@ -908,9 +904,9 @@ show_system_storage(scli_interp_t *interp, int argc, char **argv)
 		&& hrStorageTable[i]->_hrStorageDescrLength > descr_width) {
 		descr_width = hrStorageTable[i]->_hrStorageDescrLength;
 	    }
-	    type = gsnmp_identity_get_label(storage_types,
-				    hrStorageTable[i]->hrStorageType,
-				    hrStorageTable[i]->_hrStorageTypeLength);
+	    type = fmt_identity(storage_types,
+				hrStorageTable[i]->hrStorageType,
+				hrStorageTable[i]->_hrStorageTypeLength);
 	    if (type) {
 		type_width = MAX(type_width, strlen(type));
 	    }

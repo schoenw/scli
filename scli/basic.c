@@ -304,7 +304,8 @@ scli_interp_reset(scli_interp_t *interp)
 	xmlFreeDoc(interp->xml_doc);
     }
     interp->xml_doc = xmlNewDoc("1.0");
-    interp->xml_doc->children = xmlNewDocNode(interp->xml_doc, NULL, "scli", NULL);
+    interp->xml_doc->children = xmlNewDocNode(interp->xml_doc, NULL,
+					      "scli", NULL);
     interp->xml_node = interp->xml_doc->children;
     xmlSetProp(interp->xml_node, "version", VERSION);
 }

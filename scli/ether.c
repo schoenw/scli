@@ -207,11 +207,10 @@ fmt_ether_mau_info(GString *s, mau_mib_ifMauEntry_t *ifMauEntry)
 		 ifMauEntry->ifMauAutoNegSupported);
     g_string_sprintfa(s, "%-7s", e ? e : "");
 
-    if (ifMauEntry->ifMauType) {
-	g_string_sprintfa(s, " %s", 
-		  gsnmp_identity_get_label(mau_type_identities,
-					   ifMauEntry->ifMauType,
-					   ifMauEntry->_ifMauTypeLength));
+    e = fmt_identity(mau_type_identities,
+		     ifMauEntry->ifMauType, ifMauEntry->_ifMauTypeLength);
+    if (e) {
+	g_string_sprintfa(s, " %s", e);
     }
 
     /* ifMauEntry->ifMauTypeListBits */

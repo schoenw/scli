@@ -490,7 +490,7 @@ scli_init_entity_mode(scli_interp_t *interp)
 	  "xxx",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  set_entity_serial },
+	  set_entity_asset },
 
 	{ "dump entity", NULL,
 	  "xxx",
@@ -498,6 +498,11 @@ scli_init_entity_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  set_entity_serial },
 #endif
+
+#if 0
+	/* ENTITY NAME STATUS UNIT VALUE UPDATE-RATE LAST-UPDATE */
+#endif
+	
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     

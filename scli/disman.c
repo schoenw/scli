@@ -431,9 +431,9 @@ get_script_lang_name(disman_script_mib_smScriptEntry_t *smScriptEntry,
     
     for (i = 0; smLangTable[i]; i++) {
 	if (smLangTable[i]->smLangIndex == *smScriptEntry->smScriptLanguage) {
-	    return gsnmp_identity_get_label(languages,
-					    smLangTable[i]->smLangLanguage,
-					    smLangTable[i]->_smLangLanguageLength);
+	    return fmt_identity(languages,
+				smLangTable[i]->smLangLanguage,
+				smLangTable[i]->_smLangLanguageLength);
 	}
     }
     return NULL;

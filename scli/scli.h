@@ -196,7 +196,8 @@ struct scli_interp {
     int port;			/* default port number, defaults to 161 */
     int snmp;			/* version of the preferred SNMP protocol */
     time_t epoch;		/* epoch (used to invalidate cached data) */
-    int xid;			/* transaction identifier for each transaction */
+    int xid;			/* unique identifier for each transaction */
+    time_t xtime;		/* transaction time */
     int regex_flags;		/* regular expression flags (see regcomp(3)) */
 };
 
@@ -401,6 +402,10 @@ extern void
 xxx_enum(GString *s, int width, GSnmpEnum const *table, gint32 *number);
 
 extern char const *
+fmt_identity(GSnmpIdentity const *table,
+	     guint32 const *oid, gsize oidlen);
+
+extern char const *
 fmt_kmg(guint32 number);
 
 extern char const *
@@ -455,7 +460,8 @@ scan_port_set(guchar *bits, gsize bits_len, char *string);
 
     
 /*
- * XML utilities.
+ * XML utilities that are quite handy and used frequently by scli
+ * modes.
  */
 
 extern void

@@ -381,13 +381,12 @@ fmt_printer_info(GString *s,
 			  hrDeviceEntry->hrDeviceDescr);
     }
 
-    if (hrDeviceEntry && hrDeviceEntry->hrDeviceType) {
-	char const *type;
-	type = gsnmp_identity_get_label(host_resources_types_identities,
-					hrDeviceEntry->hrDeviceType,
-					hrDeviceEntry->_hrDeviceDescrLength);
-	if (type) {
-	    g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", type);
+    if (hrDeviceEntry) {
+	e = fmt_identity(host_resources_types_identities,
+			 hrDeviceEntry->hrDeviceType,
+			 hrDeviceEntry->_hrDeviceDescrLength);
+	if (e) {
+	    g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", e);
 	}
     }
 	
@@ -406,13 +405,63 @@ fmt_printer_info(GString *s,
     }
 
     if (hrPrinterEntry->hrPrinterDetectedErrorState) {
-	char const *state;
-	state = fmt_bits(error_states,
-			 hrPrinterEntry->hrPrinterDetectedErrorState,
-			 hrPrinterEntry->_hrPrinterDetectedErrorStateLength);
-	if (state) {
-	    g_string_sprintfa(s, "%-*s %s\n", indent, "Error State:", state);
+	/* XXX fmt_bits() just does non-sense here */
+	e = fmt_bits(error_states,
+		     hrPrinterEntry->hrPrinterDetectedErrorState,
+		     hrPrinterEntry->_hrPrinterDetectedErrorStateLength);
+	if (e) {
+	    g_string_sprintfa(s, "%-*s %s\n", indent, "Error State:", e);
 	}
+    }
+}
+
+
+
+static void
+xml_printer_info(xmlNodePtr root,
+		 host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
+		 host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
+{
+    xmlNodePtr tree;
+    const char *e;
+
+    tree = xmlNewChild(root, NULL, "cover", NULL);
+
+    if (hrDeviceEntry) {
+	(void) xml_new_child(tree, NULL, "description", "%.*s",
+			  (int) hrDeviceEntry->_hrDeviceDescrLength,
+			  hrDeviceEntry->hrDeviceDescr);
+    }
+
+    if (hrDeviceEntry) {
+	e = fmt_identity(host_resources_types_identities,
+			 hrDeviceEntry->hrDeviceType,
+			 hrDeviceEntry->_hrDeviceDescrLength);
+	if (e) {
+	    (void) xml_new_child(tree, NULL, "type", "%s", e);
+	}
+    }
+	
+    if (hrDeviceEntry) {
+	e = fmt_enum(host_resources_mib_enums_hrDeviceStatus,
+		     hrDeviceEntry->hrDeviceStatus);
+	if (e) {
+	    (void) xml_new_child(tree, NULL, "device-status", "%s", e);
+	}
+    }
+
+    e = fmt_enum(host_resources_mib_enums_hrPrinterStatus,
+		 hrPrinterEntry->hrPrinterStatus);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "printer-status", "%s", e);
+    }
+
+    /* XXX fmt_bits() just does non-sense here */
+    e = fmt_bits(error_states,
+		 hrPrinterEntry->hrPrinterDetectedErrorState,
+		 hrPrinterEntry->_hrPrinterDetectedErrorStateLength);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "error-states", "%s", e);
     }
 }
 
@@ -429,7 +478,7 @@ fmt_printer_general(GString *s,
     /* MISSING: prtGeneralCurrentLocalization */
     /* MISSING: prtAuxiliarySheetStartupPage */
     /* MISSING: prtAuxiliarySheetBannerPage */
-    /* Write-only-variable: prtGeneralReset */
+    /* MISSING: prtGeneralReset */
     
     if (prtGeneralEntry->prtGeneralPrinterName) {
 	g_string_sprintfa(s, "%-*s %.*s\n", indent,
@@ -557,21 +606,30 @@ show_printer_info(scli_interp_t * interp, int argc, char **argv)
 	printer_mib_get_prtGeneralTable(interp->peer, &prtGeneralTable, 0);
 	printer_mib_get_prtLocalizationTable(interp->peer, &prtLocalTable, 0);
 	for (i = 0; hrPrinterTable[i]; i++) {
-	    if (hrPrinterTable[i]->hrDeviceIndex != last) {
-		if (i > 0) {
-		    g_string_append(interp->result, "\n");
+	    if (scli_interp_xml(interp)) {
+		xmlNodePtr node = get_printer_node(interp->xml_node,
+					   hrPrinterTable[i]->hrDeviceIndex,
+						   "info");
+		xml_printer_info(node, hrPrinterTable[i],
+				 get_device_entry(hrPrinterTable[i],
+						  hrDeviceTable));
+	    } else {
+		if (hrPrinterTable[i]->hrDeviceIndex != last) {
+		    if (i > 0) {
+			g_string_append(interp->result, "\n");
+		    }
 		}
-	    }
-	    fmt_printer_info(interp->result, hrPrinterTable[i],
-			     get_device_entry(hrPrinterTable[i],
-					       hrDeviceTable));
-	    if (prtGeneralTable) {
-		fmt_printer_general(interp->result,
-				    get_general_entry(hrPrinterTable[i],
-						      prtGeneralTable),
+		fmt_printer_info(interp->result, hrPrinterTable[i],
+				 get_device_entry(hrPrinterTable[i],
+						  hrDeviceTable));
+		if (prtGeneralTable) {
+		    fmt_printer_general(interp->result,
+					get_general_entry(hrPrinterTable[i],
+							  prtGeneralTable),
 				    prtLocalTable);
+		}
+		last = hrPrinterTable[i]->hrDeviceIndex;
 	    }
-	    last = hrPrinterTable[i]->hrDeviceIndex;
 	}
     }
 
@@ -2656,8 +2714,8 @@ scli_init_printer_mode(scli_interp_t * interp)
 	{ "show printer info", NULL,
 	  "The `show printer info' command shows general information about\n"
 	  "the printer including global status information.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "devices", NULL,
 	  show_printer_info },
 
 	{ "show printer covers", NULL,
