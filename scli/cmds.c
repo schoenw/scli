@@ -277,7 +277,7 @@ history(scli_interp_t *interp, int argc, char **argv)
 
 
 
-int
+static int
 scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
 {
     int code;
