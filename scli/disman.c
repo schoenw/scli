@@ -202,7 +202,7 @@ static char const *
 get_script_lang_name(smScriptEntry_t *smScriptEntry,
 		     smLangEntry_t **smLangTable)
 {
-    int i, l;
+    int i;
 
     if (! smScriptEntry->smScriptLanguage) {
 	return NULL;
@@ -573,22 +573,22 @@ void
 scli_init_disman_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "disman", NULL, NULL },
-	{ "show disman", "languages",
+	{ "show", "disman", 0, NULL, NULL },
+	{ "show disman", "languages", SCLI_CMD_FLAG_NEED_PEER,
 	  "show languages supported by the distributed manager",
 	  cmd_languages },
-	{ "show disman", "script", NULL, NULL },
-	{ "show disman script", "details",
+	{ "show disman", "script", 0, NULL, NULL },
+	{ "show disman script", "details", SCLI_CMD_FLAG_NEED_PEER,
 	  "show scripts installed at the distributed manager",
 	  cmd_script_details },
-	{ "show disman script", "info",
+	{ "show disman script", "info", SCLI_CMD_FLAG_NEED_PEER,
 	  "show script summary information",
 	  cmd_script_info },
-	{ "show disman", "launch", NULL, NULL },
-	{ "show disman launch", "info",
+	{ "show disman", "launch", 0, NULL, NULL },
+	{ "show disman launch", "info", SCLI_CMD_FLAG_NEED_PEER,
 	  "show script summary information",
 	  cmd_launch_info },
-	{ NULL, NULL, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t disman_mode = {

@@ -29,8 +29,6 @@
 
 #include "scli.h"
 
-#include "snmpv2-mib.h"
-
 #include <getopt.h>
 #include <string.h>
 #include <sys/types.h>
@@ -51,14 +49,16 @@ static scli_interp_t *current_interp = NULL;
 static void
 mainloop(scli_interp_t *interp, int delay)
 {
-    char *input, *expansion;
+    char *input, *expansion, *prompt;
     int result, code = SCLI_OK;
 
     g_assert(interp);
 
     while (code != SCLI_EXIT) {
 	current_interp = interp;
-	input = readline("scli > ");
+	prompt = scli_prompt(interp);
+	input = readline(prompt);
+	g_free(prompt);
 	current_interp = NULL;
  	if (! input) {
 	    printf("\n");
@@ -208,7 +208,7 @@ readline_init()
 static void
 usage()
 {
-    printf("Usage: scli [OPTION] hostname [community]\n");
+    printf("Usage: scli [OPTION] [hostname [community]]\n");
     printf(
 	"Options:\n"
 	"  -V, --version     show version information and exit\n"
@@ -231,7 +231,6 @@ int
 main(int argc, char **argv)
 {
     scli_interp_t *interp;
-    system_t *system = NULL;
     char *file = NULL;
     char *cmd = NULL;
     int c, i;
@@ -239,19 +238,25 @@ main(int argc, char **argv)
     int norc = 0, port = 161, delay = 5000, retries = 3, timeout = 500000;
 
     static scli_cmd_t cmds[] = {
-	{ NULL, "help",
-	  "help about the current mode and commands",
-	  scli_cmd_help },
-	{ NULL, "history",
-	  "display the command history list with line numbers",
-	  scli_cmd_history },
-	{ NULL, "exit",
+	{ NULL, "close", 0,
+	  "close the association to a remote SNMP agent",
+	  scli_cmd_close },
+	{ NULL, "exit", 0,
 	  "exit the scli command line program",
 	  scli_cmd_exit },
-	{ NULL, "show",
+	{ NULL, "help", 0,
+	  "help about the current mode and commands",
+	  scli_cmd_help },
+	{ NULL, "history", 0,
+	  "display the command history list with line numbers",
+	  scli_cmd_history },
+	{ NULL, "open", 0,
+	  "open an association to a remote SNMP agent",
+	  scli_cmd_open },
+	{ NULL, "show", 0,
 	  "show information about a certain topic",
 	  NULL },
-	{ NULL, NULL, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
 
     static struct option const long_options[] =
@@ -308,7 +313,7 @@ main(int argc, char **argv)
         }
     }
 
-    if (argc-optind < 1 || argc-optind > 2) {
+    if (/*argc-optind < 1 ||*/ argc-optind > 2) {
         usage();
         exit(1);
     }
@@ -325,6 +330,15 @@ main(int argc, char **argv)
     }
 
     /*
+     * Initialize the g_snmp library.
+     */
+
+    if (! g_snmp_init(FALSE)) {
+	g_error("scli: Initialization of SNMP library failed");
+        exit(1);
+    }
+
+    /*
      * Initialize the interpreter. Register the toplevel commands.
      */
 
@@ -334,64 +348,18 @@ main(int argc, char **argv)
 	scli_create_command(interp, cmds + i);
     }
 
-    interp->interactive = (file == NULL && cmd == NULL && isatty(0));
+    if (file == NULL && cmd == NULL && isatty(0)) {
+	interp->flags |= SCLI_INTERP_FLAG_INTERACTIVE;
+    }
 
-    /*
-     * Lets see how we can talk to this guy. We first try to speek
-     * SNMPv2c (since this protocol does much better error handling)
-     * and we fall back to SNMPv1 only if this is necessary.
-     */
-    
-    memset(interp->peer, 0, sizeof(host_snmp));
-    interp->peer->domain = AF_INET;
-    interp->peer->name = g_strdup(argv[optind++]);
-    interp->peer->port = port;
-    interp->peer->rcomm = (argc-optind > 0) ? argv[optind++] : "public";
-    interp->peer->wcomm = interp->peer->rcomm;
-    interp->peer->retries = 3;
-    interp->peer->timeout = 1;
-    interp->peer->version = G_SNMP_V2C;
-
-    if (interp->interactive) {
+    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
 	printf("scli version %s %s\n", VERSION, scli_copyright);
     }
   
-    if (! g_snmp_init(FALSE)) {
-	g_error("scli: Initialisation of SNMP library failed");
-        exit(1);
-    }
-
-    if (interp->interactive) {
-	printf("Trying SNMPv2c ... ");
-	fflush(stdout);
-    }
-    if (snmpv2_mib_get_system(interp->peer, &system) == 0 && system) {
-	if (interp->interactive) {
-	    printf("good!\n");
-	}
-    } else {
-	if (interp->interactive) {
-	    printf("timeout.\nTrying SNMPv1  ... ");
-	    fflush(stdout);
-	}
-	interp->peer->version = G_SNMP_V1;
-	if (snmpv2_mib_get_system(interp->peer, &system) == 0 && system) {
-	    if (interp->interactive) {
-		printf("ok.\n");
-	    }
-	} else {
-	    if (interp->interactive) {
-		printf("timeout.\nGiving up!\n");
-	    }
-	    exit(1);
-	}
-    }
-    if (system) {
-	snmpv2_mib_free_system(system);
-    }
-    if (interp->interactive) {
-	printf("\n");
-	fflush(stdout);
+    if (argc-optind == 1) {
+	(void) scli_open_community(interp, argv[optind], 161, NULL);
+    } else if (argc-optind == 2) {
+	(void) scli_open_community(interp, argv[optind], 161, argv[optind+1]);
     }
 
     scli_init_system_mode(interp);
@@ -408,7 +376,7 @@ main(int argc, char **argv)
 	(void) scli_eval_init_file(interp);
     }
 
-    if (interp->interactive) {
+    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
         gchar *home = g_get_home_dir();
 	gchar *path = NULL;
 	readline_init();

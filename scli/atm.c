@@ -34,8 +34,6 @@ static void
 show_atm_interface(GString *s, atmInterfaceConfEntry_t *atmInterfaceConfEntry,
 		   ifEntry_t *ifEntry, ifXEntry_t *ifXEntry)
 {
-    int i;
-
     if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
 	g_string_sprintfa(s, "%5d   ",
 			  *atmInterfaceConfEntry->atmInterfaceMaxVpcs);
@@ -57,7 +55,7 @@ cmd_atm_interface(scli_interp_t *interp, int argc, char **argv)
     atmInterfaceConfEntry_t **atmInterfaceConfTable = NULL;
     ifEntry_t **ifTable = NULL;
     ifXEntry_t **ifXTable = NULL;
-    int i, j;
+    int i;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -90,11 +88,11 @@ void
 scli_init_atm_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "atm", NULL, NULL },
-	{ "show atm", "interface",
+	{ "show", "atm", 0, NULL, NULL },
+	{ "show atm", "interface", SCLI_CMD_FLAG_NEED_PEER,
 	  "show atm interfaces",
 	  cmd_atm_interface },
-	{ NULL, NULL, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t atm_mode = {

@@ -32,9 +32,11 @@
 #include "bridge-mib.h"
 #include "disman-script-mib.h"
 
+#include <ctype.h>
+
 
 static void
-strip_white(char *s, gsize *len)
+strip_white(guchar *s, gsize *len)
 {
     while (*len && isspace(s[(*len)-1])) {
 	(*len)--;
@@ -272,7 +274,7 @@ cmd_mounts(scli_interp_t *interp, int argc, char **argv)
 	}
 	loc_len++, rem_len++;
 	g_string_sprintfa(interp->result, "%-*s%-*sAccess\n",
-			  loc_len, "Mount Point",
+			  loc_len, "Local Mount Point",
 			  rem_len, "Remote Mount Point");
 	for (i = 0; hrFSTable[i]; i++) {
 	    show_mount(interp->result, hrFSTable[i], loc_len, rem_len);
@@ -359,7 +361,7 @@ static int
 cmd_storage(scli_interp_t *interp, int argc, char **argv)
 {
     hrStorageEntry_t **hrStorageTable = NULL;
-    int descr_width = 16;
+    int descr_width = 14;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -424,7 +426,8 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 	}
 	if (system->sysName) {
 	    g_string_sprintfa(s, "\n%-*s ", indent, "Name:");
-	    g_string_sprintfa(s, "%.*s", (int) system->_sysNameLength,
+	    g_string_sprintfa(s, "%.*s",
+			      (int) system->_sysNameLength,
 			      system->sysName);
 	}
 	if (interp->peer->name) {
@@ -434,12 +437,14 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 	}
 	if (system->sysContact) {
 	    g_string_sprintfa(s, "\n%-*s ", indent, "Contact:");
-	    g_string_sprintfa(s, "%.*s", (int) system->_sysContactLength,
+	    g_string_sprintfa(s, "%.*s",
+			      (int) system->_sysContactLength,
 			      system->sysContact);
 	}
 	if (system->sysLocation) {
 	    g_string_sprintfa(s, "\n%-*s ", indent, "Location:");
-	    g_string_sprintfa(s, "%.*s", (int) system->_sysLocationLength,
+	    g_string_sprintfa(s, "%.*s",
+			      (int) system->_sysLocationLength,
 			      system->sysLocation);
 	}
 	if (system->sysObjectID) {
@@ -562,23 +567,23 @@ void
 scli_init_system_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "system", NULL, NULL },
-	{ "show system", "info",
+	{ "show", "system", 0, NULL, NULL },
+	{ "show system", "info", SCLI_CMD_FLAG_NEED_PEER,
 	  "show system summary information",
 	  cmd_system },
-	{ "show system", "devices",
+	{ "show system", "devices", SCLI_CMD_FLAG_NEED_PEER,
 	  "show list of system devices",
 	  cmd_devices },
-	{ "show system", "storage",
+	{ "show system", "storage", SCLI_CMD_FLAG_NEED_PEER,
 	  "show storage areas attached to the system",
 	  cmd_storage },
-	{ "show system", "mounts",
+	{ "show system", "mounts", SCLI_CMD_FLAG_NEED_PEER,
 	  "show file systems mounted on the system",
 	  cmd_mounts },
-	{ "show system", "processes",
+	{ "show system", "processes", SCLI_CMD_FLAG_NEED_PEER,
 	  "show processes running on the system",
 	  cmd_processes },
-	{ NULL, NULL, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t system_mode = {

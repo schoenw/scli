@@ -52,9 +52,12 @@ typedef struct scli_mode	scli_mode_t;
 typedef struct scli_cmd		scli_cmd_t;
 
 
+#define SCLI_CMD_FLAG_NEED_PEER	0x01
+
 struct scli_cmd {
     char *path;			/* path where the command is registered */
     char *name;			/* name of the comand */
+    int   flags;		/* command flags */
     char *desc;			/* description of the command */
     int (*func) (scli_interp_t *interp, int argc, char **argv);
 				/* function to implement the command */
@@ -70,10 +73,13 @@ struct scli_mode {
 				/* called when the mode is left */
 };
 
+#define SCLI_INTERP_FLAG_INTERACTIVE	0x01
+#define SCLI_INTERP_FLAG_RECURSIVE	0x02
+
 struct scli_interp {
     GNode *cmd_root;		/* root of the command tree */
     GSList *mode_list;		/* root of list of registered modes */
-    int	interactive;		/* true if we run in interactive mode */
+    int	flags;			/* interpreter flags */
     GString *result;		/* string result buffer */
     host_snmp *peer;		/* the snmp peer we are talking to */
 };
@@ -105,6 +111,15 @@ scli_register_mode(scli_interp_t *interp, scli_mode_t *mode);
 extern int
 scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd);
 
+extern int
+scli_open_community(scli_interp_t *interp, char *host, int port,
+		    char *community);
+extern void
+scli_close(scli_interp_t *interp);
+
+extern char*
+scli_prompt(scli_interp_t *interp);
+
 /*
  * Core scli commands:
  */
@@ -117,6 +132,12 @@ scli_cmd_history(scli_interp_t *interp, int argc, char **argv);
 
 extern int
 scli_cmd_exit(scli_interp_t *interp, int argc, char **argv);
+
+extern int
+scli_cmd_open(scli_interp_t *interp, int argc, char **argv);
+
+extern int
+scli_cmd_close(scli_interp_t *interp, int argc, char **argv);
 
 /*
  * Initialization functions for the various scli modes.

@@ -48,7 +48,6 @@ cmd_snmp(scli_interp_t *interp, int argc, char **argv)
     sysOREntry_t **sysORTable;
     GString *s;
     int i;
-    int const indent = 18;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -96,10 +95,10 @@ void
 scli_init_snmp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "snmp", NULL, NULL },
-	{ "show snmp", "engine",
+	{ "show", "snmp", 0, NULL, NULL },
+	{ "show snmp", "engine", SCLI_CMD_FLAG_NEED_PEER,
 	  "show information about the snmp engine", cmd_snmp },
-	{ NULL, NULL, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t snmp_mode = {

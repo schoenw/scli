@@ -13,7 +13,7 @@
 .\" along with this program; see the file COPYING.  If not, write to
 .\" the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 .\"
-.TH STOP 1 "January 26, 2001"
+.TH SCLI 1 "March 15, 2001"
 .\" Please update the above date whenever this man page is modified.
 .\"
 .\" Some roff macros, for reference:
@@ -31,7 +31,7 @@ scli \- SNMP Command Line Interface
 .SH SYNOPSIS
 .B scli
 .RI [ options ]
-.I hostname
+.I [hostname]
 .RI [ community ]
 .SH DESCRIPTION
 \fBscli\fP provides a simple command line interface on top of the
@@ -40,9 +40,9 @@ data from devices and to configure them with simple commands. It
 relies on the capabilities of the devices and thus not all commands
 may work with all devices.
 .PP
-The \fIhostname\fR argument is the name or the IP adress of the host
-to look at. \fBstop\fP talks to this host's SNMP agent on the default
-port number 161 using the SNMP over UDP transport mapping.
+The optional \fIhostname\fR argument is the name or the IP adress of
+the remote host. \fBscli\fP talks to this host's SNMP agent on the
+default port number 161 using the SNMP over UDP transport mapping.
 .PP
 The optional \fIcommunity\fR argument is the community string used to
 communicate with the remote SNMP agent. The default string is

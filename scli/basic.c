@@ -26,10 +26,43 @@
 
 #include "scli.h"
 
+#include "snmpv2-mib.h"
+
 #include <ctype.h>
 
 
 char const scli_copyright[] = "(c) 2001 Juergen Schoenwaelder";
+
+
+static void
+page(GString *s)
+{
+#if 0
+    char c;
+    int i, cnt;
+    int const lines = 20;
+
+    while (s->str[0]) {
+	for (i = 0, cnt = 0; s->str[i] && cnt < lines; i++) {
+	    if (s->str[i] == '\n') {
+		cnt++;
+	    }
+	}
+	if (cnt != lines || !s->str[i]) {
+	    break;
+	}
+	c = s->str[i];
+	s->str[i] = 0;
+	fputs(s->str, stdout);
+	fputs("**** press <cr> to continue ****", stdout);
+	(void) fgetc(stdin);
+	s->str[i] = c;
+	g_string_erase(s, 0, i);
+    }
+#endif
+    fputs(s->str, stdout);
+}
+
 
 
 scli_interp_t*
@@ -39,11 +72,11 @@ scli_interp_create()
 
     interp = g_malloc0(sizeof(scli_interp_t));
     interp->cmd_root = g_node_new(NULL);
-    interp->peer = g_malloc0(sizeof(host_snmp));
     interp->result = g_string_new(NULL);
 
     return interp;
 }
+
 
 
 void
@@ -62,6 +95,7 @@ scli_interp_delete(scli_interp_t *interp)
 	g_free(interp);
     }
 }
+
 
 
 void
@@ -174,6 +208,7 @@ scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd)
 }
 
 
+
 static int
 eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 {
@@ -182,9 +217,17 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
    
     if (cmd->func) {
 	g_string_truncate(interp->result, 0);
+	if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER && ! interp->peer) {
+	    fputs("no association to a remote SNMP agent\n", stdout);
+	    return SCLI_ERROR;
+	}
 	code = (cmd->func) (interp, argc, argv);
 	if (interp->result) {
-	    fputs(interp->result->str, stdout);
+	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+		page(interp->result);
+	    } else {
+		fputs(interp->result->str, stdout);
+	    }
 	}
     }
 
@@ -196,12 +239,17 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 static int
 eval_all_cmd_node(scli_interp_t *interp, GNode *node)
 {
+    char *prompt;
+    
     for (node = g_node_first_child(node);
 	 node; node = g_node_next_sibling(node)) {
 	if (G_NODE_IS_LEAF(node)) {
 	    scli_cmd_t *cmd = node->data;
-	    if (cmd) {
-		printf("scli > %s %s\n", cmd->path, cmd->name);
+	    if (cmd
+		&& !(cmd->flags & SCLI_CMD_FLAG_NEED_PEER && !interp->peer)) {
+		prompt = scli_prompt(interp);
+		printf("%s%s %s\n", prompt, cmd->path, cmd->name);
+		g_free(prompt);
 		eval_cmd_node(interp, node, 0, NULL);
 	    }
 	} else {
@@ -211,7 +259,6 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node)
 
     return SCLI_OK;
 }
-
 
     
 
@@ -340,4 +387,102 @@ scli_eval_init_file(scli_interp_t *interp)
     g_free(path);
     
     return code;
+}
+
+
+
+int
+scli_open_community(scli_interp_t *interp, char *host, int port,
+		    char *community)
+{
+    system_t *system = NULL;
+
+    if (interp->peer) {
+	scli_close(interp);
+    }
+
+    interp->peer = g_malloc0(sizeof(host_snmp));
+    interp->peer->domain = AF_INET;
+    interp->peer->name = g_strdup(host);
+    interp->peer->port = port;
+    interp->peer->rcomm = g_strdup(community ? community : "public");
+    interp->peer->wcomm = interp->peer->rcomm;
+    interp->peer->retries = 3;
+    interp->peer->timeout = 1;
+    interp->peer->version = G_SNMP_V2C;
+
+    /*
+     * Lets see how we can talk to this guy. We first try to speek
+     * SNMPv2c (since this protocol does much better error handling)
+     * and we fall back to SNMPv1 only if this is necessary.
+     */
+
+    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+	printf("Trying SNMPv2c ... ");
+	fflush(stdout);
+    }
+    if (snmpv2_mib_get_system(interp->peer, &system) == 0 && system) {
+	if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+	    printf("good!\n");
+	}
+    } else {
+	if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+	    printf("timeout.\nTrying SNMPv1  ... ");
+	    fflush(stdout);
+	}
+	interp->peer->version = G_SNMP_V1;
+	if (snmpv2_mib_get_system(interp->peer, &system) == 0 && system) {
+	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+		printf("ok.\n");
+	    }
+	} else {
+	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+		printf("timeout.\nGiving up!\n");
+	    }
+	    scli_close(interp);
+	}
+    }
+    if (system) {
+	snmpv2_mib_free_system(system);
+    }
+    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+	fflush(stdout);
+    }
+
+    return 0;
+}
+
+
+
+void
+scli_close(scli_interp_t *interp)
+{
+    g_return_if_fail(interp);
+
+    if (interp->peer) {
+	if (interp->peer->name) g_free(interp->peer->name);
+	if (interp->peer->rcomm) g_free(interp->peer->rcomm);
+	g_free(interp->peer);
+	interp->peer = NULL;
+    }
+}
+
+
+
+char*
+scli_prompt(scli_interp_t *interp)
+{
+    char *prompt;
+    
+    prompt = g_malloc0(20
+		       + (interp->peer ? strlen(interp->peer->name) : 0));
+    if (interp->peer) {
+	strcat(prompt, "(");
+	strcat(prompt, interp->peer->name);
+	strcat(prompt, ") scli > ");
+    } else {
+	strcat(prompt, "scli > ");
+    }
+
+    return prompt;
 }

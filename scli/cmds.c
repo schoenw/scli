@@ -102,6 +102,8 @@ scli_cmd_history(scli_interp_t *interp, int argc, char **argv)
     HIST_ENTRY **the_list;
     int i;
     
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
     the_list = history_list();
     if (the_list) {
 	for (i = 0; the_list[i]; i++) {
@@ -109,6 +111,36 @@ scli_cmd_history(scli_interp_t *interp, int argc, char **argv)
 			      i + history_base, the_list[i]->line);
 	}
     }
+
+    return SCLI_OK;
+}
+
+
+
+int
+scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc == 2) {
+	scli_open_community(interp, argv[1], 161, NULL);
+    } else if (argc == 3) {
+	scli_open_community(interp, argv[1], 161, argv[2]);
+    } else {
+	return SCLI_ERROR;
+    }
+
+    return SCLI_OK;
+}
+
+
+
+int
+scli_cmd_close(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    scli_close(interp);
 
     return SCLI_OK;
 }

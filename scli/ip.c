@@ -304,20 +304,20 @@ void
 scli_init_ip_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "ip", NULL, NULL },
-	{ "show ip", "forwarding",
+	{ "show", "ip", 0, NULL, NULL },
+	{ "show ip", "forwarding", SCLI_CMD_FLAG_NEED_PEER,
 	  "show current IP forwarding table",
 	  cmd_ip_forwarding },
-	{ "show ip", "addresses",
+	{ "show ip", "addresses", SCLI_CMD_FLAG_NEED_PEER,
 	  "show list of assigned IP addresses",
 	  cmd_ip_addresses },
-	{ "show ip", "tunnel",
+	{ "show ip", "tunnel", SCLI_CMD_FLAG_NEED_PEER,
 	  "show list of IP tunnels",
 	  cmd_ip_tunnel },
-	{ "show ip", "mapping",
+	{ "show ip", "mapping", SCLI_CMD_FLAG_NEED_PEER,
 	  "show list of IP to media mappings",
 	  cmd_ip_media_mapping },
-	{ NULL, NULL, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t ip_mode = {

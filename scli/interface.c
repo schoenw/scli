@@ -101,7 +101,7 @@ show_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
     int j;
     int const width = 20;
 
-    g_string_sprintfa(s, "Index:       %-*d", width,
+    g_string_sprintfa(s, "Interface:   %-*d", width,
 		      ifEntry->ifIndex);
     g_string_sprintfa(s, " Name:    %-*s\n", width,
 		      get_if_name(ifEntry, ifXEntry, width));
@@ -233,9 +233,7 @@ static void
 show_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 	  int type_width, int name_width)
 {
-    int j;
-
-    g_string_sprintfa(s, "%5u  ", ifEntry->ifIndex);
+    g_string_sprintfa(s, "%6u     ", ifEntry->ifIndex);
 
     fmt_ifStatus(s,
 		 ifEntry->ifAdminStatus, ifEntry->ifOperStatus,
@@ -264,7 +262,7 @@ show_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 
     if (ifEntry->ifDescr) {
 	g_string_sprintfa(s, "%.*s",
-			  ifEntry->_ifDescrLength,
+			  (int) ifEntry->_ifDescrLength,
 			  ifEntry->ifDescr);
     }
 
@@ -305,7 +303,7 @@ cmd_info(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 	g_string_sprintfa(interp->result,
-	  "Index Status %-*s  Speed %-*s Description\n",
+			  "Interface Status %-*s  Speed %-*s Description\n",
 			  type_width, "Type",
 			  name_width, "Name");
 	for (i = 0; ifTable[i]; i++) {
@@ -345,19 +343,19 @@ void
 scli_init_interface_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "interface", NULL, NULL },
-	{ "show interface", "details",
+	{ "show", "interface", 0, NULL, NULL },
+	{ "show interface", "details", SCLI_CMD_FLAG_NEED_PEER,
 	  "show detailed information about the network interfaces",
 	  cmd_details },
-	{ "show interface", "info",
+	{ "show interface", "info", SCLI_CMD_FLAG_NEED_PEER,
 	  "show network interface summary information",
 	  cmd_info },
 #if 0
-	{ "show interface", "stack",
+	{ "show interface", "stack", SCLI_CMD_FLAG_NEED_PEER,
 	  "show interface stacking information",
 	  cmd_stack },
 #endif
-	{ NULL, NULL, NULL, NULL }
+	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t if_mib_mode = {
