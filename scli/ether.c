@@ -379,12 +379,16 @@ scli_init_ether_mode(scli_interp_t *interp)
 	{ "show ethernet mau", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "The show ethernet mau command displays information about the\n"
-	  "medium attachment units for each ethernet port. The command\n"
-	  "generates a table which displays the interface number, the\n"
-	  "medium attachment unit number for this interface, the status\n"
-	  "of the medium attachment unit, whether media is available, the\n"
-	  "jabber state, the autonegotiation state, and the type of the\n"
-	  "medium attachment unit.",
+	  "medium attachment units (MAUs) for each ethernet port. The\n"
+	  "command generates a table which has the following columns:\n"
+	  "\n"
+	  "  INTERFACE network interface number\n"
+	  "  MAU       medium attachment unit number for this interface\n"
+	  "  STATUS    status of the medium attachment unit\n"
+	  "  MEDIA     media availability\n"
+	  "  JABBER    jabber state of the medium attachment unit\n"
+	  "  AUTONEG   autonegation capabilities\n"
+	  "  TYPE      type of the medium attachment unit\n",
 	  cmd_ether_mau_info },
 
 	{ "show ethernet stats", NULL,
@@ -393,7 +397,7 @@ scli_init_ether_mode(scli_interp_t *interp)
 	  "statistics for each ethernet interface. The command outputs\n"
 	  "a table which has the following columns:\n"
 	  "\n"
-          "  INTERFACE interface number\n"
+          "  INTERFACE network interface number\n"
           "  ALIGN     alignement errors per second\n"
           "  FCS       frame check sequence errors per second\n"
           "  RCV       MAC receive errors per second\n"
