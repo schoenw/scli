@@ -31,6 +31,9 @@
 #include <regex.h>
 
 
+#define IF_MIB_IFENTRY_CONFIG \
+	( IF_MIB_IFDESCR | IF_MIB_IFADMINSTATUS )
+
 #define IF_MIB_IFENTRY_PARAMS \
 	( IF_MIB_IFDESCR | IF_MIB_IFTYPE | IF_MIB_IFMTU | IF_MIB_IFSPEED \
 	  | IF_MIB_IFPHYSADDRESS | IF_MIB_IFADMINSTATUS | IF_MIB_IFOPERSTATUS \
@@ -1210,7 +1213,7 @@ dump_interface(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_PARAMS);
+    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_CONFIG);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }

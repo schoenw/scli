@@ -634,7 +634,7 @@ dump_ip(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    ip_mib_get_ip(interp->peer, &ip, 0);
+    ip_mib_get_ip(interp->peer, &ip, IP_MIB_IPFORWARDING | IP_MIB_IPDEFAULTTTL);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
