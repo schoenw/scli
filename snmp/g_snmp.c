@@ -262,6 +262,34 @@ g_snmp_varbind_free(GSnmpVarBind *vb)
 }
 
 /*
+ * NAME:        g_snmp_vbl_add
+ * SYNOPSIS:    void g_snmp_vbl_add
+ *                  (
+ *                      GSnmpVarBind *vb,
+ *			guint32 const *oid,
+ *			gsize const len,
+ *			GSnmpVarBindType const type,
+ *			gpointer const value,
+ *			gsize const len
+ *                  )
+ * DESCRIPTION: Adds a NULL PDU to a varbind list.
+ * RETURNS:     none
+ */
+
+void
+g_snmp_vbl_add(GSList **vbl, guint32 const *oid, gsize const len,
+	       GSnmpVarBindType const type,
+	       gpointer const value, gsize const value_len)
+{
+    GSnmpVarBind *vb;
+
+    vb = g_snmp_varbind_new(oid, len, type, value, value_len);
+    if (vb) {
+	*vbl = g_slist_append(*vbl, vb);
+    }
+}
+
+/*
  * NAME:        g_snmp_vbl_add_null
  * SYNOPSIS:    void g_snmp_vbl_add_null
  *                  (
@@ -276,10 +304,7 @@ g_snmp_varbind_free(GSnmpVarBind *vb)
 void
 g_snmp_vbl_add_null(GSList **vbl, guint32 const *oid, gsize const len)
 {
-    GSnmpVarBind *vb;
-
-    vb = g_snmp_varbind_new(oid, len, G_SNMP_NULL, NULL, 0);
-    *vbl = g_slist_append(*vbl, vb);
+    g_snmp_vbl_add(vbl, oid, len, G_SNMP_NULL, NULL, 0);
 }
 
 /*

@@ -355,9 +355,10 @@ cb_done (GSnmpSession *session, void *magic, GSnmpPdu *spdu, GSList *objs)
 {
   struct syncmagic *sm = (struct syncmagic *) magic;
   sm->result = objs;
-#ifdef SNMP_DEBUG
-  g_print("cb_done: Quit loop %p\n", sm->loop);
-#endif
+  if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+      g_printerr("session %p: error-status = %d, error-index = %d\n",
+		 session, session->error_status, session->error_index);
+  }
   g_main_quit(sm->loop);
   return FALSE;
 }
@@ -371,31 +372,25 @@ g_sync_send(GSnmpSession *session, GSnmpPduType type,
 
   magic = (struct syncmagic *) g_malloc(sizeof(struct syncmagic));
   magic->loop = g_main_new(TRUE);
-#ifdef SNMP_DEBUG
-  g_print("g_sync_send: New loop %p\n", magic->loop);
-#endif
+
   session->done_callback = cb_done;
   session->time_callback = cb_time;
   session->magic = magic;
-  if (!g_async_send (session, type, objs, arg1, arg2))
-    {
-#ifdef SNMP_DEBUG
-      g_print("g_sync_send: error in async_send. Free loop %p\n", magic->loop);
-#endif
+  if (!g_async_send(session, type, objs, arg1, arg2)) {
+      if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	  g_printerr("session %p: g_sync_send failed to send PDU\n",
+		     session);
+      }
       g_main_destroy(magic->loop);
       g_free(magic);
       return NULL;
-    }
+  }
 
-  while(g_main_is_running(magic->loop))
-    {
+  while(g_main_is_running(magic->loop)) {
       g_main_run(magic->loop);
-    }
-#ifdef SNMP_DEBUG
-    g_print("g_sync_send: Free loop %p\n", magic->loop);
-#endif
-    g_main_destroy(magic->loop);
-
+  }
+  g_main_destroy(magic->loop);
+  
   result = magic->result;
   g_free(magic);
   return result;

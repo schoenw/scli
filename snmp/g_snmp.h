@@ -191,7 +191,9 @@ typedef enum
   G_SNMP_DEBUG_REQUESTS	 = 1 << 0,
   G_SNMP_DEBUG_SESSION	 = 1 << 1,
   G_SNMP_DEBUG_TRANSPORT = 1 << 2,
-  G_SNMP_DEBUG_ALL	 = G_SNMP_DEBUG_REQUESTS | G_SNMP_DEBUG_SESSION,
+  G_SNMP_DEBUG_ALL	 = G_SNMP_DEBUG_REQUESTS
+			 | G_SNMP_DEBUG_SESSION
+			 | G_SNMP_DEBUG_TRANSPORT,
   G_SNMP_DEBUG_MASK	 = 0x07
 } GSnmpDebugFlags;
 
@@ -215,12 +217,18 @@ void (*g_snmp_list_encode_hook)(GSList *list);
 
 /* SNMP varbind and varbind list management */
 
-GSnmpVarBind* g_snmp_varbind_new(guint32 const *oid, gsize oid_len,
-				 GSnmpVarBindType type,
-				 gpointer value, gsize value_len);
+GSnmpVarBind* g_snmp_varbind_new(guint32 const *oid, gsize const len,
+				 GSnmpVarBindType const type,
+				 gpointer const value,
+				 gsize const value_len);
 void          g_snmp_varbind_free(GSnmpVarBind *vb);
 
 
+void	      g_snmp_vbl_add(GSList **vbl,
+			     guint32 const *oid, gsize const len,
+			     GSnmpVarBindType const type,
+			     gpointer const value,
+			     gsize const value_len);
 void	      g_snmp_vbl_add_null(GSList **vbl,
 				  guint32 const *oid, gsize const len);
 void	      g_snmp_vbl_free(GSList *vbl);
