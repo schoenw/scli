@@ -389,6 +389,51 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 }
 
 
+
+static void
+show_if_stack(GString *s, if_mib_ifStackEntry_t *ifStackEntry)
+{
+    /*
+     *      ,-- if2 
+     * if1 -+-- if3
+     *      `-- if4
+     *
+     * if5 -,
+     * if6 -+-- if8
+     * if7 -'
+     */
+
+    g_string_sprintfa(s, "%8d %8d\n",
+		      ifStackEntry->ifStackHigherLayer,
+		      ifStackEntry->ifStackLowerLayer);
+}
+
+
+
+static int
+cmd_if_stack(scli_interp_t *interp, int argc, char **argv)
+{
+    if_mib_ifStackEntry_t **ifStackTable = NULL;
+    int i;
+
+    if (if_mib_get_ifStackTable(interp->peer, &ifStackTable)) {
+	return SCLI_ERROR;
+    }
+    
+    if (ifStackTable) {
+	g_string_sprintfa(interp->header, "  HIGHER    LOWER");
+	for (i = 0; ifStackTable[i]; i++) {
+	    show_if_stack(interp->result, ifStackTable[i]);
+	}
+    }
+
+    if (ifStackTable) if_mib_free_ifStackTable(ifStackTable);
+    
+    return SCLI_OK;
+}
+
+
+
 typedef struct {
     guint32 inOctets;
     guint32 outOctets;
@@ -397,6 +442,7 @@ typedef struct {
     guint32 inErrors;
     guint32 outErrors;
 } if_stats_t;
+
 
 
 static int
@@ -541,24 +587,6 @@ cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
 }
 
 
-#if 0
-static int
-cmd_if_stack(scli_interp_t *interp, int argc, char **argv)
-{
-    /*
-     *      ,-- if2 
-     * if1 -+-- if3
-     *      `-- if4
-     *
-     * if5 -,
-     * if6 -+-- if8
-     * if7 -'
-     */
-    
-    return SCLI_OK;
-}
-#endif
-
 /*
  * <man>
  *   show interface info [name]
@@ -583,16 +611,14 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "network interface details",
 	  cmd_if_details },
-	{ "monitor interface stats",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  "network interface statistics",
-	  cmd_if_stats },
-#if 0
 	{ "show interface stack",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "network interface stacking",
 	  cmd_if_stack },
-#endif
+	{ "monitor interface stats",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  "network interface statistics",
+	  cmd_if_stats },
 	{ NULL, 0, NULL, NULL }
     };
     
