@@ -29,6 +29,20 @@
 #include <readline/history.h>
 
 
+typedef struct {
+    GSnmpDebugFlags flag;
+    gchar	    *name;
+} SnmpDebugFlagToStringEntry;
+
+static SnmpDebugFlagToStringEntry debug_flag_table[] = {
+    { G_SNMP_DEBUG_REQUESTS, "request" },
+    { G_SNMP_DEBUG_SESSION, "session" },
+    { G_SNMP_DEBUG_TRANSPORT, "transport" },
+    { 0, 0 }
+};
+
+
+
 static gint
 alias_compare(gconstpointer a, gconstpointer b)
 {
@@ -353,6 +367,7 @@ static int
 cmd_scli_interp(scli_interp_t *interp, int argc, char **argv)
 {
     int const indent = 18;
+    SnmpDebugFlagToStringEntry *dft;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -373,14 +388,42 @@ cmd_scli_interp(scli_interp_t *interp, int argc, char **argv)
 		      interp->delay / 1000);
 
     g_string_sprintfa(interp->result, "%-*s ", indent, "Debugging:");
-    if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
-	g_string_append(interp->result, "request ");
-    }
-    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
-	g_string_append(interp->result, "session ");
+    for (dft = debug_flag_table; dft && dft->name; dft++) {
+	if (g_snmp_debug_flags & dft->flag) {
+	    g_string_sprintfa(interp->result, "%s ", dft->name);
+	}
     }
     g_string_append(interp->result, "\n");
 
+    return SCLI_OK;
+}
+
+
+
+static int
+conf_scli_debugging(scli_interp_t *interp, int argc, char **argv)
+{
+    GSnmpDebugFlags flags = 0;
+    SnmpDebugFlagToStringEntry *dft;
+    int i;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    for (i = 1; i < argc; i++) {
+	for (dft = debug_flag_table; dft && dft->name; dft++) {
+	    if (strcmp(argv[i], dft->name) == 0) {
+		flags |= dft->flag;
+		break;
+	    }
+	}
+	if (! dft || ! dft->name) {
+	    g_string_sprintfa(interp->result,
+			      "unknown debugging option \"%s\"", argv[i]);
+	    return SCLI_ERROR;
+	}
+    }
+
+    g_snmp_debug_flags = flags;
     return SCLI_OK;
 }
 
@@ -390,9 +433,9 @@ void
 scli_init_scli_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-        { "create scli alias", "<name> <value>",
+        { "add scli alias", "<name> <value>",
 	  0,
-	  "create an scli command alias",
+	  "create an alias for an scli command",
 	  cmd_scli_alias },
 	{ "close", NULL,
 	  0,
@@ -434,10 +477,14 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  "show information about the available modes",
 	  cmd_scli_modes },
-	{ "delete scli alias", "<name>",
+	{ "delete an scli alias", "<name>",
 	  0,
 	  "delete an scli command alias",
 	  cmd_scli_unalias },
+	{ "config scli interp debugging", "<layer> ...",
+	  0,
+	  "configure scli interpreter debugging options",
+	  conf_scli_debugging },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     

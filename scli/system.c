@@ -749,6 +749,111 @@ cmd_system_info(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+conf_system_contact(scli_interp_t *interp, int argc, char **argv)
+{
+    snmpv2_mib_system_t *system = NULL;
+    int code;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX;
+    }
+
+    system = snmpv2_mib_new_system();
+    system->sysContact = argv[1];
+    system->_sysContactLength = strlen(system->sysContact);
+    code = snmpv2_mib_set_system(interp->peer, system);
+    snmpv2_mib_free_system(system);
+
+    return SCLI_OK;
+}
+
+
+
+static int
+conf_system_name(scli_interp_t *interp, int argc, char **argv)
+{
+    snmpv2_mib_system_t *system = NULL;
+    int code;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX;
+    }
+
+    system = snmpv2_mib_new_system();
+    system->sysName = argv[1];
+    system->_sysNameLength = strlen(system->sysName);
+    code = snmpv2_mib_set_system(interp->peer, system);
+    snmpv2_mib_free_system(system);
+
+    return SCLI_OK;
+}
+
+
+
+static int
+conf_system_location(scli_interp_t *interp, int argc, char **argv)
+{
+    snmpv2_mib_system_t *system = NULL;
+    int code;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX;
+    }
+
+    system = snmpv2_mib_new_system();
+    system->sysLocation = argv[1];
+    system->_sysLocationLength = strlen(system->sysLocation);
+    code = snmpv2_mib_set_system(interp->peer, system);
+    snmpv2_mib_free_system(system);
+
+    return SCLI_OK;
+}
+
+
+#ifdef MEM_DEBUG
+static int
+cmd_xxx(scli_interp_t *interp, int argc, char **argv)
+{
+    if_mib_interfaces_t *interfaces = NULL;
+    if_mib_ifEntry_t **ifTable = NULL;
+    int i, n;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX;
+    }
+    n = atoi(argv[1]);
+
+    for (i = 0; i < n; i++) {
+	(void) getuid();
+#if 1
+	if (if_mib_get_interfaces(interp->peer, &interfaces)) {
+	    return SCLI_ERROR;
+	}
+#endif
+#if 0
+	if (if_mib_get_ifTable(interp->peer, &ifTable)) {
+	    return SCLI_ERROR;
+	}
+#endif
+	if (interfaces) if_mib_free_interfaces(interfaces);
+	if (ifTable) if_mib_free_ifTable(ifTable);
+    }
+    
+    
+    return SCLI_OK;
+}
+#endif
+
+
 void
 scli_init_system_mode(scli_interp_t *interp)
 {
@@ -781,6 +886,24 @@ scli_init_system_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "processes running on the system",
 	  cmd_system_processes },
+	{ "config system contact", "<contact>",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "configure system contact",
+	  conf_system_contact },
+	{ "config system name", "<name>",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "configure system name",
+	  conf_system_name },
+	{ "config system location", "<location>",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "configure system location",
+	  conf_system_location },
+#ifdef MEM_DEBUG
+	{ "xxx", "<repetitions>",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "xxx",
+	  cmd_xxx },
+#endif
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
