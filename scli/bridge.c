@@ -176,7 +176,8 @@ show_bridge_forwarding(GString *s, dot1dTpFdbEntry_t *dot1dTpFdbEntry,
     g_string_append(s, " ");
     if (dot1dTpFdbEntry->dot1dTpFdbAddress) {
 	g_string_sprintfa(s, "%s",
-		  fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress, 0));
+		  fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress,
+				    SCLI_FMT_ADDR));
 	name = fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress,
 				 SCLI_FMT_NAME);
 	g_string_sprintfa(s, " %-*s", name_width, name ? name : "");

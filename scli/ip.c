@@ -381,7 +381,7 @@ show_ip_arp(GString *s, ipNetToMediaEntry_t *ipNetToMediaEntry,
     
     g_string_sprintfa(s, " %-16s ",
 	      fmt_ipv4_address(ipNetToMediaEntry->ipNetToMediaNetAddress,
-			       SCLI_FMT_NAME_OR_ADDR));
+			       SCLI_FMT_ADDR));
 
     if (ipNetToMediaEntry->ipNetToMediaPhysAddress) {
 	for (i = 0;
