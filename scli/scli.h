@@ -469,6 +469,15 @@ xml_set_content(xmlNodePtr node, const char *fmt, ...)
 extern xmlNodePtr
 xml_new_child(xmlNodePtr parent, xmlNsPtr ns, const xmlChar *name,
 	      const char *format, ...) G_GNUC_PRINTF(4, 5);
+
+/*
+ * Mode specific utilities that are generally useful.
+ */
+
+#if 0
+extern int
+interface_match(regex_t *regex, if_mib_ifEntry_t *ifEntry);
+#endif
     
 #endif /* _SCLI_H */
 

@@ -153,8 +153,8 @@ fmt_phys_address(GString *s, guchar *address, guint16 address_len)
 
 
 
-static int
-match_interface(regex_t *regex_iface,
+int
+interface_match(regex_t *regex_iface,
 		if_mib_ifEntry_t *ifEntry)
 {
     int status;
@@ -659,7 +659,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 					    ENTITY_MIB_ENTPHYSICAL_MASK);
 	}
 	for (i = 0, c = 0; ifTable[i]; i++) {
-	    if (match_interface(regex_iface, ifTable[i])) {
+	    if (interface_match(regex_iface, ifTable[i])) {
 		if_mib_ifXEntry_t *ifXEntry;
 		ifXEntry = get_ifXEntry(ifXTable, ifTable[i]->ifIndex);
 		if (scli_interp_xml(interp)) {
@@ -802,7 +802,7 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
 			  type_width, "TYPE",
 			  name_width, "NAME");
 	for (i = 0; ifTable[i]; i++) {
-	    if (match_interface(regex_iface, ifTable[i])) {
+	    if (interface_match(regex_iface, ifTable[i])) {
 		if_mib_ifXEntry_t *ifXEntry;
 		ifXEntry = get_ifXEntry(ifXTable, ifTable[i]->ifIndex);
 		fmt_interface_info(interp->result, ifTable[i],
@@ -887,8 +887,8 @@ fmt_interface_stack(scli_interp_t *interp,
 	    }
 	}
 	if (h == 1 && l == 1 && ifTable[i] && ifEntry) {
-	    if (match_interface(regex_iface, ifTable[i])
-		|| match_interface(regex_iface, ifEntry)) {
+	    if (interface_match(regex_iface, ifTable[i])
+		|| interface_match(regex_iface, ifEntry)) {
 		fmt_interface_stack_line(interp->result, ifTable[i],
 					 type_width, "-.   ");
 		fmt_interface_stack_line(interp->result, ifEntry,
@@ -903,7 +903,7 @@ fmt_interface_stack(scli_interp_t *interp,
     
     for (i = 0; ifTable[i]; i++) {
 	int l = 0, h = 0;
-	if (! match_interface(regex_iface, ifTable[i])) {
+	if (! interface_match(regex_iface, ifTable[i])) {
 	    continue;
 	}
 	for (j = 0; ifStackTable[j]; j++) {
@@ -1110,7 +1110,7 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 	for (i = 0; ifTable[i]; i++) {
 	    GString *s;
 	    if_mib_ifXEntry_t *ifXEntry;
-	    if (! match_interface(regex_iface, ifTable[i])) {
+	    if (! interface_match(regex_iface, ifTable[i])) {
 		continue;
 	    }
 	    s = interp->result;
@@ -1233,7 +1233,7 @@ foreach_interface(scli_interp_t *interp, char *regex,
 
     if (ifTable) {
 	for (i = 0; ifTable[i]; i++) {
-	    if (match_interface(regex_iface, ifTable[i])) {
+	    if (interface_match(regex_iface, ifTable[i])) {
 		(func) (interp, ifTable[i], user_data);
 	    }
 	}
@@ -1504,7 +1504,7 @@ alert_interface_status(scli_interp_t *interp, int argc, char **argv)
 
     if (ifTable) {
 	for (i = 0; ifTable[i]; i++) {
-	    if (match_interface(regex_iface, ifTable[i])) {
+	    if (interface_match(regex_iface, ifTable[i])) {
 		e = fmt_enum(if_mib_enums_ifOperStatus,
 			     ifTable[i]->ifOperStatus);
 		if (e) {

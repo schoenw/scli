@@ -22,6 +22,7 @@
 
 #include "scli.h"
 
+#include "if-mib.h"
 #include "sonet-mib.h"
 
 
@@ -51,8 +52,32 @@ static GSnmpEnum const sonetMediumLineType[] = {
 };
 
 
+
+static int
+get_line_type_width(sonet_mib_sonetMediumEntry_t **sonetMediumTable)
+{
+    int i, line_type_width = 9;
+
+    if (sonetMediumTable) {
+	for (i = 0; sonetMediumTable[i]; i++) {
+	    if (sonetMediumTable[i]->sonetMediumLineType) {
+		char const *label;
+		label = fmt_enum(sonetMediumLineType,
+				 sonetMediumTable[i]->sonetMediumLineType);
+		if (label && strlen(label) > line_type_width) {
+		    line_type_width = strlen(label);
+		}
+	    }
+	}
+    }
+    return line_type_width;
+}
+
+
+
 static void
-fmt_sonet_media(GString *s, sonet_mib_sonetMediumEntry_t *sonetMediumEntry)
+fmt_sonet_media(GString *s, sonet_mib_sonetMediumEntry_t *sonetMediumEntry,
+		if_mib_ifEntry_t *ifEntry, int line_type_width)
 {
     const char *e;
     
@@ -64,11 +89,16 @@ fmt_sonet_media(GString *s, sonet_mib_sonetMediumEntry_t *sonetMediumEntry)
 
     e = fmt_enum(sonetMediumLineCoding,
 		 sonetMediumEntry->sonetMediumLineCoding);
-    g_string_sprintfa(s, "%-5s  ", e ? e : "");
+    g_string_sprintfa(s, "%-5s ", e ? e : "");
 
     e = fmt_enum(sonetMediumLineType,
 		 sonetMediumEntry->sonetMediumLineType);
-    g_string_sprintfa(s, "%s", e ? e : "");
+    g_string_sprintfa(s, "%-*s ", line_type_width, e ? e : "");
+
+    if (ifEntry && ifEntry->ifDescr) {
+	g_string_sprintfa(s, "%.*s",
+			  (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);
+    }
 
     g_string_append(s, "\n");
 }
@@ -79,6 +109,8 @@ static int
 show_sonet_media(scli_interp_t *interp, int argc, char **argv)
 {
     sonet_mib_sonetMediumEntry_t **sonetMediumTable = NULL;
+    if_mib_ifEntry_t *ifEntry;
+    int line_type_width;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
 
@@ -108,10 +140,18 @@ show_sonet_media(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (sonetMediumTable) {
+        line_type_width = get_line_type_width(sonetMediumTable);
 	g_string_sprintfa(interp->header,
-			  "INTERFACE TYPE  CODING LINE-TYPE");
+			  "INTERFACE TYPE  CODE  %-*s DESCRIPTION",
+			  line_type_width, "LINE-TYPE");
 	for (i = 0; sonetMediumTable[i]; i++) {
-	    fmt_sonet_media(interp->result, sonetMediumTable[i]);
+	    if_mib_get_ifEntry(interp->peer, &ifEntry,
+			       sonetMediumTable[i]->ifIndex, IF_MIB_IFDESCR);
+	    if (! interface_match(regex_iface, ifEntry)) {
+		continue;
+	    }
+	    fmt_sonet_media(interp->result, sonetMediumTable[i], ifEntry,
+			    line_type_width);
 	}
     }
 
@@ -129,7 +169,7 @@ scli_init_sonet_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 
-	{ "show sonet media", NULL,
+	{ "show sonet media", "[<regexp>]",
 	  "The `show sonet media' command displays information about the"
 	  "configuration of SONET/SDH interfaces.\n",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
