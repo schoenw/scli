@@ -38,6 +38,7 @@ static scli_vendor_t iana_vendor_table[] = {
     { 2021,	"UCD-SNMP",		"http://ucd-snmp.ucdavis.edu/" },
     { 2281,	"Ceragon",		"http://www.ceragon.com/" },
     { 2356,	"ELSA GmbH",		"http://www.elsa.de/" },
+    { 7313,	"1stWave",              "http://www.1stwave.de/" },
     { 8072,	"NET-SNMP",		"http://net-snmp.sourceforge.net/" },
     {    0,	NULL,			NULL },
 };
