@@ -361,11 +361,9 @@ main(int argc, char **argv)
     if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
 	printf("scli version %s %s\n", VERSION, scli_copyright);
     }
-  
-    if (argc-optind == 1) {
-	(void) scli_open_community(interp, argv[optind], 161, NULL);
-    } else if (argc-optind == 2) {
-	(void) scli_open_community(interp, argv[optind], 161, argv[optind+1]);
+
+    if (scli_cmd_open(interp, argc-optind+1, argv+optind-1) != SCLI_OK) {
+	fputs(interp->result->str, stdout);
     }
 
     scli_init_system_mode(interp);
