@@ -1,5 +1,5 @@
 /* 
- * system.c -- scli disman mode implementation
+ * disman.c -- scli disman mode implementation
  *
  * Copyright (C) 2001 Juergen Schoenwaelder
  *
@@ -91,12 +91,13 @@ scli_init_disman_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 	{ "show", "disman", NULL, NULL },
 	{ "show disman", "languages",
-	  "show the languages supported by the disman", cmd_languages },
+	  "show languages supported by the distributed manager",
+	  cmd_languages },
 	{ NULL, NULL, NULL, NULL }
     };
     
     static scli_mode_t disman_mode = {
-	"system",
+	"disman",
 	"scli mode to display and configure distributed managers",
 	cmds,
 	NULL,
