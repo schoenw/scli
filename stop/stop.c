@@ -197,7 +197,7 @@ stop_show_mode_summary_line(char *string)
 
 
 static void
-show_interior(host_snmp *peer)
+show_interior(GSnmpSession *peer)
 {
     int y = 0;
     
@@ -241,7 +241,7 @@ show_interior(host_snmp *peer)
 
 
 static int
-show_system(host_snmp *peer, int flags)
+show_system(GSnmpSession *peer, int flags)
 {
     snmpv2_mib_system_t *system = NULL;
     static struct timeval last, now;
@@ -327,7 +327,7 @@ show_system(host_snmp *peer, int flags)
 
 
 static void
-show_ip(host_snmp *peer, int flags)
+show_ip(GSnmpSession *peer, int flags)
 {
     ip_mib_ip_t *ip = NULL;
     static guint32 ipInReceives = 0;
@@ -418,7 +418,7 @@ show_ip(host_snmp *peer, int flags)
 
 
 static void
-show_udp(host_snmp *peer, int flags)
+show_udp(GSnmpSession *peer, int flags)
 {
     udp_mib_udp_t *udp = NULL;
     static guint32 udpInDatagrams = 0;
@@ -462,7 +462,7 @@ show_udp(host_snmp *peer, int flags)
 
 
 static void
-show_tcp(host_snmp *peer, int flags)
+show_tcp(GSnmpSession *peer, int flags)
 {
     tcp_mib_tcp_t *tcp = NULL;
     static guint32 tcpInSegs = 0;
@@ -573,7 +573,7 @@ help()
 
 
 static void
-mainloop(host_snmp *peer, int delay)
+mainloop(GSnmpSession *peer, int delay)
 {
     int c, flags = 0;
     char *input, buffer[80];
@@ -746,7 +746,7 @@ usage()
 int
 main(int argc, char **argv)
 {
-    host_snmp _peer, *peer = &_peer;
+    GSnmpSession _peer, *peer = &_peer;
     snmpv2_mib_system_t *system = NULL;
     int c, port = 161, delay = 5000, retries = 5, timeout = 200000;
     char *mode_name = NULL;
@@ -829,7 +829,7 @@ main(int argc, char **argv)
      * and we fall back to SNMPv1 only if this is necessary.
      */
     
-    memset(peer, 0, sizeof(host_snmp));
+    memset(peer, 0, sizeof(GSnmpSession));
     peer->domain = AF_INET;
     peer->name = g_strdup(argv[optind++]);
     peer->port = port;

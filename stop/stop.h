@@ -70,7 +70,7 @@
 typedef struct stop_mode {
     char *name;			/* name of the mode */
     char *desc;			/* short description of the mode */
-    void (*func) (WINDOW *win, host_snmp *peer, int);
+    void (*func) (WINDOW *win, GSnmpSession *peer, int);
 				/* function to handle the mode */
 } stop_mode_t;
 

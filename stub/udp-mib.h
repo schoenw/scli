@@ -35,7 +35,7 @@ extern udp_mib_udp_t *
 udp_mib_new_udp();
 
 extern int
-udp_mib_get_udp(host_snmp *s, udp_mib_udp_t **udp);
+udp_mib_get_udp(GSnmpSession *s, udp_mib_udp_t **udp);
 
 extern void
 udp_mib_free_udp(udp_mib_udp_t *udp);
@@ -50,7 +50,7 @@ typedef struct {
 } udp_mib_udpEntry_t;
 
 extern int
-udp_mib_get_udpTable(host_snmp *s, udp_mib_udpEntry_t ***udpEntry);
+udp_mib_get_udpTable(GSnmpSession *s, udp_mib_udpEntry_t ***udpEntry);
 
 extern void
 udp_mib_free_udpTable(udp_mib_udpEntry_t **udpEntry);
@@ -59,7 +59,7 @@ extern udp_mib_udpEntry_t *
 udp_mib_new_udpEntry();
 
 extern int
-udp_mib_get_udpEntry(host_snmp *s, udp_mib_udpEntry_t **udpEntry);
+udp_mib_get_udpEntry(GSnmpSession *s, udp_mib_udpEntry_t **udpEntry);
 
 extern void
 udp_mib_free_udpEntry(udp_mib_udpEntry_t *udpEntry);

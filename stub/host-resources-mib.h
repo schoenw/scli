@@ -167,10 +167,10 @@ extern host_resources_mib_hrSystem_t *
 host_resources_mib_new_hrSystem();
 
 extern int
-host_resources_mib_get_hrSystem(host_snmp *s, host_resources_mib_hrSystem_t **hrSystem);
+host_resources_mib_get_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t **hrSystem);
 
 extern int
-host_resources_mib_set_hrSystem(host_snmp *s, host_resources_mib_hrSystem_t *hrSystem);
+host_resources_mib_set_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t *hrSystem);
 
 extern void
 host_resources_mib_free_hrSystem(host_resources_mib_hrSystem_t *hrSystem);
@@ -187,7 +187,7 @@ extern host_resources_mib_hrStorage_t *
 host_resources_mib_new_hrStorage();
 
 extern int
-host_resources_mib_get_hrStorage(host_snmp *s, host_resources_mib_hrStorage_t **hrStorage);
+host_resources_mib_get_hrStorage(GSnmpSession *s, host_resources_mib_hrStorage_t **hrStorage);
 
 extern void
 host_resources_mib_free_hrStorage(host_resources_mib_hrStorage_t *hrStorage);
@@ -209,7 +209,7 @@ typedef struct {
 } host_resources_mib_hrStorageEntry_t;
 
 extern int
-host_resources_mib_get_hrStorageTable(host_snmp *s, host_resources_mib_hrStorageEntry_t ***hrStorageEntry);
+host_resources_mib_get_hrStorageTable(GSnmpSession *s, host_resources_mib_hrStorageEntry_t ***hrStorageEntry);
 
 extern void
 host_resources_mib_free_hrStorageTable(host_resources_mib_hrStorageEntry_t **hrStorageEntry);
@@ -218,10 +218,10 @@ extern host_resources_mib_hrStorageEntry_t *
 host_resources_mib_new_hrStorageEntry();
 
 extern int
-host_resources_mib_get_hrStorageEntry(host_snmp *s, host_resources_mib_hrStorageEntry_t **hrStorageEntry);
+host_resources_mib_get_hrStorageEntry(GSnmpSession *s, host_resources_mib_hrStorageEntry_t **hrStorageEntry);
 
 extern int
-host_resources_mib_set_hrStorageEntry(host_snmp *s, host_resources_mib_hrStorageEntry_t *hrStorageEntry);
+host_resources_mib_set_hrStorageEntry(GSnmpSession *s, host_resources_mib_hrStorageEntry_t *hrStorageEntry);
 
 extern void
 host_resources_mib_free_hrStorageEntry(host_resources_mib_hrStorageEntry_t *hrStorageEntry);
@@ -243,7 +243,7 @@ typedef struct {
 } host_resources_mib_hrDeviceEntry_t;
 
 extern int
-host_resources_mib_get_hrDeviceTable(host_snmp *s, host_resources_mib_hrDeviceEntry_t ***hrDeviceEntry);
+host_resources_mib_get_hrDeviceTable(GSnmpSession *s, host_resources_mib_hrDeviceEntry_t ***hrDeviceEntry);
 
 extern void
 host_resources_mib_free_hrDeviceTable(host_resources_mib_hrDeviceEntry_t **hrDeviceEntry);
@@ -252,7 +252,7 @@ extern host_resources_mib_hrDeviceEntry_t *
 host_resources_mib_new_hrDeviceEntry();
 
 extern int
-host_resources_mib_get_hrDeviceEntry(host_snmp *s, host_resources_mib_hrDeviceEntry_t **hrDeviceEntry);
+host_resources_mib_get_hrDeviceEntry(GSnmpSession *s, host_resources_mib_hrDeviceEntry_t **hrDeviceEntry);
 
 extern void
 host_resources_mib_free_hrDeviceEntry(host_resources_mib_hrDeviceEntry_t *hrDeviceEntry);
@@ -269,7 +269,7 @@ typedef struct {
 } host_resources_mib_hrProcessorEntry_t;
 
 extern int
-host_resources_mib_get_hrProcessorTable(host_snmp *s, host_resources_mib_hrProcessorEntry_t ***hrProcessorEntry);
+host_resources_mib_get_hrProcessorTable(GSnmpSession *s, host_resources_mib_hrProcessorEntry_t ***hrProcessorEntry);
 
 extern void
 host_resources_mib_free_hrProcessorTable(host_resources_mib_hrProcessorEntry_t **hrProcessorEntry);
@@ -278,7 +278,7 @@ extern host_resources_mib_hrProcessorEntry_t *
 host_resources_mib_new_hrProcessorEntry();
 
 extern int
-host_resources_mib_get_hrProcessorEntry(host_snmp *s, host_resources_mib_hrProcessorEntry_t **hrProcessorEntry);
+host_resources_mib_get_hrProcessorEntry(GSnmpSession *s, host_resources_mib_hrProcessorEntry_t **hrProcessorEntry);
 
 extern void
 host_resources_mib_free_hrProcessorEntry(host_resources_mib_hrProcessorEntry_t *hrProcessorEntry);
@@ -293,7 +293,7 @@ typedef struct {
 } host_resources_mib_hrNetworkEntry_t;
 
 extern int
-host_resources_mib_get_hrNetworkTable(host_snmp *s, host_resources_mib_hrNetworkEntry_t ***hrNetworkEntry);
+host_resources_mib_get_hrNetworkTable(GSnmpSession *s, host_resources_mib_hrNetworkEntry_t ***hrNetworkEntry);
 
 extern void
 host_resources_mib_free_hrNetworkTable(host_resources_mib_hrNetworkEntry_t **hrNetworkEntry);
@@ -302,7 +302,7 @@ extern host_resources_mib_hrNetworkEntry_t *
 host_resources_mib_new_hrNetworkEntry();
 
 extern int
-host_resources_mib_get_hrNetworkEntry(host_snmp *s, host_resources_mib_hrNetworkEntry_t **hrNetworkEntry);
+host_resources_mib_get_hrNetworkEntry(GSnmpSession *s, host_resources_mib_hrNetworkEntry_t **hrNetworkEntry);
 
 extern void
 host_resources_mib_free_hrNetworkEntry(host_resources_mib_hrNetworkEntry_t *hrNetworkEntry);
@@ -319,7 +319,7 @@ typedef struct {
 } host_resources_mib_hrPrinterEntry_t;
 
 extern int
-host_resources_mib_get_hrPrinterTable(host_snmp *s, host_resources_mib_hrPrinterEntry_t ***hrPrinterEntry);
+host_resources_mib_get_hrPrinterTable(GSnmpSession *s, host_resources_mib_hrPrinterEntry_t ***hrPrinterEntry);
 
 extern void
 host_resources_mib_free_hrPrinterTable(host_resources_mib_hrPrinterEntry_t **hrPrinterEntry);
@@ -328,7 +328,7 @@ extern host_resources_mib_hrPrinterEntry_t *
 host_resources_mib_new_hrPrinterEntry();
 
 extern int
-host_resources_mib_get_hrPrinterEntry(host_snmp *s, host_resources_mib_hrPrinterEntry_t **hrPrinterEntry);
+host_resources_mib_get_hrPrinterEntry(GSnmpSession *s, host_resources_mib_hrPrinterEntry_t **hrPrinterEntry);
 
 extern void
 host_resources_mib_free_hrPrinterEntry(host_resources_mib_hrPrinterEntry_t *hrPrinterEntry);
@@ -346,7 +346,7 @@ typedef struct {
 } host_resources_mib_hrDiskStorageEntry_t;
 
 extern int
-host_resources_mib_get_hrDiskStorageTable(host_snmp *s, host_resources_mib_hrDiskStorageEntry_t ***hrDiskStorageEntry);
+host_resources_mib_get_hrDiskStorageTable(GSnmpSession *s, host_resources_mib_hrDiskStorageEntry_t ***hrDiskStorageEntry);
 
 extern void
 host_resources_mib_free_hrDiskStorageTable(host_resources_mib_hrDiskStorageEntry_t **hrDiskStorageEntry);
@@ -355,7 +355,7 @@ extern host_resources_mib_hrDiskStorageEntry_t *
 host_resources_mib_new_hrDiskStorageEntry();
 
 extern int
-host_resources_mib_get_hrDiskStorageEntry(host_snmp *s, host_resources_mib_hrDiskStorageEntry_t **hrDiskStorageEntry);
+host_resources_mib_get_hrDiskStorageEntry(GSnmpSession *s, host_resources_mib_hrDiskStorageEntry_t **hrDiskStorageEntry);
 
 extern void
 host_resources_mib_free_hrDiskStorageEntry(host_resources_mib_hrDiskStorageEntry_t *hrDiskStorageEntry);
@@ -376,7 +376,7 @@ typedef struct {
 } host_resources_mib_hrPartitionEntry_t;
 
 extern int
-host_resources_mib_get_hrPartitionTable(host_snmp *s, host_resources_mib_hrPartitionEntry_t ***hrPartitionEntry);
+host_resources_mib_get_hrPartitionTable(GSnmpSession *s, host_resources_mib_hrPartitionEntry_t ***hrPartitionEntry);
 
 extern void
 host_resources_mib_free_hrPartitionTable(host_resources_mib_hrPartitionEntry_t **hrPartitionEntry);
@@ -385,7 +385,7 @@ extern host_resources_mib_hrPartitionEntry_t *
 host_resources_mib_new_hrPartitionEntry();
 
 extern int
-host_resources_mib_get_hrPartitionEntry(host_snmp *s, host_resources_mib_hrPartitionEntry_t **hrPartitionEntry);
+host_resources_mib_get_hrPartitionEntry(GSnmpSession *s, host_resources_mib_hrPartitionEntry_t **hrPartitionEntry);
 
 extern void
 host_resources_mib_free_hrPartitionEntry(host_resources_mib_hrPartitionEntry_t *hrPartitionEntry);
@@ -412,7 +412,7 @@ typedef struct {
 } host_resources_mib_hrFSEntry_t;
 
 extern int
-host_resources_mib_get_hrFSTable(host_snmp *s, host_resources_mib_hrFSEntry_t ***hrFSEntry);
+host_resources_mib_get_hrFSTable(GSnmpSession *s, host_resources_mib_hrFSEntry_t ***hrFSEntry);
 
 extern void
 host_resources_mib_free_hrFSTable(host_resources_mib_hrFSEntry_t **hrFSEntry);
@@ -421,10 +421,10 @@ extern host_resources_mib_hrFSEntry_t *
 host_resources_mib_new_hrFSEntry();
 
 extern int
-host_resources_mib_get_hrFSEntry(host_snmp *s, host_resources_mib_hrFSEntry_t **hrFSEntry);
+host_resources_mib_get_hrFSEntry(GSnmpSession *s, host_resources_mib_hrFSEntry_t **hrFSEntry);
 
 extern int
-host_resources_mib_set_hrFSEntry(host_snmp *s, host_resources_mib_hrFSEntry_t *hrFSEntry);
+host_resources_mib_set_hrFSEntry(GSnmpSession *s, host_resources_mib_hrFSEntry_t *hrFSEntry);
 
 extern void
 host_resources_mib_free_hrFSEntry(host_resources_mib_hrFSEntry_t *hrFSEntry);
@@ -441,7 +441,7 @@ extern host_resources_mib_hrSWRun_t *
 host_resources_mib_new_hrSWRun();
 
 extern int
-host_resources_mib_get_hrSWRun(host_snmp *s, host_resources_mib_hrSWRun_t **hrSWRun);
+host_resources_mib_get_hrSWRun(GSnmpSession *s, host_resources_mib_hrSWRun_t **hrSWRun);
 
 extern void
 host_resources_mib_free_hrSWRun(host_resources_mib_hrSWRun_t *hrSWRun);
@@ -465,7 +465,7 @@ typedef struct {
 } host_resources_mib_hrSWRunEntry_t;
 
 extern int
-host_resources_mib_get_hrSWRunTable(host_snmp *s, host_resources_mib_hrSWRunEntry_t ***hrSWRunEntry);
+host_resources_mib_get_hrSWRunTable(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t ***hrSWRunEntry);
 
 extern void
 host_resources_mib_free_hrSWRunTable(host_resources_mib_hrSWRunEntry_t **hrSWRunEntry);
@@ -474,10 +474,10 @@ extern host_resources_mib_hrSWRunEntry_t *
 host_resources_mib_new_hrSWRunEntry();
 
 extern int
-host_resources_mib_get_hrSWRunEntry(host_snmp *s, host_resources_mib_hrSWRunEntry_t **hrSWRunEntry);
+host_resources_mib_get_hrSWRunEntry(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t **hrSWRunEntry);
 
 extern int
-host_resources_mib_set_hrSWRunEntry(host_snmp *s, host_resources_mib_hrSWRunEntry_t *hrSWRunEntry);
+host_resources_mib_set_hrSWRunEntry(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t *hrSWRunEntry);
 
 extern void
 host_resources_mib_free_hrSWRunEntry(host_resources_mib_hrSWRunEntry_t *hrSWRunEntry);
@@ -493,7 +493,7 @@ typedef struct {
 } host_resources_mib_hrSWRunPerfEntry_t;
 
 extern int
-host_resources_mib_get_hrSWRunPerfTable(host_snmp *s, host_resources_mib_hrSWRunPerfEntry_t ***hrSWRunPerfEntry);
+host_resources_mib_get_hrSWRunPerfTable(GSnmpSession *s, host_resources_mib_hrSWRunPerfEntry_t ***hrSWRunPerfEntry);
 
 extern void
 host_resources_mib_free_hrSWRunPerfTable(host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfEntry);
@@ -502,7 +502,7 @@ extern host_resources_mib_hrSWRunPerfEntry_t *
 host_resources_mib_new_hrSWRunPerfEntry();
 
 extern int
-host_resources_mib_get_hrSWRunPerfEntry(host_snmp *s, host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfEntry);
+host_resources_mib_get_hrSWRunPerfEntry(GSnmpSession *s, host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfEntry);
 
 extern void
 host_resources_mib_free_hrSWRunPerfEntry(host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry);
@@ -520,7 +520,7 @@ extern host_resources_mib_hrSWInstalled_t *
 host_resources_mib_new_hrSWInstalled();
 
 extern int
-host_resources_mib_get_hrSWInstalled(host_snmp *s, host_resources_mib_hrSWInstalled_t **hrSWInstalled);
+host_resources_mib_get_hrSWInstalled(GSnmpSession *s, host_resources_mib_hrSWInstalled_t **hrSWInstalled);
 
 extern void
 host_resources_mib_free_hrSWInstalled(host_resources_mib_hrSWInstalled_t *hrSWInstalled);
@@ -541,7 +541,7 @@ typedef struct {
 } host_resources_mib_hrSWInstalledEntry_t;
 
 extern int
-host_resources_mib_get_hrSWInstalledTable(host_snmp *s, host_resources_mib_hrSWInstalledEntry_t ***hrSWInstalledEntry);
+host_resources_mib_get_hrSWInstalledTable(GSnmpSession *s, host_resources_mib_hrSWInstalledEntry_t ***hrSWInstalledEntry);
 
 extern void
 host_resources_mib_free_hrSWInstalledTable(host_resources_mib_hrSWInstalledEntry_t **hrSWInstalledEntry);
@@ -550,7 +550,7 @@ extern host_resources_mib_hrSWInstalledEntry_t *
 host_resources_mib_new_hrSWInstalledEntry();
 
 extern int
-host_resources_mib_get_hrSWInstalledEntry(host_snmp *s, host_resources_mib_hrSWInstalledEntry_t **hrSWInstalledEntry);
+host_resources_mib_get_hrSWInstalledEntry(GSnmpSession *s, host_resources_mib_hrSWInstalledEntry_t **hrSWInstalledEntry);
 
 extern void
 host_resources_mib_free_hrSWInstalledEntry(host_resources_mib_hrSWInstalledEntry_t *hrSWInstalledEntry);

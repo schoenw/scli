@@ -97,7 +97,7 @@ fmt_gtp(guint32 number)
 
 
 static void
-show_interface_summary(host_snmp *peer)
+show_interface_summary(GSnmpSession *peer)
 {
     snmpv2_mib_system_t *system = NULL;
     if_mib_interfaces_t *interfaces = NULL;
@@ -138,7 +138,7 @@ show_interface_summary(host_snmp *peer)
 
 
 static void
-show_interfaces(WINDOW *win, host_snmp *peer, int flags)
+show_interfaces(WINDOW *win, GSnmpSession *peer, int flags)
 {
     if_mib_ifEntry_t **ifTable = NULL;
     if_mib_ifXEntry_t **ifXTable = NULL;

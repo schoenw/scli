@@ -163,7 +163,7 @@ assign_ipForward(GSList *vbl)
 }
 
 int
-ip_forward_mib_get_ipForward(host_snmp *s, ip_forward_mib_ipForward_t **ipForward)
+ip_forward_mib_get_ipForward(GSnmpSession *s, ip_forward_mib_ipForward_t **ipForward)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 4, 24, 0};
@@ -300,7 +300,7 @@ assign_ipForwardEntry(GSList *vbl)
 }
 
 int
-ip_forward_mib_get_ipForwardTable(host_snmp *s, ip_forward_mib_ipForwardEntry_t ***ipForwardEntry)
+ip_forward_mib_get_ipForwardTable(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t ***ipForwardEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -465,7 +465,7 @@ assign_ipCidrRouteEntry(GSList *vbl)
 }
 
 int
-ip_forward_mib_get_ipCidrRouteTable(host_snmp *s, ip_forward_mib_ipCidrRouteEntry_t ***ipCidrRouteEntry)
+ip_forward_mib_get_ipCidrRouteTable(GSnmpSession *s, ip_forward_mib_ipCidrRouteEntry_t ***ipCidrRouteEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

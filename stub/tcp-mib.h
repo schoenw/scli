@@ -72,7 +72,7 @@ extern tcp_mib_tcp_t *
 tcp_mib_new_tcp();
 
 extern int
-tcp_mib_get_tcp(host_snmp *s, tcp_mib_tcp_t **tcp);
+tcp_mib_get_tcp(GSnmpSession *s, tcp_mib_tcp_t **tcp);
 
 extern void
 tcp_mib_free_tcp(tcp_mib_tcp_t *tcp);
@@ -90,7 +90,7 @@ typedef struct {
 } tcp_mib_tcpConnEntry_t;
 
 extern int
-tcp_mib_get_tcpConnTable(host_snmp *s, tcp_mib_tcpConnEntry_t ***tcpConnEntry);
+tcp_mib_get_tcpConnTable(GSnmpSession *s, tcp_mib_tcpConnEntry_t ***tcpConnEntry);
 
 extern void
 tcp_mib_free_tcpConnTable(tcp_mib_tcpConnEntry_t **tcpConnEntry);
@@ -99,10 +99,10 @@ extern tcp_mib_tcpConnEntry_t *
 tcp_mib_new_tcpConnEntry();
 
 extern int
-tcp_mib_get_tcpConnEntry(host_snmp *s, tcp_mib_tcpConnEntry_t **tcpConnEntry);
+tcp_mib_get_tcpConnEntry(GSnmpSession *s, tcp_mib_tcpConnEntry_t **tcpConnEntry);
 
 extern int
-tcp_mib_set_tcpConnEntry(host_snmp *s, tcp_mib_tcpConnEntry_t *tcpConnEntry);
+tcp_mib_set_tcpConnEntry(GSnmpSession *s, tcp_mib_tcpConnEntry_t *tcpConnEntry);
 
 extern void
 tcp_mib_free_tcpConnEntry(tcp_mib_tcpConnEntry_t *tcpConnEntry);

@@ -69,10 +69,10 @@ extern ip_mib_ip_t *
 ip_mib_new_ip();
 
 extern int
-ip_mib_get_ip(host_snmp *s, ip_mib_ip_t **ip);
+ip_mib_get_ip(GSnmpSession *s, ip_mib_ip_t **ip);
 
 extern int
-ip_mib_set_ip(host_snmp *s, ip_mib_ip_t *ip);
+ip_mib_set_ip(GSnmpSession *s, ip_mib_ip_t *ip);
 
 extern void
 ip_mib_free_ip(ip_mib_ip_t *ip);
@@ -90,7 +90,7 @@ typedef struct {
 } ip_mib_ipAddrEntry_t;
 
 extern int
-ip_mib_get_ipAddrTable(host_snmp *s, ip_mib_ipAddrEntry_t ***ipAddrEntry);
+ip_mib_get_ipAddrTable(GSnmpSession *s, ip_mib_ipAddrEntry_t ***ipAddrEntry);
 
 extern void
 ip_mib_free_ipAddrTable(ip_mib_ipAddrEntry_t **ipAddrEntry);
@@ -99,7 +99,7 @@ extern ip_mib_ipAddrEntry_t *
 ip_mib_new_ipAddrEntry();
 
 extern int
-ip_mib_get_ipAddrEntry(host_snmp *s, ip_mib_ipAddrEntry_t **ipAddrEntry);
+ip_mib_get_ipAddrEntry(GSnmpSession *s, ip_mib_ipAddrEntry_t **ipAddrEntry);
 
 extern void
 ip_mib_free_ipAddrEntry(ip_mib_ipAddrEntry_t *ipAddrEntry);
@@ -117,7 +117,7 @@ typedef struct {
 } ip_mib_ipNetToMediaEntry_t;
 
 extern int
-ip_mib_get_ipNetToMediaTable(host_snmp *s, ip_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry);
+ip_mib_get_ipNetToMediaTable(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry);
 
 extern void
 ip_mib_free_ipNetToMediaTable(ip_mib_ipNetToMediaEntry_t **ipNetToMediaEntry);
@@ -126,10 +126,10 @@ extern ip_mib_ipNetToMediaEntry_t *
 ip_mib_new_ipNetToMediaEntry();
 
 extern int
-ip_mib_get_ipNetToMediaEntry(host_snmp *s, ip_mib_ipNetToMediaEntry_t **ipNetToMediaEntry);
+ip_mib_get_ipNetToMediaEntry(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t **ipNetToMediaEntry);
 
 extern int
-ip_mib_set_ipNetToMediaEntry(host_snmp *s, ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry);
+ip_mib_set_ipNetToMediaEntry(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry);
 
 extern void
 ip_mib_free_ipNetToMediaEntry(ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry);
@@ -171,7 +171,7 @@ extern ip_mib_icmp_t *
 ip_mib_new_icmp();
 
 extern int
-ip_mib_get_icmp(host_snmp *s, ip_mib_icmp_t **icmp);
+ip_mib_get_icmp(GSnmpSession *s, ip_mib_icmp_t **icmp);
 
 extern void
 ip_mib_free_icmp(ip_mib_icmp_t *icmp);

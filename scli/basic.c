@@ -507,7 +507,7 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 	scli_close(interp);
     }
 
-    interp->peer = g_malloc0(sizeof(host_snmp));
+    interp->peer = g_malloc0(sizeof(GSnmpSession));
     interp->peer->domain = AF_INET;
     interp->peer->name = g_strdup(host);
     interp->peer->port = port;

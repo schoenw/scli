@@ -649,7 +649,7 @@ typedef struct {
 } printer_mib_prtGeneralEntry_t;
 
 extern int
-printer_mib_get_prtGeneralTable(host_snmp *s, printer_mib_prtGeneralEntry_t ***prtGeneralEntry);
+printer_mib_get_prtGeneralTable(GSnmpSession *s, printer_mib_prtGeneralEntry_t ***prtGeneralEntry);
 
 extern void
 printer_mib_free_prtGeneralTable(printer_mib_prtGeneralEntry_t **prtGeneralEntry);
@@ -658,10 +658,10 @@ extern printer_mib_prtGeneralEntry_t *
 printer_mib_new_prtGeneralEntry();
 
 extern int
-printer_mib_get_prtGeneralEntry(host_snmp *s, printer_mib_prtGeneralEntry_t **prtGeneralEntry);
+printer_mib_get_prtGeneralEntry(GSnmpSession *s, printer_mib_prtGeneralEntry_t **prtGeneralEntry);
 
 extern int
-printer_mib_set_prtGeneralEntry(host_snmp *s, printer_mib_prtGeneralEntry_t *prtGeneralEntry);
+printer_mib_set_prtGeneralEntry(GSnmpSession *s, printer_mib_prtGeneralEntry_t *prtGeneralEntry);
 
 extern void
 printer_mib_free_prtGeneralEntry(printer_mib_prtGeneralEntry_t *prtGeneralEntry);
@@ -677,7 +677,7 @@ typedef struct {
 } printer_mib_prtStorageRefEntry_t;
 
 extern int
-printer_mib_get_prtStorageRefTable(host_snmp *s, printer_mib_prtStorageRefEntry_t ***prtStorageRefEntry);
+printer_mib_get_prtStorageRefTable(GSnmpSession *s, printer_mib_prtStorageRefEntry_t ***prtStorageRefEntry);
 
 extern void
 printer_mib_free_prtStorageRefTable(printer_mib_prtStorageRefEntry_t **prtStorageRefEntry);
@@ -686,7 +686,7 @@ extern printer_mib_prtStorageRefEntry_t *
 printer_mib_new_prtStorageRefEntry();
 
 extern int
-printer_mib_get_prtStorageRefEntry(host_snmp *s, printer_mib_prtStorageRefEntry_t **prtStorageRefEntry);
+printer_mib_get_prtStorageRefEntry(GSnmpSession *s, printer_mib_prtStorageRefEntry_t **prtStorageRefEntry);
 
 extern void
 printer_mib_free_prtStorageRefEntry(printer_mib_prtStorageRefEntry_t *prtStorageRefEntry);
@@ -702,7 +702,7 @@ typedef struct {
 } printer_mib_prtDeviceRefEntry_t;
 
 extern int
-printer_mib_get_prtDeviceRefTable(host_snmp *s, printer_mib_prtDeviceRefEntry_t ***prtDeviceRefEntry);
+printer_mib_get_prtDeviceRefTable(GSnmpSession *s, printer_mib_prtDeviceRefEntry_t ***prtDeviceRefEntry);
 
 extern void
 printer_mib_free_prtDeviceRefTable(printer_mib_prtDeviceRefEntry_t **prtDeviceRefEntry);
@@ -711,7 +711,7 @@ extern printer_mib_prtDeviceRefEntry_t *
 printer_mib_new_prtDeviceRefEntry();
 
 extern int
-printer_mib_get_prtDeviceRefEntry(host_snmp *s, printer_mib_prtDeviceRefEntry_t **prtDeviceRefEntry);
+printer_mib_get_prtDeviceRefEntry(GSnmpSession *s, printer_mib_prtDeviceRefEntry_t **prtDeviceRefEntry);
 
 extern void
 printer_mib_free_prtDeviceRefEntry(printer_mib_prtDeviceRefEntry_t *prtDeviceRefEntry);
@@ -729,7 +729,7 @@ typedef struct {
 } printer_mib_prtCoverEntry_t;
 
 extern int
-printer_mib_get_prtCoverTable(host_snmp *s, printer_mib_prtCoverEntry_t ***prtCoverEntry);
+printer_mib_get_prtCoverTable(GSnmpSession *s, printer_mib_prtCoverEntry_t ***prtCoverEntry);
 
 extern void
 printer_mib_free_prtCoverTable(printer_mib_prtCoverEntry_t **prtCoverEntry);
@@ -738,7 +738,7 @@ extern printer_mib_prtCoverEntry_t *
 printer_mib_new_prtCoverEntry();
 
 extern int
-printer_mib_get_prtCoverEntry(host_snmp *s, printer_mib_prtCoverEntry_t **prtCoverEntry);
+printer_mib_get_prtCoverEntry(GSnmpSession *s, printer_mib_prtCoverEntry_t **prtCoverEntry);
 
 extern void
 printer_mib_free_prtCoverEntry(printer_mib_prtCoverEntry_t *prtCoverEntry);
@@ -758,7 +758,7 @@ typedef struct {
 } printer_mib_prtLocalizationEntry_t;
 
 extern int
-printer_mib_get_prtLocalizationTable(host_snmp *s, printer_mib_prtLocalizationEntry_t ***prtLocalizationEntry);
+printer_mib_get_prtLocalizationTable(GSnmpSession *s, printer_mib_prtLocalizationEntry_t ***prtLocalizationEntry);
 
 extern void
 printer_mib_free_prtLocalizationTable(printer_mib_prtLocalizationEntry_t **prtLocalizationEntry);
@@ -767,7 +767,7 @@ extern printer_mib_prtLocalizationEntry_t *
 printer_mib_new_prtLocalizationEntry();
 
 extern int
-printer_mib_get_prtLocalizationEntry(host_snmp *s, printer_mib_prtLocalizationEntry_t **prtLocalizationEntry);
+printer_mib_get_prtLocalizationEntry(GSnmpSession *s, printer_mib_prtLocalizationEntry_t **prtLocalizationEntry);
 
 extern void
 printer_mib_free_prtLocalizationEntry(printer_mib_prtLocalizationEntry_t *prtLocalizationEntry);
@@ -815,7 +815,7 @@ typedef struct {
 } printer_mib_prtInputEntry_t;
 
 extern int
-printer_mib_get_prtInputTable(host_snmp *s, printer_mib_prtInputEntry_t ***prtInputEntry);
+printer_mib_get_prtInputTable(GSnmpSession *s, printer_mib_prtInputEntry_t ***prtInputEntry);
 
 extern void
 printer_mib_free_prtInputTable(printer_mib_prtInputEntry_t **prtInputEntry);
@@ -824,10 +824,10 @@ extern printer_mib_prtInputEntry_t *
 printer_mib_new_prtInputEntry();
 
 extern int
-printer_mib_get_prtInputEntry(host_snmp *s, printer_mib_prtInputEntry_t **prtInputEntry);
+printer_mib_get_prtInputEntry(GSnmpSession *s, printer_mib_prtInputEntry_t **prtInputEntry);
 
 extern int
-printer_mib_set_prtInputEntry(host_snmp *s, printer_mib_prtInputEntry_t *prtInputEntry);
+printer_mib_set_prtInputEntry(GSnmpSession *s, printer_mib_prtInputEntry_t *prtInputEntry);
 
 extern void
 printer_mib_free_prtInputEntry(printer_mib_prtInputEntry_t *prtInputEntry);
@@ -871,7 +871,7 @@ typedef struct {
 } printer_mib_prtOutputEntry_t;
 
 extern int
-printer_mib_get_prtOutputTable(host_snmp *s, printer_mib_prtOutputEntry_t ***prtOutputEntry);
+printer_mib_get_prtOutputTable(GSnmpSession *s, printer_mib_prtOutputEntry_t ***prtOutputEntry);
 
 extern void
 printer_mib_free_prtOutputTable(printer_mib_prtOutputEntry_t **prtOutputEntry);
@@ -880,10 +880,10 @@ extern printer_mib_prtOutputEntry_t *
 printer_mib_new_prtOutputEntry();
 
 extern int
-printer_mib_get_prtOutputEntry(host_snmp *s, printer_mib_prtOutputEntry_t **prtOutputEntry);
+printer_mib_get_prtOutputEntry(GSnmpSession *s, printer_mib_prtOutputEntry_t **prtOutputEntry);
 
 extern int
-printer_mib_set_prtOutputEntry(host_snmp *s, printer_mib_prtOutputEntry_t *prtOutputEntry);
+printer_mib_set_prtOutputEntry(GSnmpSession *s, printer_mib_prtOutputEntry_t *prtOutputEntry);
 
 extern void
 printer_mib_free_prtOutputEntry(printer_mib_prtOutputEntry_t *prtOutputEntry);
@@ -912,7 +912,7 @@ typedef struct {
 } printer_mib_prtMarkerEntry_t;
 
 extern int
-printer_mib_get_prtMarkerTable(host_snmp *s, printer_mib_prtMarkerEntry_t ***prtMarkerEntry);
+printer_mib_get_prtMarkerTable(GSnmpSession *s, printer_mib_prtMarkerEntry_t ***prtMarkerEntry);
 
 extern void
 printer_mib_free_prtMarkerTable(printer_mib_prtMarkerEntry_t **prtMarkerEntry);
@@ -921,7 +921,7 @@ extern printer_mib_prtMarkerEntry_t *
 printer_mib_new_prtMarkerEntry();
 
 extern int
-printer_mib_get_prtMarkerEntry(host_snmp *s, printer_mib_prtMarkerEntry_t **prtMarkerEntry);
+printer_mib_get_prtMarkerEntry(GSnmpSession *s, printer_mib_prtMarkerEntry_t **prtMarkerEntry);
 
 extern void
 printer_mib_free_prtMarkerEntry(printer_mib_prtMarkerEntry_t *prtMarkerEntry);
@@ -945,7 +945,7 @@ typedef struct {
 } printer_mib_prtMarkerSuppliesEntry_t;
 
 extern int
-printer_mib_get_prtMarkerSuppliesTable(host_snmp *s, printer_mib_prtMarkerSuppliesEntry_t ***prtMarkerSuppliesEntry);
+printer_mib_get_prtMarkerSuppliesTable(GSnmpSession *s, printer_mib_prtMarkerSuppliesEntry_t ***prtMarkerSuppliesEntry);
 
 extern void
 printer_mib_free_prtMarkerSuppliesTable(printer_mib_prtMarkerSuppliesEntry_t **prtMarkerSuppliesEntry);
@@ -954,10 +954,10 @@ extern printer_mib_prtMarkerSuppliesEntry_t *
 printer_mib_new_prtMarkerSuppliesEntry();
 
 extern int
-printer_mib_get_prtMarkerSuppliesEntry(host_snmp *s, printer_mib_prtMarkerSuppliesEntry_t **prtMarkerSuppliesEntry);
+printer_mib_get_prtMarkerSuppliesEntry(GSnmpSession *s, printer_mib_prtMarkerSuppliesEntry_t **prtMarkerSuppliesEntry);
 
 extern int
-printer_mib_set_prtMarkerSuppliesEntry(host_snmp *s, printer_mib_prtMarkerSuppliesEntry_t *prtMarkerSuppliesEntry);
+printer_mib_set_prtMarkerSuppliesEntry(GSnmpSession *s, printer_mib_prtMarkerSuppliesEntry_t *prtMarkerSuppliesEntry);
 
 extern void
 printer_mib_free_prtMarkerSuppliesEntry(printer_mib_prtMarkerSuppliesEntry_t *prtMarkerSuppliesEntry);
@@ -977,7 +977,7 @@ typedef struct {
 } printer_mib_prtMarkerColorantEntry_t;
 
 extern int
-printer_mib_get_prtMarkerColorantTable(host_snmp *s, printer_mib_prtMarkerColorantEntry_t ***prtMarkerColorantEntry);
+printer_mib_get_prtMarkerColorantTable(GSnmpSession *s, printer_mib_prtMarkerColorantEntry_t ***prtMarkerColorantEntry);
 
 extern void
 printer_mib_free_prtMarkerColorantTable(printer_mib_prtMarkerColorantEntry_t **prtMarkerColorantEntry);
@@ -986,7 +986,7 @@ extern printer_mib_prtMarkerColorantEntry_t *
 printer_mib_new_prtMarkerColorantEntry();
 
 extern int
-printer_mib_get_prtMarkerColorantEntry(host_snmp *s, printer_mib_prtMarkerColorantEntry_t **prtMarkerColorantEntry);
+printer_mib_get_prtMarkerColorantEntry(GSnmpSession *s, printer_mib_prtMarkerColorantEntry_t **prtMarkerColorantEntry);
 
 extern void
 printer_mib_free_prtMarkerColorantEntry(printer_mib_prtMarkerColorantEntry_t *prtMarkerColorantEntry);
@@ -1012,7 +1012,7 @@ typedef struct {
 } printer_mib_prtMediaPathEntry_t;
 
 extern int
-printer_mib_get_prtMediaPathTable(host_snmp *s, printer_mib_prtMediaPathEntry_t ***prtMediaPathEntry);
+printer_mib_get_prtMediaPathTable(GSnmpSession *s, printer_mib_prtMediaPathEntry_t ***prtMediaPathEntry);
 
 extern void
 printer_mib_free_prtMediaPathTable(printer_mib_prtMediaPathEntry_t **prtMediaPathEntry);
@@ -1021,7 +1021,7 @@ extern printer_mib_prtMediaPathEntry_t *
 printer_mib_new_prtMediaPathEntry();
 
 extern int
-printer_mib_get_prtMediaPathEntry(host_snmp *s, printer_mib_prtMediaPathEntry_t **prtMediaPathEntry);
+printer_mib_get_prtMediaPathEntry(GSnmpSession *s, printer_mib_prtMediaPathEntry_t **prtMediaPathEntry);
 
 extern void
 printer_mib_free_prtMediaPathEntry(printer_mib_prtMediaPathEntry_t *prtMediaPathEntry);
@@ -1046,7 +1046,7 @@ typedef struct {
 } printer_mib_prtChannelEntry_t;
 
 extern int
-printer_mib_get_prtChannelTable(host_snmp *s, printer_mib_prtChannelEntry_t ***prtChannelEntry);
+printer_mib_get_prtChannelTable(GSnmpSession *s, printer_mib_prtChannelEntry_t ***prtChannelEntry);
 
 extern void
 printer_mib_free_prtChannelTable(printer_mib_prtChannelEntry_t **prtChannelEntry);
@@ -1055,10 +1055,10 @@ extern printer_mib_prtChannelEntry_t *
 printer_mib_new_prtChannelEntry();
 
 extern int
-printer_mib_get_prtChannelEntry(host_snmp *s, printer_mib_prtChannelEntry_t **prtChannelEntry);
+printer_mib_get_prtChannelEntry(GSnmpSession *s, printer_mib_prtChannelEntry_t **prtChannelEntry);
 
 extern int
-printer_mib_set_prtChannelEntry(host_snmp *s, printer_mib_prtChannelEntry_t *prtChannelEntry);
+printer_mib_set_prtChannelEntry(GSnmpSession *s, printer_mib_prtChannelEntry_t *prtChannelEntry);
 
 extern void
 printer_mib_free_prtChannelEntry(printer_mib_prtChannelEntry_t *prtChannelEntry);
@@ -1088,7 +1088,7 @@ typedef struct {
 } printer_mib_prtInterpreterEntry_t;
 
 extern int
-printer_mib_get_prtInterpreterTable(host_snmp *s, printer_mib_prtInterpreterEntry_t ***prtInterpreterEntry);
+printer_mib_get_prtInterpreterTable(GSnmpSession *s, printer_mib_prtInterpreterEntry_t ***prtInterpreterEntry);
 
 extern void
 printer_mib_free_prtInterpreterTable(printer_mib_prtInterpreterEntry_t **prtInterpreterEntry);
@@ -1097,10 +1097,10 @@ extern printer_mib_prtInterpreterEntry_t *
 printer_mib_new_prtInterpreterEntry();
 
 extern int
-printer_mib_get_prtInterpreterEntry(host_snmp *s, printer_mib_prtInterpreterEntry_t **prtInterpreterEntry);
+printer_mib_get_prtInterpreterEntry(GSnmpSession *s, printer_mib_prtInterpreterEntry_t **prtInterpreterEntry);
 
 extern int
-printer_mib_set_prtInterpreterEntry(host_snmp *s, printer_mib_prtInterpreterEntry_t *prtInterpreterEntry);
+printer_mib_set_prtInterpreterEntry(GSnmpSession *s, printer_mib_prtInterpreterEntry_t *prtInterpreterEntry);
 
 extern void
 printer_mib_free_prtInterpreterEntry(printer_mib_prtInterpreterEntry_t *prtInterpreterEntry);
@@ -1117,7 +1117,7 @@ typedef struct {
 } printer_mib_prtConsoleDisplayBufferEntry_t;
 
 extern int
-printer_mib_get_prtConsoleDisplayBufferTable(host_snmp *s, printer_mib_prtConsoleDisplayBufferEntry_t ***prtConsoleDisplayBufferEntry);
+printer_mib_get_prtConsoleDisplayBufferTable(GSnmpSession *s, printer_mib_prtConsoleDisplayBufferEntry_t ***prtConsoleDisplayBufferEntry);
 
 extern void
 printer_mib_free_prtConsoleDisplayBufferTable(printer_mib_prtConsoleDisplayBufferEntry_t **prtConsoleDisplayBufferEntry);
@@ -1126,10 +1126,10 @@ extern printer_mib_prtConsoleDisplayBufferEntry_t *
 printer_mib_new_prtConsoleDisplayBufferEntry();
 
 extern int
-printer_mib_get_prtConsoleDisplayBufferEntry(host_snmp *s, printer_mib_prtConsoleDisplayBufferEntry_t **prtConsoleDisplayBufferEntry);
+printer_mib_get_prtConsoleDisplayBufferEntry(GSnmpSession *s, printer_mib_prtConsoleDisplayBufferEntry_t **prtConsoleDisplayBufferEntry);
 
 extern int
-printer_mib_set_prtConsoleDisplayBufferEntry(host_snmp *s, printer_mib_prtConsoleDisplayBufferEntry_t *prtConsoleDisplayBufferEntry);
+printer_mib_set_prtConsoleDisplayBufferEntry(GSnmpSession *s, printer_mib_prtConsoleDisplayBufferEntry_t *prtConsoleDisplayBufferEntry);
 
 extern void
 printer_mib_free_prtConsoleDisplayBufferEntry(printer_mib_prtConsoleDisplayBufferEntry_t *prtConsoleDisplayBufferEntry);
@@ -1149,7 +1149,7 @@ typedef struct {
 } printer_mib_prtConsoleLightEntry_t;
 
 extern int
-printer_mib_get_prtConsoleLightTable(host_snmp *s, printer_mib_prtConsoleLightEntry_t ***prtConsoleLightEntry);
+printer_mib_get_prtConsoleLightTable(GSnmpSession *s, printer_mib_prtConsoleLightEntry_t ***prtConsoleLightEntry);
 
 extern void
 printer_mib_free_prtConsoleLightTable(printer_mib_prtConsoleLightEntry_t **prtConsoleLightEntry);
@@ -1158,10 +1158,10 @@ extern printer_mib_prtConsoleLightEntry_t *
 printer_mib_new_prtConsoleLightEntry();
 
 extern int
-printer_mib_get_prtConsoleLightEntry(host_snmp *s, printer_mib_prtConsoleLightEntry_t **prtConsoleLightEntry);
+printer_mib_get_prtConsoleLightEntry(GSnmpSession *s, printer_mib_prtConsoleLightEntry_t **prtConsoleLightEntry);
 
 extern int
-printer_mib_set_prtConsoleLightEntry(host_snmp *s, printer_mib_prtConsoleLightEntry_t *prtConsoleLightEntry);
+printer_mib_set_prtConsoleLightEntry(GSnmpSession *s, printer_mib_prtConsoleLightEntry_t *prtConsoleLightEntry);
 
 extern void
 printer_mib_free_prtConsoleLightEntry(printer_mib_prtConsoleLightEntry_t *prtConsoleLightEntry);
@@ -1185,7 +1185,7 @@ typedef struct {
 } printer_mib_prtAlertEntry_t;
 
 extern int
-printer_mib_get_prtAlertTable(host_snmp *s, printer_mib_prtAlertEntry_t ***prtAlertEntry);
+printer_mib_get_prtAlertTable(GSnmpSession *s, printer_mib_prtAlertEntry_t ***prtAlertEntry);
 
 extern void
 printer_mib_free_prtAlertTable(printer_mib_prtAlertEntry_t **prtAlertEntry);
@@ -1194,7 +1194,7 @@ extern printer_mib_prtAlertEntry_t *
 printer_mib_new_prtAlertEntry();
 
 extern int
-printer_mib_get_prtAlertEntry(host_snmp *s, printer_mib_prtAlertEntry_t **prtAlertEntry);
+printer_mib_get_prtAlertEntry(GSnmpSession *s, printer_mib_prtAlertEntry_t **prtAlertEntry);
 
 extern void
 printer_mib_free_prtAlertEntry(printer_mib_prtAlertEntry_t *prtAlertEntry);

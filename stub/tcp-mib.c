@@ -148,7 +148,7 @@ assign_tcp(GSList *vbl)
 }
 
 int
-tcp_mib_get_tcp(host_snmp *s, tcp_mib_tcp_t **tcp)
+tcp_mib_get_tcp(GSnmpSession *s, tcp_mib_tcp_t **tcp)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 6, 0};
@@ -254,7 +254,7 @@ assign_tcpConnEntry(GSList *vbl)
 }
 
 int
-tcp_mib_get_tcpConnTable(host_snmp *s, tcp_mib_tcpConnEntry_t ***tcpConnEntry)
+tcp_mib_get_tcpConnTable(GSnmpSession *s, tcp_mib_tcpConnEntry_t ***tcpConnEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

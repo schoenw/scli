@@ -47,7 +47,7 @@ extern snmp_framework_mib_snmpEngine_t *
 snmp_framework_mib_new_snmpEngine();
 
 extern int
-snmp_framework_mib_get_snmpEngine(host_snmp *s, snmp_framework_mib_snmpEngine_t **snmpEngine);
+snmp_framework_mib_get_snmpEngine(GSnmpSession *s, snmp_framework_mib_snmpEngine_t **snmpEngine);
 
 extern void
 snmp_framework_mib_free_snmpEngine(snmp_framework_mib_snmpEngine_t *snmpEngine);

@@ -306,7 +306,7 @@ extern if_mib_interfaces_t *
 if_mib_new_interfaces();
 
 extern int
-if_mib_get_interfaces(host_snmp *s, if_mib_interfaces_t **interfaces);
+if_mib_get_interfaces(GSnmpSession *s, if_mib_interfaces_t **interfaces);
 
 extern void
 if_mib_free_interfaces(if_mib_interfaces_t *interfaces);
@@ -344,7 +344,7 @@ typedef struct {
 } if_mib_ifEntry_t;
 
 extern int
-if_mib_get_ifTable(host_snmp *s, if_mib_ifEntry_t ***ifEntry);
+if_mib_get_ifTable(GSnmpSession *s, if_mib_ifEntry_t ***ifEntry);
 
 extern void
 if_mib_free_ifTable(if_mib_ifEntry_t **ifEntry);
@@ -353,10 +353,10 @@ extern if_mib_ifEntry_t *
 if_mib_new_ifEntry();
 
 extern int
-if_mib_get_ifEntry(host_snmp *s, if_mib_ifEntry_t **ifEntry);
+if_mib_get_ifEntry(GSnmpSession *s, if_mib_ifEntry_t **ifEntry);
 
 extern int
-if_mib_set_ifEntry(host_snmp *s, if_mib_ifEntry_t *ifEntry);
+if_mib_set_ifEntry(GSnmpSession *s, if_mib_ifEntry_t *ifEntry);
 
 extern void
 if_mib_free_ifEntry(if_mib_ifEntry_t *ifEntry);
@@ -374,7 +374,7 @@ extern if_mib_ifMIBObjects_t *
 if_mib_new_ifMIBObjects();
 
 extern int
-if_mib_get_ifMIBObjects(host_snmp *s, if_mib_ifMIBObjects_t **ifMIBObjects);
+if_mib_get_ifMIBObjects(GSnmpSession *s, if_mib_ifMIBObjects_t **ifMIBObjects);
 
 extern void
 if_mib_free_ifMIBObjects(if_mib_ifMIBObjects_t *ifMIBObjects);
@@ -409,7 +409,7 @@ typedef struct {
 } if_mib_ifXEntry_t;
 
 extern int
-if_mib_get_ifXTable(host_snmp *s, if_mib_ifXEntry_t ***ifXEntry);
+if_mib_get_ifXTable(GSnmpSession *s, if_mib_ifXEntry_t ***ifXEntry);
 
 extern void
 if_mib_free_ifXTable(if_mib_ifXEntry_t **ifXEntry);
@@ -418,10 +418,10 @@ extern if_mib_ifXEntry_t *
 if_mib_new_ifXEntry();
 
 extern int
-if_mib_get_ifXEntry(host_snmp *s, if_mib_ifXEntry_t **ifXEntry);
+if_mib_get_ifXEntry(GSnmpSession *s, if_mib_ifXEntry_t **ifXEntry);
 
 extern int
-if_mib_set_ifXEntry(host_snmp *s, if_mib_ifXEntry_t *ifXEntry);
+if_mib_set_ifXEntry(GSnmpSession *s, if_mib_ifXEntry_t *ifXEntry);
 
 extern void
 if_mib_free_ifXEntry(if_mib_ifXEntry_t *ifXEntry);
@@ -437,7 +437,7 @@ typedef struct {
 } if_mib_ifStackEntry_t;
 
 extern int
-if_mib_get_ifStackTable(host_snmp *s, if_mib_ifStackEntry_t ***ifStackEntry);
+if_mib_get_ifStackTable(GSnmpSession *s, if_mib_ifStackEntry_t ***ifStackEntry);
 
 extern void
 if_mib_free_ifStackTable(if_mib_ifStackEntry_t **ifStackEntry);
@@ -446,10 +446,10 @@ extern if_mib_ifStackEntry_t *
 if_mib_new_ifStackEntry();
 
 extern int
-if_mib_get_ifStackEntry(host_snmp *s, if_mib_ifStackEntry_t **ifStackEntry);
+if_mib_get_ifStackEntry(GSnmpSession *s, if_mib_ifStackEntry_t **ifStackEntry);
 
 extern int
-if_mib_set_ifStackEntry(host_snmp *s, if_mib_ifStackEntry_t *ifStackEntry);
+if_mib_set_ifStackEntry(GSnmpSession *s, if_mib_ifStackEntry_t *ifStackEntry);
 
 extern void
 if_mib_free_ifStackEntry(if_mib_ifStackEntry_t *ifStackEntry);
@@ -472,7 +472,7 @@ typedef struct {
 } if_mib_ifTestEntry_t;
 
 extern int
-if_mib_get_ifTestTable(host_snmp *s, if_mib_ifTestEntry_t ***ifTestEntry);
+if_mib_get_ifTestTable(GSnmpSession *s, if_mib_ifTestEntry_t ***ifTestEntry);
 
 extern void
 if_mib_free_ifTestTable(if_mib_ifTestEntry_t **ifTestEntry);
@@ -481,10 +481,10 @@ extern if_mib_ifTestEntry_t *
 if_mib_new_ifTestEntry();
 
 extern int
-if_mib_get_ifTestEntry(host_snmp *s, if_mib_ifTestEntry_t **ifTestEntry);
+if_mib_get_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t **ifTestEntry);
 
 extern int
-if_mib_set_ifTestEntry(host_snmp *s, if_mib_ifTestEntry_t *ifTestEntry);
+if_mib_set_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t *ifTestEntry);
 
 extern void
 if_mib_free_ifTestEntry(if_mib_ifTestEntry_t *ifTestEntry);
@@ -502,7 +502,7 @@ typedef struct {
 } if_mib_ifRcvAddressEntry_t;
 
 extern int
-if_mib_get_ifRcvAddressTable(host_snmp *s, if_mib_ifRcvAddressEntry_t ***ifRcvAddressEntry);
+if_mib_get_ifRcvAddressTable(GSnmpSession *s, if_mib_ifRcvAddressEntry_t ***ifRcvAddressEntry);
 
 extern void
 if_mib_free_ifRcvAddressTable(if_mib_ifRcvAddressEntry_t **ifRcvAddressEntry);
@@ -511,10 +511,10 @@ extern if_mib_ifRcvAddressEntry_t *
 if_mib_new_ifRcvAddressEntry();
 
 extern int
-if_mib_get_ifRcvAddressEntry(host_snmp *s, if_mib_ifRcvAddressEntry_t **ifRcvAddressEntry);
+if_mib_get_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t **ifRcvAddressEntry);
 
 extern int
-if_mib_set_ifRcvAddressEntry(host_snmp *s, if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry);
+if_mib_set_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry);
 
 extern void
 if_mib_free_ifRcvAddressEntry(if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry);

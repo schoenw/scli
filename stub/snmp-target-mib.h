@@ -81,10 +81,10 @@ extern snmp_target_mib_snmpTargetObjects_t *
 snmp_target_mib_new_snmpTargetObjects();
 
 extern int
-snmp_target_mib_get_snmpTargetObjects(host_snmp *s, snmp_target_mib_snmpTargetObjects_t **snmpTargetObjects);
+snmp_target_mib_get_snmpTargetObjects(GSnmpSession *s, snmp_target_mib_snmpTargetObjects_t **snmpTargetObjects);
 
 extern int
-snmp_target_mib_set_snmpTargetObjects(host_snmp *s, snmp_target_mib_snmpTargetObjects_t *snmpTargetObjects);
+snmp_target_mib_set_snmpTargetObjects(GSnmpSession *s, snmp_target_mib_snmpTargetObjects_t *snmpTargetObjects);
 
 extern void
 snmp_target_mib_free_snmpTargetObjects(snmp_target_mib_snmpTargetObjects_t *snmpTargetObjects);
@@ -111,7 +111,7 @@ typedef struct {
 } snmp_target_mib_snmpTargetAddrEntry_t;
 
 extern int
-snmp_target_mib_get_snmpTargetAddrTable(host_snmp *s, snmp_target_mib_snmpTargetAddrEntry_t ***snmpTargetAddrEntry);
+snmp_target_mib_get_snmpTargetAddrTable(GSnmpSession *s, snmp_target_mib_snmpTargetAddrEntry_t ***snmpTargetAddrEntry);
 
 extern void
 snmp_target_mib_free_snmpTargetAddrTable(snmp_target_mib_snmpTargetAddrEntry_t **snmpTargetAddrEntry);
@@ -120,10 +120,10 @@ extern snmp_target_mib_snmpTargetAddrEntry_t *
 snmp_target_mib_new_snmpTargetAddrEntry();
 
 extern int
-snmp_target_mib_get_snmpTargetAddrEntry(host_snmp *s, snmp_target_mib_snmpTargetAddrEntry_t **snmpTargetAddrEntry);
+snmp_target_mib_get_snmpTargetAddrEntry(GSnmpSession *s, snmp_target_mib_snmpTargetAddrEntry_t **snmpTargetAddrEntry);
 
 extern int
-snmp_target_mib_set_snmpTargetAddrEntry(host_snmp *s, snmp_target_mib_snmpTargetAddrEntry_t *snmpTargetAddrEntry);
+snmp_target_mib_set_snmpTargetAddrEntry(GSnmpSession *s, snmp_target_mib_snmpTargetAddrEntry_t *snmpTargetAddrEntry);
 
 extern void
 snmp_target_mib_free_snmpTargetAddrEntry(snmp_target_mib_snmpTargetAddrEntry_t *snmpTargetAddrEntry);
@@ -145,7 +145,7 @@ typedef struct {
 } snmp_target_mib_snmpTargetParamsEntry_t;
 
 extern int
-snmp_target_mib_get_snmpTargetParamsTable(host_snmp *s, snmp_target_mib_snmpTargetParamsEntry_t ***snmpTargetParamsEntry);
+snmp_target_mib_get_snmpTargetParamsTable(GSnmpSession *s, snmp_target_mib_snmpTargetParamsEntry_t ***snmpTargetParamsEntry);
 
 extern void
 snmp_target_mib_free_snmpTargetParamsTable(snmp_target_mib_snmpTargetParamsEntry_t **snmpTargetParamsEntry);
@@ -154,10 +154,10 @@ extern snmp_target_mib_snmpTargetParamsEntry_t *
 snmp_target_mib_new_snmpTargetParamsEntry();
 
 extern int
-snmp_target_mib_get_snmpTargetParamsEntry(host_snmp *s, snmp_target_mib_snmpTargetParamsEntry_t **snmpTargetParamsEntry);
+snmp_target_mib_get_snmpTargetParamsEntry(GSnmpSession *s, snmp_target_mib_snmpTargetParamsEntry_t **snmpTargetParamsEntry);
 
 extern int
-snmp_target_mib_set_snmpTargetParamsEntry(host_snmp *s, snmp_target_mib_snmpTargetParamsEntry_t *snmpTargetParamsEntry);
+snmp_target_mib_set_snmpTargetParamsEntry(GSnmpSession *s, snmp_target_mib_snmpTargetParamsEntry_t *snmpTargetParamsEntry);
 
 extern void
 snmp_target_mib_free_snmpTargetParamsEntry(snmp_target_mib_snmpTargetParamsEntry_t *snmpTargetParamsEntry);

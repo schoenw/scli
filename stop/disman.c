@@ -117,7 +117,7 @@ trim_string8(guchar *s, gsize len)
 
 
 static void
-show_disman_summary(host_snmp *peer)
+show_disman_summary(GSnmpSession *peer)
 {
     GString *s;
     
@@ -132,7 +132,7 @@ show_disman_summary(host_snmp *peer)
 
 
 static void
-show_runs(WINDOW *win, host_snmp *peer, int flags)
+show_runs(WINDOW *win, GSnmpSession *peer, int flags)
 {
     disman_script_mib_smLaunchEntry_t **smLaunchTable = NULL;
     disman_script_mib_smRunEntry_t **smRunTable = NULL;

@@ -329,7 +329,7 @@ assign_hrSystem(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrSystem(host_snmp *s, host_resources_mib_hrSystem_t **hrSystem)
+host_resources_mib_get_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t **hrSystem)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 1, 0};
@@ -406,7 +406,7 @@ assign_hrStorage(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrStorage(host_snmp *s, host_resources_mib_hrStorage_t **hrStorage)
+host_resources_mib_get_hrStorage(GSnmpSession *s, host_resources_mib_hrStorage_t **hrStorage)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 2, 0};
@@ -517,7 +517,7 @@ assign_hrStorageEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrStorageTable(host_snmp *s, host_resources_mib_hrStorageEntry_t ***hrStorageEntry)
+host_resources_mib_get_hrStorageTable(GSnmpSession *s, host_resources_mib_hrStorageEntry_t ***hrStorageEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -648,7 +648,7 @@ assign_hrDeviceEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrDeviceTable(host_snmp *s, host_resources_mib_hrDeviceEntry_t ***hrDeviceEntry)
+host_resources_mib_get_hrDeviceTable(GSnmpSession *s, host_resources_mib_hrDeviceEntry_t ***hrDeviceEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -768,7 +768,7 @@ assign_hrProcessorEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrProcessorTable(host_snmp *s, host_resources_mib_hrProcessorEntry_t ***hrProcessorEntry)
+host_resources_mib_get_hrProcessorTable(GSnmpSession *s, host_resources_mib_hrProcessorEntry_t ***hrProcessorEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -884,7 +884,7 @@ assign_hrNetworkEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrNetworkTable(host_snmp *s, host_resources_mib_hrNetworkEntry_t ***hrNetworkEntry)
+host_resources_mib_get_hrNetworkTable(GSnmpSession *s, host_resources_mib_hrNetworkEntry_t ***hrNetworkEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1004,7 +1004,7 @@ assign_hrPrinterEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrPrinterTable(host_snmp *s, host_resources_mib_hrPrinterEntry_t ***hrPrinterEntry)
+host_resources_mib_get_hrPrinterTable(GSnmpSession *s, host_resources_mib_hrPrinterEntry_t ***hrPrinterEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1129,7 +1129,7 @@ assign_hrDiskStorageEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrDiskStorageTable(host_snmp *s, host_resources_mib_hrDiskStorageEntry_t ***hrDiskStorageEntry)
+host_resources_mib_get_hrDiskStorageTable(GSnmpSession *s, host_resources_mib_hrDiskStorageEntry_t ***hrDiskStorageEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1258,7 +1258,7 @@ assign_hrPartitionEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrPartitionTable(host_snmp *s, host_resources_mib_hrPartitionEntry_t ***hrPartitionEntry)
+host_resources_mib_get_hrPartitionTable(GSnmpSession *s, host_resources_mib_hrPartitionEntry_t ***hrPartitionEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1400,7 +1400,7 @@ assign_hrFSEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrFSTable(host_snmp *s, host_resources_mib_hrFSEntry_t ***hrFSEntry)
+host_resources_mib_get_hrFSTable(GSnmpSession *s, host_resources_mib_hrFSEntry_t ***hrFSEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1499,7 +1499,7 @@ assign_hrSWRun(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrSWRun(host_snmp *s, host_resources_mib_hrSWRun_t **hrSWRun)
+host_resources_mib_get_hrSWRun(GSnmpSession *s, host_resources_mib_hrSWRun_t **hrSWRun)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 4, 0};
@@ -1612,7 +1612,7 @@ assign_hrSWRunEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrSWRunTable(host_snmp *s, host_resources_mib_hrSWRunEntry_t ***hrSWRunEntry)
+host_resources_mib_get_hrSWRunTable(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t ***hrSWRunEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1731,7 +1731,7 @@ assign_hrSWRunPerfEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrSWRunPerfTable(host_snmp *s, host_resources_mib_hrSWRunPerfEntry_t ***hrSWRunPerfEntry)
+host_resources_mib_get_hrSWRunPerfTable(GSnmpSession *s, host_resources_mib_hrSWRunPerfEntry_t ***hrSWRunPerfEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1833,7 +1833,7 @@ assign_hrSWInstalled(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrSWInstalled(host_snmp *s, host_resources_mib_hrSWInstalled_t **hrSWInstalled)
+host_resources_mib_get_hrSWInstalled(GSnmpSession *s, host_resources_mib_hrSWInstalled_t **hrSWInstalled)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 6, 0};
@@ -1939,7 +1939,7 @@ assign_hrSWInstalledEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrSWInstalledTable(host_snmp *s, host_resources_mib_hrSWInstalledEntry_t ***hrSWInstalledEntry)
+host_resources_mib_get_hrSWInstalledTable(GSnmpSession *s, host_resources_mib_hrSWInstalledEntry_t ***hrSWInstalledEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

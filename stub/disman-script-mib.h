@@ -178,7 +178,7 @@ typedef struct {
 } disman_script_mib_smLangEntry_t;
 
 extern int
-disman_script_mib_get_smLangTable(host_snmp *s, disman_script_mib_smLangEntry_t ***smLangEntry);
+disman_script_mib_get_smLangTable(GSnmpSession *s, disman_script_mib_smLangEntry_t ***smLangEntry);
 
 extern void
 disman_script_mib_free_smLangTable(disman_script_mib_smLangEntry_t **smLangEntry);
@@ -187,7 +187,7 @@ extern disman_script_mib_smLangEntry_t *
 disman_script_mib_new_smLangEntry();
 
 extern int
-disman_script_mib_get_smLangEntry(host_snmp *s, disman_script_mib_smLangEntry_t **smLangEntry);
+disman_script_mib_get_smLangEntry(GSnmpSession *s, disman_script_mib_smLangEntry_t **smLangEntry);
 
 extern void
 disman_script_mib_free_smLangEntry(disman_script_mib_smLangEntry_t *smLangEntry);
@@ -212,7 +212,7 @@ typedef struct {
 } disman_script_mib_smExtsnEntry_t;
 
 extern int
-disman_script_mib_get_smExtsnTable(host_snmp *s, disman_script_mib_smExtsnEntry_t ***smExtsnEntry);
+disman_script_mib_get_smExtsnTable(GSnmpSession *s, disman_script_mib_smExtsnEntry_t ***smExtsnEntry);
 
 extern void
 disman_script_mib_free_smExtsnTable(disman_script_mib_smExtsnEntry_t **smExtsnEntry);
@@ -221,7 +221,7 @@ extern disman_script_mib_smExtsnEntry_t *
 disman_script_mib_new_smExtsnEntry();
 
 extern int
-disman_script_mib_get_smExtsnEntry(host_snmp *s, disman_script_mib_smExtsnEntry_t **smExtsnEntry);
+disman_script_mib_get_smExtsnEntry(GSnmpSession *s, disman_script_mib_smExtsnEntry_t **smExtsnEntry);
 
 extern void
 disman_script_mib_free_smExtsnEntry(disman_script_mib_smExtsnEntry_t *smExtsnEntry);
@@ -251,7 +251,7 @@ typedef struct {
 } disman_script_mib_smScriptEntry_t;
 
 extern int
-disman_script_mib_get_smScriptTable(host_snmp *s, disman_script_mib_smScriptEntry_t ***smScriptEntry);
+disman_script_mib_get_smScriptTable(GSnmpSession *s, disman_script_mib_smScriptEntry_t ***smScriptEntry);
 
 extern void
 disman_script_mib_free_smScriptTable(disman_script_mib_smScriptEntry_t **smScriptEntry);
@@ -260,10 +260,10 @@ extern disman_script_mib_smScriptEntry_t *
 disman_script_mib_new_smScriptEntry();
 
 extern int
-disman_script_mib_get_smScriptEntry(host_snmp *s, disman_script_mib_smScriptEntry_t **smScriptEntry);
+disman_script_mib_get_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t **smScriptEntry);
 
 extern int
-disman_script_mib_set_smScriptEntry(host_snmp *s, disman_script_mib_smScriptEntry_t *smScriptEntry);
+disman_script_mib_set_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t *smScriptEntry);
 
 extern void
 disman_script_mib_free_smScriptEntry(disman_script_mib_smScriptEntry_t *smScriptEntry);
@@ -284,7 +284,7 @@ typedef struct {
 } disman_script_mib_smCodeEntry_t;
 
 extern int
-disman_script_mib_get_smCodeTable(host_snmp *s, disman_script_mib_smCodeEntry_t ***smCodeEntry);
+disman_script_mib_get_smCodeTable(GSnmpSession *s, disman_script_mib_smCodeEntry_t ***smCodeEntry);
 
 extern void
 disman_script_mib_free_smCodeTable(disman_script_mib_smCodeEntry_t **smCodeEntry);
@@ -293,10 +293,10 @@ extern disman_script_mib_smCodeEntry_t *
 disman_script_mib_new_smCodeEntry();
 
 extern int
-disman_script_mib_get_smCodeEntry(host_snmp *s, disman_script_mib_smCodeEntry_t **smCodeEntry);
+disman_script_mib_get_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t **smCodeEntry);
 
 extern int
-disman_script_mib_set_smCodeEntry(host_snmp *s, disman_script_mib_smCodeEntry_t *smCodeEntry);
+disman_script_mib_set_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t *smCodeEntry);
 
 extern void
 disman_script_mib_free_smCodeEntry(disman_script_mib_smCodeEntry_t *smCodeEntry);
@@ -335,7 +335,7 @@ typedef struct {
 } disman_script_mib_smLaunchEntry_t;
 
 extern int
-disman_script_mib_get_smLaunchTable(host_snmp *s, disman_script_mib_smLaunchEntry_t ***smLaunchEntry);
+disman_script_mib_get_smLaunchTable(GSnmpSession *s, disman_script_mib_smLaunchEntry_t ***smLaunchEntry);
 
 extern void
 disman_script_mib_free_smLaunchTable(disman_script_mib_smLaunchEntry_t **smLaunchEntry);
@@ -344,10 +344,10 @@ extern disman_script_mib_smLaunchEntry_t *
 disman_script_mib_new_smLaunchEntry();
 
 extern int
-disman_script_mib_get_smLaunchEntry(host_snmp *s, disman_script_mib_smLaunchEntry_t **smLaunchEntry);
+disman_script_mib_get_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t **smLaunchEntry);
 
 extern int
-disman_script_mib_set_smLaunchEntry(host_snmp *s, disman_script_mib_smLaunchEntry_t *smLaunchEntry);
+disman_script_mib_set_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t *smLaunchEntry);
 
 extern void
 disman_script_mib_free_smLaunchEntry(disman_script_mib_smLaunchEntry_t *smLaunchEntry);
@@ -384,7 +384,7 @@ typedef struct {
 } disman_script_mib_smRunEntry_t;
 
 extern int
-disman_script_mib_get_smRunTable(host_snmp *s, disman_script_mib_smRunEntry_t ***smRunEntry);
+disman_script_mib_get_smRunTable(GSnmpSession *s, disman_script_mib_smRunEntry_t ***smRunEntry);
 
 extern void
 disman_script_mib_free_smRunTable(disman_script_mib_smRunEntry_t **smRunEntry);
@@ -393,10 +393,10 @@ extern disman_script_mib_smRunEntry_t *
 disman_script_mib_new_smRunEntry();
 
 extern int
-disman_script_mib_get_smRunEntry(host_snmp *s, disman_script_mib_smRunEntry_t **smRunEntry);
+disman_script_mib_get_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t **smRunEntry);
 
 extern int
-disman_script_mib_set_smRunEntry(host_snmp *s, disman_script_mib_smRunEntry_t *smRunEntry);
+disman_script_mib_set_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t *smRunEntry);
 
 extern void
 disman_script_mib_free_smRunEntry(disman_script_mib_smRunEntry_t *smRunEntry);

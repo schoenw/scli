@@ -87,7 +87,7 @@ struct scli_interp {
     int	flags;			/* interpreter flags */
     GString *result;		/* string result buffer */
     char *pager;		/* external pager we are using */
-    host_snmp *peer;		/* the snmp peer we are talking to */
+    GSnmpSession *peer;		/* the snmp peer we are talking to */
 };
 
 extern scli_interp_t *

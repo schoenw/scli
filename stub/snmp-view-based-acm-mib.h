@@ -103,7 +103,7 @@ typedef struct {
 } snmp_view_based_acm_mib_vacmContextEntry_t;
 
 extern int
-snmp_view_based_acm_mib_get_vacmContextTable(host_snmp *s, snmp_view_based_acm_mib_vacmContextEntry_t ***vacmContextEntry);
+snmp_view_based_acm_mib_get_vacmContextTable(GSnmpSession *s, snmp_view_based_acm_mib_vacmContextEntry_t ***vacmContextEntry);
 
 extern void
 snmp_view_based_acm_mib_free_vacmContextTable(snmp_view_based_acm_mib_vacmContextEntry_t **vacmContextEntry);
@@ -112,7 +112,7 @@ extern snmp_view_based_acm_mib_vacmContextEntry_t *
 snmp_view_based_acm_mib_new_vacmContextEntry();
 
 extern int
-snmp_view_based_acm_mib_get_vacmContextEntry(host_snmp *s, snmp_view_based_acm_mib_vacmContextEntry_t **vacmContextEntry);
+snmp_view_based_acm_mib_get_vacmContextEntry(GSnmpSession *s, snmp_view_based_acm_mib_vacmContextEntry_t **vacmContextEntry);
 
 extern void
 snmp_view_based_acm_mib_free_vacmContextEntry(snmp_view_based_acm_mib_vacmContextEntry_t *vacmContextEntry);
@@ -132,7 +132,7 @@ typedef struct {
 } snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t;
 
 extern int
-snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(host_snmp *s, snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t ***vacmSecurityToGroupEntry);
+snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(GSnmpSession *s, snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t ***vacmSecurityToGroupEntry);
 
 extern void
 snmp_view_based_acm_mib_free_vacmSecurityToGroupTable(snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t **vacmSecurityToGroupEntry);
@@ -141,10 +141,10 @@ extern snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t *
 snmp_view_based_acm_mib_new_vacmSecurityToGroupEntry();
 
 extern int
-snmp_view_based_acm_mib_get_vacmSecurityToGroupEntry(host_snmp *s, snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t **vacmSecurityToGroupEntry);
+snmp_view_based_acm_mib_get_vacmSecurityToGroupEntry(GSnmpSession *s, snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t **vacmSecurityToGroupEntry);
 
 extern int
-snmp_view_based_acm_mib_set_vacmSecurityToGroupEntry(host_snmp *s, snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t *vacmSecurityToGroupEntry);
+snmp_view_based_acm_mib_set_vacmSecurityToGroupEntry(GSnmpSession *s, snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t *vacmSecurityToGroupEntry);
 
 extern void
 snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t *vacmSecurityToGroupEntry);
@@ -172,7 +172,7 @@ typedef struct {
 } snmp_view_based_acm_mib_vacmAccessEntry_t;
 
 extern int
-snmp_view_based_acm_mib_get_vacmAccessTable(host_snmp *s, snmp_view_based_acm_mib_vacmAccessEntry_t ***vacmAccessEntry);
+snmp_view_based_acm_mib_get_vacmAccessTable(GSnmpSession *s, snmp_view_based_acm_mib_vacmAccessEntry_t ***vacmAccessEntry);
 
 extern void
 snmp_view_based_acm_mib_free_vacmAccessTable(snmp_view_based_acm_mib_vacmAccessEntry_t **vacmAccessEntry);
@@ -181,10 +181,10 @@ extern snmp_view_based_acm_mib_vacmAccessEntry_t *
 snmp_view_based_acm_mib_new_vacmAccessEntry();
 
 extern int
-snmp_view_based_acm_mib_get_vacmAccessEntry(host_snmp *s, snmp_view_based_acm_mib_vacmAccessEntry_t **vacmAccessEntry);
+snmp_view_based_acm_mib_get_vacmAccessEntry(GSnmpSession *s, snmp_view_based_acm_mib_vacmAccessEntry_t **vacmAccessEntry);
 
 extern int
-snmp_view_based_acm_mib_set_vacmAccessEntry(host_snmp *s, snmp_view_based_acm_mib_vacmAccessEntry_t *vacmAccessEntry);
+snmp_view_based_acm_mib_set_vacmAccessEntry(GSnmpSession *s, snmp_view_based_acm_mib_vacmAccessEntry_t *vacmAccessEntry);
 
 extern void
 snmp_view_based_acm_mib_free_vacmAccessEntry(snmp_view_based_acm_mib_vacmAccessEntry_t *vacmAccessEntry);
@@ -201,10 +201,10 @@ extern snmp_view_based_acm_mib_vacmMIBViews_t *
 snmp_view_based_acm_mib_new_vacmMIBViews();
 
 extern int
-snmp_view_based_acm_mib_get_vacmMIBViews(host_snmp *s, snmp_view_based_acm_mib_vacmMIBViews_t **vacmMIBViews);
+snmp_view_based_acm_mib_get_vacmMIBViews(GSnmpSession *s, snmp_view_based_acm_mib_vacmMIBViews_t **vacmMIBViews);
 
 extern int
-snmp_view_based_acm_mib_set_vacmMIBViews(host_snmp *s, snmp_view_based_acm_mib_vacmMIBViews_t *vacmMIBViews);
+snmp_view_based_acm_mib_set_vacmMIBViews(GSnmpSession *s, snmp_view_based_acm_mib_vacmMIBViews_t *vacmMIBViews);
 
 extern void
 snmp_view_based_acm_mib_free_vacmMIBViews(snmp_view_based_acm_mib_vacmMIBViews_t *vacmMIBViews);
@@ -226,7 +226,7 @@ typedef struct {
 } snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t;
 
 extern int
-snmp_view_based_acm_mib_get_vacmViewTreeFamilyTable(host_snmp *s, snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t ***vacmViewTreeFamilyEntry);
+snmp_view_based_acm_mib_get_vacmViewTreeFamilyTable(GSnmpSession *s, snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t ***vacmViewTreeFamilyEntry);
 
 extern void
 snmp_view_based_acm_mib_free_vacmViewTreeFamilyTable(snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t **vacmViewTreeFamilyEntry);
@@ -235,10 +235,10 @@ extern snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t *
 snmp_view_based_acm_mib_new_vacmViewTreeFamilyEntry();
 
 extern int
-snmp_view_based_acm_mib_get_vacmViewTreeFamilyEntry(host_snmp *s, snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t **vacmViewTreeFamilyEntry);
+snmp_view_based_acm_mib_get_vacmViewTreeFamilyEntry(GSnmpSession *s, snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t **vacmViewTreeFamilyEntry);
 
 extern int
-snmp_view_based_acm_mib_set_vacmViewTreeFamilyEntry(host_snmp *s, snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t *vacmViewTreeFamilyEntry);
+snmp_view_based_acm_mib_set_vacmViewTreeFamilyEntry(GSnmpSession *s, snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t *vacmViewTreeFamilyEntry);
 
 extern void
 snmp_view_based_acm_mib_free_vacmViewTreeFamilyEntry(snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t *vacmViewTreeFamilyEntry);

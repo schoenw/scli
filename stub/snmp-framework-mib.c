@@ -97,7 +97,7 @@ assign_snmpEngine(GSList *vbl)
 }
 
 int
-snmp_framework_mib_get_snmpEngine(host_snmp *s, snmp_framework_mib_snmpEngine_t **snmpEngine)
+snmp_framework_mib_get_snmpEngine(GSnmpSession *s, snmp_framework_mib_snmpEngine_t **snmpEngine)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 10, 2, 1, 0};

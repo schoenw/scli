@@ -105,7 +105,7 @@ typedef struct {
 } etherlike_mib_dot3StatsEntry_t;
 
 extern int
-etherlike_mib_get_dot3StatsTable(host_snmp *s, etherlike_mib_dot3StatsEntry_t ***dot3StatsEntry);
+etherlike_mib_get_dot3StatsTable(GSnmpSession *s, etherlike_mib_dot3StatsEntry_t ***dot3StatsEntry);
 
 extern void
 etherlike_mib_free_dot3StatsTable(etherlike_mib_dot3StatsEntry_t **dot3StatsEntry);
@@ -114,7 +114,7 @@ extern etherlike_mib_dot3StatsEntry_t *
 etherlike_mib_new_dot3StatsEntry();
 
 extern int
-etherlike_mib_get_dot3StatsEntry(host_snmp *s, etherlike_mib_dot3StatsEntry_t **dot3StatsEntry);
+etherlike_mib_get_dot3StatsEntry(GSnmpSession *s, etherlike_mib_dot3StatsEntry_t **dot3StatsEntry);
 
 extern void
 etherlike_mib_free_dot3StatsEntry(etherlike_mib_dot3StatsEntry_t *dot3StatsEntry);
@@ -130,7 +130,7 @@ typedef struct {
 } etherlike_mib_dot3CollEntry_t;
 
 extern int
-etherlike_mib_get_dot3CollTable(host_snmp *s, etherlike_mib_dot3CollEntry_t ***dot3CollEntry);
+etherlike_mib_get_dot3CollTable(GSnmpSession *s, etherlike_mib_dot3CollEntry_t ***dot3CollEntry);
 
 extern void
 etherlike_mib_free_dot3CollTable(etherlike_mib_dot3CollEntry_t **dot3CollEntry);
@@ -139,7 +139,7 @@ extern etherlike_mib_dot3CollEntry_t *
 etherlike_mib_new_dot3CollEntry();
 
 extern int
-etherlike_mib_get_dot3CollEntry(host_snmp *s, etherlike_mib_dot3CollEntry_t **dot3CollEntry);
+etherlike_mib_get_dot3CollEntry(GSnmpSession *s, etherlike_mib_dot3CollEntry_t **dot3CollEntry);
 
 extern void
 etherlike_mib_free_dot3CollEntry(etherlike_mib_dot3CollEntry_t *dot3CollEntry);
@@ -156,7 +156,7 @@ typedef struct {
 } etherlike_mib_dot3ControlEntry_t;
 
 extern int
-etherlike_mib_get_dot3ControlTable(host_snmp *s, etherlike_mib_dot3ControlEntry_t ***dot3ControlEntry);
+etherlike_mib_get_dot3ControlTable(GSnmpSession *s, etherlike_mib_dot3ControlEntry_t ***dot3ControlEntry);
 
 extern void
 etherlike_mib_free_dot3ControlTable(etherlike_mib_dot3ControlEntry_t **dot3ControlEntry);
@@ -165,7 +165,7 @@ extern etherlike_mib_dot3ControlEntry_t *
 etherlike_mib_new_dot3ControlEntry();
 
 extern int
-etherlike_mib_get_dot3ControlEntry(host_snmp *s, etherlike_mib_dot3ControlEntry_t **dot3ControlEntry);
+etherlike_mib_get_dot3ControlEntry(GSnmpSession *s, etherlike_mib_dot3ControlEntry_t **dot3ControlEntry);
 
 extern void
 etherlike_mib_free_dot3ControlEntry(etherlike_mib_dot3ControlEntry_t *dot3ControlEntry);
@@ -183,7 +183,7 @@ typedef struct {
 } etherlike_mib_dot3PauseEntry_t;
 
 extern int
-etherlike_mib_get_dot3PauseTable(host_snmp *s, etherlike_mib_dot3PauseEntry_t ***dot3PauseEntry);
+etherlike_mib_get_dot3PauseTable(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t ***dot3PauseEntry);
 
 extern void
 etherlike_mib_free_dot3PauseTable(etherlike_mib_dot3PauseEntry_t **dot3PauseEntry);
@@ -192,10 +192,10 @@ extern etherlike_mib_dot3PauseEntry_t *
 etherlike_mib_new_dot3PauseEntry();
 
 extern int
-etherlike_mib_get_dot3PauseEntry(host_snmp *s, etherlike_mib_dot3PauseEntry_t **dot3PauseEntry);
+etherlike_mib_get_dot3PauseEntry(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t **dot3PauseEntry);
 
 extern int
-etherlike_mib_set_dot3PauseEntry(host_snmp *s, etherlike_mib_dot3PauseEntry_t *dot3PauseEntry);
+etherlike_mib_set_dot3PauseEntry(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t *dot3PauseEntry);
 
 extern void
 etherlike_mib_free_dot3PauseEntry(etherlike_mib_dot3PauseEntry_t *dot3PauseEntry);

@@ -94,7 +94,7 @@ extern ip_forward_mib_ipForward_t *
 ip_forward_mib_new_ipForward();
 
 extern int
-ip_forward_mib_get_ipForward(host_snmp *s, ip_forward_mib_ipForward_t **ipForward);
+ip_forward_mib_get_ipForward(GSnmpSession *s, ip_forward_mib_ipForward_t **ipForward);
 
 extern void
 ip_forward_mib_free_ipForward(ip_forward_mib_ipForward_t *ipForward);
@@ -123,7 +123,7 @@ typedef struct {
 } ip_forward_mib_ipForwardEntry_t;
 
 extern int
-ip_forward_mib_get_ipForwardTable(host_snmp *s, ip_forward_mib_ipForwardEntry_t ***ipForwardEntry);
+ip_forward_mib_get_ipForwardTable(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t ***ipForwardEntry);
 
 extern void
 ip_forward_mib_free_ipForwardTable(ip_forward_mib_ipForwardEntry_t **ipForwardEntry);
@@ -132,10 +132,10 @@ extern ip_forward_mib_ipForwardEntry_t *
 ip_forward_mib_new_ipForwardEntry();
 
 extern int
-ip_forward_mib_get_ipForwardEntry(host_snmp *s, ip_forward_mib_ipForwardEntry_t **ipForwardEntry);
+ip_forward_mib_get_ipForwardEntry(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t **ipForwardEntry);
 
 extern int
-ip_forward_mib_set_ipForwardEntry(host_snmp *s, ip_forward_mib_ipForwardEntry_t *ipForwardEntry);
+ip_forward_mib_set_ipForwardEntry(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t *ipForwardEntry);
 
 extern void
 ip_forward_mib_free_ipForwardEntry(ip_forward_mib_ipForwardEntry_t *ipForwardEntry);
@@ -165,7 +165,7 @@ typedef struct {
 } ip_forward_mib_ipCidrRouteEntry_t;
 
 extern int
-ip_forward_mib_get_ipCidrRouteTable(host_snmp *s, ip_forward_mib_ipCidrRouteEntry_t ***ipCidrRouteEntry);
+ip_forward_mib_get_ipCidrRouteTable(GSnmpSession *s, ip_forward_mib_ipCidrRouteEntry_t ***ipCidrRouteEntry);
 
 extern void
 ip_forward_mib_free_ipCidrRouteTable(ip_forward_mib_ipCidrRouteEntry_t **ipCidrRouteEntry);
@@ -174,10 +174,10 @@ extern ip_forward_mib_ipCidrRouteEntry_t *
 ip_forward_mib_new_ipCidrRouteEntry();
 
 extern int
-ip_forward_mib_get_ipCidrRouteEntry(host_snmp *s, ip_forward_mib_ipCidrRouteEntry_t **ipCidrRouteEntry);
+ip_forward_mib_get_ipCidrRouteEntry(GSnmpSession *s, ip_forward_mib_ipCidrRouteEntry_t **ipCidrRouteEntry);
 
 extern int
-ip_forward_mib_set_ipCidrRouteEntry(host_snmp *s, ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry);
+ip_forward_mib_set_ipCidrRouteEntry(GSnmpSession *s, ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry);
 
 extern void
 ip_forward_mib_free_ipCidrRouteEntry(ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry);

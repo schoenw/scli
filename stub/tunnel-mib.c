@@ -150,7 +150,7 @@ assign_tunnelIfEntry(GSList *vbl)
 }
 
 int
-tunnel_mib_get_tunnelIfTable(host_snmp *s, tunnel_mib_tunnelIfEntry_t ***tunnelIfEntry)
+tunnel_mib_get_tunnelIfTable(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t ***tunnelIfEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -281,7 +281,7 @@ assign_tunnelConfigEntry(GSList *vbl)
 }
 
 int
-tunnel_mib_get_tunnelConfigTable(host_snmp *s, tunnel_mib_tunnelConfigEntry_t ***tunnelConfigEntry)
+tunnel_mib_get_tunnelConfigTable(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t ***tunnelConfigEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

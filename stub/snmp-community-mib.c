@@ -142,7 +142,7 @@ assign_snmpCommunityEntry(GSList *vbl)
 }
 
 int
-snmp_community_mib_get_snmpCommunityTable(host_snmp *s, snmp_community_mib_snmpCommunityEntry_t ***snmpCommunityEntry)
+snmp_community_mib_get_snmpCommunityTable(GSnmpSession *s, snmp_community_mib_snmpCommunityEntry_t ***snmpCommunityEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -266,7 +266,7 @@ assign_snmpTargetAddrExtEntry(GSList *vbl)
 }
 
 int
-snmp_community_mib_get_snmpTargetAddrExtTable(host_snmp *s, snmp_community_mib_snmpTargetAddrExtEntry_t ***snmpTargetAddrExtEntry)
+snmp_community_mib_get_snmpTargetAddrExtTable(GSnmpSession *s, snmp_community_mib_snmpTargetAddrExtEntry_t ***snmpTargetAddrExtEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

@@ -47,7 +47,7 @@ typedef struct {
 
 
 static void
-show_ether_summary(host_snmp *peer)
+show_ether_summary(GSnmpSession *peer)
 {
     GString *s;
     
@@ -62,7 +62,7 @@ show_ether_summary(host_snmp *peer)
 
 
 static void
-show_ethers(WINDOW *win, host_snmp *peer, int flags)
+show_ethers(WINDOW *win, GSnmpSession *peer, int flags)
 {
     etherlike_mib_dot3StatsEntry_t **dot3StatsTable = NULL;
     static struct timeval last, now;

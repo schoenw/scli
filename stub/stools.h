@@ -87,7 +87,7 @@ extern void
 stls_vbl_free(GSList *vbl);
 
 extern void
-stls_vbl_attributes(host_snmp *s, GSList **vbl, guint32 *base, guint idx,
+stls_vbl_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
 		    stls_stub_attr_t *attributes);
 
 extern int
@@ -99,10 +99,10 @@ stls_vb_lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
  */
 
 extern GSList *
-stls_snmp_getnext(host_snmp *s, GSList *vbl);
+stls_snmp_getnext(GSnmpSession *s, GSList *vbl);
 
 extern GSList *
-stls_snmp_gettable(host_snmp *s, GSList *vbl);
+stls_snmp_gettable(GSnmpSession *s, GSList *vbl);
 
 /*
  * Some generic conversion functions that we need in several tools.

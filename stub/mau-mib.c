@@ -494,7 +494,7 @@ assign_rpMauEntry(GSList *vbl)
 }
 
 int
-mau_mib_get_rpMauTable(host_snmp *s, mau_mib_rpMauEntry_t ***rpMauEntry)
+mau_mib_get_rpMauTable(GSnmpSession *s, mau_mib_rpMauEntry_t ***rpMauEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -616,7 +616,7 @@ assign_rpJackEntry(GSList *vbl)
 }
 
 int
-mau_mib_get_rpJackTable(host_snmp *s, mau_mib_rpJackEntry_t ***rpJackEntry)
+mau_mib_get_rpJackTable(GSnmpSession *s, mau_mib_rpJackEntry_t ***rpJackEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -767,7 +767,7 @@ assign_ifMauEntry(GSList *vbl)
 }
 
 int
-mau_mib_get_ifMauTable(host_snmp *s, mau_mib_ifMauEntry_t ***ifMauEntry)
+mau_mib_get_ifMauTable(GSnmpSession *s, mau_mib_ifMauEntry_t ***ifMauEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -887,7 +887,7 @@ assign_ifJackEntry(GSList *vbl)
 }
 
 int
-mau_mib_get_ifJackTable(host_snmp *s, mau_mib_ifJackEntry_t ***ifJackEntry)
+mau_mib_get_ifJackTable(GSnmpSession *s, mau_mib_ifJackEntry_t ***ifJackEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1011,7 +1011,7 @@ assign_broadMauBasicEntry(GSList *vbl)
 }
 
 int
-mau_mib_get_broadMauBasicTable(host_snmp *s, mau_mib_broadMauBasicEntry_t ***broadMauBasicEntry)
+mau_mib_get_broadMauBasicTable(GSnmpSession *s, mau_mib_broadMauBasicEntry_t ***broadMauBasicEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1165,7 +1165,7 @@ assign_ifMauAutoNegEntry(GSList *vbl)
 }
 
 int
-mau_mib_get_ifMauAutoNegTable(host_snmp *s, mau_mib_ifMauAutoNegEntry_t ***ifMauAutoNegEntry)
+mau_mib_get_ifMauAutoNegTable(GSnmpSession *s, mau_mib_ifMauAutoNegEntry_t ***ifMauAutoNegEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

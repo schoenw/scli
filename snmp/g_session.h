@@ -16,9 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,  59 Temple Place - Suite 330, Cambridge, MA 02139, USA.
- *
- * Defines and variables for snmp support
  */
+
 #ifndef __G_SESSION_H__
 #define __G_SESSION_H__
 
@@ -38,7 +37,10 @@
 /*
  * Basic snmp info on a per host basis
  */
-typedef struct _host_snmp {
+
+typedef struct	_GSnmpSession	GSnmpSession;
+
+struct _GSnmpSession {
   struct sockaddr *address;
   guint         domain;
   gchar        *rcomm;
@@ -52,12 +54,12 @@ typedef struct _host_snmp {
   gboolean      (*done_callback) (); /* what to call when complete */
   void          (*time_callback) (); /* what to call on a timeout */
   gpointer      magic;         /* can be used to pass additional data to cb */
-} host_snmp;
+};
 
-typedef struct __snmp_request {
+typedef struct _snmp_request {
   gboolean            (*callback) ();
   void                (*timeout) ();
-  host_snmp           *host;
+  GSnmpSession        *session;
   GString             *auth;
   GSnmpPdu             pdu;
   struct sockaddr     *address;
@@ -70,36 +72,36 @@ typedef struct __snmp_request {
 } snmp_request;
 
 
-gpointer g_async_send        (host_snmp *host, 
+gpointer g_async_send        (GSnmpSession *session, 
                               GSnmpPduType type,
                               GSList *objs, 
                               guint arg1, 
                               guint arg2);
 
-gpointer g_async_getnext     (host_snmp *host, 
+gpointer g_async_getnext     (GSnmpSession *session, 
                               GSList *pdu);
 
-gpointer g_async_get         (host_snmp *host, 
+gpointer g_async_get         (GSnmpSession *session, 
                               GSList *pdu);
 
-gpointer g_async_set         (host_snmp *host, 
+gpointer g_async_set         (GSnmpSession *session, 
                               GSList *pdu);
 
-gpointer g_async_bulk        (host_snmp *host, 
+gpointer g_async_bulk        (GSnmpSession *session, 
                               GSList *pdu,
                               guint nonrep, 
                               guint maxiter);
 
-GSList * g_sync_getnext      (host_snmp *host, 
+GSList * g_sync_getnext      (GSnmpSession *session, 
                               GSList *pdu);
 
-GSList * g_sync_get          (host_snmp *host, 
+GSList * g_sync_get          (GSnmpSession *session, 
                               GSList *pdu);
 
-GSList * g_sync_set          (host_snmp *host, 
+GSList * g_sync_set          (GSnmpSession *session, 
                               GSList *pdu);
 
-GSList * g_sync_bulk         (host_snmp *host, 
+GSList * g_sync_bulk         (GSnmpSession *session, 
                               GSList *pdu,
                               guint nonrep, 
                               guint maxiter);

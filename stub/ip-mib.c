@@ -202,7 +202,7 @@ assign_ip(GSList *vbl)
 }
 
 int
-ip_mib_get_ip(host_snmp *s, ip_mib_ip_t **ip)
+ip_mib_get_ip(GSnmpSession *s, ip_mib_ip_t **ip)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 4, 0};
@@ -308,7 +308,7 @@ assign_ipAddrEntry(GSList *vbl)
 }
 
 int
-ip_mib_get_ipAddrTable(host_snmp *s, ip_mib_ipAddrEntry_t ***ipAddrEntry)
+ip_mib_get_ipAddrTable(GSnmpSession *s, ip_mib_ipAddrEntry_t ***ipAddrEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -433,7 +433,7 @@ assign_ipNetToMediaEntry(GSList *vbl)
 }
 
 int
-ip_mib_get_ipNetToMediaTable(host_snmp *s, ip_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry)
+ip_mib_get_ipNetToMediaTable(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -607,7 +607,7 @@ assign_icmp(GSList *vbl)
 }
 
 int
-ip_mib_get_icmp(host_snmp *s, ip_mib_icmp_t **icmp)
+ip_mib_get_icmp(GSnmpSession *s, ip_mib_icmp_t **icmp)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 5, 0};

@@ -444,7 +444,7 @@ assign_system(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_system(host_snmp *s, rfc1213_mib_system_t **system)
+rfc1213_mib_get_system(GSnmpSession *s, rfc1213_mib_system_t **system)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 1, 0};
@@ -521,7 +521,7 @@ assign_interfaces(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_interfaces(host_snmp *s, rfc1213_mib_interfaces_t **interfaces)
+rfc1213_mib_get_interfaces(GSnmpSession *s, rfc1213_mib_interfaces_t **interfaces)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 2, 0};
@@ -678,7 +678,7 @@ assign_ifEntry(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_ifTable(host_snmp *s, rfc1213_mib_ifEntry_t ***ifEntry)
+rfc1213_mib_get_ifTable(GSnmpSession *s, rfc1213_mib_ifEntry_t ***ifEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -800,7 +800,7 @@ assign_atEntry(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_atTable(host_snmp *s, rfc1213_mib_atEntry_t ***atEntry)
+rfc1213_mib_get_atTable(GSnmpSession *s, rfc1213_mib_atEntry_t ***atEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -956,7 +956,7 @@ assign_ip(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_ip(host_snmp *s, rfc1213_mib_ip_t **ip)
+rfc1213_mib_get_ip(GSnmpSession *s, rfc1213_mib_ip_t **ip)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 4, 0};
@@ -1062,7 +1062,7 @@ assign_ipAddrEntry(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_ipAddrTable(host_snmp *s, rfc1213_mib_ipAddrEntry_t ***ipAddrEntry)
+rfc1213_mib_get_ipAddrTable(GSnmpSession *s, rfc1213_mib_ipAddrEntry_t ***ipAddrEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1215,7 +1215,7 @@ assign_ipRouteEntry(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_ipRouteTable(host_snmp *s, rfc1213_mib_ipRouteEntry_t ***ipRouteEntry)
+rfc1213_mib_get_ipRouteTable(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t ***ipRouteEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1340,7 +1340,7 @@ assign_ipNetToMediaEntry(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_ipNetToMediaTable(host_snmp *s, rfc1213_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry)
+rfc1213_mib_get_ipNetToMediaTable(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1514,7 +1514,7 @@ assign_icmp(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_icmp(host_snmp *s, rfc1213_mib_icmp_t **icmp)
+rfc1213_mib_get_icmp(GSnmpSession *s, rfc1213_mib_icmp_t **icmp)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 5, 0};
@@ -1630,7 +1630,7 @@ assign_tcp(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_tcp(host_snmp *s, rfc1213_mib_tcp_t **tcp)
+rfc1213_mib_get_tcp(GSnmpSession *s, rfc1213_mib_tcp_t **tcp)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 6, 0};
@@ -1736,7 +1736,7 @@ assign_tcpConnEntry(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_tcpConnTable(host_snmp *s, rfc1213_mib_tcpConnEntry_t ***tcpConnEntry)
+rfc1213_mib_get_tcpConnTable(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t ***tcpConnEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1844,7 +1844,7 @@ assign_udp(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_udp(host_snmp *s, rfc1213_mib_udp_t **udp)
+rfc1213_mib_get_udp(GSnmpSession *s, rfc1213_mib_udp_t **udp)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 7, 0};
@@ -1940,7 +1940,7 @@ assign_udpEntry(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_udpTable(host_snmp *s, rfc1213_mib_udpEntry_t ***udpEntry)
+rfc1213_mib_get_udpTable(GSnmpSession *s, rfc1213_mib_udpEntry_t ***udpEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2051,7 +2051,7 @@ assign_egp(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_egp(host_snmp *s, rfc1213_mib_egp_t **egp)
+rfc1213_mib_get_egp(GSnmpSession *s, rfc1213_mib_egp_t **egp)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 8, 0};
@@ -2187,7 +2187,7 @@ assign_egpNeighEntry(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_egpNeighTable(host_snmp *s, rfc1213_mib_egpNeighEntry_t ***egpNeighEntry)
+rfc1213_mib_get_egpNeighTable(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t ***egpNeighEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2367,7 +2367,7 @@ assign_snmp(GSList *vbl)
 }
 
 int
-rfc1213_mib_get_snmp(host_snmp *s, rfc1213_mib_snmp_t **snmp)
+rfc1213_mib_get_snmp(GSnmpSession *s, rfc1213_mib_snmp_t **snmp)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 11, 0};

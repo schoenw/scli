@@ -100,7 +100,7 @@ extern disman_schedule_mib_schedObjects_t *
 disman_schedule_mib_new_schedObjects();
 
 extern int
-disman_schedule_mib_get_schedObjects(host_snmp *s, disman_schedule_mib_schedObjects_t **schedObjects);
+disman_schedule_mib_get_schedObjects(GSnmpSession *s, disman_schedule_mib_schedObjects_t **schedObjects);
 
 extern void
 disman_schedule_mib_free_schedObjects(disman_schedule_mib_schedObjects_t *schedObjects);
@@ -145,7 +145,7 @@ typedef struct {
 } disman_schedule_mib_schedEntry_t;
 
 extern int
-disman_schedule_mib_get_schedTable(host_snmp *s, disman_schedule_mib_schedEntry_t ***schedEntry);
+disman_schedule_mib_get_schedTable(GSnmpSession *s, disman_schedule_mib_schedEntry_t ***schedEntry);
 
 extern void
 disman_schedule_mib_free_schedTable(disman_schedule_mib_schedEntry_t **schedEntry);
@@ -154,10 +154,10 @@ extern disman_schedule_mib_schedEntry_t *
 disman_schedule_mib_new_schedEntry();
 
 extern int
-disman_schedule_mib_get_schedEntry(host_snmp *s, disman_schedule_mib_schedEntry_t **schedEntry);
+disman_schedule_mib_get_schedEntry(GSnmpSession *s, disman_schedule_mib_schedEntry_t **schedEntry);
 
 extern int
-disman_schedule_mib_set_schedEntry(host_snmp *s, disman_schedule_mib_schedEntry_t *schedEntry);
+disman_schedule_mib_set_schedEntry(GSnmpSession *s, disman_schedule_mib_schedEntry_t *schedEntry);
 
 extern void
 disman_schedule_mib_free_schedEntry(disman_schedule_mib_schedEntry_t *schedEntry);

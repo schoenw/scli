@@ -158,7 +158,7 @@ assign_usmStats(GSList *vbl)
 }
 
 int
-snmp_user_based_sm_mib_get_usmStats(host_snmp *s, snmp_user_based_sm_mib_usmStats_t **usmStats)
+snmp_user_based_sm_mib_get_usmStats(GSnmpSession *s, snmp_user_based_sm_mib_usmStats_t **usmStats)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 15, 1, 1, 0};
@@ -235,7 +235,7 @@ assign_usmUser(GSList *vbl)
 }
 
 int
-snmp_user_based_sm_mib_get_usmUser(host_snmp *s, snmp_user_based_sm_mib_usmUser_t **usmUser)
+snmp_user_based_sm_mib_get_usmUser(GSnmpSession *s, snmp_user_based_sm_mib_usmUser_t **usmUser)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 15, 1, 2, 0};
@@ -380,7 +380,7 @@ assign_usmUserEntry(GSList *vbl)
 }
 
 int
-snmp_user_based_sm_mib_get_usmUserTable(host_snmp *s, snmp_user_based_sm_mib_usmUserEntry_t ***usmUserEntry)
+snmp_user_based_sm_mib_get_usmUserTable(GSnmpSession *s, snmp_user_based_sm_mib_usmUserEntry_t ***usmUserEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

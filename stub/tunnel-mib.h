@@ -76,7 +76,7 @@ typedef struct {
 } tunnel_mib_tunnelIfEntry_t;
 
 extern int
-tunnel_mib_get_tunnelIfTable(host_snmp *s, tunnel_mib_tunnelIfEntry_t ***tunnelIfEntry);
+tunnel_mib_get_tunnelIfTable(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t ***tunnelIfEntry);
 
 extern void
 tunnel_mib_free_tunnelIfTable(tunnel_mib_tunnelIfEntry_t **tunnelIfEntry);
@@ -85,10 +85,10 @@ extern tunnel_mib_tunnelIfEntry_t *
 tunnel_mib_new_tunnelIfEntry();
 
 extern int
-tunnel_mib_get_tunnelIfEntry(host_snmp *s, tunnel_mib_tunnelIfEntry_t **tunnelIfEntry);
+tunnel_mib_get_tunnelIfEntry(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t **tunnelIfEntry);
 
 extern int
-tunnel_mib_set_tunnelIfEntry(host_snmp *s, tunnel_mib_tunnelIfEntry_t *tunnelIfEntry);
+tunnel_mib_set_tunnelIfEntry(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t *tunnelIfEntry);
 
 extern void
 tunnel_mib_free_tunnelIfEntry(tunnel_mib_tunnelIfEntry_t *tunnelIfEntry);
@@ -107,7 +107,7 @@ typedef struct {
 } tunnel_mib_tunnelConfigEntry_t;
 
 extern int
-tunnel_mib_get_tunnelConfigTable(host_snmp *s, tunnel_mib_tunnelConfigEntry_t ***tunnelConfigEntry);
+tunnel_mib_get_tunnelConfigTable(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t ***tunnelConfigEntry);
 
 extern void
 tunnel_mib_free_tunnelConfigTable(tunnel_mib_tunnelConfigEntry_t **tunnelConfigEntry);
@@ -116,10 +116,10 @@ extern tunnel_mib_tunnelConfigEntry_t *
 tunnel_mib_new_tunnelConfigEntry();
 
 extern int
-tunnel_mib_get_tunnelConfigEntry(host_snmp *s, tunnel_mib_tunnelConfigEntry_t **tunnelConfigEntry);
+tunnel_mib_get_tunnelConfigEntry(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t **tunnelConfigEntry);
 
 extern int
-tunnel_mib_set_tunnelConfigEntry(host_snmp *s, tunnel_mib_tunnelConfigEntry_t *tunnelConfigEntry);
+tunnel_mib_set_tunnelConfigEntry(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t *tunnelConfigEntry);
 
 extern void
 tunnel_mib_free_tunnelConfigEntry(tunnel_mib_tunnelConfigEntry_t *tunnelConfigEntry);

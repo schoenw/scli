@@ -82,7 +82,7 @@ typedef struct {
 } entity_mib_entPhysicalEntry_t;
 
 extern int
-entity_mib_get_entPhysicalTable(host_snmp *s, entity_mib_entPhysicalEntry_t ***entPhysicalEntry);
+entity_mib_get_entPhysicalTable(GSnmpSession *s, entity_mib_entPhysicalEntry_t ***entPhysicalEntry);
 
 extern void
 entity_mib_free_entPhysicalTable(entity_mib_entPhysicalEntry_t **entPhysicalEntry);
@@ -91,10 +91,10 @@ extern entity_mib_entPhysicalEntry_t *
 entity_mib_new_entPhysicalEntry();
 
 extern int
-entity_mib_get_entPhysicalEntry(host_snmp *s, entity_mib_entPhysicalEntry_t **entPhysicalEntry);
+entity_mib_get_entPhysicalEntry(GSnmpSession *s, entity_mib_entPhysicalEntry_t **entPhysicalEntry);
 
 extern int
-entity_mib_set_entPhysicalEntry(host_snmp *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry);
+entity_mib_set_entPhysicalEntry(GSnmpSession *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry);
 
 extern void
 entity_mib_free_entPhysicalEntry(entity_mib_entPhysicalEntry_t *entPhysicalEntry);
@@ -122,7 +122,7 @@ typedef struct {
 } entity_mib_entLogicalEntry_t;
 
 extern int
-entity_mib_get_entLogicalTable(host_snmp *s, entity_mib_entLogicalEntry_t ***entLogicalEntry);
+entity_mib_get_entLogicalTable(GSnmpSession *s, entity_mib_entLogicalEntry_t ***entLogicalEntry);
 
 extern void
 entity_mib_free_entLogicalTable(entity_mib_entLogicalEntry_t **entLogicalEntry);
@@ -131,7 +131,7 @@ extern entity_mib_entLogicalEntry_t *
 entity_mib_new_entLogicalEntry();
 
 extern int
-entity_mib_get_entLogicalEntry(host_snmp *s, entity_mib_entLogicalEntry_t **entLogicalEntry);
+entity_mib_get_entLogicalEntry(GSnmpSession *s, entity_mib_entLogicalEntry_t **entLogicalEntry);
 
 extern void
 entity_mib_free_entLogicalEntry(entity_mib_entLogicalEntry_t *entLogicalEntry);
@@ -146,7 +146,7 @@ typedef struct {
 } entity_mib_entLPMappingEntry_t;
 
 extern int
-entity_mib_get_entLPMappingTable(host_snmp *s, entity_mib_entLPMappingEntry_t ***entLPMappingEntry);
+entity_mib_get_entLPMappingTable(GSnmpSession *s, entity_mib_entLPMappingEntry_t ***entLPMappingEntry);
 
 extern void
 entity_mib_free_entLPMappingTable(entity_mib_entLPMappingEntry_t **entLPMappingEntry);
@@ -155,7 +155,7 @@ extern entity_mib_entLPMappingEntry_t *
 entity_mib_new_entLPMappingEntry();
 
 extern int
-entity_mib_get_entLPMappingEntry(host_snmp *s, entity_mib_entLPMappingEntry_t **entLPMappingEntry);
+entity_mib_get_entLPMappingEntry(GSnmpSession *s, entity_mib_entLPMappingEntry_t **entLPMappingEntry);
 
 extern void
 entity_mib_free_entLPMappingEntry(entity_mib_entLPMappingEntry_t *entLPMappingEntry);
@@ -172,7 +172,7 @@ typedef struct {
 } entity_mib_entAliasMappingEntry_t;
 
 extern int
-entity_mib_get_entAliasMappingTable(host_snmp *s, entity_mib_entAliasMappingEntry_t ***entAliasMappingEntry);
+entity_mib_get_entAliasMappingTable(GSnmpSession *s, entity_mib_entAliasMappingEntry_t ***entAliasMappingEntry);
 
 extern void
 entity_mib_free_entAliasMappingTable(entity_mib_entAliasMappingEntry_t **entAliasMappingEntry);
@@ -181,7 +181,7 @@ extern entity_mib_entAliasMappingEntry_t *
 entity_mib_new_entAliasMappingEntry();
 
 extern int
-entity_mib_get_entAliasMappingEntry(host_snmp *s, entity_mib_entAliasMappingEntry_t **entAliasMappingEntry);
+entity_mib_get_entAliasMappingEntry(GSnmpSession *s, entity_mib_entAliasMappingEntry_t **entAliasMappingEntry);
 
 extern void
 entity_mib_free_entAliasMappingEntry(entity_mib_entAliasMappingEntry_t *entAliasMappingEntry);
@@ -196,7 +196,7 @@ typedef struct {
 } entity_mib_entPhysicalContainsEntry_t;
 
 extern int
-entity_mib_get_entPhysicalContainsTable(host_snmp *s, entity_mib_entPhysicalContainsEntry_t ***entPhysicalContainsEntry);
+entity_mib_get_entPhysicalContainsTable(GSnmpSession *s, entity_mib_entPhysicalContainsEntry_t ***entPhysicalContainsEntry);
 
 extern void
 entity_mib_free_entPhysicalContainsTable(entity_mib_entPhysicalContainsEntry_t **entPhysicalContainsEntry);
@@ -205,7 +205,7 @@ extern entity_mib_entPhysicalContainsEntry_t *
 entity_mib_new_entPhysicalContainsEntry();
 
 extern int
-entity_mib_get_entPhysicalContainsEntry(host_snmp *s, entity_mib_entPhysicalContainsEntry_t **entPhysicalContainsEntry);
+entity_mib_get_entPhysicalContainsEntry(GSnmpSession *s, entity_mib_entPhysicalContainsEntry_t **entPhysicalContainsEntry);
 
 extern void
 entity_mib_free_entPhysicalContainsEntry(entity_mib_entPhysicalContainsEntry_t *entPhysicalContainsEntry);
@@ -222,7 +222,7 @@ extern entity_mib_entityGeneral_t *
 entity_mib_new_entityGeneral();
 
 extern int
-entity_mib_get_entityGeneral(host_snmp *s, entity_mib_entityGeneral_t **entityGeneral);
+entity_mib_get_entityGeneral(GSnmpSession *s, entity_mib_entityGeneral_t **entityGeneral);
 
 extern void
 entity_mib_free_entityGeneral(entity_mib_entityGeneral_t *entityGeneral);

@@ -84,7 +84,7 @@ assign_udp(GSList *vbl)
 }
 
 int
-udp_mib_get_udp(host_snmp *s, udp_mib_udp_t **udp)
+udp_mib_get_udp(GSnmpSession *s, udp_mib_udp_t **udp)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 7, 0};
@@ -180,7 +180,7 @@ assign_udpEntry(GSList *vbl)
 }
 
 int
-udp_mib_get_udpTable(host_snmp *s, udp_mib_udpEntry_t ***udpEntry)
+udp_mib_get_udpTable(GSnmpSession *s, udp_mib_udpEntry_t ***udpEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

@@ -159,7 +159,7 @@ assign_schedObjects(GSList *vbl)
 }
 
 int
-disman_schedule_mib_get_schedObjects(host_snmp *s, disman_schedule_mib_schedObjects_t **schedObjects)
+disman_schedule_mib_get_schedObjects(GSnmpSession *s, disman_schedule_mib_schedObjects_t **schedObjects)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 63, 1, 0};
@@ -328,7 +328,7 @@ assign_schedEntry(GSList *vbl)
 }
 
 int
-disman_schedule_mib_get_schedTable(host_snmp *s, disman_schedule_mib_schedEntry_t ***schedEntry)
+disman_schedule_mib_get_schedTable(GSnmpSession *s, disman_schedule_mib_schedEntry_t ***schedEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

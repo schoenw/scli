@@ -416,7 +416,7 @@ assign_atmMIBObjects(GSList *vbl)
 }
 
 int
-atm_mib_get_atmMIBObjects(host_snmp *s, atm_mib_atmMIBObjects_t **atmMIBObjects)
+atm_mib_get_atmMIBObjects(GSnmpSession *s, atm_mib_atmMIBObjects_t **atmMIBObjects)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 37, 1, 0};
@@ -555,7 +555,7 @@ assign_atmInterfaceConfEntry(GSList *vbl)
 }
 
 int
-atm_mib_get_atmInterfaceConfTable(host_snmp *s, atm_mib_atmInterfaceConfEntry_t ***atmInterfaceConfEntry)
+atm_mib_get_atmInterfaceConfTable(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t ***atmInterfaceConfEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -677,7 +677,7 @@ assign_atmInterfaceDs3PlcpEntry(GSList *vbl)
 }
 
 int
-atm_mib_get_atmInterfaceDs3PlcpTable(host_snmp *s, atm_mib_atmInterfaceDs3PlcpEntry_t ***atmInterfaceDs3PlcpEntry)
+atm_mib_get_atmInterfaceDs3PlcpTable(GSnmpSession *s, atm_mib_atmInterfaceDs3PlcpEntry_t ***atmInterfaceDs3PlcpEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -796,7 +796,7 @@ assign_atmInterfaceTCEntry(GSList *vbl)
 }
 
 int
-atm_mib_get_atmInterfaceTCTable(host_snmp *s, atm_mib_atmInterfaceTCEntry_t ***atmInterfaceTCEntry)
+atm_mib_get_atmInterfaceTCTable(GSnmpSession *s, atm_mib_atmInterfaceTCEntry_t ***atmInterfaceTCEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -940,7 +940,7 @@ assign_atmTrafficDescrParamEntry(GSList *vbl)
 }
 
 int
-atm_mib_get_atmTrafficDescrParamTable(host_snmp *s, atm_mib_atmTrafficDescrParamEntry_t ***atmTrafficDescrParamEntry)
+atm_mib_get_atmTrafficDescrParamTable(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t ***atmTrafficDescrParamEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1082,7 +1082,7 @@ assign_atmVplEntry(GSList *vbl)
 }
 
 int
-atm_mib_get_atmVplTable(host_snmp *s, atm_mib_atmVplEntry_t ***atmVplEntry)
+atm_mib_get_atmVplTable(GSnmpSession *s, atm_mib_atmVplEntry_t ***atmVplEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1238,7 +1238,7 @@ assign_atmVclEntry(GSList *vbl)
 }
 
 int
-atm_mib_get_atmVclTable(host_snmp *s, atm_mib_atmVclEntry_t ***atmVclEntry)
+atm_mib_get_atmVclTable(GSnmpSession *s, atm_mib_atmVclEntry_t ***atmVclEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1377,7 +1377,7 @@ assign_atmVpCrossConnectEntry(GSList *vbl)
 }
 
 int
-atm_mib_get_atmVpCrossConnectTable(host_snmp *s, atm_mib_atmVpCrossConnectEntry_t ***atmVpCrossConnectEntry)
+atm_mib_get_atmVpCrossConnectTable(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t ***atmVpCrossConnectEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1520,7 +1520,7 @@ assign_atmVcCrossConnectEntry(GSList *vbl)
 }
 
 int
-atm_mib_get_atmVcCrossConnectTable(host_snmp *s, atm_mib_atmVcCrossConnectEntry_t ***atmVcCrossConnectEntry)
+atm_mib_get_atmVcCrossConnectTable(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t ***atmVcCrossConnectEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1646,7 +1646,7 @@ assign_aal5VccEntry(GSList *vbl)
 }
 
 int
-atm_mib_get_aal5VccTable(host_snmp *s, atm_mib_aal5VccEntry_t ***aal5VccEntry)
+atm_mib_get_aal5VccTable(GSnmpSession *s, atm_mib_aal5VccEntry_t ***aal5VccEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

@@ -3,7 +3,7 @@
 #include "g_snmp.h"
 
 static gboolean
-g_snmp_table_done_callback(host_snmp *host, gpointer data, 
+g_snmp_table_done_callback(GSnmpSession *session, gpointer data, 
                            GSnmpPdu *spdu, GSList *objs)
 {
   Gsnmp_table  * table;
@@ -114,13 +114,13 @@ g_snmp_table_done_callback(host_snmp *host, gpointer data,
     }
   if (table->cb_row)
     table->cb_row(otable, index_len, table->data);
-  table->request = g_async_getnext(table->host, nobjs);
+  table->request = g_async_getnext(table->session, nobjs);
   return TRUE;
 }  
 
 
 static void
-g_snmp_table_time_callback(host_snmp *host, gpointer data)
+g_snmp_table_time_callback(GSnmpSession *session, gpointer data)
 {
     Gsnmp_table * table;
     
@@ -135,29 +135,29 @@ g_snmp_table_time_callback(host_snmp *host, gpointer data)
 
 
 Gsnmp_table *
-g_snmp_table_new(host_snmp *host, GSList *objs, 
+g_snmp_table_new(GSnmpSession *session, GSList *objs, 
 		 void (* cb_error)(), void (* cb_row)(), void (* cb_finish)(),
 		 gpointer data)
 {
     GSList *elem;
     Gsnmp_table *table;
 
-    table       = g_malloc0(sizeof(Gsnmp_table));
-    table->host = g_malloc0(sizeof(host_snmp));
+    table          = g_malloc0(sizeof(Gsnmp_table));
+    table->session = g_malloc0(sizeof(GSnmpSession));
     
-    table->host->domain  = host->domain;
-    table->host->rcomm   = host->rcomm;
-    table->host->wcomm   = host->wcomm;
-    table->host->retries = host->retries;
-    table->host->name    = host->name;
-    table->host->status  = 0;
-    table->host->port    = host->port;
-    table->host->timeout = host->timeout;
-    table->host->version = host->version;
-    table->host->magic   = table;
+    table->session->domain  = session->domain;
+    table->session->rcomm   = session->rcomm;
+    table->session->wcomm   = session->wcomm;
+    table->session->retries = session->retries;
+    table->session->name    = session->name;
+    table->session->status  = 0;
+    table->session->port    = session->port;
+    table->session->timeout = session->timeout;
+    table->session->version = session->version;
+    table->session->magic   = table;
     
-    table->host->done_callback = g_snmp_table_done_callback;
-    table->host->time_callback = g_snmp_table_time_callback;
+    table->session->done_callback = g_snmp_table_done_callback;
+    table->session->time_callback = g_snmp_table_time_callback;
     
     for (elem = objs; elem; elem = g_slist_next(elem)) {
 	GSnmpVarBind *obj, *nobj;
@@ -178,7 +178,7 @@ g_snmp_table_new(host_snmp *host, GSList *objs,
 void
 g_snmp_table_get(Gsnmp_table *table)
 {
-    table->request = g_async_getnext(table->host, table->objs);
+    table->request = g_async_getnext(table->session, table->objs);
 }
 
 
@@ -194,6 +194,6 @@ g_snmp_table_destroy(Gsnmp_table *table)
 	g_snmp_varbind_free((GSnmpVarBind *) elem->data);
     }
     g_slist_free(table->objs);
-    g_free(table->host);
+    g_free(table->session);
     g_free(table);
 }

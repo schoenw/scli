@@ -73,7 +73,7 @@ assign_snmpMPDStats(GSList *vbl)
 }
 
 int
-snmp_mpd_mib_get_snmpMPDStats(host_snmp *s, snmp_mpd_mib_snmpMPDStats_t **snmpMPDStats)
+snmp_mpd_mib_get_snmpMPDStats(GSnmpSession *s, snmp_mpd_mib_snmpMPDStats_t **snmpMPDStats)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 11, 2, 1, 0};

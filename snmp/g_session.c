@@ -47,9 +47,9 @@ static gint     id          = 1;      /* SNMP request id */
  */
 
 gboolean
-g_setup_address (host_snmp *host)
+g_setup_address (GSnmpSession *session)
 {
-  if (!g_lookup_address(host->domain, host->name, &host->address))
+  if (!g_lookup_address(session->domain, session->name, &session->address))
     return FALSE;
  
   return TRUE;
@@ -66,7 +66,7 @@ g_setup_address (host_snmp *host)
 /* Asynchronous SNMP functions */
 
 gpointer
-g_async_send (host_snmp *host, GSnmpPduType type,
+g_async_send (GSnmpSession *session, GSnmpPduType type,
 	      GSList *objs, guint arg1, guint arg2)
 {
   snmp_request * request;
@@ -83,18 +83,18 @@ g_async_send (host_snmp *host, GSnmpPduType type,
   printf("New request: %p\n", request);
 #endif
 
-  if (host->done_callback)
-    request->callback = host->done_callback;
+  if (session->done_callback)
+    request->callback = session->done_callback;
   else
     request->callback = NULL;
 
-  if (host->time_callback)
-    request->timeout  = host->time_callback;
+  if (session->time_callback)
+    request->timeout  = session->time_callback;
   else
     request->timeout  = NULL;
 
-  if (!host->address) {
-      if (!g_setup_address(host))
+  if (!session->address) {
+      if (!g_setup_address(session))
       {
 	  g_free(request);
 	  return NULL;
@@ -108,21 +108,21 @@ g_async_send (host_snmp *host, GSnmpPduType type,
 
   if (type == G_SNMP_PDU_SET)
     {
-      request->auth=g_string_new(host->wcomm);
+      request->auth=g_string_new(session->wcomm);
     }
   else
     {
-      request->auth=g_string_new(host->rcomm);
+      request->auth=g_string_new(session->rcomm);
     }
 
   request->pdu.type	            = type;
-  request->retries                  = host->retries;
-  request->timeoutval               = host->timeout;
-  request->magic                    = host->magic;
-  request->version                  = host->version;
-  request->domain                   = host->domain;
-  request->address                  = host->address;
-  request->host                     = host;
+  request->retries                  = session->retries;
+  request->timeoutval               = session->timeout;
+  request->magic                    = session->magic;
+  request->version                  = session->version;
+  request->domain                   = session->domain;
+  request->address                  = session->address;
+  request->session                  = session;
   request->time                     = now + request->timeoutval;
 
   switch (request->version)
@@ -143,7 +143,7 @@ g_async_send (host_snmp *host, GSnmpPduType type,
         printf("Unknown version!!!\n");
     }
 #ifdef SNMP_DEBUG 
-  printf("sending Pdu for %s, version %d\n", host->name, request->version);
+  printf("sending Pdu for %s, version %d\n", session->name, request->version);
 #endif
   sendPdu(request->domain, request->address, model, SMODEL_ANY, 
           request->auth, SLEVEL_NANP, NULL, NULL, pduv, &request->pdu, TRUE);
@@ -154,27 +154,27 @@ g_async_send (host_snmp *host, GSnmpPduType type,
 }
 
 gpointer
-g_async_get (host_snmp *host, GSList *pdu)
+g_async_get (GSnmpSession *session, GSList *pdu)
 {
-  return g_async_send(host, G_SNMP_PDU_GET, pdu, 0, 0);
+  return g_async_send(session, G_SNMP_PDU_GET, pdu, 0, 0);
 }
 
 gpointer
-g_async_getnext (host_snmp *host, GSList *pdu)
+g_async_getnext (GSnmpSession *session, GSList *pdu)
 {
-  return g_async_send(host, G_SNMP_PDU_NEXT, pdu, 0, 0);
+  return g_async_send(session, G_SNMP_PDU_NEXT, pdu, 0, 0);
 }
 
 gpointer
-g_async_bulk (host_snmp *host, GSList *pdu, guint nonrep, guint maxiter)
+g_async_bulk (GSnmpSession *session, GSList *pdu, guint nonrep, guint maxiter)
 {
-  return g_async_send(host, G_SNMP_PDU_BULK, pdu, nonrep, maxiter);
+  return g_async_send(session, G_SNMP_PDU_BULK, pdu, nonrep, maxiter);
 }
 
 gpointer
-g_async_set (host_snmp *host, GSList *pdu)
+g_async_set (GSnmpSession *session, GSList *pdu)
 {
-  return g_async_send(host, G_SNMP_PDU_SET, pdu, 0, 0);
+  return g_async_send(session, G_SNMP_PDU_SET, pdu, 0, 0);
 }
 
 /* Synchronous SNMP functions */
@@ -190,7 +190,7 @@ struct syncmagic {
 };
 
 static void
-cb_time(host_snmp *host, void *magic)
+cb_time(GSnmpSession *session, void *magic)
 {
   struct syncmagic *sm = (struct syncmagic *) magic;
   sm->result = NULL;
@@ -201,7 +201,7 @@ cb_time(host_snmp *host, void *magic)
 }
 
 static gboolean
-cb_done (host_snmp *host, void *magic, GSnmpPdu *spdu, GSList *objs)
+cb_done (GSnmpSession *session, void *magic, GSnmpPdu *spdu, GSList *objs)
 {
   struct syncmagic *sm = (struct syncmagic *) magic;
   sm->result = objs;
@@ -213,7 +213,7 @@ cb_done (host_snmp *host, void *magic, GSnmpPdu *spdu, GSList *objs)
 }
 
 GSList *
-g_sync_send (host_snmp *host, GSnmpPduType type,
+g_sync_send (GSnmpSession *session, GSnmpPduType type,
 	     GSList *objs, guint arg1, guint arg2)
 {
   struct syncmagic * magic;
@@ -224,10 +224,10 @@ g_sync_send (host_snmp *host, GSnmpPduType type,
 #ifdef SNMP_DEBUG
   g_print("g_sync_send: New loop %p\n", magic->loop);
 #endif
-  host->done_callback = cb_done;
-  host->time_callback = cb_time;
-  host->magic = magic;
-  if (!g_async_send (host, type, objs, arg1, arg2))
+  session->done_callback = cb_done;
+  session->time_callback = cb_time;
+  session->magic = magic;
+  if (!g_async_send (session, type, objs, arg1, arg2))
     {
 #ifdef SNMP_DEBUG
       g_print("g_sync_send: error in async_send. Free loop %p\n", magic->loop);
@@ -252,27 +252,27 @@ g_sync_send (host_snmp *host, GSnmpPduType type,
 }
 
 GSList *
-g_sync_get (host_snmp *host, GSList *pdu)
+g_sync_get (GSnmpSession *session, GSList *pdu)
 {
-  return g_sync_send(host, G_SNMP_PDU_GET, pdu, 0, 0);
+  return g_sync_send(session, G_SNMP_PDU_GET, pdu, 0, 0);
 }
 
 GSList *
-g_sync_getnext (host_snmp *host, GSList *pdu)
+g_sync_getnext (GSnmpSession *session, GSList *pdu)
 {
-  return g_sync_send(host, G_SNMP_PDU_NEXT, pdu, 0, 0);
+  return g_sync_send(session, G_SNMP_PDU_NEXT, pdu, 0, 0);
 }
 
 GSList *
-g_sync_bulk (host_snmp *host, GSList *pdu, guint nonrep, guint maxiter)
+g_sync_bulk (GSnmpSession *session, GSList *pdu, guint nonrep, guint maxiter)
 {
-  return g_sync_send(host, G_SNMP_PDU_BULK, pdu, nonrep, maxiter);
+  return g_sync_send(session, G_SNMP_PDU_BULK, pdu, nonrep, maxiter);
 }
 
 GSList *
-g_sync_set (host_snmp *host, GSList *pdu)
+g_sync_set (GSnmpSession *session, GSList *pdu)
 {
-  return g_sync_send(host, G_SNMP_PDU_SET, pdu, 0, 0);
+  return g_sync_send(session, G_SNMP_PDU_SET, pdu, 0, 0);
 }
 
 gboolean
@@ -446,7 +446,7 @@ again:
 #ifdef SNMP_DEBUG
                    printf("Calling time callback for request: %p\n", request);
 #endif
-                   request->timeout(request->host, request->magic);
+                   request->timeout(request->session, request->magic);
                 }
               g_free(request);
               goto again;
@@ -477,13 +477,13 @@ g_session_response_pdu (guint messageProcessingModel,
           return;
         }
       rq_list = g_slist_remove(rq_list, request);
-      request->host->status = PDU->request.error_status;
+      request->session->status = PDU->request.error_status;
       if (request->callback)
         {
 #ifdef SNMP_DEBUG
           printf("Calling done callback for request: %p\n", request);
 #endif
-          if (request->callback(request->host, request->magic, PDU, objs))
+          if (request->callback(request->session, request->magic, PDU, objs))
             g_slist_free(objs);
         }
       else  

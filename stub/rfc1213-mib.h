@@ -168,10 +168,10 @@ extern rfc1213_mib_system_t *
 rfc1213_mib_new_system();
 
 extern int
-rfc1213_mib_get_system(host_snmp *s, rfc1213_mib_system_t **system);
+rfc1213_mib_get_system(GSnmpSession *s, rfc1213_mib_system_t **system);
 
 extern int
-rfc1213_mib_set_system(host_snmp *s, rfc1213_mib_system_t *system);
+rfc1213_mib_set_system(GSnmpSession *s, rfc1213_mib_system_t *system);
 
 extern void
 rfc1213_mib_free_system(rfc1213_mib_system_t *system);
@@ -188,7 +188,7 @@ extern rfc1213_mib_interfaces_t *
 rfc1213_mib_new_interfaces();
 
 extern int
-rfc1213_mib_get_interfaces(host_snmp *s, rfc1213_mib_interfaces_t **interfaces);
+rfc1213_mib_get_interfaces(GSnmpSession *s, rfc1213_mib_interfaces_t **interfaces);
 
 extern void
 rfc1213_mib_free_interfaces(rfc1213_mib_interfaces_t *interfaces);
@@ -226,7 +226,7 @@ typedef struct {
 } rfc1213_mib_ifEntry_t;
 
 extern int
-rfc1213_mib_get_ifTable(host_snmp *s, rfc1213_mib_ifEntry_t ***ifEntry);
+rfc1213_mib_get_ifTable(GSnmpSession *s, rfc1213_mib_ifEntry_t ***ifEntry);
 
 extern void
 rfc1213_mib_free_ifTable(rfc1213_mib_ifEntry_t **ifEntry);
@@ -235,10 +235,10 @@ extern rfc1213_mib_ifEntry_t *
 rfc1213_mib_new_ifEntry();
 
 extern int
-rfc1213_mib_get_ifEntry(host_snmp *s, rfc1213_mib_ifEntry_t **ifEntry);
+rfc1213_mib_get_ifEntry(GSnmpSession *s, rfc1213_mib_ifEntry_t **ifEntry);
 
 extern int
-rfc1213_mib_set_ifEntry(host_snmp *s, rfc1213_mib_ifEntry_t *ifEntry);
+rfc1213_mib_set_ifEntry(GSnmpSession *s, rfc1213_mib_ifEntry_t *ifEntry);
 
 extern void
 rfc1213_mib_free_ifEntry(rfc1213_mib_ifEntry_t *ifEntry);
@@ -255,7 +255,7 @@ typedef struct {
 } rfc1213_mib_atEntry_t;
 
 extern int
-rfc1213_mib_get_atTable(host_snmp *s, rfc1213_mib_atEntry_t ***atEntry);
+rfc1213_mib_get_atTable(GSnmpSession *s, rfc1213_mib_atEntry_t ***atEntry);
 
 extern void
 rfc1213_mib_free_atTable(rfc1213_mib_atEntry_t **atEntry);
@@ -264,10 +264,10 @@ extern rfc1213_mib_atEntry_t *
 rfc1213_mib_new_atEntry();
 
 extern int
-rfc1213_mib_get_atEntry(host_snmp *s, rfc1213_mib_atEntry_t **atEntry);
+rfc1213_mib_get_atEntry(GSnmpSession *s, rfc1213_mib_atEntry_t **atEntry);
 
 extern int
-rfc1213_mib_set_atEntry(host_snmp *s, rfc1213_mib_atEntry_t *atEntry);
+rfc1213_mib_set_atEntry(GSnmpSession *s, rfc1213_mib_atEntry_t *atEntry);
 
 extern void
 rfc1213_mib_free_atEntry(rfc1213_mib_atEntry_t *atEntry);
@@ -303,10 +303,10 @@ extern rfc1213_mib_ip_t *
 rfc1213_mib_new_ip();
 
 extern int
-rfc1213_mib_get_ip(host_snmp *s, rfc1213_mib_ip_t **ip);
+rfc1213_mib_get_ip(GSnmpSession *s, rfc1213_mib_ip_t **ip);
 
 extern int
-rfc1213_mib_set_ip(host_snmp *s, rfc1213_mib_ip_t *ip);
+rfc1213_mib_set_ip(GSnmpSession *s, rfc1213_mib_ip_t *ip);
 
 extern void
 rfc1213_mib_free_ip(rfc1213_mib_ip_t *ip);
@@ -324,7 +324,7 @@ typedef struct {
 } rfc1213_mib_ipAddrEntry_t;
 
 extern int
-rfc1213_mib_get_ipAddrTable(host_snmp *s, rfc1213_mib_ipAddrEntry_t ***ipAddrEntry);
+rfc1213_mib_get_ipAddrTable(GSnmpSession *s, rfc1213_mib_ipAddrEntry_t ***ipAddrEntry);
 
 extern void
 rfc1213_mib_free_ipAddrTable(rfc1213_mib_ipAddrEntry_t **ipAddrEntry);
@@ -333,7 +333,7 @@ extern rfc1213_mib_ipAddrEntry_t *
 rfc1213_mib_new_ipAddrEntry();
 
 extern int
-rfc1213_mib_get_ipAddrEntry(host_snmp *s, rfc1213_mib_ipAddrEntry_t **ipAddrEntry);
+rfc1213_mib_get_ipAddrEntry(GSnmpSession *s, rfc1213_mib_ipAddrEntry_t **ipAddrEntry);
 
 extern void
 rfc1213_mib_free_ipAddrEntry(rfc1213_mib_ipAddrEntry_t *ipAddrEntry);
@@ -360,7 +360,7 @@ typedef struct {
 } rfc1213_mib_ipRouteEntry_t;
 
 extern int
-rfc1213_mib_get_ipRouteTable(host_snmp *s, rfc1213_mib_ipRouteEntry_t ***ipRouteEntry);
+rfc1213_mib_get_ipRouteTable(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t ***ipRouteEntry);
 
 extern void
 rfc1213_mib_free_ipRouteTable(rfc1213_mib_ipRouteEntry_t **ipRouteEntry);
@@ -369,10 +369,10 @@ extern rfc1213_mib_ipRouteEntry_t *
 rfc1213_mib_new_ipRouteEntry();
 
 extern int
-rfc1213_mib_get_ipRouteEntry(host_snmp *s, rfc1213_mib_ipRouteEntry_t **ipRouteEntry);
+rfc1213_mib_get_ipRouteEntry(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t **ipRouteEntry);
 
 extern int
-rfc1213_mib_set_ipRouteEntry(host_snmp *s, rfc1213_mib_ipRouteEntry_t *ipRouteEntry);
+rfc1213_mib_set_ipRouteEntry(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t *ipRouteEntry);
 
 extern void
 rfc1213_mib_free_ipRouteEntry(rfc1213_mib_ipRouteEntry_t *ipRouteEntry);
@@ -390,7 +390,7 @@ typedef struct {
 } rfc1213_mib_ipNetToMediaEntry_t;
 
 extern int
-rfc1213_mib_get_ipNetToMediaTable(host_snmp *s, rfc1213_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry);
+rfc1213_mib_get_ipNetToMediaTable(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry);
 
 extern void
 rfc1213_mib_free_ipNetToMediaTable(rfc1213_mib_ipNetToMediaEntry_t **ipNetToMediaEntry);
@@ -399,10 +399,10 @@ extern rfc1213_mib_ipNetToMediaEntry_t *
 rfc1213_mib_new_ipNetToMediaEntry();
 
 extern int
-rfc1213_mib_get_ipNetToMediaEntry(host_snmp *s, rfc1213_mib_ipNetToMediaEntry_t **ipNetToMediaEntry);
+rfc1213_mib_get_ipNetToMediaEntry(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t **ipNetToMediaEntry);
 
 extern int
-rfc1213_mib_set_ipNetToMediaEntry(host_snmp *s, rfc1213_mib_ipNetToMediaEntry_t *ipNetToMediaEntry);
+rfc1213_mib_set_ipNetToMediaEntry(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t *ipNetToMediaEntry);
 
 extern void
 rfc1213_mib_free_ipNetToMediaEntry(rfc1213_mib_ipNetToMediaEntry_t *ipNetToMediaEntry);
@@ -444,7 +444,7 @@ extern rfc1213_mib_icmp_t *
 rfc1213_mib_new_icmp();
 
 extern int
-rfc1213_mib_get_icmp(host_snmp *s, rfc1213_mib_icmp_t **icmp);
+rfc1213_mib_get_icmp(GSnmpSession *s, rfc1213_mib_icmp_t **icmp);
 
 extern void
 rfc1213_mib_free_icmp(rfc1213_mib_icmp_t *icmp);
@@ -474,7 +474,7 @@ extern rfc1213_mib_tcp_t *
 rfc1213_mib_new_tcp();
 
 extern int
-rfc1213_mib_get_tcp(host_snmp *s, rfc1213_mib_tcp_t **tcp);
+rfc1213_mib_get_tcp(GSnmpSession *s, rfc1213_mib_tcp_t **tcp);
 
 extern void
 rfc1213_mib_free_tcp(rfc1213_mib_tcp_t *tcp);
@@ -492,7 +492,7 @@ typedef struct {
 } rfc1213_mib_tcpConnEntry_t;
 
 extern int
-rfc1213_mib_get_tcpConnTable(host_snmp *s, rfc1213_mib_tcpConnEntry_t ***tcpConnEntry);
+rfc1213_mib_get_tcpConnTable(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t ***tcpConnEntry);
 
 extern void
 rfc1213_mib_free_tcpConnTable(rfc1213_mib_tcpConnEntry_t **tcpConnEntry);
@@ -501,10 +501,10 @@ extern rfc1213_mib_tcpConnEntry_t *
 rfc1213_mib_new_tcpConnEntry();
 
 extern int
-rfc1213_mib_get_tcpConnEntry(host_snmp *s, rfc1213_mib_tcpConnEntry_t **tcpConnEntry);
+rfc1213_mib_get_tcpConnEntry(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t **tcpConnEntry);
 
 extern int
-rfc1213_mib_set_tcpConnEntry(host_snmp *s, rfc1213_mib_tcpConnEntry_t *tcpConnEntry);
+rfc1213_mib_set_tcpConnEntry(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t *tcpConnEntry);
 
 extern void
 rfc1213_mib_free_tcpConnEntry(rfc1213_mib_tcpConnEntry_t *tcpConnEntry);
@@ -524,7 +524,7 @@ extern rfc1213_mib_udp_t *
 rfc1213_mib_new_udp();
 
 extern int
-rfc1213_mib_get_udp(host_snmp *s, rfc1213_mib_udp_t **udp);
+rfc1213_mib_get_udp(GSnmpSession *s, rfc1213_mib_udp_t **udp);
 
 extern void
 rfc1213_mib_free_udp(rfc1213_mib_udp_t *udp);
@@ -539,7 +539,7 @@ typedef struct {
 } rfc1213_mib_udpEntry_t;
 
 extern int
-rfc1213_mib_get_udpTable(host_snmp *s, rfc1213_mib_udpEntry_t ***udpEntry);
+rfc1213_mib_get_udpTable(GSnmpSession *s, rfc1213_mib_udpEntry_t ***udpEntry);
 
 extern void
 rfc1213_mib_free_udpTable(rfc1213_mib_udpEntry_t **udpEntry);
@@ -548,7 +548,7 @@ extern rfc1213_mib_udpEntry_t *
 rfc1213_mib_new_udpEntry();
 
 extern int
-rfc1213_mib_get_udpEntry(host_snmp *s, rfc1213_mib_udpEntry_t **udpEntry);
+rfc1213_mib_get_udpEntry(GSnmpSession *s, rfc1213_mib_udpEntry_t **udpEntry);
 
 extern void
 rfc1213_mib_free_udpEntry(rfc1213_mib_udpEntry_t *udpEntry);
@@ -569,7 +569,7 @@ extern rfc1213_mib_egp_t *
 rfc1213_mib_new_egp();
 
 extern int
-rfc1213_mib_get_egp(host_snmp *s, rfc1213_mib_egp_t **egp);
+rfc1213_mib_get_egp(GSnmpSession *s, rfc1213_mib_egp_t **egp);
 
 extern void
 rfc1213_mib_free_egp(rfc1213_mib_egp_t *egp);
@@ -597,7 +597,7 @@ typedef struct {
 } rfc1213_mib_egpNeighEntry_t;
 
 extern int
-rfc1213_mib_get_egpNeighTable(host_snmp *s, rfc1213_mib_egpNeighEntry_t ***egpNeighEntry);
+rfc1213_mib_get_egpNeighTable(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t ***egpNeighEntry);
 
 extern void
 rfc1213_mib_free_egpNeighTable(rfc1213_mib_egpNeighEntry_t **egpNeighEntry);
@@ -606,10 +606,10 @@ extern rfc1213_mib_egpNeighEntry_t *
 rfc1213_mib_new_egpNeighEntry();
 
 extern int
-rfc1213_mib_get_egpNeighEntry(host_snmp *s, rfc1213_mib_egpNeighEntry_t **egpNeighEntry);
+rfc1213_mib_get_egpNeighEntry(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t **egpNeighEntry);
 
 extern int
-rfc1213_mib_set_egpNeighEntry(host_snmp *s, rfc1213_mib_egpNeighEntry_t *egpNeighEntry);
+rfc1213_mib_set_egpNeighEntry(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t *egpNeighEntry);
 
 extern void
 rfc1213_mib_free_egpNeighEntry(rfc1213_mib_egpNeighEntry_t *egpNeighEntry);
@@ -653,10 +653,10 @@ extern rfc1213_mib_snmp_t *
 rfc1213_mib_new_snmp();
 
 extern int
-rfc1213_mib_get_snmp(host_snmp *s, rfc1213_mib_snmp_t **snmp);
+rfc1213_mib_get_snmp(GSnmpSession *s, rfc1213_mib_snmp_t **snmp);
 
 extern int
-rfc1213_mib_set_snmp(host_snmp *s, rfc1213_mib_snmp_t *snmp);
+rfc1213_mib_set_snmp(GSnmpSession *s, rfc1213_mib_snmp_t *snmp);
 
 extern void
 rfc1213_mib_free_snmp(rfc1213_mib_snmp_t *snmp);

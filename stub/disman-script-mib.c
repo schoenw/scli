@@ -317,7 +317,7 @@ assign_smLangEntry(GSList *vbl)
 }
 
 int
-disman_script_mib_get_smLangTable(host_snmp *s, disman_script_mib_smLangEntry_t ***smLangEntry)
+disman_script_mib_get_smLangTable(GSnmpSession *s, disman_script_mib_smLangEntry_t ***smLangEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -452,7 +452,7 @@ assign_smExtsnEntry(GSList *vbl)
 }
 
 int
-disman_script_mib_get_smExtsnTable(host_snmp *s, disman_script_mib_smExtsnEntry_t ***smExtsnEntry)
+disman_script_mib_get_smExtsnTable(GSnmpSession *s, disman_script_mib_smExtsnEntry_t ***smExtsnEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -608,7 +608,7 @@ assign_smScriptEntry(GSList *vbl)
 }
 
 int
-disman_script_mib_get_smScriptTable(host_snmp *s, disman_script_mib_smScriptEntry_t ***smScriptEntry)
+disman_script_mib_get_smScriptTable(GSnmpSession *s, disman_script_mib_smScriptEntry_t ***smScriptEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -742,7 +742,7 @@ assign_smCodeEntry(GSList *vbl)
 }
 
 int
-disman_script_mib_get_smCodeTable(host_snmp *s, disman_script_mib_smCodeEntry_t ***smCodeEntry)
+disman_script_mib_get_smCodeTable(GSnmpSession *s, disman_script_mib_smCodeEntry_t ***smCodeEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -923,7 +923,7 @@ assign_smLaunchEntry(GSList *vbl)
 }
 
 int
-disman_script_mib_get_smLaunchTable(host_snmp *s, disman_script_mib_smLaunchEntry_t ***smLaunchEntry)
+disman_script_mib_get_smLaunchTable(GSnmpSession *s, disman_script_mib_smLaunchEntry_t ***smLaunchEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1093,7 +1093,7 @@ assign_smRunEntry(GSList *vbl)
 }
 
 int
-disman_script_mib_get_smRunTable(host_snmp *s, disman_script_mib_smRunEntry_t ***smRunEntry)
+disman_script_mib_get_smRunTable(GSnmpSession *s, disman_script_mib_smRunEntry_t ***smRunEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

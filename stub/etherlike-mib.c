@@ -233,7 +233,7 @@ assign_dot3StatsEntry(GSList *vbl)
 }
 
 int
-etherlike_mib_get_dot3StatsTable(host_snmp *s, etherlike_mib_dot3StatsEntry_t ***dot3StatsEntry)
+etherlike_mib_get_dot3StatsTable(GSnmpSession *s, etherlike_mib_dot3StatsEntry_t ***dot3StatsEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -351,7 +351,7 @@ assign_dot3CollEntry(GSList *vbl)
 }
 
 int
-etherlike_mib_get_dot3CollTable(host_snmp *s, etherlike_mib_dot3CollEntry_t ***dot3CollEntry)
+etherlike_mib_get_dot3CollTable(GSnmpSession *s, etherlike_mib_dot3CollEntry_t ***dot3CollEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -471,7 +471,7 @@ assign_dot3ControlEntry(GSList *vbl)
 }
 
 int
-etherlike_mib_get_dot3ControlTable(host_snmp *s, etherlike_mib_dot3ControlEntry_t ***dot3ControlEntry)
+etherlike_mib_get_dot3ControlTable(GSnmpSession *s, etherlike_mib_dot3ControlEntry_t ***dot3ControlEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -596,7 +596,7 @@ assign_dot3PauseEntry(GSList *vbl)
 }
 
 int
-etherlike_mib_get_dot3PauseTable(host_snmp *s, etherlike_mib_dot3PauseEntry_t ***dot3PauseEntry)
+etherlike_mib_get_dot3PauseTable(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t ***dot3PauseEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

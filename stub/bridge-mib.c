@@ -181,7 +181,7 @@ assign_dot1dBase(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dBase(host_snmp *s, bridge_mib_dot1dBase_t **dot1dBase)
+bridge_mib_get_dot1dBase(GSnmpSession *s, bridge_mib_dot1dBase_t **dot1dBase)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 17, 1, 0};
@@ -285,7 +285,7 @@ assign_dot1dBasePortEntry(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dBasePortTable(host_snmp *s, bridge_mib_dot1dBasePortEntry_t ***dot1dBasePortEntry)
+bridge_mib_get_dot1dBasePortTable(GSnmpSession *s, bridge_mib_dot1dBasePortEntry_t ***dot1dBasePortEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -423,7 +423,7 @@ assign_dot1dStp(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dStp(host_snmp *s, bridge_mib_dot1dStp_t **dot1dStp)
+bridge_mib_get_dot1dStp(GSnmpSession *s, bridge_mib_dot1dStp_t **dot1dStp)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 17, 2, 0};
@@ -541,7 +541,7 @@ assign_dot1dStpPortEntry(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dStpPortTable(host_snmp *s, bridge_mib_dot1dStpPortEntry_t ***dot1dStpPortEntry)
+bridge_mib_get_dot1dStpPortTable(GSnmpSession *s, bridge_mib_dot1dStpPortEntry_t ***dot1dStpPortEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -643,7 +643,7 @@ assign_dot1dTp(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dTp(host_snmp *s, bridge_mib_dot1dTp_t **dot1dTp)
+bridge_mib_get_dot1dTp(GSnmpSession *s, bridge_mib_dot1dTp_t **dot1dTp)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 17, 4, 0};
@@ -743,7 +743,7 @@ assign_dot1dTpFdbEntry(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dTpFdbTable(host_snmp *s, bridge_mib_dot1dTpFdbEntry_t ***dot1dTpFdbEntry)
+bridge_mib_get_dot1dTpFdbTable(GSnmpSession *s, bridge_mib_dot1dTpFdbEntry_t ***dot1dTpFdbEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -868,7 +868,7 @@ assign_dot1dTpPortEntry(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dTpPortTable(host_snmp *s, bridge_mib_dot1dTpPortEntry_t ***dot1dTpPortEntry)
+bridge_mib_get_dot1dTpPortTable(GSnmpSession *s, bridge_mib_dot1dTpPortEntry_t ***dot1dTpPortEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -993,7 +993,7 @@ assign_dot1dStaticEntry(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dStaticTable(host_snmp *s, bridge_mib_dot1dStaticEntry_t ***dot1dStaticEntry)
+bridge_mib_get_dot1dStaticTable(GSnmpSession *s, bridge_mib_dot1dStaticEntry_t ***dot1dStaticEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

@@ -75,7 +75,7 @@ fmt_ipv4_address(guchar *addr, int name)
 
 
 static void
-show_tcp_summary(host_snmp *peer)
+show_tcp_summary(GSnmpSession *peer)
 {
     GString *s;
     
@@ -120,7 +120,7 @@ show_tcp_connection(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry)
 
 
 static void
-show_tcp_connections(WINDOW *win, host_snmp *peer, int flags)
+show_tcp_connections(WINDOW *win, GSnmpSession *peer, int flags)
 {
     tcp_mib_tcpConnEntry_t **tcpConnTable = NULL;
     GString *s;

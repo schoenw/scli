@@ -278,10 +278,10 @@ extern ospf_mib_ospfGeneralGroup_t *
 ospf_mib_new_ospfGeneralGroup();
 
 extern int
-ospf_mib_get_ospfGeneralGroup(host_snmp *s, ospf_mib_ospfGeneralGroup_t **ospfGeneralGroup);
+ospf_mib_get_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t **ospfGeneralGroup);
 
 extern int
-ospf_mib_set_ospfGeneralGroup(host_snmp *s, ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup);
+ospf_mib_set_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup);
 
 extern void
 ospf_mib_free_ospfGeneralGroup(ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup);
@@ -304,7 +304,7 @@ typedef struct {
 } ospf_mib_ospfAreaEntry_t;
 
 extern int
-ospf_mib_get_ospfAreaTable(host_snmp *s, ospf_mib_ospfAreaEntry_t ***ospfAreaEntry);
+ospf_mib_get_ospfAreaTable(GSnmpSession *s, ospf_mib_ospfAreaEntry_t ***ospfAreaEntry);
 
 extern void
 ospf_mib_free_ospfAreaTable(ospf_mib_ospfAreaEntry_t **ospfAreaEntry);
@@ -313,10 +313,10 @@ extern ospf_mib_ospfAreaEntry_t *
 ospf_mib_new_ospfAreaEntry();
 
 extern int
-ospf_mib_get_ospfAreaEntry(host_snmp *s, ospf_mib_ospfAreaEntry_t **ospfAreaEntry);
+ospf_mib_get_ospfAreaEntry(GSnmpSession *s, ospf_mib_ospfAreaEntry_t **ospfAreaEntry);
 
 extern int
-ospf_mib_set_ospfAreaEntry(host_snmp *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry);
+ospf_mib_set_ospfAreaEntry(GSnmpSession *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry);
 
 extern void
 ospf_mib_free_ospfAreaEntry(ospf_mib_ospfAreaEntry_t *ospfAreaEntry);
@@ -334,7 +334,7 @@ typedef struct {
 } ospf_mib_ospfStubAreaEntry_t;
 
 extern int
-ospf_mib_get_ospfStubAreaTable(host_snmp *s, ospf_mib_ospfStubAreaEntry_t ***ospfStubAreaEntry);
+ospf_mib_get_ospfStubAreaTable(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t ***ospfStubAreaEntry);
 
 extern void
 ospf_mib_free_ospfStubAreaTable(ospf_mib_ospfStubAreaEntry_t **ospfStubAreaEntry);
@@ -343,10 +343,10 @@ extern ospf_mib_ospfStubAreaEntry_t *
 ospf_mib_new_ospfStubAreaEntry();
 
 extern int
-ospf_mib_get_ospfStubAreaEntry(host_snmp *s, ospf_mib_ospfStubAreaEntry_t **ospfStubAreaEntry);
+ospf_mib_get_ospfStubAreaEntry(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t **ospfStubAreaEntry);
 
 extern int
-ospf_mib_set_ospfStubAreaEntry(host_snmp *s, ospf_mib_ospfStubAreaEntry_t *ospfStubAreaEntry);
+ospf_mib_set_ospfStubAreaEntry(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t *ospfStubAreaEntry);
 
 extern void
 ospf_mib_free_ospfStubAreaEntry(ospf_mib_ospfStubAreaEntry_t *ospfStubAreaEntry);
@@ -368,7 +368,7 @@ typedef struct {
 } ospf_mib_ospfLsdbEntry_t;
 
 extern int
-ospf_mib_get_ospfLsdbTable(host_snmp *s, ospf_mib_ospfLsdbEntry_t ***ospfLsdbEntry);
+ospf_mib_get_ospfLsdbTable(GSnmpSession *s, ospf_mib_ospfLsdbEntry_t ***ospfLsdbEntry);
 
 extern void
 ospf_mib_free_ospfLsdbTable(ospf_mib_ospfLsdbEntry_t **ospfLsdbEntry);
@@ -377,7 +377,7 @@ extern ospf_mib_ospfLsdbEntry_t *
 ospf_mib_new_ospfLsdbEntry();
 
 extern int
-ospf_mib_get_ospfLsdbEntry(host_snmp *s, ospf_mib_ospfLsdbEntry_t **ospfLsdbEntry);
+ospf_mib_get_ospfLsdbEntry(GSnmpSession *s, ospf_mib_ospfLsdbEntry_t **ospfLsdbEntry);
 
 extern void
 ospf_mib_free_ospfLsdbEntry(ospf_mib_ospfLsdbEntry_t *ospfLsdbEntry);
@@ -395,7 +395,7 @@ typedef struct {
 } ospf_mib_ospfAreaRangeEntry_t;
 
 extern int
-ospf_mib_get_ospfAreaRangeTable(host_snmp *s, ospf_mib_ospfAreaRangeEntry_t ***ospfAreaRangeEntry);
+ospf_mib_get_ospfAreaRangeTable(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t ***ospfAreaRangeEntry);
 
 extern void
 ospf_mib_free_ospfAreaRangeTable(ospf_mib_ospfAreaRangeEntry_t **ospfAreaRangeEntry);
@@ -404,10 +404,10 @@ extern ospf_mib_ospfAreaRangeEntry_t *
 ospf_mib_new_ospfAreaRangeEntry();
 
 extern int
-ospf_mib_get_ospfAreaRangeEntry(host_snmp *s, ospf_mib_ospfAreaRangeEntry_t **ospfAreaRangeEntry);
+ospf_mib_get_ospfAreaRangeEntry(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t **ospfAreaRangeEntry);
 
 extern int
-ospf_mib_set_ospfAreaRangeEntry(host_snmp *s, ospf_mib_ospfAreaRangeEntry_t *ospfAreaRangeEntry);
+ospf_mib_set_ospfAreaRangeEntry(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t *ospfAreaRangeEntry);
 
 extern void
 ospf_mib_free_ospfAreaRangeEntry(ospf_mib_ospfAreaRangeEntry_t *ospfAreaRangeEntry);
@@ -425,7 +425,7 @@ typedef struct {
 } ospf_mib_ospfHostEntry_t;
 
 extern int
-ospf_mib_get_ospfHostTable(host_snmp *s, ospf_mib_ospfHostEntry_t ***ospfHostEntry);
+ospf_mib_get_ospfHostTable(GSnmpSession *s, ospf_mib_ospfHostEntry_t ***ospfHostEntry);
 
 extern void
 ospf_mib_free_ospfHostTable(ospf_mib_ospfHostEntry_t **ospfHostEntry);
@@ -434,10 +434,10 @@ extern ospf_mib_ospfHostEntry_t *
 ospf_mib_new_ospfHostEntry();
 
 extern int
-ospf_mib_get_ospfHostEntry(host_snmp *s, ospf_mib_ospfHostEntry_t **ospfHostEntry);
+ospf_mib_get_ospfHostEntry(GSnmpSession *s, ospf_mib_ospfHostEntry_t **ospfHostEntry);
 
 extern int
-ospf_mib_set_ospfHostEntry(host_snmp *s, ospf_mib_ospfHostEntry_t *ospfHostEntry);
+ospf_mib_set_ospfHostEntry(GSnmpSession *s, ospf_mib_ospfHostEntry_t *ospfHostEntry);
 
 extern void
 ospf_mib_free_ospfHostEntry(ospf_mib_ospfHostEntry_t *ospfHostEntry);
@@ -471,7 +471,7 @@ typedef struct {
 } ospf_mib_ospfIfEntry_t;
 
 extern int
-ospf_mib_get_ospfIfTable(host_snmp *s, ospf_mib_ospfIfEntry_t ***ospfIfEntry);
+ospf_mib_get_ospfIfTable(GSnmpSession *s, ospf_mib_ospfIfEntry_t ***ospfIfEntry);
 
 extern void
 ospf_mib_free_ospfIfTable(ospf_mib_ospfIfEntry_t **ospfIfEntry);
@@ -480,10 +480,10 @@ extern ospf_mib_ospfIfEntry_t *
 ospf_mib_new_ospfIfEntry();
 
 extern int
-ospf_mib_get_ospfIfEntry(host_snmp *s, ospf_mib_ospfIfEntry_t **ospfIfEntry);
+ospf_mib_get_ospfIfEntry(GSnmpSession *s, ospf_mib_ospfIfEntry_t **ospfIfEntry);
 
 extern int
-ospf_mib_set_ospfIfEntry(host_snmp *s, ospf_mib_ospfIfEntry_t *ospfIfEntry);
+ospf_mib_set_ospfIfEntry(GSnmpSession *s, ospf_mib_ospfIfEntry_t *ospfIfEntry);
 
 extern void
 ospf_mib_free_ospfIfEntry(ospf_mib_ospfIfEntry_t *ospfIfEntry);
@@ -501,7 +501,7 @@ typedef struct {
 } ospf_mib_ospfIfMetricEntry_t;
 
 extern int
-ospf_mib_get_ospfIfMetricTable(host_snmp *s, ospf_mib_ospfIfMetricEntry_t ***ospfIfMetricEntry);
+ospf_mib_get_ospfIfMetricTable(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t ***ospfIfMetricEntry);
 
 extern void
 ospf_mib_free_ospfIfMetricTable(ospf_mib_ospfIfMetricEntry_t **ospfIfMetricEntry);
@@ -510,10 +510,10 @@ extern ospf_mib_ospfIfMetricEntry_t *
 ospf_mib_new_ospfIfMetricEntry();
 
 extern int
-ospf_mib_get_ospfIfMetricEntry(host_snmp *s, ospf_mib_ospfIfMetricEntry_t **ospfIfMetricEntry);
+ospf_mib_get_ospfIfMetricEntry(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t **ospfIfMetricEntry);
 
 extern int
-ospf_mib_set_ospfIfMetricEntry(host_snmp *s, ospf_mib_ospfIfMetricEntry_t *ospfIfMetricEntry);
+ospf_mib_set_ospfIfMetricEntry(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t *ospfIfMetricEntry);
 
 extern void
 ospf_mib_free_ospfIfMetricEntry(ospf_mib_ospfIfMetricEntry_t *ospfIfMetricEntry);
@@ -538,7 +538,7 @@ typedef struct {
 } ospf_mib_ospfVirtIfEntry_t;
 
 extern int
-ospf_mib_get_ospfVirtIfTable(host_snmp *s, ospf_mib_ospfVirtIfEntry_t ***ospfVirtIfEntry);
+ospf_mib_get_ospfVirtIfTable(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t ***ospfVirtIfEntry);
 
 extern void
 ospf_mib_free_ospfVirtIfTable(ospf_mib_ospfVirtIfEntry_t **ospfVirtIfEntry);
@@ -547,10 +547,10 @@ extern ospf_mib_ospfVirtIfEntry_t *
 ospf_mib_new_ospfVirtIfEntry();
 
 extern int
-ospf_mib_get_ospfVirtIfEntry(host_snmp *s, ospf_mib_ospfVirtIfEntry_t **ospfVirtIfEntry);
+ospf_mib_get_ospfVirtIfEntry(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t **ospfVirtIfEntry);
 
 extern int
-ospf_mib_set_ospfVirtIfEntry(host_snmp *s, ospf_mib_ospfVirtIfEntry_t *ospfVirtIfEntry);
+ospf_mib_set_ospfVirtIfEntry(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t *ospfVirtIfEntry);
 
 extern void
 ospf_mib_free_ospfVirtIfEntry(ospf_mib_ospfVirtIfEntry_t *ospfVirtIfEntry);
@@ -574,7 +574,7 @@ typedef struct {
 } ospf_mib_ospfNbrEntry_t;
 
 extern int
-ospf_mib_get_ospfNbrTable(host_snmp *s, ospf_mib_ospfNbrEntry_t ***ospfNbrEntry);
+ospf_mib_get_ospfNbrTable(GSnmpSession *s, ospf_mib_ospfNbrEntry_t ***ospfNbrEntry);
 
 extern void
 ospf_mib_free_ospfNbrTable(ospf_mib_ospfNbrEntry_t **ospfNbrEntry);
@@ -583,10 +583,10 @@ extern ospf_mib_ospfNbrEntry_t *
 ospf_mib_new_ospfNbrEntry();
 
 extern int
-ospf_mib_get_ospfNbrEntry(host_snmp *s, ospf_mib_ospfNbrEntry_t **ospfNbrEntry);
+ospf_mib_get_ospfNbrEntry(GSnmpSession *s, ospf_mib_ospfNbrEntry_t **ospfNbrEntry);
 
 extern int
-ospf_mib_set_ospfNbrEntry(host_snmp *s, ospf_mib_ospfNbrEntry_t *ospfNbrEntry);
+ospf_mib_set_ospfNbrEntry(GSnmpSession *s, ospf_mib_ospfNbrEntry_t *ospfNbrEntry);
 
 extern void
 ospf_mib_free_ospfNbrEntry(ospf_mib_ospfNbrEntry_t *ospfNbrEntry);
@@ -607,7 +607,7 @@ typedef struct {
 } ospf_mib_ospfVirtNbrEntry_t;
 
 extern int
-ospf_mib_get_ospfVirtNbrTable(host_snmp *s, ospf_mib_ospfVirtNbrEntry_t ***ospfVirtNbrEntry);
+ospf_mib_get_ospfVirtNbrTable(GSnmpSession *s, ospf_mib_ospfVirtNbrEntry_t ***ospfVirtNbrEntry);
 
 extern void
 ospf_mib_free_ospfVirtNbrTable(ospf_mib_ospfVirtNbrEntry_t **ospfVirtNbrEntry);
@@ -616,7 +616,7 @@ extern ospf_mib_ospfVirtNbrEntry_t *
 ospf_mib_new_ospfVirtNbrEntry();
 
 extern int
-ospf_mib_get_ospfVirtNbrEntry(host_snmp *s, ospf_mib_ospfVirtNbrEntry_t **ospfVirtNbrEntry);
+ospf_mib_get_ospfVirtNbrEntry(GSnmpSession *s, ospf_mib_ospfVirtNbrEntry_t **ospfVirtNbrEntry);
 
 extern void
 ospf_mib_free_ospfVirtNbrEntry(ospf_mib_ospfVirtNbrEntry_t *ospfVirtNbrEntry);
@@ -636,7 +636,7 @@ typedef struct {
 } ospf_mib_ospfExtLsdbEntry_t;
 
 extern int
-ospf_mib_get_ospfExtLsdbTable(host_snmp *s, ospf_mib_ospfExtLsdbEntry_t ***ospfExtLsdbEntry);
+ospf_mib_get_ospfExtLsdbTable(GSnmpSession *s, ospf_mib_ospfExtLsdbEntry_t ***ospfExtLsdbEntry);
 
 extern void
 ospf_mib_free_ospfExtLsdbTable(ospf_mib_ospfExtLsdbEntry_t **ospfExtLsdbEntry);
@@ -645,7 +645,7 @@ extern ospf_mib_ospfExtLsdbEntry_t *
 ospf_mib_new_ospfExtLsdbEntry();
 
 extern int
-ospf_mib_get_ospfExtLsdbEntry(host_snmp *s, ospf_mib_ospfExtLsdbEntry_t **ospfExtLsdbEntry);
+ospf_mib_get_ospfExtLsdbEntry(GSnmpSession *s, ospf_mib_ospfExtLsdbEntry_t **ospfExtLsdbEntry);
 
 extern void
 ospf_mib_free_ospfExtLsdbEntry(ospf_mib_ospfExtLsdbEntry_t *ospfExtLsdbEntry);
@@ -664,7 +664,7 @@ typedef struct {
 } ospf_mib_ospfAreaAggregateEntry_t;
 
 extern int
-ospf_mib_get_ospfAreaAggregateTable(host_snmp *s, ospf_mib_ospfAreaAggregateEntry_t ***ospfAreaAggregateEntry);
+ospf_mib_get_ospfAreaAggregateTable(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t ***ospfAreaAggregateEntry);
 
 extern void
 ospf_mib_free_ospfAreaAggregateTable(ospf_mib_ospfAreaAggregateEntry_t **ospfAreaAggregateEntry);
@@ -673,10 +673,10 @@ extern ospf_mib_ospfAreaAggregateEntry_t *
 ospf_mib_new_ospfAreaAggregateEntry();
 
 extern int
-ospf_mib_get_ospfAreaAggregateEntry(host_snmp *s, ospf_mib_ospfAreaAggregateEntry_t **ospfAreaAggregateEntry);
+ospf_mib_get_ospfAreaAggregateEntry(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t **ospfAreaAggregateEntry);
 
 extern int
-ospf_mib_set_ospfAreaAggregateEntry(host_snmp *s, ospf_mib_ospfAreaAggregateEntry_t *ospfAreaAggregateEntry);
+ospf_mib_set_ospfAreaAggregateEntry(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t *ospfAreaAggregateEntry);
 
 extern void
 ospf_mib_free_ospfAreaAggregateEntry(ospf_mib_ospfAreaAggregateEntry_t *ospfAreaAggregateEntry);

@@ -206,7 +206,7 @@ assign_entPhysicalEntry(GSList *vbl)
 }
 
 int
-entity_mib_get_entPhysicalTable(host_snmp *s, entity_mib_entPhysicalEntry_t ***entPhysicalEntry)
+entity_mib_get_entPhysicalTable(GSnmpSession *s, entity_mib_entPhysicalEntry_t ***entPhysicalEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -347,7 +347,7 @@ assign_entLogicalEntry(GSList *vbl)
 }
 
 int
-entity_mib_get_entLogicalTable(host_snmp *s, entity_mib_entLogicalEntry_t ***entLogicalEntry)
+entity_mib_get_entLogicalTable(GSnmpSession *s, entity_mib_entLogicalEntry_t ***entLogicalEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -462,7 +462,7 @@ assign_entLPMappingEntry(GSList *vbl)
 }
 
 int
-entity_mib_get_entLPMappingTable(host_snmp *s, entity_mib_entLPMappingEntry_t ***entLPMappingEntry)
+entity_mib_get_entLPMappingTable(GSnmpSession *s, entity_mib_entLPMappingEntry_t ***entLPMappingEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -581,7 +581,7 @@ assign_entAliasMappingEntry(GSList *vbl)
 }
 
 int
-entity_mib_get_entAliasMappingTable(host_snmp *s, entity_mib_entAliasMappingEntry_t ***entAliasMappingEntry)
+entity_mib_get_entAliasMappingTable(GSnmpSession *s, entity_mib_entAliasMappingEntry_t ***entAliasMappingEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -696,7 +696,7 @@ assign_entPhysicalContainsEntry(GSList *vbl)
 }
 
 int
-entity_mib_get_entPhysicalContainsTable(host_snmp *s, entity_mib_entPhysicalContainsEntry_t ***entPhysicalContainsEntry)
+entity_mib_get_entPhysicalContainsTable(GSnmpSession *s, entity_mib_entPhysicalContainsEntry_t ***entPhysicalContainsEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -795,7 +795,7 @@ assign_entityGeneral(GSList *vbl)
 }
 
 int
-entity_mib_get_entityGeneral(host_snmp *s, entity_mib_entityGeneral_t **entityGeneral)
+entity_mib_get_entityGeneral(GSnmpSession *s, entity_mib_entityGeneral_t **entityGeneral)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 47, 1, 4, 0};

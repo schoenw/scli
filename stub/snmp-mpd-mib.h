@@ -33,7 +33,7 @@ extern snmp_mpd_mib_snmpMPDStats_t *
 snmp_mpd_mib_new_snmpMPDStats();
 
 extern int
-snmp_mpd_mib_get_snmpMPDStats(host_snmp *s, snmp_mpd_mib_snmpMPDStats_t **snmpMPDStats);
+snmp_mpd_mib_get_snmpMPDStats(GSnmpSession *s, snmp_mpd_mib_snmpMPDStats_t **snmpMPDStats);
 
 extern void
 snmp_mpd_mib_free_snmpMPDStats(snmp_mpd_mib_snmpMPDStats_t *snmpMPDStats);

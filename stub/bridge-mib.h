@@ -74,7 +74,7 @@ extern bridge_mib_dot1dBase_t *
 bridge_mib_new_dot1dBase();
 
 extern int
-bridge_mib_get_dot1dBase(host_snmp *s, bridge_mib_dot1dBase_t **dot1dBase);
+bridge_mib_get_dot1dBase(GSnmpSession *s, bridge_mib_dot1dBase_t **dot1dBase);
 
 extern void
 bridge_mib_free_dot1dBase(bridge_mib_dot1dBase_t *dot1dBase);
@@ -93,7 +93,7 @@ typedef struct {
 } bridge_mib_dot1dBasePortEntry_t;
 
 extern int
-bridge_mib_get_dot1dBasePortTable(host_snmp *s, bridge_mib_dot1dBasePortEntry_t ***dot1dBasePortEntry);
+bridge_mib_get_dot1dBasePortTable(GSnmpSession *s, bridge_mib_dot1dBasePortEntry_t ***dot1dBasePortEntry);
 
 extern void
 bridge_mib_free_dot1dBasePortTable(bridge_mib_dot1dBasePortEntry_t **dot1dBasePortEntry);
@@ -102,7 +102,7 @@ extern bridge_mib_dot1dBasePortEntry_t *
 bridge_mib_new_dot1dBasePortEntry();
 
 extern int
-bridge_mib_get_dot1dBasePortEntry(host_snmp *s, bridge_mib_dot1dBasePortEntry_t **dot1dBasePortEntry);
+bridge_mib_get_dot1dBasePortEntry(GSnmpSession *s, bridge_mib_dot1dBasePortEntry_t **dot1dBasePortEntry);
 
 extern void
 bridge_mib_free_dot1dBasePortEntry(bridge_mib_dot1dBasePortEntry_t *dot1dBasePortEntry);
@@ -132,10 +132,10 @@ extern bridge_mib_dot1dStp_t *
 bridge_mib_new_dot1dStp();
 
 extern int
-bridge_mib_get_dot1dStp(host_snmp *s, bridge_mib_dot1dStp_t **dot1dStp);
+bridge_mib_get_dot1dStp(GSnmpSession *s, bridge_mib_dot1dStp_t **dot1dStp);
 
 extern int
-bridge_mib_set_dot1dStp(host_snmp *s, bridge_mib_dot1dStp_t *dot1dStp);
+bridge_mib_set_dot1dStp(GSnmpSession *s, bridge_mib_dot1dStp_t *dot1dStp);
 
 extern void
 bridge_mib_free_dot1dStp(bridge_mib_dot1dStp_t *dot1dStp);
@@ -158,7 +158,7 @@ typedef struct {
 } bridge_mib_dot1dStpPortEntry_t;
 
 extern int
-bridge_mib_get_dot1dStpPortTable(host_snmp *s, bridge_mib_dot1dStpPortEntry_t ***dot1dStpPortEntry);
+bridge_mib_get_dot1dStpPortTable(GSnmpSession *s, bridge_mib_dot1dStpPortEntry_t ***dot1dStpPortEntry);
 
 extern void
 bridge_mib_free_dot1dStpPortTable(bridge_mib_dot1dStpPortEntry_t **dot1dStpPortEntry);
@@ -167,10 +167,10 @@ extern bridge_mib_dot1dStpPortEntry_t *
 bridge_mib_new_dot1dStpPortEntry();
 
 extern int
-bridge_mib_get_dot1dStpPortEntry(host_snmp *s, bridge_mib_dot1dStpPortEntry_t **dot1dStpPortEntry);
+bridge_mib_get_dot1dStpPortEntry(GSnmpSession *s, bridge_mib_dot1dStpPortEntry_t **dot1dStpPortEntry);
 
 extern int
-bridge_mib_set_dot1dStpPortEntry(host_snmp *s, bridge_mib_dot1dStpPortEntry_t *dot1dStpPortEntry);
+bridge_mib_set_dot1dStpPortEntry(GSnmpSession *s, bridge_mib_dot1dStpPortEntry_t *dot1dStpPortEntry);
 
 extern void
 bridge_mib_free_dot1dStpPortEntry(bridge_mib_dot1dStpPortEntry_t *dot1dStpPortEntry);
@@ -188,10 +188,10 @@ extern bridge_mib_dot1dTp_t *
 bridge_mib_new_dot1dTp();
 
 extern int
-bridge_mib_get_dot1dTp(host_snmp *s, bridge_mib_dot1dTp_t **dot1dTp);
+bridge_mib_get_dot1dTp(GSnmpSession *s, bridge_mib_dot1dTp_t **dot1dTp);
 
 extern int
-bridge_mib_set_dot1dTp(host_snmp *s, bridge_mib_dot1dTp_t *dot1dTp);
+bridge_mib_set_dot1dTp(GSnmpSession *s, bridge_mib_dot1dTp_t *dot1dTp);
 
 extern void
 bridge_mib_free_dot1dTp(bridge_mib_dot1dTp_t *dot1dTp);
@@ -207,7 +207,7 @@ typedef struct {
 } bridge_mib_dot1dTpFdbEntry_t;
 
 extern int
-bridge_mib_get_dot1dTpFdbTable(host_snmp *s, bridge_mib_dot1dTpFdbEntry_t ***dot1dTpFdbEntry);
+bridge_mib_get_dot1dTpFdbTable(GSnmpSession *s, bridge_mib_dot1dTpFdbEntry_t ***dot1dTpFdbEntry);
 
 extern void
 bridge_mib_free_dot1dTpFdbTable(bridge_mib_dot1dTpFdbEntry_t **dot1dTpFdbEntry);
@@ -216,7 +216,7 @@ extern bridge_mib_dot1dTpFdbEntry_t *
 bridge_mib_new_dot1dTpFdbEntry();
 
 extern int
-bridge_mib_get_dot1dTpFdbEntry(host_snmp *s, bridge_mib_dot1dTpFdbEntry_t **dot1dTpFdbEntry);
+bridge_mib_get_dot1dTpFdbEntry(GSnmpSession *s, bridge_mib_dot1dTpFdbEntry_t **dot1dTpFdbEntry);
 
 extern void
 bridge_mib_free_dot1dTpFdbEntry(bridge_mib_dot1dTpFdbEntry_t *dot1dTpFdbEntry);
@@ -234,7 +234,7 @@ typedef struct {
 } bridge_mib_dot1dTpPortEntry_t;
 
 extern int
-bridge_mib_get_dot1dTpPortTable(host_snmp *s, bridge_mib_dot1dTpPortEntry_t ***dot1dTpPortEntry);
+bridge_mib_get_dot1dTpPortTable(GSnmpSession *s, bridge_mib_dot1dTpPortEntry_t ***dot1dTpPortEntry);
 
 extern void
 bridge_mib_free_dot1dTpPortTable(bridge_mib_dot1dTpPortEntry_t **dot1dTpPortEntry);
@@ -243,7 +243,7 @@ extern bridge_mib_dot1dTpPortEntry_t *
 bridge_mib_new_dot1dTpPortEntry();
 
 extern int
-bridge_mib_get_dot1dTpPortEntry(host_snmp *s, bridge_mib_dot1dTpPortEntry_t **dot1dTpPortEntry);
+bridge_mib_get_dot1dTpPortEntry(GSnmpSession *s, bridge_mib_dot1dTpPortEntry_t **dot1dTpPortEntry);
 
 extern void
 bridge_mib_free_dot1dTpPortEntry(bridge_mib_dot1dTpPortEntry_t *dot1dTpPortEntry);
@@ -261,7 +261,7 @@ typedef struct {
 } bridge_mib_dot1dStaticEntry_t;
 
 extern int
-bridge_mib_get_dot1dStaticTable(host_snmp *s, bridge_mib_dot1dStaticEntry_t ***dot1dStaticEntry);
+bridge_mib_get_dot1dStaticTable(GSnmpSession *s, bridge_mib_dot1dStaticEntry_t ***dot1dStaticEntry);
 
 extern void
 bridge_mib_free_dot1dStaticTable(bridge_mib_dot1dStaticEntry_t **dot1dStaticEntry);
@@ -270,10 +270,10 @@ extern bridge_mib_dot1dStaticEntry_t *
 bridge_mib_new_dot1dStaticEntry();
 
 extern int
-bridge_mib_get_dot1dStaticEntry(host_snmp *s, bridge_mib_dot1dStaticEntry_t **dot1dStaticEntry);
+bridge_mib_get_dot1dStaticEntry(GSnmpSession *s, bridge_mib_dot1dStaticEntry_t **dot1dStaticEntry);
 
 extern int
-bridge_mib_set_dot1dStaticEntry(host_snmp *s, bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry);
+bridge_mib_set_dot1dStaticEntry(GSnmpSession *s, bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry);
 
 extern void
 bridge_mib_free_dot1dStaticEntry(bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry);

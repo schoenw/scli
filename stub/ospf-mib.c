@@ -501,7 +501,7 @@ assign_ospfGeneralGroup(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfGeneralGroup(host_snmp *s, ospf_mib_ospfGeneralGroup_t **ospfGeneralGroup)
+ospf_mib_get_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t **ospfGeneralGroup)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 14, 1, 0};
@@ -622,7 +622,7 @@ assign_ospfAreaEntry(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfAreaTable(host_snmp *s, ospf_mib_ospfAreaEntry_t ***ospfAreaEntry)
+ospf_mib_get_ospfAreaTable(GSnmpSession *s, ospf_mib_ospfAreaEntry_t ***ospfAreaEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -749,7 +749,7 @@ assign_ospfStubAreaEntry(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfStubAreaTable(host_snmp *s, ospf_mib_ospfStubAreaEntry_t ***ospfStubAreaEntry)
+ospf_mib_get_ospfStubAreaTable(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t ***ospfStubAreaEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -890,7 +890,7 @@ assign_ospfLsdbEntry(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfLsdbTable(host_snmp *s, ospf_mib_ospfLsdbEntry_t ***ospfLsdbEntry)
+ospf_mib_get_ospfLsdbTable(GSnmpSession *s, ospf_mib_ospfLsdbEntry_t ***ospfLsdbEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1020,7 +1020,7 @@ assign_ospfAreaRangeEntry(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfAreaRangeTable(host_snmp *s, ospf_mib_ospfAreaRangeEntry_t ***ospfAreaRangeEntry)
+ospf_mib_get_ospfAreaRangeTable(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t ***ospfAreaRangeEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1147,7 +1147,7 @@ assign_ospfHostEntry(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfHostTable(host_snmp *s, ospf_mib_ospfHostEntry_t ***ospfHostEntry)
+ospf_mib_get_ospfHostTable(GSnmpSession *s, ospf_mib_ospfHostEntry_t ***ospfHostEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1320,7 +1320,7 @@ assign_ospfIfEntry(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfIfTable(host_snmp *s, ospf_mib_ospfIfEntry_t ***ospfIfEntry)
+ospf_mib_get_ospfIfTable(GSnmpSession *s, ospf_mib_ospfIfEntry_t ***ospfIfEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1446,7 +1446,7 @@ assign_ospfIfMetricEntry(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfIfMetricTable(host_snmp *s, ospf_mib_ospfIfMetricEntry_t ***ospfIfMetricEntry)
+ospf_mib_get_ospfIfMetricTable(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t ***ospfIfMetricEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1595,7 +1595,7 @@ assign_ospfVirtIfEntry(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfVirtIfTable(host_snmp *s, ospf_mib_ospfVirtIfEntry_t ***ospfVirtIfEntry)
+ospf_mib_get_ospfVirtIfTable(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t ***ospfVirtIfEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1740,7 +1740,7 @@ assign_ospfNbrEntry(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfNbrTable(host_snmp *s, ospf_mib_ospfNbrEntry_t ***ospfNbrEntry)
+ospf_mib_get_ospfNbrTable(GSnmpSession *s, ospf_mib_ospfNbrEntry_t ***ospfNbrEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1879,7 +1879,7 @@ assign_ospfVirtNbrEntry(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfVirtNbrTable(host_snmp *s, ospf_mib_ospfVirtNbrEntry_t ***ospfVirtNbrEntry)
+ospf_mib_get_ospfVirtNbrTable(GSnmpSession *s, ospf_mib_ospfVirtNbrEntry_t ***ospfVirtNbrEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2014,7 +2014,7 @@ assign_ospfExtLsdbEntry(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfExtLsdbTable(host_snmp *s, ospf_mib_ospfExtLsdbEntry_t ***ospfExtLsdbEntry)
+ospf_mib_get_ospfExtLsdbTable(GSnmpSession *s, ospf_mib_ospfExtLsdbEntry_t ***ospfExtLsdbEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2148,7 +2148,7 @@ assign_ospfAreaAggregateEntry(GSList *vbl)
 }
 
 int
-ospf_mib_get_ospfAreaAggregateTable(host_snmp *s, ospf_mib_ospfAreaAggregateEntry_t ***ospfAreaAggregateEntry)
+ospf_mib_get_ospfAreaAggregateTable(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t ***ospfAreaAggregateEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

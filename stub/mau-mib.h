@@ -242,7 +242,7 @@ typedef struct {
 } mau_mib_rpMauEntry_t;
 
 extern int
-mau_mib_get_rpMauTable(host_snmp *s, mau_mib_rpMauEntry_t ***rpMauEntry);
+mau_mib_get_rpMauTable(GSnmpSession *s, mau_mib_rpMauEntry_t ***rpMauEntry);
 
 extern void
 mau_mib_free_rpMauTable(mau_mib_rpMauEntry_t **rpMauEntry);
@@ -251,10 +251,10 @@ extern mau_mib_rpMauEntry_t *
 mau_mib_new_rpMauEntry();
 
 extern int
-mau_mib_get_rpMauEntry(host_snmp *s, mau_mib_rpMauEntry_t **rpMauEntry);
+mau_mib_get_rpMauEntry(GSnmpSession *s, mau_mib_rpMauEntry_t **rpMauEntry);
 
 extern int
-mau_mib_set_rpMauEntry(host_snmp *s, mau_mib_rpMauEntry_t *rpMauEntry);
+mau_mib_set_rpMauEntry(GSnmpSession *s, mau_mib_rpMauEntry_t *rpMauEntry);
 
 extern void
 mau_mib_free_rpMauEntry(mau_mib_rpMauEntry_t *rpMauEntry);
@@ -272,7 +272,7 @@ typedef struct {
 } mau_mib_rpJackEntry_t;
 
 extern int
-mau_mib_get_rpJackTable(host_snmp *s, mau_mib_rpJackEntry_t ***rpJackEntry);
+mau_mib_get_rpJackTable(GSnmpSession *s, mau_mib_rpJackEntry_t ***rpJackEntry);
 
 extern void
 mau_mib_free_rpJackTable(mau_mib_rpJackEntry_t **rpJackEntry);
@@ -281,7 +281,7 @@ extern mau_mib_rpJackEntry_t *
 mau_mib_new_rpJackEntry();
 
 extern int
-mau_mib_get_rpJackEntry(host_snmp *s, mau_mib_rpJackEntry_t **rpJackEntry);
+mau_mib_get_rpJackEntry(GSnmpSession *s, mau_mib_rpJackEntry_t **rpJackEntry);
 
 extern void
 mau_mib_free_rpJackEntry(mau_mib_rpJackEntry_t *rpJackEntry);
@@ -310,7 +310,7 @@ typedef struct {
 } mau_mib_ifMauEntry_t;
 
 extern int
-mau_mib_get_ifMauTable(host_snmp *s, mau_mib_ifMauEntry_t ***ifMauEntry);
+mau_mib_get_ifMauTable(GSnmpSession *s, mau_mib_ifMauEntry_t ***ifMauEntry);
 
 extern void
 mau_mib_free_ifMauTable(mau_mib_ifMauEntry_t **ifMauEntry);
@@ -319,10 +319,10 @@ extern mau_mib_ifMauEntry_t *
 mau_mib_new_ifMauEntry();
 
 extern int
-mau_mib_get_ifMauEntry(host_snmp *s, mau_mib_ifMauEntry_t **ifMauEntry);
+mau_mib_get_ifMauEntry(GSnmpSession *s, mau_mib_ifMauEntry_t **ifMauEntry);
 
 extern int
-mau_mib_set_ifMauEntry(host_snmp *s, mau_mib_ifMauEntry_t *ifMauEntry);
+mau_mib_set_ifMauEntry(GSnmpSession *s, mau_mib_ifMauEntry_t *ifMauEntry);
 
 extern void
 mau_mib_free_ifMauEntry(mau_mib_ifMauEntry_t *ifMauEntry);
@@ -339,7 +339,7 @@ typedef struct {
 } mau_mib_ifJackEntry_t;
 
 extern int
-mau_mib_get_ifJackTable(host_snmp *s, mau_mib_ifJackEntry_t ***ifJackEntry);
+mau_mib_get_ifJackTable(GSnmpSession *s, mau_mib_ifJackEntry_t ***ifJackEntry);
 
 extern void
 mau_mib_free_ifJackTable(mau_mib_ifJackEntry_t **ifJackEntry);
@@ -348,7 +348,7 @@ extern mau_mib_ifJackEntry_t *
 mau_mib_new_ifJackEntry();
 
 extern int
-mau_mib_get_ifJackEntry(host_snmp *s, mau_mib_ifJackEntry_t **ifJackEntry);
+mau_mib_get_ifJackEntry(GSnmpSession *s, mau_mib_ifJackEntry_t **ifJackEntry);
 
 extern void
 mau_mib_free_ifJackEntry(mau_mib_ifJackEntry_t *ifJackEntry);
@@ -366,7 +366,7 @@ typedef struct {
 } mau_mib_broadMauBasicEntry_t;
 
 extern int
-mau_mib_get_broadMauBasicTable(host_snmp *s, mau_mib_broadMauBasicEntry_t ***broadMauBasicEntry);
+mau_mib_get_broadMauBasicTable(GSnmpSession *s, mau_mib_broadMauBasicEntry_t ***broadMauBasicEntry);
 
 extern void
 mau_mib_free_broadMauBasicTable(mau_mib_broadMauBasicEntry_t **broadMauBasicEntry);
@@ -375,7 +375,7 @@ extern mau_mib_broadMauBasicEntry_t *
 mau_mib_new_broadMauBasicEntry();
 
 extern int
-mau_mib_get_broadMauBasicEntry(host_snmp *s, mau_mib_broadMauBasicEntry_t **broadMauBasicEntry);
+mau_mib_get_broadMauBasicEntry(GSnmpSession *s, mau_mib_broadMauBasicEntry_t **broadMauBasicEntry);
 
 extern void
 mau_mib_free_broadMauBasicEntry(mau_mib_broadMauBasicEntry_t *broadMauBasicEntry);
@@ -405,7 +405,7 @@ typedef struct {
 } mau_mib_ifMauAutoNegEntry_t;
 
 extern int
-mau_mib_get_ifMauAutoNegTable(host_snmp *s, mau_mib_ifMauAutoNegEntry_t ***ifMauAutoNegEntry);
+mau_mib_get_ifMauAutoNegTable(GSnmpSession *s, mau_mib_ifMauAutoNegEntry_t ***ifMauAutoNegEntry);
 
 extern void
 mau_mib_free_ifMauAutoNegTable(mau_mib_ifMauAutoNegEntry_t **ifMauAutoNegEntry);
@@ -414,10 +414,10 @@ extern mau_mib_ifMauAutoNegEntry_t *
 mau_mib_new_ifMauAutoNegEntry();
 
 extern int
-mau_mib_get_ifMauAutoNegEntry(host_snmp *s, mau_mib_ifMauAutoNegEntry_t **ifMauAutoNegEntry);
+mau_mib_get_ifMauAutoNegEntry(GSnmpSession *s, mau_mib_ifMauAutoNegEntry_t **ifMauAutoNegEntry);
 
 extern int
-mau_mib_set_ifMauAutoNegEntry(host_snmp *s, mau_mib_ifMauAutoNegEntry_t *ifMauAutoNegEntry);
+mau_mib_set_ifMauAutoNegEntry(GSnmpSession *s, mau_mib_ifMauAutoNegEntry_t *ifMauAutoNegEntry);
 
 extern void
 mau_mib_free_ifMauAutoNegEntry(mau_mib_ifMauAutoNegEntry_t *ifMauAutoNegEntry);

@@ -5,9 +5,9 @@ typedef struct _Gsnmp_table   Gsnmp_table;
 
 struct _Gsnmp_table
 {
-  host_snmp  * host;
-  GSList     * objs;
-  gpointer     data;
+  GSnmpSession *session;
+  GSList       *objs;
+  gpointer      data;
 
   gpointer     request;
 
@@ -17,7 +17,7 @@ struct _Gsnmp_table
 };
 
 
-Gsnmp_table * g_snmp_table_new (host_snmp *host, GSList *objs,
+Gsnmp_table * g_snmp_table_new (GSnmpSession *session, GSList *objs,
                   void (* cb_error)(), void (* cb_row)(), void (* cb_finish)(),
                   gpointer data);
 void g_snmp_table_get(Gsnmp_table *table);

@@ -422,7 +422,7 @@ assign_interfaces(GSList *vbl)
 }
 
 int
-if_mib_get_interfaces(host_snmp *s, if_mib_interfaces_t **interfaces)
+if_mib_get_interfaces(GSnmpSession *s, if_mib_interfaces_t **interfaces)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 2, 0};
@@ -579,7 +579,7 @@ assign_ifEntry(GSList *vbl)
 }
 
 int
-if_mib_get_ifTable(host_snmp *s, if_mib_ifEntry_t ***ifEntry)
+if_mib_get_ifTable(GSnmpSession *s, if_mib_ifEntry_t ***ifEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -681,7 +681,7 @@ assign_ifMIBObjects(GSList *vbl)
 }
 
 int
-if_mib_get_ifMIBObjects(host_snmp *s, if_mib_ifMIBObjects_t **ifMIBObjects)
+if_mib_get_ifMIBObjects(GSnmpSession *s, if_mib_ifMIBObjects_t **ifMIBObjects)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 31, 1, 0};
@@ -831,7 +831,7 @@ assign_ifXEntry(GSList *vbl)
 }
 
 int
-if_mib_get_ifXTable(host_snmp *s, if_mib_ifXEntry_t ***ifXEntry)
+if_mib_get_ifXTable(GSnmpSession *s, if_mib_ifXEntry_t ***ifXEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -949,7 +949,7 @@ assign_ifStackEntry(GSList *vbl)
 }
 
 int
-if_mib_get_ifStackTable(host_snmp *s, if_mib_ifStackEntry_t ***ifStackEntry)
+if_mib_get_ifStackTable(GSnmpSession *s, if_mib_ifStackEntry_t ***ifStackEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1083,7 +1083,7 @@ assign_ifTestEntry(GSList *vbl)
 }
 
 int
-if_mib_get_ifTestTable(host_snmp *s, if_mib_ifTestEntry_t ***ifTestEntry)
+if_mib_get_ifTestTable(GSnmpSession *s, if_mib_ifTestEntry_t ***ifTestEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1209,7 +1209,7 @@ assign_ifRcvAddressEntry(GSList *vbl)
 }
 
 int
-if_mib_get_ifRcvAddressTable(host_snmp *s, if_mib_ifRcvAddressEntry_t ***ifRcvAddressEntry)
+if_mib_get_ifRcvAddressTable(GSnmpSession *s, if_mib_ifRcvAddressEntry_t ***ifRcvAddressEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

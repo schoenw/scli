@@ -99,7 +99,7 @@ hr_sort (const void *arg1, const void *arg2)
 
 
 static void
-show_process_summary(host_snmp *peer)
+show_process_summary(GSnmpSession *peer)
 {
     host_resources_mib_hrSystem_t *hrSystem = NULL;
     host_resources_mib_hrStorage_t *hrStorage = NULL;
@@ -144,7 +144,7 @@ show_process_summary(host_snmp *peer)
 
 
 static void
-show_processes(WINDOW *win, host_snmp *peer, int flags)
+show_processes(WINDOW *win, GSnmpSession *peer, int flags)
 {
     host_resources_mib_hrSWRunEntry_t **hrSWRunTable = NULL;
     host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfTable = NULL;

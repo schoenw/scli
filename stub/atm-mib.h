@@ -251,7 +251,7 @@ extern atm_mib_atmMIBObjects_t *
 atm_mib_new_atmMIBObjects();
 
 extern int
-atm_mib_get_atmMIBObjects(host_snmp *s, atm_mib_atmMIBObjects_t **atmMIBObjects);
+atm_mib_get_atmMIBObjects(GSnmpSession *s, atm_mib_atmMIBObjects_t **atmMIBObjects);
 
 extern void
 atm_mib_free_atmMIBObjects(atm_mib_atmMIBObjects_t *atmMIBObjects);
@@ -283,7 +283,7 @@ typedef struct {
 } atm_mib_atmInterfaceConfEntry_t;
 
 extern int
-atm_mib_get_atmInterfaceConfTable(host_snmp *s, atm_mib_atmInterfaceConfEntry_t ***atmInterfaceConfEntry);
+atm_mib_get_atmInterfaceConfTable(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t ***atmInterfaceConfEntry);
 
 extern void
 atm_mib_free_atmInterfaceConfTable(atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfEntry);
@@ -292,10 +292,10 @@ extern atm_mib_atmInterfaceConfEntry_t *
 atm_mib_new_atmInterfaceConfEntry();
 
 extern int
-atm_mib_get_atmInterfaceConfEntry(host_snmp *s, atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfEntry);
+atm_mib_get_atmInterfaceConfEntry(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfEntry);
 
 extern int
-atm_mib_set_atmInterfaceConfEntry(host_snmp *s, atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry);
+atm_mib_set_atmInterfaceConfEntry(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry);
 
 extern void
 atm_mib_free_atmInterfaceConfEntry(atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry);
@@ -312,7 +312,7 @@ typedef struct {
 } atm_mib_atmInterfaceDs3PlcpEntry_t;
 
 extern int
-atm_mib_get_atmInterfaceDs3PlcpTable(host_snmp *s, atm_mib_atmInterfaceDs3PlcpEntry_t ***atmInterfaceDs3PlcpEntry);
+atm_mib_get_atmInterfaceDs3PlcpTable(GSnmpSession *s, atm_mib_atmInterfaceDs3PlcpEntry_t ***atmInterfaceDs3PlcpEntry);
 
 extern void
 atm_mib_free_atmInterfaceDs3PlcpTable(atm_mib_atmInterfaceDs3PlcpEntry_t **atmInterfaceDs3PlcpEntry);
@@ -321,7 +321,7 @@ extern atm_mib_atmInterfaceDs3PlcpEntry_t *
 atm_mib_new_atmInterfaceDs3PlcpEntry();
 
 extern int
-atm_mib_get_atmInterfaceDs3PlcpEntry(host_snmp *s, atm_mib_atmInterfaceDs3PlcpEntry_t **atmInterfaceDs3PlcpEntry);
+atm_mib_get_atmInterfaceDs3PlcpEntry(GSnmpSession *s, atm_mib_atmInterfaceDs3PlcpEntry_t **atmInterfaceDs3PlcpEntry);
 
 extern void
 atm_mib_free_atmInterfaceDs3PlcpEntry(atm_mib_atmInterfaceDs3PlcpEntry_t *atmInterfaceDs3PlcpEntry);
@@ -337,7 +337,7 @@ typedef struct {
 } atm_mib_atmInterfaceTCEntry_t;
 
 extern int
-atm_mib_get_atmInterfaceTCTable(host_snmp *s, atm_mib_atmInterfaceTCEntry_t ***atmInterfaceTCEntry);
+atm_mib_get_atmInterfaceTCTable(GSnmpSession *s, atm_mib_atmInterfaceTCEntry_t ***atmInterfaceTCEntry);
 
 extern void
 atm_mib_free_atmInterfaceTCTable(atm_mib_atmInterfaceTCEntry_t **atmInterfaceTCEntry);
@@ -346,7 +346,7 @@ extern atm_mib_atmInterfaceTCEntry_t *
 atm_mib_new_atmInterfaceTCEntry();
 
 extern int
-atm_mib_get_atmInterfaceTCEntry(host_snmp *s, atm_mib_atmInterfaceTCEntry_t **atmInterfaceTCEntry);
+atm_mib_get_atmInterfaceTCEntry(GSnmpSession *s, atm_mib_atmInterfaceTCEntry_t **atmInterfaceTCEntry);
 
 extern void
 atm_mib_free_atmInterfaceTCEntry(atm_mib_atmInterfaceTCEntry_t *atmInterfaceTCEntry);
@@ -371,7 +371,7 @@ typedef struct {
 } atm_mib_atmTrafficDescrParamEntry_t;
 
 extern int
-atm_mib_get_atmTrafficDescrParamTable(host_snmp *s, atm_mib_atmTrafficDescrParamEntry_t ***atmTrafficDescrParamEntry);
+atm_mib_get_atmTrafficDescrParamTable(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t ***atmTrafficDescrParamEntry);
 
 extern void
 atm_mib_free_atmTrafficDescrParamTable(atm_mib_atmTrafficDescrParamEntry_t **atmTrafficDescrParamEntry);
@@ -380,10 +380,10 @@ extern atm_mib_atmTrafficDescrParamEntry_t *
 atm_mib_new_atmTrafficDescrParamEntry();
 
 extern int
-atm_mib_get_atmTrafficDescrParamEntry(host_snmp *s, atm_mib_atmTrafficDescrParamEntry_t **atmTrafficDescrParamEntry);
+atm_mib_get_atmTrafficDescrParamEntry(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t **atmTrafficDescrParamEntry);
 
 extern int
-atm_mib_set_atmTrafficDescrParamEntry(host_snmp *s, atm_mib_atmTrafficDescrParamEntry_t *atmTrafficDescrParamEntry);
+atm_mib_set_atmTrafficDescrParamEntry(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t *atmTrafficDescrParamEntry);
 
 extern void
 atm_mib_free_atmTrafficDescrParamEntry(atm_mib_atmTrafficDescrParamEntry_t *atmTrafficDescrParamEntry);
@@ -407,7 +407,7 @@ typedef struct {
 } atm_mib_atmVplEntry_t;
 
 extern int
-atm_mib_get_atmVplTable(host_snmp *s, atm_mib_atmVplEntry_t ***atmVplEntry);
+atm_mib_get_atmVplTable(GSnmpSession *s, atm_mib_atmVplEntry_t ***atmVplEntry);
 
 extern void
 atm_mib_free_atmVplTable(atm_mib_atmVplEntry_t **atmVplEntry);
@@ -416,10 +416,10 @@ extern atm_mib_atmVplEntry_t *
 atm_mib_new_atmVplEntry();
 
 extern int
-atm_mib_get_atmVplEntry(host_snmp *s, atm_mib_atmVplEntry_t **atmVplEntry);
+atm_mib_get_atmVplEntry(GSnmpSession *s, atm_mib_atmVplEntry_t **atmVplEntry);
 
 extern int
-atm_mib_set_atmVplEntry(host_snmp *s, atm_mib_atmVplEntry_t *atmVplEntry);
+atm_mib_set_atmVplEntry(GSnmpSession *s, atm_mib_atmVplEntry_t *atmVplEntry);
 
 extern void
 atm_mib_free_atmVplEntry(atm_mib_atmVplEntry_t *atmVplEntry);
@@ -448,7 +448,7 @@ typedef struct {
 } atm_mib_atmVclEntry_t;
 
 extern int
-atm_mib_get_atmVclTable(host_snmp *s, atm_mib_atmVclEntry_t ***atmVclEntry);
+atm_mib_get_atmVclTable(GSnmpSession *s, atm_mib_atmVclEntry_t ***atmVclEntry);
 
 extern void
 atm_mib_free_atmVclTable(atm_mib_atmVclEntry_t **atmVclEntry);
@@ -457,10 +457,10 @@ extern atm_mib_atmVclEntry_t *
 atm_mib_new_atmVclEntry();
 
 extern int
-atm_mib_get_atmVclEntry(host_snmp *s, atm_mib_atmVclEntry_t **atmVclEntry);
+atm_mib_get_atmVclEntry(GSnmpSession *s, atm_mib_atmVclEntry_t **atmVclEntry);
 
 extern int
-atm_mib_set_atmVclEntry(host_snmp *s, atm_mib_atmVclEntry_t *atmVclEntry);
+atm_mib_set_atmVclEntry(GSnmpSession *s, atm_mib_atmVclEntry_t *atmVclEntry);
 
 extern void
 atm_mib_free_atmVclEntry(atm_mib_atmVclEntry_t *atmVclEntry);
@@ -484,7 +484,7 @@ typedef struct {
 } atm_mib_atmVpCrossConnectEntry_t;
 
 extern int
-atm_mib_get_atmVpCrossConnectTable(host_snmp *s, atm_mib_atmVpCrossConnectEntry_t ***atmVpCrossConnectEntry);
+atm_mib_get_atmVpCrossConnectTable(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t ***atmVpCrossConnectEntry);
 
 extern void
 atm_mib_free_atmVpCrossConnectTable(atm_mib_atmVpCrossConnectEntry_t **atmVpCrossConnectEntry);
@@ -493,10 +493,10 @@ extern atm_mib_atmVpCrossConnectEntry_t *
 atm_mib_new_atmVpCrossConnectEntry();
 
 extern int
-atm_mib_get_atmVpCrossConnectEntry(host_snmp *s, atm_mib_atmVpCrossConnectEntry_t **atmVpCrossConnectEntry);
+atm_mib_get_atmVpCrossConnectEntry(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t **atmVpCrossConnectEntry);
 
 extern int
-atm_mib_set_atmVpCrossConnectEntry(host_snmp *s, atm_mib_atmVpCrossConnectEntry_t *atmVpCrossConnectEntry);
+atm_mib_set_atmVpCrossConnectEntry(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t *atmVpCrossConnectEntry);
 
 extern void
 atm_mib_free_atmVpCrossConnectEntry(atm_mib_atmVpCrossConnectEntry_t *atmVpCrossConnectEntry);
@@ -522,7 +522,7 @@ typedef struct {
 } atm_mib_atmVcCrossConnectEntry_t;
 
 extern int
-atm_mib_get_atmVcCrossConnectTable(host_snmp *s, atm_mib_atmVcCrossConnectEntry_t ***atmVcCrossConnectEntry);
+atm_mib_get_atmVcCrossConnectTable(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t ***atmVcCrossConnectEntry);
 
 extern void
 atm_mib_free_atmVcCrossConnectTable(atm_mib_atmVcCrossConnectEntry_t **atmVcCrossConnectEntry);
@@ -531,10 +531,10 @@ extern atm_mib_atmVcCrossConnectEntry_t *
 atm_mib_new_atmVcCrossConnectEntry();
 
 extern int
-atm_mib_get_atmVcCrossConnectEntry(host_snmp *s, atm_mib_atmVcCrossConnectEntry_t **atmVcCrossConnectEntry);
+atm_mib_get_atmVcCrossConnectEntry(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t **atmVcCrossConnectEntry);
 
 extern int
-atm_mib_set_atmVcCrossConnectEntry(host_snmp *s, atm_mib_atmVcCrossConnectEntry_t *atmVcCrossConnectEntry);
+atm_mib_set_atmVcCrossConnectEntry(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t *atmVcCrossConnectEntry);
 
 extern void
 atm_mib_free_atmVcCrossConnectEntry(atm_mib_atmVcCrossConnectEntry_t *atmVcCrossConnectEntry);
@@ -553,7 +553,7 @@ typedef struct {
 } atm_mib_aal5VccEntry_t;
 
 extern int
-atm_mib_get_aal5VccTable(host_snmp *s, atm_mib_aal5VccEntry_t ***aal5VccEntry);
+atm_mib_get_aal5VccTable(GSnmpSession *s, atm_mib_aal5VccEntry_t ***aal5VccEntry);
 
 extern void
 atm_mib_free_aal5VccTable(atm_mib_aal5VccEntry_t **aal5VccEntry);
@@ -562,7 +562,7 @@ extern atm_mib_aal5VccEntry_t *
 atm_mib_new_aal5VccEntry();
 
 extern int
-atm_mib_get_aal5VccEntry(host_snmp *s, atm_mib_aal5VccEntry_t **aal5VccEntry);
+atm_mib_get_aal5VccEntry(GSnmpSession *s, atm_mib_aal5VccEntry_t **aal5VccEntry);
 
 extern void
 atm_mib_free_aal5VccEntry(atm_mib_aal5VccEntry_t *aal5VccEntry);

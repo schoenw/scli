@@ -54,10 +54,10 @@ extern snmpv2_mib_system_t *
 snmpv2_mib_new_system();
 
 extern int
-snmpv2_mib_get_system(host_snmp *s, snmpv2_mib_system_t **system);
+snmpv2_mib_get_system(GSnmpSession *s, snmpv2_mib_system_t **system);
 
 extern int
-snmpv2_mib_set_system(host_snmp *s, snmpv2_mib_system_t *system);
+snmpv2_mib_set_system(GSnmpSession *s, snmpv2_mib_system_t *system);
 
 extern void
 snmpv2_mib_free_system(snmpv2_mib_system_t *system);
@@ -76,7 +76,7 @@ typedef struct {
 } snmpv2_mib_sysOREntry_t;
 
 extern int
-snmpv2_mib_get_sysORTable(host_snmp *s, snmpv2_mib_sysOREntry_t ***sysOREntry);
+snmpv2_mib_get_sysORTable(GSnmpSession *s, snmpv2_mib_sysOREntry_t ***sysOREntry);
 
 extern void
 snmpv2_mib_free_sysORTable(snmpv2_mib_sysOREntry_t **sysOREntry);
@@ -85,7 +85,7 @@ extern snmpv2_mib_sysOREntry_t *
 snmpv2_mib_new_sysOREntry();
 
 extern int
-snmpv2_mib_get_sysOREntry(host_snmp *s, snmpv2_mib_sysOREntry_t **sysOREntry);
+snmpv2_mib_get_sysOREntry(GSnmpSession *s, snmpv2_mib_sysOREntry_t **sysOREntry);
 
 extern void
 snmpv2_mib_free_sysOREntry(snmpv2_mib_sysOREntry_t *sysOREntry);
@@ -131,10 +131,10 @@ extern snmpv2_mib_snmp_t *
 snmpv2_mib_new_snmp();
 
 extern int
-snmpv2_mib_get_snmp(host_snmp *s, snmpv2_mib_snmp_t **snmp);
+snmpv2_mib_get_snmp(GSnmpSession *s, snmpv2_mib_snmp_t **snmp);
 
 extern int
-snmpv2_mib_set_snmp(host_snmp *s, snmpv2_mib_snmp_t *snmp);
+snmpv2_mib_set_snmp(GSnmpSession *s, snmpv2_mib_snmp_t *snmp);
 
 extern void
 snmpv2_mib_free_snmp(snmpv2_mib_snmp_t *snmp);
@@ -151,10 +151,10 @@ extern snmpv2_mib_snmpSet_t *
 snmpv2_mib_new_snmpSet();
 
 extern int
-snmpv2_mib_get_snmpSet(host_snmp *s, snmpv2_mib_snmpSet_t **snmpSet);
+snmpv2_mib_get_snmpSet(GSnmpSession *s, snmpv2_mib_snmpSet_t **snmpSet);
 
 extern int
-snmpv2_mib_set_snmpSet(host_snmp *s, snmpv2_mib_snmpSet_t *snmpSet);
+snmpv2_mib_set_snmpSet(GSnmpSession *s, snmpv2_mib_snmpSet_t *snmpSet);
 
 extern void
 snmpv2_mib_free_snmpSet(snmpv2_mib_snmpSet_t *snmpSet);

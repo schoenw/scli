@@ -152,7 +152,7 @@ assign_system(GSList *vbl)
 }
 
 int
-snmpv2_mib_get_system(host_snmp *s, snmpv2_mib_system_t **system)
+snmpv2_mib_get_system(GSnmpSession *s, snmpv2_mib_system_t **system)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 1, 0};
@@ -254,7 +254,7 @@ assign_sysOREntry(GSList *vbl)
 }
 
 int
-snmpv2_mib_get_sysORTable(host_snmp *s, snmpv2_mib_sysOREntry_t ***sysOREntry)
+snmpv2_mib_get_sysORTable(GSnmpSession *s, snmpv2_mib_sysOREntry_t ***sysOREntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -440,7 +440,7 @@ assign_snmp(GSList *vbl)
 }
 
 int
-snmpv2_mib_get_snmp(host_snmp *s, snmpv2_mib_snmp_t **snmp)
+snmpv2_mib_get_snmp(GSnmpSession *s, snmpv2_mib_snmp_t **snmp)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 11, 0};
@@ -517,7 +517,7 @@ assign_snmpSet(GSList *vbl)
 }
 
 int
-snmpv2_mib_get_snmpSet(host_snmp *s, snmpv2_mib_snmpSet_t **snmpSet)
+snmpv2_mib_get_snmpSet(GSnmpSession *s, snmpv2_mib_snmpSet_t **snmpSet)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 1, 1, 6, 0};

@@ -979,7 +979,7 @@ assign_prtGeneralEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtGeneralTable(host_snmp *s, printer_mib_prtGeneralEntry_t ***prtGeneralEntry)
+printer_mib_get_prtGeneralTable(GSnmpSession *s, printer_mib_prtGeneralEntry_t ***prtGeneralEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1097,7 +1097,7 @@ assign_prtStorageRefEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtStorageRefTable(host_snmp *s, printer_mib_prtStorageRefEntry_t ***prtStorageRefEntry)
+printer_mib_get_prtStorageRefTable(GSnmpSession *s, printer_mib_prtStorageRefEntry_t ***prtStorageRefEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1215,7 +1215,7 @@ assign_prtDeviceRefEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtDeviceRefTable(host_snmp *s, printer_mib_prtDeviceRefEntry_t ***prtDeviceRefEntry)
+printer_mib_get_prtDeviceRefTable(GSnmpSession *s, printer_mib_prtDeviceRefEntry_t ***prtDeviceRefEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1337,7 +1337,7 @@ assign_prtCoverEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtCoverTable(host_snmp *s, printer_mib_prtCoverEntry_t ***prtCoverEntry)
+printer_mib_get_prtCoverTable(GSnmpSession *s, printer_mib_prtCoverEntry_t ***prtCoverEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1463,7 +1463,7 @@ assign_prtLocalizationEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtLocalizationTable(host_snmp *s, printer_mib_prtLocalizationEntry_t ***prtLocalizationEntry)
+printer_mib_get_prtLocalizationTable(GSnmpSession *s, printer_mib_prtLocalizationEntry_t ***prtLocalizationEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1659,7 +1659,7 @@ assign_prtInputEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtInputTable(host_snmp *s, printer_mib_prtInputEntry_t ***prtInputEntry)
+printer_mib_get_prtInputTable(GSnmpSession *s, printer_mib_prtInputEntry_t ***prtInputEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1849,7 +1849,7 @@ assign_prtOutputEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtOutputTable(host_snmp *s, printer_mib_prtOutputEntry_t ***prtOutputEntry)
+printer_mib_get_prtOutputTable(GSnmpSession *s, printer_mib_prtOutputEntry_t ***prtOutputEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2006,7 +2006,7 @@ assign_prtMarkerEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtMarkerTable(host_snmp *s, printer_mib_prtMarkerEntry_t ***prtMarkerEntry)
+printer_mib_get_prtMarkerTable(GSnmpSession *s, printer_mib_prtMarkerEntry_t ***prtMarkerEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2146,7 +2146,7 @@ assign_prtMarkerSuppliesEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtMarkerSuppliesTable(host_snmp *s, printer_mib_prtMarkerSuppliesEntry_t ***prtMarkerSuppliesEntry)
+printer_mib_get_prtMarkerSuppliesTable(GSnmpSession *s, printer_mib_prtMarkerSuppliesEntry_t ***prtMarkerSuppliesEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2274,7 +2274,7 @@ assign_prtMarkerColorantEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtMarkerColorantTable(host_snmp *s, printer_mib_prtMarkerColorantEntry_t ***prtMarkerColorantEntry)
+printer_mib_get_prtMarkerColorantTable(GSnmpSession *s, printer_mib_prtMarkerColorantEntry_t ***prtMarkerColorantEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2420,7 +2420,7 @@ assign_prtMediaPathEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtMediaPathTable(host_snmp *s, printer_mib_prtMediaPathEntry_t ***prtMediaPathEntry)
+printer_mib_get_prtMediaPathTable(GSnmpSession *s, printer_mib_prtMediaPathEntry_t ***prtMediaPathEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2561,7 +2561,7 @@ assign_prtChannelEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtChannelTable(host_snmp *s, printer_mib_prtChannelEntry_t ***prtChannelEntry)
+printer_mib_get_prtChannelTable(GSnmpSession *s, printer_mib_prtChannelEntry_t ***prtChannelEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2713,7 +2713,7 @@ assign_prtInterpreterEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtInterpreterTable(host_snmp *s, printer_mib_prtInterpreterEntry_t ***prtInterpreterEntry)
+printer_mib_get_prtInterpreterTable(GSnmpSession *s, printer_mib_prtInterpreterEntry_t ***prtInterpreterEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2832,7 +2832,7 @@ assign_prtConsoleDisplayBufferEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtConsoleDisplayBufferTable(host_snmp *s, printer_mib_prtConsoleDisplayBufferEntry_t ***prtConsoleDisplayBufferEntry)
+printer_mib_get_prtConsoleDisplayBufferTable(GSnmpSession *s, printer_mib_prtConsoleDisplayBufferEntry_t ***prtConsoleDisplayBufferEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2960,7 +2960,7 @@ assign_prtConsoleLightEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtConsoleLightTable(host_snmp *s, printer_mib_prtConsoleLightEntry_t ***prtConsoleLightEntry)
+printer_mib_get_prtConsoleLightTable(GSnmpSession *s, printer_mib_prtConsoleLightEntry_t ***prtConsoleLightEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -3100,7 +3100,7 @@ assign_prtAlertEntry(GSList *vbl)
 }
 
 int
-printer_mib_get_prtAlertTable(host_snmp *s, printer_mib_prtAlertEntry_t ***prtAlertEntry)
+printer_mib_get_prtAlertTable(GSnmpSession *s, printer_mib_prtAlertEntry_t ***prtAlertEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;

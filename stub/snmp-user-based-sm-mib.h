@@ -72,7 +72,7 @@ extern snmp_user_based_sm_mib_usmStats_t *
 snmp_user_based_sm_mib_new_usmStats();
 
 extern int
-snmp_user_based_sm_mib_get_usmStats(host_snmp *s, snmp_user_based_sm_mib_usmStats_t **usmStats);
+snmp_user_based_sm_mib_get_usmStats(GSnmpSession *s, snmp_user_based_sm_mib_usmStats_t **usmStats);
 
 extern void
 snmp_user_based_sm_mib_free_usmStats(snmp_user_based_sm_mib_usmStats_t *usmStats);
@@ -89,10 +89,10 @@ extern snmp_user_based_sm_mib_usmUser_t *
 snmp_user_based_sm_mib_new_usmUser();
 
 extern int
-snmp_user_based_sm_mib_get_usmUser(host_snmp *s, snmp_user_based_sm_mib_usmUser_t **usmUser);
+snmp_user_based_sm_mib_get_usmUser(GSnmpSession *s, snmp_user_based_sm_mib_usmUser_t **usmUser);
 
 extern int
-snmp_user_based_sm_mib_set_usmUser(host_snmp *s, snmp_user_based_sm_mib_usmUser_t *usmUser);
+snmp_user_based_sm_mib_set_usmUser(GSnmpSession *s, snmp_user_based_sm_mib_usmUser_t *usmUser);
 
 extern void
 snmp_user_based_sm_mib_free_usmUser(snmp_user_based_sm_mib_usmUser_t *usmUser);
@@ -129,7 +129,7 @@ typedef struct {
 } snmp_user_based_sm_mib_usmUserEntry_t;
 
 extern int
-snmp_user_based_sm_mib_get_usmUserTable(host_snmp *s, snmp_user_based_sm_mib_usmUserEntry_t ***usmUserEntry);
+snmp_user_based_sm_mib_get_usmUserTable(GSnmpSession *s, snmp_user_based_sm_mib_usmUserEntry_t ***usmUserEntry);
 
 extern void
 snmp_user_based_sm_mib_free_usmUserTable(snmp_user_based_sm_mib_usmUserEntry_t **usmUserEntry);
@@ -138,10 +138,10 @@ extern snmp_user_based_sm_mib_usmUserEntry_t *
 snmp_user_based_sm_mib_new_usmUserEntry();
 
 extern int
-snmp_user_based_sm_mib_get_usmUserEntry(host_snmp *s, snmp_user_based_sm_mib_usmUserEntry_t **usmUserEntry);
+snmp_user_based_sm_mib_get_usmUserEntry(GSnmpSession *s, snmp_user_based_sm_mib_usmUserEntry_t **usmUserEntry);
 
 extern int
-snmp_user_based_sm_mib_set_usmUserEntry(host_snmp *s, snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry);
+snmp_user_based_sm_mib_set_usmUserEntry(GSnmpSession *s, snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry);
 
 extern void
 snmp_user_based_sm_mib_free_usmUserEntry(snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry);

@@ -144,7 +144,7 @@ assign_snmpTargetObjects(GSList *vbl)
 }
 
 int
-snmp_target_mib_get_snmpTargetObjects(host_snmp *s, snmp_target_mib_snmpTargetObjects_t **snmpTargetObjects)
+snmp_target_mib_get_snmpTargetObjects(GSnmpSession *s, snmp_target_mib_snmpTargetObjects_t **snmpTargetObjects)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 12, 1, 0};
@@ -267,7 +267,7 @@ assign_snmpTargetAddrEntry(GSList *vbl)
 }
 
 int
-snmp_target_mib_get_snmpTargetAddrTable(host_snmp *s, snmp_target_mib_snmpTargetAddrEntry_t ***snmpTargetAddrEntry)
+snmp_target_mib_get_snmpTargetAddrTable(GSnmpSession *s, snmp_target_mib_snmpTargetAddrEntry_t ***snmpTargetAddrEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -403,7 +403,7 @@ assign_snmpTargetParamsEntry(GSList *vbl)
 }
 
 int
-snmp_target_mib_get_snmpTargetParamsTable(host_snmp *s, snmp_target_mib_snmpTargetParamsEntry_t ***snmpTargetParamsEntry)
+snmp_target_mib_get_snmpTargetParamsTable(GSnmpSession *s, snmp_target_mib_snmpTargetParamsEntry_t ***snmpTargetParamsEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
