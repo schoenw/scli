@@ -202,7 +202,11 @@ completion(char *text, int start, int end)
      * directory.
      */
 
+#ifdef HAVE_RL_COMPLETION_MATCHES
+    matches = rl_completion_matches(text, generator);
+#else
     matches = completion_matches(text, generator);
+#endif
 
     /* Don't switch to filename completion if no matches ware found. */
     if (! matches) {
