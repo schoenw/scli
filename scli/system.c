@@ -28,6 +28,131 @@
 #include "scli.h"
 
 
+static void
+fmt_hsec32(GString *s, guint32 number)
+{
+    guint32 min, hour;
+
+    min  = (number / 100 / 60) % 60;
+    hour = (number / 100 / 60 / 60);
+
+    g_string_sprintfa(s, "%4.02d:%02d", hour, min);
+}
+
+
+
+static void
+fmt_run_state_and_type(GString *s, gint32 *state, gint32 *type)
+{
+    if (state) {
+	switch (*state) {
+	case 1:  g_string_append(s, "C "); break;
+	case 2:  g_string_append(s, "R "); break;
+	case 3:  g_string_append(s, "S "); break;
+	case 4:  g_string_append(s, "Z "); break;
+	default: g_string_append(s, "- "); break;
+	}
+    } else {
+	g_string_append(s, "- ");
+    }
+
+    if (type) {
+	switch (*type) {
+	case 1:  g_string_append(s, "? "); break;
+	case 2:  g_string_append(s, "O "); break;
+	case 3:  g_string_append(s, "D "); break;
+	case 4:  g_string_append(s, "A "); break;
+	default: g_string_append(s, "- "); break;
+	}
+    } else {
+	g_string_append(s, "- ");
+    }
+}
+
+
+
+static void
+fmt_x_kbytes(GString *s, guint32 bytes)
+{
+    if (bytes > 9999999) {
+	g_string_sprintfa(s, "%5uG", bytes / 1024 / 1024);
+    } else if (bytes > 9999) {
+	g_string_sprintfa(s, "%5uM", bytes / 1024);
+    } else {
+	g_string_sprintfa(s, "%5uK", bytes);
+    }
+}
+
+
+
+static int
+cmd_processes(scli_interp_t *interp, int argc, char **argv)
+{
+    hrSWRunEntry_t **hrSWRunEntry = NULL;
+    hrSWRunPerfEntry_t **hrSWRunPerfEntry = NULL;
+    GString *s;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (host_resources_mib_get_hrSWRunEntry(interp->peer,
+					    &hrSWRunEntry) == 0) {
+	(void) host_resources_mib_get_hrSWRunPerfEntry(interp->peer,
+						       &hrSWRunPerfEntry);
+    }
+
+    s = interp->result;
+    if (hrSWRunEntry) {
+	g_string_append(s, "  PID S T MEMORY    TIME COMMAND\n");
+	for (i = 0; hrSWRunEntry[i]; i++) {
+	    if (hrSWRunEntry[i]->hrSWRunIndex) {
+		g_string_sprintfa(s, "%5d ", *(hrSWRunEntry[i]->hrSWRunIndex));
+	    } else {
+		g_string_append(s, "----- ");
+	    }
+	    fmt_run_state_and_type(s,
+				   hrSWRunEntry[i]->hrSWRunStatus,
+				   hrSWRunEntry[i]->hrSWRunType);
+	    if (hrSWRunPerfEntry && hrSWRunPerfEntry[i]
+		&& hrSWRunPerfEntry[i]->hrSWRunPerfMem) {
+		fmt_x_kbytes(s, *(hrSWRunPerfEntry[i]->hrSWRunPerfMem));
+	    } else {
+		g_string_sprintfa(s, " %5s", "-----");
+	    }
+	    if (hrSWRunPerfEntry && hrSWRunPerfEntry[i]
+		&& hrSWRunPerfEntry[i]->hrSWRunPerfCPU) {
+		g_string_append(s, " ");
+		fmt_hsec32(s, *(hrSWRunPerfEntry[i]->hrSWRunPerfCPU));
+	    } else {
+		g_string_sprintfa(s, " %5s", "--:--");
+	    }
+	    if (hrSWRunEntry[i]->hrSWRunName
+		&& hrSWRunEntry[i]->_hrSWRunNameLength) {
+		g_string_sprintfa(s, " %.*s",
+				  (int) hrSWRunEntry[i]->_hrSWRunNameLength,
+				  hrSWRunEntry[i]->hrSWRunName);
+	    }
+	    if (hrSWRunEntry[i]->hrSWRunParameters
+		&& hrSWRunEntry[i]->_hrSWRunParametersLength) {
+		g_string_sprintfa(s, " %.*s",
+				  (int) hrSWRunEntry[i]->_hrSWRunParametersLength,
+				  hrSWRunEntry[i]->hrSWRunParameters);
+	    }
+	    g_string_append(s, "\n");
+	}
+    }
+	
+    if (hrSWRunEntry)
+	host_resources_mib_free_hrSWRunEntry(hrSWRunEntry);
+    if (hrSWRunPerfEntry)
+	host_resources_mib_free_hrSWRunPerfEntry(hrSWRunPerfEntry);
+    
+    interp->result = s;
+    return SCLI_OK;
+}
+
+
+
 static int
 cmd_mounts(scli_interp_t *interp, int argc, char **argv)
 {
@@ -38,7 +163,7 @@ cmd_mounts(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (host_resources_mib_get_hrFSEntry(interp->peer, &hrFSEntry)) {
-	return SCLI_OK;
+	return SCLI_ERROR;
     }
 
     s = interp->result;
@@ -292,8 +417,8 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 	&& hrStorage) {
 	if (hrStorage->hrMemorySize) {
 	    g_string_sprintfa(s, "\n%-*s ", indent, "Memory:");
-	    fmt_kbytes(s, *(hrStorage->hrMemorySize));
-	}
+	    fmt_kbytes(s, *(hrStorage->hrMemorySize));	
+}
 	host_resources_mib_free_hrStorage(hrStorage);
     }
 
@@ -343,6 +468,8 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "show storage areas attached to the system", cmd_storage },
 	{ "show system", "mounts",
 	  "show file systems mounted on the system", cmd_mounts },
+	{ "show system", "processes",
+	  "show processes running on the system", cmd_processes },
 	{ NULL, NULL, NULL, NULL }
     };
     
