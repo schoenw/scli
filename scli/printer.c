@@ -474,6 +474,65 @@ show_printer_info(scli_interp_t * interp, int argc, char **argv)
 
 
 static void
+fmt_printer_cover(GString *s, printer_mib_prtCoverEntry_t *prtCoverEntry)
+{
+    int const indent = 18;
+    const char *e;
+
+    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+		      prtCoverEntry->hrDeviceIndex);
+
+    g_string_sprintfa(s, "%-*s %u\n", indent, "Cover:",
+		      prtCoverEntry->prtCoverIndex);
+
+    if (prtCoverEntry->prtCoverDescription &&
+	prtCoverEntry->_prtCoverDescriptionLength > 0) {
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
+			  (int) prtCoverEntry->_prtCoverDescriptionLength,
+			  prtCoverEntry->prtCoverDescription);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtCoverStatus,
+		 prtCoverEntry->prtCoverStatus);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Status:", e);
+    }
+}
+
+
+
+static int
+show_printer_covers(scli_interp_t * interp, int argc, char **argv)
+{
+    printer_mib_prtCoverEntry_t **prtCoverTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    printer_mib_get_prtCoverTable(interp->peer, &prtCoverTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (prtCoverTable) {
+	for (i = 0; prtCoverTable[i]; i++) {
+	    fmt_printer_cover(interp->result, prtCoverTable[i]);
+	}
+    }
+
+    if (prtCoverTable)
+	printer_mib_free_prtCoverTable(prtCoverTable);
+
+    return SCLI_OK;
+}
+
+
+
+static void
 fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 {
     int const indent = 18;
@@ -482,10 +541,8 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
     g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
 		      prtInputEntry->hrDeviceIndex);
 
-    if (prtInputEntry->prtInputIndex) {
-	g_string_sprintfa(s, "%-*s %u\n", indent, "Input:",
-			  prtInputEntry->prtInputIndex);
-    }
+    g_string_sprintfa(s, "%-*s %u\n", indent, "Input:",
+		      prtInputEntry->prtInputIndex);
     
     if (prtInputEntry->prtInputName &&
 	prtInputEntry->_prtInputNameLength > 0) {
@@ -751,10 +808,8 @@ fmt_printer_outputs(GString *s, printer_mib_prtOutputEntry_t *prtOutputEntry)
     g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
 		      prtOutputEntry->hrDeviceIndex);
 
-    if (prtOutputEntry->prtOutputIndex) {
-	g_string_sprintfa(s, "%-*s %u\n", indent, "Output:",
-			  prtOutputEntry->prtOutputIndex);
-    }
+    g_string_sprintfa(s, "%-*s %u\n", indent, "Output:",
+		      prtOutputEntry->prtOutputIndex);
     
     if (prtOutputEntry->prtOutputName &&
 	prtOutputEntry->_prtOutputNameLength > 0) {
@@ -886,14 +941,41 @@ fmt_printer_outputs(GString *s, printer_mib_prtOutputEntry_t *prtOutputEntry)
 	g_string_sprintfa(s, "%s\n", e ? e : "");
     }
 
-    /*
-      prtOutputStackingOrder            PrtOutputStackingOrderTC,
-      prtOutputPageDeliveryOrientation  PrtOutputPageDeliveryOrientationTC,
-      prtOutputBursting                 PresentOnOff,
-      prtOutputDecollating              PresentOnOff,
-      prtOutputPageCollated             PresentOnOff,
-      prtOutputOffsetStacking           PresentOnOff
-    */
+    e = fmt_enum(printer_mib_enums_prtOutputStackingOrder,
+		 prtOutputEntry->prtOutputStackingOrder);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Stacking Order:", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputPageDeliveryOrientation,
+		 prtOutputEntry->prtOutputPageDeliveryOrientation);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Orientation:", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputBursting,
+		 prtOutputEntry->prtOutputBursting);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Bursting:", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputDecollating,
+		 prtOutputEntry->prtOutputDecollating);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Decollating:", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputPageCollated,
+		 prtOutputEntry->prtOutputPageCollated);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Collation:", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputOffsetStacking,
+		 prtOutputEntry->prtOutputOffsetStacking);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Offset Stacking:", e);
+    }
 }
 
 
@@ -1359,6 +1441,13 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  show_printer_info },
+
+	{ "show printer covers", NULL,
+	  "The show printer covers command shows information about the\n"
+	  "covers of a printer.",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  show_printer_covers },
 
 	{ "show printer inputs", NULL,
 	  "The show printer inputs command shows information about the\n"
