@@ -63,6 +63,112 @@ static const char *error_states[] = {
 
 
 
+typedef struct {
+    const int x;
+    const int y;
+    const char *unit;
+    const char *name;
+} media_names_t;
+
+static media_names_t media_names[] = {
+    {  841, 1189, "mm", "iso-a0" },
+    {  594,  841, "mm", "iso-a1" },
+    {  420,  594, "mm", "iso-a2" },
+    {  297,  420, "mm", "iso-a3" },
+    {  210,  297, "mm", "iso-a4" },
+    {  148,  210, "mm", "iso-a5" },
+    {  105,  148, "mm", "iso-a6" },
+    {   74,  105, "mm", "iso-a7" },
+    {   52,   74, "mm", "iso-a8" },
+    {   37,   52, "mm", "iso-a9" },
+    {   26,   37, "mm", "iso-a10" },
+
+    { 1000, 1414, "mm", "iso-b0" },
+    {  707, 1000, "mm", "iso-b1" },
+    {  500,  707, "mm", "iso-b2" },
+    {  353,  500, "mm", "iso-b3" },
+    {  250,  353, "mm", "iso-b4" },
+    {  176,  250, "mm", "iso-b5" },
+    {  125,  176, "mm", "iso-b6" },
+    {   88,  125, "mm", "iso-b7" },
+    {   62,   88, "mm", "iso-b8" },
+    {   44,   62, "mm", "iso-b9" },
+    {   31,   44, "mm", "iso-b10" },
+    {  917, 1297, "mm", "iso-c0" },
+    {  648,  917, "mm", "iso-c1" },
+    {  458,  648, "mm", "iso-c2" },
+    {  324,  458, "mm", "iso-c3" },
+    {  229,  324, "mm", "iso-c4" },
+    {  162,  229, "mm", "iso-c5" },
+    {  114,  162, "mm", "iso-c6" },
+    {   81,  114, "mm", "iso-c7" },
+    {   57,   81, "mm", "iso-c8" },
+    {  110,  220, "mm", "iso-designated" },
+    
+    { 1030, 1456, "mm", "jis-b0" },
+    {  728, 1030, "mm", "jis-b1" },
+    {  515,  728, "mm", "jis-b2" },
+    {  364,  515, "mm", "jis-b3" },
+    {  257,  364, "mm", "jis-b4" },
+    {  182,  257, "mm", "jis-b5" },
+    {  128,  182, "mm", "jis-b6" },
+    {   91,  128, "mm", "jis-b7" },
+    {   64,   91, "mm", "jis-b8" },
+    {   45,   64, "mm", "jis-b9" },
+    {   32,   45, "mm", "jis-b10" },
+
+    { 0, 0, NULL, NULL }
+};
+
+
+/*
+ * Lookup a human friendly paper name.
+ */
+
+static const char *
+lookup_media_name(gint32 dir, gint32 xdir, gint32 unit)
+{
+    gint32 x, y;
+    char *s = NULL;
+    int i;
+  
+#define TENTHOUSANDTHSOFINCHES 3
+#define MICROMETERS 4
+
+    x = (dir < xdir) ?  dir : xdir;
+    y = (dir < xdir) ? xdir : dir;
+    
+    switch (unit) {
+    case TENTHOUSANDTHSOFINCHES:
+	s = "in";
+	x /= 10000;
+	y /= 10000;
+	break;
+    case MICROMETERS:
+	s = "mm";
+	x /= 1000;
+	y /= 1000;
+	break;
+    }
+
+    if (s) {
+	for (i = 0; media_names[i].name; i++) {
+	    if (x == media_names[i].x
+		&& y == media_names[i].y
+		&& strcmp(s, media_names[i].unit) == 0) {
+		break;
+	    }
+	}
+	if (media_names[i].name) {
+	    return media_names[i].name;
+	}
+    }
+
+    return NULL;
+}
+
+
+
 static char const *
 fmt_bits(const char **labels, guchar *bits, gsize bits_len)
 {
@@ -217,18 +323,24 @@ fmt_media_dimensions(GString *s, gint indent, gchar *label,
 		     gint32 *unit, const GSnmpEnum *enums)
 {
     const char *e;
+    const char *name;
     
     if (! dir || ! xdir || ! unit) {
 	return;
     }
 
-    e = fmt_enum(enums, unit);
+    name = lookup_media_name(*dir, *xdir, *unit);
+    if (name) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, label, name);
+    } else {
+	e = fmt_enum(enums, unit);
 	
-    g_string_sprintfa(s, "%-*s %s", indent, label,
-		      fmt_dimensions(dir));
-    g_string_sprintfa(s, " x %s ",
-		      fmt_dimensions(xdir));
-    g_string_sprintfa(s, "%s\n", e ? e : "");
+	g_string_sprintfa(s, "%-*s %s", indent, label,
+			  fmt_dimensions(dir));
+	g_string_sprintfa(s, " x %s ",
+			  fmt_dimensions(xdir));
+	g_string_sprintfa(s, "%s\n", e ? e : "");
+    }
 }
 
 
@@ -239,22 +351,18 @@ xml_media_dimensions(xmlNodePtr tree, gchar *label,
 		     gint32 *unit, const GSnmpEnum *enums)
 {
     const char *e;
-    gchar *s;
     xmlNodePtr node;
     
     if (! dir || ! xdir || ! unit) {
 	return;
     }
 
-    s = g_strdup(fmt_dimensions(dir));
-    node = xml_new_child(tree, NULL, label, "%sx%s", s, 
-			 fmt_dimensions(xdir));
-    g_free(s);
-
+    node = xmlNewChild(tree, NULL, label,
+		       lookup_media_name(*dir, *xdir, *unit));
+    xml_set_prop(node, "direction", "%d", *dir);
+    xml_set_prop(node, "cross-direction", "%d", *xdir);
     e = fmt_enum(enums, unit);
-    if (e) {
-	xml_set_prop(node, "unit", e);
-    }
+    if (e) xml_set_prop(node, "unit", "%s", e);
 }
 
 
@@ -577,7 +685,7 @@ fmt_printer_general(GString *s,
 
 
 static int
-show_printer_info(scli_interp_t * interp, int argc, char **argv)
+show_printer_info(scli_interp_t *interp, int argc, char **argv)
 {
     host_resources_mib_hrPrinterEntry_t **hrPrinterTable = NULL;
     host_resources_mib_hrDeviceEntry_t **hrDeviceTable = NULL;
@@ -702,7 +810,7 @@ xml_printer_cover(xmlNodePtr root,
 
 
 static int
-show_printer_covers(scli_interp_t * interp, int argc, char **argv)
+show_printer_covers(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtCoverEntry_t **prtCoverTable = NULL;
     int i;
@@ -737,6 +845,145 @@ show_printer_covers(scli_interp_t * interp, int argc, char **argv)
 
     if (prtCoverTable)
 	printer_mib_free_prtCoverTable(prtCoverTable);
+
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_printer_path(GString *s, printer_mib_prtMediaPathEntry_t *prtPathEntry)
+{
+    int const indent = 18;
+    const char *e;
+
+    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+		      prtPathEntry->hrDeviceIndex);
+
+    g_string_sprintfa(s, "%-*s %u\n", indent, "Path:",
+		      prtPathEntry->prtMediaPathIndex);
+
+    if (prtPathEntry->prtMediaPathDescription &&
+	prtPathEntry->_prtMediaPathDescriptionLength > 0) {
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
+			  (int) prtPathEntry->_prtMediaPathDescriptionLength,
+			  prtPathEntry->prtMediaPathDescription);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtMediaPathType,
+		 prtPathEntry->prtMediaPathType);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", e);
+    }
+
+    fmt_subunit(s, indent, prtPathEntry->prtMediaPathStatus);
+
+    e = fmt_enum(printer_mib_enums_prtMediaPathMaxSpeedPrintUnit,
+		 prtPathEntry->prtMediaPathMaxSpeedPrintUnit);
+    if (e && prtPathEntry->prtMediaPathMaxSpeed) {
+	g_string_sprintfa(s, "%-*s %d %s\n", indent, "Max. Speed:",
+			  *prtPathEntry->prtMediaPathMaxSpeed, e);
+    }
+
+    fmt_media_dimensions(s, indent, "Min. Dimension:",
+			 prtPathEntry->prtMediaPathMinMediaFeedDir,
+			 prtPathEntry->prtMediaPathMinMediaXFeedDir,
+			 prtPathEntry->prtMediaPathMediaSizeUnit,
+			 printer_mib_enums_prtMediaPathMediaSizeUnit);
+
+    fmt_media_dimensions(s, indent, "Max. Dimension:",
+			 prtPathEntry->prtMediaPathMaxMediaFeedDir,
+			 prtPathEntry->prtMediaPathMaxMediaXFeedDir,
+			 prtPathEntry->prtMediaPathMediaSizeUnit,
+			 printer_mib_enums_prtMediaPathMediaSizeUnit);
+}
+
+
+
+static void
+xml_printer_path(xmlNodePtr root,
+		 printer_mib_prtMediaPathEntry_t *prtPathEntry)
+{
+    xmlNodePtr tree, node;
+    const char *e;
+    
+    tree = xmlNewChild(root, NULL, "path", NULL);
+    xml_set_prop(tree, "number", "%d",
+		 prtPathEntry->prtMediaPathIndex);
+
+    if (prtPathEntry->prtMediaPathDescription) {
+	(void) xml_new_child(tree, NULL, "description", "%.*s",
+			  (int) prtPathEntry->_prtMediaPathDescriptionLength,
+			  prtPathEntry->prtMediaPathDescription);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtMediaPathType,
+		 prtPathEntry->prtMediaPathType);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "type", "%s", e);
+    }
+
+    xml_subunit(tree, prtPathEntry->prtMediaPathStatus);
+
+    if (prtPathEntry->prtMediaPathMaxSpeed) {
+	node = xml_new_child(tree, NULL, "max-speed", "%d",
+			     *prtPathEntry->prtMediaPathMaxSpeed);
+	e = fmt_enum(printer_mib_enums_prtMediaPathMaxSpeedPrintUnit,
+		     prtPathEntry->prtMediaPathMaxSpeedPrintUnit);
+	if (e) xml_set_prop(node, "unit", "%s", e);
+    }
+
+    xml_media_dimensions(tree, "min-dimension",
+			 prtPathEntry->prtMediaPathMinMediaFeedDir,
+			 prtPathEntry->prtMediaPathMinMediaXFeedDir,
+			 prtPathEntry->prtMediaPathMediaSizeUnit,
+			 printer_mib_enums_prtMediaPathMediaSizeUnit);
+
+    xml_media_dimensions(tree, "max-dimensions",
+			 prtPathEntry->prtMediaPathMaxMediaFeedDir,
+			 prtPathEntry->prtMediaPathMaxMediaXFeedDir,
+			 prtPathEntry->prtMediaPathMediaSizeUnit,
+			 printer_mib_enums_prtMediaPathMediaSizeUnit);
+}
+
+
+
+static int
+show_printer_paths(scli_interp_t *interp, int argc, char **argv)
+{
+    printer_mib_prtMediaPathEntry_t **prtPathTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    printer_mib_get_prtMediaPathTable(interp->peer, &prtPathTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (prtPathTable) {
+	for (i = 0; prtPathTable[i]; i++) {
+	    if (scli_interp_xml(interp)) {
+		xmlNodePtr node = get_printer_node(interp->xml_node,
+					   prtPathTable[i]->hrDeviceIndex,
+						   "paths");
+		xml_printer_path(node, prtPathTable[i]);
+	    } else {
+		fmt_printer_path(interp->result, prtPathTable[i]);
+	    }
+	}
+    }
+
+    if (prtPathTable)
+	printer_mib_free_prtMediaPathTable(prtPathTable);
 
     return SCLI_OK;
 }
@@ -2032,7 +2279,7 @@ xml_printer_interpreter(xmlNodePtr root,
 
 
 static int
-show_printer_interpreter(scli_interp_t * interp, int argc, char **argv)
+show_printer_interpreters(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtInterpreterEntry_t **interpTable = NULL;
     int i;
@@ -2246,7 +2493,7 @@ xml_printer_channel(xmlNodePtr root,
 
 
 static int
-show_printer_channels(scli_interp_t * interp, int argc, char **argv)
+show_printer_channels(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtChannelEntry_t **channelTable = NULL;
     printer_mib_prtInterpreterEntry_t **interpTable = NULL;
@@ -2331,7 +2578,7 @@ xml_printer_display(xmlNodePtr root,
 
 
 static int
-show_printer_display(scli_interp_t * interp, int argc, char **argv)
+show_printer_display(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtConsoleDisplayBufferEntry_t **displayTable;
     int i;
@@ -2619,7 +2866,7 @@ xml_printer_alert(xmlNodePtr root, printer_mib_prtAlertEntry_t *alertEntry)
 
 
 static int
-show_printer_alert(scli_interp_t * interp, int argc, char **argv)
+show_printer_alert(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtAlertEntry_t **alertTable = NULL;
     int i;
@@ -2698,7 +2945,7 @@ set_printer_operator(scli_interp_t *interp, int argc, char **argv)
 
 
 void
-scli_init_printer_mode(scli_interp_t * interp)
+scli_init_printer_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 
@@ -2718,12 +2965,12 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "devices", NULL,
 	  show_printer_info },
 
-	{ "show printer covers", NULL,
-	  "The `show printer covers' command shows information about the\n"
-	  "covers of a printer.",
+	{ "show printer paths", NULL,
+	  "The `show printer paths' command shows information about the\n"
+	  "media paths of a printer.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "devices", NULL,
-	  show_printer_covers },
+	  show_printer_paths },
 
 	{ "show printer inputs", NULL,
 	  "The `show printer inputs' command shows information about the\n"
@@ -2766,13 +3013,13 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "devices", NULL,
 	  show_printer_supplies },
 
-	{ "show printer interpreter", NULL,
-	  "The `show printer interpreter' command shows information about\n"
+	{ "show printer interpreters", NULL,
+	  "The `show printer interpreters' command shows information about\n"
 	  "the page description language and control language interpreters\n"
 	  "supported by the printer.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "devices", NULL,
-	  show_printer_interpreter },
+	  show_printer_interpreters },
 
 	{ "show printer channels", NULL,
 	  "The `show printer channels' command shows information about\n"
@@ -2781,6 +3028,13 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "devices", NULL,
 	  show_printer_channels },
 	
+	{ "show printer covers", NULL,
+	  "The `show printer covers' command shows information about the\n"
+	  "covers of a printer.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "devices", NULL,
+	  show_printer_covers },
+
 	{ "show printer display", NULL,
 	  "The `show printer display' command shows the current\n"
 	  "contents of the display attached to the printer. The command\n"
