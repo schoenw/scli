@@ -31,6 +31,162 @@
 
 
 
+static guint32 const dot3MauTypeAUI[]
+	= { MAU_MIB_DOT3MAUTYPEAUI };
+static guint32 const dot3MauType10Base5[]
+	= { MAU_MIB_DOT3MAUTYPE10BASE5 };
+static guint32 const dot3MauTypeFoirl[]
+	= { MAU_MIB_DOT3MAUTYPEFOIRL };
+static guint32 const dot3MauType10Base2[]
+	= { MAU_MIB_DOT3MAUTYPE10BASE2 };
+static guint32 const dot3MauType10BaseT[]
+	= { MAU_MIB_DOT3MAUTYPE10BASET };
+static guint32 const dot3MauType10BaseFP[]
+	= { MAU_MIB_DOT3MAUTYPE10BASEFP };
+static guint32 const dot3MauType10BaseFB[]
+	= { MAU_MIB_DOT3MAUTYPE10BASEFB };
+static guint32 const dot3MauType10BaseFL[]
+	= { MAU_MIB_DOT3MAUTYPE10BASEFL };
+static guint32 const dot3MauType10Broad36[]
+	= { MAU_MIB_DOT3MAUTYPE10BROAD36 };
+static guint32 const dot3MauType10BaseTHD[]
+	= { MAU_MIB_DOT3MAUTYPE10BASETHD };
+static guint32 const dot3MauType10BaseTFD[]
+	= { MAU_MIB_DOT3MAUTYPE10BASETFD };
+static guint32 const dot3MauType10BaseFLHD[]
+	= { MAU_MIB_DOT3MAUTYPE10BASEFLHD };
+static guint32 const dot3MauType10BaseFLFD[]
+	= { MAU_MIB_DOT3MAUTYPE10BASEFLFD };
+static guint32 const dot3MauType100BaseT4[]
+	= { MAU_MIB_DOT3MAUTYPE100BASET4 };
+static guint32 const dot3MauType100BaseTXHD[]
+	= { MAU_MIB_DOT3MAUTYPE100BASETXHD };
+static guint32 const dot3MauType100BaseTXFD[]
+	= { MAU_MIB_DOT3MAUTYPE100BASETXFD };
+static guint32 const dot3MauType100BaseFXHD[]
+	= { MAU_MIB_DOT3MAUTYPE100BASEFXHD };
+static guint32 const dot3MauType100BaseFXFD[]
+	= { MAU_MIB_DOT3MAUTYPE100BASEFXFD };
+static guint32 const dot3MauType100BaseT2HD[]
+	= { MAU_MIB_DOT3MAUTYPE100BASET2HD };
+static guint32 const dot3MauType100BaseT2FD[]
+	= { MAU_MIB_DOT3MAUTYPE100BASET2FD };
+static guint32 const dot3MauType1000BaseXHD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASEXHD };
+static guint32 const dot3MauType1000BaseXFD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASEXFD };
+static guint32 const dot3MauType1000BaseLXHD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASELXHD };
+static guint32 const dot3MauType1000BaseLXFD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASELXFD };
+static guint32 const dot3MauType1000BaseSXHD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASESXHD };
+static guint32 const dot3MauType1000BaseSXFD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASESXFD };
+static guint32 const dot3MauType1000BaseCXHD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASECXHD };
+static guint32 const dot3MauType1000BaseCXFD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASECXFD };
+static guint32 const dot3MauType1000BaseTHD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASETHD };
+static guint32 const dot3MauType1000BaseTFD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASETFD };
+
+stls_identity_t const mau_type_identities[] = {
+    { dot3MauTypeAUI,
+      sizeof(dot3MauTypeAUI)/sizeof(guint32),
+      "AUI" },
+    { dot3MauType10Base5,
+      sizeof(dot3MauType10Base5)/sizeof(guint32),
+      "10Base5" },
+    { dot3MauTypeFoirl,
+      sizeof(dot3MauTypeFoirl)/sizeof(guint32),
+      "Foirl" },
+    { dot3MauType10Base2,
+      sizeof(dot3MauType10Base2)/sizeof(guint32),
+      "10Base2" },
+    { dot3MauType10BaseT,
+      sizeof(dot3MauType10BaseT)/sizeof(guint32),
+      "10BaseT" },
+    { dot3MauType10BaseFP,
+      sizeof(dot3MauType10BaseFP)/sizeof(guint32),
+      "10BaseFP" },
+    { dot3MauType10BaseFB,
+      sizeof(dot3MauType10BaseFB)/sizeof(guint32),
+      "10BaseFB" },
+    { dot3MauType10BaseFL,
+      sizeof(dot3MauType10BaseFL)/sizeof(guint32),
+      "10BaseFL" },
+    { dot3MauType10Broad36,
+      sizeof(dot3MauType10Broad36)/sizeof(guint32),
+      "10Broad36" },
+    { dot3MauType10BaseTHD,
+      sizeof(dot3MauType10BaseTHD)/sizeof(guint32),
+      "10BaseTHD" },
+    { dot3MauType10BaseTFD,
+      sizeof(dot3MauType10BaseTFD)/sizeof(guint32),
+      "10BaseTFD" },
+    { dot3MauType10BaseFLHD,
+      sizeof(dot3MauType10BaseFLHD)/sizeof(guint32),
+      "10BaseFLHD" },
+    { dot3MauType10BaseFLFD,
+      sizeof(dot3MauType10BaseFLFD)/sizeof(guint32),
+      "10BaseFLFD" },
+    { dot3MauType100BaseT4,
+      sizeof(dot3MauType100BaseT4)/sizeof(guint32),
+      "100BaseT4" },
+    { dot3MauType100BaseTXHD,
+      sizeof(dot3MauType100BaseTXHD)/sizeof(guint32),
+      "100BaseTXHD" },
+    { dot3MauType100BaseTXFD,
+      sizeof(dot3MauType100BaseTXFD)/sizeof(guint32),
+      "100BaseTXFD" },
+    { dot3MauType100BaseFXHD,
+      sizeof(dot3MauType100BaseFXHD)/sizeof(guint32),
+      "100BaseFXHD" },
+    { dot3MauType100BaseFXFD,
+      sizeof(dot3MauType100BaseFXFD)/sizeof(guint32),
+      "100BaseFXFD" },
+    { dot3MauType100BaseT2HD,
+      sizeof(dot3MauType100BaseT2HD)/sizeof(guint32),
+      "100BaseT2HD" },
+    { dot3MauType100BaseT2FD,
+      sizeof(dot3MauType100BaseT2FD)/sizeof(guint32),
+      "100BaseT2FD" },
+    { dot3MauType1000BaseXHD,
+      sizeof(dot3MauType1000BaseXHD)/sizeof(guint32),
+      "1000BaseXHD" },
+    { dot3MauType1000BaseXFD,
+      sizeof(dot3MauType1000BaseXFD)/sizeof(guint32),
+      "1000BaseXFD" },
+    { dot3MauType1000BaseLXHD,
+      sizeof(dot3MauType1000BaseLXHD)/sizeof(guint32),
+      "1000BaseLXHD" },
+    { dot3MauType1000BaseLXFD,
+      sizeof(dot3MauType1000BaseLXFD)/sizeof(guint32),
+      "1000BaseLXFD" },
+    { dot3MauType1000BaseSXHD,
+      sizeof(dot3MauType1000BaseSXHD)/sizeof(guint32),
+      "1000BaseSXHD" },
+    { dot3MauType1000BaseSXFD,
+      sizeof(dot3MauType1000BaseSXFD)/sizeof(guint32),
+      "1000BaseSXFD" },
+    { dot3MauType1000BaseCXHD,
+      sizeof(dot3MauType1000BaseCXHD)/sizeof(guint32),
+      "1000BaseCXHD" },
+    { dot3MauType1000BaseCXFD,
+      sizeof(dot3MauType1000BaseCXFD)/sizeof(guint32),
+      "1000BaseCXFD" },
+    { dot3MauType1000BaseTHD,
+      sizeof(dot3MauType1000BaseTHD)/sizeof(guint32),
+      "1000BaseTHD" },
+    { dot3MauType1000BaseTFD,
+      sizeof(dot3MauType1000BaseTFD)/sizeof(guint32),
+      "1000BaseTFD" },
+    { 0, 0, NULL }
+};
+
+
 static void
 show_ether_mau_info(GString *s, ifMauEntry_t *ifMauEntry)
 {
@@ -46,8 +202,15 @@ show_ether_mau_info(GString *s, ifMauEntry_t *ifMauEntry)
     fmt_enum(s, 9, mau_mib_enums_ifMauJabberState,
 	     ifMauEntry->ifMauJabberState);
 
-    fmt_enum(s, 5, mau_mib_enums_ifMauAutoNegSupported,
+    fmt_enum(s, 7, mau_mib_enums_ifMauAutoNegSupported,
 	     ifMauEntry->ifMauAutoNegSupported);
+
+    if (ifMauEntry->ifMauType) {
+	g_string_sprintfa(s, " %s", 
+		  stls_identity_get_label(mau_type_identities,
+					  ifMauEntry->ifMauType,
+					  ifMauEntry->_ifMauTypeLength));
+    }
 
     /* ifMauEntry->ifMauTypeListBits */
 
@@ -87,7 +250,7 @@ cmd_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
 
     if (ifMauTable) {
 	g_string_sprintfa(interp->result,
-		  "Interface   Mau Status      Media         Jabber   AutoNeg\n");
+		  "Interface   Mau Status      Media         Jabber   AutoNeg Type\n");
 	for (i = 0; ifMauTable[i]; i++) {
 	    show_ether_mau_info(interp->result, ifMauTable[i]);
 	}
