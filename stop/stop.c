@@ -60,7 +60,7 @@ static int do_network_summary = 1;
 static int do_transport_summary = 1;
 static int do_mode_summary = 1;
 
-static GSList *mode_list = NULL;
+static GList *mode_list = NULL;
 static stop_mode_t *active_mode = NULL;
 
 static WINDOW *mode_win = NULL;
@@ -111,7 +111,7 @@ void
 stop_register_mode(stop_mode_t *mode)
 {
     if (mode) {
-	mode_list = g_slist_append(mode_list, mode);
+	mode_list = g_list_append(mode_list, mode);
 	if (! active_mode) {
 	    active_mode = mode;
 	}
@@ -162,23 +162,6 @@ stop_show_mode_summary_line(char *string)
     }
 }
 
-
-static char*
-fmt_kmg(guint32 number)
-{
-    static char buffer[80];
-
-    if (number > 999999999) {
-	g_snprintf(buffer, sizeof(buffer), "%3ug", number / 1000000);
-    } else if (number > 999999) {
-	g_snprintf(buffer, sizeof(buffer), "%3um", number / 1000000);
-    } else if (number > 9999) {
-	g_snprintf(buffer, sizeof(buffer), "%3uk", number / 1000);
-    } else {
-	g_snprintf(buffer, sizeof(buffer), "%4u", number);
-    }
-    return buffer;
-}
 
 
 static void
@@ -516,7 +499,7 @@ show_tcp(host_snmp *peer, int flags)
 static void
 help()
 {
-    GSList *elem;
+    GList *elem;
     int y = 0;
     
     clear();
@@ -533,11 +516,12 @@ help()
     mvprintw(y++, 0, "n\tToggle display of network layer summary information");
     mvprintw(y++, 0, "t\tToggle display of transport layer summary information");
     mvprintw(y++, 0, "w\tFreeze the screen until someone hits a key");
-    mvprintw(y++, 0, "T\tToggle through list of mode");
+    mvprintw(y++, 0, ">\tSelect next mode in the list of display modes");
+    mvprintw(y++, 0, "<\tSelect previous mode in the list of display modes");
     mvprintw(y++, 0, "q\tQuit");
     y++;
-    mvprintw(y++, 0, "Available modes:");
-    for (elem = mode_list; elem ; elem = g_slist_next(elem)) {
+    mvprintw(y++, 0, "Supported display modes:");
+    for (elem = mode_list; elem ; elem = g_list_next(elem)) {
 	stop_mode_t *mode = (stop_mode_t *) elem->data;
 	mvprintw(y++, 0, "%s %-14s %s",
 		 (mode == active_mode) ? "*" : " ",
@@ -556,7 +540,7 @@ mainloop(host_snmp *peer, int delay)
 {
     int c, flags = 0;
     char *input, buffer[80];
-    GSList *elem;
+    GList *elem;
     GString *s;
     
     flags |= STOP_FLAG_RESTART;
@@ -663,12 +647,28 @@ mainloop(host_snmp *peer, int delay)
 	    (void) getch();
 	    break;
         case 'T':
-	    elem = g_slist_find(mode_list, active_mode);
+	case '>':
+	    elem = g_list_find(mode_list, active_mode);
 	    if (elem) {
-		elem = g_slist_next(elem);
+		elem = g_list_next(elem);
 	    }
 	    if (! elem) {
 		elem = mode_list;
+	    }
+	    active_mode = (stop_mode_t *) elem->data;
+            flags |= STOP_FLAG_RESTART;
+	    s = g_string_new(NULL);
+	    g_string_sprintfa(s, "Switching to %s mode.", active_mode->name);
+	    stop_show_message(s->str);
+	    g_string_free(s, 1);
+            break;
+	case '<':
+	    elem = g_list_find(mode_list, active_mode);
+	    if (elem) {
+		elem = g_list_previous(elem);
+	    }
+	    if (! elem) {
+		elem = g_list_last(mode_list);
 	    }
 	    active_mode = (stop_mode_t *) elem->data;
             flags |= STOP_FLAG_RESTART;
@@ -837,8 +837,8 @@ main(int argc, char **argv)
     stop_init_ether_mode();
 
     if (mode_name) {
-	GSList *elem;
-	for (elem = mode_list; elem; elem = g_slist_next(elem)) {
+	GList *elem;
+	for (elem = mode_list; elem; elem = g_list_next(elem)) {
 	    stop_mode_t *mode = (stop_mode_t *) elem->data;
 	    if (strcmp(mode->name, mode_name) == 0) {
 		active_mode = mode;
