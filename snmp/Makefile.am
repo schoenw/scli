@@ -24,4 +24,4 @@ libgsnmp_a_SOURCES =	\
 	g_transport.c	\
 	g_transport.h	\
 	g_utils.c	\
-	g_utils,h
+	g_utils.h
