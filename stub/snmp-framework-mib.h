@@ -29,26 +29,28 @@
 #define SNMP_FRAMEWORK_MIB_SNMPAUTHPROTOCOLS	1,3,6,1,6,3,10,1,1
 #define SNMP_FRAMEWORK_MIB_SNMPPRIVPROTOCOLS	1,3,6,1,6,3,10,1,2
 
+extern stls_identity_t const snmp_framework_mib_identities[];
+
 /*
  * C type definitions for SNMP-FRAMEWORK-MIB::snmpEngine.
  */
 
-typedef struct snmpEngine {
+typedef struct {
     guchar   *snmpEngineID;
     gsize    _snmpEngineIDLength;
     gint32   *snmpEngineBoots;
     gint32   *snmpEngineTime;
     gint32   *snmpEngineMaxMessageSize;
-} snmpEngine_t;
+} snmp_framework_mib_snmpEngine_t;
 
-extern snmpEngine_t *
+extern snmp_framework_mib_snmpEngine_t *
 snmp_framework_mib_new_snmpEngine();
 
 extern int
-snmp_framework_mib_get_snmpEngine(host_snmp *s, snmpEngine_t **snmpEngine);
+snmp_framework_mib_get_snmpEngine(host_snmp *s, snmp_framework_mib_snmpEngine_t **snmpEngine);
 
 extern void
-snmp_framework_mib_free_snmpEngine(snmpEngine_t *snmpEngine);
+snmp_framework_mib_free_snmpEngine(snmp_framework_mib_snmpEngine_t *snmpEngine);
 
 
 #endif /* _SNMP_FRAMEWORK_MIB_H_ */

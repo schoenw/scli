@@ -46,7 +46,7 @@ extern stls_enum_t const snmp_community_mib_enums_snmpCommunityStatus[];
  * C type definitions for SNMP-COMMUNITY-MIB::snmpCommunityEntry.
  */
 
-typedef struct snmpCommunityEntry {
+typedef struct {
     guchar   snmpCommunityIndex[32];
     gsize    _snmpCommunityIndexLength;
     guchar   *snmpCommunityName;
@@ -61,55 +61,55 @@ typedef struct snmpCommunityEntry {
     gsize    _snmpCommunityTransportTagLength;
     gint32   *snmpCommunityStorageType;
     gint32   *snmpCommunityStatus;
-} snmpCommunityEntry_t;
+} snmp_community_mib_snmpCommunityEntry_t;
 
 extern int
-snmp_community_mib_get_snmpCommunityTable(host_snmp *s, snmpCommunityEntry_t ***snmpCommunityEntry);
+snmp_community_mib_get_snmpCommunityTable(host_snmp *s, snmp_community_mib_snmpCommunityEntry_t ***snmpCommunityEntry);
 
 extern void
-snmp_community_mib_free_snmpCommunityTable(snmpCommunityEntry_t **snmpCommunityEntry);
+snmp_community_mib_free_snmpCommunityTable(snmp_community_mib_snmpCommunityEntry_t **snmpCommunityEntry);
 
-extern snmpCommunityEntry_t *
+extern snmp_community_mib_snmpCommunityEntry_t *
 snmp_community_mib_new_snmpCommunityEntry();
 
 extern int
-snmp_community_mib_get_snmpCommunityEntry(host_snmp *s, snmpCommunityEntry_t **snmpCommunityEntry);
+snmp_community_mib_get_snmpCommunityEntry(host_snmp *s, snmp_community_mib_snmpCommunityEntry_t **snmpCommunityEntry);
 
 extern int
-snmp_community_mib_set_snmpCommunityEntry(host_snmp *s, snmpCommunityEntry_t *snmpCommunityEntry);
+snmp_community_mib_set_snmpCommunityEntry(host_snmp *s, snmp_community_mib_snmpCommunityEntry_t *snmpCommunityEntry);
 
 extern void
-snmp_community_mib_free_snmpCommunityEntry(snmpCommunityEntry_t *snmpCommunityEntry);
+snmp_community_mib_free_snmpCommunityEntry(snmp_community_mib_snmpCommunityEntry_t *snmpCommunityEntry);
 
 /*
  * C type definitions for SNMP-COMMUNITY-MIB::snmpTargetAddrExtEntry.
  */
 
-typedef struct snmpTargetAddrExtEntry {
+typedef struct {
     guchar   snmpTargetAddrName[32];
     gsize    _snmpTargetAddrNameLength;
     guchar   *snmpTargetAddrTMask;
     gsize    _snmpTargetAddrTMaskLength;
     gint32   *snmpTargetAddrMMS;
-} snmpTargetAddrExtEntry_t;
+} snmp_community_mib_snmpTargetAddrExtEntry_t;
 
 extern int
-snmp_community_mib_get_snmpTargetAddrExtTable(host_snmp *s, snmpTargetAddrExtEntry_t ***snmpTargetAddrExtEntry);
+snmp_community_mib_get_snmpTargetAddrExtTable(host_snmp *s, snmp_community_mib_snmpTargetAddrExtEntry_t ***snmpTargetAddrExtEntry);
 
 extern void
-snmp_community_mib_free_snmpTargetAddrExtTable(snmpTargetAddrExtEntry_t **snmpTargetAddrExtEntry);
+snmp_community_mib_free_snmpTargetAddrExtTable(snmp_community_mib_snmpTargetAddrExtEntry_t **snmpTargetAddrExtEntry);
 
-extern snmpTargetAddrExtEntry_t *
+extern snmp_community_mib_snmpTargetAddrExtEntry_t *
 snmp_community_mib_new_snmpTargetAddrExtEntry();
 
 extern int
-snmp_community_mib_get_snmpTargetAddrExtEntry(host_snmp *s, snmpTargetAddrExtEntry_t **snmpTargetAddrExtEntry);
+snmp_community_mib_get_snmpTargetAddrExtEntry(host_snmp *s, snmp_community_mib_snmpTargetAddrExtEntry_t **snmpTargetAddrExtEntry);
 
 extern int
-snmp_community_mib_set_snmpTargetAddrExtEntry(host_snmp *s, snmpTargetAddrExtEntry_t *snmpTargetAddrExtEntry);
+snmp_community_mib_set_snmpTargetAddrExtEntry(host_snmp *s, snmp_community_mib_snmpTargetAddrExtEntry_t *snmpTargetAddrExtEntry);
 
 extern void
-snmp_community_mib_free_snmpTargetAddrExtEntry(snmpTargetAddrExtEntry_t *snmpTargetAddrExtEntry);
+snmp_community_mib_free_snmpTargetAddrExtEntry(snmp_community_mib_snmpTargetAddrExtEntry_t *snmpTargetAddrExtEntry);
 
 
 #endif /* _SNMP_COMMUNITY_MIB_H_ */

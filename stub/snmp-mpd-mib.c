@@ -24,20 +24,20 @@ static stls_stub_attr_t _snmpMPDStats[] = {
 };
 
 
-snmpMPDStats_t *
+snmp_mpd_mib_snmpMPDStats_t *
 snmp_mpd_mib_new_snmpMPDStats()
 {
-    snmpMPDStats_t *snmpMPDStats;
+    snmp_mpd_mib_snmpMPDStats_t *snmpMPDStats;
 
-    snmpMPDStats = (snmpMPDStats_t *) g_malloc0(sizeof(snmpMPDStats_t) + sizeof(gpointer));
+    snmpMPDStats = (snmp_mpd_mib_snmpMPDStats_t *) g_malloc0(sizeof(snmp_mpd_mib_snmpMPDStats_t) + sizeof(gpointer));
     return snmpMPDStats;
 }
 
-static snmpMPDStats_t *
+static snmp_mpd_mib_snmpMPDStats_t *
 assign_snmpMPDStats(GSList *vbl)
 {
     GSList *elem;
-    snmpMPDStats_t *snmpMPDStats;
+    snmp_mpd_mib_snmpMPDStats_t *snmpMPDStats;
     guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 11, 2, 1};
@@ -47,7 +47,7 @@ assign_snmpMPDStats(GSList *vbl)
         return NULL;
     }
 
-    p = (char *) snmpMPDStats + sizeof(snmpMPDStats_t);
+    p = (char *) snmpMPDStats + sizeof(snmp_mpd_mib_snmpMPDStats_t);
     * (GSList **) p = vbl;
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -73,7 +73,7 @@ assign_snmpMPDStats(GSList *vbl)
 }
 
 int
-snmp_mpd_mib_get_snmpMPDStats(host_snmp *s, snmpMPDStats_t **snmpMPDStats)
+snmp_mpd_mib_get_snmpMPDStats(host_snmp *s, snmp_mpd_mib_snmpMPDStats_t **snmpMPDStats)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 11, 2, 1, 0};
@@ -94,13 +94,13 @@ snmp_mpd_mib_get_snmpMPDStats(host_snmp *s, snmpMPDStats_t **snmpMPDStats)
 }
 
 void
-snmp_mpd_mib_free_snmpMPDStats(snmpMPDStats_t *snmpMPDStats)
+snmp_mpd_mib_free_snmpMPDStats(snmp_mpd_mib_snmpMPDStats_t *snmpMPDStats)
 {
     GSList *vbl;
     char *p;
 
     if (snmpMPDStats) {
-        p = (char *) snmpMPDStats + sizeof(snmpMPDStats_t);
+        p = (char *) snmpMPDStats + sizeof(snmp_mpd_mib_snmpMPDStats_t);
         vbl = * (GSList **) p;
         stls_vbl_free(vbl);
         g_free(snmpMPDStats);

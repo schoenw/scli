@@ -44,20 +44,20 @@ static stls_stub_attr_t _snmpEngine[] = {
 };
 
 
-snmpEngine_t *
+snmp_framework_mib_snmpEngine_t *
 snmp_framework_mib_new_snmpEngine()
 {
-    snmpEngine_t *snmpEngine;
+    snmp_framework_mib_snmpEngine_t *snmpEngine;
 
-    snmpEngine = (snmpEngine_t *) g_malloc0(sizeof(snmpEngine_t) + sizeof(gpointer));
+    snmpEngine = (snmp_framework_mib_snmpEngine_t *) g_malloc0(sizeof(snmp_framework_mib_snmpEngine_t) + sizeof(gpointer));
     return snmpEngine;
 }
 
-static snmpEngine_t *
+static snmp_framework_mib_snmpEngine_t *
 assign_snmpEngine(GSList *vbl)
 {
     GSList *elem;
-    snmpEngine_t *snmpEngine;
+    snmp_framework_mib_snmpEngine_t *snmpEngine;
     guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 10, 2, 1};
@@ -67,7 +67,7 @@ assign_snmpEngine(GSList *vbl)
         return NULL;
     }
 
-    p = (char *) snmpEngine + sizeof(snmpEngine_t);
+    p = (char *) snmpEngine + sizeof(snmp_framework_mib_snmpEngine_t);
     * (GSList **) p = vbl;
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -97,7 +97,7 @@ assign_snmpEngine(GSList *vbl)
 }
 
 int
-snmp_framework_mib_get_snmpEngine(host_snmp *s, snmpEngine_t **snmpEngine)
+snmp_framework_mib_get_snmpEngine(host_snmp *s, snmp_framework_mib_snmpEngine_t **snmpEngine)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 10, 2, 1, 0};
@@ -118,13 +118,13 @@ snmp_framework_mib_get_snmpEngine(host_snmp *s, snmpEngine_t **snmpEngine)
 }
 
 void
-snmp_framework_mib_free_snmpEngine(snmpEngine_t *snmpEngine)
+snmp_framework_mib_free_snmpEngine(snmp_framework_mib_snmpEngine_t *snmpEngine)
 {
     GSList *vbl;
     char *p;
 
     if (snmpEngine) {
-        p = (char *) snmpEngine + sizeof(snmpEngine_t);
+        p = (char *) snmpEngine + sizeof(snmp_framework_mib_snmpEngine_t);
         vbl = * (GSList **) p;
         stls_vbl_free(vbl);
         g_free(snmpEngine);

@@ -53,53 +53,55 @@ extern stls_enum_t const snmp_user_based_sm_mib_enums_usmUserStatus[];
 #define SNMP_USER_BASED_SM_MIB_USMNOPRIVPROTOCOL	1,3,6,1,6,3,10,1,2,1
 #define SNMP_USER_BASED_SM_MIB_USMDESPRIVPROTOCOL	1,3,6,1,6,3,10,1,2,2
 
+extern stls_identity_t const snmp_user_based_sm_mib_identities[];
+
 /*
  * C type definitions for SNMP-USER-BASED-SM-MIB::usmStats.
  */
 
-typedef struct usmStats {
+typedef struct {
     guint32  *usmStatsUnsupportedSecLevels;
     guint32  *usmStatsNotInTimeWindows;
     guint32  *usmStatsUnknownUserNames;
     guint32  *usmStatsUnknownEngineIDs;
     guint32  *usmStatsWrongDigests;
     guint32  *usmStatsDecryptionErrors;
-} usmStats_t;
+} snmp_user_based_sm_mib_usmStats_t;
 
-extern usmStats_t *
+extern snmp_user_based_sm_mib_usmStats_t *
 snmp_user_based_sm_mib_new_usmStats();
 
 extern int
-snmp_user_based_sm_mib_get_usmStats(host_snmp *s, usmStats_t **usmStats);
+snmp_user_based_sm_mib_get_usmStats(host_snmp *s, snmp_user_based_sm_mib_usmStats_t **usmStats);
 
 extern void
-snmp_user_based_sm_mib_free_usmStats(usmStats_t *usmStats);
+snmp_user_based_sm_mib_free_usmStats(snmp_user_based_sm_mib_usmStats_t *usmStats);
 
 /*
  * C type definitions for SNMP-USER-BASED-SM-MIB::usmUser.
  */
 
-typedef struct usmUser {
+typedef struct {
     gint32   *usmUserSpinLock;
-} usmUser_t;
+} snmp_user_based_sm_mib_usmUser_t;
 
-extern usmUser_t *
+extern snmp_user_based_sm_mib_usmUser_t *
 snmp_user_based_sm_mib_new_usmUser();
 
 extern int
-snmp_user_based_sm_mib_get_usmUser(host_snmp *s, usmUser_t **usmUser);
+snmp_user_based_sm_mib_get_usmUser(host_snmp *s, snmp_user_based_sm_mib_usmUser_t **usmUser);
 
 extern int
-snmp_user_based_sm_mib_set_usmUser(host_snmp *s, usmUser_t *usmUser);
+snmp_user_based_sm_mib_set_usmUser(host_snmp *s, snmp_user_based_sm_mib_usmUser_t *usmUser);
 
 extern void
-snmp_user_based_sm_mib_free_usmUser(usmUser_t *usmUser);
+snmp_user_based_sm_mib_free_usmUser(snmp_user_based_sm_mib_usmUser_t *usmUser);
 
 /*
  * C type definitions for SNMP-USER-BASED-SM-MIB::usmUserEntry.
  */
 
-typedef struct usmUserEntry {
+typedef struct {
     guchar   usmUserEngineID[32];
     gsize    _usmUserEngineIDLength;
     guchar   usmUserName[32];
@@ -124,25 +126,25 @@ typedef struct usmUserEntry {
     gsize    _usmUserPublicLength;
     gint32   *usmUserStorageType;
     gint32   *usmUserStatus;
-} usmUserEntry_t;
+} snmp_user_based_sm_mib_usmUserEntry_t;
 
 extern int
-snmp_user_based_sm_mib_get_usmUserTable(host_snmp *s, usmUserEntry_t ***usmUserEntry);
+snmp_user_based_sm_mib_get_usmUserTable(host_snmp *s, snmp_user_based_sm_mib_usmUserEntry_t ***usmUserEntry);
 
 extern void
-snmp_user_based_sm_mib_free_usmUserTable(usmUserEntry_t **usmUserEntry);
+snmp_user_based_sm_mib_free_usmUserTable(snmp_user_based_sm_mib_usmUserEntry_t **usmUserEntry);
 
-extern usmUserEntry_t *
+extern snmp_user_based_sm_mib_usmUserEntry_t *
 snmp_user_based_sm_mib_new_usmUserEntry();
 
 extern int
-snmp_user_based_sm_mib_get_usmUserEntry(host_snmp *s, usmUserEntry_t **usmUserEntry);
+snmp_user_based_sm_mib_get_usmUserEntry(host_snmp *s, snmp_user_based_sm_mib_usmUserEntry_t **usmUserEntry);
 
 extern int
-snmp_user_based_sm_mib_set_usmUserEntry(host_snmp *s, usmUserEntry_t *usmUserEntry);
+snmp_user_based_sm_mib_set_usmUserEntry(host_snmp *s, snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry);
 
 extern void
-snmp_user_based_sm_mib_free_usmUserEntry(usmUserEntry_t *usmUserEntry);
+snmp_user_based_sm_mib_free_usmUserEntry(snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry);
 
 
 #endif /* _SNMP_USER_BASED_SM_MIB_H_ */

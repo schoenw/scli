@@ -100,20 +100,20 @@ static stls_stub_attr_t _usmUserEntry[] = {
 };
 
 
-usmStats_t *
+snmp_user_based_sm_mib_usmStats_t *
 snmp_user_based_sm_mib_new_usmStats()
 {
-    usmStats_t *usmStats;
+    snmp_user_based_sm_mib_usmStats_t *usmStats;
 
-    usmStats = (usmStats_t *) g_malloc0(sizeof(usmStats_t) + sizeof(gpointer));
+    usmStats = (snmp_user_based_sm_mib_usmStats_t *) g_malloc0(sizeof(snmp_user_based_sm_mib_usmStats_t) + sizeof(gpointer));
     return usmStats;
 }
 
-static usmStats_t *
+static snmp_user_based_sm_mib_usmStats_t *
 assign_usmStats(GSList *vbl)
 {
     GSList *elem;
-    usmStats_t *usmStats;
+    snmp_user_based_sm_mib_usmStats_t *usmStats;
     guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 15, 1, 1};
@@ -123,7 +123,7 @@ assign_usmStats(GSList *vbl)
         return NULL;
     }
 
-    p = (char *) usmStats + sizeof(usmStats_t);
+    p = (char *) usmStats + sizeof(snmp_user_based_sm_mib_usmStats_t);
     * (GSList **) p = vbl;
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -158,7 +158,7 @@ assign_usmStats(GSList *vbl)
 }
 
 int
-snmp_user_based_sm_mib_get_usmStats(host_snmp *s, usmStats_t **usmStats)
+snmp_user_based_sm_mib_get_usmStats(host_snmp *s, snmp_user_based_sm_mib_usmStats_t **usmStats)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 15, 1, 1, 0};
@@ -179,33 +179,33 @@ snmp_user_based_sm_mib_get_usmStats(host_snmp *s, usmStats_t **usmStats)
 }
 
 void
-snmp_user_based_sm_mib_free_usmStats(usmStats_t *usmStats)
+snmp_user_based_sm_mib_free_usmStats(snmp_user_based_sm_mib_usmStats_t *usmStats)
 {
     GSList *vbl;
     char *p;
 
     if (usmStats) {
-        p = (char *) usmStats + sizeof(usmStats_t);
+        p = (char *) usmStats + sizeof(snmp_user_based_sm_mib_usmStats_t);
         vbl = * (GSList **) p;
         stls_vbl_free(vbl);
         g_free(usmStats);
     }
 }
 
-usmUser_t *
+snmp_user_based_sm_mib_usmUser_t *
 snmp_user_based_sm_mib_new_usmUser()
 {
-    usmUser_t *usmUser;
+    snmp_user_based_sm_mib_usmUser_t *usmUser;
 
-    usmUser = (usmUser_t *) g_malloc0(sizeof(usmUser_t) + sizeof(gpointer));
+    usmUser = (snmp_user_based_sm_mib_usmUser_t *) g_malloc0(sizeof(snmp_user_based_sm_mib_usmUser_t) + sizeof(gpointer));
     return usmUser;
 }
 
-static usmUser_t *
+static snmp_user_based_sm_mib_usmUser_t *
 assign_usmUser(GSList *vbl)
 {
     GSList *elem;
-    usmUser_t *usmUser;
+    snmp_user_based_sm_mib_usmUser_t *usmUser;
     guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 15, 1, 2};
@@ -215,7 +215,7 @@ assign_usmUser(GSList *vbl)
         return NULL;
     }
 
-    p = (char *) usmUser + sizeof(usmUser_t);
+    p = (char *) usmUser + sizeof(snmp_user_based_sm_mib_usmUser_t);
     * (GSList **) p = vbl;
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -235,7 +235,7 @@ assign_usmUser(GSList *vbl)
 }
 
 int
-snmp_user_based_sm_mib_get_usmUser(host_snmp *s, usmUser_t **usmUser)
+snmp_user_based_sm_mib_get_usmUser(host_snmp *s, snmp_user_based_sm_mib_usmUser_t **usmUser)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 15, 1, 2, 0};
@@ -256,30 +256,30 @@ snmp_user_based_sm_mib_get_usmUser(host_snmp *s, usmUser_t **usmUser)
 }
 
 void
-snmp_user_based_sm_mib_free_usmUser(usmUser_t *usmUser)
+snmp_user_based_sm_mib_free_usmUser(snmp_user_based_sm_mib_usmUser_t *usmUser)
 {
     GSList *vbl;
     char *p;
 
     if (usmUser) {
-        p = (char *) usmUser + sizeof(usmUser_t);
+        p = (char *) usmUser + sizeof(snmp_user_based_sm_mib_usmUser_t);
         vbl = * (GSList **) p;
         stls_vbl_free(vbl);
         g_free(usmUser);
     }
 }
 
-usmUserEntry_t *
+snmp_user_based_sm_mib_usmUserEntry_t *
 snmp_user_based_sm_mib_new_usmUserEntry()
 {
-    usmUserEntry_t *usmUserEntry;
+    snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry;
 
-    usmUserEntry = (usmUserEntry_t *) g_malloc0(sizeof(usmUserEntry_t) + sizeof(gpointer));
+    usmUserEntry = (snmp_user_based_sm_mib_usmUserEntry_t *) g_malloc0(sizeof(snmp_user_based_sm_mib_usmUserEntry_t) + sizeof(gpointer));
     return usmUserEntry;
 }
 
 static int
-unpack_usmUserEntry(GSnmpVarBind *vb, usmUserEntry_t *usmUserEntry)
+unpack_usmUserEntry(GSnmpVarBind *vb, snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry)
 {
     int i, len, idx = 12;
 
@@ -301,11 +301,11 @@ unpack_usmUserEntry(GSnmpVarBind *vb, usmUserEntry_t *usmUserEntry)
     return 0;
 }
 
-static usmUserEntry_t *
+static snmp_user_based_sm_mib_usmUserEntry_t *
 assign_usmUserEntry(GSList *vbl)
 {
     GSList *elem;
-    usmUserEntry_t *usmUserEntry;
+    snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry;
     guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 15, 1, 2, 2, 1};
@@ -315,7 +315,7 @@ assign_usmUserEntry(GSList *vbl)
         return NULL;
     }
 
-    p = (char *) usmUserEntry + sizeof(usmUserEntry_t);
+    p = (char *) usmUserEntry + sizeof(snmp_user_based_sm_mib_usmUserEntry_t);
     * (GSList **) p = vbl;
 
     if (unpack_usmUserEntry((GSnmpVarBind *) vbl->data, usmUserEntry) < 0) {
@@ -380,7 +380,7 @@ assign_usmUserEntry(GSList *vbl)
 }
 
 int
-snmp_user_based_sm_mib_get_usmUserTable(host_snmp *s, usmUserEntry_t ***usmUserEntry)
+snmp_user_based_sm_mib_get_usmUserTable(host_snmp *s, snmp_user_based_sm_mib_usmUserEntry_t ***usmUserEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -397,7 +397,7 @@ snmp_user_based_sm_mib_get_usmUserTable(host_snmp *s, usmUserEntry_t ***usmUserE
         return -2;
     }
 
-    *usmUserEntry = (usmUserEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(usmUserEntry_t *));
+    *usmUserEntry = (snmp_user_based_sm_mib_usmUserEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(snmp_user_based_sm_mib_usmUserEntry_t *));
     if (! *usmUserEntry) {
         return -4;
     }
@@ -410,13 +410,13 @@ snmp_user_based_sm_mib_get_usmUserTable(host_snmp *s, usmUserEntry_t ***usmUserE
 }
 
 void
-snmp_user_based_sm_mib_free_usmUserEntry(usmUserEntry_t *usmUserEntry)
+snmp_user_based_sm_mib_free_usmUserEntry(snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry)
 {
     GSList *vbl;
     char *p;
 
     if (usmUserEntry) {
-        p = (char *) usmUserEntry + sizeof(usmUserEntry_t);
+        p = (char *) usmUserEntry + sizeof(snmp_user_based_sm_mib_usmUserEntry_t);
         vbl = * (GSList **) p;
         stls_vbl_free(vbl);
         g_free(usmUserEntry);
@@ -424,7 +424,7 @@ snmp_user_based_sm_mib_free_usmUserEntry(usmUserEntry_t *usmUserEntry)
 }
 
 void
-snmp_user_based_sm_mib_free_usmUserTable(usmUserEntry_t **usmUserEntry)
+snmp_user_based_sm_mib_free_usmUserTable(snmp_user_based_sm_mib_usmUserEntry_t **usmUserEntry)
 {
     int i;
 

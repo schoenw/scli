@@ -95,20 +95,20 @@ static stls_stub_attr_t _snmpTargetParamsEntry[] = {
 };
 
 
-snmpTargetObjects_t *
+snmp_target_mib_snmpTargetObjects_t *
 snmp_target_mib_new_snmpTargetObjects()
 {
-    snmpTargetObjects_t *snmpTargetObjects;
+    snmp_target_mib_snmpTargetObjects_t *snmpTargetObjects;
 
-    snmpTargetObjects = (snmpTargetObjects_t *) g_malloc0(sizeof(snmpTargetObjects_t) + sizeof(gpointer));
+    snmpTargetObjects = (snmp_target_mib_snmpTargetObjects_t *) g_malloc0(sizeof(snmp_target_mib_snmpTargetObjects_t) + sizeof(gpointer));
     return snmpTargetObjects;
 }
 
-static snmpTargetObjects_t *
+static snmp_target_mib_snmpTargetObjects_t *
 assign_snmpTargetObjects(GSList *vbl)
 {
     GSList *elem;
-    snmpTargetObjects_t *snmpTargetObjects;
+    snmp_target_mib_snmpTargetObjects_t *snmpTargetObjects;
     guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 12, 1};
@@ -118,7 +118,7 @@ assign_snmpTargetObjects(GSList *vbl)
         return NULL;
     }
 
-    p = (char *) snmpTargetObjects + sizeof(snmpTargetObjects_t);
+    p = (char *) snmpTargetObjects + sizeof(snmp_target_mib_snmpTargetObjects_t);
     * (GSList **) p = vbl;
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
@@ -144,7 +144,7 @@ assign_snmpTargetObjects(GSList *vbl)
 }
 
 int
-snmp_target_mib_get_snmpTargetObjects(host_snmp *s, snmpTargetObjects_t **snmpTargetObjects)
+snmp_target_mib_get_snmpTargetObjects(host_snmp *s, snmp_target_mib_snmpTargetObjects_t **snmpTargetObjects)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 12, 1, 0};
@@ -165,30 +165,30 @@ snmp_target_mib_get_snmpTargetObjects(host_snmp *s, snmpTargetObjects_t **snmpTa
 }
 
 void
-snmp_target_mib_free_snmpTargetObjects(snmpTargetObjects_t *snmpTargetObjects)
+snmp_target_mib_free_snmpTargetObjects(snmp_target_mib_snmpTargetObjects_t *snmpTargetObjects)
 {
     GSList *vbl;
     char *p;
 
     if (snmpTargetObjects) {
-        p = (char *) snmpTargetObjects + sizeof(snmpTargetObjects_t);
+        p = (char *) snmpTargetObjects + sizeof(snmp_target_mib_snmpTargetObjects_t);
         vbl = * (GSList **) p;
         stls_vbl_free(vbl);
         g_free(snmpTargetObjects);
     }
 }
 
-snmpTargetAddrEntry_t *
+snmp_target_mib_snmpTargetAddrEntry_t *
 snmp_target_mib_new_snmpTargetAddrEntry()
 {
-    snmpTargetAddrEntry_t *snmpTargetAddrEntry;
+    snmp_target_mib_snmpTargetAddrEntry_t *snmpTargetAddrEntry;
 
-    snmpTargetAddrEntry = (snmpTargetAddrEntry_t *) g_malloc0(sizeof(snmpTargetAddrEntry_t) + sizeof(gpointer));
+    snmpTargetAddrEntry = (snmp_target_mib_snmpTargetAddrEntry_t *) g_malloc0(sizeof(snmp_target_mib_snmpTargetAddrEntry_t) + sizeof(gpointer));
     return snmpTargetAddrEntry;
 }
 
 static int
-unpack_snmpTargetAddrEntry(GSnmpVarBind *vb, snmpTargetAddrEntry_t *snmpTargetAddrEntry)
+unpack_snmpTargetAddrEntry(GSnmpVarBind *vb, snmp_target_mib_snmpTargetAddrEntry_t *snmpTargetAddrEntry)
 {
     int i, len, idx = 11;
 
@@ -202,11 +202,11 @@ unpack_snmpTargetAddrEntry(GSnmpVarBind *vb, snmpTargetAddrEntry_t *snmpTargetAd
     return 0;
 }
 
-static snmpTargetAddrEntry_t *
+static snmp_target_mib_snmpTargetAddrEntry_t *
 assign_snmpTargetAddrEntry(GSList *vbl)
 {
     GSList *elem;
-    snmpTargetAddrEntry_t *snmpTargetAddrEntry;
+    snmp_target_mib_snmpTargetAddrEntry_t *snmpTargetAddrEntry;
     guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 12, 1, 2, 1};
@@ -216,7 +216,7 @@ assign_snmpTargetAddrEntry(GSList *vbl)
         return NULL;
     }
 
-    p = (char *) snmpTargetAddrEntry + sizeof(snmpTargetAddrEntry_t);
+    p = (char *) snmpTargetAddrEntry + sizeof(snmp_target_mib_snmpTargetAddrEntry_t);
     * (GSList **) p = vbl;
 
     if (unpack_snmpTargetAddrEntry((GSnmpVarBind *) vbl->data, snmpTargetAddrEntry) < 0) {
@@ -267,7 +267,7 @@ assign_snmpTargetAddrEntry(GSList *vbl)
 }
 
 int
-snmp_target_mib_get_snmpTargetAddrTable(host_snmp *s, snmpTargetAddrEntry_t ***snmpTargetAddrEntry)
+snmp_target_mib_get_snmpTargetAddrTable(host_snmp *s, snmp_target_mib_snmpTargetAddrEntry_t ***snmpTargetAddrEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -284,7 +284,7 @@ snmp_target_mib_get_snmpTargetAddrTable(host_snmp *s, snmpTargetAddrEntry_t ***s
         return -2;
     }
 
-    *snmpTargetAddrEntry = (snmpTargetAddrEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(snmpTargetAddrEntry_t *));
+    *snmpTargetAddrEntry = (snmp_target_mib_snmpTargetAddrEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(snmp_target_mib_snmpTargetAddrEntry_t *));
     if (! *snmpTargetAddrEntry) {
         return -4;
     }
@@ -297,13 +297,13 @@ snmp_target_mib_get_snmpTargetAddrTable(host_snmp *s, snmpTargetAddrEntry_t ***s
 }
 
 void
-snmp_target_mib_free_snmpTargetAddrEntry(snmpTargetAddrEntry_t *snmpTargetAddrEntry)
+snmp_target_mib_free_snmpTargetAddrEntry(snmp_target_mib_snmpTargetAddrEntry_t *snmpTargetAddrEntry)
 {
     GSList *vbl;
     char *p;
 
     if (snmpTargetAddrEntry) {
-        p = (char *) snmpTargetAddrEntry + sizeof(snmpTargetAddrEntry_t);
+        p = (char *) snmpTargetAddrEntry + sizeof(snmp_target_mib_snmpTargetAddrEntry_t);
         vbl = * (GSList **) p;
         stls_vbl_free(vbl);
         g_free(snmpTargetAddrEntry);
@@ -311,7 +311,7 @@ snmp_target_mib_free_snmpTargetAddrEntry(snmpTargetAddrEntry_t *snmpTargetAddrEn
 }
 
 void
-snmp_target_mib_free_snmpTargetAddrTable(snmpTargetAddrEntry_t **snmpTargetAddrEntry)
+snmp_target_mib_free_snmpTargetAddrTable(snmp_target_mib_snmpTargetAddrEntry_t **snmpTargetAddrEntry)
 {
     int i;
 
@@ -323,17 +323,17 @@ snmp_target_mib_free_snmpTargetAddrTable(snmpTargetAddrEntry_t **snmpTargetAddrE
     }
 }
 
-snmpTargetParamsEntry_t *
+snmp_target_mib_snmpTargetParamsEntry_t *
 snmp_target_mib_new_snmpTargetParamsEntry()
 {
-    snmpTargetParamsEntry_t *snmpTargetParamsEntry;
+    snmp_target_mib_snmpTargetParamsEntry_t *snmpTargetParamsEntry;
 
-    snmpTargetParamsEntry = (snmpTargetParamsEntry_t *) g_malloc0(sizeof(snmpTargetParamsEntry_t) + sizeof(gpointer));
+    snmpTargetParamsEntry = (snmp_target_mib_snmpTargetParamsEntry_t *) g_malloc0(sizeof(snmp_target_mib_snmpTargetParamsEntry_t) + sizeof(gpointer));
     return snmpTargetParamsEntry;
 }
 
 static int
-unpack_snmpTargetParamsEntry(GSnmpVarBind *vb, snmpTargetParamsEntry_t *snmpTargetParamsEntry)
+unpack_snmpTargetParamsEntry(GSnmpVarBind *vb, snmp_target_mib_snmpTargetParamsEntry_t *snmpTargetParamsEntry)
 {
     int i, len, idx = 11;
 
@@ -347,11 +347,11 @@ unpack_snmpTargetParamsEntry(GSnmpVarBind *vb, snmpTargetParamsEntry_t *snmpTarg
     return 0;
 }
 
-static snmpTargetParamsEntry_t *
+static snmp_target_mib_snmpTargetParamsEntry_t *
 assign_snmpTargetParamsEntry(GSList *vbl)
 {
     GSList *elem;
-    snmpTargetParamsEntry_t *snmpTargetParamsEntry;
+    snmp_target_mib_snmpTargetParamsEntry_t *snmpTargetParamsEntry;
     guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 12, 1, 3, 1};
@@ -361,7 +361,7 @@ assign_snmpTargetParamsEntry(GSList *vbl)
         return NULL;
     }
 
-    p = (char *) snmpTargetParamsEntry + sizeof(snmpTargetParamsEntry_t);
+    p = (char *) snmpTargetParamsEntry + sizeof(snmp_target_mib_snmpTargetParamsEntry_t);
     * (GSList **) p = vbl;
 
     if (unpack_snmpTargetParamsEntry((GSnmpVarBind *) vbl->data, snmpTargetParamsEntry) < 0) {
@@ -403,7 +403,7 @@ assign_snmpTargetParamsEntry(GSList *vbl)
 }
 
 int
-snmp_target_mib_get_snmpTargetParamsTable(host_snmp *s, snmpTargetParamsEntry_t ***snmpTargetParamsEntry)
+snmp_target_mib_get_snmpTargetParamsTable(host_snmp *s, snmp_target_mib_snmpTargetParamsEntry_t ***snmpTargetParamsEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -420,7 +420,7 @@ snmp_target_mib_get_snmpTargetParamsTable(host_snmp *s, snmpTargetParamsEntry_t 
         return -2;
     }
 
-    *snmpTargetParamsEntry = (snmpTargetParamsEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(snmpTargetParamsEntry_t *));
+    *snmpTargetParamsEntry = (snmp_target_mib_snmpTargetParamsEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(snmp_target_mib_snmpTargetParamsEntry_t *));
     if (! *snmpTargetParamsEntry) {
         return -4;
     }
@@ -433,13 +433,13 @@ snmp_target_mib_get_snmpTargetParamsTable(host_snmp *s, snmpTargetParamsEntry_t 
 }
 
 void
-snmp_target_mib_free_snmpTargetParamsEntry(snmpTargetParamsEntry_t *snmpTargetParamsEntry)
+snmp_target_mib_free_snmpTargetParamsEntry(snmp_target_mib_snmpTargetParamsEntry_t *snmpTargetParamsEntry)
 {
     GSList *vbl;
     char *p;
 
     if (snmpTargetParamsEntry) {
-        p = (char *) snmpTargetParamsEntry + sizeof(snmpTargetParamsEntry_t);
+        p = (char *) snmpTargetParamsEntry + sizeof(snmp_target_mib_snmpTargetParamsEntry_t);
         vbl = * (GSList **) p;
         stls_vbl_free(vbl);
         g_free(snmpTargetParamsEntry);
@@ -447,7 +447,7 @@ snmp_target_mib_free_snmpTargetParamsEntry(snmpTargetParamsEntry_t *snmpTargetPa
 }
 
 void
-snmp_target_mib_free_snmpTargetParamsTable(snmpTargetParamsEntry_t **snmpTargetParamsEntry)
+snmp_target_mib_free_snmpTargetParamsTable(snmp_target_mib_snmpTargetParamsEntry_t **snmpTargetParamsEntry)
 {
     int i;
 
