@@ -286,6 +286,7 @@ void scli_interp_init(scli_interp_t *interp)
     scli_init_printer_mode(interp);
     scli_init_isdn_mode(interp);
     scli_init_rs232_mode(interp);
+    scli_init_sonet_mode(interp);
     scli_init_cisco_mode(interp);
     scli_init_nortel_mode(interp);
     scli_init_netsnmp_mode(interp);
