@@ -46,6 +46,30 @@ snmp_view_based_acm_mib_proc_create_member(GSnmpSession *s,
     snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(vacmGroupEntry);
 }
 
+void
+snmp_view_based_acm_mib_proc_delete_member(GSnmpSession *s,
+					   guchar *name,
+					   guchar *group,
+					   gint32 model)
+{
+    snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t *vacmGroupEntry;
+    const gint32 createAndGo = SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_CREATEANDGO;
+
+    vacmGroupEntry = snmp_view_based_acm_mib_new_vacmSecurityToGroupEntry();
+    if (! vacmGroupEntry) {
+	s->error_status = G_SNMP_ERR_PROCEDURE;
+	return;
+    }
+    vacmGroupEntry->_vacmSecurityNameLength = strlen(name);
+    memcpy(vacmGroupEntry->vacmSecurityName, name,
+	   vacmGroupEntry->_vacmSecurityNameLength);
+    vacmGroupEntry->_vacmGroupNameLength = strlen(group);
+    vacmGroupEntry->vacmGroupName = group;
+    vacmGroupEntry->vacmSecurityModel = 0;
+    snmp_view_based_acm_mib_set_vacmSecurityToGroupEntry(s, vacmGroupEntry, 0);
+    snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(vacmGroupEntry);
+}
+
 #if 0
 void
 disman_script_mib_proc_create_script(GSnmpSession *s,
