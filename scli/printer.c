@@ -152,6 +152,7 @@ cmd_printer_xxx(scli_interp_t * interp, int argc, char **argv)
     host_resources_mib_hrPrinterEntry_t **hrPrinterTable;
     host_resources_mib_hrDeviceEntry_t **hrDeviceTable;
     int i;
+    gint32 last = 0;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -162,8 +163,15 @@ cmd_printer_xxx(scli_interp_t * interp, int argc, char **argv)
 
     if (hrPrinterTable) {
 	for (i = 0; hrPrinterTable[i]; i++) {
+	    if (hrPrinterTable[i]->hrDeviceIndex != last) {
+		if (i > 0) {
+		    g_string_append(interp->result, "\n");
+		}
+	    }
 	    show_printer_xxx(interp->result, hrPrinterTable[i],
-		     get_device_entry(hrPrinterTable[i], hrDeviceTable));
+			     get_device_entry(hrPrinterTable[i],
+					      hrDeviceTable));
+	    last = hrPrinterTable[i]->hrDeviceIndex;
 	}
     }
 
@@ -778,9 +786,13 @@ cmd_printer_inputs(scli_interp_t * interp, int argc, char **argv)
 
 
 static void
-show_printer_console(GString *s,
+show_printer_console_display(GString *s,
      printer_mib_prtConsoleDisplayBufferEntry_t *prtConsoleDisplayEntry)
 {
+
+    g_string_sprintfa(s, "%4d   ",
+		      prtConsoleDisplayEntry->prtConsoleDisplayBufferIndex);
+	
     if (prtConsoleDisplayEntry->prtConsoleDisplayBufferText) {
 	g_string_sprintfa(s, "%.*s\n",
 	    (int) prtConsoleDisplayEntry->_prtConsoleDisplayBufferTextLength,
@@ -795,6 +807,7 @@ cmd_printer_console(scli_interp_t * interp, int argc, char **argv)
 {
     printer_mib_prtConsoleDisplayBufferEntry_t **prtConsoleDisplayTable;
     int i;
+    gint32 last = 0;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -805,12 +818,104 @@ cmd_printer_console(scli_interp_t * interp, int argc, char **argv)
 
     if (prtConsoleDisplayTable) {
 	for (i = 0; prtConsoleDisplayTable[i]; i++) {
-	    show_printer_console(interp->result, prtConsoleDisplayTable[i]);
+	    if (prtConsoleDisplayTable[i]->hrDeviceIndex != last) {
+		if (i > 0) {
+		    g_string_append(interp->result, "\n");
+		}
+		g_string_sprintfa(interp->result, "Line   Text\n");
+	    }
+	    show_printer_console_display(interp->result,
+					 prtConsoleDisplayTable[i]);
+	    last = prtConsoleDisplayTable[i]->hrDeviceIndex;
 	}
     }
 
     if (prtConsoleDisplayTable)
 	printer_mib_free_prtConsoleDisplayBufferTable(prtConsoleDisplayTable);
+
+    return SCLI_OK;
+}
+
+
+
+static void
+show_printer_console_light(GString *s,
+		   printer_mib_prtConsoleLightEntry_t *prtConsoleLightEntry,
+			   int led_width)
+{
+    char const *state = "off";
+    
+    if (! prtConsoleLightEntry->prtConsoleOnTime
+	|| ! prtConsoleLightEntry->prtConsoleOffTime
+	|| ! prtConsoleLightEntry->prtConsoleColor
+	|| ! prtConsoleLightEntry->prtConsoleDescription) {
+	return;
+    }
+
+    g_string_sprintfa(s, "%4d   ", prtConsoleLightEntry->prtConsoleLightIndex);
+    
+    g_string_sprintfa(s, "%-*.*s ", led_width,
+		      (int) prtConsoleLightEntry->_prtConsoleDescriptionLength,
+		      prtConsoleLightEntry->prtConsoleDescription);
+    
+    fmt_enum(s, 10,
+	     printer_mib_enums_prtConsoleColor,
+	     prtConsoleLightEntry->prtConsoleColor);
+    
+    if (*prtConsoleLightEntry->prtConsoleOnTime
+	&& !*prtConsoleLightEntry->prtConsoleOffTime) {
+	state = "on";
+    } else if (!*prtConsoleLightEntry->prtConsoleOnTime
+	       && *prtConsoleLightEntry->prtConsoleOffTime) {
+	state = "off";
+    } else if (*prtConsoleLightEntry->prtConsoleOnTime
+	       && *prtConsoleLightEntry->prtConsoleOffTime) {
+	state = "blink";
+    }
+
+    g_string_sprintfa(s, "   %s\n", state);
+}
+
+
+
+static int
+cmd_printer_lights(scli_interp_t * interp, int argc, char **argv)
+{
+    printer_mib_prtConsoleLightEntry_t **prtConsoleLightTable;
+    int i;
+    int led_width = 18;
+    gint32 last = 0;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (printer_mib_get_prtConsoleLightTable(interp->peer, &
+					     prtConsoleLightTable)) {
+	return SCLI_ERROR;
+    }
+
+    if (prtConsoleLightTable) {
+	for (i = 0; prtConsoleLightTable[i]; i++) {
+	    if (prtConsoleLightTable[i]->_prtConsoleDescriptionLength > led_width) {
+		led_width = prtConsoleLightTable[i]->_prtConsoleDescriptionLength;
+	    }
+	}
+	for (i = 0; prtConsoleLightTable[i]; i++) {
+	    if (prtConsoleLightTable[i]->hrDeviceIndex != last) {
+		if (i > 0) {
+		    g_string_append(interp->result, "\n");
+		}
+		g_string_sprintfa(interp->result, "Number %-*s Color      Status\n",
+				  led_width, "Description");
+	    }
+	    show_printer_console_light(interp->result,
+				       prtConsoleLightTable[i],
+				       led_width);
+	    last = prtConsoleLightTable[i]->hrDeviceIndex;
+	}
+    }
+
+    if (prtConsoleLightTable)
+	printer_mib_free_prtConsoleLightTable(prtConsoleLightTable);
 	
     return SCLI_OK;
 }
@@ -841,6 +946,10 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "printer console information",
 	  cmd_printer_console },
+	{ "show printer lights",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "printer console light information",
+	  cmd_printer_lights },
 	{ NULL, 0, NULL, NULL }
     };
 
