@@ -1,16 +1,14 @@
-Changes in stools 0.1.19:
-
-- scli supports a new printer mode
-- scli now supports multiple "show scli" commands
-- minor bug fixes
-
 Changes in stools 0.1.18:
 
 - scli supports a new ospf mode
+- scli supports a new "show printer info" command
+- scli supports a new "show printer alerts" command
+- scli supports a new "show printer inputs" command
 - scli now shows names for ethernet addresses in "show bridge forwarding"
 - scli now shows names for ethernet addresses in "show interface details"
 - scli now shows names for ethernet addresses in "show ip mapping"
-- scli supports a new "show scli" command
+- scli supports a new set of "show scli" commands
+- minor bug fixes
 
 Changes in stools 0.1.17:
 
