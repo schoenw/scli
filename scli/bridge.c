@@ -297,7 +297,8 @@ cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_bridge_filter(GString *s, bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry)
+show_bridge_filter(GString *s,
+		   bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry)
 {
     if (dot1dStaticEntry->dot1dStaticReceivePort) {
 	g_string_sprintfa(s, "%5d ",

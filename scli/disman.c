@@ -500,7 +500,8 @@ get_launch_entry(disman_script_mib_smRunEntry_t *smRunEntry,
 
 
 static void
-show_extension(GString *s, disman_script_mib_smExtsnEntry_t *smExtsnEntry,
+show_extension(GString *s,
+	       disman_script_mib_smExtsnEntry_t *smExtsnEntry,
 	       int c)
 {
     int const indent = 12;

@@ -38,6 +38,7 @@ misc_printer_printInputDimension(GString *s, gint32 * dim)
 }
 
 
+
 static int
 cmd_printer_info(scli_interp_t * interp, int argc, char **argv)
 {
@@ -184,14 +185,17 @@ cmd_printer_info(scli_interp_t * interp, int argc, char **argv)
 	    }
 
 	}
-	printer_mib_free_prtGeneralTable(prtGeneralTable);
     }
+
+    if (prtGeneralTable)
+	printer_mib_free_prtGeneralTable(prtGeneralTable);
 
     if (prtLocalTable)
 	printer_mib_free_prtLocalizationTable(prtLocalTable);
 
     return SCLI_OK;
 }
+
 
 
 static void
@@ -254,6 +258,7 @@ show_printer_alert(GString *s, printer_mib_prtAlertEntry_t *prtAlertEntry)
 }
 
 
+
 static int
 cmd_printer_alert(scli_interp_t * interp, int argc, char **argv)
 {
@@ -279,6 +284,7 @@ cmd_printer_alert(scli_interp_t * interp, int argc, char **argv)
     
     return SCLI_OK;
 }
+
 
 
 static void
@@ -606,6 +612,7 @@ show_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 }
 
 
+
 static int
 cmd_printer_inputs(scli_interp_t * interp, int argc, char **argv)
 {
@@ -631,6 +638,7 @@ cmd_printer_inputs(scli_interp_t * interp, int argc, char **argv)
 	
     return SCLI_OK;
 }
+
 
 
 void
