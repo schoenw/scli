@@ -110,10 +110,110 @@ print_string(char *label, guchar *string, gsize len)
 
 
 static void
-show_entity_summary(scli_interp_t *interp)
+storage(hrStorageEntry_t *hrStorageEntry)
+{
+    static guint32 const hrStorageTypes[] = {1, 3, 6, 1, 2, 1, 25, 2, 1};
+    guint const idx = sizeof(hrStorageTypes)/sizeof(guint32);
+    gchar *type = NULL;
+
+    static stls_table_t const storage_types[] = {
+	{ 2, "ram" },
+	{ 3, "virtual memory" },
+	{ 4, "fixed disk" },
+	{ 5, "removable disk" },
+	{ 6, "floppy disk" },
+	{ 7, "compact disk" },
+	{ 8, "ram disk" },
+	{ 9, "flash memory" },
+	{ 10, "network disk" },
+	{ 0, NULL }
+    };
+    
+    g_return_if_fail(hrStorageEntry);
+
+    if (hrStorageEntry->hrStorageType
+	&& hrStorageEntry->_hrStorageTypeLength == idx + 1
+	&& memcmp(hrStorageEntry->hrStorageType,
+		  hrStorageTypes, sizeof(hrStorageTypes)) == 0) {
+	type = stls_table_get_value(storage_types,
+				    hrStorageEntry->hrStorageType[idx]);
+    }
+
+    if (hrStorageEntry->hrStorageDescr
+	&& hrStorageEntry->_hrStorageDescrLength) {
+	printf("%-20.*s", (int) MIN(25, hrStorageEntry->_hrStorageDescrLength),
+	       hrStorageEntry->hrStorageDescr);
+    } else {
+	printf("%20s", "");
+    }
+
+    if (hrStorageEntry->hrStorageAllocationUnits
+	&& hrStorageEntry->hrStorageSize
+	&& hrStorageEntry->hrStorageUsed) {
+	
+	guint64 storage_size = 0;
+	guint64 storage_used = 0;
+	guint32 const scale = 1024;
+	
+	storage_size = *(hrStorageEntry->hrStorageSize);
+	storage_size *= *(hrStorageEntry->hrStorageAllocationUnits);
+	storage_size /= scale;
+
+    	storage_used = *(hrStorageEntry->hrStorageUsed);
+	storage_used *= *(hrStorageEntry->hrStorageAllocationUnits);
+	storage_used /= scale;
+
+        printf("%10llu %10llu %10llu %3u%%",
+	       storage_size, storage_used, storage_size - storage_used,
+	       (guint32) (storage_size
+			  ? storage_used / storage_size * 100 : 0));
+
+	if (type) {
+	    printf(" (%s)\n", type);
+	} else {
+	    printf("\n");
+	}
+    } else {
+	printf("\n");
+    }
+}
+
+
+
+static int
+cmd_storage(scli_interp_t *interp, int argc, char **argv)
+{
+    hrStorageEntry_t **hrStorageEntry = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (host_resources_mib_get_hrStorageEntry(interp->peer,
+					      &hrStorageEntry)) {
+	return SCLI_OK;
+    }
+
+    if (hrStorageEntry) {
+	printf("Storage Area          "
+	       "Size [K]   Used [K]   Free [K] Use%%\n");
+	for (i = 0; hrStorageEntry[i]; i++) {
+	    storage(hrStorageEntry[i]);
+	}
+	host_resources_mib_free_hrStorageEntry(hrStorageEntry);
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+cmd_entities(scli_interp_t *interp, int argc, char **argv)
 {
     entPhysicalEntry_t **entPhysicalEntry = NULL;
     int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (entity_mib_get_entPhysicalEntry(interp->peer, &entPhysicalEntry) == 0 && entPhysicalEntry) {
 	for (i = 0; entPhysicalEntry[i]; i++) {
@@ -124,18 +224,20 @@ show_entity_summary(scli_interp_t *interp)
 	}
 	entity_mib_free_entPhysicalEntry(entPhysicalEntry);
     }
+    
+    return SCLI_OK;
 }
 
 
 
-static void
-show_system_summary(scli_interp_t *interp)
+static int
+cmd_show(scli_interp_t *interp, int argc, char **argv)
 {
     system_t *system = NULL;
     hrSystem_t *hrSystem = NULL;
     hrStorage_t *hrStorage = NULL;
 
-    g_return_if_fail(interp);
+    g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (snmpv2_mib_get_system(interp->peer, &system) == 0 && system) {
 	print_string(NULL,
@@ -211,35 +313,6 @@ show_system_summary(scli_interp_t *interp)
 	}
 	host_resources_mib_free_hrStorage(hrStorage);
     }
-}
-
-
-
-static int
-cmd_entities(scli_interp_t *interp, int argc, char **argv)
-{
-    g_return_val_if_fail(interp, SCLI_ERROR);
-
-    if (argc == 1) {
-	show_entity_summary(interp);
-    }
-    
-    return SCLI_OK;
-}
-
-
-
-static int
-cmd_show(scli_interp_t *interp, int argc, char **argv)
-{
-    g_return_val_if_fail(interp, SCLI_ERROR);
-
-    if (argc != 1) {
-	printf("wrong # args: should be \"show system\"\n");
-	return SCLI_ERROR;
-    }
-    
-    show_system_summary(interp);
 
     return SCLI_OK;
 }
@@ -254,6 +327,8 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "show generic system information", cmd_show },
 	{ "show system", "entities",
 	  "show the entities that make up the system", cmd_entities },
+	{ "show system", "storage",
+	  "show storage areas attached to the system", cmd_storage },
 	{ NULL, NULL, NULL, NULL }
     };
     
