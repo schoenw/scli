@@ -58,6 +58,35 @@ fmt_bridgeid(guchar *addr)
 
 
 static void
+fmt_stpStatus(GString *s, gint32 *enable, gint32 *state)
+{
+    const char *e;
+
+    GSnmpEnum const port_state[] = {
+	{ BRIDGE_MIB_DOT1DSTPPORTSTATE_DISABLED,	"D" },
+	{ BRIDGE_MIB_DOT1DSTPPORTSTATE_BLOCKING,	"B" },
+	{ BRIDGE_MIB_DOT1DSTPPORTSTATE_LISTENING,	"I" },
+	{ BRIDGE_MIB_DOT1DSTPPORTSTATE_LEARNING,	"L" },
+	{ BRIDGE_MIB_DOT1DSTPPORTSTATE_FORWARDING,	"F" },
+	{ BRIDGE_MIB_DOT1DSTPPORTSTATE_BROKEN,		"X" },
+	{ 0, NULL }
+    };
+    
+    GSnmpEnum const port_enable[] = {
+	{ BRIDGE_MIB_DOT1DSTPPORTENABLE_ENABLED,	"E" },
+	{ BRIDGE_MIB_DOT1DSTPPORTENABLE_DISABLED,	"D" },
+	{ 0, NULL }
+    };
+
+    e = fmt_enum(port_enable, enable);
+    g_string_sprintfa(s, "%s", e ? e : "-");
+    e = fmt_enum(port_state, state);
+    g_string_sprintfa(s, "%s", e ? e : "-");
+}
+
+
+
+static void
 fmt_bridge_stp_info(GString *s, bridge_mib_dot1dStp_t *dot1dStp)
 {
     int const indent = 18;
@@ -321,21 +350,14 @@ static void
 fmt_bridge_stp_port(GString *s,
 		    bridge_mib_dot1dStpPortEntry_t *dot1dStpPortEntry)
 {
-    const char *e;
-    
     g_string_sprintfa(s, "%5u ", dot1dStpPortEntry->dot1dStpPort);
 
     if (dot1dStpPortEntry->dot1dStpPortPriority) {
-	g_string_sprintfa(s, "%5u ", *dot1dStpPortEntry->dot1dStpPortPriority);
+	g_string_sprintfa(s, "%5u   ", *dot1dStpPortEntry->dot1dStpPortPriority);
     }
 
-    e = fmt_enum(bridge_mib_enums_dot1dStpPortState,
-		 dot1dStpPortEntry->dot1dStpPortState);
-    g_string_sprintfa(s, " %s ", e ? e : "");
-
-    e = fmt_enum(bridge_mib_enums_dot1dStpPortEnable,
-		 dot1dStpPortEntry->dot1dStpPortEnable);
-    g_string_sprintfa(s, " %s ", e ? e : "");
+    fmt_stpStatus(s, dot1dStpPortEntry->dot1dStpPortEnable,
+		  dot1dStpPortEntry->dot1dStpPortState);
 
     if (dot1dStpPortEntry->dot1dStpPortPathCost) {
 	g_string_sprintfa(s, "%5u ", *dot1dStpPortEntry->dot1dStpPortPathCost);
@@ -387,7 +409,7 @@ show_bridge_stp_ports(scli_interp_t *interp, int argc, char **argv)
 
     if (dot1dStpPortTable) {
 	g_string_sprintfa(interp->header,
-			  " PORT PRIO STATE STATUS P-COST D-ROOT D-COST D-BRIDGE D-PORT");
+			  " PORT  PRIO STATE P-COST D-ROOT D-COST D-BRIDGE D-PORT");
 	for (i = 0; dot1dStpPortTable[i]; i++) {
 	    fmt_bridge_stp_port(interp->result, dot1dStpPortTable[i]);
 	}
@@ -712,7 +734,23 @@ scli_init_bridge_mode(scli_interp_t *interp)
 
 	{ "show bridge stp ports", NULL,
 	  "The show bridge stp ports command displays information about the\n"
-	  "bridge ports which participate in the spanning tree protocol.",
+	  "bridge ports which participate in the spanning tree protocol. The\n"
+	  "command generates a table with the following columns:\n"
+	  "\n"
+	  "  PORT     port number\n"
+	  "  PRIO     spanning tree priority of the port\n"
+	  "  STATE    spanning tree status of the port\n"
+	  "  P-COST   path costs for this port\n"
+	  "  D-ROOT   designated root port\n"
+	  "  D-COST   designated costs\n"
+	  "  D-BRIDGE designated bridge\n"
+	  "  D-PORT   designated port\n"
+	  "\n"
+	  "The status is encoded in two characters. The first character\n"
+	  "indicates whether STP on the port is enabled (E) or disabled\n"
+	  "(D). The second character indicates the current status\n"
+	  "(D=disabled, B=blocking, I=listening, L=learning, F=forwarding,\n"
+	  "X=broken).",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_bridge_stp_ports },
