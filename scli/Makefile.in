@@ -73,7 +73,7 @@ VERSION = @VERSION@
 
 INCLUDES = -I$(top_srcdir)/stub -I$(top_srcdir)/snmp $(GLIB_CFLAGS)
 bin_PROGRAMS = scli
-scli_SOURCES = scli.c scli.h scli.1 vendors.c 		  getopt.h getopt.c getopt1.c basic.c cmds.c fmt.c 		  system.c entity.c interface.c
+scli_SOURCES = scli.c scli.h scli.1 vendors.c 		  getopt.h getopt.c getopt1.c basic.c cmds.c fmt.c 		  system.c entity.c interface.c disman.c
 
 scli_LDADD = -L../stub -lstub -L../snmp -lsnmp $(GLIB_LIBS)
 man_MANS = scli.1
@@ -88,7 +88,7 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 scli_OBJECTS =  scli.o vendors.o getopt.o getopt1.o basic.o cmds.o fmt.o \
-system.o entity.o interface.o
+system.o entity.o interface.o disman.o
 scli_DEPENDENCIES = 
 scli_LDFLAGS = 
 CFLAGS = @CFLAGS@
@@ -106,9 +106,9 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/basic.P .deps/cmds.P .deps/entity.P .deps/fmt.P \
-.deps/getopt.P .deps/getopt1.P .deps/interface.P .deps/scli.P \
-.deps/system.P .deps/vendors.P
+DEP_FILES =  .deps/basic.P .deps/cmds.P .deps/disman.P .deps/entity.P \
+.deps/fmt.P .deps/getopt.P .deps/getopt1.P .deps/interface.P \
+.deps/scli.P .deps/system.P .deps/vendors.P
 SOURCES = $(scli_SOURCES)
 OBJECTS = $(scli_OBJECTS)
 

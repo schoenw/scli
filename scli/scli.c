@@ -390,6 +390,7 @@ main(int argc, char **argv)
 
     scli_init_system_mode(interp);
     scli_init_entity_mode(interp);
+    scli_init_disman_mode(interp);
     scli_init_interface_mode(interp);
 
     if (! norc) {
