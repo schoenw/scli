@@ -31,6 +31,11 @@
  * Tables to map enumerations to strings and vice versa.
  */
 
+#define UCD_SNMP_MIB_PRERRORFLAG_OK	0
+#define UCD_SNMP_MIB_PRERRORFLAG_ERROR	1
+
+extern GSnmpEnum const ucd_snmp_mib_enums_prErrorFlag[];
+
 #define UCD_SNMP_MIB_FILEERRORFLAG_TRUE	1
 #define UCD_SNMP_MIB_FILEERRORFLAG_FALSE	2
 

@@ -133,8 +133,10 @@ lookup(GSnmpVarBind *vb, guint32 const *base, guint16 const base_len,
     for (i = 0; attributes[i].label; i++) {
 	if (vb->id_len > base_len && vb->id[base_len] == attributes[i].subid) {
 	    if (vb->type != attributes[i].type) {
-		g_warning("type tag 0x%02x does not match 0x%02x (%s)",
-			  vb->type, attributes[i].type, attributes[i].label);
+		const char *a = gsnmp_enum_get_label(gsnmp_enum_type_table, vb->type);
+		const char *b = gsnmp_enum_get_label(gsnmp_enum_type_table, attributes[i].type);
+		g_warning("%s: type mismatch: %s%s%s", attributes[i].label,
+		          (a) ? a : "", (a || b) ? " != " : "", (b) ? b : "");
 		return -3;
 	    }
 	    *idx = attributes[i].subid;
@@ -148,7 +150,7 @@ lookup(GSnmpVarBind *vb, guint32 const *base, guint16 const base_len,
 static guint32 const oid_snmpNotifyEntry[] = {1, 3, 6, 1, 6, 3, 13, 1, 1, 1};
 
 static attribute_t attr_snmpNotifyEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, SNMP_NOTIFICATION_MIB_SNMPNOTIFYTAG, "snmpNotifyTag" },
+    { 2, G_SNMP_OCTETSTRING, SNMP_NOTIFICATION_MIB_SNMPNOTIFYTAG, "snmpNotifyTag" },
     { 3, G_SNMP_INTEGER32, SNMP_NOTIFICATION_MIB_SNMPNOTIFYTYPE, "snmpNotifyType" },
     { 4, G_SNMP_INTEGER32, SNMP_NOTIFICATION_MIB_SNMPNOTIFYSTORAGETYPE, "snmpNotifyStorageType" },
     { 5, G_SNMP_INTEGER32, SNMP_NOTIFICATION_MIB_SNMPNOTIFYROWSTATUS, "snmpNotifyRowStatus" },
@@ -158,7 +160,7 @@ static attribute_t attr_snmpNotifyEntry[] = {
 static guint32 const oid_snmpNotifyFilterProfileEntry[] = {1, 3, 6, 1, 6, 3, 13, 1, 2, 1};
 
 static attribute_t attr_snmpNotifyFilterProfileEntry[] = {
-    { 1, G_SNMP_OCTET_STRING, SNMP_NOTIFICATION_MIB_SNMPNOTIFYFILTERPROFILENAME, "snmpNotifyFilterProfileName" },
+    { 1, G_SNMP_OCTETSTRING, SNMP_NOTIFICATION_MIB_SNMPNOTIFYFILTERPROFILENAME, "snmpNotifyFilterProfileName" },
     { 2, G_SNMP_INTEGER32, SNMP_NOTIFICATION_MIB_SNMPNOTIFYFILTERPROFILESTORTYPE, "snmpNotifyFilterProfileStorType" },
     { 3, G_SNMP_INTEGER32, SNMP_NOTIFICATION_MIB_SNMPNOTIFYFILTERPROFILEROWSTATUS, "snmpNotifyFilterProfileRowStatus" },
     { 0, 0, 0, NULL }
@@ -167,7 +169,7 @@ static attribute_t attr_snmpNotifyFilterProfileEntry[] = {
 static guint32 const oid_snmpNotifyFilterEntry[] = {1, 3, 6, 1, 6, 3, 13, 1, 3, 1};
 
 static attribute_t attr_snmpNotifyFilterEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, SNMP_NOTIFICATION_MIB_SNMPNOTIFYFILTERMASK, "snmpNotifyFilterMask" },
+    { 2, G_SNMP_OCTETSTRING, SNMP_NOTIFICATION_MIB_SNMPNOTIFYFILTERMASK, "snmpNotifyFilterMask" },
     { 3, G_SNMP_INTEGER32, SNMP_NOTIFICATION_MIB_SNMPNOTIFYFILTERTYPE, "snmpNotifyFilterType" },
     { 4, G_SNMP_INTEGER32, SNMP_NOTIFICATION_MIB_SNMPNOTIFYFILTERSTORAGETYPE, "snmpNotifyFilterStorageType" },
     { 5, G_SNMP_INTEGER32, SNMP_NOTIFICATION_MIB_SNMPNOTIFYFILTERROWSTATUS, "snmpNotifyFilterRowStatus" },
@@ -317,6 +319,10 @@ snmp_notification_mib_get_snmpNotifyEntry(GSnmpSession *s, snmp_notification_mib
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *snmpNotifyEntry = assign_snmpNotifyEntry(out);
     }
 }
@@ -339,7 +345,7 @@ snmp_notification_mib_set_snmpNotifyEntry(GSnmpSession *s, snmp_notification_mib
 
     if (snmpNotifyEntry->snmpNotifyTag) {
         base[10] = 2;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        snmpNotifyEntry->snmpNotifyTag,
                        snmpNotifyEntry->_snmpNotifyTagLength);
     }
@@ -535,6 +541,10 @@ snmp_notification_mib_get_snmpNotifyFilterProfileEntry(GSnmpSession *s, snmp_not
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *snmpNotifyFilterProfileEntry = assign_snmpNotifyFilterProfileEntry(out);
     }
 }
@@ -557,7 +567,7 @@ snmp_notification_mib_set_snmpNotifyFilterProfileEntry(GSnmpSession *s, snmp_not
 
     if (snmpNotifyFilterProfileEntry->snmpNotifyFilterProfileName) {
         base[10] = 1;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        snmpNotifyFilterProfileEntry->snmpNotifyFilterProfileName,
                        snmpNotifyFilterProfileEntry->_snmpNotifyFilterProfileNameLength);
     }
@@ -764,6 +774,10 @@ snmp_notification_mib_get_snmpNotifyFilterEntry(GSnmpSession *s, snmp_notificati
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *snmpNotifyFilterEntry = assign_snmpNotifyFilterEntry(out);
     }
 }
@@ -786,7 +800,7 @@ snmp_notification_mib_set_snmpNotifyFilterEntry(GSnmpSession *s, snmp_notificati
 
     if (snmpNotifyFilterEntry->snmpNotifyFilterMask) {
         base[10] = 2;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        snmpNotifyFilterEntry->snmpNotifyFilterMask,
                        snmpNotifyFilterEntry->_snmpNotifyFilterMaskLength);
     }

@@ -132,8 +132,10 @@ lookup(GSnmpVarBind *vb, guint32 const *base, guint16 const base_len,
     for (i = 0; attributes[i].label; i++) {
 	if (vb->id_len > base_len && vb->id[base_len] == attributes[i].subid) {
 	    if (vb->type != attributes[i].type) {
-		g_warning("type tag 0x%02x does not match 0x%02x (%s)",
-			  vb->type, attributes[i].type, attributes[i].label);
+		const char *a = gsnmp_enum_get_label(gsnmp_enum_type_table, vb->type);
+		const char *b = gsnmp_enum_get_label(gsnmp_enum_type_table, attributes[i].type);
+		g_warning("%s: type mismatch: %s%s%s", attributes[i].label,
+		          (a) ? a : "", (a || b) ? " != " : "", (b) ? b : "");
 		return -3;
 	    }
 	    *idx = attributes[i].subid;
@@ -147,29 +149,29 @@ lookup(GSnmpVarBind *vb, guint32 const *base, guint16 const base_len,
 static guint32 const oid_schedObjects[] = {1, 3, 6, 1, 2, 1, 63, 1};
 
 static attribute_t attr_schedObjects[] = {
-    { 1, G_SNMP_OCTET_STRING, DISMAN_SCHEDULE_MIB_SCHEDLOCALTIME, "schedLocalTime" },
+    { 1, G_SNMP_OCTETSTRING, DISMAN_SCHEDULE_MIB_SCHEDLOCALTIME, "schedLocalTime" },
     { 0, 0, 0, NULL }
 };
 
 static guint32 const oid_schedEntry[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1};
 
 static attribute_t attr_schedEntry[] = {
-    { 3, G_SNMP_OCTET_STRING, DISMAN_SCHEDULE_MIB_SCHEDDESCR, "schedDescr" },
+    { 3, G_SNMP_OCTETSTRING, DISMAN_SCHEDULE_MIB_SCHEDDESCR, "schedDescr" },
     { 4, G_SNMP_UNSIGNED32, DISMAN_SCHEDULE_MIB_SCHEDINTERVAL, "schedInterval" },
-    { 5, G_SNMP_OCTET_STRING, DISMAN_SCHEDULE_MIB_SCHEDWEEKDAY, "schedWeekDay" },
-    { 6, G_SNMP_OCTET_STRING, DISMAN_SCHEDULE_MIB_SCHEDMONTH, "schedMonth" },
-    { 7, G_SNMP_OCTET_STRING, DISMAN_SCHEDULE_MIB_SCHEDDAY, "schedDay" },
-    { 8, G_SNMP_OCTET_STRING, DISMAN_SCHEDULE_MIB_SCHEDHOUR, "schedHour" },
-    { 9, G_SNMP_OCTET_STRING, DISMAN_SCHEDULE_MIB_SCHEDMINUTE, "schedMinute" },
-    { 10, G_SNMP_OCTET_STRING, DISMAN_SCHEDULE_MIB_SCHEDCONTEXTNAME, "schedContextName" },
-    { 11, G_SNMP_OBJECT_ID, DISMAN_SCHEDULE_MIB_SCHEDVARIABLE, "schedVariable" },
+    { 5, G_SNMP_OCTETSTRING, DISMAN_SCHEDULE_MIB_SCHEDWEEKDAY, "schedWeekDay" },
+    { 6, G_SNMP_OCTETSTRING, DISMAN_SCHEDULE_MIB_SCHEDMONTH, "schedMonth" },
+    { 7, G_SNMP_OCTETSTRING, DISMAN_SCHEDULE_MIB_SCHEDDAY, "schedDay" },
+    { 8, G_SNMP_OCTETSTRING, DISMAN_SCHEDULE_MIB_SCHEDHOUR, "schedHour" },
+    { 9, G_SNMP_OCTETSTRING, DISMAN_SCHEDULE_MIB_SCHEDMINUTE, "schedMinute" },
+    { 10, G_SNMP_OCTETSTRING, DISMAN_SCHEDULE_MIB_SCHEDCONTEXTNAME, "schedContextName" },
+    { 11, G_SNMP_OBJECTID, DISMAN_SCHEDULE_MIB_SCHEDVARIABLE, "schedVariable" },
     { 12, G_SNMP_INTEGER32, DISMAN_SCHEDULE_MIB_SCHEDVALUE, "schedValue" },
     { 13, G_SNMP_INTEGER32, DISMAN_SCHEDULE_MIB_SCHEDTYPE, "schedType" },
     { 14, G_SNMP_INTEGER32, DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS, "schedAdminStatus" },
     { 15, G_SNMP_INTEGER32, DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS, "schedOperStatus" },
     { 16, G_SNMP_COUNTER32, DISMAN_SCHEDULE_MIB_SCHEDFAILURES, "schedFailures" },
     { 17, G_SNMP_INTEGER32, DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE, "schedLastFailure" },
-    { 18, G_SNMP_OCTET_STRING, DISMAN_SCHEDULE_MIB_SCHEDLASTFAILED, "schedLastFailed" },
+    { 18, G_SNMP_OCTETSTRING, DISMAN_SCHEDULE_MIB_SCHEDLASTFAILED, "schedLastFailed" },
     { 19, G_SNMP_INTEGER32, DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE, "schedStorageType" },
     { 20, G_SNMP_INTEGER32, DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS, "schedRowStatus" },
     { 21, G_SNMP_COUNTER32, DISMAN_SCHEDULE_MIB_SCHEDTRIGGERS, "schedTriggers" },
@@ -232,6 +234,10 @@ disman_schedule_mib_get_schedObjects(GSnmpSession *s, disman_schedule_mib_schedO
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *schedObjects = assign_schedObjects(out);
     }
 }
@@ -469,6 +475,10 @@ disman_schedule_mib_get_schedEntry(GSnmpSession *s, disman_schedule_mib_schedEnt
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *schedEntry = assign_schedEntry(out);
     }
 }
@@ -491,7 +501,7 @@ disman_schedule_mib_set_schedEntry(GSnmpSession *s, disman_schedule_mib_schedEnt
 
     if (schedEntry->schedDescr) {
         base[10] = 3;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        schedEntry->schedDescr,
                        schedEntry->_schedDescrLength);
     }
@@ -503,43 +513,43 @@ disman_schedule_mib_set_schedEntry(GSnmpSession *s, disman_schedule_mib_schedEnt
     }
     if (schedEntry->schedWeekDay) {
         base[10] = 5;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        schedEntry->schedWeekDay,
                        schedEntry->_schedWeekDayLength);
     }
     if (schedEntry->schedMonth) {
         base[10] = 6;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        schedEntry->schedMonth,
                        schedEntry->_schedMonthLength);
     }
     if (schedEntry->schedDay) {
         base[10] = 7;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        schedEntry->schedDay,
                        schedEntry->_schedDayLength);
     }
     if (schedEntry->schedHour) {
         base[10] = 8;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        schedEntry->schedHour,
                        schedEntry->_schedHourLength);
     }
     if (schedEntry->schedMinute) {
         base[10] = 9;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        schedEntry->schedMinute,
                        schedEntry->_schedMinuteLength);
     }
     if (schedEntry->schedContextName) {
         base[10] = 10;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        schedEntry->schedContextName,
                        schedEntry->_schedContextNameLength);
     }
     if (schedEntry->schedVariable) {
         base[10] = 11;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OBJECT_ID,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OBJECTID,
                        schedEntry->schedVariable,
                        schedEntry->_schedVariableLength);
     }

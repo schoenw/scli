@@ -24,6 +24,12 @@
 
 #include "ucd-snmp-mib.h"
 
+GSnmpEnum const ucd_snmp_mib_enums_prErrorFlag[] = {
+    { UCD_SNMP_MIB_PRERRORFLAG_OK,	"ok" },
+    { UCD_SNMP_MIB_PRERRORFLAG_ERROR,	"error" },
+    { 0, NULL }
+};
+
 GSnmpEnum const ucd_snmp_mib_enums_fileErrorFlag[] = {
     { UCD_SNMP_MIB_FILEERRORFLAG_TRUE,	"true" },
     { UCD_SNMP_MIB_FILEERRORFLAG_FALSE,	"false" },
@@ -80,8 +86,10 @@ lookup(GSnmpVarBind *vb, guint32 const *base, guint16 const base_len,
     for (i = 0; attributes[i].label; i++) {
 	if (vb->id_len > base_len && vb->id[base_len] == attributes[i].subid) {
 	    if (vb->type != attributes[i].type) {
-		g_warning("type tag 0x%02x does not match 0x%02x (%s)",
-			  vb->type, attributes[i].type, attributes[i].label);
+		const char *a = gsnmp_enum_get_label(gsnmp_enum_type_table, vb->type);
+		const char *b = gsnmp_enum_get_label(gsnmp_enum_type_table, attributes[i].type);
+		g_warning("%s: type mismatch: %s%s%s", attributes[i].label,
+		          (a) ? a : "", (a || b) ? " != " : "", (b) ? b : "");
 		return -3;
 	    }
 	    *idx = attributes[i].subid;
@@ -95,14 +103,14 @@ lookup(GSnmpVarBind *vb, guint32 const *base, guint16 const base_len,
 static guint32 const oid_prEntry[] = {1, 3, 6, 1, 4, 1, 2021, 2, 1};
 
 static attribute_t attr_prEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_PRNAMES, "prNames" },
+    { 2, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_PRNAMES, "prNames" },
     { 3, G_SNMP_INTEGER32, UCD_SNMP_MIB_PRMIN, "prMin" },
     { 4, G_SNMP_INTEGER32, UCD_SNMP_MIB_PRMAX, "prMax" },
     { 5, G_SNMP_INTEGER32, UCD_SNMP_MIB_PRCOUNT, "prCount" },
     { 100, G_SNMP_INTEGER32, UCD_SNMP_MIB_PRERRORFLAG, "prErrorFlag" },
-    { 101, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_PRERRMESSAGE, "prErrMessage" },
+    { 101, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_PRERRMESSAGE, "prErrMessage" },
     { 102, G_SNMP_INTEGER32, UCD_SNMP_MIB_PRERRFIX, "prErrFix" },
-    { 103, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_PRERRFIXCMD, "prErrFixCmd" },
+    { 103, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_PRERRFIXCMD, "prErrFixCmd" },
     { 0, 0, 0, NULL }
 };
 
@@ -110,7 +118,7 @@ static guint32 const oid_memory[] = {1, 3, 6, 1, 4, 1, 2021, 4};
 
 static attribute_t attr_memory[] = {
     { 1, G_SNMP_INTEGER32, UCD_SNMP_MIB_MEMINDEX, "memIndex" },
-    { 2, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_MEMERRORNAME, "memErrorName" },
+    { 2, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_MEMERRORNAME, "memErrorName" },
     { 3, G_SNMP_INTEGER32, UCD_SNMP_MIB_MEMTOTALSWAP, "memTotalSwap" },
     { 4, G_SNMP_INTEGER32, UCD_SNMP_MIB_MEMAVAILSWAP, "memAvailSwap" },
     { 5, G_SNMP_INTEGER32, UCD_SNMP_MIB_MEMTOTALREAL, "memTotalReal" },
@@ -125,27 +133,27 @@ static attribute_t attr_memory[] = {
     { 14, G_SNMP_INTEGER32, UCD_SNMP_MIB_MEMBUFFER, "memBuffer" },
     { 15, G_SNMP_INTEGER32, UCD_SNMP_MIB_MEMCACHED, "memCached" },
     { 100, G_SNMP_INTEGER32, UCD_SNMP_MIB_MEMSWAPERROR, "memSwapError" },
-    { 101, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_MEMSWAPERRORMSG, "memSwapErrorMsg" },
+    { 101, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_MEMSWAPERRORMSG, "memSwapErrorMsg" },
     { 0, 0, 0, NULL }
 };
 
 static guint32 const oid_extEntry[] = {1, 3, 6, 1, 4, 1, 2021, 8, 1};
 
 static attribute_t attr_extEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_EXTNAMES, "extNames" },
-    { 3, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_EXTCOMMAND, "extCommand" },
+    { 2, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_EXTNAMES, "extNames" },
+    { 3, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_EXTCOMMAND, "extCommand" },
     { 100, G_SNMP_INTEGER32, UCD_SNMP_MIB_EXTRESULT, "extResult" },
-    { 101, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_EXTOUTPUT, "extOutput" },
+    { 101, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_EXTOUTPUT, "extOutput" },
     { 102, G_SNMP_INTEGER32, UCD_SNMP_MIB_EXTERRFIX, "extErrFix" },
-    { 103, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_EXTERRFIXCMD, "extErrFixCmd" },
+    { 103, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_EXTERRFIXCMD, "extErrFixCmd" },
     { 0, 0, 0, NULL }
 };
 
 static guint32 const oid_dskEntry[] = {1, 3, 6, 1, 4, 1, 2021, 9, 1};
 
 static attribute_t attr_dskEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_DSKPATH, "dskPath" },
-    { 3, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_DSKDEVICE, "dskDevice" },
+    { 2, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_DSKPATH, "dskPath" },
+    { 3, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_DSKDEVICE, "dskDevice" },
     { 4, G_SNMP_INTEGER32, UCD_SNMP_MIB_DSKMINIMUM, "dskMinimum" },
     { 5, G_SNMP_INTEGER32, UCD_SNMP_MIB_DSKMINPERCENT, "dskMinPercent" },
     { 6, G_SNMP_INTEGER32, UCD_SNMP_MIB_DSKTOTAL, "dskTotal" },
@@ -154,20 +162,20 @@ static attribute_t attr_dskEntry[] = {
     { 9, G_SNMP_INTEGER32, UCD_SNMP_MIB_DSKPERCENT, "dskPercent" },
     { 10, G_SNMP_INTEGER32, UCD_SNMP_MIB_DSKPERCENTNODE, "dskPercentNode" },
     { 100, G_SNMP_INTEGER32, UCD_SNMP_MIB_DSKERRORFLAG, "dskErrorFlag" },
-    { 101, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_DSKERRORMSG, "dskErrorMsg" },
+    { 101, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_DSKERRORMSG, "dskErrorMsg" },
     { 0, 0, 0, NULL }
 };
 
 static guint32 const oid_laEntry[] = {1, 3, 6, 1, 4, 1, 2021, 10, 1};
 
 static attribute_t attr_laEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_LANAMES, "laNames" },
-    { 3, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_LALOAD, "laLoad" },
-    { 4, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_LACONFIG, "laConfig" },
+    { 2, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_LANAMES, "laNames" },
+    { 3, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_LALOAD, "laLoad" },
+    { 4, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_LACONFIG, "laConfig" },
     { 5, G_SNMP_INTEGER32, UCD_SNMP_MIB_LALOADINT, "laLoadInt" },
     { 6, G_SNMP_OPAQUE, UCD_SNMP_MIB_LALOADFLOAT, "laLoadFloat" },
     { 100, G_SNMP_INTEGER32, UCD_SNMP_MIB_LAERRORFLAG, "laErrorFlag" },
-    { 101, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_LAERRMESSAGE, "laErrMessage" },
+    { 101, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_LAERRMESSAGE, "laErrMessage" },
     { 0, 0, 0, NULL }
 };
 
@@ -175,7 +183,7 @@ static guint32 const oid_systemStats[] = {1, 3, 6, 1, 4, 1, 2021, 11};
 
 static attribute_t attr_systemStats[] = {
     { 1, G_SNMP_INTEGER32, UCD_SNMP_MIB_SSINDEX, "ssIndex" },
-    { 2, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_SSERRORNAME, "ssErrorName" },
+    { 2, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_SSERRORNAME, "ssErrorName" },
     { 3, G_SNMP_INTEGER32, UCD_SNMP_MIB_SSSWAPIN, "ssSwapIn" },
     { 4, G_SNMP_INTEGER32, UCD_SNMP_MIB_SSSWAPOUT, "ssSwapOut" },
     { 5, G_SNMP_INTEGER32, UCD_SNMP_MIB_SSIOSENT, "ssIOSent" },
@@ -202,11 +210,11 @@ static attribute_t attr_systemStats[] = {
 static guint32 const oid_fileEntry[] = {1, 3, 6, 1, 4, 1, 2021, 15, 1};
 
 static attribute_t attr_fileEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_FILENAME, "fileName" },
+    { 2, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_FILENAME, "fileName" },
     { 3, G_SNMP_INTEGER32, UCD_SNMP_MIB_FILESIZE, "fileSize" },
     { 4, G_SNMP_INTEGER32, UCD_SNMP_MIB_FILEMAX, "fileMax" },
     { 100, G_SNMP_INTEGER32, UCD_SNMP_MIB_FILEERRORFLAG, "fileErrorFlag" },
-    { 101, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_FILEERRORMSG, "fileErrorMsg" },
+    { 101, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_FILEERRORMSG, "fileErrorMsg" },
     { 0, 0, 0, NULL }
 };
 
@@ -214,11 +222,11 @@ static guint32 const oid_version[] = {1, 3, 6, 1, 4, 1, 2021, 100};
 
 static attribute_t attr_version[] = {
     { 1, G_SNMP_INTEGER32, UCD_SNMP_MIB_VERSIONINDEX, "versionIndex" },
-    { 2, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_VERSIONTAG, "versionTag" },
-    { 3, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_VERSIONDATE, "versionDate" },
-    { 4, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_VERSIONCDATE, "versionCDate" },
-    { 5, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_VERSIONIDENT, "versionIdent" },
-    { 6, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_VERSIONCONFIGUREOPTIONS, "versionConfigureOptions" },
+    { 2, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_VERSIONTAG, "versionTag" },
+    { 3, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_VERSIONDATE, "versionDate" },
+    { 4, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_VERSIONCDATE, "versionCDate" },
+    { 5, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_VERSIONIDENT, "versionIdent" },
+    { 6, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_VERSIONCONFIGUREOPTIONS, "versionConfigureOptions" },
     { 10, G_SNMP_INTEGER32, UCD_SNMP_MIB_VERSIONCLEARCACHE, "versionClearCache" },
     { 11, G_SNMP_INTEGER32, UCD_SNMP_MIB_VERSIONUPDATECONFIG, "versionUpdateConfig" },
     { 12, G_SNMP_INTEGER32, UCD_SNMP_MIB_VERSIONRESTARTAGENT, "versionRestartAgent" },
@@ -230,16 +238,16 @@ static guint32 const oid_snmperrs[] = {1, 3, 6, 1, 4, 1, 2021, 101};
 
 static attribute_t attr_snmperrs[] = {
     { 1, G_SNMP_INTEGER32, UCD_SNMP_MIB_SNMPERRINDEX, "snmperrIndex" },
-    { 2, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_SNMPERRNAMES, "snmperrNames" },
+    { 2, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_SNMPERRNAMES, "snmperrNames" },
     { 100, G_SNMP_INTEGER32, UCD_SNMP_MIB_SNMPERRERRORFLAG, "snmperrErrorFlag" },
-    { 101, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_SNMPERRERRMESSAGE, "snmperrErrMessage" },
+    { 101, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_SNMPERRERRMESSAGE, "snmperrErrMessage" },
     { 0, 0, 0, NULL }
 };
 
 static guint32 const oid_mrEntry[] = {1, 3, 6, 1, 4, 1, 2021, 102, 1};
 
 static attribute_t attr_mrEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, UCD_SNMP_MIB_MRMODULENAME, "mrModuleName" },
+    { 2, G_SNMP_OCTETSTRING, UCD_SNMP_MIB_MRMODULENAME, "mrModuleName" },
     { 0, 0, 0, NULL }
 };
 
@@ -389,6 +397,10 @@ ucd_snmp_mib_get_prEntry(GSnmpSession *s, ucd_snmp_mib_prEntry_t **prEntry, gint
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *prEntry = assign_prEntry(out);
     }
 }
@@ -556,6 +568,10 @@ ucd_snmp_mib_get_memory(GSnmpSession *s, ucd_snmp_mib_memory_t **memory, gint ma
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *memory = assign_memory(out);
     }
 }
@@ -715,6 +731,10 @@ ucd_snmp_mib_get_extEntry(GSnmpSession *s, ucd_snmp_mib_extEntry_t **extEntry, g
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *extEntry = assign_extEntry(out);
     }
 }
@@ -930,6 +950,10 @@ ucd_snmp_mib_get_dskEntry(GSnmpSession *s, ucd_snmp_mib_dskEntry_t **dskEntry, g
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *dskEntry = assign_dskEntry(out);
     }
 }
@@ -1106,6 +1130,10 @@ ucd_snmp_mib_get_laEntry(GSnmpSession *s, ucd_snmp_mib_laEntry_t **laEntry, gint
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *laEntry = assign_laEntry(out);
     }
 }
@@ -1256,6 +1284,10 @@ ucd_snmp_mib_get_systemStats(GSnmpSession *s, ucd_snmp_mib_systemStats_t **syste
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *systemStats = assign_systemStats(out);
     }
 }
@@ -1408,6 +1440,10 @@ ucd_snmp_mib_get_fileEntry(GSnmpSession *s, ucd_snmp_mib_fileEntry_t **fileEntry
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *fileEntry = assign_fileEntry(out);
     }
 }
@@ -1530,6 +1566,10 @@ ucd_snmp_mib_get_version(GSnmpSession *s, ucd_snmp_mib_version_t **version, gint
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *version = assign_version(out);
     }
 }
@@ -1657,6 +1697,10 @@ ucd_snmp_mib_get_snmperrs(GSnmpSession *s, ucd_snmp_mib_snmperrs_t **snmperrs, g
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *snmperrs = assign_snmperrs(out);
     }
 }
@@ -1807,6 +1851,10 @@ ucd_snmp_mib_get_mrEntry(GSnmpSession *s, ucd_snmp_mib_mrEntry_t **mrEntry, guin
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *mrEntry = assign_mrEntry(out);
     }
 }

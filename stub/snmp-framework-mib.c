@@ -78,8 +78,10 @@ lookup(GSnmpVarBind *vb, guint32 const *base, guint16 const base_len,
     for (i = 0; attributes[i].label; i++) {
 	if (vb->id_len > base_len && vb->id[base_len] == attributes[i].subid) {
 	    if (vb->type != attributes[i].type) {
-		g_warning("type tag 0x%02x does not match 0x%02x (%s)",
-			  vb->type, attributes[i].type, attributes[i].label);
+		const char *a = gsnmp_enum_get_label(gsnmp_enum_type_table, vb->type);
+		const char *b = gsnmp_enum_get_label(gsnmp_enum_type_table, attributes[i].type);
+		g_warning("%s: type mismatch: %s%s%s", attributes[i].label,
+		          (a) ? a : "", (a || b) ? " != " : "", (b) ? b : "");
 		return -3;
 	    }
 	    *idx = attributes[i].subid;
@@ -93,7 +95,7 @@ lookup(GSnmpVarBind *vb, guint32 const *base, guint16 const base_len,
 static guint32 const oid_snmpEngine[] = {1, 3, 6, 1, 6, 3, 10, 2, 1};
 
 static attribute_t attr_snmpEngine[] = {
-    { 1, G_SNMP_OCTET_STRING, SNMP_FRAMEWORK_MIB_SNMPENGINEID, "snmpEngineID" },
+    { 1, G_SNMP_OCTETSTRING, SNMP_FRAMEWORK_MIB_SNMPENGINEID, "snmpEngineID" },
     { 2, G_SNMP_INTEGER32, SNMP_FRAMEWORK_MIB_SNMPENGINEBOOTS, "snmpEngineBoots" },
     { 3, G_SNMP_INTEGER32, SNMP_FRAMEWORK_MIB_SNMPENGINETIME, "snmpEngineTime" },
     { 4, G_SNMP_INTEGER32, SNMP_FRAMEWORK_MIB_SNMPENGINEMAXMESSAGESIZE, "snmpEngineMaxMessageSize" },

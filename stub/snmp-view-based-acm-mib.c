@@ -138,8 +138,10 @@ lookup(GSnmpVarBind *vb, guint32 const *base, guint16 const base_len,
     for (i = 0; attributes[i].label; i++) {
 	if (vb->id_len > base_len && vb->id[base_len] == attributes[i].subid) {
 	    if (vb->type != attributes[i].type) {
-		g_warning("type tag 0x%02x does not match 0x%02x (%s)",
-			  vb->type, attributes[i].type, attributes[i].label);
+		const char *a = gsnmp_enum_get_label(gsnmp_enum_type_table, vb->type);
+		const char *b = gsnmp_enum_get_label(gsnmp_enum_type_table, attributes[i].type);
+		g_warning("%s: type mismatch: %s%s%s", attributes[i].label,
+		          (a) ? a : "", (a || b) ? " != " : "", (b) ? b : "");
 		return -3;
 	    }
 	    *idx = attributes[i].subid;
@@ -153,14 +155,14 @@ lookup(GSnmpVarBind *vb, guint32 const *base, guint16 const base_len,
 static guint32 const oid_vacmContextEntry[] = {1, 3, 6, 1, 6, 3, 16, 1, 1, 1};
 
 static attribute_t attr_vacmContextEntry[] = {
-    { 1, G_SNMP_OCTET_STRING, SNMP_VIEW_BASED_ACM_MIB_VACMCONTEXTNAME, "vacmContextName" },
+    { 1, G_SNMP_OCTETSTRING, SNMP_VIEW_BASED_ACM_MIB_VACMCONTEXTNAME, "vacmContextName" },
     { 0, 0, 0, NULL }
 };
 
 static guint32 const oid_vacmSecurityToGroupEntry[] = {1, 3, 6, 1, 6, 3, 16, 1, 2, 1};
 
 static attribute_t attr_vacmSecurityToGroupEntry[] = {
-    { 3, G_SNMP_OCTET_STRING, SNMP_VIEW_BASED_ACM_MIB_VACMGROUPNAME, "vacmGroupName" },
+    { 3, G_SNMP_OCTETSTRING, SNMP_VIEW_BASED_ACM_MIB_VACMGROUPNAME, "vacmGroupName" },
     { 4, G_SNMP_INTEGER32, SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTORAGETYPE, "vacmSecurityToGroupStorageType" },
     { 5, G_SNMP_INTEGER32, SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS, "vacmSecurityToGroupStatus" },
     { 0, 0, 0, NULL }
@@ -170,9 +172,9 @@ static guint32 const oid_vacmAccessEntry[] = {1, 3, 6, 1, 6, 3, 16, 1, 4, 1};
 
 static attribute_t attr_vacmAccessEntry[] = {
     { 4, G_SNMP_INTEGER32, SNMP_VIEW_BASED_ACM_MIB_VACMACCESSCONTEXTMATCH, "vacmAccessContextMatch" },
-    { 5, G_SNMP_OCTET_STRING, SNMP_VIEW_BASED_ACM_MIB_VACMACCESSREADVIEWNAME, "vacmAccessReadViewName" },
-    { 6, G_SNMP_OCTET_STRING, SNMP_VIEW_BASED_ACM_MIB_VACMACCESSWRITEVIEWNAME, "vacmAccessWriteViewName" },
-    { 7, G_SNMP_OCTET_STRING, SNMP_VIEW_BASED_ACM_MIB_VACMACCESSNOTIFYVIEWNAME, "vacmAccessNotifyViewName" },
+    { 5, G_SNMP_OCTETSTRING, SNMP_VIEW_BASED_ACM_MIB_VACMACCESSREADVIEWNAME, "vacmAccessReadViewName" },
+    { 6, G_SNMP_OCTETSTRING, SNMP_VIEW_BASED_ACM_MIB_VACMACCESSWRITEVIEWNAME, "vacmAccessWriteViewName" },
+    { 7, G_SNMP_OCTETSTRING, SNMP_VIEW_BASED_ACM_MIB_VACMACCESSNOTIFYVIEWNAME, "vacmAccessNotifyViewName" },
     { 8, G_SNMP_INTEGER32, SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE, "vacmAccessStorageType" },
     { 9, G_SNMP_INTEGER32, SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS, "vacmAccessStatus" },
     { 0, 0, 0, NULL }
@@ -188,7 +190,7 @@ static attribute_t attr_vacmMIBViews[] = {
 static guint32 const oid_vacmViewTreeFamilyEntry[] = {1, 3, 6, 1, 6, 3, 16, 1, 5, 2, 1};
 
 static attribute_t attr_vacmViewTreeFamilyEntry[] = {
-    { 3, G_SNMP_OCTET_STRING, SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYMASK, "vacmViewTreeFamilyMask" },
+    { 3, G_SNMP_OCTETSTRING, SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYMASK, "vacmViewTreeFamilyMask" },
     { 4, G_SNMP_INTEGER32, SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE, "vacmViewTreeFamilyType" },
     { 5, G_SNMP_INTEGER32, SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE, "vacmViewTreeFamilyStorageType" },
     { 6, G_SNMP_INTEGER32, SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS, "vacmViewTreeFamilyStatus" },
@@ -325,6 +327,10 @@ snmp_view_based_acm_mib_get_vacmContextEntry(GSnmpSession *s, snmp_view_based_ac
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *vacmContextEntry = assign_vacmContextEntry(out);
     }
 }
@@ -499,6 +505,10 @@ snmp_view_based_acm_mib_get_vacmSecurityToGroupEntry(GSnmpSession *s, snmp_view_
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *vacmSecurityToGroupEntry = assign_vacmSecurityToGroupEntry(out);
     }
 }
@@ -521,7 +531,7 @@ snmp_view_based_acm_mib_set_vacmSecurityToGroupEntry(GSnmpSession *s, snmp_view_
 
     if (vacmSecurityToGroupEntry->vacmGroupName) {
         base[10] = 3;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        vacmSecurityToGroupEntry->vacmGroupName,
                        vacmSecurityToGroupEntry->_vacmGroupNameLength);
     }
@@ -746,6 +756,10 @@ snmp_view_based_acm_mib_get_vacmAccessEntry(GSnmpSession *s, snmp_view_based_acm
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *vacmAccessEntry = assign_vacmAccessEntry(out);
     }
 }
@@ -774,19 +788,19 @@ snmp_view_based_acm_mib_set_vacmAccessEntry(GSnmpSession *s, snmp_view_based_acm
     }
     if (vacmAccessEntry->vacmAccessReadViewName) {
         base[10] = 5;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        vacmAccessEntry->vacmAccessReadViewName,
                        vacmAccessEntry->_vacmAccessReadViewNameLength);
     }
     if (vacmAccessEntry->vacmAccessWriteViewName) {
         base[10] = 6;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        vacmAccessEntry->vacmAccessWriteViewName,
                        vacmAccessEntry->_vacmAccessWriteViewNameLength);
     }
     if (vacmAccessEntry->vacmAccessNotifyViewName) {
         base[10] = 7;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        vacmAccessEntry->vacmAccessNotifyViewName,
                        vacmAccessEntry->_vacmAccessNotifyViewNameLength);
     }
@@ -891,6 +905,10 @@ snmp_view_based_acm_mib_get_vacmMIBViews(GSnmpSession *s, snmp_view_based_acm_mi
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *vacmMIBViews = assign_vacmMIBViews(out);
     }
 }
@@ -1088,6 +1106,10 @@ snmp_view_based_acm_mib_get_vacmViewTreeFamilyEntry(GSnmpSession *s, snmp_view_b
     out = g_snmp_session_sync_get(s, in);
     g_snmp_vbl_free(in);
     if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
         *vacmViewTreeFamilyEntry = assign_vacmViewTreeFamilyEntry(out);
     }
 }
@@ -1110,7 +1132,7 @@ snmp_view_based_acm_mib_set_vacmViewTreeFamilyEntry(GSnmpSession *s, snmp_view_b
 
     if (vacmViewTreeFamilyEntry->vacmViewTreeFamilyMask) {
         base[11] = 3;
-        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTETSTRING,
                        vacmViewTreeFamilyEntry->vacmViewTreeFamilyMask,
                        vacmViewTreeFamilyEntry->_vacmViewTreeFamilyMaskLength);
     }
