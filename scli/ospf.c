@@ -1,7 +1,7 @@
 /* 
  * ospf.c -- scli ospf mode implementation
  *
- * Copyright (C) 2001 Juergen Schoenwaelder
+ * Copyright (C) 2001 Oliver Wellnitz, Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -144,14 +144,15 @@ show_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
 {
     g_string_append(s, "\nArea: ");
     if (ospfAreaEntry->ospfAreaId) {
-	g_string_sprintfa(s,"%-15s", 
+	g_string_sprintfa(s,"             %-15s", 
 			  fmt_ipv4_address(ospfAreaEntry->ospfAreaId,
-					   SCLI_FMT_NAME_OR_ADDR));
+					   SCLI_FMT_ADDR));
     } else {
-	g_string_append(s, "?   ");
+	g_string_append(s,  "            ?");
     }
-    
-    g_string_append(s, "Area status: ");
+    g_string_append(s, "\n");
+
+    g_string_append(s, "Area status:       ");
     if (ospfAreaEntry->ospfAreaStatus) {
 	fmt_enum(s, 13, ospf_mib_enums_ospfAreaStatus,
 		 ospfAreaEntry->ospfAreaStatus);
@@ -160,7 +161,7 @@ show_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
     }
     g_string_append(s, "\n");
     
-    g_string_append(s, "Auth-Type: ");
+    g_string_append(s, "Auth-Type:         ");
     if (ospfAreaEntry->ospfAuthType) {
 	switch (*ospfAreaEntry->ospfAuthType) {
 	case 0:
@@ -181,7 +182,7 @@ show_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
     }
     g_string_append(s, "\n");
     
-    g_string_append(s, "AS external LSAs: ");
+    g_string_append(s, "AS external LSAs:  ");
     if (ospfAreaEntry->ospfImportAsExtern) {	 
 	fmt_enum(s, 16, ospf_mib_enums_ospfImportAsExtern,
 		 ospfAreaEntry->ospfImportAsExtern);
@@ -344,7 +345,7 @@ show_ospf_interfaces(GString *s,
     if (ospfIfEntry->ospfIfAreaId) {
 	g_string_sprintfa(s,"%s", 
 			  fmt_ipv4_address(ospfIfEntry->ospfIfAreaId,
-					   SCLI_FMT_NAME_OR_ADDR));
+					   SCLI_FMT_ADDR));
     } else {
 	g_string_append(s, "?");
     }
