@@ -346,8 +346,9 @@ xml_tcp_state(xmlNodePtr root, gint32 state, guint32 count, GSList *ports)
 
     for (elem = ports; elem; elem = g_slist_next(elem)) {
 	tcp_state_t *t = (tcp_state_t *) elem->data;
-	node = xml_new_child(tree, NULL, "count", "%u", t->count);
-	xml_set_prop(node, "service", "%s", t->name);
+	node = xml_new_child(tree, NULL, "service", "%u", t->count);
+	xml_set_prop(node, "port", "%d", t->port);
+	xml_set_prop(node, "name", "%s", t->name);
     }
 }
 
