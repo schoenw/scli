@@ -312,12 +312,12 @@ cmd_ether_stats(scli_interp_t *interp, int argc, char **argv)
 
     if (dot3StatsTable) {
 	g_string_append(interp->header,
-			"INDEX | ALIGN   FCS   MAC  LONG | "
+			"INTERFACE | ALIGN   FCS   MAC  LONG | "
 			"DEFER  SCOL  MCOL  XCOL  LCOL   MAC  CARR");
 	for (i = 0; dot3StatsTable[i]; i++) {
 	    GString *s = interp->result;
 
-	    g_string_sprintfa(s, "%5u |",
+	    g_string_sprintfa(s, "%9u |",
 			      dot3StatsTable[i]->dot3StatsIndex);
 	    
 	    fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsAlignmentErrors,

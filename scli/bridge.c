@@ -106,10 +106,10 @@ show_bridge_port(GString *s,
 {
     g_string_sprintfa(s, "%5u ", dot1dBasePortEntry->dot1dBasePort);
     if (dot1dBasePortEntry->dot1dBasePortIfIndex) {
-	g_string_sprintfa(s, "%7u   ",
+	g_string_sprintfa(s, "%9u ",
 			  *dot1dBasePortEntry->dot1dBasePortIfIndex);
     } else {
-	g_string_sprintfa(s, "%7s   ", "");
+	g_string_sprintfa(s, "%9s ", "");
     }
     if (ifEntry) {
 	fmt_enum(s, type_width, if_mib_enums_ifType, ifEntry->ifType);

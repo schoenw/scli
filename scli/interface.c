@@ -309,7 +309,7 @@ show_if_info(GString *s,
 	     if_mib_ifXEntry_t *ifXEntry,
 	     int type_width, int name_width)
 {
-    g_string_sprintfa(s, "%6u     ", ifEntry->ifIndex);
+    g_string_sprintfa(s, "%9u  ", ifEntry->ifIndex);
 
     fmt_ifStatus(s,
 		 ifEntry->ifAdminStatus, ifEntry->ifOperStatus,
@@ -424,7 +424,11 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_if_stack(GString *s, if_mib_ifStackEntry_t *ifStackEntry)
+show_if_stack(GString *s,
+	      if_mib_ifStackEntry_t *ifStackEntry,
+	      if_mib_ifStackEntry_t **ifStackTable,
+	      if_mib_ifEntry_t **ifTable,
+	      int level)
 {
     /*
      *      ,-- if2 
@@ -436,9 +440,40 @@ show_if_stack(GString *s, if_mib_ifStackEntry_t *ifStackEntry)
      * if7 -'
      */
 
-    g_string_sprintfa(s, "%8d %8d\n",
-		      ifStackEntry->ifStackHigherLayer,
-		      ifStackEntry->ifStackLowerLayer);
+    int i = 0;
+    char *ifDescr = NULL;
+    int ifDescrLength = 0;
+
+    if (! ifStackEntry->ifStackStatus
+	|| *ifStackEntry->ifStackStatus != IF_MIB_IFSTACKSTATUS_ACTIVE) {
+	return;
+    }
+
+    if (ifTable) {
+	for (i = 0; ifTable[i]; i++) {
+	    if (ifTable[i]->ifIndex == ifStackEntry->ifStackHigherLayer) break;
+	}
+	if (ifTable[i]) {
+	    ifDescr = ifTable[i]->ifDescr;
+	    ifDescrLength = ifTable[i]->_ifDescrLength;
+	}
+    }
+
+    g_string_sprintfa(s, "%*s%s %.*s (%d)\n", level*4, "",
+		      level ? "`- " : "-  ",
+		      ifDescrLength, ifDescr ? ifDescr : "",
+		      ifStackEntry->ifStackHigherLayer);
+
+    for (i = 0; ifStackTable[i]; i++) {
+	if ((ifStackTable[i]->ifStackLowerLayer
+	     == ifStackEntry->ifStackHigherLayer)
+	    && ifStackTable[i]->ifStackHigherLayer) {
+	    show_if_stack(s, ifStackTable[i], ifStackTable, ifTable, level+1);
+	    if (ifStackTable[i]->ifStackStatus) {
+		*ifStackTable[i]->ifStackStatus = 0;
+	    }
+	}
+    }
 }
 
 
@@ -447,20 +482,25 @@ static int
 cmd_if_stack(scli_interp_t *interp, int argc, char **argv)
 {
     if_mib_ifStackEntry_t **ifStackTable = NULL;
+    if_mib_ifEntry_t **ifTable = NULL;
     int i;
 
     if (if_mib_get_ifStackTable(interp->peer, &ifStackTable)) {
 	return SCLI_ERROR;
     }
+    (void) if_mib_get_ifTable(interp->peer, &ifTable);
     
     if (ifStackTable) {
-	g_string_sprintfa(interp->header, "  HIGHER    LOWER");
 	for (i = 0; ifStackTable[i]; i++) {
-	    show_if_stack(interp->result, ifStackTable[i]);
+	    if (ifStackTable[i]->ifStackLowerLayer == 0) {	
+		show_if_stack(interp->result,
+			      ifStackTable[i], ifStackTable, ifTable, 0);
+	    }
 	}
     }
 
     if (ifStackTable) if_mib_free_ifStackTable(ifStackTable);
+    if (ifTable) if_mib_free_ifTable(ifTable);
     
     return SCLI_OK;
 }
@@ -519,7 +559,7 @@ cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
     delta = TV_DIFF(last, now);
 
     if (ifTable) {
-	g_string_append(interp->header, "INDEX STAT SPEED "
+	g_string_append(interp->header, "INTERFACE STATUS "
 			"I-BPS O-BPS I-PPS O-PPS I-ERR O-ERR  DESCRIPTION");
 	for (i = 0; ifTable[i]; i++) {
 	    GString *s;
@@ -528,24 +568,13 @@ cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
 		continue;
 	    }
 	    s = interp->result;
-	    g_string_sprintfa(s, "%5u ", ifTable[i]->ifIndex);
+	    g_string_sprintfa(s, "%9u  ", ifTable[i]->ifIndex);
 	    fmt_ifStatus(s,
 			 ifTable[i]->ifAdminStatus, ifTable[i]->ifOperStatus,
 	 (ifXTable && ifXTable[i]) ? ifXTable[i]->ifConnectorPresent : NULL,
 	 (ifXTable && ifXTable[i]) ? ifXTable[i]->ifPromiscuousMode : NULL);
 
-	    if (ifTable[i]->ifSpeed) {
-		if (*(ifTable[i]->ifSpeed) == 0xffffffff
-		    && ifXTable && ifXTable[i]->ifHighSpeed) {
-		    g_string_sprintfa(s, " %5s",
-				      fmt_gtp(*(ifXTable[i]->ifHighSpeed)));
-		} else {
-		    g_string_sprintfa(s, " %5s",
-				      fmt_kmg(*(ifTable[i]->ifSpeed)));
-		}
-	    } else {
-		g_string_sprintfa(s, "  ----");
-	    }
+	    g_string_sprintfa(s, " ");
 
 	    fmt_counter_dt(s, ifTable[i]->ifInOctets, &(stats[i].inOctets),
 			   &last, delta);
