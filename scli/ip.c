@@ -250,7 +250,7 @@ show_ip_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry,
     if (tunnelIfEntry->tunnelIfLocalAddress) {
 	g_string_sprintfa(s, "%-15s  ",
 		  fmt_ipv4_address(tunnelIfEntry->tunnelIfLocalAddress,
-				   SCLI_FMT_NAME_OR_ADDR));
+				   SCLI_FMT_ADDR));
     } else {
 	g_string_sprintfa(s, "%-15s  ", "-");
     }
@@ -258,7 +258,7 @@ show_ip_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry,
     if (tunnelIfEntry->tunnelIfRemoteAddress) {
 	g_string_sprintfa(s, "%-15s  ",
 		  fmt_ipv4_address(tunnelIfEntry->tunnelIfRemoteAddress,
-				   SCLI_FMT_NAME_OR_ADDR));
+				   SCLI_FMT_ADDR));
     } else {
 	g_string_sprintfa(s, "%-15s  ", "-");
     }
