@@ -36,6 +36,9 @@ typedef struct interfaces {
     gint32   *ifNumber;
 } interfaces_t;
 
+extern interfaces_t *
+if_mib_new_interfaces();
+
 extern int
 if_mib_get_interfaces(host_snmp *s, interfaces_t **interfaces);
 
@@ -75,10 +78,22 @@ typedef struct ifEntry {
 } ifEntry_t;
 
 extern int
-if_mib_get_ifEntry(host_snmp *s, ifEntry_t ***ifEntry);
+if_mib_get_ifTable(host_snmp *s, ifEntry_t ***ifEntry);
 
 extern void
-if_mib_free_ifEntry(ifEntry_t **ifEntry);
+if_mib_free_ifTable(ifEntry_t **ifEntry);
+
+extern ifEntry_t *
+if_mib_new_ifEntry();
+
+extern int
+if_mib_get_ifEntry(host_snmp *s, ifEntry_t **ifEntry);
+
+extern int
+if_mib_set_ifEntry(host_snmp *s, ifEntry_t *ifEntry);
+
+extern void
+if_mib_free_ifEntry(ifEntry_t *ifEntry);
 
 /*
  * C type definitions for IF-MIB::ifMIBObjects.
@@ -88,6 +103,9 @@ typedef struct ifMIBObjects {
     guint32  *ifTableLastChange;
     guint32  *ifStackLastChange;
 } ifMIBObjects_t;
+
+extern ifMIBObjects_t *
+if_mib_new_ifMIBObjects();
 
 extern int
 if_mib_get_ifMIBObjects(host_snmp *s, ifMIBObjects_t **ifMIBObjects);
@@ -125,10 +143,22 @@ typedef struct ifXEntry {
 } ifXEntry_t;
 
 extern int
-if_mib_get_ifXEntry(host_snmp *s, ifXEntry_t ***ifXEntry);
+if_mib_get_ifXTable(host_snmp *s, ifXEntry_t ***ifXEntry);
 
 extern void
-if_mib_free_ifXEntry(ifXEntry_t **ifXEntry);
+if_mib_free_ifXTable(ifXEntry_t **ifXEntry);
+
+extern ifXEntry_t *
+if_mib_new_ifXEntry();
+
+extern int
+if_mib_get_ifXEntry(host_snmp *s, ifXEntry_t **ifXEntry);
+
+extern int
+if_mib_set_ifXEntry(host_snmp *s, ifXEntry_t *ifXEntry);
+
+extern void
+if_mib_free_ifXEntry(ifXEntry_t *ifXEntry);
 
 /*
  * C type definitions for IF-MIB::ifStackEntry.
@@ -141,10 +171,22 @@ typedef struct ifStackEntry {
 } ifStackEntry_t;
 
 extern int
-if_mib_get_ifStackEntry(host_snmp *s, ifStackEntry_t ***ifStackEntry);
+if_mib_get_ifStackTable(host_snmp *s, ifStackEntry_t ***ifStackEntry);
 
 extern void
-if_mib_free_ifStackEntry(ifStackEntry_t **ifStackEntry);
+if_mib_free_ifStackTable(ifStackEntry_t **ifStackEntry);
+
+extern ifStackEntry_t *
+if_mib_new_ifStackEntry();
+
+extern int
+if_mib_get_ifStackEntry(host_snmp *s, ifStackEntry_t **ifStackEntry);
+
+extern int
+if_mib_set_ifStackEntry(host_snmp *s, ifStackEntry_t *ifStackEntry);
+
+extern void
+if_mib_free_ifStackEntry(ifStackEntry_t *ifStackEntry);
 
 /*
  * C type definitions for IF-MIB::ifTestEntry.
@@ -164,10 +206,22 @@ typedef struct ifTestEntry {
 } ifTestEntry_t;
 
 extern int
-if_mib_get_ifTestEntry(host_snmp *s, ifTestEntry_t ***ifTestEntry);
+if_mib_get_ifTestTable(host_snmp *s, ifTestEntry_t ***ifTestEntry);
 
 extern void
-if_mib_free_ifTestEntry(ifTestEntry_t **ifTestEntry);
+if_mib_free_ifTestTable(ifTestEntry_t **ifTestEntry);
+
+extern ifTestEntry_t *
+if_mib_new_ifTestEntry();
+
+extern int
+if_mib_get_ifTestEntry(host_snmp *s, ifTestEntry_t **ifTestEntry);
+
+extern int
+if_mib_set_ifTestEntry(host_snmp *s, ifTestEntry_t *ifTestEntry);
+
+extern void
+if_mib_free_ifTestEntry(ifTestEntry_t *ifTestEntry);
 
 /*
  * C type definitions for IF-MIB::ifRcvAddressEntry.
@@ -182,10 +236,22 @@ typedef struct ifRcvAddressEntry {
 } ifRcvAddressEntry_t;
 
 extern int
-if_mib_get_ifRcvAddressEntry(host_snmp *s, ifRcvAddressEntry_t ***ifRcvAddressEntry);
+if_mib_get_ifRcvAddressTable(host_snmp *s, ifRcvAddressEntry_t ***ifRcvAddressEntry);
 
 extern void
-if_mib_free_ifRcvAddressEntry(ifRcvAddressEntry_t **ifRcvAddressEntry);
+if_mib_free_ifRcvAddressTable(ifRcvAddressEntry_t **ifRcvAddressEntry);
+
+extern ifRcvAddressEntry_t *
+if_mib_new_ifRcvAddressEntry();
+
+extern int
+if_mib_get_ifRcvAddressEntry(host_snmp *s, ifRcvAddressEntry_t **ifRcvAddressEntry);
+
+extern int
+if_mib_set_ifRcvAddressEntry(host_snmp *s, ifRcvAddressEntry_t *ifRcvAddressEntry);
+
+extern void
+if_mib_free_ifRcvAddressEntry(ifRcvAddressEntry_t *ifRcvAddressEntry);
 
 
 #endif /* _IF_MIB_H_ */

@@ -29,6 +29,15 @@ stls_table_t snmp_user_based_sm_mib_enums_usmUserStatus[] = {
 };
 
 
+usmStats_t *
+snmp_user_based_sm_mib_new_usmStats()
+{
+    usmStats_t *usmStats;
+
+    usmStats = (usmStats_t *) g_malloc0(sizeof(usmStats_t) + sizeof(gpointer));
+    return usmStats;
+}
+
 static usmStats_t *
 assign_usmStats(GSList *vbl)
 {
@@ -37,7 +46,7 @@ assign_usmStats(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 15, 1, 1};
 
-    usmStats = (usmStats_t *) g_malloc0(sizeof(usmStats_t) + sizeof(GSList *));
+    usmStats = snmp_user_based_sm_mib_new_usmStats();
     if (! usmStats) {
         return NULL;
     }
@@ -118,6 +127,15 @@ snmp_user_based_sm_mib_free_usmStats(usmStats_t *usmStats)
     }
 }
 
+usmUser_t *
+snmp_user_based_sm_mib_new_usmUser()
+{
+    usmUser_t *usmUser;
+
+    usmUser = (usmUser_t *) g_malloc0(sizeof(usmUser_t) + sizeof(gpointer));
+    return usmUser;
+}
+
 static usmUser_t *
 assign_usmUser(GSList *vbl)
 {
@@ -126,7 +144,7 @@ assign_usmUser(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 15, 1, 2};
 
-    usmUser = (usmUser_t *) g_malloc0(sizeof(usmUser_t) + sizeof(GSList *));
+    usmUser = snmp_user_based_sm_mib_new_usmUser();
     if (! usmUser) {
         return NULL;
     }
@@ -187,6 +205,15 @@ snmp_user_based_sm_mib_free_usmUser(usmUser_t *usmUser)
     }
 }
 
+usmUserEntry_t *
+snmp_user_based_sm_mib_new_usmUserEntry()
+{
+    usmUserEntry_t *usmUserEntry;
+
+    usmUserEntry = (usmUserEntry_t *) g_malloc0(sizeof(usmUserEntry_t) + sizeof(gpointer));
+    return usmUserEntry;
+}
+
 static int
 unpack_usmUserEntry(GSnmpVarBind *vb, usmUserEntry_t *usmUserEntry)
 {
@@ -218,7 +245,7 @@ assign_usmUserEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 15, 1, 2, 2, 1};
 
-    usmUserEntry = (usmUserEntry_t *) g_malloc0(sizeof(usmUserEntry_t) + sizeof(GSList *));
+    usmUserEntry = snmp_user_based_sm_mib_new_usmUserEntry();
     if (! usmUserEntry) {
         return NULL;
     }
@@ -290,7 +317,7 @@ assign_usmUserEntry(GSList *vbl)
 }
 
 int
-snmp_user_based_sm_mib_get_usmUserEntry(host_snmp *s, usmUserEntry_t ***usmUserEntry)
+snmp_user_based_sm_mib_get_usmUserTable(host_snmp *s, usmUserEntry_t ***usmUserEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -330,18 +357,27 @@ snmp_user_based_sm_mib_get_usmUserEntry(host_snmp *s, usmUserEntry_t ***usmUserE
 }
 
 void
-snmp_user_based_sm_mib_free_usmUserEntry(usmUserEntry_t **usmUserEntry)
+snmp_user_based_sm_mib_free_usmUserEntry(usmUserEntry_t *usmUserEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (usmUserEntry) {
+        p = (char *) usmUserEntry + sizeof(usmUserEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(usmUserEntry);
+    }
+}
+
+void
+snmp_user_based_sm_mib_free_usmUserTable(usmUserEntry_t **usmUserEntry)
+{
     int i;
 
     if (usmUserEntry) {
         for (i = 0; usmUserEntry[i]; i++) {
-            p = (char *) usmUserEntry[i] + sizeof(usmUserEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(usmUserEntry[i]);
+            snmp_user_based_sm_mib_free_usmUserEntry(usmUserEntry[i]);
         }
         g_free(usmUserEntry);
     }

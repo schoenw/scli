@@ -31,6 +31,9 @@ typedef struct ipForward {
     guint32  *ipCidrRouteNumber;
 } ipForward_t;
 
+extern ipForward_t *
+ip_forward_mib_new_ipForward();
+
 extern int
 ip_forward_mib_get_ipForward(host_snmp *s, ipForward_t **ipForward);
 
@@ -61,10 +64,22 @@ typedef struct ipForwardEntry {
 } ipForwardEntry_t;
 
 extern int
-ip_forward_mib_get_ipForwardEntry(host_snmp *s, ipForwardEntry_t ***ipForwardEntry);
+ip_forward_mib_get_ipForwardTable(host_snmp *s, ipForwardEntry_t ***ipForwardEntry);
 
 extern void
-ip_forward_mib_free_ipForwardEntry(ipForwardEntry_t **ipForwardEntry);
+ip_forward_mib_free_ipForwardTable(ipForwardEntry_t **ipForwardEntry);
+
+extern ipForwardEntry_t *
+ip_forward_mib_new_ipForwardEntry();
+
+extern int
+ip_forward_mib_get_ipForwardEntry(host_snmp *s, ipForwardEntry_t **ipForwardEntry);
+
+extern int
+ip_forward_mib_set_ipForwardEntry(host_snmp *s, ipForwardEntry_t *ipForwardEntry);
+
+extern void
+ip_forward_mib_free_ipForwardEntry(ipForwardEntry_t *ipForwardEntry);
 
 /*
  * C type definitions for IP-FORWARD-MIB::ipCidrRouteEntry.
@@ -91,10 +106,22 @@ typedef struct ipCidrRouteEntry {
 } ipCidrRouteEntry_t;
 
 extern int
-ip_forward_mib_get_ipCidrRouteEntry(host_snmp *s, ipCidrRouteEntry_t ***ipCidrRouteEntry);
+ip_forward_mib_get_ipCidrRouteTable(host_snmp *s, ipCidrRouteEntry_t ***ipCidrRouteEntry);
 
 extern void
-ip_forward_mib_free_ipCidrRouteEntry(ipCidrRouteEntry_t **ipCidrRouteEntry);
+ip_forward_mib_free_ipCidrRouteTable(ipCidrRouteEntry_t **ipCidrRouteEntry);
+
+extern ipCidrRouteEntry_t *
+ip_forward_mib_new_ipCidrRouteEntry();
+
+extern int
+ip_forward_mib_get_ipCidrRouteEntry(host_snmp *s, ipCidrRouteEntry_t **ipCidrRouteEntry);
+
+extern int
+ip_forward_mib_set_ipCidrRouteEntry(host_snmp *s, ipCidrRouteEntry_t *ipCidrRouteEntry);
+
+extern void
+ip_forward_mib_free_ipCidrRouteEntry(ipCidrRouteEntry_t *ipCidrRouteEntry);
 
 
 #endif /* _IP_FORWARD_MIB_H_ */

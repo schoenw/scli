@@ -31,6 +31,9 @@ typedef struct schedObjects {
     guchar   *schedLocalTime;
 } schedObjects_t;
 
+extern schedObjects_t *
+disman_schedule_mib_new_schedObjects();
+
 extern int
 disman_schedule_mib_get_schedObjects(host_snmp *s, schedObjects_t **schedObjects);
 
@@ -76,10 +79,22 @@ typedef struct schedEntry {
 } schedEntry_t;
 
 extern int
-disman_schedule_mib_get_schedEntry(host_snmp *s, schedEntry_t ***schedEntry);
+disman_schedule_mib_get_schedTable(host_snmp *s, schedEntry_t ***schedEntry);
 
 extern void
-disman_schedule_mib_free_schedEntry(schedEntry_t **schedEntry);
+disman_schedule_mib_free_schedTable(schedEntry_t **schedEntry);
+
+extern schedEntry_t *
+disman_schedule_mib_new_schedEntry();
+
+extern int
+disman_schedule_mib_get_schedEntry(host_snmp *s, schedEntry_t **schedEntry);
+
+extern int
+disman_schedule_mib_set_schedEntry(host_snmp *s, schedEntry_t *schedEntry);
+
+extern void
+disman_schedule_mib_free_schedEntry(schedEntry_t *schedEntry);
 
 
 #endif /* _DISMAN_SCHEDULE_MIB_H_ */

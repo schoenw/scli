@@ -31,6 +31,15 @@ stls_table_t entity_mib_enums_entPhysicalIsFRU[] = {
 };
 
 
+entPhysicalEntry_t *
+entity_mib_new_entPhysicalEntry()
+{
+    entPhysicalEntry_t *entPhysicalEntry;
+
+    entPhysicalEntry = (entPhysicalEntry_t *) g_malloc0(sizeof(entPhysicalEntry_t) + sizeof(gpointer));
+    return entPhysicalEntry;
+}
+
 static int
 unpack_entPhysicalEntry(GSnmpVarBind *vb, entPhysicalEntry_t *entPhysicalEntry)
 {
@@ -50,7 +59,7 @@ assign_entPhysicalEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1};
 
-    entPhysicalEntry = (entPhysicalEntry_t *) g_malloc0(sizeof(entPhysicalEntry_t) + sizeof(GSList *));
+    entPhysicalEntry = entity_mib_new_entPhysicalEntry();
     if (! entPhysicalEntry) {
         return NULL;
     }
@@ -136,7 +145,7 @@ assign_entPhysicalEntry(GSList *vbl)
 }
 
 int
-entity_mib_get_entPhysicalEntry(host_snmp *s, entPhysicalEntry_t ***entPhysicalEntry)
+entity_mib_get_entPhysicalTable(host_snmp *s, entPhysicalEntry_t ***entPhysicalEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -180,21 +189,39 @@ entity_mib_get_entPhysicalEntry(host_snmp *s, entPhysicalEntry_t ***entPhysicalE
 }
 
 void
-entity_mib_free_entPhysicalEntry(entPhysicalEntry_t **entPhysicalEntry)
+entity_mib_free_entPhysicalEntry(entPhysicalEntry_t *entPhysicalEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (entPhysicalEntry) {
+        p = (char *) entPhysicalEntry + sizeof(entPhysicalEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(entPhysicalEntry);
+    }
+}
+
+void
+entity_mib_free_entPhysicalTable(entPhysicalEntry_t **entPhysicalEntry)
+{
     int i;
 
     if (entPhysicalEntry) {
         for (i = 0; entPhysicalEntry[i]; i++) {
-            p = (char *) entPhysicalEntry[i] + sizeof(entPhysicalEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(entPhysicalEntry[i]);
+            entity_mib_free_entPhysicalEntry(entPhysicalEntry[i]);
         }
         g_free(entPhysicalEntry);
     }
+}
+
+entLogicalEntry_t *
+entity_mib_new_entLogicalEntry()
+{
+    entLogicalEntry_t *entLogicalEntry;
+
+    entLogicalEntry = (entLogicalEntry_t *) g_malloc0(sizeof(entLogicalEntry_t) + sizeof(gpointer));
+    return entLogicalEntry;
 }
 
 static int
@@ -216,7 +243,7 @@ assign_entLogicalEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1};
 
-    entLogicalEntry = (entLogicalEntry_t *) g_malloc0(sizeof(entLogicalEntry_t) + sizeof(GSList *));
+    entLogicalEntry = entity_mib_new_entLogicalEntry();
     if (! entLogicalEntry) {
         return NULL;
     }
@@ -274,7 +301,7 @@ assign_entLogicalEntry(GSList *vbl)
 }
 
 int
-entity_mib_get_entLogicalEntry(host_snmp *s, entLogicalEntry_t ***entLogicalEntry)
+entity_mib_get_entLogicalTable(host_snmp *s, entLogicalEntry_t ***entLogicalEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -310,21 +337,39 @@ entity_mib_get_entLogicalEntry(host_snmp *s, entLogicalEntry_t ***entLogicalEntr
 }
 
 void
-entity_mib_free_entLogicalEntry(entLogicalEntry_t **entLogicalEntry)
+entity_mib_free_entLogicalEntry(entLogicalEntry_t *entLogicalEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (entLogicalEntry) {
+        p = (char *) entLogicalEntry + sizeof(entLogicalEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(entLogicalEntry);
+    }
+}
+
+void
+entity_mib_free_entLogicalTable(entLogicalEntry_t **entLogicalEntry)
+{
     int i;
 
     if (entLogicalEntry) {
         for (i = 0; entLogicalEntry[i]; i++) {
-            p = (char *) entLogicalEntry[i] + sizeof(entLogicalEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(entLogicalEntry[i]);
+            entity_mib_free_entLogicalEntry(entLogicalEntry[i]);
         }
         g_free(entLogicalEntry);
     }
+}
+
+entLPMappingEntry_t *
+entity_mib_new_entLPMappingEntry()
+{
+    entLPMappingEntry_t *entLPMappingEntry;
+
+    entLPMappingEntry = (entLPMappingEntry_t *) g_malloc0(sizeof(entLPMappingEntry_t) + sizeof(gpointer));
+    return entLPMappingEntry;
 }
 
 static int
@@ -348,7 +393,7 @@ assign_entLPMappingEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 1, 1};
 
-    entLPMappingEntry = (entLPMappingEntry_t *) g_malloc0(sizeof(entLPMappingEntry_t) + sizeof(GSList *));
+    entLPMappingEntry = entity_mib_new_entLPMappingEntry();
     if (! entLPMappingEntry) {
         return NULL;
     }
@@ -378,7 +423,7 @@ assign_entLPMappingEntry(GSList *vbl)
 }
 
 int
-entity_mib_get_entLPMappingEntry(host_snmp *s, entLPMappingEntry_t ***entLPMappingEntry)
+entity_mib_get_entLPMappingTable(host_snmp *s, entLPMappingEntry_t ***entLPMappingEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -407,21 +452,39 @@ entity_mib_get_entLPMappingEntry(host_snmp *s, entLPMappingEntry_t ***entLPMappi
 }
 
 void
-entity_mib_free_entLPMappingEntry(entLPMappingEntry_t **entLPMappingEntry)
+entity_mib_free_entLPMappingEntry(entLPMappingEntry_t *entLPMappingEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (entLPMappingEntry) {
+        p = (char *) entLPMappingEntry + sizeof(entLPMappingEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(entLPMappingEntry);
+    }
+}
+
+void
+entity_mib_free_entLPMappingTable(entLPMappingEntry_t **entLPMappingEntry)
+{
     int i;
 
     if (entLPMappingEntry) {
         for (i = 0; entLPMappingEntry[i]; i++) {
-            p = (char *) entLPMappingEntry[i] + sizeof(entLPMappingEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(entLPMappingEntry[i]);
+            entity_mib_free_entLPMappingEntry(entLPMappingEntry[i]);
         }
         g_free(entLPMappingEntry);
     }
+}
+
+entAliasMappingEntry_t *
+entity_mib_new_entAliasMappingEntry()
+{
+    entAliasMappingEntry_t *entAliasMappingEntry;
+
+    entAliasMappingEntry = (entAliasMappingEntry_t *) g_malloc0(sizeof(entAliasMappingEntry_t) + sizeof(gpointer));
+    return entAliasMappingEntry;
 }
 
 static int
@@ -445,7 +508,7 @@ assign_entAliasMappingEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 2, 1};
 
-    entAliasMappingEntry = (entAliasMappingEntry_t *) g_malloc0(sizeof(entAliasMappingEntry_t) + sizeof(GSList *));
+    entAliasMappingEntry = entity_mib_new_entAliasMappingEntry();
     if (! entAliasMappingEntry) {
         return NULL;
     }
@@ -479,7 +542,7 @@ assign_entAliasMappingEntry(GSList *vbl)
 }
 
 int
-entity_mib_get_entAliasMappingEntry(host_snmp *s, entAliasMappingEntry_t ***entAliasMappingEntry)
+entity_mib_get_entAliasMappingTable(host_snmp *s, entAliasMappingEntry_t ***entAliasMappingEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -509,21 +572,39 @@ entity_mib_get_entAliasMappingEntry(host_snmp *s, entAliasMappingEntry_t ***entA
 }
 
 void
-entity_mib_free_entAliasMappingEntry(entAliasMappingEntry_t **entAliasMappingEntry)
+entity_mib_free_entAliasMappingEntry(entAliasMappingEntry_t *entAliasMappingEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (entAliasMappingEntry) {
+        p = (char *) entAliasMappingEntry + sizeof(entAliasMappingEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(entAliasMappingEntry);
+    }
+}
+
+void
+entity_mib_free_entAliasMappingTable(entAliasMappingEntry_t **entAliasMappingEntry)
+{
     int i;
 
     if (entAliasMappingEntry) {
         for (i = 0; entAliasMappingEntry[i]; i++) {
-            p = (char *) entAliasMappingEntry[i] + sizeof(entAliasMappingEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(entAliasMappingEntry[i]);
+            entity_mib_free_entAliasMappingEntry(entAliasMappingEntry[i]);
         }
         g_free(entAliasMappingEntry);
     }
+}
+
+entPhysicalContainsEntry_t *
+entity_mib_new_entPhysicalContainsEntry()
+{
+    entPhysicalContainsEntry_t *entPhysicalContainsEntry;
+
+    entPhysicalContainsEntry = (entPhysicalContainsEntry_t *) g_malloc0(sizeof(entPhysicalContainsEntry_t) + sizeof(gpointer));
+    return entPhysicalContainsEntry;
 }
 
 static int
@@ -547,7 +628,7 @@ assign_entPhysicalContainsEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 3, 1};
 
-    entPhysicalContainsEntry = (entPhysicalContainsEntry_t *) g_malloc0(sizeof(entPhysicalContainsEntry_t) + sizeof(GSList *));
+    entPhysicalContainsEntry = entity_mib_new_entPhysicalContainsEntry();
     if (! entPhysicalContainsEntry) {
         return NULL;
     }
@@ -577,7 +658,7 @@ assign_entPhysicalContainsEntry(GSList *vbl)
 }
 
 int
-entity_mib_get_entPhysicalContainsEntry(host_snmp *s, entPhysicalContainsEntry_t ***entPhysicalContainsEntry)
+entity_mib_get_entPhysicalContainsTable(host_snmp *s, entPhysicalContainsEntry_t ***entPhysicalContainsEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -606,21 +687,39 @@ entity_mib_get_entPhysicalContainsEntry(host_snmp *s, entPhysicalContainsEntry_t
 }
 
 void
-entity_mib_free_entPhysicalContainsEntry(entPhysicalContainsEntry_t **entPhysicalContainsEntry)
+entity_mib_free_entPhysicalContainsEntry(entPhysicalContainsEntry_t *entPhysicalContainsEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (entPhysicalContainsEntry) {
+        p = (char *) entPhysicalContainsEntry + sizeof(entPhysicalContainsEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(entPhysicalContainsEntry);
+    }
+}
+
+void
+entity_mib_free_entPhysicalContainsTable(entPhysicalContainsEntry_t **entPhysicalContainsEntry)
+{
     int i;
 
     if (entPhysicalContainsEntry) {
         for (i = 0; entPhysicalContainsEntry[i]; i++) {
-            p = (char *) entPhysicalContainsEntry[i] + sizeof(entPhysicalContainsEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(entPhysicalContainsEntry[i]);
+            entity_mib_free_entPhysicalContainsEntry(entPhysicalContainsEntry[i]);
         }
         g_free(entPhysicalContainsEntry);
     }
+}
+
+entityGeneral_t *
+entity_mib_new_entityGeneral()
+{
+    entityGeneral_t *entityGeneral;
+
+    entityGeneral = (entityGeneral_t *) g_malloc0(sizeof(entityGeneral_t) + sizeof(gpointer));
+    return entityGeneral;
 }
 
 static entityGeneral_t *
@@ -631,7 +730,7 @@ assign_entityGeneral(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 4};
 
-    entityGeneral = (entityGeneral_t *) g_malloc0(sizeof(entityGeneral_t) + sizeof(GSList *));
+    entityGeneral = entity_mib_new_entityGeneral();
     if (! entityGeneral) {
         return NULL;
     }

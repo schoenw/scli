@@ -86,17 +86,17 @@ show_containment(GString *s, char *prefix,
 static int
 cmd_containment(scli_interp_t *interp, int argc, char **argv)
 {
-    entPhysicalEntry_t **entPhysicalEntry = NULL;
+    entPhysicalEntry_t **entPhysicalTable = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (entity_mib_get_entPhysicalEntry(interp->peer, &entPhysicalEntry)) {
+    if (entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable)) {
 	return SCLI_ERROR;
     }
 
-    if (entPhysicalEntry) {
-	show_containment(interp->result, "", entPhysicalEntry, 0);
-	entity_mib_free_entPhysicalEntry(entPhysicalEntry);
+    if (entPhysicalTable) {
+	show_containment(interp->result, "", entPhysicalTable, 0);
+	entity_mib_free_entPhysicalTable(entPhysicalTable);
     }
     
     return SCLI_OK;
@@ -196,23 +196,23 @@ show_component(GString *s, entPhysicalEntry_t *entPhysicalEntry)
 static int
 cmd_components(scli_interp_t *interp, int argc, char **argv)
 {
-    entPhysicalEntry_t **entPhysicalEntry = NULL;
+    entPhysicalEntry_t **entPhysicalTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (entity_mib_get_entPhysicalEntry(interp->peer, &entPhysicalEntry)) {
+    if (entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable)) {
 	return SCLI_ERROR;
     }
 
-    if (entPhysicalEntry) {
-	for (i = 0; entPhysicalEntry[i]; i++) {
+    if (entPhysicalTable) {
+	for (i = 0; entPhysicalTable[i]; i++) {
 	    if (i) {
 		g_string_append(interp->result, "\n");
 	    }
-	    show_component(interp->result, entPhysicalEntry[i]);
+	    show_component(interp->result, entPhysicalTable[i]);
 	}
-	entity_mib_free_entPhysicalEntry(entPhysicalEntry);
+	entity_mib_free_entPhysicalTable(entPhysicalTable);
     }
     
     return SCLI_OK;

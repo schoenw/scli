@@ -36,10 +36,19 @@ typedef struct vacmContextEntry {
 } vacmContextEntry_t;
 
 extern int
-snmp_view_based_acm_mib_get_vacmContextEntry(host_snmp *s, vacmContextEntry_t ***vacmContextEntry);
+snmp_view_based_acm_mib_get_vacmContextTable(host_snmp *s, vacmContextEntry_t ***vacmContextEntry);
 
 extern void
-snmp_view_based_acm_mib_free_vacmContextEntry(vacmContextEntry_t **vacmContextEntry);
+snmp_view_based_acm_mib_free_vacmContextTable(vacmContextEntry_t **vacmContextEntry);
+
+extern vacmContextEntry_t *
+snmp_view_based_acm_mib_new_vacmContextEntry();
+
+extern int
+snmp_view_based_acm_mib_get_vacmContextEntry(host_snmp *s, vacmContextEntry_t **vacmContextEntry);
+
+extern void
+snmp_view_based_acm_mib_free_vacmContextEntry(vacmContextEntry_t *vacmContextEntry);
 
 /*
  * C type definitions for SNMP-VIEW-BASED-ACM-MIB::vacmSecurityToGroupEntry.
@@ -56,10 +65,22 @@ typedef struct vacmSecurityToGroupEntry {
 } vacmSecurityToGroupEntry_t;
 
 extern int
-snmp_view_based_acm_mib_get_vacmSecurityToGroupEntry(host_snmp *s, vacmSecurityToGroupEntry_t ***vacmSecurityToGroupEntry);
+snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(host_snmp *s, vacmSecurityToGroupEntry_t ***vacmSecurityToGroupEntry);
 
 extern void
-snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(vacmSecurityToGroupEntry_t **vacmSecurityToGroupEntry);
+snmp_view_based_acm_mib_free_vacmSecurityToGroupTable(vacmSecurityToGroupEntry_t **vacmSecurityToGroupEntry);
+
+extern vacmSecurityToGroupEntry_t *
+snmp_view_based_acm_mib_new_vacmSecurityToGroupEntry();
+
+extern int
+snmp_view_based_acm_mib_get_vacmSecurityToGroupEntry(host_snmp *s, vacmSecurityToGroupEntry_t **vacmSecurityToGroupEntry);
+
+extern int
+snmp_view_based_acm_mib_set_vacmSecurityToGroupEntry(host_snmp *s, vacmSecurityToGroupEntry_t *vacmSecurityToGroupEntry);
+
+extern void
+snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(vacmSecurityToGroupEntry_t *vacmSecurityToGroupEntry);
 
 /*
  * C type definitions for SNMP-VIEW-BASED-ACM-MIB::vacmAccessEntry.
@@ -84,10 +105,22 @@ typedef struct vacmAccessEntry {
 } vacmAccessEntry_t;
 
 extern int
-snmp_view_based_acm_mib_get_vacmAccessEntry(host_snmp *s, vacmAccessEntry_t ***vacmAccessEntry);
+snmp_view_based_acm_mib_get_vacmAccessTable(host_snmp *s, vacmAccessEntry_t ***vacmAccessEntry);
 
 extern void
-snmp_view_based_acm_mib_free_vacmAccessEntry(vacmAccessEntry_t **vacmAccessEntry);
+snmp_view_based_acm_mib_free_vacmAccessTable(vacmAccessEntry_t **vacmAccessEntry);
+
+extern vacmAccessEntry_t *
+snmp_view_based_acm_mib_new_vacmAccessEntry();
+
+extern int
+snmp_view_based_acm_mib_get_vacmAccessEntry(host_snmp *s, vacmAccessEntry_t **vacmAccessEntry);
+
+extern int
+snmp_view_based_acm_mib_set_vacmAccessEntry(host_snmp *s, vacmAccessEntry_t *vacmAccessEntry);
+
+extern void
+snmp_view_based_acm_mib_free_vacmAccessEntry(vacmAccessEntry_t *vacmAccessEntry);
 
 /*
  * C type definitions for SNMP-VIEW-BASED-ACM-MIB::vacmMIBViews.
@@ -97,8 +130,14 @@ typedef struct vacmMIBViews {
     gint32   *vacmViewSpinLock;
 } vacmMIBViews_t;
 
+extern vacmMIBViews_t *
+snmp_view_based_acm_mib_new_vacmMIBViews();
+
 extern int
 snmp_view_based_acm_mib_get_vacmMIBViews(host_snmp *s, vacmMIBViews_t **vacmMIBViews);
+
+extern int
+snmp_view_based_acm_mib_set_vacmMIBViews(host_snmp *s, vacmMIBViews_t *vacmMIBViews);
 
 extern void
 snmp_view_based_acm_mib_free_vacmMIBViews(vacmMIBViews_t *vacmMIBViews);
@@ -120,10 +159,22 @@ typedef struct vacmViewTreeFamilyEntry {
 } vacmViewTreeFamilyEntry_t;
 
 extern int
-snmp_view_based_acm_mib_get_vacmViewTreeFamilyEntry(host_snmp *s, vacmViewTreeFamilyEntry_t ***vacmViewTreeFamilyEntry);
+snmp_view_based_acm_mib_get_vacmViewTreeFamilyTable(host_snmp *s, vacmViewTreeFamilyEntry_t ***vacmViewTreeFamilyEntry);
 
 extern void
-snmp_view_based_acm_mib_free_vacmViewTreeFamilyEntry(vacmViewTreeFamilyEntry_t **vacmViewTreeFamilyEntry);
+snmp_view_based_acm_mib_free_vacmViewTreeFamilyTable(vacmViewTreeFamilyEntry_t **vacmViewTreeFamilyEntry);
+
+extern vacmViewTreeFamilyEntry_t *
+snmp_view_based_acm_mib_new_vacmViewTreeFamilyEntry();
+
+extern int
+snmp_view_based_acm_mib_get_vacmViewTreeFamilyEntry(host_snmp *s, vacmViewTreeFamilyEntry_t **vacmViewTreeFamilyEntry);
+
+extern int
+snmp_view_based_acm_mib_set_vacmViewTreeFamilyEntry(host_snmp *s, vacmViewTreeFamilyEntry_t *vacmViewTreeFamilyEntry);
+
+extern void
+snmp_view_based_acm_mib_free_vacmViewTreeFamilyEntry(vacmViewTreeFamilyEntry_t *vacmViewTreeFamilyEntry);
 
 
 #endif /* _SNMP_VIEW_BASED_ACM_MIB_H_ */

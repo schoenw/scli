@@ -41,7 +41,7 @@ static int
 cmd_snmp(scli_interp_t *interp, int argc, char **argv)
 {
     snmpEngine_t *snmpEngine;
-    sysOREntry_t **sysOREntry;
+    sysOREntry_t **sysORTable;
     GString *s;
     int i;
     int const indent = 18;
@@ -69,18 +69,18 @@ cmd_snmp(scli_interp_t *interp, int argc, char **argv)
 	snmp_framework_mib_free_snmpEngine(snmpEngine);
     }
     
-    if (snmpv2_mib_get_sysOREntry(interp->peer, &sysOREntry)) {
+    if (snmpv2_mib_get_sysORTable(interp->peer, &sysORTable)) {
 	return SCLI_ERROR;
     }
 
-    if (sysOREntry) {
-	for (i = 0; sysOREntry[i]; i++) {
+    if (sysORTable) {
+	for (i = 0; sysORTable[i]; i++) {
 	    g_string_sprintfa(s, "%3d: %.*s\n",
-			      sysOREntry[i]->sysORIndex,
-			      (int) sysOREntry[i]->_sysORDescrLength,
-			      sysOREntry[i]->sysORDescr);
+			      sysORTable[i]->sysORIndex,
+			      (int) sysORTable[i]->_sysORDescrLength,
+			      sysORTable[i]->sysORDescr);
 	}
-	snmpv2_mib_free_sysOREntry(sysOREntry);
+	snmpv2_mib_free_sysORTable(sysORTable);
     }
     
     return SCLI_OK;

@@ -57,22 +57,22 @@ show_ip_forward(GString *s, ipCidrRouteEntry_t *ipCidrRouteEntry)
 static int
 cmd_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 {
-    ipCidrRouteEntry_t **ipCidrRouteEntry = NULL;
+    ipCidrRouteEntry_t **ipCidrRouteTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (ip_forward_mib_get_ipCidrRouteEntry(interp->peer, &ipCidrRouteEntry)) {
+    if (ip_forward_mib_get_ipCidrRouteTable(interp->peer, &ipCidrRouteTable)) {
 	return SCLI_ERROR;
     }
 
-    if (ipCidrRouteEntry) {
+    if (ipCidrRouteTable) {
 	g_string_sprintfa(interp->result, "%-32s%-32s%s\n",
 			  "Destination", "Next Hop", "Interface");
-	for (i = 0; ipCidrRouteEntry[i]; i++) {
-	    show_ip_forward(interp->result, ipCidrRouteEntry[i]);
+	for (i = 0; ipCidrRouteTable[i]; i++) {
+	    show_ip_forward(interp->result, ipCidrRouteTable[i]);
 	}
-	ip_forward_mib_free_ipCidrRouteEntry(ipCidrRouteEntry);
+	ip_forward_mib_free_ipCidrRouteTable(ipCidrRouteTable);
     }
     return SCLI_OK;
 }
@@ -121,22 +121,22 @@ show_ip_address(GString *s, ipAddrEntry_t *ipAddrEntry)
 static int
 cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 {
-    ipAddrEntry_t **ipAddrEntry = NULL;
+    ipAddrEntry_t **ipAddrTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (ip_mib_get_ipAddrEntry(interp->peer, &ipAddrEntry)) {
+    if (ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable)) {
 	return SCLI_ERROR;
     }
 
-    if (ipAddrEntry) {
+    if (ipAddrTable) {
 	g_string_sprintfa(interp->result,
 			  "Address        Prefix  Interface   Name\n");
-	for (i = 0; ipAddrEntry[i]; i++) {
-	    show_ip_address(interp->result, ipAddrEntry[i]);
+	for (i = 0; ipAddrTable[i]; i++) {
+	    show_ip_address(interp->result, ipAddrTable[i]);
 	}
-	ip_mib_free_ipAddrEntry(ipAddrEntry);
+	ip_mib_free_ipAddrTable(ipAddrTable);
     }
     return SCLI_OK;
 }

@@ -38,8 +38,14 @@ typedef struct system {
     guint32  *sysORLastChange;
 } system_t;
 
+extern system_t *
+snmpv2_mib_new_system();
+
 extern int
 snmpv2_mib_get_system(host_snmp *s, system_t **system);
+
+extern int
+snmpv2_mib_set_system(host_snmp *s, system_t *system);
 
 extern void
 snmpv2_mib_free_system(system_t *system);
@@ -58,10 +64,19 @@ typedef struct sysOREntry {
 } sysOREntry_t;
 
 extern int
-snmpv2_mib_get_sysOREntry(host_snmp *s, sysOREntry_t ***sysOREntry);
+snmpv2_mib_get_sysORTable(host_snmp *s, sysOREntry_t ***sysOREntry);
 
 extern void
-snmpv2_mib_free_sysOREntry(sysOREntry_t **sysOREntry);
+snmpv2_mib_free_sysORTable(sysOREntry_t **sysOREntry);
+
+extern sysOREntry_t *
+snmpv2_mib_new_sysOREntry();
+
+extern int
+snmpv2_mib_get_sysOREntry(host_snmp *s, sysOREntry_t **sysOREntry);
+
+extern void
+snmpv2_mib_free_sysOREntry(sysOREntry_t *sysOREntry);
 
 /*
  * C type definitions for SNMPv2-MIB::snmp.
@@ -100,8 +115,14 @@ typedef struct snmp {
     guint32  *snmpProxyDrops;
 } snmp_t;
 
+extern snmp_t *
+snmpv2_mib_new_snmp();
+
 extern int
 snmpv2_mib_get_snmp(host_snmp *s, snmp_t **snmp);
+
+extern int
+snmpv2_mib_set_snmp(host_snmp *s, snmp_t *snmp);
 
 extern void
 snmpv2_mib_free_snmp(snmp_t *snmp);
@@ -114,8 +135,14 @@ typedef struct snmpSet {
     gint32   *snmpSetSerialNo;
 } snmpSet_t;
 
+extern snmpSet_t *
+snmpv2_mib_new_snmpSet();
+
 extern int
 snmpv2_mib_get_snmpSet(host_snmp *s, snmpSet_t **snmpSet);
+
+extern int
+snmpv2_mib_set_snmpSet(host_snmp *s, snmpSet_t *snmpSet);
 
 extern void
 snmpv2_mib_free_snmpSet(snmpSet_t *snmpSet);

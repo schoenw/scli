@@ -283,6 +283,15 @@ stls_table_t if_mib_enums_ifRcvAddressType[] = {
 };
 
 
+interfaces_t *
+if_mib_new_interfaces()
+{
+    interfaces_t *interfaces;
+
+    interfaces = (interfaces_t *) g_malloc0(sizeof(interfaces_t) + sizeof(gpointer));
+    return interfaces;
+}
+
 static interfaces_t *
 assign_interfaces(GSList *vbl)
 {
@@ -291,7 +300,7 @@ assign_interfaces(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 2};
 
-    interfaces = (interfaces_t *) g_malloc0(sizeof(interfaces_t) + sizeof(GSList *));
+    interfaces = if_mib_new_interfaces();
     if (! interfaces) {
         return NULL;
     }
@@ -352,6 +361,15 @@ if_mib_free_interfaces(interfaces_t *interfaces)
     }
 }
 
+ifEntry_t *
+if_mib_new_ifEntry()
+{
+    ifEntry_t *ifEntry;
+
+    ifEntry = (ifEntry_t *) g_malloc0(sizeof(ifEntry_t) + sizeof(gpointer));
+    return ifEntry;
+}
+
 static int
 unpack_ifEntry(GSnmpVarBind *vb, ifEntry_t *ifEntry)
 {
@@ -371,7 +389,7 @@ assign_ifEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 2, 2, 1};
 
-    ifEntry = (ifEntry_t *) g_malloc0(sizeof(ifEntry_t) + sizeof(GSList *));
+    ifEntry = if_mib_new_ifEntry();
     if (! ifEntry) {
         return NULL;
     }
@@ -467,7 +485,7 @@ assign_ifEntry(GSList *vbl)
 }
 
 int
-if_mib_get_ifEntry(host_snmp *s, ifEntry_t ***ifEntry)
+if_mib_get_ifTable(host_snmp *s, ifEntry_t ***ifEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -517,21 +535,39 @@ if_mib_get_ifEntry(host_snmp *s, ifEntry_t ***ifEntry)
 }
 
 void
-if_mib_free_ifEntry(ifEntry_t **ifEntry)
+if_mib_free_ifEntry(ifEntry_t *ifEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (ifEntry) {
+        p = (char *) ifEntry + sizeof(ifEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(ifEntry);
+    }
+}
+
+void
+if_mib_free_ifTable(ifEntry_t **ifEntry)
+{
     int i;
 
     if (ifEntry) {
         for (i = 0; ifEntry[i]; i++) {
-            p = (char *) ifEntry[i] + sizeof(ifEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(ifEntry[i]);
+            if_mib_free_ifEntry(ifEntry[i]);
         }
         g_free(ifEntry);
     }
+}
+
+ifMIBObjects_t *
+if_mib_new_ifMIBObjects()
+{
+    ifMIBObjects_t *ifMIBObjects;
+
+    ifMIBObjects = (ifMIBObjects_t *) g_malloc0(sizeof(ifMIBObjects_t) + sizeof(gpointer));
+    return ifMIBObjects;
 }
 
 static ifMIBObjects_t *
@@ -542,7 +578,7 @@ assign_ifMIBObjects(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 31, 1};
 
-    ifMIBObjects = (ifMIBObjects_t *) g_malloc0(sizeof(ifMIBObjects_t) + sizeof(GSList *));
+    ifMIBObjects = if_mib_new_ifMIBObjects();
     if (! ifMIBObjects) {
         return NULL;
     }
@@ -607,6 +643,15 @@ if_mib_free_ifMIBObjects(ifMIBObjects_t *ifMIBObjects)
     }
 }
 
+ifXEntry_t *
+if_mib_new_ifXEntry()
+{
+    ifXEntry_t *ifXEntry;
+
+    ifXEntry = (ifXEntry_t *) g_malloc0(sizeof(ifXEntry_t) + sizeof(gpointer));
+    return ifXEntry;
+}
+
 static int
 unpack_ifXEntry(GSnmpVarBind *vb, ifXEntry_t *ifXEntry)
 {
@@ -626,7 +671,7 @@ assign_ifXEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1};
 
-    ifXEntry = (ifXEntry_t *) g_malloc0(sizeof(ifXEntry_t) + sizeof(GSList *));
+    ifXEntry = if_mib_new_ifXEntry();
     if (! ifXEntry) {
         return NULL;
     }
@@ -715,7 +760,7 @@ assign_ifXEntry(GSList *vbl)
 }
 
 int
-if_mib_get_ifXEntry(host_snmp *s, ifXEntry_t ***ifXEntry)
+if_mib_get_ifXTable(host_snmp *s, ifXEntry_t ***ifXEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -779,21 +824,39 @@ if_mib_get_ifXEntry(host_snmp *s, ifXEntry_t ***ifXEntry)
 }
 
 void
-if_mib_free_ifXEntry(ifXEntry_t **ifXEntry)
+if_mib_free_ifXEntry(ifXEntry_t *ifXEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (ifXEntry) {
+        p = (char *) ifXEntry + sizeof(ifXEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(ifXEntry);
+    }
+}
+
+void
+if_mib_free_ifXTable(ifXEntry_t **ifXEntry)
+{
     int i;
 
     if (ifXEntry) {
         for (i = 0; ifXEntry[i]; i++) {
-            p = (char *) ifXEntry[i] + sizeof(ifXEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(ifXEntry[i]);
+            if_mib_free_ifXEntry(ifXEntry[i]);
         }
         g_free(ifXEntry);
     }
+}
+
+ifStackEntry_t *
+if_mib_new_ifStackEntry()
+{
+    ifStackEntry_t *ifStackEntry;
+
+    ifStackEntry = (ifStackEntry_t *) g_malloc0(sizeof(ifStackEntry_t) + sizeof(gpointer));
+    return ifStackEntry;
 }
 
 static int
@@ -817,7 +880,7 @@ assign_ifStackEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 31, 1, 2, 1};
 
-    ifStackEntry = (ifStackEntry_t *) g_malloc0(sizeof(ifStackEntry_t) + sizeof(GSList *));
+    ifStackEntry = if_mib_new_ifStackEntry();
     if (! ifStackEntry) {
         return NULL;
     }
@@ -850,7 +913,7 @@ assign_ifStackEntry(GSList *vbl)
 }
 
 int
-if_mib_get_ifStackEntry(host_snmp *s, ifStackEntry_t ***ifStackEntry)
+if_mib_get_ifStackTable(host_snmp *s, ifStackEntry_t ***ifStackEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -880,21 +943,39 @@ if_mib_get_ifStackEntry(host_snmp *s, ifStackEntry_t ***ifStackEntry)
 }
 
 void
-if_mib_free_ifStackEntry(ifStackEntry_t **ifStackEntry)
+if_mib_free_ifStackEntry(ifStackEntry_t *ifStackEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (ifStackEntry) {
+        p = (char *) ifStackEntry + sizeof(ifStackEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(ifStackEntry);
+    }
+}
+
+void
+if_mib_free_ifStackTable(ifStackEntry_t **ifStackEntry)
+{
     int i;
 
     if (ifStackEntry) {
         for (i = 0; ifStackEntry[i]; i++) {
-            p = (char *) ifStackEntry[i] + sizeof(ifStackEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(ifStackEntry[i]);
+            if_mib_free_ifStackEntry(ifStackEntry[i]);
         }
         g_free(ifStackEntry);
     }
+}
+
+ifTestEntry_t *
+if_mib_new_ifTestEntry()
+{
+    ifTestEntry_t *ifTestEntry;
+
+    ifTestEntry = (ifTestEntry_t *) g_malloc0(sizeof(ifTestEntry_t) + sizeof(gpointer));
+    return ifTestEntry;
 }
 
 static int
@@ -916,7 +997,7 @@ assign_ifTestEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 31, 1, 3, 1};
 
-    ifTestEntry = (ifTestEntry_t *) g_malloc0(sizeof(ifTestEntry_t) + sizeof(GSList *));
+    ifTestEntry = if_mib_new_ifTestEntry();
     if (! ifTestEntry) {
         return NULL;
     }
@@ -967,7 +1048,7 @@ assign_ifTestEntry(GSList *vbl)
 }
 
 int
-if_mib_get_ifTestEntry(host_snmp *s, ifTestEntry_t ***ifTestEntry)
+if_mib_get_ifTestTable(host_snmp *s, ifTestEntry_t ***ifTestEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1002,21 +1083,39 @@ if_mib_get_ifTestEntry(host_snmp *s, ifTestEntry_t ***ifTestEntry)
 }
 
 void
-if_mib_free_ifTestEntry(ifTestEntry_t **ifTestEntry)
+if_mib_free_ifTestEntry(ifTestEntry_t *ifTestEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (ifTestEntry) {
+        p = (char *) ifTestEntry + sizeof(ifTestEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(ifTestEntry);
+    }
+}
+
+void
+if_mib_free_ifTestTable(ifTestEntry_t **ifTestEntry)
+{
     int i;
 
     if (ifTestEntry) {
         for (i = 0; ifTestEntry[i]; i++) {
-            p = (char *) ifTestEntry[i] + sizeof(ifTestEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(ifTestEntry[i]);
+            if_mib_free_ifTestEntry(ifTestEntry[i]);
         }
         g_free(ifTestEntry);
     }
+}
+
+ifRcvAddressEntry_t *
+if_mib_new_ifRcvAddressEntry()
+{
+    ifRcvAddressEntry_t *ifRcvAddressEntry;
+
+    ifRcvAddressEntry = (ifRcvAddressEntry_t *) g_malloc0(sizeof(ifRcvAddressEntry_t) + sizeof(gpointer));
+    return ifRcvAddressEntry;
 }
 
 static int
@@ -1045,7 +1144,7 @@ assign_ifRcvAddressEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 31, 1, 4, 1};
 
-    ifRcvAddressEntry = (ifRcvAddressEntry_t *) g_malloc0(sizeof(ifRcvAddressEntry_t) + sizeof(GSList *));
+    ifRcvAddressEntry = if_mib_new_ifRcvAddressEntry();
     if (! ifRcvAddressEntry) {
         return NULL;
     }
@@ -1081,7 +1180,7 @@ assign_ifRcvAddressEntry(GSList *vbl)
 }
 
 int
-if_mib_get_ifRcvAddressEntry(host_snmp *s, ifRcvAddressEntry_t ***ifRcvAddressEntry)
+if_mib_get_ifRcvAddressTable(host_snmp *s, ifRcvAddressEntry_t ***ifRcvAddressEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1112,18 +1211,27 @@ if_mib_get_ifRcvAddressEntry(host_snmp *s, ifRcvAddressEntry_t ***ifRcvAddressEn
 }
 
 void
-if_mib_free_ifRcvAddressEntry(ifRcvAddressEntry_t **ifRcvAddressEntry)
+if_mib_free_ifRcvAddressEntry(ifRcvAddressEntry_t *ifRcvAddressEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (ifRcvAddressEntry) {
+        p = (char *) ifRcvAddressEntry + sizeof(ifRcvAddressEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(ifRcvAddressEntry);
+    }
+}
+
+void
+if_mib_free_ifRcvAddressTable(ifRcvAddressEntry_t **ifRcvAddressEntry)
+{
     int i;
 
     if (ifRcvAddressEntry) {
         for (i = 0; ifRcvAddressEntry[i]; i++) {
-            p = (char *) ifRcvAddressEntry[i] + sizeof(ifRcvAddressEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(ifRcvAddressEntry[i]);
+            if_mib_free_ifRcvAddressEntry(ifRcvAddressEntry[i]);
         }
         g_free(ifRcvAddressEntry);
     }

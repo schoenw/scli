@@ -88,6 +88,15 @@ stls_table_t host_resources_mib_enums_hrSWInstalledType[] = {
 };
 
 
+hrSystem_t *
+host_resources_mib_new_hrSystem()
+{
+    hrSystem_t *hrSystem;
+
+    hrSystem = (hrSystem_t *) g_malloc0(sizeof(hrSystem_t) + sizeof(gpointer));
+    return hrSystem;
+}
+
 static hrSystem_t *
 assign_hrSystem(GSList *vbl)
 {
@@ -96,7 +105,7 @@ assign_hrSystem(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 1};
 
-    hrSystem = (hrSystem_t *) g_malloc0(sizeof(hrSystem_t) + sizeof(GSList *));
+    hrSystem = host_resources_mib_new_hrSystem();
     if (! hrSystem) {
         return NULL;
     }
@@ -183,6 +192,15 @@ host_resources_mib_free_hrSystem(hrSystem_t *hrSystem)
     }
 }
 
+hrStorage_t *
+host_resources_mib_new_hrStorage()
+{
+    hrStorage_t *hrStorage;
+
+    hrStorage = (hrStorage_t *) g_malloc0(sizeof(hrStorage_t) + sizeof(gpointer));
+    return hrStorage;
+}
+
 static hrStorage_t *
 assign_hrStorage(GSList *vbl)
 {
@@ -191,7 +209,7 @@ assign_hrStorage(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 2};
 
-    hrStorage = (hrStorage_t *) g_malloc0(sizeof(hrStorage_t) + sizeof(GSList *));
+    hrStorage = host_resources_mib_new_hrStorage();
     if (! hrStorage) {
         return NULL;
     }
@@ -252,6 +270,15 @@ host_resources_mib_free_hrStorage(hrStorage_t *hrStorage)
     }
 }
 
+hrStorageEntry_t *
+host_resources_mib_new_hrStorageEntry()
+{
+    hrStorageEntry_t *hrStorageEntry;
+
+    hrStorageEntry = (hrStorageEntry_t *) g_malloc0(sizeof(hrStorageEntry_t) + sizeof(gpointer));
+    return hrStorageEntry;
+}
+
 static int
 unpack_hrStorageEntry(GSnmpVarBind *vb, hrStorageEntry_t *hrStorageEntry)
 {
@@ -271,7 +298,7 @@ assign_hrStorageEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1};
 
-    hrStorageEntry = (hrStorageEntry_t *) g_malloc0(sizeof(hrStorageEntry_t) + sizeof(GSList *));
+    hrStorageEntry = host_resources_mib_new_hrStorageEntry();
     if (! hrStorageEntry) {
         return NULL;
     }
@@ -321,7 +348,7 @@ assign_hrStorageEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrStorageEntry(host_snmp *s, hrStorageEntry_t ***hrStorageEntry)
+host_resources_mib_get_hrStorageTable(host_snmp *s, hrStorageEntry_t ***hrStorageEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -356,21 +383,39 @@ host_resources_mib_get_hrStorageEntry(host_snmp *s, hrStorageEntry_t ***hrStorag
 }
 
 void
-host_resources_mib_free_hrStorageEntry(hrStorageEntry_t **hrStorageEntry)
+host_resources_mib_free_hrStorageEntry(hrStorageEntry_t *hrStorageEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (hrStorageEntry) {
+        p = (char *) hrStorageEntry + sizeof(hrStorageEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(hrStorageEntry);
+    }
+}
+
+void
+host_resources_mib_free_hrStorageTable(hrStorageEntry_t **hrStorageEntry)
+{
     int i;
 
     if (hrStorageEntry) {
         for (i = 0; hrStorageEntry[i]; i++) {
-            p = (char *) hrStorageEntry[i] + sizeof(hrStorageEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(hrStorageEntry[i]);
+            host_resources_mib_free_hrStorageEntry(hrStorageEntry[i]);
         }
         g_free(hrStorageEntry);
     }
+}
+
+hrDeviceEntry_t *
+host_resources_mib_new_hrDeviceEntry()
+{
+    hrDeviceEntry_t *hrDeviceEntry;
+
+    hrDeviceEntry = (hrDeviceEntry_t *) g_malloc0(sizeof(hrDeviceEntry_t) + sizeof(gpointer));
+    return hrDeviceEntry;
 }
 
 static int
@@ -392,7 +437,7 @@ assign_hrDeviceEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1};
 
-    hrDeviceEntry = (hrDeviceEntry_t *) g_malloc0(sizeof(hrDeviceEntry_t) + sizeof(GSList *));
+    hrDeviceEntry = host_resources_mib_new_hrDeviceEntry();
     if (! hrDeviceEntry) {
         return NULL;
     }
@@ -440,7 +485,7 @@ assign_hrDeviceEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrDeviceEntry(host_snmp *s, hrDeviceEntry_t ***hrDeviceEntry)
+host_resources_mib_get_hrDeviceTable(host_snmp *s, hrDeviceEntry_t ***hrDeviceEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -474,21 +519,39 @@ host_resources_mib_get_hrDeviceEntry(host_snmp *s, hrDeviceEntry_t ***hrDeviceEn
 }
 
 void
-host_resources_mib_free_hrDeviceEntry(hrDeviceEntry_t **hrDeviceEntry)
+host_resources_mib_free_hrDeviceEntry(hrDeviceEntry_t *hrDeviceEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (hrDeviceEntry) {
+        p = (char *) hrDeviceEntry + sizeof(hrDeviceEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(hrDeviceEntry);
+    }
+}
+
+void
+host_resources_mib_free_hrDeviceTable(hrDeviceEntry_t **hrDeviceEntry)
+{
     int i;
 
     if (hrDeviceEntry) {
         for (i = 0; hrDeviceEntry[i]; i++) {
-            p = (char *) hrDeviceEntry[i] + sizeof(hrDeviceEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(hrDeviceEntry[i]);
+            host_resources_mib_free_hrDeviceEntry(hrDeviceEntry[i]);
         }
         g_free(hrDeviceEntry);
     }
+}
+
+hrProcessorEntry_t *
+host_resources_mib_new_hrProcessorEntry()
+{
+    hrProcessorEntry_t *hrProcessorEntry;
+
+    hrProcessorEntry = (hrProcessorEntry_t *) g_malloc0(sizeof(hrProcessorEntry_t) + sizeof(gpointer));
+    return hrProcessorEntry;
 }
 
 static int
@@ -510,7 +573,7 @@ assign_hrProcessorEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 3, 1};
 
-    hrProcessorEntry = (hrProcessorEntry_t *) g_malloc0(sizeof(hrProcessorEntry_t) + sizeof(GSList *));
+    hrProcessorEntry = host_resources_mib_new_hrProcessorEntry();
     if (! hrProcessorEntry) {
         return NULL;
     }
@@ -547,7 +610,7 @@ assign_hrProcessorEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrProcessorEntry(host_snmp *s, hrProcessorEntry_t ***hrProcessorEntry)
+host_resources_mib_get_hrProcessorTable(host_snmp *s, hrProcessorEntry_t ***hrProcessorEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -578,21 +641,39 @@ host_resources_mib_get_hrProcessorEntry(host_snmp *s, hrProcessorEntry_t ***hrPr
 }
 
 void
-host_resources_mib_free_hrProcessorEntry(hrProcessorEntry_t **hrProcessorEntry)
+host_resources_mib_free_hrProcessorEntry(hrProcessorEntry_t *hrProcessorEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (hrProcessorEntry) {
+        p = (char *) hrProcessorEntry + sizeof(hrProcessorEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(hrProcessorEntry);
+    }
+}
+
+void
+host_resources_mib_free_hrProcessorTable(hrProcessorEntry_t **hrProcessorEntry)
+{
     int i;
 
     if (hrProcessorEntry) {
         for (i = 0; hrProcessorEntry[i]; i++) {
-            p = (char *) hrProcessorEntry[i] + sizeof(hrProcessorEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(hrProcessorEntry[i]);
+            host_resources_mib_free_hrProcessorEntry(hrProcessorEntry[i]);
         }
         g_free(hrProcessorEntry);
     }
+}
+
+hrNetworkEntry_t *
+host_resources_mib_new_hrNetworkEntry()
+{
+    hrNetworkEntry_t *hrNetworkEntry;
+
+    hrNetworkEntry = (hrNetworkEntry_t *) g_malloc0(sizeof(hrNetworkEntry_t) + sizeof(gpointer));
+    return hrNetworkEntry;
 }
 
 static int
@@ -614,7 +695,7 @@ assign_hrNetworkEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 4, 1};
 
-    hrNetworkEntry = (hrNetworkEntry_t *) g_malloc0(sizeof(hrNetworkEntry_t) + sizeof(GSList *));
+    hrNetworkEntry = host_resources_mib_new_hrNetworkEntry();
     if (! hrNetworkEntry) {
         return NULL;
     }
@@ -647,7 +728,7 @@ assign_hrNetworkEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrNetworkEntry(host_snmp *s, hrNetworkEntry_t ***hrNetworkEntry)
+host_resources_mib_get_hrNetworkTable(host_snmp *s, hrNetworkEntry_t ***hrNetworkEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -677,21 +758,39 @@ host_resources_mib_get_hrNetworkEntry(host_snmp *s, hrNetworkEntry_t ***hrNetwor
 }
 
 void
-host_resources_mib_free_hrNetworkEntry(hrNetworkEntry_t **hrNetworkEntry)
+host_resources_mib_free_hrNetworkEntry(hrNetworkEntry_t *hrNetworkEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (hrNetworkEntry) {
+        p = (char *) hrNetworkEntry + sizeof(hrNetworkEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(hrNetworkEntry);
+    }
+}
+
+void
+host_resources_mib_free_hrNetworkTable(hrNetworkEntry_t **hrNetworkEntry)
+{
     int i;
 
     if (hrNetworkEntry) {
         for (i = 0; hrNetworkEntry[i]; i++) {
-            p = (char *) hrNetworkEntry[i] + sizeof(hrNetworkEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(hrNetworkEntry[i]);
+            host_resources_mib_free_hrNetworkEntry(hrNetworkEntry[i]);
         }
         g_free(hrNetworkEntry);
     }
+}
+
+hrPrinterEntry_t *
+host_resources_mib_new_hrPrinterEntry()
+{
+    hrPrinterEntry_t *hrPrinterEntry;
+
+    hrPrinterEntry = (hrPrinterEntry_t *) g_malloc0(sizeof(hrPrinterEntry_t) + sizeof(gpointer));
+    return hrPrinterEntry;
 }
 
 static int
@@ -713,7 +812,7 @@ assign_hrPrinterEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 5, 1};
 
-    hrPrinterEntry = (hrPrinterEntry_t *) g_malloc0(sizeof(hrPrinterEntry_t) + sizeof(GSList *));
+    hrPrinterEntry = host_resources_mib_new_hrPrinterEntry();
     if (! hrPrinterEntry) {
         return NULL;
     }
@@ -750,7 +849,7 @@ assign_hrPrinterEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrPrinterEntry(host_snmp *s, hrPrinterEntry_t ***hrPrinterEntry)
+host_resources_mib_get_hrPrinterTable(host_snmp *s, hrPrinterEntry_t ***hrPrinterEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -781,21 +880,39 @@ host_resources_mib_get_hrPrinterEntry(host_snmp *s, hrPrinterEntry_t ***hrPrinte
 }
 
 void
-host_resources_mib_free_hrPrinterEntry(hrPrinterEntry_t **hrPrinterEntry)
+host_resources_mib_free_hrPrinterEntry(hrPrinterEntry_t *hrPrinterEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (hrPrinterEntry) {
+        p = (char *) hrPrinterEntry + sizeof(hrPrinterEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(hrPrinterEntry);
+    }
+}
+
+void
+host_resources_mib_free_hrPrinterTable(hrPrinterEntry_t **hrPrinterEntry)
+{
     int i;
 
     if (hrPrinterEntry) {
         for (i = 0; hrPrinterEntry[i]; i++) {
-            p = (char *) hrPrinterEntry[i] + sizeof(hrPrinterEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(hrPrinterEntry[i]);
+            host_resources_mib_free_hrPrinterEntry(hrPrinterEntry[i]);
         }
         g_free(hrPrinterEntry);
     }
+}
+
+hrDiskStorageEntry_t *
+host_resources_mib_new_hrDiskStorageEntry()
+{
+    hrDiskStorageEntry_t *hrDiskStorageEntry;
+
+    hrDiskStorageEntry = (hrDiskStorageEntry_t *) g_malloc0(sizeof(hrDiskStorageEntry_t) + sizeof(gpointer));
+    return hrDiskStorageEntry;
 }
 
 static int
@@ -817,7 +934,7 @@ assign_hrDiskStorageEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 6, 1};
 
-    hrDiskStorageEntry = (hrDiskStorageEntry_t *) g_malloc0(sizeof(hrDiskStorageEntry_t) + sizeof(GSList *));
+    hrDiskStorageEntry = host_resources_mib_new_hrDiskStorageEntry();
     if (! hrDiskStorageEntry) {
         return NULL;
     }
@@ -859,7 +976,7 @@ assign_hrDiskStorageEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrDiskStorageEntry(host_snmp *s, hrDiskStorageEntry_t ***hrDiskStorageEntry)
+host_resources_mib_get_hrDiskStorageTable(host_snmp *s, hrDiskStorageEntry_t ***hrDiskStorageEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -892,21 +1009,39 @@ host_resources_mib_get_hrDiskStorageEntry(host_snmp *s, hrDiskStorageEntry_t ***
 }
 
 void
-host_resources_mib_free_hrDiskStorageEntry(hrDiskStorageEntry_t **hrDiskStorageEntry)
+host_resources_mib_free_hrDiskStorageEntry(hrDiskStorageEntry_t *hrDiskStorageEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (hrDiskStorageEntry) {
+        p = (char *) hrDiskStorageEntry + sizeof(hrDiskStorageEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(hrDiskStorageEntry);
+    }
+}
+
+void
+host_resources_mib_free_hrDiskStorageTable(hrDiskStorageEntry_t **hrDiskStorageEntry)
+{
     int i;
 
     if (hrDiskStorageEntry) {
         for (i = 0; hrDiskStorageEntry[i]; i++) {
-            p = (char *) hrDiskStorageEntry[i] + sizeof(hrDiskStorageEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(hrDiskStorageEntry[i]);
+            host_resources_mib_free_hrDiskStorageEntry(hrDiskStorageEntry[i]);
         }
         g_free(hrDiskStorageEntry);
     }
+}
+
+hrPartitionEntry_t *
+host_resources_mib_new_hrPartitionEntry()
+{
+    hrPartitionEntry_t *hrPartitionEntry;
+
+    hrPartitionEntry = (hrPartitionEntry_t *) g_malloc0(sizeof(hrPartitionEntry_t) + sizeof(gpointer));
+    return hrPartitionEntry;
 }
 
 static int
@@ -930,7 +1065,7 @@ assign_hrPartitionEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1};
 
-    hrPartitionEntry = (hrPartitionEntry_t *) g_malloc0(sizeof(hrPartitionEntry_t) + sizeof(GSList *));
+    hrPartitionEntry = host_resources_mib_new_hrPartitionEntry();
     if (! hrPartitionEntry) {
         return NULL;
     }
@@ -974,7 +1109,7 @@ assign_hrPartitionEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrPartitionEntry(host_snmp *s, hrPartitionEntry_t ***hrPartitionEntry)
+host_resources_mib_get_hrPartitionTable(host_snmp *s, hrPartitionEntry_t ***hrPartitionEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1007,21 +1142,39 @@ host_resources_mib_get_hrPartitionEntry(host_snmp *s, hrPartitionEntry_t ***hrPa
 }
 
 void
-host_resources_mib_free_hrPartitionEntry(hrPartitionEntry_t **hrPartitionEntry)
+host_resources_mib_free_hrPartitionEntry(hrPartitionEntry_t *hrPartitionEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (hrPartitionEntry) {
+        p = (char *) hrPartitionEntry + sizeof(hrPartitionEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(hrPartitionEntry);
+    }
+}
+
+void
+host_resources_mib_free_hrPartitionTable(hrPartitionEntry_t **hrPartitionEntry)
+{
     int i;
 
     if (hrPartitionEntry) {
         for (i = 0; hrPartitionEntry[i]; i++) {
-            p = (char *) hrPartitionEntry[i] + sizeof(hrPartitionEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(hrPartitionEntry[i]);
+            host_resources_mib_free_hrPartitionEntry(hrPartitionEntry[i]);
         }
         g_free(hrPartitionEntry);
     }
+}
+
+hrFSEntry_t *
+host_resources_mib_new_hrFSEntry()
+{
+    hrFSEntry_t *hrFSEntry;
+
+    hrFSEntry = (hrFSEntry_t *) g_malloc0(sizeof(hrFSEntry_t) + sizeof(gpointer));
+    return hrFSEntry;
 }
 
 static int
@@ -1043,7 +1196,7 @@ assign_hrFSEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1};
 
-    hrFSEntry = (hrFSEntry_t *) g_malloc0(sizeof(hrFSEntry_t) + sizeof(GSList *));
+    hrFSEntry = host_resources_mib_new_hrFSEntry();
     if (! hrFSEntry) {
         return NULL;
     }
@@ -1102,7 +1255,7 @@ assign_hrFSEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrFSEntry(host_snmp *s, hrFSEntry_t ***hrFSEntry)
+host_resources_mib_get_hrFSTable(host_snmp *s, hrFSEntry_t ***hrFSEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1139,21 +1292,39 @@ host_resources_mib_get_hrFSEntry(host_snmp *s, hrFSEntry_t ***hrFSEntry)
 }
 
 void
-host_resources_mib_free_hrFSEntry(hrFSEntry_t **hrFSEntry)
+host_resources_mib_free_hrFSEntry(hrFSEntry_t *hrFSEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (hrFSEntry) {
+        p = (char *) hrFSEntry + sizeof(hrFSEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(hrFSEntry);
+    }
+}
+
+void
+host_resources_mib_free_hrFSTable(hrFSEntry_t **hrFSEntry)
+{
     int i;
 
     if (hrFSEntry) {
         for (i = 0; hrFSEntry[i]; i++) {
-            p = (char *) hrFSEntry[i] + sizeof(hrFSEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(hrFSEntry[i]);
+            host_resources_mib_free_hrFSEntry(hrFSEntry[i]);
         }
         g_free(hrFSEntry);
     }
+}
+
+hrSWRun_t *
+host_resources_mib_new_hrSWRun()
+{
+    hrSWRun_t *hrSWRun;
+
+    hrSWRun = (hrSWRun_t *) g_malloc0(sizeof(hrSWRun_t) + sizeof(gpointer));
+    return hrSWRun;
 }
 
 static hrSWRun_t *
@@ -1164,7 +1335,7 @@ assign_hrSWRun(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 4};
 
-    hrSWRun = (hrSWRun_t *) g_malloc0(sizeof(hrSWRun_t) + sizeof(GSList *));
+    hrSWRun = host_resources_mib_new_hrSWRun();
     if (! hrSWRun) {
         return NULL;
     }
@@ -1225,6 +1396,15 @@ host_resources_mib_free_hrSWRun(hrSWRun_t *hrSWRun)
     }
 }
 
+hrSWRunEntry_t *
+host_resources_mib_new_hrSWRunEntry()
+{
+    hrSWRunEntry_t *hrSWRunEntry;
+
+    hrSWRunEntry = (hrSWRunEntry_t *) g_malloc0(sizeof(hrSWRunEntry_t) + sizeof(gpointer));
+    return hrSWRunEntry;
+}
+
 static int
 unpack_hrSWRunEntry(GSnmpVarBind *vb, hrSWRunEntry_t *hrSWRunEntry)
 {
@@ -1244,7 +1424,7 @@ assign_hrSWRunEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1};
 
-    hrSWRunEntry = (hrSWRunEntry_t *) g_malloc0(sizeof(hrSWRunEntry_t) + sizeof(GSList *));
+    hrSWRunEntry = host_resources_mib_new_hrSWRunEntry();
     if (! hrSWRunEntry) {
         return NULL;
     }
@@ -1296,7 +1476,7 @@ assign_hrSWRunEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrSWRunEntry(host_snmp *s, hrSWRunEntry_t ***hrSWRunEntry)
+host_resources_mib_get_hrSWRunTable(host_snmp *s, hrSWRunEntry_t ***hrSWRunEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1331,21 +1511,39 @@ host_resources_mib_get_hrSWRunEntry(host_snmp *s, hrSWRunEntry_t ***hrSWRunEntry
 }
 
 void
-host_resources_mib_free_hrSWRunEntry(hrSWRunEntry_t **hrSWRunEntry)
+host_resources_mib_free_hrSWRunEntry(hrSWRunEntry_t *hrSWRunEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (hrSWRunEntry) {
+        p = (char *) hrSWRunEntry + sizeof(hrSWRunEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(hrSWRunEntry);
+    }
+}
+
+void
+host_resources_mib_free_hrSWRunTable(hrSWRunEntry_t **hrSWRunEntry)
+{
     int i;
 
     if (hrSWRunEntry) {
         for (i = 0; hrSWRunEntry[i]; i++) {
-            p = (char *) hrSWRunEntry[i] + sizeof(hrSWRunEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(hrSWRunEntry[i]);
+            host_resources_mib_free_hrSWRunEntry(hrSWRunEntry[i]);
         }
         g_free(hrSWRunEntry);
     }
+}
+
+hrSWRunPerfEntry_t *
+host_resources_mib_new_hrSWRunPerfEntry()
+{
+    hrSWRunPerfEntry_t *hrSWRunPerfEntry;
+
+    hrSWRunPerfEntry = (hrSWRunPerfEntry_t *) g_malloc0(sizeof(hrSWRunPerfEntry_t) + sizeof(gpointer));
+    return hrSWRunPerfEntry;
 }
 
 static int
@@ -1367,7 +1565,7 @@ assign_hrSWRunPerfEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 5, 1, 1};
 
-    hrSWRunPerfEntry = (hrSWRunPerfEntry_t *) g_malloc0(sizeof(hrSWRunPerfEntry_t) + sizeof(GSList *));
+    hrSWRunPerfEntry = host_resources_mib_new_hrSWRunPerfEntry();
     if (! hrSWRunPerfEntry) {
         return NULL;
     }
@@ -1403,7 +1601,7 @@ assign_hrSWRunPerfEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrSWRunPerfEntry(host_snmp *s, hrSWRunPerfEntry_t ***hrSWRunPerfEntry)
+host_resources_mib_get_hrSWRunPerfTable(host_snmp *s, hrSWRunPerfEntry_t ***hrSWRunPerfEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1434,21 +1632,39 @@ host_resources_mib_get_hrSWRunPerfEntry(host_snmp *s, hrSWRunPerfEntry_t ***hrSW
 }
 
 void
-host_resources_mib_free_hrSWRunPerfEntry(hrSWRunPerfEntry_t **hrSWRunPerfEntry)
+host_resources_mib_free_hrSWRunPerfEntry(hrSWRunPerfEntry_t *hrSWRunPerfEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (hrSWRunPerfEntry) {
+        p = (char *) hrSWRunPerfEntry + sizeof(hrSWRunPerfEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(hrSWRunPerfEntry);
+    }
+}
+
+void
+host_resources_mib_free_hrSWRunPerfTable(hrSWRunPerfEntry_t **hrSWRunPerfEntry)
+{
     int i;
 
     if (hrSWRunPerfEntry) {
         for (i = 0; hrSWRunPerfEntry[i]; i++) {
-            p = (char *) hrSWRunPerfEntry[i] + sizeof(hrSWRunPerfEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(hrSWRunPerfEntry[i]);
+            host_resources_mib_free_hrSWRunPerfEntry(hrSWRunPerfEntry[i]);
         }
         g_free(hrSWRunPerfEntry);
     }
+}
+
+hrSWInstalled_t *
+host_resources_mib_new_hrSWInstalled()
+{
+    hrSWInstalled_t *hrSWInstalled;
+
+    hrSWInstalled = (hrSWInstalled_t *) g_malloc0(sizeof(hrSWInstalled_t) + sizeof(gpointer));
+    return hrSWInstalled;
 }
 
 static hrSWInstalled_t *
@@ -1459,7 +1675,7 @@ assign_hrSWInstalled(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 6};
 
-    hrSWInstalled = (hrSWInstalled_t *) g_malloc0(sizeof(hrSWInstalled_t) + sizeof(GSList *));
+    hrSWInstalled = host_resources_mib_new_hrSWInstalled();
     if (! hrSWInstalled) {
         return NULL;
     }
@@ -1524,6 +1740,15 @@ host_resources_mib_free_hrSWInstalled(hrSWInstalled_t *hrSWInstalled)
     }
 }
 
+hrSWInstalledEntry_t *
+host_resources_mib_new_hrSWInstalledEntry()
+{
+    hrSWInstalledEntry_t *hrSWInstalledEntry;
+
+    hrSWInstalledEntry = (hrSWInstalledEntry_t *) g_malloc0(sizeof(hrSWInstalledEntry_t) + sizeof(gpointer));
+    return hrSWInstalledEntry;
+}
+
 static int
 unpack_hrSWInstalledEntry(GSnmpVarBind *vb, hrSWInstalledEntry_t *hrSWInstalledEntry)
 {
@@ -1543,7 +1768,7 @@ assign_hrSWInstalledEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1};
 
-    hrSWInstalledEntry = (hrSWInstalledEntry_t *) g_malloc0(sizeof(hrSWInstalledEntry_t) + sizeof(GSList *));
+    hrSWInstalledEntry = host_resources_mib_new_hrSWInstalledEntry();
     if (! hrSWInstalledEntry) {
         return NULL;
     }
@@ -1588,7 +1813,7 @@ assign_hrSWInstalledEntry(GSList *vbl)
 }
 
 int
-host_resources_mib_get_hrSWInstalledEntry(host_snmp *s, hrSWInstalledEntry_t ***hrSWInstalledEntry)
+host_resources_mib_get_hrSWInstalledTable(host_snmp *s, hrSWInstalledEntry_t ***hrSWInstalledEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1621,18 +1846,27 @@ host_resources_mib_get_hrSWInstalledEntry(host_snmp *s, hrSWInstalledEntry_t ***
 }
 
 void
-host_resources_mib_free_hrSWInstalledEntry(hrSWInstalledEntry_t **hrSWInstalledEntry)
+host_resources_mib_free_hrSWInstalledEntry(hrSWInstalledEntry_t *hrSWInstalledEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (hrSWInstalledEntry) {
+        p = (char *) hrSWInstalledEntry + sizeof(hrSWInstalledEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(hrSWInstalledEntry);
+    }
+}
+
+void
+host_resources_mib_free_hrSWInstalledTable(hrSWInstalledEntry_t **hrSWInstalledEntry)
+{
     int i;
 
     if (hrSWInstalledEntry) {
         for (i = 0; hrSWInstalledEntry[i]; i++) {
-            p = (char *) hrSWInstalledEntry[i] + sizeof(hrSWInstalledEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(hrSWInstalledEntry[i]);
+            host_resources_mib_free_hrSWInstalledEntry(hrSWInstalledEntry[i]);
         }
         g_free(hrSWInstalledEntry);
     }

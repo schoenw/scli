@@ -55,22 +55,22 @@ show_tcp_connection(GString *s, tcpConnEntry_t *tcpConnEntry)
 static int
 cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 {
-    tcpConnEntry_t **tcpConnEntry = NULL;
+    tcpConnEntry_t **tcpConnTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (tcp_mib_get_tcpConnEntry(interp->peer, &tcpConnEntry)) {
+    if (tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable)) {
 	return SCLI_ERROR;
     }
 
-    if (tcpConnEntry) {
+    if (tcpConnTable) {
 	g_string_sprintfa(interp->result, "%-32s%-32s%s\n",
 			  "Local Address", "Remote Address", "State");
-	for (i = 0; tcpConnEntry[i]; i++) {
-	    show_tcp_connection(interp->result, tcpConnEntry[i]);
+	for (i = 0; tcpConnTable[i]; i++) {
+	    show_tcp_connection(interp->result, tcpConnTable[i]);
 	}
-	tcp_mib_free_tcpConnEntry(tcpConnEntry);
+	tcp_mib_free_tcpConnTable(tcpConnTable);
     }
     return SCLI_OK;
 }

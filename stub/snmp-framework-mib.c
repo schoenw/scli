@@ -9,6 +9,15 @@
 
 #include "snmp-framework-mib.h"
 
+snmpEngine_t *
+snmp_framework_mib_new_snmpEngine()
+{
+    snmpEngine_t *snmpEngine;
+
+    snmpEngine = (snmpEngine_t *) g_malloc0(sizeof(snmpEngine_t) + sizeof(gpointer));
+    return snmpEngine;
+}
+
 static snmpEngine_t *
 assign_snmpEngine(GSList *vbl)
 {
@@ -17,7 +26,7 @@ assign_snmpEngine(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 10, 2, 1};
 
-    snmpEngine = (snmpEngine_t *) g_malloc0(sizeof(snmpEngine_t) + sizeof(GSList *));
+    snmpEngine = snmp_framework_mib_new_snmpEngine();
     if (! snmpEngine) {
         return NULL;
     }

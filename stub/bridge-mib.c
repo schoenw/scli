@@ -59,6 +59,15 @@ stls_table_t bridge_mib_enums_dot1dStaticStatus[] = {
 };
 
 
+dot1dBase_t *
+bridge_mib_new_dot1dBase()
+{
+    dot1dBase_t *dot1dBase;
+
+    dot1dBase = (dot1dBase_t *) g_malloc0(sizeof(dot1dBase_t) + sizeof(gpointer));
+    return dot1dBase;
+}
+
 static dot1dBase_t *
 assign_dot1dBase(GSList *vbl)
 {
@@ -67,7 +76,7 @@ assign_dot1dBase(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 1};
 
-    dot1dBase = (dot1dBase_t *) g_malloc0(sizeof(dot1dBase_t) + sizeof(GSList *));
+    dot1dBase = bridge_mib_new_dot1dBase();
     if (! dot1dBase) {
         return NULL;
     }
@@ -136,6 +145,15 @@ bridge_mib_free_dot1dBase(dot1dBase_t *dot1dBase)
     }
 }
 
+dot1dBasePortEntry_t *
+bridge_mib_new_dot1dBasePortEntry()
+{
+    dot1dBasePortEntry_t *dot1dBasePortEntry;
+
+    dot1dBasePortEntry = (dot1dBasePortEntry_t *) g_malloc0(sizeof(dot1dBasePortEntry_t) + sizeof(gpointer));
+    return dot1dBasePortEntry;
+}
+
 static int
 unpack_dot1dBasePortEntry(GSnmpVarBind *vb, dot1dBasePortEntry_t *dot1dBasePortEntry)
 {
@@ -155,7 +173,7 @@ assign_dot1dBasePortEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 1, 4, 1};
 
-    dot1dBasePortEntry = (dot1dBasePortEntry_t *) g_malloc0(sizeof(dot1dBasePortEntry_t) + sizeof(GSList *));
+    dot1dBasePortEntry = bridge_mib_new_dot1dBasePortEntry();
     if (! dot1dBasePortEntry) {
         return NULL;
     }
@@ -198,7 +216,7 @@ assign_dot1dBasePortEntry(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dBasePortEntry(host_snmp *s, dot1dBasePortEntry_t ***dot1dBasePortEntry)
+bridge_mib_get_dot1dBasePortTable(host_snmp *s, dot1dBasePortEntry_t ***dot1dBasePortEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -231,21 +249,39 @@ bridge_mib_get_dot1dBasePortEntry(host_snmp *s, dot1dBasePortEntry_t ***dot1dBas
 }
 
 void
-bridge_mib_free_dot1dBasePortEntry(dot1dBasePortEntry_t **dot1dBasePortEntry)
+bridge_mib_free_dot1dBasePortEntry(dot1dBasePortEntry_t *dot1dBasePortEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (dot1dBasePortEntry) {
+        p = (char *) dot1dBasePortEntry + sizeof(dot1dBasePortEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(dot1dBasePortEntry);
+    }
+}
+
+void
+bridge_mib_free_dot1dBasePortTable(dot1dBasePortEntry_t **dot1dBasePortEntry)
+{
     int i;
 
     if (dot1dBasePortEntry) {
         for (i = 0; dot1dBasePortEntry[i]; i++) {
-            p = (char *) dot1dBasePortEntry[i] + sizeof(dot1dBasePortEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(dot1dBasePortEntry[i]);
+            bridge_mib_free_dot1dBasePortEntry(dot1dBasePortEntry[i]);
         }
         g_free(dot1dBasePortEntry);
     }
+}
+
+dot1dStp_t *
+bridge_mib_new_dot1dStp()
+{
+    dot1dStp_t *dot1dStp;
+
+    dot1dStp = (dot1dStp_t *) g_malloc0(sizeof(dot1dStp_t) + sizeof(gpointer));
+    return dot1dStp;
 }
 
 static dot1dStp_t *
@@ -256,7 +292,7 @@ assign_dot1dStp(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 2};
 
-    dot1dStp = (dot1dStp_t *) g_malloc0(sizeof(dot1dStp_t) + sizeof(GSList *));
+    dot1dStp = bridge_mib_new_dot1dStp();
     if (! dot1dStp) {
         return NULL;
     }
@@ -369,6 +405,15 @@ bridge_mib_free_dot1dStp(dot1dStp_t *dot1dStp)
     }
 }
 
+dot1dStpPortEntry_t *
+bridge_mib_new_dot1dStpPortEntry()
+{
+    dot1dStpPortEntry_t *dot1dStpPortEntry;
+
+    dot1dStpPortEntry = (dot1dStpPortEntry_t *) g_malloc0(sizeof(dot1dStpPortEntry_t) + sizeof(gpointer));
+    return dot1dStpPortEntry;
+}
+
 static int
 unpack_dot1dStpPortEntry(GSnmpVarBind *vb, dot1dStpPortEntry_t *dot1dStpPortEntry)
 {
@@ -388,7 +433,7 @@ assign_dot1dStpPortEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 2, 15, 1};
 
-    dot1dStpPortEntry = (dot1dStpPortEntry_t *) g_malloc0(sizeof(dot1dStpPortEntry_t) + sizeof(GSList *));
+    dot1dStpPortEntry = bridge_mib_new_dot1dStpPortEntry();
     if (! dot1dStpPortEntry) {
         return NULL;
     }
@@ -445,7 +490,7 @@ assign_dot1dStpPortEntry(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dStpPortEntry(host_snmp *s, dot1dStpPortEntry_t ***dot1dStpPortEntry)
+bridge_mib_get_dot1dStpPortTable(host_snmp *s, dot1dStpPortEntry_t ***dot1dStpPortEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -483,21 +528,39 @@ bridge_mib_get_dot1dStpPortEntry(host_snmp *s, dot1dStpPortEntry_t ***dot1dStpPo
 }
 
 void
-bridge_mib_free_dot1dStpPortEntry(dot1dStpPortEntry_t **dot1dStpPortEntry)
+bridge_mib_free_dot1dStpPortEntry(dot1dStpPortEntry_t *dot1dStpPortEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (dot1dStpPortEntry) {
+        p = (char *) dot1dStpPortEntry + sizeof(dot1dStpPortEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(dot1dStpPortEntry);
+    }
+}
+
+void
+bridge_mib_free_dot1dStpPortTable(dot1dStpPortEntry_t **dot1dStpPortEntry)
+{
     int i;
 
     if (dot1dStpPortEntry) {
         for (i = 0; dot1dStpPortEntry[i]; i++) {
-            p = (char *) dot1dStpPortEntry[i] + sizeof(dot1dStpPortEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(dot1dStpPortEntry[i]);
+            bridge_mib_free_dot1dStpPortEntry(dot1dStpPortEntry[i]);
         }
         g_free(dot1dStpPortEntry);
     }
+}
+
+dot1dTp_t *
+bridge_mib_new_dot1dTp()
+{
+    dot1dTp_t *dot1dTp;
+
+    dot1dTp = (dot1dTp_t *) g_malloc0(sizeof(dot1dTp_t) + sizeof(gpointer));
+    return dot1dTp;
 }
 
 static dot1dTp_t *
@@ -508,7 +571,7 @@ assign_dot1dTp(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 4};
 
-    dot1dTp = (dot1dTp_t *) g_malloc0(sizeof(dot1dTp_t) + sizeof(GSList *));
+    dot1dTp = bridge_mib_new_dot1dTp();
     if (! dot1dTp) {
         return NULL;
     }
@@ -573,6 +636,15 @@ bridge_mib_free_dot1dTp(dot1dTp_t *dot1dTp)
     }
 }
 
+dot1dTpFdbEntry_t *
+bridge_mib_new_dot1dTpFdbEntry()
+{
+    dot1dTpFdbEntry_t *dot1dTpFdbEntry;
+
+    dot1dTpFdbEntry = (dot1dTpFdbEntry_t *) g_malloc0(sizeof(dot1dTpFdbEntry_t) + sizeof(gpointer));
+    return dot1dTpFdbEntry;
+}
+
 static int
 unpack_dot1dTpFdbEntry(GSnmpVarBind *vb, dot1dTpFdbEntry_t *dot1dTpFdbEntry)
 {
@@ -595,7 +667,7 @@ assign_dot1dTpFdbEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 4, 3, 1};
 
-    dot1dTpFdbEntry = (dot1dTpFdbEntry_t *) g_malloc0(sizeof(dot1dTpFdbEntry_t) + sizeof(GSList *));
+    dot1dTpFdbEntry = bridge_mib_new_dot1dTpFdbEntry();
     if (! dot1dTpFdbEntry) {
         return NULL;
     }
@@ -631,7 +703,7 @@ assign_dot1dTpFdbEntry(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dTpFdbEntry(host_snmp *s, dot1dTpFdbEntry_t ***dot1dTpFdbEntry)
+bridge_mib_get_dot1dTpFdbTable(host_snmp *s, dot1dTpFdbEntry_t ***dot1dTpFdbEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -662,21 +734,39 @@ bridge_mib_get_dot1dTpFdbEntry(host_snmp *s, dot1dTpFdbEntry_t ***dot1dTpFdbEntr
 }
 
 void
-bridge_mib_free_dot1dTpFdbEntry(dot1dTpFdbEntry_t **dot1dTpFdbEntry)
+bridge_mib_free_dot1dTpFdbEntry(dot1dTpFdbEntry_t *dot1dTpFdbEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (dot1dTpFdbEntry) {
+        p = (char *) dot1dTpFdbEntry + sizeof(dot1dTpFdbEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(dot1dTpFdbEntry);
+    }
+}
+
+void
+bridge_mib_free_dot1dTpFdbTable(dot1dTpFdbEntry_t **dot1dTpFdbEntry)
+{
     int i;
 
     if (dot1dTpFdbEntry) {
         for (i = 0; dot1dTpFdbEntry[i]; i++) {
-            p = (char *) dot1dTpFdbEntry[i] + sizeof(dot1dTpFdbEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(dot1dTpFdbEntry[i]);
+            bridge_mib_free_dot1dTpFdbEntry(dot1dTpFdbEntry[i]);
         }
         g_free(dot1dTpFdbEntry);
     }
+}
+
+dot1dTpPortEntry_t *
+bridge_mib_new_dot1dTpPortEntry()
+{
+    dot1dTpPortEntry_t *dot1dTpPortEntry;
+
+    dot1dTpPortEntry = (dot1dTpPortEntry_t *) g_malloc0(sizeof(dot1dTpPortEntry_t) + sizeof(gpointer));
+    return dot1dTpPortEntry;
 }
 
 static int
@@ -698,7 +788,7 @@ assign_dot1dTpPortEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 4, 4, 1};
 
-    dot1dTpPortEntry = (dot1dTpPortEntry_t *) g_malloc0(sizeof(dot1dTpPortEntry_t) + sizeof(GSList *));
+    dot1dTpPortEntry = bridge_mib_new_dot1dTpPortEntry();
     if (! dot1dTpPortEntry) {
         return NULL;
     }
@@ -740,7 +830,7 @@ assign_dot1dTpPortEntry(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dTpPortEntry(host_snmp *s, dot1dTpPortEntry_t ***dot1dTpPortEntry)
+bridge_mib_get_dot1dTpPortTable(host_snmp *s, dot1dTpPortEntry_t ***dot1dTpPortEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -773,21 +863,39 @@ bridge_mib_get_dot1dTpPortEntry(host_snmp *s, dot1dTpPortEntry_t ***dot1dTpPortE
 }
 
 void
-bridge_mib_free_dot1dTpPortEntry(dot1dTpPortEntry_t **dot1dTpPortEntry)
+bridge_mib_free_dot1dTpPortEntry(dot1dTpPortEntry_t *dot1dTpPortEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (dot1dTpPortEntry) {
+        p = (char *) dot1dTpPortEntry + sizeof(dot1dTpPortEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(dot1dTpPortEntry);
+    }
+}
+
+void
+bridge_mib_free_dot1dTpPortTable(dot1dTpPortEntry_t **dot1dTpPortEntry)
+{
     int i;
 
     if (dot1dTpPortEntry) {
         for (i = 0; dot1dTpPortEntry[i]; i++) {
-            p = (char *) dot1dTpPortEntry[i] + sizeof(dot1dTpPortEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(dot1dTpPortEntry[i]);
+            bridge_mib_free_dot1dTpPortEntry(dot1dTpPortEntry[i]);
         }
         g_free(dot1dTpPortEntry);
     }
+}
+
+dot1dStaticEntry_t *
+bridge_mib_new_dot1dStaticEntry()
+{
+    dot1dStaticEntry_t *dot1dStaticEntry;
+
+    dot1dStaticEntry = (dot1dStaticEntry_t *) g_malloc0(sizeof(dot1dStaticEntry_t) + sizeof(gpointer));
+    return dot1dStaticEntry;
 }
 
 static int
@@ -814,7 +922,7 @@ assign_dot1dStaticEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 5, 1, 1};
 
-    dot1dStaticEntry = (dot1dStaticEntry_t *) g_malloc0(sizeof(dot1dStaticEntry_t) + sizeof(GSList *));
+    dot1dStaticEntry = bridge_mib_new_dot1dStaticEntry();
     if (! dot1dStaticEntry) {
         return NULL;
     }
@@ -851,7 +959,7 @@ assign_dot1dStaticEntry(GSList *vbl)
 }
 
 int
-bridge_mib_get_dot1dStaticEntry(host_snmp *s, dot1dStaticEntry_t ***dot1dStaticEntry)
+bridge_mib_get_dot1dStaticTable(host_snmp *s, dot1dStaticEntry_t ***dot1dStaticEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -882,18 +990,27 @@ bridge_mib_get_dot1dStaticEntry(host_snmp *s, dot1dStaticEntry_t ***dot1dStaticE
 }
 
 void
-bridge_mib_free_dot1dStaticEntry(dot1dStaticEntry_t **dot1dStaticEntry)
+bridge_mib_free_dot1dStaticEntry(dot1dStaticEntry_t *dot1dStaticEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (dot1dStaticEntry) {
+        p = (char *) dot1dStaticEntry + sizeof(dot1dStaticEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(dot1dStaticEntry);
+    }
+}
+
+void
+bridge_mib_free_dot1dStaticTable(dot1dStaticEntry_t **dot1dStaticEntry)
+{
     int i;
 
     if (dot1dStaticEntry) {
         for (i = 0; dot1dStaticEntry[i]; i++) {
-            p = (char *) dot1dStaticEntry[i] + sizeof(dot1dStaticEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(dot1dStaticEntry[i]);
+            bridge_mib_free_dot1dStaticEntry(dot1dStaticEntry[i]);
         }
         g_free(dot1dStaticEntry);
     }

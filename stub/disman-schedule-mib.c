@@ -73,6 +73,15 @@ stls_table_t disman_schedule_mib_enums_schedRowStatus[] = {
 };
 
 
+schedObjects_t *
+disman_schedule_mib_new_schedObjects()
+{
+    schedObjects_t *schedObjects;
+
+    schedObjects = (schedObjects_t *) g_malloc0(sizeof(schedObjects_t) + sizeof(gpointer));
+    return schedObjects;
+}
+
 static schedObjects_t *
 assign_schedObjects(GSList *vbl)
 {
@@ -81,7 +90,7 @@ assign_schedObjects(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 63, 1};
 
-    schedObjects = (schedObjects_t *) g_malloc0(sizeof(schedObjects_t) + sizeof(GSList *));
+    schedObjects = disman_schedule_mib_new_schedObjects();
     if (! schedObjects) {
         return NULL;
     }
@@ -142,6 +151,15 @@ disman_schedule_mib_free_schedObjects(schedObjects_t *schedObjects)
     }
 }
 
+schedEntry_t *
+disman_schedule_mib_new_schedEntry()
+{
+    schedEntry_t *schedEntry;
+
+    schedEntry = (schedEntry_t *) g_malloc0(sizeof(schedEntry_t) + sizeof(gpointer));
+    return schedEntry;
+}
+
 static int
 unpack_schedEntry(GSnmpVarBind *vb, schedEntry_t *schedEntry)
 {
@@ -173,7 +191,7 @@ assign_schedEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1};
 
-    schedEntry = (schedEntry_t *) g_malloc0(sizeof(schedEntry_t) + sizeof(GSList *));
+    schedEntry = disman_schedule_mib_new_schedEntry();
     if (! schedEntry) {
         return NULL;
     }
@@ -266,7 +284,7 @@ assign_schedEntry(GSList *vbl)
 }
 
 int
-disman_schedule_mib_get_schedEntry(host_snmp *s, schedEntry_t ***schedEntry)
+disman_schedule_mib_get_schedTable(host_snmp *s, schedEntry_t ***schedEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -313,18 +331,27 @@ disman_schedule_mib_get_schedEntry(host_snmp *s, schedEntry_t ***schedEntry)
 }
 
 void
-disman_schedule_mib_free_schedEntry(schedEntry_t **schedEntry)
+disman_schedule_mib_free_schedEntry(schedEntry_t *schedEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (schedEntry) {
+        p = (char *) schedEntry + sizeof(schedEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(schedEntry);
+    }
+}
+
+void
+disman_schedule_mib_free_schedTable(schedEntry_t **schedEntry)
+{
     int i;
 
     if (schedEntry) {
         for (i = 0; schedEntry[i]; i++) {
-            p = (char *) schedEntry[i] + sizeof(schedEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(schedEntry[i]);
+            disman_schedule_mib_free_schedEntry(schedEntry[i]);
         }
         g_free(schedEntry);
     }

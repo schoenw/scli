@@ -24,6 +24,15 @@ stls_table_t ip_mib_enums_ipNetToMediaType[] = {
 };
 
 
+ip_t *
+ip_mib_new_ip()
+{
+    ip_t *ip;
+
+    ip = (ip_t *) g_malloc0(sizeof(ip_t) + sizeof(gpointer));
+    return ip;
+}
+
 static ip_t *
 assign_ip(GSList *vbl)
 {
@@ -32,7 +41,7 @@ assign_ip(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4};
 
-    ip = (ip_t *) g_malloc0(sizeof(ip_t) + sizeof(GSList *));
+    ip = ip_mib_new_ip();
     if (! ip) {
         return NULL;
     }
@@ -169,6 +178,15 @@ ip_mib_free_ip(ip_t *ip)
     }
 }
 
+ipAddrEntry_t *
+ip_mib_new_ipAddrEntry()
+{
+    ipAddrEntry_t *ipAddrEntry;
+
+    ipAddrEntry = (ipAddrEntry_t *) g_malloc0(sizeof(ipAddrEntry_t) + sizeof(gpointer));
+    return ipAddrEntry;
+}
+
 static int
 unpack_ipAddrEntry(GSnmpVarBind *vb, ipAddrEntry_t *ipAddrEntry)
 {
@@ -191,7 +209,7 @@ assign_ipAddrEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4, 20, 1};
 
-    ipAddrEntry = (ipAddrEntry_t *) g_malloc0(sizeof(ipAddrEntry_t) + sizeof(GSList *));
+    ipAddrEntry = ip_mib_new_ipAddrEntry();
     if (! ipAddrEntry) {
         return NULL;
     }
@@ -233,7 +251,7 @@ assign_ipAddrEntry(GSList *vbl)
 }
 
 int
-ip_mib_get_ipAddrEntry(host_snmp *s, ipAddrEntry_t ***ipAddrEntry)
+ip_mib_get_ipAddrTable(host_snmp *s, ipAddrEntry_t ***ipAddrEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -266,21 +284,39 @@ ip_mib_get_ipAddrEntry(host_snmp *s, ipAddrEntry_t ***ipAddrEntry)
 }
 
 void
-ip_mib_free_ipAddrEntry(ipAddrEntry_t **ipAddrEntry)
+ip_mib_free_ipAddrEntry(ipAddrEntry_t *ipAddrEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (ipAddrEntry) {
+        p = (char *) ipAddrEntry + sizeof(ipAddrEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(ipAddrEntry);
+    }
+}
+
+void
+ip_mib_free_ipAddrTable(ipAddrEntry_t **ipAddrEntry)
+{
     int i;
 
     if (ipAddrEntry) {
         for (i = 0; ipAddrEntry[i]; i++) {
-            p = (char *) ipAddrEntry[i] + sizeof(ipAddrEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(ipAddrEntry[i]);
+            ip_mib_free_ipAddrEntry(ipAddrEntry[i]);
         }
         g_free(ipAddrEntry);
     }
+}
+
+ipNetToMediaEntry_t *
+ip_mib_new_ipNetToMediaEntry()
+{
+    ipNetToMediaEntry_t *ipNetToMediaEntry;
+
+    ipNetToMediaEntry = (ipNetToMediaEntry_t *) g_malloc0(sizeof(ipNetToMediaEntry_t) + sizeof(gpointer));
+    return ipNetToMediaEntry;
 }
 
 static int
@@ -307,7 +343,7 @@ assign_ipNetToMediaEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4, 22, 1};
 
-    ipNetToMediaEntry = (ipNetToMediaEntry_t *) g_malloc0(sizeof(ipNetToMediaEntry_t) + sizeof(GSList *));
+    ipNetToMediaEntry = ip_mib_new_ipNetToMediaEntry();
     if (! ipNetToMediaEntry) {
         return NULL;
     }
@@ -344,7 +380,7 @@ assign_ipNetToMediaEntry(GSList *vbl)
 }
 
 int
-ip_mib_get_ipNetToMediaEntry(host_snmp *s, ipNetToMediaEntry_t ***ipNetToMediaEntry)
+ip_mib_get_ipNetToMediaTable(host_snmp *s, ipNetToMediaEntry_t ***ipNetToMediaEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -375,21 +411,39 @@ ip_mib_get_ipNetToMediaEntry(host_snmp *s, ipNetToMediaEntry_t ***ipNetToMediaEn
 }
 
 void
-ip_mib_free_ipNetToMediaEntry(ipNetToMediaEntry_t **ipNetToMediaEntry)
+ip_mib_free_ipNetToMediaEntry(ipNetToMediaEntry_t *ipNetToMediaEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (ipNetToMediaEntry) {
+        p = (char *) ipNetToMediaEntry + sizeof(ipNetToMediaEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(ipNetToMediaEntry);
+    }
+}
+
+void
+ip_mib_free_ipNetToMediaTable(ipNetToMediaEntry_t **ipNetToMediaEntry)
+{
     int i;
 
     if (ipNetToMediaEntry) {
         for (i = 0; ipNetToMediaEntry[i]; i++) {
-            p = (char *) ipNetToMediaEntry[i] + sizeof(ipNetToMediaEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(ipNetToMediaEntry[i]);
+            ip_mib_free_ipNetToMediaEntry(ipNetToMediaEntry[i]);
         }
         g_free(ipNetToMediaEntry);
     }
+}
+
+icmp_t *
+ip_mib_new_icmp()
+{
+    icmp_t *icmp;
+
+    icmp = (icmp_t *) g_malloc0(sizeof(icmp_t) + sizeof(gpointer));
+    return icmp;
 }
 
 static icmp_t *
@@ -400,7 +454,7 @@ assign_icmp(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 5};
 
-    icmp = (icmp_t *) g_malloc0(sizeof(icmp_t) + sizeof(GSList *));
+    icmp = ip_mib_new_icmp();
     if (! icmp) {
         return NULL;
     }

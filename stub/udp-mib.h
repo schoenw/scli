@@ -23,6 +23,9 @@ typedef struct udp {
     guint32  *udpOutDatagrams;
 } udp_t;
 
+extern udp_t *
+udp_mib_new_udp();
+
 extern int
 udp_mib_get_udp(host_snmp *s, udp_t **udp);
 
@@ -39,10 +42,19 @@ typedef struct udpEntry {
 } udpEntry_t;
 
 extern int
-udp_mib_get_udpEntry(host_snmp *s, udpEntry_t ***udpEntry);
+udp_mib_get_udpTable(host_snmp *s, udpEntry_t ***udpEntry);
 
 extern void
-udp_mib_free_udpEntry(udpEntry_t **udpEntry);
+udp_mib_free_udpTable(udpEntry_t **udpEntry);
+
+extern udpEntry_t *
+udp_mib_new_udpEntry();
+
+extern int
+udp_mib_get_udpEntry(host_snmp *s, udpEntry_t **udpEntry);
+
+extern void
+udp_mib_free_udpEntry(udpEntry_t *udpEntry);
 
 
 #endif /* _UDP_MIB_H_ */

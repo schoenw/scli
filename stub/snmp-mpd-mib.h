@@ -22,6 +22,9 @@ typedef struct snmpMPDStats {
     guint32  *snmpUnknownPDUHandlers;
 } snmpMPDStats_t;
 
+extern snmpMPDStats_t *
+snmp_mpd_mib_new_snmpMPDStats();
+
 extern int
 snmp_mpd_mib_get_snmpMPDStats(host_snmp *s, snmpMPDStats_t **snmpMPDStats);
 

@@ -9,6 +9,15 @@
 
 #include "udp-mib.h"
 
+udp_t *
+udp_mib_new_udp()
+{
+    udp_t *udp;
+
+    udp = (udp_t *) g_malloc0(sizeof(udp_t) + sizeof(gpointer));
+    return udp;
+}
+
 static udp_t *
 assign_udp(GSList *vbl)
 {
@@ -17,7 +26,7 @@ assign_udp(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 7};
 
-    udp = (udp_t *) g_malloc0(sizeof(udp_t) + sizeof(GSList *));
+    udp = udp_mib_new_udp();
     if (! udp) {
         return NULL;
     }
@@ -90,6 +99,15 @@ udp_mib_free_udp(udp_t *udp)
     }
 }
 
+udpEntry_t *
+udp_mib_new_udpEntry()
+{
+    udpEntry_t *udpEntry;
+
+    udpEntry = (udpEntry_t *) g_malloc0(sizeof(udpEntry_t) + sizeof(gpointer));
+    return udpEntry;
+}
+
 static int
 unpack_udpEntry(GSnmpVarBind *vb, udpEntry_t *udpEntry)
 {
@@ -114,7 +132,7 @@ assign_udpEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 7, 5, 1};
 
-    udpEntry = (udpEntry_t *) g_malloc0(sizeof(udpEntry_t) + sizeof(GSList *));
+    udpEntry = udp_mib_new_udpEntry();
     if (! udpEntry) {
         return NULL;
     }
@@ -144,7 +162,7 @@ assign_udpEntry(GSList *vbl)
 }
 
 int
-udp_mib_get_udpEntry(host_snmp *s, udpEntry_t ***udpEntry)
+udp_mib_get_udpTable(host_snmp *s, udpEntry_t ***udpEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -173,18 +191,27 @@ udp_mib_get_udpEntry(host_snmp *s, udpEntry_t ***udpEntry)
 }
 
 void
-udp_mib_free_udpEntry(udpEntry_t **udpEntry)
+udp_mib_free_udpEntry(udpEntry_t *udpEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (udpEntry) {
+        p = (char *) udpEntry + sizeof(udpEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(udpEntry);
+    }
+}
+
+void
+udp_mib_free_udpTable(udpEntry_t **udpEntry)
+{
     int i;
 
     if (udpEntry) {
         for (i = 0; udpEntry[i]; i++) {
-            p = (char *) udpEntry[i] + sizeof(udpEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(udpEntry[i]);
+            udp_mib_free_udpEntry(udpEntry[i]);
         }
         g_free(udpEntry);
     }

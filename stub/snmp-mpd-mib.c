@@ -9,6 +9,15 @@
 
 #include "snmp-mpd-mib.h"
 
+snmpMPDStats_t *
+snmp_mpd_mib_new_snmpMPDStats()
+{
+    snmpMPDStats_t *snmpMPDStats;
+
+    snmpMPDStats = (snmpMPDStats_t *) g_malloc0(sizeof(snmpMPDStats_t) + sizeof(gpointer));
+    return snmpMPDStats;
+}
+
 static snmpMPDStats_t *
 assign_snmpMPDStats(GSList *vbl)
 {
@@ -17,7 +26,7 @@ assign_snmpMPDStats(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 11, 2, 1};
 
-    snmpMPDStats = (snmpMPDStats_t *) g_malloc0(sizeof(snmpMPDStats_t) + sizeof(GSList *));
+    snmpMPDStats = snmp_mpd_mib_new_snmpMPDStats();
     if (! snmpMPDStats) {
         return NULL;
     }

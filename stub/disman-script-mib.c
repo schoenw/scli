@@ -135,6 +135,15 @@ stls_table_t disman_script_mib_enums_smRunState[] = {
 };
 
 
+smLangEntry_t *
+disman_script_mib_new_smLangEntry()
+{
+    smLangEntry_t *smLangEntry;
+
+    smLangEntry = (smLangEntry_t *) g_malloc0(sizeof(smLangEntry_t) + sizeof(gpointer));
+    return smLangEntry;
+}
+
 static int
 unpack_smLangEntry(GSnmpVarBind *vb, smLangEntry_t *smLangEntry)
 {
@@ -154,7 +163,7 @@ assign_smLangEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1};
 
-    smLangEntry = (smLangEntry_t *) g_malloc0(sizeof(smLangEntry_t) + sizeof(GSList *));
+    smLangEntry = disman_script_mib_new_smLangEntry();
     if (! smLangEntry) {
         return NULL;
     }
@@ -204,7 +213,7 @@ assign_smLangEntry(GSList *vbl)
 }
 
 int
-disman_script_mib_get_smLangEntry(host_snmp *s, smLangEntry_t ***smLangEntry)
+disman_script_mib_get_smLangTable(host_snmp *s, smLangEntry_t ***smLangEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -238,21 +247,39 @@ disman_script_mib_get_smLangEntry(host_snmp *s, smLangEntry_t ***smLangEntry)
 }
 
 void
-disman_script_mib_free_smLangEntry(smLangEntry_t **smLangEntry)
+disman_script_mib_free_smLangEntry(smLangEntry_t *smLangEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (smLangEntry) {
+        p = (char *) smLangEntry + sizeof(smLangEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(smLangEntry);
+    }
+}
+
+void
+disman_script_mib_free_smLangTable(smLangEntry_t **smLangEntry)
+{
     int i;
 
     if (smLangEntry) {
         for (i = 0; smLangEntry[i]; i++) {
-            p = (char *) smLangEntry[i] + sizeof(smLangEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(smLangEntry[i]);
+            disman_script_mib_free_smLangEntry(smLangEntry[i]);
         }
         g_free(smLangEntry);
     }
+}
+
+smExtsnEntry_t *
+disman_script_mib_new_smExtsnEntry()
+{
+    smExtsnEntry_t *smExtsnEntry;
+
+    smExtsnEntry = (smExtsnEntry_t *) g_malloc0(sizeof(smExtsnEntry_t) + sizeof(gpointer));
+    return smExtsnEntry;
 }
 
 static int
@@ -276,7 +303,7 @@ assign_smExtsnEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1};
 
-    smExtsnEntry = (smExtsnEntry_t *) g_malloc0(sizeof(smExtsnEntry_t) + sizeof(GSList *));
+    smExtsnEntry = disman_script_mib_new_smExtsnEntry();
     if (! smExtsnEntry) {
         return NULL;
     }
@@ -326,7 +353,7 @@ assign_smExtsnEntry(GSList *vbl)
 }
 
 int
-disman_script_mib_get_smExtsnEntry(host_snmp *s, smExtsnEntry_t ***smExtsnEntry)
+disman_script_mib_get_smExtsnTable(host_snmp *s, smExtsnEntry_t ***smExtsnEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -360,21 +387,39 @@ disman_script_mib_get_smExtsnEntry(host_snmp *s, smExtsnEntry_t ***smExtsnEntry)
 }
 
 void
-disman_script_mib_free_smExtsnEntry(smExtsnEntry_t **smExtsnEntry)
+disman_script_mib_free_smExtsnEntry(smExtsnEntry_t *smExtsnEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (smExtsnEntry) {
+        p = (char *) smExtsnEntry + sizeof(smExtsnEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(smExtsnEntry);
+    }
+}
+
+void
+disman_script_mib_free_smExtsnTable(smExtsnEntry_t **smExtsnEntry)
+{
     int i;
 
     if (smExtsnEntry) {
         for (i = 0; smExtsnEntry[i]; i++) {
-            p = (char *) smExtsnEntry[i] + sizeof(smExtsnEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(smExtsnEntry[i]);
+            disman_script_mib_free_smExtsnEntry(smExtsnEntry[i]);
         }
         g_free(smExtsnEntry);
     }
+}
+
+smScriptEntry_t *
+disman_script_mib_new_smScriptEntry()
+{
+    smScriptEntry_t *smScriptEntry;
+
+    smScriptEntry = (smScriptEntry_t *) g_malloc0(sizeof(smScriptEntry_t) + sizeof(gpointer));
+    return smScriptEntry;
 }
 
 static int
@@ -408,7 +453,7 @@ assign_smScriptEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1};
 
-    smScriptEntry = (smScriptEntry_t *) g_malloc0(sizeof(smScriptEntry_t) + sizeof(GSList *));
+    smScriptEntry = disman_script_mib_new_smScriptEntry();
     if (! smScriptEntry) {
         return NULL;
     }
@@ -461,7 +506,7 @@ assign_smScriptEntry(GSList *vbl)
 }
 
 int
-disman_script_mib_get_smScriptEntry(host_snmp *s, smScriptEntry_t ***smScriptEntry)
+disman_script_mib_get_smScriptTable(host_snmp *s, smScriptEntry_t ***smScriptEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -497,21 +542,39 @@ disman_script_mib_get_smScriptEntry(host_snmp *s, smScriptEntry_t ***smScriptEnt
 }
 
 void
-disman_script_mib_free_smScriptEntry(smScriptEntry_t **smScriptEntry)
+disman_script_mib_free_smScriptEntry(smScriptEntry_t *smScriptEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (smScriptEntry) {
+        p = (char *) smScriptEntry + sizeof(smScriptEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(smScriptEntry);
+    }
+}
+
+void
+disman_script_mib_free_smScriptTable(smScriptEntry_t **smScriptEntry)
+{
     int i;
 
     if (smScriptEntry) {
         for (i = 0; smScriptEntry[i]; i++) {
-            p = (char *) smScriptEntry[i] + sizeof(smScriptEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(smScriptEntry[i]);
+            disman_script_mib_free_smScriptEntry(smScriptEntry[i]);
         }
         g_free(smScriptEntry);
     }
+}
+
+smCodeEntry_t *
+disman_script_mib_new_smCodeEntry()
+{
+    smCodeEntry_t *smCodeEntry;
+
+    smCodeEntry = (smCodeEntry_t *) g_malloc0(sizeof(smCodeEntry_t) + sizeof(gpointer));
+    return smCodeEntry;
 }
 
 static int
@@ -547,7 +610,7 @@ assign_smCodeEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 2, 1};
 
-    smCodeEntry = (smCodeEntry_t *) g_malloc0(sizeof(smCodeEntry_t) + sizeof(GSList *));
+    smCodeEntry = disman_script_mib_new_smCodeEntry();
     if (! smCodeEntry) {
         return NULL;
     }
@@ -584,7 +647,7 @@ assign_smCodeEntry(GSList *vbl)
 }
 
 int
-disman_script_mib_get_smCodeEntry(host_snmp *s, smCodeEntry_t ***smCodeEntry)
+disman_script_mib_get_smCodeTable(host_snmp *s, smCodeEntry_t ***smCodeEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -615,21 +678,39 @@ disman_script_mib_get_smCodeEntry(host_snmp *s, smCodeEntry_t ***smCodeEntry)
 }
 
 void
-disman_script_mib_free_smCodeEntry(smCodeEntry_t **smCodeEntry)
+disman_script_mib_free_smCodeEntry(smCodeEntry_t *smCodeEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (smCodeEntry) {
+        p = (char *) smCodeEntry + sizeof(smCodeEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(smCodeEntry);
+    }
+}
+
+void
+disman_script_mib_free_smCodeTable(smCodeEntry_t **smCodeEntry)
+{
     int i;
 
     if (smCodeEntry) {
         for (i = 0; smCodeEntry[i]; i++) {
-            p = (char *) smCodeEntry[i] + sizeof(smCodeEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(smCodeEntry[i]);
+            disman_script_mib_free_smCodeEntry(smCodeEntry[i]);
         }
         g_free(smCodeEntry);
     }
+}
+
+smLaunchEntry_t *
+disman_script_mib_new_smLaunchEntry()
+{
+    smLaunchEntry_t *smLaunchEntry;
+
+    smLaunchEntry = (smLaunchEntry_t *) g_malloc0(sizeof(smLaunchEntry_t) + sizeof(gpointer));
+    return smLaunchEntry;
 }
 
 static int
@@ -663,7 +744,7 @@ assign_smLaunchEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1};
 
-    smLaunchEntry = (smLaunchEntry_t *) g_malloc0(sizeof(smLaunchEntry_t) + sizeof(GSList *));
+    smLaunchEntry = disman_script_mib_new_smLaunchEntry();
     if (! smLaunchEntry) {
         return NULL;
     }
@@ -738,7 +819,7 @@ assign_smLaunchEntry(GSList *vbl)
 }
 
 int
-disman_script_mib_get_smLaunchEntry(host_snmp *s, smLaunchEntry_t ***smLaunchEntry)
+disman_script_mib_get_smLaunchTable(host_snmp *s, smLaunchEntry_t ***smLaunchEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -781,21 +862,39 @@ disman_script_mib_get_smLaunchEntry(host_snmp *s, smLaunchEntry_t ***smLaunchEnt
 }
 
 void
-disman_script_mib_free_smLaunchEntry(smLaunchEntry_t **smLaunchEntry)
+disman_script_mib_free_smLaunchEntry(smLaunchEntry_t *smLaunchEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (smLaunchEntry) {
+        p = (char *) smLaunchEntry + sizeof(smLaunchEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(smLaunchEntry);
+    }
+}
+
+void
+disman_script_mib_free_smLaunchTable(smLaunchEntry_t **smLaunchEntry)
+{
     int i;
 
     if (smLaunchEntry) {
         for (i = 0; smLaunchEntry[i]; i++) {
-            p = (char *) smLaunchEntry[i] + sizeof(smLaunchEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(smLaunchEntry[i]);
+            disman_script_mib_free_smLaunchEntry(smLaunchEntry[i]);
         }
         g_free(smLaunchEntry);
     }
+}
+
+smRunEntry_t *
+disman_script_mib_new_smRunEntry()
+{
+    smRunEntry_t *smRunEntry;
+
+    smRunEntry = (smRunEntry_t *) g_malloc0(sizeof(smRunEntry_t) + sizeof(gpointer));
+    return smRunEntry;
 }
 
 static int
@@ -831,7 +930,7 @@ assign_smRunEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1};
 
-    smRunEntry = (smRunEntry_t *) g_malloc0(sizeof(smRunEntry_t) + sizeof(GSList *));
+    smRunEntry = disman_script_mib_new_smRunEntry();
     if (! smRunEntry) {
         return NULL;
     }
@@ -896,7 +995,7 @@ assign_smRunEntry(GSList *vbl)
 }
 
 int
-disman_script_mib_get_smRunEntry(host_snmp *s, smRunEntry_t ***smRunEntry)
+disman_script_mib_get_smRunTable(host_snmp *s, smRunEntry_t ***smRunEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -935,18 +1034,27 @@ disman_script_mib_get_smRunEntry(host_snmp *s, smRunEntry_t ***smRunEntry)
 }
 
 void
-disman_script_mib_free_smRunEntry(smRunEntry_t **smRunEntry)
+disman_script_mib_free_smRunEntry(smRunEntry_t *smRunEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (smRunEntry) {
+        p = (char *) smRunEntry + sizeof(smRunEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(smRunEntry);
+    }
+}
+
+void
+disman_script_mib_free_smRunTable(smRunEntry_t **smRunEntry)
+{
     int i;
 
     if (smRunEntry) {
         for (i = 0; smRunEntry[i]; i++) {
-            p = (char *) smRunEntry[i] + sizeof(smRunEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(smRunEntry[i]);
+            disman_script_mib_free_smRunEntry(smRunEntry[i]);
         }
         g_free(smRunEntry);
     }

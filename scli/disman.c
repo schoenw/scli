@@ -97,28 +97,28 @@ show_langauge(GString *s, smLangEntry_t *smLangEntry,
 static int
 cmd_languages(scli_interp_t *interp, int argc, char **argv)
 {
-    smLangEntry_t **smLangEntry = NULL;
-    smExtsnEntry_t **smExtsnEntry = NULL;
+    smLangEntry_t **smLangTable = NULL;
+    smExtsnEntry_t **smExtsnTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (disman_script_mib_get_smLangEntry(interp->peer, &smLangEntry)) {
+    if (disman_script_mib_get_smLangTable(interp->peer, &smLangTable)) {
 	return SCLI_ERROR;
     }
-    (void) disman_script_mib_get_smExtsnEntry(interp->peer, &smExtsnEntry);
+    (void) disman_script_mib_get_smExtsnTable(interp->peer, &smExtsnTable);
 
-    if (smLangEntry) {
-	for (i = 0; smLangEntry[i]; i++) {
+    if (smLangTable) {
+	for (i = 0; smLangTable[i]; i++) {
 	    if (i) {
 		g_string_append(interp->result, "\n");
 	    }
-	    show_langauge(interp->result, smLangEntry[i], smExtsnEntry);
+	    show_langauge(interp->result, smLangTable[i], smExtsnTable);
 	}
     }
 
-    if (smLangEntry) disman_script_mib_free_smLangEntry(smLangEntry);
-    if (smExtsnEntry) disman_script_mib_free_smExtsnEntry(smExtsnEntry);
+    if (smLangTable) disman_script_mib_free_smLangTable(smLangTable);
+    if (smExtsnTable) disman_script_mib_free_smExtsnTable(smExtsnTable);
     
     return SCLI_OK;
 }
@@ -176,23 +176,23 @@ show_script(GString *s, smScriptEntry_t *smScriptEntry)
 static int
 cmd_scripts(scli_interp_t *interp, int argc, char **argv)
 {
-    smScriptEntry_t **smScriptEntry = NULL;
+    smScriptEntry_t **smScriptTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (disman_script_mib_get_smScriptEntry(interp->peer, &smScriptEntry)) {
+    if (disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable)) {
 	return SCLI_ERROR;
     }
 
-    if (smScriptEntry) {
-	for (i = 0; smScriptEntry[i]; i++) {
+    if (smScriptTable) {
+	for (i = 0; smScriptTable[i]; i++) {
 	    if (i) {
 		g_string_append(interp->result, "\n");
 	    }
-	    show_script(interp->result, smScriptEntry[i]);
+	    show_script(interp->result, smScriptTable[i]);
 	}
-	disman_script_mib_free_smScriptEntry(smScriptEntry);
+	disman_script_mib_free_smScriptTable(smScriptTable);
     }
 
     return SCLI_OK;

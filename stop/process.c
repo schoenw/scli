@@ -179,8 +179,8 @@ show_process_summary(host_snmp *peer)
 static void
 show_processes(WINDOW *win, host_snmp *peer, int flags)
 {
-    hrSWRunEntry_t **hrSWRunEntry = NULL;
-    hrSWRunPerfEntry_t **hrSWRunPerfEntry = NULL;
+    hrSWRunEntry_t **hrSWRunTable = NULL;
+    hrSWRunPerfEntry_t **hrSWRunPerfTable = NULL;
     int j, i;
     int n_idx;
     hr_sort_t *s_arr;
@@ -195,23 +195,23 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 	sleep(1);
     }
 
-    if (host_resources_mib_get_hrSWRunEntry(peer, &hrSWRunEntry) != 0 
-	|| hrSWRunEntry == NULL
-	|| host_resources_mib_get_hrSWRunPerfEntry(peer, 
-						   &hrSWRunPerfEntry) != 0
-	|| hrSWRunPerfEntry == NULL) {
+    if (host_resources_mib_get_hrSWRunTable(peer, &hrSWRunTable) != 0 
+	|| hrSWRunTable == NULL
+	|| host_resources_mib_get_hrSWRunPerfTable(peer, 
+						   &hrSWRunPerfTable) != 0
+	|| hrSWRunPerfTable == NULL) {
 	return;
     }
 
     /* count number of elements: */
-    for (n_idx = 0; hrSWRunEntry[n_idx] && hrSWRunPerfEntry[n_idx]; n_idx++) {
+    for (n_idx = 0; hrSWRunTable[n_idx] && hrSWRunPerfTable[n_idx]; n_idx++) {
 	continue;
     }
     /* allocate array to sort: */
     s_arr = g_malloc (n_idx * sizeof(hr_sort_t));
     for (i = 0; i < n_idx; i++) {
 	s_arr [i].idx = i;
-	s_arr [i].cpu = *hrSWRunPerfEntry [i]->hrSWRunPerfCPU;
+	s_arr [i].cpu = *hrSWRunPerfTable [i]->hrSWRunPerfCPU;
     }
 
     qsort ((void *) s_arr, n_idx, sizeof(hr_sort_t), hr_sort);
@@ -220,23 +220,23 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 	GString *s;
         i = s_arr [j].idx;
 	s = g_string_new(NULL);
-	g_string_sprintfa(s, "%5d ", hrSWRunEntry[i]->hrSWRunIndex);
+	g_string_sprintfa(s, "%5d ", hrSWRunTable[i]->hrSWRunIndex);
 	fmt_run_state_and_type(s,
-			       hrSWRunEntry[i]->hrSWRunStatus,
-			       hrSWRunEntry[i]->hrSWRunType);
+			       hrSWRunTable[i]->hrSWRunStatus,
+			       hrSWRunTable[i]->hrSWRunType);
 	g_string_sprintfa(s, " %5s", 
-			  fmt_kbytes(*hrSWRunPerfEntry[i]->hrSWRunPerfMem));
+			  fmt_kbytes(*hrSWRunPerfTable[i]->hrSWRunPerfMem));
 	g_string_sprintfa(s, " %7s", 
-			  fmt_hsec32(*hrSWRunPerfEntry[i]->hrSWRunPerfCPU));
-	if (hrSWRunEntry[i]->hrSWRunPath) {
+			  fmt_hsec32(*hrSWRunPerfTable[i]->hrSWRunPerfCPU));
+	if (hrSWRunTable[i]->hrSWRunPath) {
 	    g_string_sprintfa(s, " %.*s",
-			(int) hrSWRunEntry[i]->_hrSWRunPathLength,
-			      hrSWRunEntry[i]->hrSWRunPath);
+			(int) hrSWRunTable[i]->_hrSWRunPathLength,
+			      hrSWRunTable[i]->hrSWRunPath);
 	}
-	if (hrSWRunEntry[i]->hrSWRunParameters) {
+	if (hrSWRunTable[i]->hrSWRunParameters) {
 	    g_string_sprintfa(s, " %.*s",
- 		        (int) hrSWRunEntry[i]->_hrSWRunParametersLength,
-			      hrSWRunEntry[i]->hrSWRunParameters);
+ 		        (int) hrSWRunTable[i]->_hrSWRunParametersLength,
+			      hrSWRunTable[i]->hrSWRunParameters);
 	}
 	g_string_truncate(s, COLS);
 	mvwprintw(win, j + 1, 0, s->str);
@@ -244,8 +244,8 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 	g_string_free(s, 1);
     }
 
-    host_resources_mib_free_hrSWRunEntry(hrSWRunEntry);
-    host_resources_mib_free_hrSWRunPerfEntry(hrSWRunPerfEntry);
+    host_resources_mib_free_hrSWRunTable(hrSWRunTable);
+    host_resources_mib_free_hrSWRunPerfTable(hrSWRunPerfTable);
 }
 
 

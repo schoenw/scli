@@ -16,6 +16,15 @@ stls_table_t snmpv2_mib_enums_snmpEnableAuthenTraps[] = {
 };
 
 
+system_t *
+snmpv2_mib_new_system()
+{
+    system_t *system;
+
+    system = (system_t *) g_malloc0(sizeof(system_t) + sizeof(gpointer));
+    return system;
+}
+
 static system_t *
 assign_system(GSList *vbl)
 {
@@ -24,7 +33,7 @@ assign_system(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 1};
 
-    system = (system_t *) g_malloc0(sizeof(system_t) + sizeof(GSList *));
+    system = snmpv2_mib_new_system();
     if (! system) {
         return NULL;
     }
@@ -118,6 +127,15 @@ snmpv2_mib_free_system(system_t *system)
     }
 }
 
+sysOREntry_t *
+snmpv2_mib_new_sysOREntry()
+{
+    sysOREntry_t *sysOREntry;
+
+    sysOREntry = (sysOREntry_t *) g_malloc0(sizeof(sysOREntry_t) + sizeof(gpointer));
+    return sysOREntry;
+}
+
 static int
 unpack_sysOREntry(GSnmpVarBind *vb, sysOREntry_t *sysOREntry)
 {
@@ -137,7 +155,7 @@ assign_sysOREntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 1, 9, 1};
 
-    sysOREntry = (sysOREntry_t *) g_malloc0(sizeof(sysOREntry_t) + sizeof(GSList *));
+    sysOREntry = snmpv2_mib_new_sysOREntry();
     if (! sysOREntry) {
         return NULL;
     }
@@ -178,7 +196,7 @@ assign_sysOREntry(GSList *vbl)
 }
 
 int
-snmpv2_mib_get_sysOREntry(host_snmp *s, sysOREntry_t ***sysOREntry)
+snmpv2_mib_get_sysORTable(host_snmp *s, sysOREntry_t ***sysOREntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -210,21 +228,39 @@ snmpv2_mib_get_sysOREntry(host_snmp *s, sysOREntry_t ***sysOREntry)
 }
 
 void
-snmpv2_mib_free_sysOREntry(sysOREntry_t **sysOREntry)
+snmpv2_mib_free_sysOREntry(sysOREntry_t *sysOREntry)
 {
     GSList *vbl;
     char *p;
+
+    if (sysOREntry) {
+        p = (char *) sysOREntry + sizeof(sysOREntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(sysOREntry);
+    }
+}
+
+void
+snmpv2_mib_free_sysORTable(sysOREntry_t **sysOREntry)
+{
     int i;
 
     if (sysOREntry) {
         for (i = 0; sysOREntry[i]; i++) {
-            p = (char *) sysOREntry[i] + sizeof(sysOREntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(sysOREntry[i]);
+            snmpv2_mib_free_sysOREntry(sysOREntry[i]);
         }
         g_free(sysOREntry);
     }
+}
+
+snmp_t *
+snmpv2_mib_new_snmp()
+{
+    snmp_t *snmp;
+
+    snmp = (snmp_t *) g_malloc0(sizeof(snmp_t) + sizeof(gpointer));
+    return snmp;
 }
 
 static snmp_t *
@@ -235,7 +271,7 @@ assign_snmp(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 11};
 
-    snmp = (snmp_t *) g_malloc0(sizeof(snmp_t) + sizeof(GSList *));
+    snmp = snmpv2_mib_new_snmp();
     if (! snmp) {
         return NULL;
     }
@@ -412,6 +448,15 @@ snmpv2_mib_free_snmp(snmp_t *snmp)
     }
 }
 
+snmpSet_t *
+snmpv2_mib_new_snmpSet()
+{
+    snmpSet_t *snmpSet;
+
+    snmpSet = (snmpSet_t *) g_malloc0(sizeof(snmpSet_t) + sizeof(gpointer));
+    return snmpSet;
+}
+
 static snmpSet_t *
 assign_snmpSet(GSList *vbl)
 {
@@ -420,7 +465,7 @@ assign_snmpSet(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 1, 1, 6};
 
-    snmpSet = (snmpSet_t *) g_malloc0(sizeof(snmpSet_t) + sizeof(GSList *));
+    snmpSet = snmpv2_mib_new_snmpSet();
     if (! snmpSet) {
         return NULL;
     }

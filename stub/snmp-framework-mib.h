@@ -24,6 +24,9 @@ typedef struct snmpEngine {
     gint32   *snmpEngineMaxMessageSize;
 } snmpEngine_t;
 
+extern snmpEngine_t *
+snmp_framework_mib_new_snmpEngine();
+
 extern int
 snmp_framework_mib_get_snmpEngine(host_snmp *s, snmpEngine_t **snmpEngine);
 

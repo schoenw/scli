@@ -31,59 +31,59 @@
 static int
 cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
 {
-    ifEntry_t **ifEntry = NULL;
-    ifXEntry_t **ifXEntry = NULL;
+    ifEntry_t **ifTable = NULL;
+    ifXEntry_t **ifXTable = NULL;
     system_t *system = NULL;
-    ipAddrEntry_t **ipAddrEntry = NULL;
+    ipAddrEntry_t **ipAddrTable = NULL;
     GString *s;
     int i, j;
     int const width = 20;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (if_mib_get_ifEntry(interp->peer, &ifEntry)) {
+    if (if_mib_get_ifTable(interp->peer, &ifTable)) {
 	return SCLI_ERROR;
     }
-    (void) if_mib_get_ifXEntry(interp->peer, &ifXEntry);
+    (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
     (void) snmpv2_mib_get_system(interp->peer, &system);
-    (void) ip_mib_get_ipAddrEntry(interp->peer, &ipAddrEntry);
+    (void) ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable);
 
     s = interp->result;
-    if (ifEntry) {
+    if (ifTable) {
 
-	for (i = 0; ifEntry[i]; i++) {
+	for (i = 0; ifTable[i]; i++) {
 
 	    if (i) {
 		g_string_append(s, "\n");
 	    }
 
 	    g_string_sprintfa(s, "Index:       %-*d", width,
-			      ifEntry[i]->ifIndex);
-	    if (ifXEntry && ifXEntry[i]
-		&& ifXEntry[i]->ifName && ifXEntry[i]->_ifNameLength) {
+			      ifTable[i]->ifIndex);
+	    if (ifXTable && ifXTable[i]
+		&& ifXTable[i]->ifName && ifXTable[i]->_ifNameLength) {
 		g_string_sprintfa(s, " Name:    %.*s\n",
-			    (int) ifXEntry[i]->_ifNameLength,
-				  ifXEntry[i]->ifName);
-	    } else if (ifEntry[i]->ifDescr && ifEntry[i]->_ifDescrLength
-		&& ifEntry[i]->_ifDescrLength < width) {
+			    (int) ifXTable[i]->_ifNameLength,
+				  ifXTable[i]->ifName);
+	    } else if (ifTable[i]->ifDescr && ifTable[i]->_ifDescrLength
+		&& ifTable[i]->_ifDescrLength < width) {
 		g_string_sprintfa(s, " Name:    %.*s\n",
-			    (int) ifEntry[i]->_ifDescrLength,
-				  ifEntry[i]->ifDescr);
+			    (int) ifTable[i]->_ifDescrLength,
+				  ifTable[i]->ifDescr);
 	    } else {
 		g_string_sprintfa(s, " Name:    if#%-17d\n",
-				  ifEntry[i]->ifIndex);
+				  ifTable[i]->ifIndex);
 	    }
 
 	    g_string_append(s, "OperStatus:  ");
 	    fmt_enum(s, width, if_mib_enums_ifOperStatus,
-		     ifEntry[i]->ifOperStatus);
-	    if (ifEntry[i]->ifPhysAddress
-		&& ifEntry[i]->_ifPhysAddressLength) {
+		     ifTable[i]->ifOperStatus);
+	    if (ifTable[i]->ifPhysAddress
+		&& ifTable[i]->_ifPhysAddressLength) {
 		g_string_append(s, " Address: ");
-		for (j = 0; j < ifEntry[i]->_ifPhysAddressLength; j++) {
+		for (j = 0; j < ifTable[i]->_ifPhysAddressLength; j++) {
 		    g_string_sprintfa(s, "%s%02X",
 				      (j == 0) ? "" : ":",
-				      ifEntry[i]->ifPhysAddress[j]);
+				      ifTable[i]->ifPhysAddress[j]);
 		}
 		g_string_append(s, "\n");
 	    } else {
@@ -92,35 +92,35 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
 
 	    g_string_append(s, "AdminStatus: ");
 	    fmt_enum(s, width, if_mib_enums_ifAdminStatus,
-		     ifEntry[i]->ifAdminStatus);
+		     ifTable[i]->ifAdminStatus);
 	    g_string_append(s, " Type:    ");
 	    fmt_enum(s, width, if_mib_enums_ifType,
-		     ifEntry[i]->ifType);
+		     ifTable[i]->ifType);
 	    g_string_append(s, "\n");
 
 	    g_string_append(s, "Traps:       ");
 	    fmt_enum(s, width, if_mib_enums_ifLinkUpDownTrapEnable,
-		     (ifXEntry && ifXEntry[i]) ?
-		     ifXEntry[i]->ifLinkUpDownTrapEnable : NULL);
-	    if (ifEntry[i]->ifMtu) {
+		     (ifXTable && ifXTable[i]) ?
+		     ifXTable[i]->ifLinkUpDownTrapEnable : NULL);
+	    if (ifTable[i]->ifMtu) {
 		g_string_sprintfa(s, " MTU:     %d byte\n",
-				  *(ifEntry[i]->ifMtu));
+				  *(ifTable[i]->ifMtu));
 	    } else {
 		g_string_append(s, " MTU:\n");
 	    }
 
 	    g_string_append(s, "Connector:   ");
 	    fmt_enum(s, width, if_mib_enums_ifConnectorPresent,
-		     (ifXEntry && ifXEntry[i]) ?
-		     ifXEntry[i]->ifConnectorPresent : NULL);
-	    if (ifEntry[i]->ifSpeed) {
-		if (*(ifEntry[i]->ifSpeed) == 0xffffffff
-		    && ifXEntry && ifXEntry[i]->ifHighSpeed) {
+		     (ifXTable && ifXTable[i]) ?
+		     ifXTable[i]->ifConnectorPresent : NULL);
+	    if (ifTable[i]->ifSpeed) {
+		if (*(ifTable[i]->ifSpeed) == 0xffffffff
+		    && ifXTable && ifXTable[i]->ifHighSpeed) {
 		    g_string_sprintfa(s, " Speed:   %s bps\n",
-				      fmt_gtp(*(ifXEntry[i]->ifHighSpeed)));
+				      fmt_gtp(*(ifXTable[i]->ifHighSpeed)));
 		} else {
 		    g_string_sprintfa(s, " Speed:   %s bps\n",
-				      fmt_kmg(*(ifEntry[i]->ifSpeed)));
+				      fmt_kmg(*(ifTable[i]->ifSpeed)));
 		}
 	    } else {
 		g_string_append(s, " Speed:\n");
@@ -128,11 +128,11 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
 	    
 	    g_string_append(s, "Promiscuous: ");
 	    fmt_enum(s, width, if_mib_enums_ifPromiscuousMode,
-		     (ifXEntry && ifXEntry[i]) ?
-		     ifXEntry[i]->ifPromiscuousMode : NULL);
-	    if (ifEntry[i]->ifLastChange && system && system->sysUpTime) {
+		     (ifXTable && ifXTable[i]) ?
+		     ifXTable[i]->ifPromiscuousMode : NULL);
+	    if (ifTable[i]->ifLastChange && system && system->sysUpTime) {
 		guint32 dsecs =
-		    *(system->sysUpTime) - *(ifEntry[i]->ifLastChange);
+		    *(system->sysUpTime) - *(ifTable[i]->ifLastChange);
 		g_string_sprintfa(s, " Change:  ");
 		fmt_time_ticks(s, dsecs);
 		g_string_append(s, "\n");
@@ -140,38 +140,38 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
 		g_string_append(s, " Change:\n");
 	    }
 	    
-	    for (j = 0; ipAddrEntry[j]; j++) {
-		if (ipAddrEntry[j]->ipAdEntIfIndex
-		    && (ifEntry[i]->ifIndex
-			== *(ipAddrEntry[j]->ipAdEntIfIndex))) {
+	    for (j = 0; ipAddrTable[j]; j++) {
+		if (ipAddrTable[j]->ipAdEntIfIndex
+		    && (ifTable[i]->ifIndex
+			== *(ipAddrTable[j]->ipAdEntIfIndex))) {
 		    g_string_sprintfa(s, "IP Address:  %-*s", width,
 				      fmt_ipv4_address(
-					  ipAddrEntry[j]->ipAdEntAddr, 0));
+					  ipAddrTable[j]->ipAdEntAddr, 0));
 		    g_string_sprintfa(s, " Prefix:  %s\n",
 				      fmt_ipv4_mask(
-					  ipAddrEntry[j]->ipAdEntNetMask));
+					  ipAddrTable[j]->ipAdEntNetMask));
 		}
 	    }
 	    	    
-	    if (ifEntry[i]->ifDescr && ifEntry[i]->_ifDescrLength) {
+	    if (ifTable[i]->ifDescr && ifTable[i]->_ifDescrLength) {
 		g_string_sprintfa(s, "Description: %.*s\n",
-			    (int) ifEntry[i]->_ifDescrLength,
-				  ifEntry[i]->ifDescr);
+			    (int) ifTable[i]->_ifDescrLength,
+				  ifTable[i]->ifDescr);
 	    }
 
-	    if (ifXEntry && ifXEntry[i]
-		&& ifXEntry[i]->ifAlias && ifXEntry[i]->_ifAliasLength) {
+	    if (ifXTable && ifXTable[i]
+		&& ifXTable[i]->ifAlias && ifXTable[i]->_ifAliasLength) {
 		g_string_sprintfa(s, "Alias:       %.*s\n",
-			    (int) ifXEntry[i]->_ifAliasLength,
-				  ifXEntry[i]->ifAlias);
+			    (int) ifXTable[i]->_ifAliasLength,
+				  ifXTable[i]->ifAlias);
 	    }
 	}
     }
 
-    if (ifEntry) if_mib_free_ifEntry(ifEntry);
-    if (ifXEntry) if_mib_free_ifXEntry(ifXEntry);
+    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifXTable) if_mib_free_ifXTable(ifXTable);
     if (system) snmpv2_mib_free_system(system);
-    if (ipAddrEntry) ip_mib_free_ipAddrEntry(ipAddrEntry);
+    if (ipAddrTable) ip_mib_free_ipAddrTable(ipAddrTable);
 
     interp->result = s;
     return SCLI_OK;

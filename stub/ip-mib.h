@@ -46,8 +46,14 @@ typedef struct ip {
     guint32  *ipRoutingDiscards;
 } ip_t;
 
+extern ip_t *
+ip_mib_new_ip();
+
 extern int
 ip_mib_get_ip(host_snmp *s, ip_t **ip);
+
+extern int
+ip_mib_set_ip(host_snmp *s, ip_t *ip);
 
 extern void
 ip_mib_free_ip(ip_t *ip);
@@ -65,10 +71,19 @@ typedef struct ipAddrEntry {
 } ipAddrEntry_t;
 
 extern int
-ip_mib_get_ipAddrEntry(host_snmp *s, ipAddrEntry_t ***ipAddrEntry);
+ip_mib_get_ipAddrTable(host_snmp *s, ipAddrEntry_t ***ipAddrEntry);
 
 extern void
-ip_mib_free_ipAddrEntry(ipAddrEntry_t **ipAddrEntry);
+ip_mib_free_ipAddrTable(ipAddrEntry_t **ipAddrEntry);
+
+extern ipAddrEntry_t *
+ip_mib_new_ipAddrEntry();
+
+extern int
+ip_mib_get_ipAddrEntry(host_snmp *s, ipAddrEntry_t **ipAddrEntry);
+
+extern void
+ip_mib_free_ipAddrEntry(ipAddrEntry_t *ipAddrEntry);
 
 /*
  * C type definitions for IP-MIB::ipNetToMediaEntry.
@@ -83,10 +98,22 @@ typedef struct ipNetToMediaEntry {
 } ipNetToMediaEntry_t;
 
 extern int
-ip_mib_get_ipNetToMediaEntry(host_snmp *s, ipNetToMediaEntry_t ***ipNetToMediaEntry);
+ip_mib_get_ipNetToMediaTable(host_snmp *s, ipNetToMediaEntry_t ***ipNetToMediaEntry);
 
 extern void
-ip_mib_free_ipNetToMediaEntry(ipNetToMediaEntry_t **ipNetToMediaEntry);
+ip_mib_free_ipNetToMediaTable(ipNetToMediaEntry_t **ipNetToMediaEntry);
+
+extern ipNetToMediaEntry_t *
+ip_mib_new_ipNetToMediaEntry();
+
+extern int
+ip_mib_get_ipNetToMediaEntry(host_snmp *s, ipNetToMediaEntry_t **ipNetToMediaEntry);
+
+extern int
+ip_mib_set_ipNetToMediaEntry(host_snmp *s, ipNetToMediaEntry_t *ipNetToMediaEntry);
+
+extern void
+ip_mib_free_ipNetToMediaEntry(ipNetToMediaEntry_t *ipNetToMediaEntry);
 
 /*
  * C type definitions for IP-MIB::icmp.
@@ -120,6 +147,9 @@ typedef struct icmp {
     guint32  *icmpOutAddrMasks;
     guint32  *icmpOutAddrMaskReps;
 } icmp_t;
+
+extern icmp_t *
+ip_mib_new_icmp();
 
 extern int
 ip_mib_get_icmp(host_snmp *s, icmp_t **icmp);

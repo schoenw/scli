@@ -33,6 +33,9 @@ typedef struct dot1dBase {
     gint32   *dot1dBaseType;
 } dot1dBase_t;
 
+extern dot1dBase_t *
+bridge_mib_new_dot1dBase();
+
 extern int
 bridge_mib_get_dot1dBase(host_snmp *s, dot1dBase_t **dot1dBase);
 
@@ -53,10 +56,19 @@ typedef struct dot1dBasePortEntry {
 } dot1dBasePortEntry_t;
 
 extern int
-bridge_mib_get_dot1dBasePortEntry(host_snmp *s, dot1dBasePortEntry_t ***dot1dBasePortEntry);
+bridge_mib_get_dot1dBasePortTable(host_snmp *s, dot1dBasePortEntry_t ***dot1dBasePortEntry);
 
 extern void
-bridge_mib_free_dot1dBasePortEntry(dot1dBasePortEntry_t **dot1dBasePortEntry);
+bridge_mib_free_dot1dBasePortTable(dot1dBasePortEntry_t **dot1dBasePortEntry);
+
+extern dot1dBasePortEntry_t *
+bridge_mib_new_dot1dBasePortEntry();
+
+extern int
+bridge_mib_get_dot1dBasePortEntry(host_snmp *s, dot1dBasePortEntry_t **dot1dBasePortEntry);
+
+extern void
+bridge_mib_free_dot1dBasePortEntry(dot1dBasePortEntry_t *dot1dBasePortEntry);
 
 /*
  * C type definitions for BRIDGE-MIB::dot1dStp.
@@ -79,8 +91,14 @@ typedef struct dot1dStp {
     gint32   *dot1dStpBridgeForwardDelay;
 } dot1dStp_t;
 
+extern dot1dStp_t *
+bridge_mib_new_dot1dStp();
+
 extern int
 bridge_mib_get_dot1dStp(host_snmp *s, dot1dStp_t **dot1dStp);
+
+extern int
+bridge_mib_set_dot1dStp(host_snmp *s, dot1dStp_t *dot1dStp);
 
 extern void
 bridge_mib_free_dot1dStp(dot1dStp_t *dot1dStp);
@@ -103,10 +121,22 @@ typedef struct dot1dStpPortEntry {
 } dot1dStpPortEntry_t;
 
 extern int
-bridge_mib_get_dot1dStpPortEntry(host_snmp *s, dot1dStpPortEntry_t ***dot1dStpPortEntry);
+bridge_mib_get_dot1dStpPortTable(host_snmp *s, dot1dStpPortEntry_t ***dot1dStpPortEntry);
 
 extern void
-bridge_mib_free_dot1dStpPortEntry(dot1dStpPortEntry_t **dot1dStpPortEntry);
+bridge_mib_free_dot1dStpPortTable(dot1dStpPortEntry_t **dot1dStpPortEntry);
+
+extern dot1dStpPortEntry_t *
+bridge_mib_new_dot1dStpPortEntry();
+
+extern int
+bridge_mib_get_dot1dStpPortEntry(host_snmp *s, dot1dStpPortEntry_t **dot1dStpPortEntry);
+
+extern int
+bridge_mib_set_dot1dStpPortEntry(host_snmp *s, dot1dStpPortEntry_t *dot1dStpPortEntry);
+
+extern void
+bridge_mib_free_dot1dStpPortEntry(dot1dStpPortEntry_t *dot1dStpPortEntry);
 
 /*
  * C type definitions for BRIDGE-MIB::dot1dTp.
@@ -117,8 +147,14 @@ typedef struct dot1dTp {
     gint32   *dot1dTpAgingTime;
 } dot1dTp_t;
 
+extern dot1dTp_t *
+bridge_mib_new_dot1dTp();
+
 extern int
 bridge_mib_get_dot1dTp(host_snmp *s, dot1dTp_t **dot1dTp);
+
+extern int
+bridge_mib_set_dot1dTp(host_snmp *s, dot1dTp_t *dot1dTp);
 
 extern void
 bridge_mib_free_dot1dTp(dot1dTp_t *dot1dTp);
@@ -134,10 +170,19 @@ typedef struct dot1dTpFdbEntry {
 } dot1dTpFdbEntry_t;
 
 extern int
-bridge_mib_get_dot1dTpFdbEntry(host_snmp *s, dot1dTpFdbEntry_t ***dot1dTpFdbEntry);
+bridge_mib_get_dot1dTpFdbTable(host_snmp *s, dot1dTpFdbEntry_t ***dot1dTpFdbEntry);
 
 extern void
-bridge_mib_free_dot1dTpFdbEntry(dot1dTpFdbEntry_t **dot1dTpFdbEntry);
+bridge_mib_free_dot1dTpFdbTable(dot1dTpFdbEntry_t **dot1dTpFdbEntry);
+
+extern dot1dTpFdbEntry_t *
+bridge_mib_new_dot1dTpFdbEntry();
+
+extern int
+bridge_mib_get_dot1dTpFdbEntry(host_snmp *s, dot1dTpFdbEntry_t **dot1dTpFdbEntry);
+
+extern void
+bridge_mib_free_dot1dTpFdbEntry(dot1dTpFdbEntry_t *dot1dTpFdbEntry);
 
 /*
  * C type definitions for BRIDGE-MIB::dot1dTpPortEntry.
@@ -152,10 +197,19 @@ typedef struct dot1dTpPortEntry {
 } dot1dTpPortEntry_t;
 
 extern int
-bridge_mib_get_dot1dTpPortEntry(host_snmp *s, dot1dTpPortEntry_t ***dot1dTpPortEntry);
+bridge_mib_get_dot1dTpPortTable(host_snmp *s, dot1dTpPortEntry_t ***dot1dTpPortEntry);
 
 extern void
-bridge_mib_free_dot1dTpPortEntry(dot1dTpPortEntry_t **dot1dTpPortEntry);
+bridge_mib_free_dot1dTpPortTable(dot1dTpPortEntry_t **dot1dTpPortEntry);
+
+extern dot1dTpPortEntry_t *
+bridge_mib_new_dot1dTpPortEntry();
+
+extern int
+bridge_mib_get_dot1dTpPortEntry(host_snmp *s, dot1dTpPortEntry_t **dot1dTpPortEntry);
+
+extern void
+bridge_mib_free_dot1dTpPortEntry(dot1dTpPortEntry_t *dot1dTpPortEntry);
 
 /*
  * C type definitions for BRIDGE-MIB::dot1dStaticEntry.
@@ -170,10 +224,22 @@ typedef struct dot1dStaticEntry {
 } dot1dStaticEntry_t;
 
 extern int
-bridge_mib_get_dot1dStaticEntry(host_snmp *s, dot1dStaticEntry_t ***dot1dStaticEntry);
+bridge_mib_get_dot1dStaticTable(host_snmp *s, dot1dStaticEntry_t ***dot1dStaticEntry);
 
 extern void
-bridge_mib_free_dot1dStaticEntry(dot1dStaticEntry_t **dot1dStaticEntry);
+bridge_mib_free_dot1dStaticTable(dot1dStaticEntry_t **dot1dStaticEntry);
+
+extern dot1dStaticEntry_t *
+bridge_mib_new_dot1dStaticEntry();
+
+extern int
+bridge_mib_get_dot1dStaticEntry(host_snmp *s, dot1dStaticEntry_t **dot1dStaticEntry);
+
+extern int
+bridge_mib_set_dot1dStaticEntry(host_snmp *s, dot1dStaticEntry_t *dot1dStaticEntry);
+
+extern void
+bridge_mib_free_dot1dStaticEntry(dot1dStaticEntry_t *dot1dStaticEntry);
 
 
 #endif /* _BRIDGE_MIB_H_ */

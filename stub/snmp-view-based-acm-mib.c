@@ -86,6 +86,15 @@ stls_table_t snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStatus[] = {
 };
 
 
+vacmContextEntry_t *
+snmp_view_based_acm_mib_new_vacmContextEntry()
+{
+    vacmContextEntry_t *vacmContextEntry;
+
+    vacmContextEntry = (vacmContextEntry_t *) g_malloc0(sizeof(vacmContextEntry_t) + sizeof(gpointer));
+    return vacmContextEntry;
+}
+
 static int
 unpack_vacmContextEntry(GSnmpVarBind *vb, vacmContextEntry_t *vacmContextEntry)
 {
@@ -110,7 +119,7 @@ assign_vacmContextEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 16, 1, 1, 1};
 
-    vacmContextEntry = (vacmContextEntry_t *) g_malloc0(sizeof(vacmContextEntry_t) + sizeof(GSList *));
+    vacmContextEntry = snmp_view_based_acm_mib_new_vacmContextEntry();
     if (! vacmContextEntry) {
         return NULL;
     }
@@ -140,7 +149,7 @@ assign_vacmContextEntry(GSList *vbl)
 }
 
 int
-snmp_view_based_acm_mib_get_vacmContextEntry(host_snmp *s, vacmContextEntry_t ***vacmContextEntry)
+snmp_view_based_acm_mib_get_vacmContextTable(host_snmp *s, vacmContextEntry_t ***vacmContextEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -169,21 +178,39 @@ snmp_view_based_acm_mib_get_vacmContextEntry(host_snmp *s, vacmContextEntry_t **
 }
 
 void
-snmp_view_based_acm_mib_free_vacmContextEntry(vacmContextEntry_t **vacmContextEntry)
+snmp_view_based_acm_mib_free_vacmContextEntry(vacmContextEntry_t *vacmContextEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (vacmContextEntry) {
+        p = (char *) vacmContextEntry + sizeof(vacmContextEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(vacmContextEntry);
+    }
+}
+
+void
+snmp_view_based_acm_mib_free_vacmContextTable(vacmContextEntry_t **vacmContextEntry)
+{
     int i;
 
     if (vacmContextEntry) {
         for (i = 0; vacmContextEntry[i]; i++) {
-            p = (char *) vacmContextEntry[i] + sizeof(vacmContextEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(vacmContextEntry[i]);
+            snmp_view_based_acm_mib_free_vacmContextEntry(vacmContextEntry[i]);
         }
         g_free(vacmContextEntry);
     }
+}
+
+vacmSecurityToGroupEntry_t *
+snmp_view_based_acm_mib_new_vacmSecurityToGroupEntry()
+{
+    vacmSecurityToGroupEntry_t *vacmSecurityToGroupEntry;
+
+    vacmSecurityToGroupEntry = (vacmSecurityToGroupEntry_t *) g_malloc0(sizeof(vacmSecurityToGroupEntry_t) + sizeof(gpointer));
+    return vacmSecurityToGroupEntry;
 }
 
 static int
@@ -212,7 +239,7 @@ assign_vacmSecurityToGroupEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 16, 1, 2, 1};
 
-    vacmSecurityToGroupEntry = (vacmSecurityToGroupEntry_t *) g_malloc0(sizeof(vacmSecurityToGroupEntry_t) + sizeof(GSList *));
+    vacmSecurityToGroupEntry = snmp_view_based_acm_mib_new_vacmSecurityToGroupEntry();
     if (! vacmSecurityToGroupEntry) {
         return NULL;
     }
@@ -252,7 +279,7 @@ assign_vacmSecurityToGroupEntry(GSList *vbl)
 }
 
 int
-snmp_view_based_acm_mib_get_vacmSecurityToGroupEntry(host_snmp *s, vacmSecurityToGroupEntry_t ***vacmSecurityToGroupEntry)
+snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(host_snmp *s, vacmSecurityToGroupEntry_t ***vacmSecurityToGroupEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -284,21 +311,39 @@ snmp_view_based_acm_mib_get_vacmSecurityToGroupEntry(host_snmp *s, vacmSecurityT
 }
 
 void
-snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(vacmSecurityToGroupEntry_t **vacmSecurityToGroupEntry)
+snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(vacmSecurityToGroupEntry_t *vacmSecurityToGroupEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (vacmSecurityToGroupEntry) {
+        p = (char *) vacmSecurityToGroupEntry + sizeof(vacmSecurityToGroupEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(vacmSecurityToGroupEntry);
+    }
+}
+
+void
+snmp_view_based_acm_mib_free_vacmSecurityToGroupTable(vacmSecurityToGroupEntry_t **vacmSecurityToGroupEntry)
+{
     int i;
 
     if (vacmSecurityToGroupEntry) {
         for (i = 0; vacmSecurityToGroupEntry[i]; i++) {
-            p = (char *) vacmSecurityToGroupEntry[i] + sizeof(vacmSecurityToGroupEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(vacmSecurityToGroupEntry[i]);
+            snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(vacmSecurityToGroupEntry[i]);
         }
         g_free(vacmSecurityToGroupEntry);
     }
+}
+
+vacmAccessEntry_t *
+snmp_view_based_acm_mib_new_vacmAccessEntry()
+{
+    vacmAccessEntry_t *vacmAccessEntry;
+
+    vacmAccessEntry = (vacmAccessEntry_t *) g_malloc0(sizeof(vacmAccessEntry_t) + sizeof(gpointer));
+    return vacmAccessEntry;
 }
 
 static int
@@ -336,7 +381,7 @@ assign_vacmAccessEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 16, 1, 4, 1};
 
-    vacmAccessEntry = (vacmAccessEntry_t *) g_malloc0(sizeof(vacmAccessEntry_t) + sizeof(GSList *));
+    vacmAccessEntry = snmp_view_based_acm_mib_new_vacmAccessEntry();
     if (! vacmAccessEntry) {
         return NULL;
     }
@@ -387,7 +432,7 @@ assign_vacmAccessEntry(GSList *vbl)
 }
 
 int
-snmp_view_based_acm_mib_get_vacmAccessEntry(host_snmp *s, vacmAccessEntry_t ***vacmAccessEntry)
+snmp_view_based_acm_mib_get_vacmAccessTable(host_snmp *s, vacmAccessEntry_t ***vacmAccessEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -422,21 +467,39 @@ snmp_view_based_acm_mib_get_vacmAccessEntry(host_snmp *s, vacmAccessEntry_t ***v
 }
 
 void
-snmp_view_based_acm_mib_free_vacmAccessEntry(vacmAccessEntry_t **vacmAccessEntry)
+snmp_view_based_acm_mib_free_vacmAccessEntry(vacmAccessEntry_t *vacmAccessEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (vacmAccessEntry) {
+        p = (char *) vacmAccessEntry + sizeof(vacmAccessEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(vacmAccessEntry);
+    }
+}
+
+void
+snmp_view_based_acm_mib_free_vacmAccessTable(vacmAccessEntry_t **vacmAccessEntry)
+{
     int i;
 
     if (vacmAccessEntry) {
         for (i = 0; vacmAccessEntry[i]; i++) {
-            p = (char *) vacmAccessEntry[i] + sizeof(vacmAccessEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(vacmAccessEntry[i]);
+            snmp_view_based_acm_mib_free_vacmAccessEntry(vacmAccessEntry[i]);
         }
         g_free(vacmAccessEntry);
     }
+}
+
+vacmMIBViews_t *
+snmp_view_based_acm_mib_new_vacmMIBViews()
+{
+    vacmMIBViews_t *vacmMIBViews;
+
+    vacmMIBViews = (vacmMIBViews_t *) g_malloc0(sizeof(vacmMIBViews_t) + sizeof(gpointer));
+    return vacmMIBViews;
 }
 
 static vacmMIBViews_t *
@@ -447,7 +510,7 @@ assign_vacmMIBViews(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 16, 1, 5};
 
-    vacmMIBViews = (vacmMIBViews_t *) g_malloc0(sizeof(vacmMIBViews_t) + sizeof(GSList *));
+    vacmMIBViews = snmp_view_based_acm_mib_new_vacmMIBViews();
     if (! vacmMIBViews) {
         return NULL;
     }
@@ -508,6 +571,15 @@ snmp_view_based_acm_mib_free_vacmMIBViews(vacmMIBViews_t *vacmMIBViews)
     }
 }
 
+vacmViewTreeFamilyEntry_t *
+snmp_view_based_acm_mib_new_vacmViewTreeFamilyEntry()
+{
+    vacmViewTreeFamilyEntry_t *vacmViewTreeFamilyEntry;
+
+    vacmViewTreeFamilyEntry = (vacmViewTreeFamilyEntry_t *) g_malloc0(sizeof(vacmViewTreeFamilyEntry_t) + sizeof(gpointer));
+    return vacmViewTreeFamilyEntry;
+}
+
 static int
 unpack_vacmViewTreeFamilyEntry(GSnmpVarBind *vb, vacmViewTreeFamilyEntry_t *vacmViewTreeFamilyEntry)
 {
@@ -533,7 +605,7 @@ assign_vacmViewTreeFamilyEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 16, 1, 5, 2, 1};
 
-    vacmViewTreeFamilyEntry = (vacmViewTreeFamilyEntry_t *) g_malloc0(sizeof(vacmViewTreeFamilyEntry_t) + sizeof(GSList *));
+    vacmViewTreeFamilyEntry = snmp_view_based_acm_mib_new_vacmViewTreeFamilyEntry();
     if (! vacmViewTreeFamilyEntry) {
         return NULL;
     }
@@ -576,7 +648,7 @@ assign_vacmViewTreeFamilyEntry(GSList *vbl)
 }
 
 int
-snmp_view_based_acm_mib_get_vacmViewTreeFamilyEntry(host_snmp *s, vacmViewTreeFamilyEntry_t ***vacmViewTreeFamilyEntry)
+snmp_view_based_acm_mib_get_vacmViewTreeFamilyTable(host_snmp *s, vacmViewTreeFamilyEntry_t ***vacmViewTreeFamilyEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -609,18 +681,27 @@ snmp_view_based_acm_mib_get_vacmViewTreeFamilyEntry(host_snmp *s, vacmViewTreeFa
 }
 
 void
-snmp_view_based_acm_mib_free_vacmViewTreeFamilyEntry(vacmViewTreeFamilyEntry_t **vacmViewTreeFamilyEntry)
+snmp_view_based_acm_mib_free_vacmViewTreeFamilyEntry(vacmViewTreeFamilyEntry_t *vacmViewTreeFamilyEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (vacmViewTreeFamilyEntry) {
+        p = (char *) vacmViewTreeFamilyEntry + sizeof(vacmViewTreeFamilyEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(vacmViewTreeFamilyEntry);
+    }
+}
+
+void
+snmp_view_based_acm_mib_free_vacmViewTreeFamilyTable(vacmViewTreeFamilyEntry_t **vacmViewTreeFamilyEntry)
+{
     int i;
 
     if (vacmViewTreeFamilyEntry) {
         for (i = 0; vacmViewTreeFamilyEntry[i]; i++) {
-            p = (char *) vacmViewTreeFamilyEntry[i] + sizeof(vacmViewTreeFamilyEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(vacmViewTreeFamilyEntry[i]);
+            snmp_view_based_acm_mib_free_vacmViewTreeFamilyEntry(vacmViewTreeFamilyEntry[i]);
         }
         g_free(vacmViewTreeFamilyEntry);
     }

@@ -34,6 +34,15 @@ stls_table_t tcp_mib_enums_tcpConnState[] = {
 };
 
 
+tcp_t *
+tcp_mib_new_tcp()
+{
+    tcp_t *tcp;
+
+    tcp = (tcp_t *) g_malloc0(sizeof(tcp_t) + sizeof(gpointer));
+    return tcp;
+}
+
 static tcp_t *
 assign_tcp(GSList *vbl)
 {
@@ -42,7 +51,7 @@ assign_tcp(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 6};
 
-    tcp = (tcp_t *) g_malloc0(sizeof(tcp_t) + sizeof(GSList *));
+    tcp = tcp_mib_new_tcp();
     if (! tcp) {
         return NULL;
     }
@@ -155,6 +164,15 @@ tcp_mib_free_tcp(tcp_t *tcp)
     }
 }
 
+tcpConnEntry_t *
+tcp_mib_new_tcpConnEntry()
+{
+    tcpConnEntry_t *tcpConnEntry;
+
+    tcpConnEntry = (tcpConnEntry_t *) g_malloc0(sizeof(tcpConnEntry_t) + sizeof(gpointer));
+    return tcpConnEntry;
+}
+
 static int
 unpack_tcpConnEntry(GSnmpVarBind *vb, tcpConnEntry_t *tcpConnEntry)
 {
@@ -186,7 +204,7 @@ assign_tcpConnEntry(GSList *vbl)
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 6, 13, 1};
 
-    tcpConnEntry = (tcpConnEntry_t *) g_malloc0(sizeof(tcpConnEntry_t) + sizeof(GSList *));
+    tcpConnEntry = tcp_mib_new_tcpConnEntry();
     if (! tcpConnEntry) {
         return NULL;
     }
@@ -219,7 +237,7 @@ assign_tcpConnEntry(GSList *vbl)
 }
 
 int
-tcp_mib_get_tcpConnEntry(host_snmp *s, tcpConnEntry_t ***tcpConnEntry)
+tcp_mib_get_tcpConnTable(host_snmp *s, tcpConnEntry_t ***tcpConnEntry)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -249,18 +267,27 @@ tcp_mib_get_tcpConnEntry(host_snmp *s, tcpConnEntry_t ***tcpConnEntry)
 }
 
 void
-tcp_mib_free_tcpConnEntry(tcpConnEntry_t **tcpConnEntry)
+tcp_mib_free_tcpConnEntry(tcpConnEntry_t *tcpConnEntry)
 {
     GSList *vbl;
     char *p;
+
+    if (tcpConnEntry) {
+        p = (char *) tcpConnEntry + sizeof(tcpConnEntry_t);
+        vbl = * (GSList **) p;
+        stls_vbl_free(vbl);
+        g_free(tcpConnEntry);
+    }
+}
+
+void
+tcp_mib_free_tcpConnTable(tcpConnEntry_t **tcpConnEntry)
+{
     int i;
 
     if (tcpConnEntry) {
         for (i = 0; tcpConnEntry[i]; i++) {
-            p = (char *) tcpConnEntry[i] + sizeof(tcpConnEntry_t);
-            vbl = * (GSList **) p;
-            stls_vbl_free(vbl);
-            g_free(tcpConnEntry[i]);
+            tcp_mib_free_tcpConnEntry(tcpConnEntry[i]);
         }
         g_free(tcpConnEntry);
     }

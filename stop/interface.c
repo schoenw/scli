@@ -180,8 +180,8 @@ show_interface_summary(host_snmp *peer)
 static void
 show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 {
-    ifEntry_t **ifEntry = NULL;
-    ifXEntry_t **ifXEntry = NULL;
+    ifEntry_t **ifTable = NULL;
+    ifXEntry_t **ifXTable = NULL;
     static struct timeval last, now;
     double delta;
     int i;
@@ -201,79 +201,79 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	}
     }
 
-    if (if_mib_get_ifEntry(peer, &ifEntry) == 0) {
-	(void) if_mib_get_ifXEntry(peer, &ifXEntry);
+    if (if_mib_get_ifTable(peer, &ifTable) == 0) {
+	(void) if_mib_get_ifXTable(peer, &ifXTable);
     }
 
-    if (! stats && ifEntry) {
-	for (i = 0; ifEntry[i]; i++) ;
+    if (! stats && ifTable) {
+	for (i = 0; ifTable[i]; i++) ;
 	stats = (if_stats_t *) g_malloc0(i * sizeof(if_stats_t));
     }
 
     gettimeofday (&now, NULL);
     delta = TV_DIFF(last, now);
 
-    if (ifEntry) {
-	for (i = 0; ifEntry[i]; i++) {
+    if (ifTable) {
+	for (i = 0; ifTable[i]; i++) {
 	    GString *s;
 	    s = g_string_new(NULL);
-	    g_string_sprintfa(s, "%5u", ifEntry[i]->ifIndex);
+	    g_string_sprintfa(s, "%5u", ifTable[i]->ifIndex);
 	    g_string_sprintfa(s, " %4s",
-			      fmt_ifStatus(ifEntry[i]->ifAdminStatus,
-					   ifEntry[i]->ifOperStatus));
-	    if (ifEntry[i]->ifMtu) {
-		g_string_sprintfa(s, " %5d", *(ifEntry[i]->ifMtu));
+			      fmt_ifStatus(ifTable[i]->ifAdminStatus,
+					   ifTable[i]->ifOperStatus));
+	    if (ifTable[i]->ifMtu) {
+		g_string_sprintfa(s, " %5d", *(ifTable[i]->ifMtu));
 	    } else {
 		g_string_sprintfa(s, "  ----");
 	    }
-	    if (ifEntry[i]->ifSpeed) {
-		if (*(ifEntry[i]->ifSpeed) == 0xffffffff
-		    && ifXEntry && ifXEntry[i]->ifHighSpeed) {
+	    if (ifTable[i]->ifSpeed) {
+		if (*(ifTable[i]->ifSpeed) == 0xffffffff
+		    && ifXTable && ifXTable[i]->ifHighSpeed) {
 		    g_string_sprintfa(s, " %5s",
-				      fmt_gtp(*(ifXEntry[i]->ifHighSpeed)));
+				      fmt_gtp(*(ifXTable[i]->ifHighSpeed)));
 		} else {
 		    g_string_sprintfa(s, " %5s",
-				      fmt_kmg(*(ifEntry[i]->ifSpeed)));
+				      fmt_kmg(*(ifTable[i]->ifSpeed)));
 		}
 	    } else {
 		g_string_sprintfa(s, "  ----");
 	    }
 
-	    if (ifEntry[i]->ifInOctets && delta > TV_DELTA) {
+	    if (ifTable[i]->ifInOctets && delta > TV_DELTA) {
 		if (last.tv_sec && last.tv_usec) {
-		    double f_val = (*(ifEntry[i]->ifInOctets) - stats[i].inOctets) / delta;
+		    double f_val = (*(ifTable[i]->ifInOctets) - stats[i].inOctets) / delta;
 		    g_string_sprintfa(s, " %5s",
 				      fmt_kmg((guint32) f_val));
 		} else {
 		    g_string_sprintfa(s, "  ----");
 		}
-		stats[i].inOctets = *(ifEntry[i]->ifInOctets);
+		stats[i].inOctets = *(ifTable[i]->ifInOctets);
 	    } else {
 		g_string_sprintfa(s, "  ----");
 	    }
 	    
-	    if (ifEntry[i]->ifOutOctets && delta > TV_DELTA) {
+	    if (ifTable[i]->ifOutOctets && delta > TV_DELTA) {
 		if (last.tv_sec && last.tv_usec) {
-		    double f_val = (*(ifEntry[i]->ifOutOctets) - stats[i].outOctets) / delta;
+		    double f_val = (*(ifTable[i]->ifOutOctets) - stats[i].outOctets) / delta;
 		    g_string_sprintfa(s, " %5s",
 				      fmt_kmg((guint32) f_val));
 		} else {
 		    g_string_sprintfa(s, "  ----");
 		}
-		stats[i].outOctets = *(ifEntry[i]->ifOutOctets);
+		stats[i].outOctets = *(ifTable[i]->ifOutOctets);
 	    } else {
 		g_string_sprintfa(s, "  ----");
 	    }
 	    
-	    if (ifEntry[i]->ifInUcastPkts && delta > TV_DELTA) {
+	    if (ifTable[i]->ifInUcastPkts && delta > TV_DELTA) {
 		guint32 pkts;
-		pkts = *(ifEntry[i]->ifInUcastPkts);
-		if (ifXEntry && ifXEntry[i]->ifInMulticastPkts
-		    && ifXEntry[i]->ifInBroadcastPkts) {
-		    pkts += *(ifXEntry[i]->ifInMulticastPkts);
-		    pkts += *(ifXEntry[i]->ifInBroadcastPkts);
-		} else if (ifEntry[i]->ifInNUcastPkts) {
-		    pkts += *(ifEntry[i]->ifInNUcastPkts);
+		pkts = *(ifTable[i]->ifInUcastPkts);
+		if (ifXTable && ifXTable[i]->ifInMulticastPkts
+		    && ifXTable[i]->ifInBroadcastPkts) {
+		    pkts += *(ifXTable[i]->ifInMulticastPkts);
+		    pkts += *(ifXTable[i]->ifInBroadcastPkts);
+		} else if (ifTable[i]->ifInNUcastPkts) {
+		    pkts += *(ifTable[i]->ifInNUcastPkts);
 		} else {
 		    /* might be fixed length ??? */
 		}
@@ -289,15 +289,15 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 		g_string_sprintfa(s, "  ----");
 	    }
 	    
-	    if (ifEntry[i]->ifOutUcastPkts && delta > TV_DELTA) {
+	    if (ifTable[i]->ifOutUcastPkts && delta > TV_DELTA) {
 		guint32 pkts;
-		pkts = *(ifEntry[i]->ifOutUcastPkts);
-		if (ifXEntry && ifXEntry[i]->ifOutMulticastPkts
-		    && ifXEntry[i]->ifOutBroadcastPkts) {
-		    pkts += *(ifXEntry[i]->ifOutMulticastPkts);
-		    pkts += *(ifXEntry[i]->ifOutBroadcastPkts);
-		} else if (ifEntry[i]->ifOutNUcastPkts) {
-		    pkts += *(ifEntry[i]->ifOutNUcastPkts);
+		pkts = *(ifTable[i]->ifOutUcastPkts);
+		if (ifXTable && ifXTable[i]->ifOutMulticastPkts
+		    && ifXTable[i]->ifOutBroadcastPkts) {
+		    pkts += *(ifXTable[i]->ifOutMulticastPkts);
+		    pkts += *(ifXTable[i]->ifOutBroadcastPkts);
+		} else if (ifTable[i]->ifOutNUcastPkts) {
+		    pkts += *(ifTable[i]->ifOutNUcastPkts);
 		} else {
 		    /* might be fixed length ??? */
 		}
@@ -313,10 +313,10 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 		g_string_sprintfa(s, "  ----");
 	    }
 	    
-	    if (ifEntry[i]->ifDescr && ifEntry[i]->_ifDescrLength) {
+	    if (ifTable[i]->ifDescr && ifTable[i]->_ifDescrLength) {
 		g_string_sprintfa(s, "  %.*s",
-				  (int) ifEntry[i]->_ifDescrLength,
-				  ifEntry[i]->ifDescr);
+				  (int) ifTable[i]->_ifDescrLength,
+				  ifTable[i]->ifDescr);
 	    }
 	    g_string_truncate(s, COLS);
 	    mvwprintw(win, i+1, 0, s->str);
@@ -325,8 +325,8 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
     }
     
     last = now;
-    if (ifEntry) if_mib_free_ifEntry(ifEntry);
-    if (ifXEntry) if_mib_free_ifXEntry(ifXEntry);
+    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifXTable) if_mib_free_ifXTable(ifXTable);
 }
 
 

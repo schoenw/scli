@@ -32,6 +32,9 @@ typedef struct usmStats {
     guint32  *usmStatsDecryptionErrors;
 } usmStats_t;
 
+extern usmStats_t *
+snmp_user_based_sm_mib_new_usmStats();
+
 extern int
 snmp_user_based_sm_mib_get_usmStats(host_snmp *s, usmStats_t **usmStats);
 
@@ -46,8 +49,14 @@ typedef struct usmUser {
     gint32   *usmUserSpinLock;
 } usmUser_t;
 
+extern usmUser_t *
+snmp_user_based_sm_mib_new_usmUser();
+
 extern int
 snmp_user_based_sm_mib_get_usmUser(host_snmp *s, usmUser_t **usmUser);
+
+extern int
+snmp_user_based_sm_mib_set_usmUser(host_snmp *s, usmUser_t *usmUser);
 
 extern void
 snmp_user_based_sm_mib_free_usmUser(usmUser_t *usmUser);
@@ -84,10 +93,22 @@ typedef struct usmUserEntry {
 } usmUserEntry_t;
 
 extern int
-snmp_user_based_sm_mib_get_usmUserEntry(host_snmp *s, usmUserEntry_t ***usmUserEntry);
+snmp_user_based_sm_mib_get_usmUserTable(host_snmp *s, usmUserEntry_t ***usmUserEntry);
 
 extern void
-snmp_user_based_sm_mib_free_usmUserEntry(usmUserEntry_t **usmUserEntry);
+snmp_user_based_sm_mib_free_usmUserTable(usmUserEntry_t **usmUserEntry);
+
+extern usmUserEntry_t *
+snmp_user_based_sm_mib_new_usmUserEntry();
+
+extern int
+snmp_user_based_sm_mib_get_usmUserEntry(host_snmp *s, usmUserEntry_t **usmUserEntry);
+
+extern int
+snmp_user_based_sm_mib_set_usmUserEntry(host_snmp *s, usmUserEntry_t *usmUserEntry);
+
+extern void
+snmp_user_based_sm_mib_free_usmUserEntry(usmUserEntry_t *usmUserEntry);
 
 
 #endif /* _SNMP_USER_BASED_SM_MIB_H_ */

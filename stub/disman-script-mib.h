@@ -49,10 +49,19 @@ typedef struct smLangEntry {
 } smLangEntry_t;
 
 extern int
-disman_script_mib_get_smLangEntry(host_snmp *s, smLangEntry_t ***smLangEntry);
+disman_script_mib_get_smLangTable(host_snmp *s, smLangEntry_t ***smLangEntry);
 
 extern void
-disman_script_mib_free_smLangEntry(smLangEntry_t **smLangEntry);
+disman_script_mib_free_smLangTable(smLangEntry_t **smLangEntry);
+
+extern smLangEntry_t *
+disman_script_mib_new_smLangEntry();
+
+extern int
+disman_script_mib_get_smLangEntry(host_snmp *s, smLangEntry_t **smLangEntry);
+
+extern void
+disman_script_mib_free_smLangEntry(smLangEntry_t *smLangEntry);
 
 /*
  * C type definitions for DISMAN-SCRIPT-MIB::smExtsnEntry.
@@ -74,10 +83,19 @@ typedef struct smExtsnEntry {
 } smExtsnEntry_t;
 
 extern int
-disman_script_mib_get_smExtsnEntry(host_snmp *s, smExtsnEntry_t ***smExtsnEntry);
+disman_script_mib_get_smExtsnTable(host_snmp *s, smExtsnEntry_t ***smExtsnEntry);
 
 extern void
-disman_script_mib_free_smExtsnEntry(smExtsnEntry_t **smExtsnEntry);
+disman_script_mib_free_smExtsnTable(smExtsnEntry_t **smExtsnEntry);
+
+extern smExtsnEntry_t *
+disman_script_mib_new_smExtsnEntry();
+
+extern int
+disman_script_mib_get_smExtsnEntry(host_snmp *s, smExtsnEntry_t **smExtsnEntry);
+
+extern void
+disman_script_mib_free_smExtsnEntry(smExtsnEntry_t *smExtsnEntry);
 
 /*
  * C type definitions for DISMAN-SCRIPT-MIB::smScriptEntry.
@@ -100,10 +118,22 @@ typedef struct smScriptEntry {
 } smScriptEntry_t;
 
 extern int
-disman_script_mib_get_smScriptEntry(host_snmp *s, smScriptEntry_t ***smScriptEntry);
+disman_script_mib_get_smScriptTable(host_snmp *s, smScriptEntry_t ***smScriptEntry);
 
 extern void
-disman_script_mib_free_smScriptEntry(smScriptEntry_t **smScriptEntry);
+disman_script_mib_free_smScriptTable(smScriptEntry_t **smScriptEntry);
+
+extern smScriptEntry_t *
+disman_script_mib_new_smScriptEntry();
+
+extern int
+disman_script_mib_get_smScriptEntry(host_snmp *s, smScriptEntry_t **smScriptEntry);
+
+extern int
+disman_script_mib_set_smScriptEntry(host_snmp *s, smScriptEntry_t *smScriptEntry);
+
+extern void
+disman_script_mib_free_smScriptEntry(smScriptEntry_t *smScriptEntry);
 
 /*
  * C type definitions for DISMAN-SCRIPT-MIB::smCodeEntry.
@@ -121,10 +151,22 @@ typedef struct smCodeEntry {
 } smCodeEntry_t;
 
 extern int
-disman_script_mib_get_smCodeEntry(host_snmp *s, smCodeEntry_t ***smCodeEntry);
+disman_script_mib_get_smCodeTable(host_snmp *s, smCodeEntry_t ***smCodeEntry);
 
 extern void
-disman_script_mib_free_smCodeEntry(smCodeEntry_t **smCodeEntry);
+disman_script_mib_free_smCodeTable(smCodeEntry_t **smCodeEntry);
+
+extern smCodeEntry_t *
+disman_script_mib_new_smCodeEntry();
+
+extern int
+disman_script_mib_get_smCodeEntry(host_snmp *s, smCodeEntry_t **smCodeEntry);
+
+extern int
+disman_script_mib_set_smCodeEntry(host_snmp *s, smCodeEntry_t *smCodeEntry);
+
+extern void
+disman_script_mib_free_smCodeEntry(smCodeEntry_t *smCodeEntry);
 
 /*
  * C type definitions for DISMAN-SCRIPT-MIB::smLaunchEntry.
@@ -155,10 +197,22 @@ typedef struct smLaunchEntry {
 } smLaunchEntry_t;
 
 extern int
-disman_script_mib_get_smLaunchEntry(host_snmp *s, smLaunchEntry_t ***smLaunchEntry);
+disman_script_mib_get_smLaunchTable(host_snmp *s, smLaunchEntry_t ***smLaunchEntry);
 
 extern void
-disman_script_mib_free_smLaunchEntry(smLaunchEntry_t **smLaunchEntry);
+disman_script_mib_free_smLaunchTable(smLaunchEntry_t **smLaunchEntry);
+
+extern smLaunchEntry_t *
+disman_script_mib_new_smLaunchEntry();
+
+extern int
+disman_script_mib_get_smLaunchEntry(host_snmp *s, smLaunchEntry_t **smLaunchEntry);
+
+extern int
+disman_script_mib_set_smLaunchEntry(host_snmp *s, smLaunchEntry_t *smLaunchEntry);
+
+extern void
+disman_script_mib_free_smLaunchEntry(smLaunchEntry_t *smLaunchEntry);
 
 /*
  * C type definitions for DISMAN-SCRIPT-MIB::smRunEntry.
@@ -188,10 +242,22 @@ typedef struct smRunEntry {
 } smRunEntry_t;
 
 extern int
-disman_script_mib_get_smRunEntry(host_snmp *s, smRunEntry_t ***smRunEntry);
+disman_script_mib_get_smRunTable(host_snmp *s, smRunEntry_t ***smRunEntry);
 
 extern void
-disman_script_mib_free_smRunEntry(smRunEntry_t **smRunEntry);
+disman_script_mib_free_smRunTable(smRunEntry_t **smRunEntry);
+
+extern smRunEntry_t *
+disman_script_mib_new_smRunEntry();
+
+extern int
+disman_script_mib_get_smRunEntry(host_snmp *s, smRunEntry_t **smRunEntry);
+
+extern int
+disman_script_mib_set_smRunEntry(host_snmp *s, smRunEntry_t *smRunEntry);
+
+extern void
+disman_script_mib_free_smRunEntry(smRunEntry_t *smRunEntry);
 
 
 #endif /* _DISMAN_SCRIPT_MIB_H_ */

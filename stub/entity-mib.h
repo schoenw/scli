@@ -54,10 +54,22 @@ typedef struct entPhysicalEntry {
 } entPhysicalEntry_t;
 
 extern int
-entity_mib_get_entPhysicalEntry(host_snmp *s, entPhysicalEntry_t ***entPhysicalEntry);
+entity_mib_get_entPhysicalTable(host_snmp *s, entPhysicalEntry_t ***entPhysicalEntry);
 
 extern void
-entity_mib_free_entPhysicalEntry(entPhysicalEntry_t **entPhysicalEntry);
+entity_mib_free_entPhysicalTable(entPhysicalEntry_t **entPhysicalEntry);
+
+extern entPhysicalEntry_t *
+entity_mib_new_entPhysicalEntry();
+
+extern int
+entity_mib_get_entPhysicalEntry(host_snmp *s, entPhysicalEntry_t **entPhysicalEntry);
+
+extern int
+entity_mib_set_entPhysicalEntry(host_snmp *s, entPhysicalEntry_t *entPhysicalEntry);
+
+extern void
+entity_mib_free_entPhysicalEntry(entPhysicalEntry_t *entPhysicalEntry);
 
 /*
  * C type definitions for ENTITY-MIB::entLogicalEntry.
@@ -82,10 +94,19 @@ typedef struct entLogicalEntry {
 } entLogicalEntry_t;
 
 extern int
-entity_mib_get_entLogicalEntry(host_snmp *s, entLogicalEntry_t ***entLogicalEntry);
+entity_mib_get_entLogicalTable(host_snmp *s, entLogicalEntry_t ***entLogicalEntry);
 
 extern void
-entity_mib_free_entLogicalEntry(entLogicalEntry_t **entLogicalEntry);
+entity_mib_free_entLogicalTable(entLogicalEntry_t **entLogicalEntry);
+
+extern entLogicalEntry_t *
+entity_mib_new_entLogicalEntry();
+
+extern int
+entity_mib_get_entLogicalEntry(host_snmp *s, entLogicalEntry_t **entLogicalEntry);
+
+extern void
+entity_mib_free_entLogicalEntry(entLogicalEntry_t *entLogicalEntry);
 
 /*
  * C type definitions for ENTITY-MIB::entLPMappingEntry.
@@ -97,10 +118,19 @@ typedef struct entLPMappingEntry {
 } entLPMappingEntry_t;
 
 extern int
-entity_mib_get_entLPMappingEntry(host_snmp *s, entLPMappingEntry_t ***entLPMappingEntry);
+entity_mib_get_entLPMappingTable(host_snmp *s, entLPMappingEntry_t ***entLPMappingEntry);
 
 extern void
-entity_mib_free_entLPMappingEntry(entLPMappingEntry_t **entLPMappingEntry);
+entity_mib_free_entLPMappingTable(entLPMappingEntry_t **entLPMappingEntry);
+
+extern entLPMappingEntry_t *
+entity_mib_new_entLPMappingEntry();
+
+extern int
+entity_mib_get_entLPMappingEntry(host_snmp *s, entLPMappingEntry_t **entLPMappingEntry);
+
+extern void
+entity_mib_free_entLPMappingEntry(entLPMappingEntry_t *entLPMappingEntry);
 
 /*
  * C type definitions for ENTITY-MIB::entAliasMappingEntry.
@@ -114,10 +144,19 @@ typedef struct entAliasMappingEntry {
 } entAliasMappingEntry_t;
 
 extern int
-entity_mib_get_entAliasMappingEntry(host_snmp *s, entAliasMappingEntry_t ***entAliasMappingEntry);
+entity_mib_get_entAliasMappingTable(host_snmp *s, entAliasMappingEntry_t ***entAliasMappingEntry);
 
 extern void
-entity_mib_free_entAliasMappingEntry(entAliasMappingEntry_t **entAliasMappingEntry);
+entity_mib_free_entAliasMappingTable(entAliasMappingEntry_t **entAliasMappingEntry);
+
+extern entAliasMappingEntry_t *
+entity_mib_new_entAliasMappingEntry();
+
+extern int
+entity_mib_get_entAliasMappingEntry(host_snmp *s, entAliasMappingEntry_t **entAliasMappingEntry);
+
+extern void
+entity_mib_free_entAliasMappingEntry(entAliasMappingEntry_t *entAliasMappingEntry);
 
 /*
  * C type definitions for ENTITY-MIB::entPhysicalContainsEntry.
@@ -129,10 +168,19 @@ typedef struct entPhysicalContainsEntry {
 } entPhysicalContainsEntry_t;
 
 extern int
-entity_mib_get_entPhysicalContainsEntry(host_snmp *s, entPhysicalContainsEntry_t ***entPhysicalContainsEntry);
+entity_mib_get_entPhysicalContainsTable(host_snmp *s, entPhysicalContainsEntry_t ***entPhysicalContainsEntry);
 
 extern void
-entity_mib_free_entPhysicalContainsEntry(entPhysicalContainsEntry_t **entPhysicalContainsEntry);
+entity_mib_free_entPhysicalContainsTable(entPhysicalContainsEntry_t **entPhysicalContainsEntry);
+
+extern entPhysicalContainsEntry_t *
+entity_mib_new_entPhysicalContainsEntry();
+
+extern int
+entity_mib_get_entPhysicalContainsEntry(host_snmp *s, entPhysicalContainsEntry_t **entPhysicalContainsEntry);
+
+extern void
+entity_mib_free_entPhysicalContainsEntry(entPhysicalContainsEntry_t *entPhysicalContainsEntry);
 
 /*
  * C type definitions for ENTITY-MIB::entityGeneral.
@@ -141,6 +189,9 @@ entity_mib_free_entPhysicalContainsEntry(entPhysicalContainsEntry_t **entPhysica
 typedef struct entityGeneral {
     guint32  *entLastChangeTime;
 } entityGeneral_t;
+
+extern entityGeneral_t *
+entity_mib_new_entityGeneral();
 
 extern int
 entity_mib_get_entityGeneral(host_snmp *s, entityGeneral_t **entityGeneral);

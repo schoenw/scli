@@ -40,6 +40,9 @@ typedef struct tcp {
     guint32  *tcpOutRsts;
 } tcp_t;
 
+extern tcp_t *
+tcp_mib_new_tcp();
+
 extern int
 tcp_mib_get_tcp(host_snmp *s, tcp_t **tcp);
 
@@ -59,10 +62,22 @@ typedef struct tcpConnEntry {
 } tcpConnEntry_t;
 
 extern int
-tcp_mib_get_tcpConnEntry(host_snmp *s, tcpConnEntry_t ***tcpConnEntry);
+tcp_mib_get_tcpConnTable(host_snmp *s, tcpConnEntry_t ***tcpConnEntry);
 
 extern void
-tcp_mib_free_tcpConnEntry(tcpConnEntry_t **tcpConnEntry);
+tcp_mib_free_tcpConnTable(tcpConnEntry_t **tcpConnEntry);
+
+extern tcpConnEntry_t *
+tcp_mib_new_tcpConnEntry();
+
+extern int
+tcp_mib_get_tcpConnEntry(host_snmp *s, tcpConnEntry_t **tcpConnEntry);
+
+extern int
+tcp_mib_set_tcpConnEntry(host_snmp *s, tcpConnEntry_t *tcpConnEntry);
+
+extern void
+tcp_mib_free_tcpConnEntry(tcpConnEntry_t *tcpConnEntry);
 
 
 #endif /* _TCP_MIB_H_ */

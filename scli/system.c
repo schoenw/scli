@@ -104,20 +104,20 @@ show_device(GString *s, hrDeviceEntry_t *hrDeviceEntry)
 static int
 cmd_devices(scli_interp_t *interp, int argc, char **argv)
 {
-    hrDeviceEntry_t **hrDeviceEntry = NULL;
+    hrDeviceEntry_t **hrDeviceTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (host_resources_mib_get_hrDeviceEntry(interp->peer, &hrDeviceEntry)) {
+    if (host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable)) {
 	return SCLI_ERROR;
     }
     
-    if (hrDeviceEntry) {
-	for (i = 0; hrDeviceEntry[i]; i++) {
-	    show_device(interp->result, hrDeviceEntry[i]);
+    if (hrDeviceTable) {
+	for (i = 0; hrDeviceTable[i]; i++) {
+	    show_device(interp->result, hrDeviceTable[i]);
 	}
-	host_resources_mib_free_hrDeviceEntry(hrDeviceEntry);
+	host_resources_mib_free_hrDeviceTable(hrDeviceTable);
     }
 
     return SCLI_OK;
@@ -166,30 +166,30 @@ show_process(GString *s, hrSWRunEntry_t *hrSWRunEntry,
 static int
 cmd_processes(scli_interp_t *interp, int argc, char **argv)
 {
-    hrSWRunEntry_t **hrSWRunEntry = NULL;
-    hrSWRunPerfEntry_t **hrSWRunPerfEntry = NULL;
+    hrSWRunEntry_t **hrSWRunTable = NULL;
+    hrSWRunPerfEntry_t **hrSWRunPerfTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (host_resources_mib_get_hrSWRunEntry(interp->peer, &hrSWRunEntry)) {
+    if (host_resources_mib_get_hrSWRunTable(interp->peer, &hrSWRunTable)) {
 	return SCLI_ERROR;
     }
-    (void) host_resources_mib_get_hrSWRunPerfEntry(interp->peer,
-						   &hrSWRunPerfEntry);
+    (void) host_resources_mib_get_hrSWRunPerfTable(interp->peer,
+						   &hrSWRunPerfTable);
 
-    if (hrSWRunEntry) {
+    if (hrSWRunTable) {
 	g_string_append(interp->result, "  PID S T MEMORY    TIME COMMAND\n");
-	for (i = 0; hrSWRunEntry[i]; i++) {
-	    show_process(interp->result, hrSWRunEntry[i],
-			 hrSWRunPerfEntry ? hrSWRunPerfEntry[i] : NULL);
+	for (i = 0; hrSWRunTable[i]; i++) {
+	    show_process(interp->result, hrSWRunTable[i],
+			 hrSWRunPerfTable ? hrSWRunPerfTable[i] : NULL);
 	}
     }
 	
-    if (hrSWRunEntry)
-	host_resources_mib_free_hrSWRunEntry(hrSWRunEntry);
-    if (hrSWRunPerfEntry)
-	host_resources_mib_free_hrSWRunPerfEntry(hrSWRunPerfEntry);
+    if (hrSWRunTable)
+	host_resources_mib_free_hrSWRunTable(hrSWRunTable);
+    if (hrSWRunPerfTable)
+	host_resources_mib_free_hrSWRunPerfTable(hrSWRunPerfTable);
     
     return SCLI_OK;
 }
@@ -231,34 +231,34 @@ show_mount(GString *s, hrFSEntry_t *hrFSEntry, int loc_len, int rem_len)
 static int
 cmd_mounts(scli_interp_t *interp, int argc, char **argv)
 {
-    hrFSEntry_t **hrFSEntry = NULL;
+    hrFSEntry_t **hrFSTable = NULL;
     int i, loc_len = 20, rem_len = 20;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (host_resources_mib_get_hrFSEntry(interp->peer, &hrFSEntry)) {
+    if (host_resources_mib_get_hrFSTable(interp->peer, &hrFSTable)) {
 	return SCLI_ERROR;
     }
 
-    if (hrFSEntry) {
-	for (i = 0; hrFSEntry[i]; i++) {
-	    if (hrFSEntry[i]->hrFSMountPoint) {
+    if (hrFSTable) {
+	for (i = 0; hrFSTable[i]; i++) {
+	    if (hrFSTable[i]->hrFSMountPoint) {
 		loc_len = MAX(loc_len,
-			      hrFSEntry[i]->_hrFSMountPointLength);
+			      hrFSTable[i]->_hrFSMountPointLength);
 	    }
-	    if (hrFSEntry[i]->hrFSRemoteMountPoint) {
+	    if (hrFSTable[i]->hrFSRemoteMountPoint) {
 		rem_len = MAX(rem_len,
-			      hrFSEntry[i]->_hrFSRemoteMountPointLength);
+			      hrFSTable[i]->_hrFSRemoteMountPointLength);
 	    }
 	}
 	loc_len++, rem_len++;
 	g_string_sprintfa(interp->result, "%-*s%-*sAccess\n",
 			  loc_len, "Mount Point",
 			  rem_len, "Remote Mount Point");
-	for (i = 0; hrFSEntry[i]; i++) {
-	    show_mount(interp->result, hrFSEntry[i], loc_len, rem_len);
+	for (i = 0; hrFSTable[i]; i++) {
+	    show_mount(interp->result, hrFSTable[i], loc_len, rem_len);
 	}
-	host_resources_mib_free_hrFSEntry(hrFSEntry);
+	host_resources_mib_free_hrFSTable(hrFSTable);
     }
 
     return SCLI_OK;
@@ -338,23 +338,23 @@ show_storage(GString *s, hrStorageEntry_t *hrStorageEntry)
 static int
 cmd_storage(scli_interp_t *interp, int argc, char **argv)
 {
-    hrStorageEntry_t **hrStorageEntry = NULL;
+    hrStorageEntry_t **hrStorageTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (host_resources_mib_get_hrStorageEntry(interp->peer,
-					      &hrStorageEntry)) {
+    if (host_resources_mib_get_hrStorageTable(interp->peer,
+					      &hrStorageTable)) {
 	return SCLI_ERROR;
     }
 
-    if (hrStorageEntry) {
+    if (hrStorageTable) {
 	g_string_append(interp->result, "Storage Area          "
 	       "Size [K]   Used [K]   Free [K] Use%\n");
-	for (i = 0; hrStorageEntry[i]; i++) {
-	    show_storage(interp->result, hrStorageEntry[i]);
+	for (i = 0; hrStorageTable[i]; i++) {
+	    show_storage(interp->result, hrStorageTable[i]);
 	}
-	host_resources_mib_free_hrStorageEntry(hrStorageEntry);
+	host_resources_mib_free_hrStorageTable(hrStorageTable);
     }
 
     return SCLI_OK;
@@ -370,7 +370,7 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
     hrStorage_t *hrStorage = NULL;
     interfaces_t *interfaces = NULL;
     dot1dBase_t *dot1dBase = NULL;
-    smLangEntry_t **smLangEntry = NULL;
+    smLangEntry_t **smLangTable = NULL;
     GString *s;
     int i;
     int const indent = 18;
@@ -384,7 +384,7 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
     (void) host_resources_mib_get_hrStorage(interp->peer, &hrStorage);
     (void) if_mib_get_interfaces(interp->peer, &interfaces);
     (void) bridge_mib_get_dot1dBase(interp->peer, &dot1dBase);
-    (void) disman_script_mib_get_smLangEntry(interp->peer, &smLangEntry);
+    (void) disman_script_mib_get_smLangTable(interp->peer, &smLangTable);
     
     s = interp->result;
     if (system) {
@@ -502,8 +502,8 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 	}
     }
 
-    if (smLangEntry) {
-	for (i = 0; smLangEntry[i]; i++) ;
+    if (smLangTable) {
+	for (i = 0; smLangTable[i]; i++) ;
 	g_string_sprintfa(s, "\n%-*s %u", indent, "Script Languages:", i);
     }
 
@@ -519,8 +519,8 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 	if_mib_free_interfaces(interfaces);
     if (dot1dBase)
 	bridge_mib_free_dot1dBase(dot1dBase);
-    if (smLangEntry)
-	disman_script_mib_free_smLangEntry(smLangEntry);
+    if (smLangTable)
+	disman_script_mib_free_smLangTable(smLangTable);
 
     return SCLI_OK;
 }
