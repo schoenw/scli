@@ -166,6 +166,12 @@ fmt_kmg(guint32 number);
 extern char*
 fmt_gtp(guint32 number);
 
+extern char*
+fmt_port(int port, int name);
+
+extern char*
+fmt_ipv4_address(guchar *addr, int name);
+
 
 #endif /* _SCLI_H */
 

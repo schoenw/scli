@@ -31,21 +31,18 @@
 static void
 show_tcp_connection(GString *s, tcpConnEntry_t *tcpConnEntry)
 {
-    int j;
+    int pos;
     
-    for (j = 0; j < 4; j++) {
-	g_string_sprintfa(s, "%s%d", j ? "." : "",
-			  tcpConnEntry->tcpConnLocalAddress[j]);
-    }
-    g_string_sprintfa(s, ":%d",
-		      tcpConnEntry->tcpConnLocalPort);
-    g_string_append(s, "\t\t");
-    for (j = 0; j < 4; j++) {
-	g_string_sprintfa(s, "%s%d", j ? "." : "",
-			  tcpConnEntry->tcpConnRemAddress[j]);
-    }
-    g_string_sprintfa(s, ":%d\t\t",
-		      tcpConnEntry->tcpConnRemPort);
+    g_string_sprintfa(s, "%s:%s%n",
+		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress, 1),
+		      fmt_port(tcpConnEntry->tcpConnLocalPort, 1),
+		      &pos);
+    g_string_sprintfa(s, "%*s", 32-pos, "");
+    g_string_sprintfa(s, "%s:%s%n",
+		      fmt_ipv4_address(tcpConnEntry->tcpConnRemAddress, 1),
+		      fmt_port(tcpConnEntry->tcpConnRemPort, 1),
+		      &pos);
+    g_string_sprintfa(s, "%*s", 32-pos, "");
     if (tcpConnEntry->tcpConnState) {
 	fmt_enum(s, 1, tcp_mib_enums_tcpConnState,
 		 tcpConnEntry->tcpConnState);
@@ -68,8 +65,8 @@ cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (tcpConnEntry) {
-	g_string_append(interp->result,
-			"Local Address\t\tRemote Address\t\tState\n");
+	g_string_sprintfa(interp->result, "%-32s%-32s%s\n",
+			  "Local Address", "Remote Address", "State");
 	for (i = 0; tcpConnEntry[i]; i++) {
 	    show_tcp_connection(interp->result, tcpConnEntry[i]);
 	}
@@ -92,7 +89,7 @@ scli_init_tcp_mode(scli_interp_t *interp)
     };
     
     static scli_mode_t tcp_mode = {
-	"interface",
+	"tcp",
 	"scli mode to display and configure tcp parameters",
 	cmds,
 	NULL,

@@ -27,6 +27,9 @@
 #include "stools.h"
 #include "scli.h"
 
+#include <netdb.h>
+#include <netinet/in.h>
+
 extern time_t timezone;
 
 
@@ -139,3 +142,43 @@ fmt_gtp(guint32 number)
 }
 
 
+
+char*
+fmt_port(int port, int name)
+{
+    struct servent *s;
+    static char buffer[12];
+
+    if (name) {
+	s = getservbyport(htons(port), "tcp");
+	if (s) {
+	    return s->s_name;
+	}
+	if (! port) {
+	    return "*";
+	}
+    }
+    sprintf(buffer, "%d", port);
+    return buffer;
+}
+
+
+
+char*
+fmt_ipv4_address(guchar *addr, int name)
+{
+    static char buffer[16];
+    struct hostent *h;
+
+    if (name) {
+	h = gethostbyaddr((char *) addr, 4, AF_INET);
+	if (h) {
+	    return h->h_name;
+	}
+	if (! addr[0] && ! addr[1] && ! addr[2] && ! addr[3]) {
+	    return "*";
+	}
+    }
+    sprintf(buffer, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
+    return buffer;
+}

@@ -145,6 +145,19 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
 	    } else {
 		g_string_append(s, " Change:\n");
 	    }
+	    
+	    for (j = 0; ipAddrEntry[j]; j++) {
+		if (ipAddrEntry[j]->ipAdEntIfIndex
+		    && (ifEntry[i]->ifIndex
+			== *(ipAddrEntry[j]->ipAdEntIfIndex))) {
+		    g_string_sprintfa(s, "IP Address:  %-*s", width,
+				      fmt_ipv4_address(
+					  ipAddrEntry[j]->ipAdEntAddr, 0));
+		    g_string_sprintfa(s, " Host:    %s\n",
+				      fmt_ipv4_address(
+					  ipAddrEntry[j]->ipAdEntAddr, 1));
+		}
+	    }
 	    	    
 	    if (ifEntry[i]->ifDescr && ifEntry[i]->_ifDescrLength) {
 		g_string_sprintfa(s, "Description: %.*s\n",
@@ -157,20 +170,6 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
 		g_string_sprintfa(s, "Alias:       %.*s\n",
 			    (int) ifXEntry[i]->_ifAliasLength,
 				  ifXEntry[i]->ifAlias);
-	    }
-	    
-	    for (j = 0; ipAddrEntry[j]; j++) {
-		if (ipAddrEntry[j]->ipAdEntIfIndex
-		    && (ifEntry[i]->ifIndex
-			== *(ipAddrEntry[j]->ipAdEntIfIndex))) {
-		    int k;
-		    g_string_append(s, "IP Address:  ");
-		    for (k = 0; k < 4; k++) {
-			g_string_sprintfa(s, "%s%d", k ? "." : "",
-					  ipAddrEntry[j]->ipAdEntAddr[k]);
-		    }
-		    g_string_append(s, "\n");
-		}
 	    }
 	}
     }
