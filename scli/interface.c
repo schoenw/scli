@@ -27,6 +27,7 @@
 #include "if-mib-proc.h"
 #include "ip-mib.h"
 #include "entity-mib.h"
+#include "ctype.h"
 
 
 
@@ -237,6 +238,45 @@ get_if_name_width(if_mib_ifXEntry_t **ifXTable)
 	}
     }
     return name_width;
+}
+
+
+
+static void
+fmt_entity_root(scli_interp_t *interp,
+		entity_mib_entPhysicalEntry_t **entPhysicalTable,
+		entity_mib_entPhysicalEntry_t *entPhysicalEntry)
+{
+    int const indent = 12;
+    const char *e;
+    GString *s = interp->result;
+    int i;
+
+    while (entPhysicalEntry) {
+	if (entPhysicalEntry && entPhysicalEntry->entPhysicalDescr) {
+	    e = fmt_enum(entity_mib_enums_entPhysicalClass,
+			 entPhysicalEntry->entPhysicalClass);
+	    if (e) {
+		char *x = g_strdup_printf("%s:", e);
+		x[0] = toupper(x[0]);
+		g_string_sprintfa(s, "%-*s %.*s\n", indent, x,
+			    (int) entPhysicalEntry->_entPhysicalDescrLength,
+				  entPhysicalEntry->entPhysicalDescr);
+		g_free(x);
+	    }
+	}
+	for (i = 0; entPhysicalTable[i]; i++) {
+	    if (entPhysicalEntry->entPhysicalContainedIn
+		&& (*entPhysicalEntry->entPhysicalContainedIn
+		    == entPhysicalTable[i]->entPhysicalIndex)) {
+		entPhysicalEntry = entPhysicalTable[i];
+		break;
+	    }
+	}
+	if (!entPhysicalTable[i]) {
+	    entPhysicalEntry = NULL;
+	}
+    }
 }
 
 
@@ -480,10 +520,10 @@ xml_interface_details(xmlNodePtr root,
 
 
 
-static gint32
-get_entity_index(gint32 ifIndex,
-		 entity_mib_entAliasMappingEntry_t **entAliasMappingTable,
-		 entity_mib_entPhysicalEntry_t **entPhysicalTable)
+static entity_mib_entPhysicalEntry_t*
+get_entity(gint32 ifIndex,
+	   entity_mib_entAliasMappingEntry_t **entAliasMappingTable,
+	   entity_mib_entPhysicalEntry_t **entPhysicalTable)
 {
     int i;
     static const gint32 ifIndex_base[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 1};
@@ -515,20 +555,15 @@ get_entity_index(gint32 ifIndex,
 	}
     }
 
-    if (! entPhysicalIndex) {
-	return 0;
-    }
-
-    for (i = 0; entPhysicalTable[i]; i++) {
-	if (entPhysicalTable[i]->entPhysicalIndex == entPhysicalIndex) {
-	    /*
-	    g_printerr("%.*s\n",
-		       (int) entPhysicalTable[i]->_entPhysicalDescrLength,
-		       entPhysicalTable[i]->entPhysicalDescr);
-	    */
+    if (entPhysicalIndex) {
+	for (i = 0; entPhysicalTable[i]; i++) {
+	    if (entPhysicalTable[i]->entPhysicalIndex == entPhysicalIndex) {
+		return entPhysicalTable[i];
+	    }
 	}
     }
-    return entPhysicalIndex;
+
+    return NULL;
 }
 
 
@@ -542,6 +577,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
     ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
     entity_mib_entAliasMappingEntry_t **entAliasMappingTable = NULL;
     entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
+    entity_mib_entPhysicalEntry_t *entPhysicalEntry = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i, c;
 
@@ -590,10 +626,14 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 		    if (c) {
 			g_string_append(interp->result, "\n");
 		    }
-		    (void) get_entity_index(ifTable[i]->ifIndex,
-					    entAliasMappingTable, entPhysicalTable);
+		    entPhysicalEntry = get_entity(ifTable[i]->ifIndex,
+				  entAliasMappingTable, entPhysicalTable);
 		    fmt_interface_details(interp->result, ifTable[i],
 					  ifXEntry, system, ipAddrTable);
+		    if (entPhysicalEntry) {
+			fmt_entity_root(interp, entPhysicalTable,
+					entPhysicalEntry);
+		    }
 		}
 		c++;
 	    }
@@ -1421,7 +1461,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	
 	{ "show interface stack", "[<regexp>]",
 	  "The show interface stack command shows the stacking order\n"
-	  "of the interfaces. <xxx>",
+	  "of the interfaces.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  show_interface_stack },
