@@ -137,7 +137,7 @@ match_vlan(regex_t *regex_vlan,
 
 
 static void
-xml_ports(xmlNodePtr root, guchar *bits, gsize bits_len)
+xml_port_set(xmlNodePtr root, guchar *bits, gsize bits_len)
 {
     int bit, i;
     xmlNodePtr node;
@@ -154,7 +154,7 @@ xml_ports(xmlNodePtr root, guchar *bits, gsize bits_len)
 
 
 static void
-fmt_ports(GString *s, guchar *bits, gsize bits_len)
+fmt_port_set(GString *s, guchar *bits, gsize bits_len)
 {
     int bit, i;
     int first = -1;
@@ -189,7 +189,7 @@ fmt_ports(GString *s, guchar *bits, gsize bits_len)
 
 
 static int
-scan_ports(guchar *bits, gsize bits_len, char *string)
+scan_port_set(guchar *bits, gsize bits_len, char *string)
 {
     char *p = string;
     int i, from, to, off;
@@ -216,6 +216,41 @@ scan_ports(guchar *bits, gsize bits_len, char *string)
     }
 
     return SCLI_OK;
+}
+
+
+
+static void
+fmt_id_list(GString *s, guchar *ids, gint32 numids)
+{
+    int i, cnt;
+    int first = -1;
+    int last = -1;
+    int port;
+
+    for (i = 0, cnt = 0; i < numids; i++) {
+	port = ids[i*2] * 256 + ids[i*2+1];
+	if (first < 0) {
+	    first = port;
+	} else {
+	    if (last+1 != port) {
+		if (first == last) {
+		    g_string_sprintfa(s, "%s%d", cnt ? "," : "", first);
+		} else {
+		    g_string_sprintfa(s, "%s%d-%d", cnt ? "," : "", first, last);
+		}
+		first = port;
+		cnt++;
+	    }
+	}
+	last = port;
+    }
+
+    if (first == last) {
+	g_string_sprintfa(s, "%s%d", i ? "," : "", first);
+    } else {
+	g_string_sprintfa(s, "%s%d-%d", i ? "," : "", first, last);
+    }
 }
 
 
@@ -280,19 +315,19 @@ xml_nortel_bridge_vlan_details(xmlNodePtr root,
 	&& *vlanEntry->rcVlanType == RAPID_CITY_RCVLANTYPE_BYPORT) {
 	if (vlanEntry->rcVlanPortMembers) {
 	    node = xmlNewChild(tree, NULL, "member", NULL);
-	    xml_ports(node, vlanEntry->rcVlanPortMembers, 32);
+	    xml_port_set(node, vlanEntry->rcVlanPortMembers, 32);
 	}
 	if (vlanEntry->rcVlanActiveMembers) {
 	    node = xmlNewChild(tree, NULL, "active", NULL);
-	    xml_ports(node, vlanEntry->rcVlanActiveMembers, 32);
+	    xml_port_set(node, vlanEntry->rcVlanActiveMembers, 32);
 	}
 	if (vlanEntry->rcVlanStaticMembers) {
 	    node = xmlNewChild(tree, NULL, "static", NULL);
-	    xml_ports(node, vlanEntry->rcVlanStaticMembers, 32);
+	    xml_port_set(node, vlanEntry->rcVlanStaticMembers, 32);
 	}
 	if (vlanEntry->rcVlanNotAllowToJoin) {
 	    node = xmlNewChild(tree, NULL, "disallowed", NULL);
-	    xml_ports(node, vlanEntry->rcVlanNotAllowToJoin, 32);
+	    xml_port_set(node, vlanEntry->rcVlanNotAllowToJoin, 32);
 	}
     }
 }
@@ -334,28 +369,28 @@ fmt_nortel_bridge_vlan_details(GString *s,
 	&& *vlanEntry->rcVlanType == RAPID_CITY_RCVLANTYPE_BYPORT) {
 	if (vlanEntry->rcVlanPortMembers) {
 	    g_string_append(s, "\nMember:      ");
-	    fmt_ports(s, vlanEntry->rcVlanPortMembers, 32);
+	    fmt_port_set(s, vlanEntry->rcVlanPortMembers, 32);
 	    g_string_append(s, "\n");
 	} else {
 	    g_string_append(s, "\n");
 	}
 	if (vlanEntry->rcVlanActiveMembers) {
 	    g_string_append(s, "Allowed:     ");
-	    fmt_ports(s, vlanEntry->rcVlanActiveMembers, 32);
+	    fmt_port_set(s, vlanEntry->rcVlanActiveMembers, 32);
 	    g_string_append(s, "\n");
 	} else {
 	    g_string_append(s, "\n");
 	}
 	if (vlanEntry->rcVlanStaticMembers) {
 	    g_string_append(s, "Static:      ");
-	    fmt_ports(s, vlanEntry->rcVlanStaticMembers, 32);
+	    fmt_port_set(s, vlanEntry->rcVlanStaticMembers, 32);
 	    g_string_append(s, "\n");
 	} else {
 	    g_string_append(s, "\n");
 	}
 	if (vlanEntry->rcVlanNotAllowToJoin) {
 	    g_string_append(s, "Disallowed:  ");
-	    fmt_ports(s, vlanEntry->rcVlanNotAllowToJoin, 32);
+	    fmt_port_set(s, vlanEntry->rcVlanNotAllowToJoin, 32);
 	    g_string_append(s, "\n");
 	} else {
 	    g_string_append(s, "\n");
@@ -457,7 +492,7 @@ fmt_nortel_bridge_vlan_info(GString *s,
     }
 
     if (vlanEntry->rcVlanPortMembers) {
-	fmt_ports(s, vlanEntry->rcVlanPortMembers, 32);
+	fmt_port_set(s, vlanEntry->rcVlanPortMembers, 32);
     }
 
     g_string_append(s, "\n");
@@ -547,7 +582,6 @@ fmt_nortel_bridge_vlan_port(GString *s,
     };
 
     const char *e;
-    int i;
     
     g_string_sprintfa(s, "%5u ", vlanPortEntry->rcVlanPortIndex);
 
@@ -574,12 +608,8 @@ fmt_nortel_bridge_vlan_port(GString *s,
 
     if (vlanPortEntry->rcVlanPortNumVlanIds
 	&& vlanPortEntry->rcVlanPortVlanIds) {
-	for (i = 0; i < *vlanPortEntry->rcVlanPortNumVlanIds; i += 2) {
-	    gint32 port;
-	    port = vlanPortEntry->rcVlanPortVlanIds[i*2] * 256
-		+ vlanPortEntry->rcVlanPortVlanIds[i*2+1];
-	    g_string_sprintfa(s, "%s%d", i ? "," : "", port);
-	}
+	fmt_id_list(s, vlanPortEntry->rcVlanPortVlanIds,
+		    *vlanPortEntry->rcVlanPortNumVlanIds);
     }
 
     g_string_sprintfa(s, "\n");
@@ -778,7 +808,7 @@ set_nortel_bridge_vlan_ports(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_REGEXP;
     }
 
-    if (scan_ports(ports, sizeof(ports), argv[2]) != SCLI_OK) {
+    if (scan_port_set(ports, sizeof(ports), argv[2]) != SCLI_OK) {
 	if (regex_vlan) regfree(regex_vlan);
 	return SCLI_SYNTAX;
     }
