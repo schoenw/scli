@@ -437,6 +437,8 @@ main(int argc, char **argv)
     scli_init_ether_mode(interp);
     scli_init_ospf_mode(interp);
     scli_init_printer_mode(interp);
+    scli_init_cisco_mode(interp);
+    scli_init_nortel_mode(interp);
 
     if (! norc) {
 	(void) scli_eval_init_file(interp);

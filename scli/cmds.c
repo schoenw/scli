@@ -69,12 +69,13 @@ print_cmd_tree(GString *s, GNode *node, char *prefix)
 {
     scli_cmd_t *cmd = (scli_cmd_t *) node->data;
     int len;
+    const int width = 24;
 
     len = strlen(prefix);
     
     if (cmd) {
 	g_string_sprintfa(s, "%s- ", prefix);
-	g_string_sprintfa(s, "%-*s %s\n", (20-len > 0) ? 20-len : 0,
+	g_string_sprintfa(s, "%-*s %s\n", (width-len > 0) ? width-len : 0,
 			  cmd->name, cmd->desc ? cmd->desc : "");
     }
 
