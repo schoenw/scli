@@ -464,7 +464,7 @@ main(int argc, char **argv)
     scli_init_nortel_mode(interp);
     scli_init_netsnmp_mode(interp);
 
-    if (argc > 1) {
+    if (optind < argc) {
 	char *margv[] = { "open", NULL, NULL, NULL };
 	margv[1] = argv[optind];
 	margv[2] = argv[optind+1];
