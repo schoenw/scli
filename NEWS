@@ -1,5 +1,10 @@
 Changes in stools 0.1.15:
 
+- stop supports a new tcp mode
+- scli supports a new "show udp listener" command
+- scli supports a new "show tcp listener" command
+- scli shows long output in your favorite pager if $PAGER is defined
+- stubs now check the SNMP ASN.1 type tag in responses
 - scli supports new "open" and "close" commands
 - scli shows the remote host name in the prompt
 - minor bug fixes

@@ -3,15 +3,10 @@
   -u --user
   -c --context
 
-- Check ASN.1 tags in the responses to have some minimum type checking.
-  (Requires changes to the MIB stub generator.)
-
 - Add reasonable error reporting to the stub code.
 
 - Change the configure setup so that stop is linked against curses and
   scli against readline only.
-
-- Enhance the stub generator to properly decode all INDEX elements.
 
 - Add a mechanism (perhaps based on fd_sets) to tell the stubs to retrieve
   only a subset of the members of a data structure. This would be more
@@ -25,8 +20,6 @@
 
 - Complete the disman scli mode and add a disman stop mode.
 
-- Add a mechanism to switch between agents without restarting scli/stop.
-
 - Display processor load in the stop process mode summary line.
 
 - Make index members pointers again in the stub interface? (FS)
@@ -35,8 +28,6 @@
 
 - Generally check strings for printable characters and trim white spaces.
 
-- Do some pager stuff on long results? Should we have an internal pager
-  or should we just call $PAGER?
 
 ==== GXSNMP specific things ====
 
