@@ -141,6 +141,18 @@ fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 
 
 
+static void
+fmt_phys_address(GString *s, guchar *address, guint16 address_len)
+{
+     int i;
+
+     for (i = 0; i < address_len; i++) {
+	  g_string_sprintfa(s, "%s%02X", (i == 0) ? "" : ":", address[i]);
+     }
+}
+
+
+
 static int
 match_interface(regex_t *regex_iface,
 		if_mib_ifEntry_t *ifEntry)
@@ -289,12 +301,14 @@ fmt_interface_details(GString *s,
 		      if_mib_ifEntry_t *ifEntry,
 		      if_mib_ifXEntry_t *ifXEntry,
 		      snmpv2_mib_system_t *system,
-		      ip_mib_ipAddrEntry_t **ipAddrTable)
+		      ip_mib_ipAddrEntry_t **ipAddrTable,
+		      if_mib_ifRcvAddressEntry_t **ifRcvAddrTable)
 {
     int j;
     char *name;
     int const width = 20;
     const char *e;
+    const char *f;
 
     g_string_sprintfa(s, "Interface:   %-*d", width,
 		      ifEntry->ifIndex);
@@ -310,10 +324,8 @@ fmt_interface_details(GString *s,
     g_string_sprintfa(s, "OperStatus:  %-*s", width, e ? e : "");
     if (ifEntry->ifPhysAddress && ifEntry->_ifPhysAddressLength) {
 	g_string_append(s, " Address: ");
-	for (j = 0; j < ifEntry->_ifPhysAddressLength; j++) {
-	    g_string_sprintfa(s, "%s%02X", (j == 0) ? "" : ":",
-			      ifEntry->ifPhysAddress[j]);
-	}
+	fmt_phys_address(s, ifEntry->ifPhysAddress,
+			 ifEntry->_ifPhysAddressLength);
 	/* See RFC 2665 section 3.2.6. why the test below is so ugly... */
 	if (ifEntry->ifType && ifEntry->_ifPhysAddressLength == 6
 	    && (*ifEntry->ifType == IF_MIB_IFTYPE_ETHERNETCSMACD
@@ -372,6 +384,28 @@ fmt_interface_details(GString *s,
 	g_string_append(s, " Change:\n");
     }
 
+    if (ifRcvAddrTable) {
+	for (j = 0; ifRcvAddrTable[j]; j++) {
+	    if (ifRcvAddrTable[j]->ifIndex == ifEntry->ifIndex
+		&& ifRcvAddrTable[j]->ifRcvAddressAddress) {
+		e = fmt_enum(if_mib_enums_ifRcvAddressStatus,
+			     ifRcvAddrTable[j]->ifRcvAddressStatus);
+		f = fmt_enum(if_mib_enums_ifRcvAddressType,
+			     ifRcvAddrTable[j]->ifRcvAddressType);
+		g_string_sprintfa(s, "RecvStatus:  %s/%s",
+				  e ? e : "", f ? f : "");
+		g_string_sprintfa(s, "%*s", width - 1 -
+				  (e ? strlen(e) : 0) - (f ? strlen(f) : 0),
+				  "");
+		g_string_sprintfa(s, " Address: ");
+		fmt_phys_address(s,
+				 ifRcvAddrTable[j]->ifRcvAddressAddress,
+				 ifRcvAddrTable[j]->_ifRcvAddressAddressLength);
+		g_string_sprintfa(s, "\n");
+	    }
+	}
+    }
+
     if (ipAddrTable) {
 	for (j = 0; ipAddrTable[j]; j++) {
 	    if (ipAddrTable[j]->ipAdEntIfIndex
@@ -408,7 +442,8 @@ xml_interface_details(xmlNodePtr root,
 		      if_mib_ifEntry_t *ifEntry,
 		      if_mib_ifXEntry_t *ifXEntry,
 		      snmpv2_mib_system_t *system,
-		      ip_mib_ipAddrEntry_t **ipAddrTable)
+		      ip_mib_ipAddrEntry_t **ipAddrTable,
+		      if_mib_ifRcvAddressEntry_t **ifRcvAddrTable)
 {
     int j;
     xmlNodePtr tree, node;
@@ -576,6 +611,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 {
     if_mib_ifEntry_t **ifTable = NULL;
     if_mib_ifXEntry_t **ifXTable = NULL;
+    if_mib_ifRcvAddressEntry_t **ifRcvAddrTable = NULL;
     snmpv2_mib_system_t *system = NULL;
     ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
     entity_mib_entAliasMappingEntry_t **entAliasMappingTable = NULL;
@@ -611,6 +647,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 
     if (ifTable) {
 	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS);
+	if_mib_get_ifRcvAddressTable(interp->peer, &ifRcvAddrTable, 0);
 	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
 	ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0);
 	
@@ -626,7 +663,8 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 		ifXEntry = get_ifXEntry(ifXTable, ifTable[i]->ifIndex);
 		if (scli_interp_xml(interp)) {
 		    xml_interface_details(interp->xml_node, ifTable[i],
-					  ifXEntry, system, ipAddrTable);
+					  ifXEntry, system, ipAddrTable,
+					  ifRcvAddrTable);
 		} else {
 		    if (c) {
 			g_string_append(interp->result, "\n");
@@ -634,7 +672,8 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 		    entPhysicalEntry = get_entity(ifTable[i]->ifIndex,
 				  entAliasMappingTable, entPhysicalTable);
 		    fmt_interface_details(interp->result, ifTable[i],
-					  ifXEntry, system, ipAddrTable);
+					  ifXEntry, system, ipAddrTable,
+					  ifRcvAddrTable);
 		    if (entPhysicalEntry) {
 			fmt_entity_root(interp, entPhysicalTable,
 					entPhysicalEntry);
@@ -647,6 +686,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 
     if (ifTable) if_mib_proc_free_ifTable(ifTable);
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
+    if (ifRcvAddrTable) if_mib_free_ifRcvAddressTable(ifRcvAddrTable);
     if (system) snmpv2_mib_free_system(system);
     if (ipAddrTable) ip_mib_free_ipAddrTable(ipAddrTable);
     if (entAliasMappingTable)
@@ -1502,7 +1542,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_interface_stats },
-	
+
 	{ "monitor interface stats", "[<regexp>]",
 	  "The `monitor interface stats' command shows the same\n"
 	  "information as the show interface stats command. The\n"
