@@ -111,7 +111,7 @@ fmt_row_status(GString *s, gint32 *status)
 
 
 static int
-cmd_snmp_engine(scli_interp_t *interp, int argc, char **argv)
+show_snmp_engine(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_framework_mib_snmpEngine_t *snmpEngine;
     int const indent = 18;
@@ -151,20 +151,30 @@ cmd_snmp_engine(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_snmp_resource(GString *s, snmpv2_mib_sysOREntry_t *sysOREntry)
+fmt_snmp_resource(GString *s,
+		  snmpv2_mib_sysOREntry_t *sysOREntry,
+		  snmpv2_mib_system_t *system)
 {
-    g_string_sprintfa(s, "%3d: %.*s\n",
-		      sysOREntry->sysORIndex,
-		      (int) sysOREntry->_sysORDescrLength,
-		      sysOREntry->sysORDescr);
+    g_string_sprintfa(s, "%5d ", sysOREntry->sysORIndex);
+    if (sysOREntry->sysORUpTime && system && system->sysUpTime) {
+	guint32 dsecs = *system->sysUpTime - *sysOREntry->sysORUpTime;
+	g_string_append(s, fmt_timeticks(dsecs));
+    }
+    if (sysOREntry->sysORDescr) {
+	g_string_sprintfa(s, " %.*s",
+			  (int) sysOREntry->_sysORDescrLength,
+			  sysOREntry->sysORDescr);
+    }
+    g_string_append(s, "\n");
 }
 
 
 
 static int
-cmd_snmp_resources(scli_interp_t *interp, int argc, char **argv)
+show_snmp_resources(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_sysOREntry_t **sysORTable;
+    snmpv2_mib_system_t *system;
     int i;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -172,14 +182,17 @@ cmd_snmp_resources(scli_interp_t *interp, int argc, char **argv)
     if (snmpv2_mib_get_sysORTable(interp->peer, &sysORTable)) {
 	return SCLI_ERROR;
     }
-    
+    (void) snmpv2_mib_get_system(interp->peer, &system);
+        
     if (sysORTable) {
+	g_string_sprintfa(interp->header, "INDEX DESCRIPTION");
 	for (i = 0; sysORTable[i]; i++) {
-	    show_snmp_resource(interp->result, sysORTable[i]);
+	    fmt_snmp_resource(interp->result, sysORTable[i], system);
 	}
     }
     
     if (sysORTable) snmpv2_mib_free_sysORTable(sysORTable);
+    if (system) snmpv2_mib_free_system(system);
     
     return SCLI_OK;
 }
@@ -187,9 +200,9 @@ cmd_snmp_resources(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_snmp_vacm_group(GString *s,
+fmt_snmp_vacm_group(GString *s,
      snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t *vacmGroupEntry,
-		     int sec_name_width, int sec_group_width)
+		    int sec_name_width, int sec_group_width)
 {
     char const *model;
     
@@ -219,7 +232,7 @@ show_snmp_vacm_group(GString *s,
 
 
 static int
-cmd_snmp_vacm_groups(scli_interp_t *interp, int argc, char **argv)
+show_snmp_vacm_groups(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t **vacmGroupTable;
     int sec_name_width = 8;
@@ -240,12 +253,11 @@ cmd_snmp_vacm_groups(scli_interp_t *interp, int argc, char **argv)
 	    if (vacmGroupTable[i]->_vacmGroupNameLength > sec_group_width)
 		sec_group_width = vacmGroupTable[i]->_vacmGroupNameLength;
 	}
-	g_string_sprintfa(interp->result,
-			  "Row Mod %-*s -> Group\n",
-			  sec_name_width, "Name");
+	g_string_sprintfa(interp->header, "ROW MOD %-*s    GROUP",
+			  sec_name_width, "NAME");
 	for (i = 0; vacmGroupTable[i]; i++) {
-	    show_snmp_vacm_group(interp->result, vacmGroupTable[i],
-				 sec_name_width, sec_group_width);
+	    fmt_snmp_vacm_group(interp->result, vacmGroupTable[i],
+				sec_name_width, sec_group_width);
 	}
     }
 
@@ -258,10 +270,10 @@ cmd_snmp_vacm_groups(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_snmp_vacm_access(GString *s,
+fmt_snmp_vacm_access(GString *s,
 	      snmp_view_based_acm_mib_vacmAccessEntry_t *vacmAccessEntry,
-		      int group_width, int cntxt_width,
-		      int read_width, int  write_width, int notify_width)
+		     int group_width, int cntxt_width,
+		     int read_width, int  write_width, int notify_width)
 {
     char const *model = NULL, *level = NULL, *match = NULL;
     
@@ -308,7 +320,7 @@ show_snmp_vacm_access(GString *s,
 
 
 static int
-cmd_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
+show_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_view_based_acm_mib_vacmAccessEntry_t **vacmAccessTable;
     int group_width = 5;
@@ -341,18 +353,18 @@ cmd_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
 		> notify_width)
 		notify_width = vacmAccessTable[i]->_vacmAccessNotifyViewNameLength;
 	}
-	g_string_sprintfa(interp->result,
-			  "Row %-*s Mod Sec %-*s %-8s %-*s %-*s %-*s\n",
-			  group_width, "Group",
-			  cntxt_width, "Ctx",
-			  "Match",
-			  read_width, "Read",
-			  write_width, "Write",
-			  notify_width, "Notify");
+	g_string_sprintfa(interp->header,
+			  "ROW %-*s MOD SEC %-*s %-8s %-*s %-*s %-*s",
+			  group_width, "GROUP",
+			  cntxt_width, "CTX",
+			  "MATCH",
+			  read_width, "READ",
+			  write_width, "WRITE",
+			  notify_width, "NOTIFY");
 	for (i = 0; vacmAccessTable[i]; i++) {
-	    show_snmp_vacm_access(interp->result, vacmAccessTable[i],
-				  group_width, cntxt_width,
-				  read_width, write_width, notify_width);
+	    fmt_snmp_vacm_access(interp->result, vacmAccessTable[i],
+				 group_width, cntxt_width,
+				 read_width, write_width, notify_width);
 	}
     }
 
@@ -365,9 +377,9 @@ cmd_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_snmp_vacm_view(GString *s,
-	      snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t *vacmViewEntry,
-		    int new, int last)
+fmt_snmp_vacm_view(GString *s,
+	   snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t *vacmViewEntry,
+		   int new, int last)
 {
     char const *type = NULL;
     int i;
@@ -410,7 +422,7 @@ show_snmp_vacm_view(GString *s,
 
 
 static int
-cmd_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
+show_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t **vacmViewTable;
     int new;
@@ -442,7 +454,7 @@ cmd_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
 			       vacmViewTable[i+1]->vacmViewTreeFamilyViewName,
 			       vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength) != 0);
 	    }
-	    show_snmp_vacm_view(interp->result, vacmViewTable[i], new, last);
+	    fmt_snmp_vacm_view(interp->result, vacmViewTable[i], new, last);
 	}
     }
 
@@ -460,41 +472,66 @@ scli_init_snmp_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show snmp engine", NULL,
-	  "information about the SNMP engine",
+	  "The show snmp engine command displays information about the\n"
+	  "SNMP protocol engine such as the number of boots, the current\n"
+	  "time relative to the last boot and the maximum message size.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_snmp_engine },
+	  show_snmp_engine },
 
 	{ "show snmp resources", NULL,
-	  "information about the SNMP resources",
+	  "The show snmp resources command displays information about the\n"
+	  "resources or modules supported by the SNMP agent.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_snmp_resources },
+	  show_snmp_resources },
 
 	{ "show snmp vacm groups", NULL,
-	  "information about the VACM groups",
+	  "The show snmp vacm groups command displays the mapping of\n"
+	  "security names to group names. The command generates a table\n"
+	  "with the following columns:\n"
+	  "\n"
+	  "  ROW   row storage type and status\n"
+	  "  MOD   security model\n"
+	  "  NAME  security name\n"
+	  "  GROUP security group name",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_snmp_vacm_groups },
+	  show_snmp_vacm_groups },
 
 	{ "show snmp vacm access", NULL,
-	  "information about the VACM access rules",
+	  "The show snmp vacm access command display the access control\n"
+	  "rules for the security groups. The command generates a table\n"
+	  "with the following columns:\n"
+	  "\n"
+	  "  ROW    row storage type and status\n"
+	  "  GROUP  security group name\n"
+	  "  MOD    security model\n"
+	  "  SEC    security level (--, a-, ap)\n"
+	  "  CTX    context name\n"
+	  "  MATCH  match (exact or prefix)\n"
+	  "  READ   view name for read access\n"
+	  "  WRITE  view name for write access\n"
+	  "  NOTIFY view name for notification",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_snmp_vacm_access },
+	  show_snmp_vacm_access },
 
 	{ "show snmp vacm views", NULL,
-	  "information about the VACM views",
+	  "The show snmp vacm views command displays the view definitions.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_snmp_vacm_views },
+	  show_snmp_vacm_views },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t snmp_mode = {
 	"snmp",
-	"scli mode to display and configure snmp specific information",
+	
+	"The snmp scli mode is based on the SNMPv2-MIB as published\n"
+	"in RFC 1907, the SNMP-FRAMEWORK-MIB as published in RFC 2571\n"
+	"and the SNMP-VIEW-BASED-ACM-MIB as published in RFC 2575.",
 	cmds
     };
     
