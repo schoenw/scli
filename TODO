@@ -17,10 +17,6 @@ o change the monitor command to a simple loop
 
 - Add reasonable error reporting to the stub code.
 
-- Add a mechanism (perhaps based on fd_sets) to tell the stubs to retrieve
-  only a subset of the members of a data structure. This would be more
-  friendly to the network - but why should be friendly? ;-)
-
 - Write some more substantial documentation including a cookbook on how
   to extend the scli.
 
@@ -28,10 +24,6 @@ o change the monitor command to a simple loop
   interactive programs).
 
 - Display processor load in the scli monitor system process summary line.
-
-- Make index members pointers again in the stub interface? (FS)
-
-- Add a mechanism to retrieve only selections of a table? (FS)
 
 - Generally check strings for printable characters and trim white spaces.
 

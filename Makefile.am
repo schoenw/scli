@@ -1,3 +1,3 @@
 EXTRA_DIST	= TODO
 
-SUBDIRS		= snmp stub scli doc
+SUBDIRS		= snmp stub proc scli doc
