@@ -1,3 +1,192 @@
+2001-06-20 17:06  schoenw
+
+	* scli/interface.c: Rewrote the interface stack display function.
+        The regex now only matches the ifDescr value.
+
+2001-06-20 15:03  schoenw
+
+	* scli/: basic.c, scli.c: Minor readline cleanups.
+
+2001-06-20 14:34  schoenw
+
+	* scli/scli.c: Use rl_completion_matches() instead of
+        completion_matches() where available.
+
+2001-06-20 14:34  schoenw
+
+	* configure, config.h.in, configure.in: Added a test to handle
+        readline version differences.
+
+2001-06-20 14:28  schoenw
+
+	* scli/: basic.c, scli.c: Fixed the handling of SIGWINCH.
+
+2001-06-20 12:28  schoenw
+
+	* scli/: bridge.c, ether.c, interface.c: Support larger interface
+	numbers. Added an initial version of the show interface stack
+        command implementation.
+
+2001-06-20 11:08  schoenw
+
+	* scli/ospf.c: Minor layout updates.
+
+2001-06-19 18:18  schoenw
+
+	* scli/interface.c: Use regular expressions to identify interfaces.
+
+2001-06-19 12:41  schoenw
+
+	* scli/interface.c: Some more work on interface stacks. Still more
+	work needed to display interface stacks in a nice human friendly
+        way.
+
+2001-06-19 11:45  schoenw
+
+	* scli/: basic.c, monitor.c, scli.c, scli.h: Provided a wrapper for
+	curses [de]initialization since some curses implementations do not
+	tolerate calls to endwin() if curses has not been initialized
+        before.
+
+2001-06-19 08:48  schoenw
+
+	* scli/: interface.c, monitor.c, scli.c, tcp.c: Ported monitor
+        summary information over from the stop implementation.
+
+2001-06-18 16:26  schoenw
+
+	* scli/: disman.c, ip.c: Changes to make headers more consistent.
+        Support DISMAN run and scheduler monitors.
+
+2001-06-18 13:10  schoenw
+
+	* stop/: ether.c, interface.c: Fixed a bug where the cache was not
+        properly invalidated.
+
+2001-06-18 13:09  schoenw
+
+	* scli/monitor.c: The monitor.c module contains the code which
+        evaluates scli commands in monitor mode.
+
+2001-06-18 13:07  schoenw
+
+	* scli/: Makefile.am, Makefile.in, atm.c, basic.c, bridge.c,
+	cmds.c, ether.c, fmt.c, interface.c, printer.c, scli.1, scli.c,
+	scli.h, system.c, tcp.c, udp.c: Integrated most of the stop
+	functionality into scli. Started to use g_print and friends to
+        allow for a future GUI for scli.
+
+2001-06-15 16:32  schoenw
+
+	* scli/: cmds.c, scli.c, scli.h: Made the scli core command
+        implementations static.
+
+2001-06-15 16:31  schoenw
+
+	* scli/basic.c: Register scli modes in alphabetical order.
+
+2001-06-15 16:10  schoenw
+
+	* scli/system.c: Added some xml output functions. More work needed.
+
+2001-06-14 13:24  schoenw
+
+	* scli/atm.c: Added xml support (which is easy since this mode does
+        basically nothing).
+
+2001-06-14 13:14  schoenw
+
+	* scli/: disman.c, fmt.c, scli.h, system.c: Changed the signature
+        of some formatting functions.
+
+2001-06-14 11:51  schoenw
+
+	* scli/tcp.c: Fixed inconsistencies in the XML output format.
+
+2001-06-14 10:02  schoenw
+
+	* scli/udp.c: Use plain addresses and port numbers rather than
+        names in XML mode.
+
+2001-06-14 10:00  schoenw
+
+	* scli/printer.c: More formatting updates.
+
+2001-06-14 09:55  schoenw
+
+	* scli/: basic.c, scli.1, scli.c, scli.h, tcp.c, udp.c: Added a
+	command line option to produce XML output. Modified the udp and tcp
+        modes to actually generate XML. More work needed.
+
+2001-06-13 17:52  schoenw
+
+	* scli/printer.c: And yet more updates. Enough for today I would
+        say.
+
+2001-06-13 17:15  schoenw
+
+	* scli/printer.c: More code updates to handle multiple printers
+        better.
+
+2001-06-13 14:53  schoenw
+
+	* scli/printer.c: Some more code to display console messages and
+        lights (!).
+
+2001-06-13 12:26  schoenw
+
+	* scli/printer.c: Some more features that definately need even more
+        work.
+
+2001-06-13 10:20  schoenw
+
+	* stub/: iana-language-mib.c, iana-language-mib.h: Regenerated
+        stubs for the IANA-LANGUAGE-MIB.
+
+2001-06-13 09:47  schoenw
+
+	* snmp/g_session.c, snmp/g_session.h, snmp/g_snmp_table.c,
+	snmp/g_snmp_table.h, stub/atm-mib.c, stub/atm-mib.h,
+	stub/bridge-mib.c, stub/bridge-mib.h, stub/disman-schedule-mib.c,
+	stub/disman-schedule-mib.h, stub/disman-script-mib.c,
+	stub/disman-script-mib.h, stub/entity-mib.c, stub/entity-mib.h,
+	stub/etherlike-mib.c, stub/etherlike-mib.h,
+	stub/host-resources-mib.c, stub/host-resources-mib.h,
+	stub/if-mib.c, stub/if-mib.h, stub/ip-forward-mib.c,
+	stub/ip-forward-mib.h, stub/ip-mib.c, stub/ip-mib.h,
+	stub/mau-mib.c, stub/mau-mib.h, stub/ospf-mib.c, stub/ospf-mib.h,
+	stub/printer-mib.c, stub/printer-mib.h, stub/rfc1213-mib.c,
+	stub/rfc1213-mib.h, stub/snmp-community-mib.c,
+	stub/snmp-community-mib.h, stub/snmp-framework-mib.c,
+	stub/snmp-framework-mib.h, stub/snmp-mpd-mib.c,
+	stub/snmp-mpd-mib.h, stub/snmp-target-mib.c,
+	stub/snmp-target-mib.h, stub/snmp-user-based-sm-mib.c,
+	stub/snmp-user-based-sm-mib.h, stub/snmp-view-based-acm-mib.c,
+	stub/snmp-view-based-acm-mib.h, stub/snmpv2-mib.c,
+	stub/snmpv2-mib.h, stub/stools.c, stub/stools.h, stub/tcp-mib.c,
+	stub/tcp-mib.h, stub/tunnel-mib.c, stub/tunnel-mib.h,
+	stub/udp-mib.c, stub/udp-mib.h, stop/disman.c, stop/ether.c,
+	stop/interface.c, stop/process.c, stop/stop.c, stop/stop.h,
+	stop/tcp.c, scli/basic.c, scli/scli.h: Replaced host_snmp with
+        GSnmpSession.
+
+2001-06-13 09:17  schoenw
+
+	* configure, configure.in: Bumped the version number to 0.1.19
+        again.
+
+2001-06-13 09:14  schoenw
+
+	* scli/ospf.c: Some minor layout patches from Oliver Wellnitz.
+
+2001-06-13 09:14  schoenw
+
+	* scli/: bridge.c, disman.c, printer.c: Minor code cleanups.
+
+2001-06-12 17:30  schoenw
+
+	* ChangeLog: Generated the ChangeLog via cvs2cl.
+
 2001-06-12 17:15  schoenw
 
 	* scli/printer.c: Fixed a bug where unterminated strings were
