@@ -582,10 +582,10 @@ fmt_display_string(GString *s, int indent, char *label, int len, char *string)
 	if (string[i] == '\r') continue;
 	if (isspace((int) string[i])) {
 	    int j, p;
-	    for (j = i+1, p = pos; p < 80 && j < len; p++, j++) {
+	    for (j = i+1, p = pos; p < 76 && j < len; p++, j++) {
 		if (string[j] != '\r' && isspace((int) string[j])) break;
 	    }
-	    if (p == 80) {
+	    if (p == 76) {
 		g_string_sprintfa(s, "\n%*s", indent, "");
 		pos = indent;
 		continue;
@@ -630,7 +630,7 @@ fmt_taddress(guint32 *tdomain, gsize tdomain_len,
 	e = NULL;
     }
 
-    if (! tdomain && taddress) {
+    if (! tdomain || !taddress) {
 	return NULL;
     }
 
