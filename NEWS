@@ -1,3 +1,13 @@
+Changes in scli 0.2.3:
+
+- new "set nortel bridge vlan default" command
+- XML support for "show printer console lights"
+- XML support for "show printer console display"
+- XML support for "show printer alerts"
+- new "show scli schema" command
+- regenerated stubs to remove unneeded code
+- minor bug fixes
+
 Changes in scli 0.2.2:
 
 - scli supports a new "show nortel bridge vlan ports" command

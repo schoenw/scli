@@ -1,3 +1,87 @@
+2001-09-28 20:46  schoenw
+
+	* scli/printer.c: Added missing syntax checks and cleaned up the
+        code.
+
+2001-09-28 13:36  schoenw
+
+	* scli/nortel.c: Added the "set nortel bridge vlan default"
+        command.
+
+2001-09-28 13:09  schoenw
+
+	* scli/nortel.c: The show nortel bridge vlan details command now
+        also shows that ports that use a vlan as their default.
+
+2001-09-27 15:02  schoenw
+
+	* scli/printer.c: Some more output for printer interpreters.
+
+2001-09-27 13:33  schoenw
+
+	* scli/printer.c: Fixed the xml format of "show printer console
+        lights".
+
+2001-09-27 10:07  schoenw
+
+	* scli/printer.c: Added XML support to the show printer console and
+	show printer alerts commands. Started work on a show printer
+        interpreter command.
+
+2001-09-27 10:02  schoenw
+
+	* scli/monitor.c: Explicitely set the return code when processing
+        'q'.
+
+2001-09-27 10:01  schoenw
+
+	* scli/: basic.c, cmds.c: Added a "show scli schema" command and
+        fixed the propagation of SCLI_EXIT.
+
+2001-09-27 10:00  schoenw
+
+	* scli/scli.1.in: Removed documentation for interactive commands
+	that are not available (although it would be nice to have them
+        implemented).
+
+2001-09-27 09:59  schoenw
+
+	* scli/: system.c, interface.c: Do not rely on table augmentations
+        coming out 1:1.
+
+2001-09-27 09:57  schoenw
+
+	* doc/: Makefile.am, scli.texinfo, stools.texinfo: Renamed
+        stools.texinfo to scli.texinfo.
+
+2001-09-27 09:54  schoenw
+
+	* stub/: Makefile.am, rapid-city.c, rapid-city.h, rfc1213-mib.c,
+	rfc1213-mib.h: Regenerated some stubs to remove code that is not
+        currently being used by scli.
+
+2001-09-26 11:59  schoenw
+
+	* configure.in: Bumped the version number.
+
+2001-09-26 11:58  schoenw
+
+	* scli/printer.c: Reworked the "show printer display|lights|alerts"
+	commands to produce better output. Added documentation for these
+        commands.
+
+2001-09-26 11:02  schoenw
+
+	* scli/nortel.c: Fixed a bug in the formatting of IdLists.
+
+2001-09-26 10:35  schoenw
+
+	* scli/: bridge.c, ip.c: Minor cosmetic changes.
+
+2001-09-25 16:11  schoenw
+
+	* ChangeLog, NEWS: Updates for release 0.2.2.
+
 2001-09-25 15:59  schoenw
 
 	* scli/nortel.c: Finished the implementation of the "show nortel
