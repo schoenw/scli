@@ -82,6 +82,9 @@ stls_snmp_gettable(host_snmp *s, GSList *vbl);
 #include "snmpv2-mib.h"
 #include "host-resources-mib.h"
 #include "entity-mib.h"
+#include "bridge-mib.h"
+#include "disman-script-mib.h"
+#include "disman-schedule-mib.h"
 
 #endif
 
