@@ -355,13 +355,13 @@ fmt_ospf_interfaces(GString *s,
     if (ospfIfEntry->ospfIfAdminStat) {
 	e = fmt_enum(ospf_mib_enums_ospfIfAdminStat,
 		     ospfIfEntry->ospfIfAdminStat);
-	g_string_sprintfa(s, "%-*s %16s\n",
+	g_string_sprintfa(s, "%-*s %s\n",
 			  indent, "AdminStatus:", e ? e : "");
     }
     
     if (ospfIfEntry->ospfIfType) {
 	e = fmt_enum(ospf_mib_enums_ospfIfType, ospfIfEntry->ospfIfType);
-	g_string_sprintfa(s, "%-*s %16s\n",
+	g_string_sprintfa(s, "%-*s %s\n",
 			  indent, "Type:", e ? e : "");
     }
     
