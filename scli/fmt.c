@@ -339,7 +339,7 @@ fmt_ipv4_mask(guchar *addr)
 	    }
 	}
     }
-    g_snprintf(buffer, sizeof(buffer), "/%u", prefix);
+    g_snprintf(buffer, sizeof(buffer), "%u", prefix);
     return buffer;
 }
 

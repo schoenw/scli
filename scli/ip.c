@@ -60,7 +60,7 @@ fmt_ip_route(GString *s,
 	&& ipRouteEntry->ipRouteNextHop
 	&& ipRouteEntry->ipRouteMask
 	&& ipRouteEntry->ipRouteIfIndex) {
-	g_string_sprintfa(s, "%s%s%n",
+	g_string_sprintfa(s, "%s/%s%n",
 			  fmt_ipv4_address(ipRouteEntry->ipRouteDest,
 					   SCLI_FMT_ADDR),
 			  fmt_ipv4_mask(ipRouteEntry->ipRouteMask), &pos);
@@ -167,34 +167,45 @@ show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-fmt_ip_address(GString *s, ip_mib_ipAddrEntry_t *ipAddrEntry)
+xml_ip_address(xmlNodePtr root, ip_mib_ipAddrEntry_t *ipAddrEntry)
 {
-    unsigned prefix = 0;
+    xmlNodePtr tree;
     char *name;
-    int i, j;
+
+    tree = xmlNewChild(root, NULL, "address", NULL);
+    xmlSetProp(tree, "address",
+	       fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_ADDR));
 
     if (ipAddrEntry->ipAdEntNetMask) {
-	for (i = 0; i < 4; i++) {
-	    for (j = 0; j < 8; j++) {
-		if ((1 << (7-j)) & (ipAddrEntry->ipAdEntNetMask)[i]) {
-		    prefix++;
-		} else {
-		    i = 4;
-		    break;
-		}
-	    }
-	}
+	xmlSetProp(tree, "prefix", fmt_ipv4_mask(ipAddrEntry->ipAdEntNetMask));
     }
-	      
+
     if (ipAddrEntry->ipAdEntIfIndex) {
-	g_string_sprintfa(s, "%6u    ", *(ipAddrEntry->ipAdEntIfIndex));
+	xml_set_prop(tree, "interface", "%d", *ipAddrEntry->ipAdEntIfIndex);
+    }
+
+    name = fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_NAME);
+    if (name) {
+	(void) xmlNewChild(tree, NULL, "name", name);
+    }
+}
+
+
+
+static void
+fmt_ip_address(GString *s, ip_mib_ipAddrEntry_t *ipAddrEntry)
+{
+    char *name;
+
+    if (ipAddrEntry->ipAdEntIfIndex) {
+	g_string_sprintfa(s, "%9u ", *(ipAddrEntry->ipAdEntIfIndex));
     } else {
 	g_string_sprintfa(s, "%6s    ", "");
     }
     g_string_sprintfa(s, "%-16s ",
 	      fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_ADDR));
     if (ipAddrEntry->ipAdEntNetMask) {
-	g_string_sprintfa(s, "%-6s",
+	g_string_sprintfa(s, "/%-6s",
 			  fmt_ipv4_mask(ipAddrEntry->ipAdEntNetMask));;
     } else {
 	g_string_sprintfa(s, "%-6s", "");
@@ -226,10 +237,16 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (ipAddrTable) {
-	g_string_sprintfa(interp->header,
-			  "INTERFACE ADDRESS        PREFIX  NAME");
+	if (! scli_interp_xml(interp)) {
+	    g_string_sprintfa(interp->header,
+			      "INTERFACE ADDRESS        PREFIX  NAME");
+	}
 	for (i = 0; ipAddrTable[i]; i++) {
-	    fmt_ip_address(interp->result, ipAddrTable[i]);
+	    if (scli_interp_xml(interp)) {
+		xml_ip_address(interp->xml_node, ipAddrTable[i]);
+	    } else {
+		fmt_ip_address(interp->result, ipAddrTable[i]);
+	    }
 	}
     }
 
@@ -377,7 +394,7 @@ fmt_ip_mapping(GString *s,
     const char *e;
     int i;
 
-    g_string_sprintfa(s, "%6u    ",
+    g_string_sprintfa(s, "%9u ",
 		      ipNetToMediaEntry->ipNetToMediaIfIndex);
 
     e = fmt_enum(ip_mib_enums_ipNetToMediaType,
@@ -658,8 +675,8 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "  ADDRESS   IP address\n"
 	  "  PREFIX    IP address prefix length\n"
 	  "  NAME      name of the IP address",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  "ip", NULL,
 	  show_ip_addresses },
 	
 	{ "show ip tunnel", NULL,

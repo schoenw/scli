@@ -332,7 +332,7 @@ fmt_interface_details(GString *s,
 		    g_string_sprintfa(s, "IP Address:  %-*s", width,
 		      fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr,
 				       SCLI_FMT_ADDR));
-		    g_string_sprintfa(s, " Prefix:  %s\n",
+		    g_string_sprintfa(s, " Prefix:  /%s\n",
 		      fmt_ipv4_mask(ipAddrTable[j]->ipAdEntNetMask));
 		}
 	    }
@@ -451,7 +451,7 @@ xml_interface_details(xmlNodePtr root,
 		    g_string_sprintfa(s, "IP Address:  %-*s", width,
 		      fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr,
 				       SCLI_FMT_ADDR));
-		    g_string_sprintfa(s, " Prefix:  %s\n",
+		    g_string_sprintfa(s, " Prefix:  /%s\n",
 		      fmt_ipv4_mask(ipAddrTable[j]->ipAdEntNetMask));
 		}
 	    }
