@@ -61,17 +61,26 @@ get_lines()
 
 
 static void
-page(GString *s)
+page(scli_interp_t *interp, GString *s)
 {
-    char *file_name, *pager;
+    char *file_name;
     char cmd[1024];
     FILE *f = NULL;
     int i, cnt;
 
-    pager = getenv("PAGER");
-    if (!pager) {
+    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+	if (g_snmp_list_decode_hook) {
+	    fputs("\r                         \r", stdout);
+	}
+    } else {
+    nopager:
 	fputs(s->str, stdout);
 	return;
+    }
+
+    
+    if (! interp->pager) {
+	goto nopager;
     }
 
     for (i = 0, cnt = 0; s->str[i]; i++) {
@@ -81,26 +90,22 @@ page(GString *s)
     }
 
     if (cnt < get_lines()) {
-	fputs(s->str, stdout);
-	return;
+	goto nopager;
     }
 
     file_name = tmpnam(NULL);
-    if (file_name) {
-	f = fopen(file_name, "w");
-	if (f) {
-	    fputs(s->str, f);
-	    fflush(f);
-	    g_snprintf(cmd, sizeof(cmd), "less %s", file_name);
-	    system(cmd);
-	}
+    if (! file_name) {
+	goto nopager;
     }
-
-    if (f) {
-	fclose(f);
-    } else {
-	fputs(s->str, stdout);
+    f = fopen(file_name, "w");
+    if (! f) {
+	goto nopager;
     }
+    fputs(s->str, f);
+    fflush(f);
+    g_snprintf(cmd, sizeof(cmd), "less %s", file_name);
+    (void) system(cmd);
+    (void) fclose(f);
     (void) unlink(file_name);
 }
 
@@ -296,14 +301,7 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 	    return code;
 	}
 	if (interp->result) {
-	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
-		if (g_snmp_list_decode_hook) {
-		    fputs("\r                         \r", stdout);
-		}
-		page(interp->result);
-	    } else {
-		fputs(interp->result->str, stdout);
- 	    }
+	    page(interp, interp->result);
 	}
     }
 
@@ -330,7 +328,7 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 		    }
 		    g_string_sprintfa(s, "%c %s [%s]\n\n", '#',
 				      cmd->desc ? cmd->desc : "",
-				      interp->peer->name);
+			      (interp->peer) ? interp->peer->name : "?");
 		    g_string_append(s, interp->result->str);
 		}
 	    }
@@ -399,14 +397,7 @@ scli_eval(scli_interp_t *interp, char *cmd)
 		g_snmp_list_decode_hook = NULL;
 	    }
 	    code = eval_all_cmd_node(interp, node, s);
-	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
-		if (g_snmp_list_decode_hook) {
-		    fputs("\r                         \r", stdout);
-		}
-		page(s);
-	    } else {
-		fputs(s->str, stdout);
-	    }
+	    page(interp, s);
 	    g_string_free(s, 1);
 	    g_string_truncate(interp->result, 0);
 	    interp->flags &= ~SCLI_INTERP_FLAG_RECURSIVE;
