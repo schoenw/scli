@@ -50,6 +50,7 @@ typedef struct _GSnmpTransport {
     void     (*receiveMessage) ();
     gboolean (*resolveAddress) (
 	gchar           *taddress,
+	guint16         port,
 	struct sockaddr **address);
     guint    (*getSocket) ();
 } GSnmpTransport;
