@@ -65,6 +65,71 @@ stls_enum_t const etherlike_mib_enums_dot3PauseOperMode[] = {
 };
 
 
+static guint32 const dot3TestTdr[]
+	= { ETHERLIKE_MIB_DOT3TESTTDR };
+static guint32 const dot3TestLoopBack[]
+	= { ETHERLIKE_MIB_DOT3TESTLOOPBACK };
+static guint32 const dot3ErrorInitError[]
+	= { ETHERLIKE_MIB_DOT3ERRORINITERROR };
+static guint32 const dot3ErrorLoopbackError[]
+	= { ETHERLIKE_MIB_DOT3ERRORLOOPBACKERROR };
+
+stls_identity_t const etherlike_mib_identities[] = {
+    { dot3TestTdr,
+      sizeof(dot3TestTdr)/sizeof(guint32),
+      "dot3TestTdr" },
+    { dot3TestLoopBack,
+      sizeof(dot3TestLoopBack)/sizeof(guint32),
+      "dot3TestLoopBack" },
+    { dot3ErrorInitError,
+      sizeof(dot3ErrorInitError)/sizeof(guint32),
+      "dot3ErrorInitError" },
+    { dot3ErrorLoopbackError,
+      sizeof(dot3ErrorLoopbackError)/sizeof(guint32),
+      "dot3ErrorLoopbackError" },
+    { 0, 0, NULL }
+};
+
+
+static stls_stub_attr_t _dot3StatsEntry[] = {
+    { 2, G_SNMP_COUNTER32, "dot3StatsAlignmentErrors" },
+    { 3, G_SNMP_COUNTER32, "dot3StatsFCSErrors" },
+    { 4, G_SNMP_COUNTER32, "dot3StatsSingleCollisionFrames" },
+    { 5, G_SNMP_COUNTER32, "dot3StatsMultipleCollisionFrames" },
+    { 6, G_SNMP_COUNTER32, "dot3StatsSQETestErrors" },
+    { 7, G_SNMP_COUNTER32, "dot3StatsDeferredTransmissions" },
+    { 8, G_SNMP_COUNTER32, "dot3StatsLateCollisions" },
+    { 9, G_SNMP_COUNTER32, "dot3StatsExcessiveCollisions" },
+    { 10, G_SNMP_COUNTER32, "dot3StatsInternalMacTransmitErrors" },
+    { 11, G_SNMP_COUNTER32, "dot3StatsCarrierSenseErrors" },
+    { 13, G_SNMP_COUNTER32, "dot3StatsFrameTooLongs" },
+    { 16, G_SNMP_COUNTER32, "dot3StatsInternalMacReceiveErrors" },
+    { 17, G_SNMP_OBJECT_ID, "dot3StatsEtherChipSet" },
+    { 18, G_SNMP_COUNTER32, "dot3StatsSymbolErrors" },
+    { 19, G_SNMP_INTEGER32, "dot3StatsDuplexStatus" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _dot3CollEntry[] = {
+    { 3, G_SNMP_COUNTER32, "dot3CollFrequencies" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _dot3ControlEntry[] = {
+    { 1, G_SNMP_OCTET_STRING, "dot3ControlFunctionsSupported" },
+    { 2, G_SNMP_COUNTER32, "dot3ControlInUnknownOpcodes" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _dot3PauseEntry[] = {
+    { 1, G_SNMP_INTEGER32, "dot3PauseAdminMode" },
+    { 2, G_SNMP_INTEGER32, "dot3PauseOperMode" },
+    { 3, G_SNMP_COUNTER32, "dot3InPauseFrames" },
+    { 4, G_SNMP_COUNTER32, "dot3OutPauseFrames" },
+    { 0, 0, NULL }
+};
+
+
 dot3StatsEntry_t *
 etherlike_mib_new_dot3StatsEntry()
 {
@@ -90,6 +155,7 @@ assign_dot3StatsEntry(GSList *vbl)
 {
     GSList *elem;
     dot3StatsEntry_t *dot3StatsEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 10, 7, 2, 1};
 
@@ -109,120 +175,58 @@ assign_dot3StatsEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsAlignmentErrors = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsAlignmentErrors");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsFCSErrors = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsFCSErrors");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsSingleCollisionFrames = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsSingleCollisionFrames");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsMultipleCollisionFrames = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsMultipleCollisionFrames");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsSQETestErrors = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsSQETestErrors");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsDeferredTransmissions = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsDeferredTransmissions");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsLateCollisions = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsLateCollisions");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 9) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsExcessiveCollisions = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsExcessiveCollisions");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 10) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsInternalMacTransmitErrors = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsInternalMacTransmitErrors");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 11) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsCarrierSenseErrors = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsCarrierSenseErrors");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 13) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsFrameTooLongs = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsFrameTooLongs");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 16) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsInternalMacReceiveErrors = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsInternalMacReceiveErrors");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 17) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                dot3StatsEntry->_dot3StatsEtherChipSetLength = vb->syntax_len / sizeof(guint32);
-                dot3StatsEntry->dot3StatsEtherChipSet = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for dot3StatsEtherChipSet");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 18) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3StatsEntry->dot3StatsSymbolErrors = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsSymbolErrors");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 19) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot3StatsEntry->dot3StatsDuplexStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot3StatsDuplexStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _dot3StatsEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            dot3StatsEntry->dot3StatsAlignmentErrors = &(vb->syntax.ui32[0]);
+            break;
+        case 3:
+            dot3StatsEntry->dot3StatsFCSErrors = &(vb->syntax.ui32[0]);
+            break;
+        case 4:
+            dot3StatsEntry->dot3StatsSingleCollisionFrames = &(vb->syntax.ui32[0]);
+            break;
+        case 5:
+            dot3StatsEntry->dot3StatsMultipleCollisionFrames = &(vb->syntax.ui32[0]);
+            break;
+        case 6:
+            dot3StatsEntry->dot3StatsSQETestErrors = &(vb->syntax.ui32[0]);
+            break;
+        case 7:
+            dot3StatsEntry->dot3StatsDeferredTransmissions = &(vb->syntax.ui32[0]);
+            break;
+        case 8:
+            dot3StatsEntry->dot3StatsLateCollisions = &(vb->syntax.ui32[0]);
+            break;
+        case 9:
+            dot3StatsEntry->dot3StatsExcessiveCollisions = &(vb->syntax.ui32[0]);
+            break;
+        case 10:
+            dot3StatsEntry->dot3StatsInternalMacTransmitErrors = &(vb->syntax.ui32[0]);
+            break;
+        case 11:
+            dot3StatsEntry->dot3StatsCarrierSenseErrors = &(vb->syntax.ui32[0]);
+            break;
+        case 13:
+            dot3StatsEntry->dot3StatsFrameTooLongs = &(vb->syntax.ui32[0]);
+            break;
+        case 16:
+            dot3StatsEntry->dot3StatsInternalMacReceiveErrors = &(vb->syntax.ui32[0]);
+            break;
+        case 17:
+            dot3StatsEntry->_dot3StatsEtherChipSetLength = vb->syntax_len / sizeof(guint32);
+            dot3StatsEntry->dot3StatsEtherChipSet = vb->syntax.ui32;
+            break;
+        case 18:
+            dot3StatsEntry->dot3StatsSymbolErrors = &(vb->syntax.ui32[0]);
+            break;
+        case 19:
+            dot3StatsEntry->dot3StatsDuplexStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return dot3StatsEntry;
@@ -238,21 +242,7 @@ etherlike_mib_get_dot3StatsTable(host_snmp *s, dot3StatsEntry_t ***dot3StatsEntr
 
     *dot3StatsEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
-    base[10] = 8; stls_vbl_add_null(&in, base, 11);
-    base[10] = 9; stls_vbl_add_null(&in, base, 11);
-    base[10] = 10; stls_vbl_add_null(&in, base, 11);
-    base[10] = 11; stls_vbl_add_null(&in, base, 11);
-    base[10] = 13; stls_vbl_add_null(&in, base, 11);
-    base[10] = 16; stls_vbl_add_null(&in, base, 11);
-    base[10] = 17; stls_vbl_add_null(&in, base, 11);
-    base[10] = 18; stls_vbl_add_null(&in, base, 11);
-    base[10] = 19; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _dot3StatsEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -326,6 +316,7 @@ assign_dot3CollEntry(GSList *vbl)
 {
     GSList *elem;
     dot3CollEntry_t *dot3CollEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 10, 7, 5, 1};
 
@@ -345,21 +336,15 @@ assign_dot3CollEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3CollEntry->dot3CollFrequencies = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3CollFrequencies");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _dot3CollEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 3:
+            dot3CollEntry->dot3CollFrequencies = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return dot3CollEntry;
@@ -375,7 +360,7 @@ etherlike_mib_get_dot3CollTable(host_snmp *s, dot3CollEntry_t ***dot3CollEntry)
 
     *dot3CollEntry = NULL;
 
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _dot3CollEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -447,6 +432,7 @@ assign_dot3ControlEntry(GSList *vbl)
 {
     GSList *elem;
     dot3ControlEntry_t *dot3ControlEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 10, 7, 9, 1};
 
@@ -466,29 +452,19 @@ assign_dot3ControlEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 1) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                dot3ControlEntry->_dot3ControlFunctionsSupportedLength = vb->syntax_len;
-                dot3ControlEntry->dot3ControlFunctionsSupported = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for dot3ControlFunctionsSupported");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3ControlEntry->dot3ControlInUnknownOpcodes = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3ControlInUnknownOpcodes");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _dot3ControlEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            dot3ControlEntry->_dot3ControlFunctionsSupportedLength = vb->syntax_len;
+            dot3ControlEntry->dot3ControlFunctionsSupported = vb->syntax.uc;
+            break;
+        case 2:
+            dot3ControlEntry->dot3ControlInUnknownOpcodes = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return dot3ControlEntry;
@@ -504,8 +480,7 @@ etherlike_mib_get_dot3ControlTable(host_snmp *s, dot3ControlEntry_t ***dot3Contr
 
     *dot3ControlEntry = NULL;
 
-    base[10] = 1; stls_vbl_add_null(&in, base, 11);
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _dot3ControlEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -577,6 +552,7 @@ assign_dot3PauseEntry(GSList *vbl)
 {
     GSList *elem;
     dot3PauseEntry_t *dot3PauseEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 10, 7, 10, 1};
 
@@ -596,42 +572,24 @@ assign_dot3PauseEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot3PauseEntry->dot3PauseAdminMode = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot3PauseAdminMode");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot3PauseEntry->dot3PauseOperMode = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot3PauseOperMode");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3PauseEntry->dot3InPauseFrames = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3InPauseFrames");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot3PauseEntry->dot3OutPauseFrames = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot3OutPauseFrames");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _dot3PauseEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            dot3PauseEntry->dot3PauseAdminMode = &(vb->syntax.i32[0]);
+            break;
+        case 2:
+            dot3PauseEntry->dot3PauseOperMode = &(vb->syntax.i32[0]);
+            break;
+        case 3:
+            dot3PauseEntry->dot3InPauseFrames = &(vb->syntax.ui32[0]);
+            break;
+        case 4:
+            dot3PauseEntry->dot3OutPauseFrames = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return dot3PauseEntry;
@@ -647,10 +605,7 @@ etherlike_mib_get_dot3PauseTable(host_snmp *s, dot3PauseEntry_t ***dot3PauseEntr
 
     *dot3PauseEntry = NULL;
 
-    base[10] = 1; stls_vbl_add_null(&in, base, 11);
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _dot3PauseEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

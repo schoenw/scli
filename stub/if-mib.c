@@ -298,6 +298,87 @@ stls_enum_t const if_mib_enums_ifRcvAddressType[] = {
 };
 
 
+static stls_stub_attr_t _interfaces[] = {
+    { 1, G_SNMP_INTEGER32, "ifNumber" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _ifEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, "ifDescr" },
+    { 3, G_SNMP_INTEGER32, "ifType" },
+    { 4, G_SNMP_INTEGER32, "ifMtu" },
+    { 5, G_SNMP_UNSIGNED32, "ifSpeed" },
+    { 6, G_SNMP_OCTET_STRING, "ifPhysAddress" },
+    { 7, G_SNMP_INTEGER32, "ifAdminStatus" },
+    { 8, G_SNMP_INTEGER32, "ifOperStatus" },
+    { 9, G_SNMP_TIMETICKS, "ifLastChange" },
+    { 10, G_SNMP_COUNTER32, "ifInOctets" },
+    { 11, G_SNMP_COUNTER32, "ifInUcastPkts" },
+    { 12, G_SNMP_COUNTER32, "ifInNUcastPkts" },
+    { 13, G_SNMP_COUNTER32, "ifInDiscards" },
+    { 14, G_SNMP_COUNTER32, "ifInErrors" },
+    { 15, G_SNMP_COUNTER32, "ifInUnknownProtos" },
+    { 16, G_SNMP_COUNTER32, "ifOutOctets" },
+    { 17, G_SNMP_COUNTER32, "ifOutUcastPkts" },
+    { 18, G_SNMP_COUNTER32, "ifOutNUcastPkts" },
+    { 19, G_SNMP_COUNTER32, "ifOutDiscards" },
+    { 20, G_SNMP_COUNTER32, "ifOutErrors" },
+    { 21, G_SNMP_UNSIGNED32, "ifOutQLen" },
+    { 22, G_SNMP_OBJECT_ID, "ifSpecific" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _ifMIBObjects[] = {
+    { 5, G_SNMP_TIMETICKS, "ifTableLastChange" },
+    { 6, G_SNMP_TIMETICKS, "ifStackLastChange" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _ifXEntry[] = {
+    { 1, G_SNMP_OCTET_STRING, "ifName" },
+    { 2, G_SNMP_COUNTER32, "ifInMulticastPkts" },
+    { 3, G_SNMP_COUNTER32, "ifInBroadcastPkts" },
+    { 4, G_SNMP_COUNTER32, "ifOutMulticastPkts" },
+    { 5, G_SNMP_COUNTER32, "ifOutBroadcastPkts" },
+    { 6, G_SNMP_COUNTER64, "ifHCInOctets" },
+    { 7, G_SNMP_COUNTER64, "ifHCInUcastPkts" },
+    { 8, G_SNMP_COUNTER64, "ifHCInMulticastPkts" },
+    { 9, G_SNMP_COUNTER64, "ifHCInBroadcastPkts" },
+    { 10, G_SNMP_COUNTER64, "ifHCOutOctets" },
+    { 11, G_SNMP_COUNTER64, "ifHCOutUcastPkts" },
+    { 12, G_SNMP_COUNTER64, "ifHCOutMulticastPkts" },
+    { 13, G_SNMP_COUNTER64, "ifHCOutBroadcastPkts" },
+    { 14, G_SNMP_INTEGER32, "ifLinkUpDownTrapEnable" },
+    { 15, G_SNMP_UNSIGNED32, "ifHighSpeed" },
+    { 16, G_SNMP_INTEGER32, "ifPromiscuousMode" },
+    { 17, G_SNMP_INTEGER32, "ifConnectorPresent" },
+    { 18, G_SNMP_OCTET_STRING, "ifAlias" },
+    { 19, G_SNMP_TIMETICKS, "ifCounterDiscontinuityTime" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _ifStackEntry[] = {
+    { 3, G_SNMP_INTEGER32, "ifStackStatus" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _ifTestEntry[] = {
+    { 1, G_SNMP_INTEGER32, "ifTestId" },
+    { 2, G_SNMP_INTEGER32, "ifTestStatus" },
+    { 3, G_SNMP_OBJECT_ID, "ifTestType" },
+    { 4, G_SNMP_INTEGER32, "ifTestResult" },
+    { 5, G_SNMP_OBJECT_ID, "ifTestCode" },
+    { 6, G_SNMP_OCTET_STRING, "ifTestOwner" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _ifRcvAddressEntry[] = {
+    { 2, G_SNMP_INTEGER32, "ifRcvAddressStatus" },
+    { 3, G_SNMP_INTEGER32, "ifRcvAddressType" },
+    { 0, 0, NULL }
+};
+
+
 interfaces_t *
 if_mib_new_interfaces()
 {
@@ -312,6 +393,7 @@ assign_interfaces(GSList *vbl)
 {
     GSList *elem;
     interfaces_t *interfaces;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 2};
 
@@ -325,21 +407,15 @@ assign_interfaces(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 8 && vb->id[7] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                interfaces->ifNumber = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifNumber");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _interfaces, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            interfaces->ifNumber = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return interfaces;
@@ -353,7 +429,7 @@ if_mib_get_interfaces(host_snmp *s, interfaces_t **interfaces)
 
     *interfaces = NULL;
 
-    base[7] = 1; stls_vbl_add_null(&in, base, 8);
+    stls_vbl_attributes(s, &in, base, 7, _interfaces);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -405,6 +481,7 @@ assign_ifEntry(GSList *vbl)
 {
     GSList *elem;
     ifEntry_t *ifEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 2, 2, 1};
 
@@ -424,164 +501,78 @@ assign_ifEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 10 && vb->id[9] == 2) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                ifEntry->_ifDescrLength = vb->syntax_len;
-                ifEntry->ifDescr = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for ifDescr");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifEntry->ifType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifType");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifEntry->ifMtu = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMtu");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 5) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
-                ifEntry->ifSpeed = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifSpeed");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 6) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                ifEntry->_ifPhysAddressLength = vb->syntax_len;
-                ifEntry->ifPhysAddress = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for ifPhysAddress");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifEntry->ifAdminStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifAdminStatus");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 8) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifEntry->ifOperStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifOperStatus");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 9) {
-            if (vb->type == G_SNMP_TIMETICKS) {
-                ifEntry->ifLastChange = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifLastChange");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 10) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifEntry->ifInOctets = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifInOctets");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 11) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifEntry->ifInUcastPkts = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifInUcastPkts");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 12) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifEntry->ifInNUcastPkts = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifInNUcastPkts");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 13) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifEntry->ifInDiscards = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifInDiscards");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 14) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifEntry->ifInErrors = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifInErrors");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 15) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifEntry->ifInUnknownProtos = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifInUnknownProtos");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 16) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifEntry->ifOutOctets = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifOutOctets");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 17) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifEntry->ifOutUcastPkts = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifOutUcastPkts");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 18) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifEntry->ifOutNUcastPkts = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifOutNUcastPkts");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 19) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifEntry->ifOutDiscards = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifOutDiscards");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 20) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifEntry->ifOutErrors = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifOutErrors");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 21) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
-                ifEntry->ifOutQLen = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifOutQLen");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 22) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                ifEntry->_ifSpecificLength = vb->syntax_len / sizeof(guint32);
-                ifEntry->ifSpecific = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for ifSpecific");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _ifEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            ifEntry->_ifDescrLength = vb->syntax_len;
+            ifEntry->ifDescr = vb->syntax.uc;
+            break;
+        case 3:
+            ifEntry->ifType = &(vb->syntax.i32[0]);
+            break;
+        case 4:
+            ifEntry->ifMtu = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            ifEntry->ifSpeed = &(vb->syntax.ui32[0]);
+            break;
+        case 6:
+            ifEntry->_ifPhysAddressLength = vb->syntax_len;
+            ifEntry->ifPhysAddress = vb->syntax.uc;
+            break;
+        case 7:
+            ifEntry->ifAdminStatus = &(vb->syntax.i32[0]);
+            break;
+        case 8:
+            ifEntry->ifOperStatus = &(vb->syntax.i32[0]);
+            break;
+        case 9:
+            ifEntry->ifLastChange = &(vb->syntax.ui32[0]);
+            break;
+        case 10:
+            ifEntry->ifInOctets = &(vb->syntax.ui32[0]);
+            break;
+        case 11:
+            ifEntry->ifInUcastPkts = &(vb->syntax.ui32[0]);
+            break;
+        case 12:
+            ifEntry->ifInNUcastPkts = &(vb->syntax.ui32[0]);
+            break;
+        case 13:
+            ifEntry->ifInDiscards = &(vb->syntax.ui32[0]);
+            break;
+        case 14:
+            ifEntry->ifInErrors = &(vb->syntax.ui32[0]);
+            break;
+        case 15:
+            ifEntry->ifInUnknownProtos = &(vb->syntax.ui32[0]);
+            break;
+        case 16:
+            ifEntry->ifOutOctets = &(vb->syntax.ui32[0]);
+            break;
+        case 17:
+            ifEntry->ifOutUcastPkts = &(vb->syntax.ui32[0]);
+            break;
+        case 18:
+            ifEntry->ifOutNUcastPkts = &(vb->syntax.ui32[0]);
+            break;
+        case 19:
+            ifEntry->ifOutDiscards = &(vb->syntax.ui32[0]);
+            break;
+        case 20:
+            ifEntry->ifOutErrors = &(vb->syntax.ui32[0]);
+            break;
+        case 21:
+            ifEntry->ifOutQLen = &(vb->syntax.ui32[0]);
+            break;
+        case 22:
+            ifEntry->_ifSpecificLength = vb->syntax_len / sizeof(guint32);
+            ifEntry->ifSpecific = vb->syntax.ui32;
+            break;
+        };
     }
 
     return ifEntry;
@@ -597,27 +588,7 @@ if_mib_get_ifTable(host_snmp *s, ifEntry_t ***ifEntry)
 
     *ifEntry = NULL;
 
-    base[9] = 2; stls_vbl_add_null(&in, base, 10);
-    base[9] = 3; stls_vbl_add_null(&in, base, 10);
-    base[9] = 4; stls_vbl_add_null(&in, base, 10);
-    base[9] = 5; stls_vbl_add_null(&in, base, 10);
-    base[9] = 6; stls_vbl_add_null(&in, base, 10);
-    base[9] = 7; stls_vbl_add_null(&in, base, 10);
-    base[9] = 8; stls_vbl_add_null(&in, base, 10);
-    base[9] = 9; stls_vbl_add_null(&in, base, 10);
-    base[9] = 10; stls_vbl_add_null(&in, base, 10);
-    base[9] = 11; stls_vbl_add_null(&in, base, 10);
-    base[9] = 12; stls_vbl_add_null(&in, base, 10);
-    base[9] = 13; stls_vbl_add_null(&in, base, 10);
-    base[9] = 14; stls_vbl_add_null(&in, base, 10);
-    base[9] = 15; stls_vbl_add_null(&in, base, 10);
-    base[9] = 16; stls_vbl_add_null(&in, base, 10);
-    base[9] = 17; stls_vbl_add_null(&in, base, 10);
-    base[9] = 18; stls_vbl_add_null(&in, base, 10);
-    base[9] = 19; stls_vbl_add_null(&in, base, 10);
-    base[9] = 20; stls_vbl_add_null(&in, base, 10);
-    base[9] = 21; stls_vbl_add_null(&in, base, 10);
-    base[9] = 22; stls_vbl_add_null(&in, base, 10);
+    stls_vbl_attributes(s, &in, base, 9, _ifEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -678,6 +649,7 @@ assign_ifMIBObjects(GSList *vbl)
 {
     GSList *elem;
     ifMIBObjects_t *ifMIBObjects;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 31, 1};
 
@@ -691,28 +663,18 @@ assign_ifMIBObjects(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 9 && vb->id[8] == 5) {
-            if (vb->type == G_SNMP_TIMETICKS) {
-                ifMIBObjects->ifTableLastChange = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifTableLastChange");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 6) {
-            if (vb->type == G_SNMP_TIMETICKS) {
-                ifMIBObjects->ifStackLastChange = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifStackLastChange");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _ifMIBObjects, &idx) < 0) continue;
+
+        switch (idx) {
+        case 5:
+            ifMIBObjects->ifTableLastChange = &(vb->syntax.ui32[0]);
+            break;
+        case 6:
+            ifMIBObjects->ifStackLastChange = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return ifMIBObjects;
@@ -726,8 +688,7 @@ if_mib_get_ifMIBObjects(host_snmp *s, ifMIBObjects_t **ifMIBObjects)
 
     *ifMIBObjects = NULL;
 
-    base[8] = 5; stls_vbl_add_null(&in, base, 9);
-    base[8] = 6; stls_vbl_add_null(&in, base, 9);
+    stls_vbl_attributes(s, &in, base, 8, _ifMIBObjects);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -779,6 +740,7 @@ assign_ifXEntry(GSList *vbl)
 {
     GSList *elem;
     ifXEntry_t *ifXEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1};
 
@@ -798,149 +760,71 @@ assign_ifXEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 1) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                ifXEntry->_ifNameLength = vb->syntax_len;
-                ifXEntry->ifName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for ifName");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifXEntry->ifInMulticastPkts = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifInMulticastPkts");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifXEntry->ifInBroadcastPkts = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifInBroadcastPkts");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifXEntry->ifOutMulticastPkts = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifOutMulticastPkts");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifXEntry->ifOutBroadcastPkts = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifOutBroadcastPkts");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_COUNTER64) {
-                ifXEntry->ifHCInOctets = &(vb->syntax.ui64[0]);
-            } else {
-                g_warning("illegal type for ifHCInOctets");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_COUNTER64) {
-                ifXEntry->ifHCInUcastPkts = &(vb->syntax.ui64[0]);
-            } else {
-                g_warning("illegal type for ifHCInUcastPkts");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_COUNTER64) {
-                ifXEntry->ifHCInMulticastPkts = &(vb->syntax.ui64[0]);
-            } else {
-                g_warning("illegal type for ifHCInMulticastPkts");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 9) {
-            if (vb->type == G_SNMP_COUNTER64) {
-                ifXEntry->ifHCInBroadcastPkts = &(vb->syntax.ui64[0]);
-            } else {
-                g_warning("illegal type for ifHCInBroadcastPkts");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 10) {
-            if (vb->type == G_SNMP_COUNTER64) {
-                ifXEntry->ifHCOutOctets = &(vb->syntax.ui64[0]);
-            } else {
-                g_warning("illegal type for ifHCOutOctets");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 11) {
-            if (vb->type == G_SNMP_COUNTER64) {
-                ifXEntry->ifHCOutUcastPkts = &(vb->syntax.ui64[0]);
-            } else {
-                g_warning("illegal type for ifHCOutUcastPkts");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 12) {
-            if (vb->type == G_SNMP_COUNTER64) {
-                ifXEntry->ifHCOutMulticastPkts = &(vb->syntax.ui64[0]);
-            } else {
-                g_warning("illegal type for ifHCOutMulticastPkts");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 13) {
-            if (vb->type == G_SNMP_COUNTER64) {
-                ifXEntry->ifHCOutBroadcastPkts = &(vb->syntax.ui64[0]);
-            } else {
-                g_warning("illegal type for ifHCOutBroadcastPkts");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 14) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifXEntry->ifLinkUpDownTrapEnable = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifLinkUpDownTrapEnable");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 15) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
-                ifXEntry->ifHighSpeed = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifHighSpeed");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 16) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifXEntry->ifPromiscuousMode = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifPromiscuousMode");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 17) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifXEntry->ifConnectorPresent = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifConnectorPresent");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 18) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                ifXEntry->_ifAliasLength = vb->syntax_len;
-                ifXEntry->ifAlias = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for ifAlias");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 19) {
-            if (vb->type == G_SNMP_TIMETICKS) {
-                ifXEntry->ifCounterDiscontinuityTime = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifCounterDiscontinuityTime");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _ifXEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            ifXEntry->_ifNameLength = vb->syntax_len;
+            ifXEntry->ifName = vb->syntax.uc;
+            break;
+        case 2:
+            ifXEntry->ifInMulticastPkts = &(vb->syntax.ui32[0]);
+            break;
+        case 3:
+            ifXEntry->ifInBroadcastPkts = &(vb->syntax.ui32[0]);
+            break;
+        case 4:
+            ifXEntry->ifOutMulticastPkts = &(vb->syntax.ui32[0]);
+            break;
+        case 5:
+            ifXEntry->ifOutBroadcastPkts = &(vb->syntax.ui32[0]);
+            break;
+        case 6:
+            ifXEntry->ifHCInOctets = &(vb->syntax.ui64[0]);
+            break;
+        case 7:
+            ifXEntry->ifHCInUcastPkts = &(vb->syntax.ui64[0]);
+            break;
+        case 8:
+            ifXEntry->ifHCInMulticastPkts = &(vb->syntax.ui64[0]);
+            break;
+        case 9:
+            ifXEntry->ifHCInBroadcastPkts = &(vb->syntax.ui64[0]);
+            break;
+        case 10:
+            ifXEntry->ifHCOutOctets = &(vb->syntax.ui64[0]);
+            break;
+        case 11:
+            ifXEntry->ifHCOutUcastPkts = &(vb->syntax.ui64[0]);
+            break;
+        case 12:
+            ifXEntry->ifHCOutMulticastPkts = &(vb->syntax.ui64[0]);
+            break;
+        case 13:
+            ifXEntry->ifHCOutBroadcastPkts = &(vb->syntax.ui64[0]);
+            break;
+        case 14:
+            ifXEntry->ifLinkUpDownTrapEnable = &(vb->syntax.i32[0]);
+            break;
+        case 15:
+            ifXEntry->ifHighSpeed = &(vb->syntax.ui32[0]);
+            break;
+        case 16:
+            ifXEntry->ifPromiscuousMode = &(vb->syntax.i32[0]);
+            break;
+        case 17:
+            ifXEntry->ifConnectorPresent = &(vb->syntax.i32[0]);
+            break;
+        case 18:
+            ifXEntry->_ifAliasLength = vb->syntax_len;
+            ifXEntry->ifAlias = vb->syntax.uc;
+            break;
+        case 19:
+            ifXEntry->ifCounterDiscontinuityTime = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return ifXEntry;
@@ -956,41 +840,7 @@ if_mib_get_ifXTable(host_snmp *s, ifXEntry_t ***ifXEntry)
 
     *ifXEntry = NULL;
 
-    base[10] = 1; stls_vbl_add_null(&in, base, 11);
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    if (s->version > G_SNMP_V1) {
-        base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    }
-    if (s->version > G_SNMP_V1) {
-        base[10] = 7; stls_vbl_add_null(&in, base, 11);
-    }
-    if (s->version > G_SNMP_V1) {
-        base[10] = 8; stls_vbl_add_null(&in, base, 11);
-    }
-    if (s->version > G_SNMP_V1) {
-        base[10] = 9; stls_vbl_add_null(&in, base, 11);
-    }
-    if (s->version > G_SNMP_V1) {
-        base[10] = 10; stls_vbl_add_null(&in, base, 11);
-    }
-    if (s->version > G_SNMP_V1) {
-        base[10] = 11; stls_vbl_add_null(&in, base, 11);
-    }
-    if (s->version > G_SNMP_V1) {
-        base[10] = 12; stls_vbl_add_null(&in, base, 11);
-    }
-    if (s->version > G_SNMP_V1) {
-        base[10] = 13; stls_vbl_add_null(&in, base, 11);
-    }
-    base[10] = 14; stls_vbl_add_null(&in, base, 11);
-    base[10] = 15; stls_vbl_add_null(&in, base, 11);
-    base[10] = 16; stls_vbl_add_null(&in, base, 11);
-    base[10] = 17; stls_vbl_add_null(&in, base, 11);
-    base[10] = 18; stls_vbl_add_null(&in, base, 11);
-    base[10] = 19; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _ifXEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1064,6 +914,7 @@ assign_ifStackEntry(GSList *vbl)
 {
     GSList *elem;
     ifStackEntry_t *ifStackEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 31, 1, 2, 1};
 
@@ -1083,21 +934,15 @@ assign_ifStackEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifStackEntry->ifStackStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifStackStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _ifStackEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 3:
+            ifStackEntry->ifStackStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return ifStackEntry;
@@ -1113,7 +958,7 @@ if_mib_get_ifStackTable(host_snmp *s, ifStackEntry_t ***ifStackEntry)
 
     *ifStackEntry = NULL;
 
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _ifStackEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1185,6 +1030,7 @@ assign_ifTestEntry(GSList *vbl)
 {
     GSList *elem;
     ifTestEntry_t *ifTestEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 31, 1, 3, 1};
 
@@ -1204,59 +1050,33 @@ assign_ifTestEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifTestEntry->ifTestId = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifTestId");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifTestEntry->ifTestStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifTestStatus");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                ifTestEntry->_ifTestTypeLength = vb->syntax_len / sizeof(guint32);
-                ifTestEntry->ifTestType = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for ifTestType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifTestEntry->ifTestResult = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifTestResult");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                ifTestEntry->_ifTestCodeLength = vb->syntax_len / sizeof(guint32);
-                ifTestEntry->ifTestCode = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for ifTestCode");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                ifTestEntry->_ifTestOwnerLength = vb->syntax_len;
-                ifTestEntry->ifTestOwner = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for ifTestOwner");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _ifTestEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            ifTestEntry->ifTestId = &(vb->syntax.i32[0]);
+            break;
+        case 2:
+            ifTestEntry->ifTestStatus = &(vb->syntax.i32[0]);
+            break;
+        case 3:
+            ifTestEntry->_ifTestTypeLength = vb->syntax_len / sizeof(guint32);
+            ifTestEntry->ifTestType = vb->syntax.ui32;
+            break;
+        case 4:
+            ifTestEntry->ifTestResult = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            ifTestEntry->_ifTestCodeLength = vb->syntax_len / sizeof(guint32);
+            ifTestEntry->ifTestCode = vb->syntax.ui32;
+            break;
+        case 6:
+            ifTestEntry->_ifTestOwnerLength = vb->syntax_len;
+            ifTestEntry->ifTestOwner = vb->syntax.uc;
+            break;
+        };
     }
 
     return ifTestEntry;
@@ -1272,12 +1092,7 @@ if_mib_get_ifTestTable(host_snmp *s, ifTestEntry_t ***ifTestEntry)
 
     *ifTestEntry = NULL;
 
-    base[10] = 1; stls_vbl_add_null(&in, base, 11);
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _ifTestEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1356,6 +1171,7 @@ assign_ifRcvAddressEntry(GSList *vbl)
 {
     GSList *elem;
     ifRcvAddressEntry_t *ifRcvAddressEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 31, 1, 4, 1};
 
@@ -1375,28 +1191,18 @@ assign_ifRcvAddressEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifRcvAddressEntry->ifRcvAddressStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifRcvAddressStatus");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifRcvAddressEntry->ifRcvAddressType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifRcvAddressType");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _ifRcvAddressEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            ifRcvAddressEntry->ifRcvAddressStatus = &(vb->syntax.i32[0]);
+            break;
+        case 3:
+            ifRcvAddressEntry->ifRcvAddressType = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return ifRcvAddressEntry;
@@ -1412,8 +1218,7 @@ if_mib_get_ifRcvAddressTable(host_snmp *s, ifRcvAddressEntry_t ***ifRcvAddressEn
 
     *ifRcvAddressEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _ifRcvAddressEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

@@ -42,6 +42,57 @@ stls_enum_t const entity_mib_enums_entPhysicalIsFRU[] = {
 };
 
 
+static stls_stub_attr_t _entPhysicalEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, "entPhysicalDescr" },
+    { 3, G_SNMP_OBJECT_ID, "entPhysicalVendorType" },
+    { 4, G_SNMP_INTEGER32, "entPhysicalContainedIn" },
+    { 5, G_SNMP_INTEGER32, "entPhysicalClass" },
+    { 6, G_SNMP_INTEGER32, "entPhysicalParentRelPos" },
+    { 7, G_SNMP_OCTET_STRING, "entPhysicalName" },
+    { 8, G_SNMP_OCTET_STRING, "entPhysicalHardwareRev" },
+    { 9, G_SNMP_OCTET_STRING, "entPhysicalFirmwareRev" },
+    { 10, G_SNMP_OCTET_STRING, "entPhysicalSoftwareRev" },
+    { 11, G_SNMP_OCTET_STRING, "entPhysicalSerialNum" },
+    { 12, G_SNMP_OCTET_STRING, "entPhysicalMfgName" },
+    { 13, G_SNMP_OCTET_STRING, "entPhysicalModelName" },
+    { 14, G_SNMP_OCTET_STRING, "entPhysicalAlias" },
+    { 15, G_SNMP_OCTET_STRING, "entPhysicalAssetID" },
+    { 16, G_SNMP_INTEGER32, "entPhysicalIsFRU" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _entLogicalEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, "entLogicalDescr" },
+    { 3, G_SNMP_OBJECT_ID, "entLogicalType" },
+    { 4, G_SNMP_OCTET_STRING, "entLogicalCommunity" },
+    { 5, G_SNMP_OCTET_STRING, "entLogicalTAddress" },
+    { 6, G_SNMP_OBJECT_ID, "entLogicalTDomain" },
+    { 7, G_SNMP_OCTET_STRING, "entLogicalContextEngineID" },
+    { 8, G_SNMP_OCTET_STRING, "entLogicalContextName" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _entLPMappingEntry[] = {
+    { 1, G_SNMP_INTEGER32, "entLPPhysicalIndex" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _entAliasMappingEntry[] = {
+    { 2, G_SNMP_OBJECT_ID, "entAliasMappingIdentifier" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _entPhysicalContainsEntry[] = {
+    { 1, G_SNMP_INTEGER32, "entPhysicalChildIndex" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _entityGeneral[] = {
+    { 1, G_SNMP_TIMETICKS, "entLastChangeTime" },
+    { 0, 0, NULL }
+};
+
+
 entPhysicalEntry_t *
 entity_mib_new_entPhysicalEntry()
 {
@@ -67,6 +118,7 @@ assign_entPhysicalEntry(GSList *vbl)
 {
     GSList *elem;
     entPhysicalEntry_t *entPhysicalEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1};
 
@@ -86,130 +138,68 @@ assign_entPhysicalEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 12 && vb->id[11] == 2) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entPhysicalEntry->_entPhysicalDescrLength = vb->syntax_len;
-                entPhysicalEntry->entPhysicalDescr = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entPhysicalDescr");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 3) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                entPhysicalEntry->_entPhysicalVendorTypeLength = vb->syntax_len / sizeof(guint32);
-                entPhysicalEntry->entPhysicalVendorType = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for entPhysicalVendorType");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                entPhysicalEntry->entPhysicalContainedIn = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for entPhysicalContainedIn");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                entPhysicalEntry->entPhysicalClass = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for entPhysicalClass");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                entPhysicalEntry->entPhysicalParentRelPos = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for entPhysicalParentRelPos");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 7) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entPhysicalEntry->_entPhysicalNameLength = vb->syntax_len;
-                entPhysicalEntry->entPhysicalName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entPhysicalName");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 8) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entPhysicalEntry->_entPhysicalHardwareRevLength = vb->syntax_len;
-                entPhysicalEntry->entPhysicalHardwareRev = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entPhysicalHardwareRev");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 9) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entPhysicalEntry->_entPhysicalFirmwareRevLength = vb->syntax_len;
-                entPhysicalEntry->entPhysicalFirmwareRev = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entPhysicalFirmwareRev");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 10) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entPhysicalEntry->_entPhysicalSoftwareRevLength = vb->syntax_len;
-                entPhysicalEntry->entPhysicalSoftwareRev = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entPhysicalSoftwareRev");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 11) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entPhysicalEntry->_entPhysicalSerialNumLength = vb->syntax_len;
-                entPhysicalEntry->entPhysicalSerialNum = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entPhysicalSerialNum");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 12) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entPhysicalEntry->_entPhysicalMfgNameLength = vb->syntax_len;
-                entPhysicalEntry->entPhysicalMfgName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entPhysicalMfgName");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 13) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entPhysicalEntry->_entPhysicalModelNameLength = vb->syntax_len;
-                entPhysicalEntry->entPhysicalModelName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entPhysicalModelName");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 14) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entPhysicalEntry->_entPhysicalAliasLength = vb->syntax_len;
-                entPhysicalEntry->entPhysicalAlias = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entPhysicalAlias");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 15) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entPhysicalEntry->_entPhysicalAssetIDLength = vb->syntax_len;
-                entPhysicalEntry->entPhysicalAssetID = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entPhysicalAssetID");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 16) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                entPhysicalEntry->entPhysicalIsFRU = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for entPhysicalIsFRU");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _entPhysicalEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            entPhysicalEntry->_entPhysicalDescrLength = vb->syntax_len;
+            entPhysicalEntry->entPhysicalDescr = vb->syntax.uc;
+            break;
+        case 3:
+            entPhysicalEntry->_entPhysicalVendorTypeLength = vb->syntax_len / sizeof(guint32);
+            entPhysicalEntry->entPhysicalVendorType = vb->syntax.ui32;
+            break;
+        case 4:
+            entPhysicalEntry->entPhysicalContainedIn = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            entPhysicalEntry->entPhysicalClass = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            entPhysicalEntry->entPhysicalParentRelPos = &(vb->syntax.i32[0]);
+            break;
+        case 7:
+            entPhysicalEntry->_entPhysicalNameLength = vb->syntax_len;
+            entPhysicalEntry->entPhysicalName = vb->syntax.uc;
+            break;
+        case 8:
+            entPhysicalEntry->_entPhysicalHardwareRevLength = vb->syntax_len;
+            entPhysicalEntry->entPhysicalHardwareRev = vb->syntax.uc;
+            break;
+        case 9:
+            entPhysicalEntry->_entPhysicalFirmwareRevLength = vb->syntax_len;
+            entPhysicalEntry->entPhysicalFirmwareRev = vb->syntax.uc;
+            break;
+        case 10:
+            entPhysicalEntry->_entPhysicalSoftwareRevLength = vb->syntax_len;
+            entPhysicalEntry->entPhysicalSoftwareRev = vb->syntax.uc;
+            break;
+        case 11:
+            entPhysicalEntry->_entPhysicalSerialNumLength = vb->syntax_len;
+            entPhysicalEntry->entPhysicalSerialNum = vb->syntax.uc;
+            break;
+        case 12:
+            entPhysicalEntry->_entPhysicalMfgNameLength = vb->syntax_len;
+            entPhysicalEntry->entPhysicalMfgName = vb->syntax.uc;
+            break;
+        case 13:
+            entPhysicalEntry->_entPhysicalModelNameLength = vb->syntax_len;
+            entPhysicalEntry->entPhysicalModelName = vb->syntax.uc;
+            break;
+        case 14:
+            entPhysicalEntry->_entPhysicalAliasLength = vb->syntax_len;
+            entPhysicalEntry->entPhysicalAlias = vb->syntax.uc;
+            break;
+        case 15:
+            entPhysicalEntry->_entPhysicalAssetIDLength = vb->syntax_len;
+            entPhysicalEntry->entPhysicalAssetID = vb->syntax.uc;
+            break;
+        case 16:
+            entPhysicalEntry->entPhysicalIsFRU = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return entPhysicalEntry;
@@ -225,21 +215,7 @@ entity_mib_get_entPhysicalTable(host_snmp *s, entPhysicalEntry_t ***entPhysicalE
 
     *entPhysicalEntry = NULL;
 
-    base[11] = 2; stls_vbl_add_null(&in, base, 12);
-    base[11] = 3; stls_vbl_add_null(&in, base, 12);
-    base[11] = 4; stls_vbl_add_null(&in, base, 12);
-    base[11] = 5; stls_vbl_add_null(&in, base, 12);
-    base[11] = 6; stls_vbl_add_null(&in, base, 12);
-    base[11] = 7; stls_vbl_add_null(&in, base, 12);
-    base[11] = 8; stls_vbl_add_null(&in, base, 12);
-    base[11] = 9; stls_vbl_add_null(&in, base, 12);
-    base[11] = 10; stls_vbl_add_null(&in, base, 12);
-    base[11] = 11; stls_vbl_add_null(&in, base, 12);
-    base[11] = 12; stls_vbl_add_null(&in, base, 12);
-    base[11] = 13; stls_vbl_add_null(&in, base, 12);
-    base[11] = 14; stls_vbl_add_null(&in, base, 12);
-    base[11] = 15; stls_vbl_add_null(&in, base, 12);
-    base[11] = 16; stls_vbl_add_null(&in, base, 12);
+    stls_vbl_attributes(s, &in, base, 11, _entPhysicalEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -311,6 +287,7 @@ assign_entLogicalEntry(GSList *vbl)
 {
     GSList *elem;
     entLogicalEntry_t *entLogicalEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1};
 
@@ -330,70 +307,40 @@ assign_entLogicalEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 12 && vb->id[11] == 2) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entLogicalEntry->_entLogicalDescrLength = vb->syntax_len;
-                entLogicalEntry->entLogicalDescr = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entLogicalDescr");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 3) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                entLogicalEntry->_entLogicalTypeLength = vb->syntax_len / sizeof(guint32);
-                entLogicalEntry->entLogicalType = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for entLogicalType");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 4) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entLogicalEntry->_entLogicalCommunityLength = vb->syntax_len;
-                entLogicalEntry->entLogicalCommunity = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entLogicalCommunity");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 5) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entLogicalEntry->_entLogicalTAddressLength = vb->syntax_len;
-                entLogicalEntry->entLogicalTAddress = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entLogicalTAddress");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 6) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                entLogicalEntry->_entLogicalTDomainLength = vb->syntax_len / sizeof(guint32);
-                entLogicalEntry->entLogicalTDomain = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for entLogicalTDomain");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 7) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entLogicalEntry->_entLogicalContextEngineIDLength = vb->syntax_len;
-                entLogicalEntry->entLogicalContextEngineID = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entLogicalContextEngineID");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 8) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                entLogicalEntry->_entLogicalContextNameLength = vb->syntax_len;
-                entLogicalEntry->entLogicalContextName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for entLogicalContextName");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _entLogicalEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            entLogicalEntry->_entLogicalDescrLength = vb->syntax_len;
+            entLogicalEntry->entLogicalDescr = vb->syntax.uc;
+            break;
+        case 3:
+            entLogicalEntry->_entLogicalTypeLength = vb->syntax_len / sizeof(guint32);
+            entLogicalEntry->entLogicalType = vb->syntax.ui32;
+            break;
+        case 4:
+            entLogicalEntry->_entLogicalCommunityLength = vb->syntax_len;
+            entLogicalEntry->entLogicalCommunity = vb->syntax.uc;
+            break;
+        case 5:
+            entLogicalEntry->_entLogicalTAddressLength = vb->syntax_len;
+            entLogicalEntry->entLogicalTAddress = vb->syntax.uc;
+            break;
+        case 6:
+            entLogicalEntry->_entLogicalTDomainLength = vb->syntax_len / sizeof(guint32);
+            entLogicalEntry->entLogicalTDomain = vb->syntax.ui32;
+            break;
+        case 7:
+            entLogicalEntry->_entLogicalContextEngineIDLength = vb->syntax_len;
+            entLogicalEntry->entLogicalContextEngineID = vb->syntax.uc;
+            break;
+        case 8:
+            entLogicalEntry->_entLogicalContextNameLength = vb->syntax_len;
+            entLogicalEntry->entLogicalContextName = vb->syntax.uc;
+            break;
+        };
     }
 
     return entLogicalEntry;
@@ -409,13 +356,7 @@ entity_mib_get_entLogicalTable(host_snmp *s, entLogicalEntry_t ***entLogicalEntr
 
     *entLogicalEntry = NULL;
 
-    base[11] = 2; stls_vbl_add_null(&in, base, 12);
-    base[11] = 3; stls_vbl_add_null(&in, base, 12);
-    base[11] = 4; stls_vbl_add_null(&in, base, 12);
-    base[11] = 5; stls_vbl_add_null(&in, base, 12);
-    base[11] = 6; stls_vbl_add_null(&in, base, 12);
-    base[11] = 7; stls_vbl_add_null(&in, base, 12);
-    base[11] = 8; stls_vbl_add_null(&in, base, 12);
+    stls_vbl_attributes(s, &in, base, 11, _entLogicalEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -489,6 +430,7 @@ assign_entLPMappingEntry(GSList *vbl)
 {
     GSList *elem;
     entLPMappingEntry_t *entLPMappingEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 1, 1};
 
@@ -508,14 +450,12 @@ assign_entLPMappingEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _entLPMappingEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        };
     }
 
     return entLPMappingEntry;
@@ -531,7 +471,7 @@ entity_mib_get_entLPMappingTable(host_snmp *s, entLPMappingEntry_t ***entLPMappi
 
     *entLPMappingEntry = NULL;
 
-    base[11] = 1; stls_vbl_add_null(&in, base, 12);
+    stls_vbl_attributes(s, &in, base, 11, _entLPMappingEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -605,6 +545,7 @@ assign_entAliasMappingEntry(GSList *vbl)
 {
     GSList *elem;
     entAliasMappingEntry_t *entAliasMappingEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 2, 1};
 
@@ -624,22 +565,16 @@ assign_entAliasMappingEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 12 && vb->id[11] == 2) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                entAliasMappingEntry->_entAliasMappingIdentifierLength = vb->syntax_len / sizeof(guint32);
-                entAliasMappingEntry->entAliasMappingIdentifier = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for entAliasMappingIdentifier");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _entAliasMappingEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            entAliasMappingEntry->_entAliasMappingIdentifierLength = vb->syntax_len / sizeof(guint32);
+            entAliasMappingEntry->entAliasMappingIdentifier = vb->syntax.ui32;
+            break;
+        };
     }
 
     return entAliasMappingEntry;
@@ -655,7 +590,7 @@ entity_mib_get_entAliasMappingTable(host_snmp *s, entAliasMappingEntry_t ***entA
 
     *entAliasMappingEntry = NULL;
 
-    base[11] = 2; stls_vbl_add_null(&in, base, 12);
+    stls_vbl_attributes(s, &in, base, 11, _entAliasMappingEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -729,6 +664,7 @@ assign_entPhysicalContainsEntry(GSList *vbl)
 {
     GSList *elem;
     entPhysicalContainsEntry_t *entPhysicalContainsEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 3, 1};
 
@@ -748,14 +684,12 @@ assign_entPhysicalContainsEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _entPhysicalContainsEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        };
     }
 
     return entPhysicalContainsEntry;
@@ -771,7 +705,7 @@ entity_mib_get_entPhysicalContainsTable(host_snmp *s, entPhysicalContainsEntry_t
 
     *entPhysicalContainsEntry = NULL;
 
-    base[11] = 1; stls_vbl_add_null(&in, base, 12);
+    stls_vbl_attributes(s, &in, base, 11, _entPhysicalContainsEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -832,6 +766,7 @@ assign_entityGeneral(GSList *vbl)
 {
     GSList *elem;
     entityGeneral_t *entityGeneral;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 4};
 
@@ -845,21 +780,15 @@ assign_entityGeneral(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 10 && vb->id[9] == 1) {
-            if (vb->type == G_SNMP_TIMETICKS) {
-                entityGeneral->entLastChangeTime = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for entLastChangeTime");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _entityGeneral, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            entityGeneral->entLastChangeTime = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return entityGeneral;
@@ -873,7 +802,7 @@ entity_mib_get_entityGeneral(host_snmp *s, entityGeneral_t **entityGeneral)
 
     *entityGeneral = NULL;
 
-    base[9] = 1; stls_vbl_add_null(&in, base, 10);
+    stls_vbl_attributes(s, &in, base, 9, _entityGeneral);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);

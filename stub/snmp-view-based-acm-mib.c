@@ -95,6 +95,42 @@ stls_enum_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStatus[] = {
 };
 
 
+static stls_stub_attr_t _vacmContextEntry[] = {
+    { 1, G_SNMP_OCTET_STRING, "vacmContextName" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _vacmSecurityToGroupEntry[] = {
+    { 3, G_SNMP_OCTET_STRING, "vacmGroupName" },
+    { 4, G_SNMP_INTEGER32, "vacmSecurityToGroupStorageType" },
+    { 5, G_SNMP_INTEGER32, "vacmSecurityToGroupStatus" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _vacmAccessEntry[] = {
+    { 4, G_SNMP_INTEGER32, "vacmAccessContextMatch" },
+    { 5, G_SNMP_OCTET_STRING, "vacmAccessReadViewName" },
+    { 6, G_SNMP_OCTET_STRING, "vacmAccessWriteViewName" },
+    { 7, G_SNMP_OCTET_STRING, "vacmAccessNotifyViewName" },
+    { 8, G_SNMP_INTEGER32, "vacmAccessStorageType" },
+    { 9, G_SNMP_INTEGER32, "vacmAccessStatus" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _vacmMIBViews[] = {
+    { 1, G_SNMP_INTEGER32, "vacmViewSpinLock" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _vacmViewTreeFamilyEntry[] = {
+    { 3, G_SNMP_OCTET_STRING, "vacmViewTreeFamilyMask" },
+    { 4, G_SNMP_INTEGER32, "vacmViewTreeFamilyType" },
+    { 5, G_SNMP_INTEGER32, "vacmViewTreeFamilyStorageType" },
+    { 6, G_SNMP_INTEGER32, "vacmViewTreeFamilyStatus" },
+    { 0, 0, NULL }
+};
+
+
 vacmContextEntry_t *
 snmp_view_based_acm_mib_new_vacmContextEntry()
 {
@@ -125,6 +161,7 @@ assign_vacmContextEntry(GSList *vbl)
 {
     GSList *elem;
     vacmContextEntry_t *vacmContextEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 16, 1, 1, 1};
 
@@ -144,14 +181,12 @@ assign_vacmContextEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _vacmContextEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        };
     }
 
     return vacmContextEntry;
@@ -167,7 +202,7 @@ snmp_view_based_acm_mib_get_vacmContextTable(host_snmp *s, vacmContextEntry_t **
 
     *vacmContextEntry = NULL;
 
-    base[10] = 1; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _vacmContextEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -246,6 +281,7 @@ assign_vacmSecurityToGroupEntry(GSList *vbl)
 {
     GSList *elem;
     vacmSecurityToGroupEntry_t *vacmSecurityToGroupEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 16, 1, 2, 1};
 
@@ -265,36 +301,22 @@ assign_vacmSecurityToGroupEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                vacmSecurityToGroupEntry->_vacmGroupNameLength = vb->syntax_len;
-                vacmSecurityToGroupEntry->vacmGroupName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for vacmGroupName");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                vacmSecurityToGroupEntry->vacmSecurityToGroupStorageType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for vacmSecurityToGroupStorageType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                vacmSecurityToGroupEntry->vacmSecurityToGroupStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for vacmSecurityToGroupStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _vacmSecurityToGroupEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 3:
+            vacmSecurityToGroupEntry->_vacmGroupNameLength = vb->syntax_len;
+            vacmSecurityToGroupEntry->vacmGroupName = vb->syntax.uc;
+            break;
+        case 4:
+            vacmSecurityToGroupEntry->vacmSecurityToGroupStorageType = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            vacmSecurityToGroupEntry->vacmSecurityToGroupStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return vacmSecurityToGroupEntry;
@@ -310,9 +332,7 @@ snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(host_snmp *s, vacmSecurityT
 
     *vacmSecurityToGroupEntry = NULL;
 
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _vacmSecurityToGroupEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -400,6 +420,7 @@ assign_vacmAccessEntry(GSList *vbl)
 {
     GSList *elem;
     vacmAccessEntry_t *vacmAccessEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 16, 1, 4, 1};
 
@@ -419,59 +440,33 @@ assign_vacmAccessEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                vacmAccessEntry->vacmAccessContextMatch = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for vacmAccessContextMatch");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                vacmAccessEntry->_vacmAccessReadViewNameLength = vb->syntax_len;
-                vacmAccessEntry->vacmAccessReadViewName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for vacmAccessReadViewName");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                vacmAccessEntry->_vacmAccessWriteViewNameLength = vb->syntax_len;
-                vacmAccessEntry->vacmAccessWriteViewName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for vacmAccessWriteViewName");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                vacmAccessEntry->_vacmAccessNotifyViewNameLength = vb->syntax_len;
-                vacmAccessEntry->vacmAccessNotifyViewName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for vacmAccessNotifyViewName");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                vacmAccessEntry->vacmAccessStorageType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for vacmAccessStorageType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 9) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                vacmAccessEntry->vacmAccessStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for vacmAccessStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _vacmAccessEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 4:
+            vacmAccessEntry->vacmAccessContextMatch = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            vacmAccessEntry->_vacmAccessReadViewNameLength = vb->syntax_len;
+            vacmAccessEntry->vacmAccessReadViewName = vb->syntax.uc;
+            break;
+        case 6:
+            vacmAccessEntry->_vacmAccessWriteViewNameLength = vb->syntax_len;
+            vacmAccessEntry->vacmAccessWriteViewName = vb->syntax.uc;
+            break;
+        case 7:
+            vacmAccessEntry->_vacmAccessNotifyViewNameLength = vb->syntax_len;
+            vacmAccessEntry->vacmAccessNotifyViewName = vb->syntax.uc;
+            break;
+        case 8:
+            vacmAccessEntry->vacmAccessStorageType = &(vb->syntax.i32[0]);
+            break;
+        case 9:
+            vacmAccessEntry->vacmAccessStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return vacmAccessEntry;
@@ -487,12 +482,7 @@ snmp_view_based_acm_mib_get_vacmAccessTable(host_snmp *s, vacmAccessEntry_t ***v
 
     *vacmAccessEntry = NULL;
 
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
-    base[10] = 8; stls_vbl_add_null(&in, base, 11);
-    base[10] = 9; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _vacmAccessEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -553,6 +543,7 @@ assign_vacmMIBViews(GSList *vbl)
 {
     GSList *elem;
     vacmMIBViews_t *vacmMIBViews;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 16, 1, 5};
 
@@ -566,21 +557,15 @@ assign_vacmMIBViews(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 10 && vb->id[9] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                vacmMIBViews->vacmViewSpinLock = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for vacmViewSpinLock");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _vacmMIBViews, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            vacmMIBViews->vacmViewSpinLock = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return vacmMIBViews;
@@ -594,7 +579,7 @@ snmp_view_based_acm_mib_get_vacmMIBViews(host_snmp *s, vacmMIBViews_t **vacmMIBV
 
     *vacmMIBViews = NULL;
 
-    base[9] = 1; stls_vbl_add_null(&in, base, 10);
+    stls_vbl_attributes(s, &in, base, 9, _vacmMIBViews);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -652,6 +637,7 @@ assign_vacmViewTreeFamilyEntry(GSList *vbl)
 {
     GSList *elem;
     vacmViewTreeFamilyEntry_t *vacmViewTreeFamilyEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 16, 1, 5, 2, 1};
 
@@ -671,43 +657,25 @@ assign_vacmViewTreeFamilyEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 12 && vb->id[11] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                vacmViewTreeFamilyEntry->_vacmViewTreeFamilyMaskLength = vb->syntax_len;
-                vacmViewTreeFamilyEntry->vacmViewTreeFamilyMask = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for vacmViewTreeFamilyMask");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                vacmViewTreeFamilyEntry->vacmViewTreeFamilyType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for vacmViewTreeFamilyType");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                vacmViewTreeFamilyEntry->vacmViewTreeFamilyStorageType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for vacmViewTreeFamilyStorageType");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                vacmViewTreeFamilyEntry->vacmViewTreeFamilyStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for vacmViewTreeFamilyStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _vacmViewTreeFamilyEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 3:
+            vacmViewTreeFamilyEntry->_vacmViewTreeFamilyMaskLength = vb->syntax_len;
+            vacmViewTreeFamilyEntry->vacmViewTreeFamilyMask = vb->syntax.uc;
+            break;
+        case 4:
+            vacmViewTreeFamilyEntry->vacmViewTreeFamilyType = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            vacmViewTreeFamilyEntry->vacmViewTreeFamilyStorageType = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            vacmViewTreeFamilyEntry->vacmViewTreeFamilyStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return vacmViewTreeFamilyEntry;
@@ -723,10 +691,7 @@ snmp_view_based_acm_mib_get_vacmViewTreeFamilyTable(host_snmp *s, vacmViewTreeFa
 
     *vacmViewTreeFamilyEntry = NULL;
 
-    base[11] = 3; stls_vbl_add_null(&in, base, 12);
-    base[11] = 4; stls_vbl_add_null(&in, base, 12);
-    base[11] = 5; stls_vbl_add_null(&in, base, 12);
-    base[11] = 6; stls_vbl_add_null(&in, base, 12);
+    stls_vbl_attributes(s, &in, base, 11, _vacmViewTreeFamilyEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

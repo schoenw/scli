@@ -16,6 +16,14 @@
 
 #include "snmp-mpd-mib.h"
 
+static stls_stub_attr_t _snmpMPDStats[] = {
+    { 1, G_SNMP_COUNTER32, "snmpUnknownSecurityModels" },
+    { 2, G_SNMP_COUNTER32, "snmpInvalidMsgs" },
+    { 3, G_SNMP_COUNTER32, "snmpUnknownPDUHandlers" },
+    { 0, 0, NULL }
+};
+
+
 snmpMPDStats_t *
 snmp_mpd_mib_new_snmpMPDStats()
 {
@@ -30,6 +38,7 @@ assign_snmpMPDStats(GSList *vbl)
 {
     GSList *elem;
     snmpMPDStats_t *snmpMPDStats;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 11, 2, 1};
 
@@ -43,35 +52,21 @@ assign_snmpMPDStats(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 10 && vb->id[9] == 1) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                snmpMPDStats->snmpUnknownSecurityModels = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for snmpUnknownSecurityModels");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 2) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                snmpMPDStats->snmpInvalidMsgs = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for snmpInvalidMsgs");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 3) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                snmpMPDStats->snmpUnknownPDUHandlers = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for snmpUnknownPDUHandlers");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _snmpMPDStats, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            snmpMPDStats->snmpUnknownSecurityModels = &(vb->syntax.ui32[0]);
+            break;
+        case 2:
+            snmpMPDStats->snmpInvalidMsgs = &(vb->syntax.ui32[0]);
+            break;
+        case 3:
+            snmpMPDStats->snmpUnknownPDUHandlers = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return snmpMPDStats;
@@ -85,9 +80,7 @@ snmp_mpd_mib_get_snmpMPDStats(host_snmp *s, snmpMPDStats_t **snmpMPDStats)
 
     *snmpMPDStats = NULL;
 
-    base[9] = 1; stls_vbl_add_null(&in, base, 10);
-    base[9] = 2; stls_vbl_add_null(&in, base, 10);
-    base[9] = 3; stls_vbl_add_null(&in, base, 10);
+    stls_vbl_attributes(s, &in, base, 9, _snmpMPDStats);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);

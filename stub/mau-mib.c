@@ -195,6 +195,222 @@ stls_enum_t const mau_mib_enums_ifMauAutoNegRemoteFaultReceived[] = {
 };
 
 
+static guint32 const dot3MauTypeAUI[]
+	= { MAU_MIB_DOT3MAUTYPEAUI };
+static guint32 const dot3MauType10Base5[]
+	= { MAU_MIB_DOT3MAUTYPE10BASE5 };
+static guint32 const dot3MauTypeFoirl[]
+	= { MAU_MIB_DOT3MAUTYPEFOIRL };
+static guint32 const dot3MauType10Base2[]
+	= { MAU_MIB_DOT3MAUTYPE10BASE2 };
+static guint32 const dot3MauType10BaseT[]
+	= { MAU_MIB_DOT3MAUTYPE10BASET };
+static guint32 const dot3MauType10BaseFP[]
+	= { MAU_MIB_DOT3MAUTYPE10BASEFP };
+static guint32 const dot3MauType10BaseFB[]
+	= { MAU_MIB_DOT3MAUTYPE10BASEFB };
+static guint32 const dot3MauType10BaseFL[]
+	= { MAU_MIB_DOT3MAUTYPE10BASEFL };
+static guint32 const dot3MauType10Broad36[]
+	= { MAU_MIB_DOT3MAUTYPE10BROAD36 };
+static guint32 const dot3MauType10BaseTHD[]
+	= { MAU_MIB_DOT3MAUTYPE10BASETHD };
+static guint32 const dot3MauType10BaseTFD[]
+	= { MAU_MIB_DOT3MAUTYPE10BASETFD };
+static guint32 const dot3MauType10BaseFLHD[]
+	= { MAU_MIB_DOT3MAUTYPE10BASEFLHD };
+static guint32 const dot3MauType10BaseFLFD[]
+	= { MAU_MIB_DOT3MAUTYPE10BASEFLFD };
+static guint32 const dot3MauType100BaseT4[]
+	= { MAU_MIB_DOT3MAUTYPE100BASET4 };
+static guint32 const dot3MauType100BaseTXHD[]
+	= { MAU_MIB_DOT3MAUTYPE100BASETXHD };
+static guint32 const dot3MauType100BaseTXFD[]
+	= { MAU_MIB_DOT3MAUTYPE100BASETXFD };
+static guint32 const dot3MauType100BaseFXHD[]
+	= { MAU_MIB_DOT3MAUTYPE100BASEFXHD };
+static guint32 const dot3MauType100BaseFXFD[]
+	= { MAU_MIB_DOT3MAUTYPE100BASEFXFD };
+static guint32 const dot3MauType100BaseT2HD[]
+	= { MAU_MIB_DOT3MAUTYPE100BASET2HD };
+static guint32 const dot3MauType100BaseT2FD[]
+	= { MAU_MIB_DOT3MAUTYPE100BASET2FD };
+static guint32 const dot3MauType1000BaseXHD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASEXHD };
+static guint32 const dot3MauType1000BaseXFD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASEXFD };
+static guint32 const dot3MauType1000BaseLXHD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASELXHD };
+static guint32 const dot3MauType1000BaseLXFD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASELXFD };
+static guint32 const dot3MauType1000BaseSXHD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASESXHD };
+static guint32 const dot3MauType1000BaseSXFD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASESXFD };
+static guint32 const dot3MauType1000BaseCXHD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASECXHD };
+static guint32 const dot3MauType1000BaseCXFD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASECXFD };
+static guint32 const dot3MauType1000BaseTHD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASETHD };
+static guint32 const dot3MauType1000BaseTFD[]
+	= { MAU_MIB_DOT3MAUTYPE1000BASETFD };
+
+stls_identity_t const mau_mib_identities[] = {
+    { dot3MauTypeAUI,
+      sizeof(dot3MauTypeAUI)/sizeof(guint32),
+      "dot3MauTypeAUI" },
+    { dot3MauType10Base5,
+      sizeof(dot3MauType10Base5)/sizeof(guint32),
+      "dot3MauType10Base5" },
+    { dot3MauTypeFoirl,
+      sizeof(dot3MauTypeFoirl)/sizeof(guint32),
+      "dot3MauTypeFoirl" },
+    { dot3MauType10Base2,
+      sizeof(dot3MauType10Base2)/sizeof(guint32),
+      "dot3MauType10Base2" },
+    { dot3MauType10BaseT,
+      sizeof(dot3MauType10BaseT)/sizeof(guint32),
+      "dot3MauType10BaseT" },
+    { dot3MauType10BaseFP,
+      sizeof(dot3MauType10BaseFP)/sizeof(guint32),
+      "dot3MauType10BaseFP" },
+    { dot3MauType10BaseFB,
+      sizeof(dot3MauType10BaseFB)/sizeof(guint32),
+      "dot3MauType10BaseFB" },
+    { dot3MauType10BaseFL,
+      sizeof(dot3MauType10BaseFL)/sizeof(guint32),
+      "dot3MauType10BaseFL" },
+    { dot3MauType10Broad36,
+      sizeof(dot3MauType10Broad36)/sizeof(guint32),
+      "dot3MauType10Broad36" },
+    { dot3MauType10BaseTHD,
+      sizeof(dot3MauType10BaseTHD)/sizeof(guint32),
+      "dot3MauType10BaseTHD" },
+    { dot3MauType10BaseTFD,
+      sizeof(dot3MauType10BaseTFD)/sizeof(guint32),
+      "dot3MauType10BaseTFD" },
+    { dot3MauType10BaseFLHD,
+      sizeof(dot3MauType10BaseFLHD)/sizeof(guint32),
+      "dot3MauType10BaseFLHD" },
+    { dot3MauType10BaseFLFD,
+      sizeof(dot3MauType10BaseFLFD)/sizeof(guint32),
+      "dot3MauType10BaseFLFD" },
+    { dot3MauType100BaseT4,
+      sizeof(dot3MauType100BaseT4)/sizeof(guint32),
+      "dot3MauType100BaseT4" },
+    { dot3MauType100BaseTXHD,
+      sizeof(dot3MauType100BaseTXHD)/sizeof(guint32),
+      "dot3MauType100BaseTXHD" },
+    { dot3MauType100BaseTXFD,
+      sizeof(dot3MauType100BaseTXFD)/sizeof(guint32),
+      "dot3MauType100BaseTXFD" },
+    { dot3MauType100BaseFXHD,
+      sizeof(dot3MauType100BaseFXHD)/sizeof(guint32),
+      "dot3MauType100BaseFXHD" },
+    { dot3MauType100BaseFXFD,
+      sizeof(dot3MauType100BaseFXFD)/sizeof(guint32),
+      "dot3MauType100BaseFXFD" },
+    { dot3MauType100BaseT2HD,
+      sizeof(dot3MauType100BaseT2HD)/sizeof(guint32),
+      "dot3MauType100BaseT2HD" },
+    { dot3MauType100BaseT2FD,
+      sizeof(dot3MauType100BaseT2FD)/sizeof(guint32),
+      "dot3MauType100BaseT2FD" },
+    { dot3MauType1000BaseXHD,
+      sizeof(dot3MauType1000BaseXHD)/sizeof(guint32),
+      "dot3MauType1000BaseXHD" },
+    { dot3MauType1000BaseXFD,
+      sizeof(dot3MauType1000BaseXFD)/sizeof(guint32),
+      "dot3MauType1000BaseXFD" },
+    { dot3MauType1000BaseLXHD,
+      sizeof(dot3MauType1000BaseLXHD)/sizeof(guint32),
+      "dot3MauType1000BaseLXHD" },
+    { dot3MauType1000BaseLXFD,
+      sizeof(dot3MauType1000BaseLXFD)/sizeof(guint32),
+      "dot3MauType1000BaseLXFD" },
+    { dot3MauType1000BaseSXHD,
+      sizeof(dot3MauType1000BaseSXHD)/sizeof(guint32),
+      "dot3MauType1000BaseSXHD" },
+    { dot3MauType1000BaseSXFD,
+      sizeof(dot3MauType1000BaseSXFD)/sizeof(guint32),
+      "dot3MauType1000BaseSXFD" },
+    { dot3MauType1000BaseCXHD,
+      sizeof(dot3MauType1000BaseCXHD)/sizeof(guint32),
+      "dot3MauType1000BaseCXHD" },
+    { dot3MauType1000BaseCXFD,
+      sizeof(dot3MauType1000BaseCXFD)/sizeof(guint32),
+      "dot3MauType1000BaseCXFD" },
+    { dot3MauType1000BaseTHD,
+      sizeof(dot3MauType1000BaseTHD)/sizeof(guint32),
+      "dot3MauType1000BaseTHD" },
+    { dot3MauType1000BaseTFD,
+      sizeof(dot3MauType1000BaseTFD)/sizeof(guint32),
+      "dot3MauType1000BaseTFD" },
+    { 0, 0, NULL }
+};
+
+
+static stls_stub_attr_t _rpMauEntry[] = {
+    { 4, G_SNMP_OBJECT_ID, "rpMauType" },
+    { 5, G_SNMP_INTEGER32, "rpMauStatus" },
+    { 6, G_SNMP_INTEGER32, "rpMauMediaAvailable" },
+    { 7, G_SNMP_COUNTER32, "rpMauMediaAvailableStateExits" },
+    { 8, G_SNMP_INTEGER32, "rpMauJabberState" },
+    { 9, G_SNMP_COUNTER32, "rpMauJabberingStateEnters" },
+    { 10, G_SNMP_COUNTER32, "rpMauFalseCarriers" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _rpJackEntry[] = {
+    { 2, G_SNMP_INTEGER32, "rpJackType" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _ifMauEntry[] = {
+    { 3, G_SNMP_OBJECT_ID, "ifMauType" },
+    { 4, G_SNMP_INTEGER32, "ifMauStatus" },
+    { 5, G_SNMP_INTEGER32, "ifMauMediaAvailable" },
+    { 6, G_SNMP_COUNTER32, "ifMauMediaAvailableStateExits" },
+    { 7, G_SNMP_INTEGER32, "ifMauJabberState" },
+    { 8, G_SNMP_COUNTER32, "ifMauJabberingStateEnters" },
+    { 9, G_SNMP_COUNTER32, "ifMauFalseCarriers" },
+    { 10, G_SNMP_INTEGER32, "ifMauTypeList" },
+    { 11, G_SNMP_OBJECT_ID, "ifMauDefaultType" },
+    { 12, G_SNMP_INTEGER32, "ifMauAutoNegSupported" },
+    { 13, G_SNMP_OCTET_STRING, "ifMauTypeListBits" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _ifJackEntry[] = {
+    { 2, G_SNMP_INTEGER32, "ifJackType" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _broadMauBasicEntry[] = {
+    { 3, G_SNMP_INTEGER32, "broadMauXmtRcvSplitType" },
+    { 4, G_SNMP_INTEGER32, "broadMauXmtCarrierFreq" },
+    { 5, G_SNMP_INTEGER32, "broadMauTranslationFreq" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _ifMauAutoNegEntry[] = {
+    { 1, G_SNMP_INTEGER32, "ifMauAutoNegAdminStatus" },
+    { 2, G_SNMP_INTEGER32, "ifMauAutoNegRemoteSignaling" },
+    { 4, G_SNMP_INTEGER32, "ifMauAutoNegConfig" },
+    { 5, G_SNMP_INTEGER32, "ifMauAutoNegCapability" },
+    { 6, G_SNMP_INTEGER32, "ifMauAutoNegCapAdvertised" },
+    { 7, G_SNMP_INTEGER32, "ifMauAutoNegCapReceived" },
+    { 8, G_SNMP_INTEGER32, "ifMauAutoNegRestart" },
+    { 9, G_SNMP_OCTET_STRING, "ifMauAutoNegCapabilityBits" },
+    { 10, G_SNMP_OCTET_STRING, "ifMauAutoNegCapAdvertisedBits" },
+    { 11, G_SNMP_OCTET_STRING, "ifMauAutoNegCapReceivedBits" },
+    { 12, G_SNMP_INTEGER32, "ifMauAutoNegRemoteFaultAdvertised" },
+    { 13, G_SNMP_INTEGER32, "ifMauAutoNegRemoteFaultReceived" },
+    { 0, 0, NULL }
+};
+
+
 rpMauEntry_t *
 mau_mib_new_rpMauEntry()
 {
@@ -224,6 +440,7 @@ assign_rpMauEntry(GSList *vbl)
 {
     GSList *elem;
     rpMauEntry_t *rpMauEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 26, 1, 1, 1};
 
@@ -243,64 +460,34 @@ assign_rpMauEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                rpMauEntry->_rpMauTypeLength = vb->syntax_len / sizeof(guint32);
-                rpMauEntry->rpMauType = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for rpMauType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                rpMauEntry->rpMauStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for rpMauStatus");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                rpMauEntry->rpMauMediaAvailable = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for rpMauMediaAvailable");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                rpMauEntry->rpMauMediaAvailableStateExits = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for rpMauMediaAvailableStateExits");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                rpMauEntry->rpMauJabberState = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for rpMauJabberState");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 9) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                rpMauEntry->rpMauJabberingStateEnters = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for rpMauJabberingStateEnters");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 10) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                rpMauEntry->rpMauFalseCarriers = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for rpMauFalseCarriers");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _rpMauEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 4:
+            rpMauEntry->_rpMauTypeLength = vb->syntax_len / sizeof(guint32);
+            rpMauEntry->rpMauType = vb->syntax.ui32;
+            break;
+        case 5:
+            rpMauEntry->rpMauStatus = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            rpMauEntry->rpMauMediaAvailable = &(vb->syntax.i32[0]);
+            break;
+        case 7:
+            rpMauEntry->rpMauMediaAvailableStateExits = &(vb->syntax.ui32[0]);
+            break;
+        case 8:
+            rpMauEntry->rpMauJabberState = &(vb->syntax.i32[0]);
+            break;
+        case 9:
+            rpMauEntry->rpMauJabberingStateEnters = &(vb->syntax.ui32[0]);
+            break;
+        case 10:
+            rpMauEntry->rpMauFalseCarriers = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return rpMauEntry;
@@ -316,13 +503,7 @@ mau_mib_get_rpMauTable(host_snmp *s, rpMauEntry_t ***rpMauEntry)
 
     *rpMauEntry = NULL;
 
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
-    base[10] = 8; stls_vbl_add_null(&in, base, 11);
-    base[10] = 9; stls_vbl_add_null(&in, base, 11);
-    base[10] = 10; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _rpMauEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -400,6 +581,7 @@ assign_rpJackEntry(GSList *vbl)
 {
     GSList *elem;
     rpJackEntry_t *rpJackEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 26, 1, 2, 1};
 
@@ -419,21 +601,15 @@ assign_rpJackEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                rpJackEntry->rpJackType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for rpJackType");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _rpJackEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            rpJackEntry->rpJackType = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return rpJackEntry;
@@ -449,7 +625,7 @@ mau_mib_get_rpJackTable(host_snmp *s, rpJackEntry_t ***rpJackEntry)
 
     *rpJackEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _rpJackEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -523,6 +699,7 @@ assign_ifMauEntry(GSList *vbl)
 {
     GSList *elem;
     ifMauEntry_t *ifMauEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 26, 2, 1, 1};
 
@@ -542,94 +719,48 @@ assign_ifMauEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                ifMauEntry->_ifMauTypeLength = vb->syntax_len / sizeof(guint32);
-                ifMauEntry->ifMauType = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for ifMauType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauEntry->ifMauStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauStatus");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauEntry->ifMauMediaAvailable = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauMediaAvailable");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifMauEntry->ifMauMediaAvailableStateExits = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifMauMediaAvailableStateExits");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauEntry->ifMauJabberState = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauJabberState");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifMauEntry->ifMauJabberingStateEnters = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifMauJabberingStateEnters");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 9) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                ifMauEntry->ifMauFalseCarriers = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ifMauFalseCarriers");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 10) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauEntry->ifMauTypeList = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauTypeList");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 11) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                ifMauEntry->_ifMauDefaultTypeLength = vb->syntax_len / sizeof(guint32);
-                ifMauEntry->ifMauDefaultType = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for ifMauDefaultType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 12) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauEntry->ifMauAutoNegSupported = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauAutoNegSupported");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 13) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                ifMauEntry->_ifMauTypeListBitsLength = vb->syntax_len;
-                ifMauEntry->ifMauTypeListBits = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for ifMauTypeListBits");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _ifMauEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 3:
+            ifMauEntry->_ifMauTypeLength = vb->syntax_len / sizeof(guint32);
+            ifMauEntry->ifMauType = vb->syntax.ui32;
+            break;
+        case 4:
+            ifMauEntry->ifMauStatus = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            ifMauEntry->ifMauMediaAvailable = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            ifMauEntry->ifMauMediaAvailableStateExits = &(vb->syntax.ui32[0]);
+            break;
+        case 7:
+            ifMauEntry->ifMauJabberState = &(vb->syntax.i32[0]);
+            break;
+        case 8:
+            ifMauEntry->ifMauJabberingStateEnters = &(vb->syntax.ui32[0]);
+            break;
+        case 9:
+            ifMauEntry->ifMauFalseCarriers = &(vb->syntax.ui32[0]);
+            break;
+        case 10:
+            ifMauEntry->ifMauTypeList = &(vb->syntax.i32[0]);
+            break;
+        case 11:
+            ifMauEntry->_ifMauDefaultTypeLength = vb->syntax_len / sizeof(guint32);
+            ifMauEntry->ifMauDefaultType = vb->syntax.ui32;
+            break;
+        case 12:
+            ifMauEntry->ifMauAutoNegSupported = &(vb->syntax.i32[0]);
+            break;
+        case 13:
+            ifMauEntry->_ifMauTypeListBitsLength = vb->syntax_len;
+            ifMauEntry->ifMauTypeListBits = vb->syntax.uc;
+            break;
+        };
     }
 
     return ifMauEntry;
@@ -645,17 +776,7 @@ mau_mib_get_ifMauTable(host_snmp *s, ifMauEntry_t ***ifMauEntry)
 
     *ifMauEntry = NULL;
 
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
-    base[10] = 8; stls_vbl_add_null(&in, base, 11);
-    base[10] = 9; stls_vbl_add_null(&in, base, 11);
-    base[10] = 10; stls_vbl_add_null(&in, base, 11);
-    base[10] = 11; stls_vbl_add_null(&in, base, 11);
-    base[10] = 12; stls_vbl_add_null(&in, base, 11);
-    base[10] = 13; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _ifMauEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -731,6 +852,7 @@ assign_ifJackEntry(GSList *vbl)
 {
     GSList *elem;
     ifJackEntry_t *ifJackEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 26, 2, 2, 1};
 
@@ -750,21 +872,15 @@ assign_ifJackEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifJackEntry->ifJackType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifJackType");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _ifJackEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            ifJackEntry->ifJackType = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return ifJackEntry;
@@ -780,7 +896,7 @@ mau_mib_get_ifJackTable(host_snmp *s, ifJackEntry_t ***ifJackEntry)
 
     *ifJackEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _ifJackEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -854,6 +970,7 @@ assign_broadMauBasicEntry(GSList *vbl)
 {
     GSList *elem;
     broadMauBasicEntry_t *broadMauBasicEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 26, 3, 1, 1};
 
@@ -873,35 +990,21 @@ assign_broadMauBasicEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                broadMauBasicEntry->broadMauXmtRcvSplitType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for broadMauXmtRcvSplitType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                broadMauBasicEntry->broadMauXmtCarrierFreq = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for broadMauXmtCarrierFreq");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                broadMauBasicEntry->broadMauTranslationFreq = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for broadMauTranslationFreq");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _broadMauBasicEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 3:
+            broadMauBasicEntry->broadMauXmtRcvSplitType = &(vb->syntax.i32[0]);
+            break;
+        case 4:
+            broadMauBasicEntry->broadMauXmtCarrierFreq = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            broadMauBasicEntry->broadMauTranslationFreq = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return broadMauBasicEntry;
@@ -917,9 +1020,7 @@ mau_mib_get_broadMauBasicTable(host_snmp *s, broadMauBasicEntry_t ***broadMauBas
 
     *broadMauBasicEntry = NULL;
 
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _broadMauBasicEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -993,6 +1094,7 @@ assign_ifMauAutoNegEntry(GSList *vbl)
 {
     GSList *elem;
     ifMauAutoNegEntry_t *ifMauAutoNegEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 26, 5, 1, 1};
 
@@ -1012,101 +1114,51 @@ assign_ifMauAutoNegEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauAutoNegEntry->ifMauAutoNegAdminStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauAutoNegAdminStatus");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauAutoNegEntry->ifMauAutoNegRemoteSignaling = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauAutoNegRemoteSignaling");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauAutoNegEntry->ifMauAutoNegConfig = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauAutoNegConfig");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauAutoNegEntry->ifMauAutoNegCapability = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauAutoNegCapability");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauAutoNegEntry->ifMauAutoNegCapAdvertised = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauAutoNegCapAdvertised");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauAutoNegEntry->ifMauAutoNegCapReceived = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauAutoNegCapReceived");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauAutoNegEntry->ifMauAutoNegRestart = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauAutoNegRestart");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 9) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                ifMauAutoNegEntry->_ifMauAutoNegCapabilityBitsLength = vb->syntax_len;
-                ifMauAutoNegEntry->ifMauAutoNegCapabilityBits = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for ifMauAutoNegCapabilityBits");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 10) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                ifMauAutoNegEntry->_ifMauAutoNegCapAdvertisedBitsLength = vb->syntax_len;
-                ifMauAutoNegEntry->ifMauAutoNegCapAdvertisedBits = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for ifMauAutoNegCapAdvertisedBits");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 11) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                ifMauAutoNegEntry->_ifMauAutoNegCapReceivedBitsLength = vb->syntax_len;
-                ifMauAutoNegEntry->ifMauAutoNegCapReceivedBits = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for ifMauAutoNegCapReceivedBits");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 12) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauAutoNegEntry->ifMauAutoNegRemoteFaultAdvertised = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauAutoNegRemoteFaultAdvertised");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 13) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ifMauAutoNegEntry->ifMauAutoNegRemoteFaultReceived = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ifMauAutoNegRemoteFaultReceived");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _ifMauAutoNegEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            ifMauAutoNegEntry->ifMauAutoNegAdminStatus = &(vb->syntax.i32[0]);
+            break;
+        case 2:
+            ifMauAutoNegEntry->ifMauAutoNegRemoteSignaling = &(vb->syntax.i32[0]);
+            break;
+        case 4:
+            ifMauAutoNegEntry->ifMauAutoNegConfig = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            ifMauAutoNegEntry->ifMauAutoNegCapability = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            ifMauAutoNegEntry->ifMauAutoNegCapAdvertised = &(vb->syntax.i32[0]);
+            break;
+        case 7:
+            ifMauAutoNegEntry->ifMauAutoNegCapReceived = &(vb->syntax.i32[0]);
+            break;
+        case 8:
+            ifMauAutoNegEntry->ifMauAutoNegRestart = &(vb->syntax.i32[0]);
+            break;
+        case 9:
+            ifMauAutoNegEntry->_ifMauAutoNegCapabilityBitsLength = vb->syntax_len;
+            ifMauAutoNegEntry->ifMauAutoNegCapabilityBits = vb->syntax.uc;
+            break;
+        case 10:
+            ifMauAutoNegEntry->_ifMauAutoNegCapAdvertisedBitsLength = vb->syntax_len;
+            ifMauAutoNegEntry->ifMauAutoNegCapAdvertisedBits = vb->syntax.uc;
+            break;
+        case 11:
+            ifMauAutoNegEntry->_ifMauAutoNegCapReceivedBitsLength = vb->syntax_len;
+            ifMauAutoNegEntry->ifMauAutoNegCapReceivedBits = vb->syntax.uc;
+            break;
+        case 12:
+            ifMauAutoNegEntry->ifMauAutoNegRemoteFaultAdvertised = &(vb->syntax.i32[0]);
+            break;
+        case 13:
+            ifMauAutoNegEntry->ifMauAutoNegRemoteFaultReceived = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return ifMauAutoNegEntry;
@@ -1122,18 +1174,7 @@ mau_mib_get_ifMauAutoNegTable(host_snmp *s, ifMauAutoNegEntry_t ***ifMauAutoNegE
 
     *ifMauAutoNegEntry = NULL;
 
-    base[10] = 1; stls_vbl_add_null(&in, base, 11);
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
-    base[10] = 8; stls_vbl_add_null(&in, base, 11);
-    base[10] = 9; stls_vbl_add_null(&in, base, 11);
-    base[10] = 10; stls_vbl_add_null(&in, base, 11);
-    base[10] = 11; stls_vbl_add_null(&in, base, 11);
-    base[10] = 12; stls_vbl_add_null(&in, base, 11);
-    base[10] = 13; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _ifMauAutoNegEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

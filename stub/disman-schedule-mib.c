@@ -3,12 +3,20 @@
  * version 0.2.14 for the stools package.
  *
  * Derived from DISMAN-SCHEDULE-MIB:
- *   This MIB module defines a MIB which provides mechanisms
- *   to schedule SNMP set operations periodically or at
- *   specific points in time.
+ *   This MIB module defines a MIB which provides mechanisms to
+ *   schedule SNMP set operations periodically or at specific
+ *   points in time.
+ *
+ * Revision 2001-03-01 00:00:
+ *   Revised version, published as RFC XXXX.
+ *   
+ *   This revision introduces a new object type called
+ *   schedTriggers. Several clarifications have been added
+ *   to remove ambiguities that were discovered and reported
+ *   by implementors.
  *
  * Revision 1998-11-17 18:00:
- *   [Revision added by libsmi due to a LAST-UPDATED clause.]
+ *   Initial version, published as RFC 2591.
  *
  * $Id$
  */
@@ -79,6 +87,35 @@ stls_enum_t const disman_schedule_mib_enums_schedRowStatus[] = {
 };
 
 
+static stls_stub_attr_t _schedObjects[] = {
+    { 1, G_SNMP_OCTET_STRING, "schedLocalTime" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _schedEntry[] = {
+    { 3, G_SNMP_OCTET_STRING, "schedDescr" },
+    { 4, G_SNMP_UNSIGNED32, "schedInterval" },
+    { 5, G_SNMP_OCTET_STRING, "schedWeekDay" },
+    { 6, G_SNMP_OCTET_STRING, "schedMonth" },
+    { 7, G_SNMP_OCTET_STRING, "schedDay" },
+    { 8, G_SNMP_OCTET_STRING, "schedHour" },
+    { 9, G_SNMP_OCTET_STRING, "schedMinute" },
+    { 10, G_SNMP_OCTET_STRING, "schedContextName" },
+    { 11, G_SNMP_OBJECT_ID, "schedVariable" },
+    { 12, G_SNMP_INTEGER32, "schedValue" },
+    { 13, G_SNMP_INTEGER32, "schedType" },
+    { 14, G_SNMP_INTEGER32, "schedAdminStatus" },
+    { 15, G_SNMP_INTEGER32, "schedOperStatus" },
+    { 16, G_SNMP_COUNTER32, "schedFailures" },
+    { 17, G_SNMP_INTEGER32, "schedLastFailure" },
+    { 18, G_SNMP_OCTET_STRING, "schedLastFailed" },
+    { 19, G_SNMP_INTEGER32, "schedStorageType" },
+    { 20, G_SNMP_INTEGER32, "schedRowStatus" },
+    { 21, G_SNMP_COUNTER32, "schedTriggers" },
+    { 0, 0, NULL }
+};
+
+
 schedObjects_t *
 disman_schedule_mib_new_schedObjects()
 {
@@ -93,6 +130,7 @@ assign_schedObjects(GSList *vbl)
 {
     GSList *elem;
     schedObjects_t *schedObjects;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 63, 1};
 
@@ -106,21 +144,15 @@ assign_schedObjects(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 9 && vb->id[8] == 1) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                schedObjects->schedLocalTime = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for schedLocalTime");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _schedObjects, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            schedObjects->schedLocalTime = vb->syntax.uc;
+            break;
+        };
     }
 
     return schedObjects;
@@ -134,7 +166,7 @@ disman_schedule_mib_get_schedObjects(host_snmp *s, schedObjects_t **schedObjects
 
     *schedObjects = NULL;
 
-    base[8] = 1; stls_vbl_add_null(&in, base, 9);
+    stls_vbl_attributes(s, &in, base, 8, _schedObjects);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -198,6 +230,7 @@ assign_schedEntry(GSList *vbl)
 {
     GSList *elem;
     schedEntry_t *schedEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1};
 
@@ -217,149 +250,78 @@ assign_schedEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                schedEntry->_schedDescrLength = vb->syntax_len;
-                schedEntry->schedDescr = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for schedDescr");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
-                schedEntry->schedInterval = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for schedInterval");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                schedEntry->_schedWeekDayLength = vb->syntax_len;
-                schedEntry->schedWeekDay = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for schedWeekDay");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                schedEntry->_schedMonthLength = vb->syntax_len;
-                schedEntry->schedMonth = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for schedMonth");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                schedEntry->_schedDayLength = vb->syntax_len;
-                schedEntry->schedDay = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for schedDay");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                schedEntry->_schedHourLength = vb->syntax_len;
-                schedEntry->schedHour = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for schedHour");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 9) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                schedEntry->_schedMinuteLength = vb->syntax_len;
-                schedEntry->schedMinute = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for schedMinute");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 10) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                schedEntry->_schedContextNameLength = vb->syntax_len;
-                schedEntry->schedContextName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for schedContextName");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 11) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                schedEntry->_schedVariableLength = vb->syntax_len / sizeof(guint32);
-                schedEntry->schedVariable = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for schedVariable");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 12) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                schedEntry->schedValue = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for schedValue");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 13) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                schedEntry->schedType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for schedType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 14) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                schedEntry->schedAdminStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for schedAdminStatus");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 15) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                schedEntry->schedOperStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for schedOperStatus");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 16) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                schedEntry->schedFailures = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for schedFailures");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 17) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                schedEntry->schedLastFailure = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for schedLastFailure");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 18) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                schedEntry->_schedLastFailedLength = vb->syntax_len;
-                schedEntry->schedLastFailed = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for schedLastFailed");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 19) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                schedEntry->schedStorageType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for schedStorageType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 20) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                schedEntry->schedRowStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for schedRowStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _schedEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 3:
+            schedEntry->_schedDescrLength = vb->syntax_len;
+            schedEntry->schedDescr = vb->syntax.uc;
+            break;
+        case 4:
+            schedEntry->schedInterval = &(vb->syntax.ui32[0]);
+            break;
+        case 5:
+            schedEntry->_schedWeekDayLength = vb->syntax_len;
+            schedEntry->schedWeekDay = vb->syntax.uc;
+            break;
+        case 6:
+            schedEntry->_schedMonthLength = vb->syntax_len;
+            schedEntry->schedMonth = vb->syntax.uc;
+            break;
+        case 7:
+            schedEntry->_schedDayLength = vb->syntax_len;
+            schedEntry->schedDay = vb->syntax.uc;
+            break;
+        case 8:
+            schedEntry->_schedHourLength = vb->syntax_len;
+            schedEntry->schedHour = vb->syntax.uc;
+            break;
+        case 9:
+            schedEntry->_schedMinuteLength = vb->syntax_len;
+            schedEntry->schedMinute = vb->syntax.uc;
+            break;
+        case 10:
+            schedEntry->_schedContextNameLength = vb->syntax_len;
+            schedEntry->schedContextName = vb->syntax.uc;
+            break;
+        case 11:
+            schedEntry->_schedVariableLength = vb->syntax_len / sizeof(guint32);
+            schedEntry->schedVariable = vb->syntax.ui32;
+            break;
+        case 12:
+            schedEntry->schedValue = &(vb->syntax.i32[0]);
+            break;
+        case 13:
+            schedEntry->schedType = &(vb->syntax.i32[0]);
+            break;
+        case 14:
+            schedEntry->schedAdminStatus = &(vb->syntax.i32[0]);
+            break;
+        case 15:
+            schedEntry->schedOperStatus = &(vb->syntax.i32[0]);
+            break;
+        case 16:
+            schedEntry->schedFailures = &(vb->syntax.ui32[0]);
+            break;
+        case 17:
+            schedEntry->schedLastFailure = &(vb->syntax.i32[0]);
+            break;
+        case 18:
+            schedEntry->_schedLastFailedLength = vb->syntax_len;
+            schedEntry->schedLastFailed = vb->syntax.uc;
+            break;
+        case 19:
+            schedEntry->schedStorageType = &(vb->syntax.i32[0]);
+            break;
+        case 20:
+            schedEntry->schedRowStatus = &(vb->syntax.i32[0]);
+            break;
+        case 21:
+            schedEntry->schedTriggers = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return schedEntry;
@@ -375,24 +337,7 @@ disman_schedule_mib_get_schedTable(host_snmp *s, schedEntry_t ***schedEntry)
 
     *schedEntry = NULL;
 
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
-    base[10] = 8; stls_vbl_add_null(&in, base, 11);
-    base[10] = 9; stls_vbl_add_null(&in, base, 11);
-    base[10] = 10; stls_vbl_add_null(&in, base, 11);
-    base[10] = 11; stls_vbl_add_null(&in, base, 11);
-    base[10] = 12; stls_vbl_add_null(&in, base, 11);
-    base[10] = 13; stls_vbl_add_null(&in, base, 11);
-    base[10] = 14; stls_vbl_add_null(&in, base, 11);
-    base[10] = 15; stls_vbl_add_null(&in, base, 11);
-    base[10] = 16; stls_vbl_add_null(&in, base, 11);
-    base[10] = 17; stls_vbl_add_null(&in, base, 11);
-    base[10] = 18; stls_vbl_add_null(&in, base, 11);
-    base[10] = 19; stls_vbl_add_null(&in, base, 11);
-    base[10] = 20; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _schedEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

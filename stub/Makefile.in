@@ -272,8 +272,10 @@ distclean-generic clean-generic maintainer-clean-generic clean \
 mostlyclean distclean maintainer-clean
 
 
-stubs:
+rmstubs:
 	rm -f $(STUBS)
+
+stubs:
 	@for f in $(MIBS) ; do \
 	    echo "$(SMIDUMP) -f stools $$f" ; \
 	    $(SMIDUMP) -f stools $$f ; \

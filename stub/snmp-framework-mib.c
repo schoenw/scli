@@ -19,6 +19,31 @@
 
 #include "snmp-framework-mib.h"
 
+static guint32 const snmpAuthProtocols[]
+	= { SNMP_FRAMEWORK_MIB_SNMPAUTHPROTOCOLS };
+static guint32 const snmpPrivProtocols[]
+	= { SNMP_FRAMEWORK_MIB_SNMPPRIVPROTOCOLS };
+
+stls_identity_t const snmp_framework_mib_identities[] = {
+    { snmpAuthProtocols,
+      sizeof(snmpAuthProtocols)/sizeof(guint32),
+      "snmpAuthProtocols" },
+    { snmpPrivProtocols,
+      sizeof(snmpPrivProtocols)/sizeof(guint32),
+      "snmpPrivProtocols" },
+    { 0, 0, NULL }
+};
+
+
+static stls_stub_attr_t _snmpEngine[] = {
+    { 1, G_SNMP_OCTET_STRING, "snmpEngineID" },
+    { 2, G_SNMP_INTEGER32, "snmpEngineBoots" },
+    { 3, G_SNMP_INTEGER32, "snmpEngineTime" },
+    { 4, G_SNMP_INTEGER32, "snmpEngineMaxMessageSize" },
+    { 0, 0, NULL }
+};
+
+
 snmpEngine_t *
 snmp_framework_mib_new_snmpEngine()
 {
@@ -33,6 +58,7 @@ assign_snmpEngine(GSList *vbl)
 {
     GSList *elem;
     snmpEngine_t *snmpEngine;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 10, 2, 1};
 
@@ -46,43 +72,25 @@ assign_snmpEngine(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 10 && vb->id[9] == 1) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                snmpEngine->_snmpEngineIDLength = vb->syntax_len;
-                snmpEngine->snmpEngineID = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for snmpEngineID");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpEngine->snmpEngineBoots = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpEngineBoots");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpEngine->snmpEngineTime = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpEngineTime");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpEngine->snmpEngineMaxMessageSize = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpEngineMaxMessageSize");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _snmpEngine, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            snmpEngine->_snmpEngineIDLength = vb->syntax_len;
+            snmpEngine->snmpEngineID = vb->syntax.uc;
+            break;
+        case 2:
+            snmpEngine->snmpEngineBoots = &(vb->syntax.i32[0]);
+            break;
+        case 3:
+            snmpEngine->snmpEngineTime = &(vb->syntax.i32[0]);
+            break;
+        case 4:
+            snmpEngine->snmpEngineMaxMessageSize = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return snmpEngine;
@@ -96,10 +104,7 @@ snmp_framework_mib_get_snmpEngine(host_snmp *s, snmpEngine_t **snmpEngine)
 
     *snmpEngine = NULL;
 
-    base[9] = 1; stls_vbl_add_null(&in, base, 10);
-    base[9] = 2; stls_vbl_add_null(&in, base, 10);
-    base[9] = 3; stls_vbl_add_null(&in, base, 10);
-    base[9] = 4; stls_vbl_add_null(&in, base, 10);
+    stls_vbl_attributes(s, &in, base, 9, _snmpEngine);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);

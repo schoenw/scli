@@ -65,6 +65,36 @@ stls_enum_t const snmp_target_mib_enums_snmpTargetParamsRowStatus[] = {
 };
 
 
+static stls_stub_attr_t _snmpTargetObjects[] = {
+    { 1, G_SNMP_INTEGER32, "snmpTargetSpinLock" },
+    { 4, G_SNMP_COUNTER32, "snmpUnavailableContexts" },
+    { 5, G_SNMP_COUNTER32, "snmpUnknownContexts" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _snmpTargetAddrEntry[] = {
+    { 2, G_SNMP_OBJECT_ID, "snmpTargetAddrTDomain" },
+    { 3, G_SNMP_OCTET_STRING, "snmpTargetAddrTAddress" },
+    { 4, G_SNMP_INTEGER32, "snmpTargetAddrTimeout" },
+    { 5, G_SNMP_INTEGER32, "snmpTargetAddrRetryCount" },
+    { 6, G_SNMP_OCTET_STRING, "snmpTargetAddrTagList" },
+    { 7, G_SNMP_OCTET_STRING, "snmpTargetAddrParams" },
+    { 8, G_SNMP_INTEGER32, "snmpTargetAddrStorageType" },
+    { 9, G_SNMP_INTEGER32, "snmpTargetAddrRowStatus" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _snmpTargetParamsEntry[] = {
+    { 2, G_SNMP_INTEGER32, "snmpTargetParamsMPModel" },
+    { 3, G_SNMP_INTEGER32, "snmpTargetParamsSecurityModel" },
+    { 4, G_SNMP_OCTET_STRING, "snmpTargetParamsSecurityName" },
+    { 5, G_SNMP_INTEGER32, "snmpTargetParamsSecurityLevel" },
+    { 6, G_SNMP_INTEGER32, "snmpTargetParamsStorageType" },
+    { 7, G_SNMP_INTEGER32, "snmpTargetParamsRowStatus" },
+    { 0, 0, NULL }
+};
+
+
 snmpTargetObjects_t *
 snmp_target_mib_new_snmpTargetObjects()
 {
@@ -79,6 +109,7 @@ assign_snmpTargetObjects(GSList *vbl)
 {
     GSList *elem;
     snmpTargetObjects_t *snmpTargetObjects;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 12, 1};
 
@@ -92,35 +123,21 @@ assign_snmpTargetObjects(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 9 && vb->id[8] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpTargetObjects->snmpTargetSpinLock = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpTargetSpinLock");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 4) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                snmpTargetObjects->snmpUnavailableContexts = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for snmpUnavailableContexts");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 5) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                snmpTargetObjects->snmpUnknownContexts = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for snmpUnknownContexts");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _snmpTargetObjects, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            snmpTargetObjects->snmpTargetSpinLock = &(vb->syntax.i32[0]);
+            break;
+        case 4:
+            snmpTargetObjects->snmpUnavailableContexts = &(vb->syntax.ui32[0]);
+            break;
+        case 5:
+            snmpTargetObjects->snmpUnknownContexts = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return snmpTargetObjects;
@@ -134,9 +151,7 @@ snmp_target_mib_get_snmpTargetObjects(host_snmp *s, snmpTargetObjects_t **snmpTa
 
     *snmpTargetObjects = NULL;
 
-    base[8] = 1; stls_vbl_add_null(&in, base, 9);
-    base[8] = 4; stls_vbl_add_null(&in, base, 9);
-    base[8] = 5; stls_vbl_add_null(&in, base, 9);
+    stls_vbl_attributes(s, &in, base, 8, _snmpTargetObjects);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -192,6 +207,7 @@ assign_snmpTargetAddrEntry(GSList *vbl)
 {
     GSList *elem;
     snmpTargetAddrEntry_t *snmpTargetAddrEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 12, 1, 2, 1};
 
@@ -211,74 +227,40 @@ assign_snmpTargetAddrEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                snmpTargetAddrEntry->_snmpTargetAddrTDomainLength = vb->syntax_len / sizeof(guint32);
-                snmpTargetAddrEntry->snmpTargetAddrTDomain = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for snmpTargetAddrTDomain");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                snmpTargetAddrEntry->_snmpTargetAddrTAddressLength = vb->syntax_len;
-                snmpTargetAddrEntry->snmpTargetAddrTAddress = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for snmpTargetAddrTAddress");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpTargetAddrEntry->snmpTargetAddrTimeout = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpTargetAddrTimeout");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpTargetAddrEntry->snmpTargetAddrRetryCount = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpTargetAddrRetryCount");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                snmpTargetAddrEntry->_snmpTargetAddrTagListLength = vb->syntax_len;
-                snmpTargetAddrEntry->snmpTargetAddrTagList = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for snmpTargetAddrTagList");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                snmpTargetAddrEntry->_snmpTargetAddrParamsLength = vb->syntax_len;
-                snmpTargetAddrEntry->snmpTargetAddrParams = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for snmpTargetAddrParams");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpTargetAddrEntry->snmpTargetAddrStorageType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpTargetAddrStorageType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 9) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpTargetAddrEntry->snmpTargetAddrRowStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpTargetAddrRowStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _snmpTargetAddrEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            snmpTargetAddrEntry->_snmpTargetAddrTDomainLength = vb->syntax_len / sizeof(guint32);
+            snmpTargetAddrEntry->snmpTargetAddrTDomain = vb->syntax.ui32;
+            break;
+        case 3:
+            snmpTargetAddrEntry->_snmpTargetAddrTAddressLength = vb->syntax_len;
+            snmpTargetAddrEntry->snmpTargetAddrTAddress = vb->syntax.uc;
+            break;
+        case 4:
+            snmpTargetAddrEntry->snmpTargetAddrTimeout = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            snmpTargetAddrEntry->snmpTargetAddrRetryCount = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            snmpTargetAddrEntry->_snmpTargetAddrTagListLength = vb->syntax_len;
+            snmpTargetAddrEntry->snmpTargetAddrTagList = vb->syntax.uc;
+            break;
+        case 7:
+            snmpTargetAddrEntry->_snmpTargetAddrParamsLength = vb->syntax_len;
+            snmpTargetAddrEntry->snmpTargetAddrParams = vb->syntax.uc;
+            break;
+        case 8:
+            snmpTargetAddrEntry->snmpTargetAddrStorageType = &(vb->syntax.i32[0]);
+            break;
+        case 9:
+            snmpTargetAddrEntry->snmpTargetAddrRowStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return snmpTargetAddrEntry;
@@ -294,14 +276,7 @@ snmp_target_mib_get_snmpTargetAddrTable(host_snmp *s, snmpTargetAddrEntry_t ***s
 
     *snmpTargetAddrEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
-    base[10] = 8; stls_vbl_add_null(&in, base, 11);
-    base[10] = 9; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _snmpTargetAddrEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -377,6 +352,7 @@ assign_snmpTargetParamsEntry(GSList *vbl)
 {
     GSList *elem;
     snmpTargetParamsEntry_t *snmpTargetParamsEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 12, 1, 3, 1};
 
@@ -396,57 +372,31 @@ assign_snmpTargetParamsEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpTargetParamsEntry->snmpTargetParamsMPModel = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpTargetParamsMPModel");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpTargetParamsEntry->snmpTargetParamsSecurityModel = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpTargetParamsSecurityModel");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                snmpTargetParamsEntry->_snmpTargetParamsSecurityNameLength = vb->syntax_len;
-                snmpTargetParamsEntry->snmpTargetParamsSecurityName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for snmpTargetParamsSecurityName");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpTargetParamsEntry->snmpTargetParamsSecurityLevel = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpTargetParamsSecurityLevel");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpTargetParamsEntry->snmpTargetParamsStorageType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpTargetParamsStorageType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpTargetParamsEntry->snmpTargetParamsRowStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpTargetParamsRowStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _snmpTargetParamsEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            snmpTargetParamsEntry->snmpTargetParamsMPModel = &(vb->syntax.i32[0]);
+            break;
+        case 3:
+            snmpTargetParamsEntry->snmpTargetParamsSecurityModel = &(vb->syntax.i32[0]);
+            break;
+        case 4:
+            snmpTargetParamsEntry->_snmpTargetParamsSecurityNameLength = vb->syntax_len;
+            snmpTargetParamsEntry->snmpTargetParamsSecurityName = vb->syntax.uc;
+            break;
+        case 5:
+            snmpTargetParamsEntry->snmpTargetParamsSecurityLevel = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            snmpTargetParamsEntry->snmpTargetParamsStorageType = &(vb->syntax.i32[0]);
+            break;
+        case 7:
+            snmpTargetParamsEntry->snmpTargetParamsRowStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return snmpTargetParamsEntry;
@@ -462,12 +412,7 @@ snmp_target_mib_get_snmpTargetParamsTable(host_snmp *s, snmpTargetParamsEntry_t 
 
     *snmpTargetParamsEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _snmpTargetParamsEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

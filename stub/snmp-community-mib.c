@@ -37,6 +37,24 @@ stls_enum_t const snmp_community_mib_enums_snmpCommunityStatus[] = {
 };
 
 
+static stls_stub_attr_t _snmpCommunityEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, "snmpCommunityName" },
+    { 3, G_SNMP_OCTET_STRING, "snmpCommunitySecurityName" },
+    { 4, G_SNMP_OCTET_STRING, "snmpCommunityContextEngineID" },
+    { 5, G_SNMP_OCTET_STRING, "snmpCommunityContextName" },
+    { 6, G_SNMP_OCTET_STRING, "snmpCommunityTransportTag" },
+    { 7, G_SNMP_INTEGER32, "snmpCommunityStorageType" },
+    { 8, G_SNMP_INTEGER32, "snmpCommunityStatus" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _snmpTargetAddrExtEntry[] = {
+    { 1, G_SNMP_OCTET_STRING, "snmpTargetAddrTMask" },
+    { 2, G_SNMP_INTEGER32, "snmpTargetAddrMMS" },
+    { 0, 0, NULL }
+};
+
+
 snmpCommunityEntry_t *
 snmp_community_mib_new_snmpCommunityEntry()
 {
@@ -66,6 +84,7 @@ assign_snmpCommunityEntry(GSList *vbl)
 {
     GSList *elem;
     snmpCommunityEntry_t *snmpCommunityEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 18, 1, 1, 1};
 
@@ -85,68 +104,38 @@ assign_snmpCommunityEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                snmpCommunityEntry->_snmpCommunityNameLength = vb->syntax_len;
-                snmpCommunityEntry->snmpCommunityName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for snmpCommunityName");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                snmpCommunityEntry->_snmpCommunitySecurityNameLength = vb->syntax_len;
-                snmpCommunityEntry->snmpCommunitySecurityName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for snmpCommunitySecurityName");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                snmpCommunityEntry->_snmpCommunityContextEngineIDLength = vb->syntax_len;
-                snmpCommunityEntry->snmpCommunityContextEngineID = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for snmpCommunityContextEngineID");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                snmpCommunityEntry->_snmpCommunityContextNameLength = vb->syntax_len;
-                snmpCommunityEntry->snmpCommunityContextName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for snmpCommunityContextName");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                snmpCommunityEntry->_snmpCommunityTransportTagLength = vb->syntax_len;
-                snmpCommunityEntry->snmpCommunityTransportTag = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for snmpCommunityTransportTag");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpCommunityEntry->snmpCommunityStorageType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpCommunityStorageType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpCommunityEntry->snmpCommunityStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpCommunityStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _snmpCommunityEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            snmpCommunityEntry->_snmpCommunityNameLength = vb->syntax_len;
+            snmpCommunityEntry->snmpCommunityName = vb->syntax.uc;
+            break;
+        case 3:
+            snmpCommunityEntry->_snmpCommunitySecurityNameLength = vb->syntax_len;
+            snmpCommunityEntry->snmpCommunitySecurityName = vb->syntax.uc;
+            break;
+        case 4:
+            snmpCommunityEntry->_snmpCommunityContextEngineIDLength = vb->syntax_len;
+            snmpCommunityEntry->snmpCommunityContextEngineID = vb->syntax.uc;
+            break;
+        case 5:
+            snmpCommunityEntry->_snmpCommunityContextNameLength = vb->syntax_len;
+            snmpCommunityEntry->snmpCommunityContextName = vb->syntax.uc;
+            break;
+        case 6:
+            snmpCommunityEntry->_snmpCommunityTransportTagLength = vb->syntax_len;
+            snmpCommunityEntry->snmpCommunityTransportTag = vb->syntax.uc;
+            break;
+        case 7:
+            snmpCommunityEntry->snmpCommunityStorageType = &(vb->syntax.i32[0]);
+            break;
+        case 8:
+            snmpCommunityEntry->snmpCommunityStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return snmpCommunityEntry;
@@ -162,13 +151,7 @@ snmp_community_mib_get_snmpCommunityTable(host_snmp *s, snmpCommunityEntry_t ***
 
     *snmpCommunityEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
-    base[10] = 8; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _snmpCommunityEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -244,6 +227,7 @@ assign_snmpTargetAddrExtEntry(GSList *vbl)
 {
     GSList *elem;
     snmpTargetAddrExtEntry_t *snmpTargetAddrExtEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 18, 1, 2, 1};
 
@@ -263,29 +247,19 @@ assign_snmpTargetAddrExtEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 1) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                snmpTargetAddrExtEntry->_snmpTargetAddrTMaskLength = vb->syntax_len;
-                snmpTargetAddrExtEntry->snmpTargetAddrTMask = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for snmpTargetAddrTMask");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                snmpTargetAddrExtEntry->snmpTargetAddrMMS = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for snmpTargetAddrMMS");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _snmpTargetAddrExtEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            snmpTargetAddrExtEntry->_snmpTargetAddrTMaskLength = vb->syntax_len;
+            snmpTargetAddrExtEntry->snmpTargetAddrTMask = vb->syntax.uc;
+            break;
+        case 2:
+            snmpTargetAddrExtEntry->snmpTargetAddrMMS = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return snmpTargetAddrExtEntry;
@@ -301,8 +275,7 @@ snmp_community_mib_get_snmpTargetAddrExtTable(host_snmp *s, snmpTargetAddrExtEnt
 
     *snmpTargetAddrExtEntry = NULL;
 
-    base[10] = 1; stls_vbl_add_null(&in, base, 11);
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _snmpTargetAddrExtEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

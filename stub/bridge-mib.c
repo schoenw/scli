@@ -59,6 +59,79 @@ stls_enum_t const bridge_mib_enums_dot1dStaticStatus[] = {
 };
 
 
+static stls_stub_attr_t _dot1dBase[] = {
+    { 1, G_SNMP_OCTET_STRING, "dot1dBaseBridgeAddress" },
+    { 2, G_SNMP_INTEGER32, "dot1dBaseNumPorts" },
+    { 3, G_SNMP_INTEGER32, "dot1dBaseType" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _dot1dBasePortEntry[] = {
+    { 2, G_SNMP_INTEGER32, "dot1dBasePortIfIndex" },
+    { 3, G_SNMP_OBJECT_ID, "dot1dBasePortCircuit" },
+    { 4, G_SNMP_COUNTER32, "dot1dBasePortDelayExceededDiscards" },
+    { 5, G_SNMP_COUNTER32, "dot1dBasePortMtuExceededDiscards" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _dot1dStp[] = {
+    { 1, G_SNMP_INTEGER32, "dot1dStpProtocolSpecification" },
+    { 2, G_SNMP_INTEGER32, "dot1dStpPriority" },
+    { 3, G_SNMP_TIMETICKS, "dot1dStpTimeSinceTopologyChange" },
+    { 4, G_SNMP_COUNTER32, "dot1dStpTopChanges" },
+    { 5, G_SNMP_OCTET_STRING, "dot1dStpDesignatedRoot" },
+    { 6, G_SNMP_INTEGER32, "dot1dStpRootCost" },
+    { 7, G_SNMP_INTEGER32, "dot1dStpRootPort" },
+    { 8, G_SNMP_INTEGER32, "dot1dStpMaxAge" },
+    { 9, G_SNMP_INTEGER32, "dot1dStpHelloTime" },
+    { 10, G_SNMP_INTEGER32, "dot1dStpHoldTime" },
+    { 11, G_SNMP_INTEGER32, "dot1dStpForwardDelay" },
+    { 12, G_SNMP_INTEGER32, "dot1dStpBridgeMaxAge" },
+    { 13, G_SNMP_INTEGER32, "dot1dStpBridgeHelloTime" },
+    { 14, G_SNMP_INTEGER32, "dot1dStpBridgeForwardDelay" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _dot1dStpPortEntry[] = {
+    { 2, G_SNMP_INTEGER32, "dot1dStpPortPriority" },
+    { 3, G_SNMP_INTEGER32, "dot1dStpPortState" },
+    { 4, G_SNMP_INTEGER32, "dot1dStpPortEnable" },
+    { 5, G_SNMP_INTEGER32, "dot1dStpPortPathCost" },
+    { 6, G_SNMP_OCTET_STRING, "dot1dStpPortDesignatedRoot" },
+    { 7, G_SNMP_INTEGER32, "dot1dStpPortDesignatedCost" },
+    { 8, G_SNMP_OCTET_STRING, "dot1dStpPortDesignatedBridge" },
+    { 9, G_SNMP_OCTET_STRING, "dot1dStpPortDesignatedPort" },
+    { 10, G_SNMP_COUNTER32, "dot1dStpPortForwardTransitions" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _dot1dTp[] = {
+    { 1, G_SNMP_COUNTER32, "dot1dTpLearnedEntryDiscards" },
+    { 2, G_SNMP_INTEGER32, "dot1dTpAgingTime" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _dot1dTpFdbEntry[] = {
+    { 2, G_SNMP_INTEGER32, "dot1dTpFdbPort" },
+    { 3, G_SNMP_INTEGER32, "dot1dTpFdbStatus" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _dot1dTpPortEntry[] = {
+    { 2, G_SNMP_INTEGER32, "dot1dTpPortMaxInfo" },
+    { 3, G_SNMP_COUNTER32, "dot1dTpPortInFrames" },
+    { 4, G_SNMP_COUNTER32, "dot1dTpPortOutFrames" },
+    { 5, G_SNMP_COUNTER32, "dot1dTpPortInDiscards" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _dot1dStaticEntry[] = {
+    { 3, G_SNMP_OCTET_STRING, "dot1dStaticAllowedToGoTo" },
+    { 4, G_SNMP_INTEGER32, "dot1dStaticStatus" },
+    { 0, 0, NULL }
+};
+
+
 dot1dBase_t *
 bridge_mib_new_dot1dBase()
 {
@@ -73,6 +146,7 @@ assign_dot1dBase(GSList *vbl)
 {
     GSList *elem;
     dot1dBase_t *dot1dBase;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 1};
 
@@ -86,35 +160,21 @@ assign_dot1dBase(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 9 && vb->id[8] == 1) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                dot1dBase->dot1dBaseBridgeAddress = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for dot1dBaseBridgeAddress");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dBase->dot1dBaseNumPorts = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dBaseNumPorts");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dBase->dot1dBaseType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dBaseType");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _dot1dBase, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            dot1dBase->dot1dBaseBridgeAddress = vb->syntax.uc;
+            break;
+        case 2:
+            dot1dBase->dot1dBaseNumPorts = &(vb->syntax.i32[0]);
+            break;
+        case 3:
+            dot1dBase->dot1dBaseType = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return dot1dBase;
@@ -128,9 +188,7 @@ bridge_mib_get_dot1dBase(host_snmp *s, dot1dBase_t **dot1dBase)
 
     *dot1dBase = NULL;
 
-    base[8] = 1; stls_vbl_add_null(&in, base, 9);
-    base[8] = 2; stls_vbl_add_null(&in, base, 9);
-    base[8] = 3; stls_vbl_add_null(&in, base, 9);
+    stls_vbl_attributes(s, &in, base, 8, _dot1dBase);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -182,6 +240,7 @@ assign_dot1dBasePortEntry(GSList *vbl)
 {
     GSList *elem;
     dot1dBasePortEntry_t *dot1dBasePortEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 1, 4, 1};
 
@@ -201,43 +260,25 @@ assign_dot1dBasePortEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dBasePortEntry->dot1dBasePortIfIndex = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dBasePortIfIndex");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                dot1dBasePortEntry->_dot1dBasePortCircuitLength = vb->syntax_len / sizeof(guint32);
-                dot1dBasePortEntry->dot1dBasePortCircuit = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for dot1dBasePortCircuit");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot1dBasePortEntry->dot1dBasePortDelayExceededDiscards = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot1dBasePortDelayExceededDiscards");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot1dBasePortEntry->dot1dBasePortMtuExceededDiscards = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot1dBasePortMtuExceededDiscards");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _dot1dBasePortEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            dot1dBasePortEntry->dot1dBasePortIfIndex = &(vb->syntax.i32[0]);
+            break;
+        case 3:
+            dot1dBasePortEntry->_dot1dBasePortCircuitLength = vb->syntax_len / sizeof(guint32);
+            dot1dBasePortEntry->dot1dBasePortCircuit = vb->syntax.ui32;
+            break;
+        case 4:
+            dot1dBasePortEntry->dot1dBasePortDelayExceededDiscards = &(vb->syntax.ui32[0]);
+            break;
+        case 5:
+            dot1dBasePortEntry->dot1dBasePortMtuExceededDiscards = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return dot1dBasePortEntry;
@@ -253,10 +294,7 @@ bridge_mib_get_dot1dBasePortTable(host_snmp *s, dot1dBasePortEntry_t ***dot1dBas
 
     *dot1dBasePortEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _dot1dBasePortEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -317,6 +355,7 @@ assign_dot1dStp(GSList *vbl)
 {
     GSList *elem;
     dot1dStp_t *dot1dStp;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 2};
 
@@ -330,112 +369,54 @@ assign_dot1dStp(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 9 && vb->id[8] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStp->dot1dStpProtocolSpecification = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpProtocolSpecification");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStp->dot1dStpPriority = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpPriority");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 3) {
-            if (vb->type == G_SNMP_TIMETICKS) {
-                dot1dStp->dot1dStpTimeSinceTopologyChange = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpTimeSinceTopologyChange");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 4) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot1dStp->dot1dStpTopChanges = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpTopChanges");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 5) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                dot1dStp->dot1dStpDesignatedRoot = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for dot1dStpDesignatedRoot");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStp->dot1dStpRootCost = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpRootCost");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStp->dot1dStpRootPort = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpRootPort");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 8) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStp->dot1dStpMaxAge = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpMaxAge");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 9) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStp->dot1dStpHelloTime = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpHelloTime");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 10) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStp->dot1dStpHoldTime = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpHoldTime");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 11) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStp->dot1dStpForwardDelay = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpForwardDelay");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 12) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStp->dot1dStpBridgeMaxAge = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpBridgeMaxAge");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 13) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStp->dot1dStpBridgeHelloTime = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpBridgeHelloTime");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 14) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStp->dot1dStpBridgeForwardDelay = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpBridgeForwardDelay");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _dot1dStp, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            dot1dStp->dot1dStpProtocolSpecification = &(vb->syntax.i32[0]);
+            break;
+        case 2:
+            dot1dStp->dot1dStpPriority = &(vb->syntax.i32[0]);
+            break;
+        case 3:
+            dot1dStp->dot1dStpTimeSinceTopologyChange = &(vb->syntax.ui32[0]);
+            break;
+        case 4:
+            dot1dStp->dot1dStpTopChanges = &(vb->syntax.ui32[0]);
+            break;
+        case 5:
+            dot1dStp->dot1dStpDesignatedRoot = vb->syntax.uc;
+            break;
+        case 6:
+            dot1dStp->dot1dStpRootCost = &(vb->syntax.i32[0]);
+            break;
+        case 7:
+            dot1dStp->dot1dStpRootPort = &(vb->syntax.i32[0]);
+            break;
+        case 8:
+            dot1dStp->dot1dStpMaxAge = &(vb->syntax.i32[0]);
+            break;
+        case 9:
+            dot1dStp->dot1dStpHelloTime = &(vb->syntax.i32[0]);
+            break;
+        case 10:
+            dot1dStp->dot1dStpHoldTime = &(vb->syntax.i32[0]);
+            break;
+        case 11:
+            dot1dStp->dot1dStpForwardDelay = &(vb->syntax.i32[0]);
+            break;
+        case 12:
+            dot1dStp->dot1dStpBridgeMaxAge = &(vb->syntax.i32[0]);
+            break;
+        case 13:
+            dot1dStp->dot1dStpBridgeHelloTime = &(vb->syntax.i32[0]);
+            break;
+        case 14:
+            dot1dStp->dot1dStpBridgeForwardDelay = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return dot1dStp;
@@ -449,20 +430,7 @@ bridge_mib_get_dot1dStp(host_snmp *s, dot1dStp_t **dot1dStp)
 
     *dot1dStp = NULL;
 
-    base[8] = 1; stls_vbl_add_null(&in, base, 9);
-    base[8] = 2; stls_vbl_add_null(&in, base, 9);
-    base[8] = 3; stls_vbl_add_null(&in, base, 9);
-    base[8] = 4; stls_vbl_add_null(&in, base, 9);
-    base[8] = 5; stls_vbl_add_null(&in, base, 9);
-    base[8] = 6; stls_vbl_add_null(&in, base, 9);
-    base[8] = 7; stls_vbl_add_null(&in, base, 9);
-    base[8] = 8; stls_vbl_add_null(&in, base, 9);
-    base[8] = 9; stls_vbl_add_null(&in, base, 9);
-    base[8] = 10; stls_vbl_add_null(&in, base, 9);
-    base[8] = 11; stls_vbl_add_null(&in, base, 9);
-    base[8] = 12; stls_vbl_add_null(&in, base, 9);
-    base[8] = 13; stls_vbl_add_null(&in, base, 9);
-    base[8] = 14; stls_vbl_add_null(&in, base, 9);
+    stls_vbl_attributes(s, &in, base, 8, _dot1dStp);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -514,6 +482,7 @@ assign_dot1dStpPortEntry(GSList *vbl)
 {
     GSList *elem;
     dot1dStpPortEntry_t *dot1dStpPortEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 2, 15, 1};
 
@@ -533,77 +502,39 @@ assign_dot1dStpPortEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStpPortEntry->dot1dStpPortPriority = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpPortPriority");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStpPortEntry->dot1dStpPortState = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpPortState");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStpPortEntry->dot1dStpPortEnable = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpPortEnable");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStpPortEntry->dot1dStpPortPathCost = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpPortPathCost");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                dot1dStpPortEntry->dot1dStpPortDesignatedRoot = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for dot1dStpPortDesignatedRoot");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStpPortEntry->dot1dStpPortDesignatedCost = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpPortDesignatedCost");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                dot1dStpPortEntry->dot1dStpPortDesignatedBridge = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for dot1dStpPortDesignatedBridge");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 9) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                dot1dStpPortEntry->dot1dStpPortDesignatedPort = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for dot1dStpPortDesignatedPort");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 10) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot1dStpPortEntry->dot1dStpPortForwardTransitions = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot1dStpPortForwardTransitions");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _dot1dStpPortEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            dot1dStpPortEntry->dot1dStpPortPriority = &(vb->syntax.i32[0]);
+            break;
+        case 3:
+            dot1dStpPortEntry->dot1dStpPortState = &(vb->syntax.i32[0]);
+            break;
+        case 4:
+            dot1dStpPortEntry->dot1dStpPortEnable = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            dot1dStpPortEntry->dot1dStpPortPathCost = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            dot1dStpPortEntry->dot1dStpPortDesignatedRoot = vb->syntax.uc;
+            break;
+        case 7:
+            dot1dStpPortEntry->dot1dStpPortDesignatedCost = &(vb->syntax.i32[0]);
+            break;
+        case 8:
+            dot1dStpPortEntry->dot1dStpPortDesignatedBridge = vb->syntax.uc;
+            break;
+        case 9:
+            dot1dStpPortEntry->dot1dStpPortDesignatedPort = vb->syntax.uc;
+            break;
+        case 10:
+            dot1dStpPortEntry->dot1dStpPortForwardTransitions = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return dot1dStpPortEntry;
@@ -619,15 +550,7 @@ bridge_mib_get_dot1dStpPortTable(host_snmp *s, dot1dStpPortEntry_t ***dot1dStpPo
 
     *dot1dStpPortEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
-    base[10] = 8; stls_vbl_add_null(&in, base, 11);
-    base[10] = 9; stls_vbl_add_null(&in, base, 11);
-    base[10] = 10; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _dot1dStpPortEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -688,6 +611,7 @@ assign_dot1dTp(GSList *vbl)
 {
     GSList *elem;
     dot1dTp_t *dot1dTp;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 4};
 
@@ -701,28 +625,18 @@ assign_dot1dTp(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 9 && vb->id[8] == 1) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot1dTp->dot1dTpLearnedEntryDiscards = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot1dTpLearnedEntryDiscards");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dTp->dot1dTpAgingTime = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dTpAgingTime");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _dot1dTp, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            dot1dTp->dot1dTpLearnedEntryDiscards = &(vb->syntax.ui32[0]);
+            break;
+        case 2:
+            dot1dTp->dot1dTpAgingTime = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return dot1dTp;
@@ -736,8 +650,7 @@ bridge_mib_get_dot1dTp(host_snmp *s, dot1dTp_t **dot1dTp)
 
     *dot1dTp = NULL;
 
-    base[8] = 1; stls_vbl_add_null(&in, base, 9);
-    base[8] = 2; stls_vbl_add_null(&in, base, 9);
+    stls_vbl_attributes(s, &in, base, 8, _dot1dTp);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -792,6 +705,7 @@ assign_dot1dTpFdbEntry(GSList *vbl)
 {
     GSList *elem;
     dot1dTpFdbEntry_t *dot1dTpFdbEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 4, 3, 1};
 
@@ -811,28 +725,18 @@ assign_dot1dTpFdbEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dTpFdbEntry->dot1dTpFdbPort = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dTpFdbPort");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dTpFdbEntry->dot1dTpFdbStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dTpFdbStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _dot1dTpFdbEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            dot1dTpFdbEntry->dot1dTpFdbPort = &(vb->syntax.i32[0]);
+            break;
+        case 3:
+            dot1dTpFdbEntry->dot1dTpFdbStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return dot1dTpFdbEntry;
@@ -848,8 +752,7 @@ bridge_mib_get_dot1dTpFdbTable(host_snmp *s, dot1dTpFdbEntry_t ***dot1dTpFdbEntr
 
     *dot1dTpFdbEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _dot1dTpFdbEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -921,6 +824,7 @@ assign_dot1dTpPortEntry(GSList *vbl)
 {
     GSList *elem;
     dot1dTpPortEntry_t *dot1dTpPortEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 4, 4, 1};
 
@@ -940,42 +844,24 @@ assign_dot1dTpPortEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dTpPortEntry->dot1dTpPortMaxInfo = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dTpPortMaxInfo");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot1dTpPortEntry->dot1dTpPortInFrames = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot1dTpPortInFrames");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot1dTpPortEntry->dot1dTpPortOutFrames = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot1dTpPortOutFrames");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                dot1dTpPortEntry->dot1dTpPortInDiscards = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for dot1dTpPortInDiscards");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _dot1dTpPortEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            dot1dTpPortEntry->dot1dTpPortMaxInfo = &(vb->syntax.i32[0]);
+            break;
+        case 3:
+            dot1dTpPortEntry->dot1dTpPortInFrames = &(vb->syntax.ui32[0]);
+            break;
+        case 4:
+            dot1dTpPortEntry->dot1dTpPortOutFrames = &(vb->syntax.ui32[0]);
+            break;
+        case 5:
+            dot1dTpPortEntry->dot1dTpPortInDiscards = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return dot1dTpPortEntry;
@@ -991,10 +877,7 @@ bridge_mib_get_dot1dTpPortTable(host_snmp *s, dot1dTpPortEntry_t ***dot1dTpPortE
 
     *dot1dTpPortEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _dot1dTpPortEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1071,6 +954,7 @@ assign_dot1dStaticEntry(GSList *vbl)
 {
     GSList *elem;
     dot1dStaticEntry_t *dot1dStaticEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 5, 1, 1};
 
@@ -1090,29 +974,19 @@ assign_dot1dStaticEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                dot1dStaticEntry->_dot1dStaticAllowedToGoToLength = vb->syntax_len;
-                dot1dStaticEntry->dot1dStaticAllowedToGoTo = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for dot1dStaticAllowedToGoTo");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                dot1dStaticEntry->dot1dStaticStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for dot1dStaticStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _dot1dStaticEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 3:
+            dot1dStaticEntry->_dot1dStaticAllowedToGoToLength = vb->syntax_len;
+            dot1dStaticEntry->dot1dStaticAllowedToGoTo = vb->syntax.uc;
+            break;
+        case 4:
+            dot1dStaticEntry->dot1dStaticStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return dot1dStaticEntry;
@@ -1128,8 +1002,7 @@ bridge_mib_get_dot1dStaticTable(host_snmp *s, dot1dStaticEntry_t ***dot1dStaticE
 
     *dot1dStaticEntry = NULL;
 
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _dot1dStaticEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

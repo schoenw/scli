@@ -150,6 +150,122 @@ stls_enum_t const host_resources_mib_enums_hrSWInstalledType[] = {
 };
 
 
+static stls_stub_attr_t _hrSystem[] = {
+    { 1, G_SNMP_TIMETICKS, "hrSystemUptime" },
+    { 2, G_SNMP_OCTET_STRING, "hrSystemDate" },
+    { 3, G_SNMP_INTEGER32, "hrSystemInitialLoadDevice" },
+    { 4, G_SNMP_OCTET_STRING, "hrSystemInitialLoadParameters" },
+    { 5, G_SNMP_UNSIGNED32, "hrSystemNumUsers" },
+    { 6, G_SNMP_UNSIGNED32, "hrSystemProcesses" },
+    { 7, G_SNMP_INTEGER32, "hrSystemMaxProcesses" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrStorage[] = {
+    { 2, G_SNMP_INTEGER32, "hrMemorySize" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrStorageEntry[] = {
+    { 2, G_SNMP_OBJECT_ID, "hrStorageType" },
+    { 3, G_SNMP_OCTET_STRING, "hrStorageDescr" },
+    { 4, G_SNMP_INTEGER32, "hrStorageAllocationUnits" },
+    { 5, G_SNMP_INTEGER32, "hrStorageSize" },
+    { 6, G_SNMP_INTEGER32, "hrStorageUsed" },
+    { 7, G_SNMP_COUNTER32, "hrStorageAllocationFailures" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrDeviceEntry[] = {
+    { 2, G_SNMP_OBJECT_ID, "hrDeviceType" },
+    { 3, G_SNMP_OCTET_STRING, "hrDeviceDescr" },
+    { 4, G_SNMP_OBJECT_ID, "hrDeviceID" },
+    { 5, G_SNMP_INTEGER32, "hrDeviceStatus" },
+    { 6, G_SNMP_COUNTER32, "hrDeviceErrors" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrProcessorEntry[] = {
+    { 1, G_SNMP_OBJECT_ID, "hrProcessorFrwID" },
+    { 2, G_SNMP_INTEGER32, "hrProcessorLoad" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrNetworkEntry[] = {
+    { 1, G_SNMP_INTEGER32, "hrNetworkIfIndex" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrPrinterEntry[] = {
+    { 1, G_SNMP_INTEGER32, "hrPrinterStatus" },
+    { 2, G_SNMP_OCTET_STRING, "hrPrinterDetectedErrorState" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrDiskStorageEntry[] = {
+    { 1, G_SNMP_INTEGER32, "hrDiskStorageAccess" },
+    { 2, G_SNMP_INTEGER32, "hrDiskStorageMedia" },
+    { 3, G_SNMP_INTEGER32, "hrDiskStorageRemoveble" },
+    { 4, G_SNMP_INTEGER32, "hrDiskStorageCapacity" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrPartitionEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, "hrPartitionLabel" },
+    { 3, G_SNMP_OCTET_STRING, "hrPartitionID" },
+    { 4, G_SNMP_INTEGER32, "hrPartitionSize" },
+    { 5, G_SNMP_INTEGER32, "hrPartitionFSIndex" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrFSEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, "hrFSMountPoint" },
+    { 3, G_SNMP_OCTET_STRING, "hrFSRemoteMountPoint" },
+    { 4, G_SNMP_OBJECT_ID, "hrFSType" },
+    { 5, G_SNMP_INTEGER32, "hrFSAccess" },
+    { 6, G_SNMP_INTEGER32, "hrFSBootable" },
+    { 7, G_SNMP_INTEGER32, "hrFSStorageIndex" },
+    { 8, G_SNMP_OCTET_STRING, "hrFSLastFullBackupDate" },
+    { 9, G_SNMP_OCTET_STRING, "hrFSLastPartialBackupDate" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrSWRun[] = {
+    { 1, G_SNMP_INTEGER32, "hrSWOSIndex" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrSWRunEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, "hrSWRunName" },
+    { 3, G_SNMP_OBJECT_ID, "hrSWRunID" },
+    { 4, G_SNMP_OCTET_STRING, "hrSWRunPath" },
+    { 5, G_SNMP_OCTET_STRING, "hrSWRunParameters" },
+    { 6, G_SNMP_INTEGER32, "hrSWRunType" },
+    { 7, G_SNMP_INTEGER32, "hrSWRunStatus" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrSWRunPerfEntry[] = {
+    { 1, G_SNMP_INTEGER32, "hrSWRunPerfCPU" },
+    { 2, G_SNMP_INTEGER32, "hrSWRunPerfMem" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrSWInstalled[] = {
+    { 1, G_SNMP_TIMETICKS, "hrSWInstalledLastChange" },
+    { 2, G_SNMP_TIMETICKS, "hrSWInstalledLastUpdateTime" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _hrSWInstalledEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, "hrSWInstalledName" },
+    { 3, G_SNMP_OBJECT_ID, "hrSWInstalledID" },
+    { 4, G_SNMP_INTEGER32, "hrSWInstalledType" },
+    { 5, G_SNMP_OCTET_STRING, "hrSWInstalledDate" },
+    { 0, 0, NULL }
+};
+
+
 hrSystem_t *
 host_resources_mib_new_hrSystem()
 {
@@ -164,6 +280,7 @@ assign_hrSystem(GSList *vbl)
 {
     GSList *elem;
     hrSystem_t *hrSystem;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 1};
 
@@ -177,65 +294,35 @@ assign_hrSystem(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 9 && vb->id[8] == 1) {
-            if (vb->type == G_SNMP_TIMETICKS) {
-                hrSystem->hrSystemUptime = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for hrSystemUptime");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 2) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrSystem->_hrSystemDateLength = vb->syntax_len;
-                hrSystem->hrSystemDate = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrSystemDate");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrSystem->hrSystemInitialLoadDevice = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrSystemInitialLoadDevice");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 4) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrSystem->_hrSystemInitialLoadParametersLength = vb->syntax_len;
-                hrSystem->hrSystemInitialLoadParameters = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrSystemInitialLoadParameters");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 5) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
-                hrSystem->hrSystemNumUsers = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for hrSystemNumUsers");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 6) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
-                hrSystem->hrSystemProcesses = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for hrSystemProcesses");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrSystem->hrSystemMaxProcesses = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrSystemMaxProcesses");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrSystem, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            hrSystem->hrSystemUptime = &(vb->syntax.ui32[0]);
+            break;
+        case 2:
+            hrSystem->_hrSystemDateLength = vb->syntax_len;
+            hrSystem->hrSystemDate = vb->syntax.uc;
+            break;
+        case 3:
+            hrSystem->hrSystemInitialLoadDevice = &(vb->syntax.i32[0]);
+            break;
+        case 4:
+            hrSystem->_hrSystemInitialLoadParametersLength = vb->syntax_len;
+            hrSystem->hrSystemInitialLoadParameters = vb->syntax.uc;
+            break;
+        case 5:
+            hrSystem->hrSystemNumUsers = &(vb->syntax.ui32[0]);
+            break;
+        case 6:
+            hrSystem->hrSystemProcesses = &(vb->syntax.ui32[0]);
+            break;
+        case 7:
+            hrSystem->hrSystemMaxProcesses = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return hrSystem;
@@ -249,13 +336,7 @@ host_resources_mib_get_hrSystem(host_snmp *s, hrSystem_t **hrSystem)
 
     *hrSystem = NULL;
 
-    base[8] = 1; stls_vbl_add_null(&in, base, 9);
-    base[8] = 2; stls_vbl_add_null(&in, base, 9);
-    base[8] = 3; stls_vbl_add_null(&in, base, 9);
-    base[8] = 4; stls_vbl_add_null(&in, base, 9);
-    base[8] = 5; stls_vbl_add_null(&in, base, 9);
-    base[8] = 6; stls_vbl_add_null(&in, base, 9);
-    base[8] = 7; stls_vbl_add_null(&in, base, 9);
+    stls_vbl_attributes(s, &in, base, 8, _hrSystem);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -296,6 +377,7 @@ assign_hrStorage(GSList *vbl)
 {
     GSList *elem;
     hrStorage_t *hrStorage;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 2};
 
@@ -309,21 +391,15 @@ assign_hrStorage(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 9 && vb->id[8] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrStorage->hrMemorySize = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrMemorySize");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrStorage, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            hrStorage->hrMemorySize = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return hrStorage;
@@ -337,7 +413,7 @@ host_resources_mib_get_hrStorage(host_snmp *s, hrStorage_t **hrStorage)
 
     *hrStorage = NULL;
 
-    base[8] = 2; stls_vbl_add_null(&in, base, 9);
+    stls_vbl_attributes(s, &in, base, 8, _hrStorage);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -389,6 +465,7 @@ assign_hrStorageEntry(GSList *vbl)
 {
     GSList *elem;
     hrStorageEntry_t *hrStorageEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1};
 
@@ -408,58 +485,32 @@ assign_hrStorageEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                hrStorageEntry->_hrStorageTypeLength = vb->syntax_len / sizeof(guint32);
-                hrStorageEntry->hrStorageType = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for hrStorageType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrStorageEntry->_hrStorageDescrLength = vb->syntax_len;
-                hrStorageEntry->hrStorageDescr = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrStorageDescr");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrStorageEntry->hrStorageAllocationUnits = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrStorageAllocationUnits");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrStorageEntry->hrStorageSize = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrStorageSize");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrStorageEntry->hrStorageUsed = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrStorageUsed");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                hrStorageEntry->hrStorageAllocationFailures = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for hrStorageAllocationFailures");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrStorageEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            hrStorageEntry->_hrStorageTypeLength = vb->syntax_len / sizeof(guint32);
+            hrStorageEntry->hrStorageType = vb->syntax.ui32;
+            break;
+        case 3:
+            hrStorageEntry->_hrStorageDescrLength = vb->syntax_len;
+            hrStorageEntry->hrStorageDescr = vb->syntax.uc;
+            break;
+        case 4:
+            hrStorageEntry->hrStorageAllocationUnits = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            hrStorageEntry->hrStorageSize = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            hrStorageEntry->hrStorageUsed = &(vb->syntax.i32[0]);
+            break;
+        case 7:
+            hrStorageEntry->hrStorageAllocationFailures = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return hrStorageEntry;
@@ -475,12 +526,7 @@ host_resources_mib_get_hrStorageTable(host_snmp *s, hrStorageEntry_t ***hrStorag
 
     *hrStorageEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _hrStorageEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -552,6 +598,7 @@ assign_hrDeviceEntry(GSList *vbl)
 {
     GSList *elem;
     hrDeviceEntry_t *hrDeviceEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1};
 
@@ -571,52 +618,30 @@ assign_hrDeviceEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                hrDeviceEntry->_hrDeviceTypeLength = vb->syntax_len / sizeof(guint32);
-                hrDeviceEntry->hrDeviceType = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for hrDeviceType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrDeviceEntry->_hrDeviceDescrLength = vb->syntax_len;
-                hrDeviceEntry->hrDeviceDescr = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrDeviceDescr");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                hrDeviceEntry->_hrDeviceIDLength = vb->syntax_len / sizeof(guint32);
-                hrDeviceEntry->hrDeviceID = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for hrDeviceID");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrDeviceEntry->hrDeviceStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrDeviceStatus");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                hrDeviceEntry->hrDeviceErrors = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for hrDeviceErrors");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrDeviceEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            hrDeviceEntry->_hrDeviceTypeLength = vb->syntax_len / sizeof(guint32);
+            hrDeviceEntry->hrDeviceType = vb->syntax.ui32;
+            break;
+        case 3:
+            hrDeviceEntry->_hrDeviceDescrLength = vb->syntax_len;
+            hrDeviceEntry->hrDeviceDescr = vb->syntax.uc;
+            break;
+        case 4:
+            hrDeviceEntry->_hrDeviceIDLength = vb->syntax_len / sizeof(guint32);
+            hrDeviceEntry->hrDeviceID = vb->syntax.ui32;
+            break;
+        case 5:
+            hrDeviceEntry->hrDeviceStatus = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            hrDeviceEntry->hrDeviceErrors = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return hrDeviceEntry;
@@ -632,11 +657,7 @@ host_resources_mib_get_hrDeviceTable(host_snmp *s, hrDeviceEntry_t ***hrDeviceEn
 
     *hrDeviceEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _hrDeviceEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -708,6 +729,7 @@ assign_hrProcessorEntry(GSList *vbl)
 {
     GSList *elem;
     hrProcessorEntry_t *hrProcessorEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 3, 1};
 
@@ -727,29 +749,19 @@ assign_hrProcessorEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 1) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                hrProcessorEntry->_hrProcessorFrwIDLength = vb->syntax_len / sizeof(guint32);
-                hrProcessorEntry->hrProcessorFrwID = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for hrProcessorFrwID");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrProcessorEntry->hrProcessorLoad = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrProcessorLoad");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrProcessorEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            hrProcessorEntry->_hrProcessorFrwIDLength = vb->syntax_len / sizeof(guint32);
+            hrProcessorEntry->hrProcessorFrwID = vb->syntax.ui32;
+            break;
+        case 2:
+            hrProcessorEntry->hrProcessorLoad = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return hrProcessorEntry;
@@ -765,8 +777,7 @@ host_resources_mib_get_hrProcessorTable(host_snmp *s, hrProcessorEntry_t ***hrPr
 
     *hrProcessorEntry = NULL;
 
-    base[10] = 1; stls_vbl_add_null(&in, base, 11);
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _hrProcessorEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -838,6 +849,7 @@ assign_hrNetworkEntry(GSList *vbl)
 {
     GSList *elem;
     hrNetworkEntry_t *hrNetworkEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 4, 1};
 
@@ -857,21 +869,15 @@ assign_hrNetworkEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrNetworkEntry->hrNetworkIfIndex = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrNetworkIfIndex");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrNetworkEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            hrNetworkEntry->hrNetworkIfIndex = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return hrNetworkEntry;
@@ -887,7 +893,7 @@ host_resources_mib_get_hrNetworkTable(host_snmp *s, hrNetworkEntry_t ***hrNetwor
 
     *hrNetworkEntry = NULL;
 
-    base[10] = 1; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _hrNetworkEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -959,6 +965,7 @@ assign_hrPrinterEntry(GSList *vbl)
 {
     GSList *elem;
     hrPrinterEntry_t *hrPrinterEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 5, 1};
 
@@ -978,29 +985,19 @@ assign_hrPrinterEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrPrinterEntry->hrPrinterStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrPrinterStatus");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrPrinterEntry->_hrPrinterDetectedErrorStateLength = vb->syntax_len;
-                hrPrinterEntry->hrPrinterDetectedErrorState = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrPrinterDetectedErrorState");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrPrinterEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            hrPrinterEntry->hrPrinterStatus = &(vb->syntax.i32[0]);
+            break;
+        case 2:
+            hrPrinterEntry->_hrPrinterDetectedErrorStateLength = vb->syntax_len;
+            hrPrinterEntry->hrPrinterDetectedErrorState = vb->syntax.uc;
+            break;
+        };
     }
 
     return hrPrinterEntry;
@@ -1016,8 +1013,7 @@ host_resources_mib_get_hrPrinterTable(host_snmp *s, hrPrinterEntry_t ***hrPrinte
 
     *hrPrinterEntry = NULL;
 
-    base[10] = 1; stls_vbl_add_null(&in, base, 11);
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _hrPrinterEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1089,6 +1085,7 @@ assign_hrDiskStorageEntry(GSList *vbl)
 {
     GSList *elem;
     hrDiskStorageEntry_t *hrDiskStorageEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 6, 1};
 
@@ -1108,42 +1105,24 @@ assign_hrDiskStorageEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrDiskStorageEntry->hrDiskStorageAccess = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrDiskStorageAccess");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrDiskStorageEntry->hrDiskStorageMedia = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrDiskStorageMedia");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrDiskStorageEntry->hrDiskStorageRemoveble = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrDiskStorageRemoveble");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrDiskStorageEntry->hrDiskStorageCapacity = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrDiskStorageCapacity");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrDiskStorageEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            hrDiskStorageEntry->hrDiskStorageAccess = &(vb->syntax.i32[0]);
+            break;
+        case 2:
+            hrDiskStorageEntry->hrDiskStorageMedia = &(vb->syntax.i32[0]);
+            break;
+        case 3:
+            hrDiskStorageEntry->hrDiskStorageRemoveble = &(vb->syntax.i32[0]);
+            break;
+        case 4:
+            hrDiskStorageEntry->hrDiskStorageCapacity = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return hrDiskStorageEntry;
@@ -1159,10 +1138,7 @@ host_resources_mib_get_hrDiskStorageTable(host_snmp *s, hrDiskStorageEntry_t ***
 
     *hrDiskStorageEntry = NULL;
 
-    base[10] = 1; stls_vbl_add_null(&in, base, 11);
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _hrDiskStorageEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1236,6 +1212,7 @@ assign_hrPartitionEntry(GSList *vbl)
 {
     GSList *elem;
     hrPartitionEntry_t *hrPartitionEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1};
 
@@ -1255,44 +1232,26 @@ assign_hrPartitionEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrPartitionEntry->_hrPartitionLabelLength = vb->syntax_len;
-                hrPartitionEntry->hrPartitionLabel = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrPartitionLabel");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrPartitionEntry->_hrPartitionIDLength = vb->syntax_len;
-                hrPartitionEntry->hrPartitionID = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrPartitionID");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrPartitionEntry->hrPartitionSize = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrPartitionSize");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrPartitionEntry->hrPartitionFSIndex = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrPartitionFSIndex");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrPartitionEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            hrPartitionEntry->_hrPartitionLabelLength = vb->syntax_len;
+            hrPartitionEntry->hrPartitionLabel = vb->syntax.uc;
+            break;
+        case 3:
+            hrPartitionEntry->_hrPartitionIDLength = vb->syntax_len;
+            hrPartitionEntry->hrPartitionID = vb->syntax.uc;
+            break;
+        case 4:
+            hrPartitionEntry->hrPartitionSize = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            hrPartitionEntry->hrPartitionFSIndex = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return hrPartitionEntry;
@@ -1308,10 +1267,7 @@ host_resources_mib_get_hrPartitionTable(host_snmp *s, hrPartitionEntry_t ***hrPa
 
     *hrPartitionEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _hrPartitionEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1383,6 +1339,7 @@ assign_hrFSEntry(GSList *vbl)
 {
     GSList *elem;
     hrFSEntry_t *hrFSEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1};
 
@@ -1402,75 +1359,41 @@ assign_hrFSEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrFSEntry->_hrFSMountPointLength = vb->syntax_len;
-                hrFSEntry->hrFSMountPoint = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrFSMountPoint");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrFSEntry->_hrFSRemoteMountPointLength = vb->syntax_len;
-                hrFSEntry->hrFSRemoteMountPoint = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrFSRemoteMountPoint");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                hrFSEntry->_hrFSTypeLength = vb->syntax_len / sizeof(guint32);
-                hrFSEntry->hrFSType = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for hrFSType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrFSEntry->hrFSAccess = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrFSAccess");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrFSEntry->hrFSBootable = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrFSBootable");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrFSEntry->hrFSStorageIndex = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrFSStorageIndex");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrFSEntry->_hrFSLastFullBackupDateLength = vb->syntax_len;
-                hrFSEntry->hrFSLastFullBackupDate = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrFSLastFullBackupDate");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 9) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrFSEntry->_hrFSLastPartialBackupDateLength = vb->syntax_len;
-                hrFSEntry->hrFSLastPartialBackupDate = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrFSLastPartialBackupDate");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrFSEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            hrFSEntry->_hrFSMountPointLength = vb->syntax_len;
+            hrFSEntry->hrFSMountPoint = vb->syntax.uc;
+            break;
+        case 3:
+            hrFSEntry->_hrFSRemoteMountPointLength = vb->syntax_len;
+            hrFSEntry->hrFSRemoteMountPoint = vb->syntax.uc;
+            break;
+        case 4:
+            hrFSEntry->_hrFSTypeLength = vb->syntax_len / sizeof(guint32);
+            hrFSEntry->hrFSType = vb->syntax.ui32;
+            break;
+        case 5:
+            hrFSEntry->hrFSAccess = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            hrFSEntry->hrFSBootable = &(vb->syntax.i32[0]);
+            break;
+        case 7:
+            hrFSEntry->hrFSStorageIndex = &(vb->syntax.i32[0]);
+            break;
+        case 8:
+            hrFSEntry->_hrFSLastFullBackupDateLength = vb->syntax_len;
+            hrFSEntry->hrFSLastFullBackupDate = vb->syntax.uc;
+            break;
+        case 9:
+            hrFSEntry->_hrFSLastPartialBackupDateLength = vb->syntax_len;
+            hrFSEntry->hrFSLastPartialBackupDate = vb->syntax.uc;
+            break;
+        };
     }
 
     return hrFSEntry;
@@ -1486,14 +1409,7 @@ host_resources_mib_get_hrFSTable(host_snmp *s, hrFSEntry_t ***hrFSEntry)
 
     *hrFSEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
-    base[10] = 8; stls_vbl_add_null(&in, base, 11);
-    base[10] = 9; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _hrFSEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1554,6 +1470,7 @@ assign_hrSWRun(GSList *vbl)
 {
     GSList *elem;
     hrSWRun_t *hrSWRun;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 4};
 
@@ -1567,21 +1484,15 @@ assign_hrSWRun(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 9 && vb->id[8] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrSWRun->hrSWOSIndex = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrSWOSIndex");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrSWRun, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            hrSWRun->hrSWOSIndex = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return hrSWRun;
@@ -1595,7 +1506,7 @@ host_resources_mib_get_hrSWRun(host_snmp *s, hrSWRun_t **hrSWRun)
 
     *hrSWRun = NULL;
 
-    base[8] = 1; stls_vbl_add_null(&in, base, 9);
+    stls_vbl_attributes(s, &in, base, 8, _hrSWRun);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -1647,6 +1558,7 @@ assign_hrSWRunEntry(GSList *vbl)
 {
     GSList *elem;
     hrSWRunEntry_t *hrSWRunEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1};
 
@@ -1666,60 +1578,34 @@ assign_hrSWRunEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrSWRunEntry->_hrSWRunNameLength = vb->syntax_len;
-                hrSWRunEntry->hrSWRunName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrSWRunName");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                hrSWRunEntry->_hrSWRunIDLength = vb->syntax_len / sizeof(guint32);
-                hrSWRunEntry->hrSWRunID = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for hrSWRunID");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrSWRunEntry->_hrSWRunPathLength = vb->syntax_len;
-                hrSWRunEntry->hrSWRunPath = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrSWRunPath");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrSWRunEntry->_hrSWRunParametersLength = vb->syntax_len;
-                hrSWRunEntry->hrSWRunParameters = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrSWRunParameters");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrSWRunEntry->hrSWRunType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrSWRunType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrSWRunEntry->hrSWRunStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrSWRunStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrSWRunEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            hrSWRunEntry->_hrSWRunNameLength = vb->syntax_len;
+            hrSWRunEntry->hrSWRunName = vb->syntax.uc;
+            break;
+        case 3:
+            hrSWRunEntry->_hrSWRunIDLength = vb->syntax_len / sizeof(guint32);
+            hrSWRunEntry->hrSWRunID = vb->syntax.ui32;
+            break;
+        case 4:
+            hrSWRunEntry->_hrSWRunPathLength = vb->syntax_len;
+            hrSWRunEntry->hrSWRunPath = vb->syntax.uc;
+            break;
+        case 5:
+            hrSWRunEntry->_hrSWRunParametersLength = vb->syntax_len;
+            hrSWRunEntry->hrSWRunParameters = vb->syntax.uc;
+            break;
+        case 6:
+            hrSWRunEntry->hrSWRunType = &(vb->syntax.i32[0]);
+            break;
+        case 7:
+            hrSWRunEntry->hrSWRunStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return hrSWRunEntry;
@@ -1735,12 +1621,7 @@ host_resources_mib_get_hrSWRunTable(host_snmp *s, hrSWRunEntry_t ***hrSWRunEntry
 
     *hrSWRunEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _hrSWRunEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1812,6 +1693,7 @@ assign_hrSWRunPerfEntry(GSList *vbl)
 {
     GSList *elem;
     hrSWRunPerfEntry_t *hrSWRunPerfEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 5, 1, 1};
 
@@ -1831,28 +1713,18 @@ assign_hrSWRunPerfEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrSWRunPerfEntry->hrSWRunPerfCPU = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrSWRunPerfCPU");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrSWRunPerfEntry->hrSWRunPerfMem = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrSWRunPerfMem");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrSWRunPerfEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            hrSWRunPerfEntry->hrSWRunPerfCPU = &(vb->syntax.i32[0]);
+            break;
+        case 2:
+            hrSWRunPerfEntry->hrSWRunPerfMem = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return hrSWRunPerfEntry;
@@ -1868,8 +1740,7 @@ host_resources_mib_get_hrSWRunPerfTable(host_snmp *s, hrSWRunPerfEntry_t ***hrSW
 
     *hrSWRunPerfEntry = NULL;
 
-    base[10] = 1; stls_vbl_add_null(&in, base, 11);
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _hrSWRunPerfEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1930,6 +1801,7 @@ assign_hrSWInstalled(GSList *vbl)
 {
     GSList *elem;
     hrSWInstalled_t *hrSWInstalled;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 6};
 
@@ -1943,28 +1815,18 @@ assign_hrSWInstalled(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 9 && vb->id[8] == 1) {
-            if (vb->type == G_SNMP_TIMETICKS) {
-                hrSWInstalled->hrSWInstalledLastChange = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for hrSWInstalledLastChange");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 2) {
-            if (vb->type == G_SNMP_TIMETICKS) {
-                hrSWInstalled->hrSWInstalledLastUpdateTime = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for hrSWInstalledLastUpdateTime");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrSWInstalled, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            hrSWInstalled->hrSWInstalledLastChange = &(vb->syntax.ui32[0]);
+            break;
+        case 2:
+            hrSWInstalled->hrSWInstalledLastUpdateTime = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return hrSWInstalled;
@@ -1978,8 +1840,7 @@ host_resources_mib_get_hrSWInstalled(host_snmp *s, hrSWInstalled_t **hrSWInstall
 
     *hrSWInstalled = NULL;
 
-    base[8] = 1; stls_vbl_add_null(&in, base, 9);
-    base[8] = 2; stls_vbl_add_null(&in, base, 9);
+    stls_vbl_attributes(s, &in, base, 8, _hrSWInstalled);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -2031,6 +1892,7 @@ assign_hrSWInstalledEntry(GSList *vbl)
 {
     GSList *elem;
     hrSWInstalledEntry_t *hrSWInstalledEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1};
 
@@ -2050,45 +1912,27 @@ assign_hrSWInstalledEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrSWInstalledEntry->_hrSWInstalledNameLength = vb->syntax_len;
-                hrSWInstalledEntry->hrSWInstalledName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrSWInstalledName");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                hrSWInstalledEntry->_hrSWInstalledIDLength = vb->syntax_len / sizeof(guint32);
-                hrSWInstalledEntry->hrSWInstalledID = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for hrSWInstalledID");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                hrSWInstalledEntry->hrSWInstalledType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for hrSWInstalledType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                hrSWInstalledEntry->_hrSWInstalledDateLength = vb->syntax_len;
-                hrSWInstalledEntry->hrSWInstalledDate = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for hrSWInstalledDate");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _hrSWInstalledEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            hrSWInstalledEntry->_hrSWInstalledNameLength = vb->syntax_len;
+            hrSWInstalledEntry->hrSWInstalledName = vb->syntax.uc;
+            break;
+        case 3:
+            hrSWInstalledEntry->_hrSWInstalledIDLength = vb->syntax_len / sizeof(guint32);
+            hrSWInstalledEntry->hrSWInstalledID = vb->syntax.ui32;
+            break;
+        case 4:
+            hrSWInstalledEntry->hrSWInstalledType = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            hrSWInstalledEntry->_hrSWInstalledDateLength = vb->syntax_len;
+            hrSWInstalledEntry->hrSWInstalledDate = vb->syntax.uc;
+            break;
+        };
     }
 
     return hrSWInstalledEntry;
@@ -2104,10 +1948,7 @@ host_resources_mib_get_hrSWInstalledTable(host_snmp *s, hrSWInstalledEntry_t ***
 
     *hrSWInstalledEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _hrSWInstalledEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

@@ -53,8 +53,10 @@ libstub_a_SOURCES	= stools.h stools.c $(STUBS)
 
 SMIDUMP			= ../../libsmi/tools/smidump
 
-stubs:
+rmstubs:
 	rm -f $(STUBS)
+
+stubs:
 	@for f in $(MIBS) ; do \
 	    echo "$(SMIDUMP) -f stools $$f" ; \
 	    $(SMIDUMP) -f stools $$f ; \

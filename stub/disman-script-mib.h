@@ -6,8 +6,28 @@
  *   This MIB module defines a set of objects that allow to
  *   delegate management scripts to distributed managers.
  *
+ * Revision 2001-04-03 00:00:
+ *   Revised version, published as RFC XXXX.
+ *   
+ *   This revision introduces several new objects: smScriptError,
+ *   smScriptLastChange, smLaunchError, smLaunchLastChange,
+ *   smLaunchRowExpireTime, smRunResultTime, and smRunErrorTime.
+ *   
+ *   The following existing objects were updated: the maximum
+ *   value of smRunLifeTime now disables the timer, an
+ *   autostart value was added to the smLaunchAdminStatus
+ *   object, and a new expired state was added to the
+ *   smLaunchOperStatus object.
+ *   
+ *   A new smScriptException notification has been added to
+ *   support runtime error notifications.
+ *   
+ *   Clarifications have been added in several places to remove
+ *   ambiguities or contradictions that were discovered and
+ *   reported by implementors.
+ *
  * Revision 1999-02-22 18:00:
- *   [Revision added by libsmi due to a LAST-UPDATED clause.]
+ *   Initial version, published as RFC 2592.
  *
  * $Id$
  */
@@ -79,11 +99,13 @@ extern stls_enum_t const disman_script_mib_enums_smLaunchControl[];
 
 #define DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_ENABLED	1
 #define DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_DISABLED	2
+#define DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_AUTOSTART	3
 
 extern stls_enum_t const disman_script_mib_enums_smLaunchAdminStatus[];
 
 #define DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_ENABLED	1
 #define DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_DISABLED	2
+#define DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_EXPIRED	3
 
 extern stls_enum_t const disman_script_mib_enums_smLaunchOperStatus[];
 
@@ -208,7 +230,7 @@ disman_script_mib_free_smExtsnEntry(smExtsnEntry_t *smExtsnEntry);
 typedef struct smScriptEntry {
     guchar   smScriptOwner[32];
     gsize    _smScriptOwnerLength;
-    guchar   smScriptName[128];
+    guchar   smScriptName[32];
     gsize    _smScriptNameLength;
     guchar   *smScriptDescr;
     gsize    _smScriptDescrLength;
@@ -219,6 +241,10 @@ typedef struct smScriptEntry {
     gint32   *smScriptOperStatus;
     gint32   *smScriptStorageType;
     gint32   *smScriptRowStatus;
+    guchar   *smScriptError;
+    gsize    _smScriptErrorLength;
+    guchar   *smScriptLastChange;
+    gsize    _smScriptLastChangeLength;
 } smScriptEntry_t;
 
 extern int
@@ -246,7 +272,7 @@ disman_script_mib_free_smScriptEntry(smScriptEntry_t *smScriptEntry);
 typedef struct smCodeEntry {
     guchar   smScriptOwner[32];
     gsize    _smScriptOwnerLength;
-    guchar   smScriptName[128];
+    guchar   smScriptName[32];
     gsize    _smScriptNameLength;
     guint32  smCodeIndex;
     guchar   *smCodeText;
@@ -298,6 +324,11 @@ typedef struct smLaunchEntry {
     gint32   *smLaunchRunIndexNext;
     gint32   *smLaunchStorageType;
     gint32   *smLaunchRowStatus;
+    guchar   *smLaunchError;
+    gsize    _smLaunchErrorLength;
+    guchar   *smLaunchLastChange;
+    gsize    _smLaunchLastChangeLength;
+    gint32   *smLaunchRowExpireTime;
 } smLaunchEntry_t;
 
 extern int
@@ -343,6 +374,10 @@ typedef struct smRunEntry {
     gint32   *smRunState;
     guchar   *smRunError;
     gsize    _smRunErrorLength;
+    guchar   *smRunResultTime;
+    gsize    _smRunResultTimeLength;
+    guchar   *smRunErrorTime;
+    gsize    _smRunErrorTimeLength;
 } smRunEntry_t;
 
 extern int

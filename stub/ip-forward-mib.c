@@ -79,6 +79,44 @@ stls_enum_t const ip_forward_mib_enums_ipCidrRouteStatus[] = {
 };
 
 
+static stls_stub_attr_t _ipForward[] = {
+    { 1, G_SNMP_UNSIGNED32, "ipForwardNumber" },
+    { 3, G_SNMP_UNSIGNED32, "ipCidrRouteNumber" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _ipForwardEntry[] = {
+    { 2, G_SNMP_IPADDRESS, "ipForwardMask" },
+    { 5, G_SNMP_INTEGER32, "ipForwardIfIndex" },
+    { 6, G_SNMP_INTEGER32, "ipForwardType" },
+    { 8, G_SNMP_INTEGER32, "ipForwardAge" },
+    { 9, G_SNMP_OBJECT_ID, "ipForwardInfo" },
+    { 10, G_SNMP_INTEGER32, "ipForwardNextHopAS" },
+    { 11, G_SNMP_INTEGER32, "ipForwardMetric1" },
+    { 12, G_SNMP_INTEGER32, "ipForwardMetric2" },
+    { 13, G_SNMP_INTEGER32, "ipForwardMetric3" },
+    { 14, G_SNMP_INTEGER32, "ipForwardMetric4" },
+    { 15, G_SNMP_INTEGER32, "ipForwardMetric5" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _ipCidrRouteEntry[] = {
+    { 5, G_SNMP_INTEGER32, "ipCidrRouteIfIndex" },
+    { 6, G_SNMP_INTEGER32, "ipCidrRouteType" },
+    { 7, G_SNMP_INTEGER32, "ipCidrRouteProto" },
+    { 8, G_SNMP_INTEGER32, "ipCidrRouteAge" },
+    { 9, G_SNMP_OBJECT_ID, "ipCidrRouteInfo" },
+    { 10, G_SNMP_INTEGER32, "ipCidrRouteNextHopAS" },
+    { 11, G_SNMP_INTEGER32, "ipCidrRouteMetric1" },
+    { 12, G_SNMP_INTEGER32, "ipCidrRouteMetric2" },
+    { 13, G_SNMP_INTEGER32, "ipCidrRouteMetric3" },
+    { 14, G_SNMP_INTEGER32, "ipCidrRouteMetric4" },
+    { 15, G_SNMP_INTEGER32, "ipCidrRouteMetric5" },
+    { 16, G_SNMP_INTEGER32, "ipCidrRouteStatus" },
+    { 0, 0, NULL }
+};
+
+
 ipForward_t *
 ip_forward_mib_new_ipForward()
 {
@@ -93,6 +131,7 @@ assign_ipForward(GSList *vbl)
 {
     GSList *elem;
     ipForward_t *ipForward;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4, 24};
 
@@ -106,28 +145,18 @@ assign_ipForward(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 9 && vb->id[8] == 1) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
-                ipForward->ipForwardNumber = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ipForwardNumber");
-            }
-        }
-        if (vb->id_len > 9 && vb->id[8] == 3) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
-                ipForward->ipCidrRouteNumber = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for ipCidrRouteNumber");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _ipForward, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            ipForward->ipForwardNumber = &(vb->syntax.ui32[0]);
+            break;
+        case 3:
+            ipForward->ipCidrRouteNumber = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return ipForward;
@@ -141,8 +170,7 @@ ip_forward_mib_get_ipForward(host_snmp *s, ipForward_t **ipForward)
 
     *ipForward = NULL;
 
-    base[8] = 1; stls_vbl_add_null(&in, base, 9);
-    base[8] = 3; stls_vbl_add_null(&in, base, 9);
+    stls_vbl_attributes(s, &in, base, 8, _ipForward);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -206,6 +234,7 @@ assign_ipForwardEntry(GSList *vbl)
 {
     GSList *elem;
     ipForwardEntry_t *ipForwardEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4, 24, 2, 1};
 
@@ -225,92 +254,46 @@ assign_ipForwardEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_IPADDRESS) {
-                ipForwardEntry->ipForwardMask = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for ipForwardMask");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipForwardEntry->ipForwardIfIndex = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipForwardIfIndex");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipForwardEntry->ipForwardType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipForwardType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipForwardEntry->ipForwardAge = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipForwardAge");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 9) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                ipForwardEntry->_ipForwardInfoLength = vb->syntax_len / sizeof(guint32);
-                ipForwardEntry->ipForwardInfo = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for ipForwardInfo");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 10) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipForwardEntry->ipForwardNextHopAS = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipForwardNextHopAS");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 11) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipForwardEntry->ipForwardMetric1 = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipForwardMetric1");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 12) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipForwardEntry->ipForwardMetric2 = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipForwardMetric2");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 13) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipForwardEntry->ipForwardMetric3 = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipForwardMetric3");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 14) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipForwardEntry->ipForwardMetric4 = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipForwardMetric4");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 15) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipForwardEntry->ipForwardMetric5 = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipForwardMetric5");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _ipForwardEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            ipForwardEntry->ipForwardMask = vb->syntax.uc;
+            break;
+        case 5:
+            ipForwardEntry->ipForwardIfIndex = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            ipForwardEntry->ipForwardType = &(vb->syntax.i32[0]);
+            break;
+        case 8:
+            ipForwardEntry->ipForwardAge = &(vb->syntax.i32[0]);
+            break;
+        case 9:
+            ipForwardEntry->_ipForwardInfoLength = vb->syntax_len / sizeof(guint32);
+            ipForwardEntry->ipForwardInfo = vb->syntax.ui32;
+            break;
+        case 10:
+            ipForwardEntry->ipForwardNextHopAS = &(vb->syntax.i32[0]);
+            break;
+        case 11:
+            ipForwardEntry->ipForwardMetric1 = &(vb->syntax.i32[0]);
+            break;
+        case 12:
+            ipForwardEntry->ipForwardMetric2 = &(vb->syntax.i32[0]);
+            break;
+        case 13:
+            ipForwardEntry->ipForwardMetric3 = &(vb->syntax.i32[0]);
+            break;
+        case 14:
+            ipForwardEntry->ipForwardMetric4 = &(vb->syntax.i32[0]);
+            break;
+        case 15:
+            ipForwardEntry->ipForwardMetric5 = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return ipForwardEntry;
@@ -326,17 +309,7 @@ ip_forward_mib_get_ipForwardTable(host_snmp *s, ipForwardEntry_t ***ipForwardEnt
 
     *ipForwardEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 8; stls_vbl_add_null(&in, base, 11);
-    base[10] = 9; stls_vbl_add_null(&in, base, 11);
-    base[10] = 10; stls_vbl_add_null(&in, base, 11);
-    base[10] = 11; stls_vbl_add_null(&in, base, 11);
-    base[10] = 12; stls_vbl_add_null(&in, base, 11);
-    base[10] = 13; stls_vbl_add_null(&in, base, 11);
-    base[10] = 14; stls_vbl_add_null(&in, base, 11);
-    base[10] = 15; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _ipForwardEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -423,6 +396,7 @@ assign_ipCidrRouteEntry(GSList *vbl)
 {
     GSList *elem;
     ipCidrRouteEntry_t *ipCidrRouteEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4, 24, 4, 1};
 
@@ -442,99 +416,49 @@ assign_ipCidrRouteEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipCidrRouteEntry->ipCidrRouteIfIndex = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipCidrRouteIfIndex");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipCidrRouteEntry->ipCidrRouteType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipCidrRouteType");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipCidrRouteEntry->ipCidrRouteProto = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipCidrRouteProto");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 8) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipCidrRouteEntry->ipCidrRouteAge = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipCidrRouteAge");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 9) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                ipCidrRouteEntry->_ipCidrRouteInfoLength = vb->syntax_len / sizeof(guint32);
-                ipCidrRouteEntry->ipCidrRouteInfo = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for ipCidrRouteInfo");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 10) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipCidrRouteEntry->ipCidrRouteNextHopAS = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipCidrRouteNextHopAS");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 11) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipCidrRouteEntry->ipCidrRouteMetric1 = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipCidrRouteMetric1");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 12) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipCidrRouteEntry->ipCidrRouteMetric2 = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipCidrRouteMetric2");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 13) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipCidrRouteEntry->ipCidrRouteMetric3 = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipCidrRouteMetric3");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 14) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipCidrRouteEntry->ipCidrRouteMetric4 = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipCidrRouteMetric4");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 15) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipCidrRouteEntry->ipCidrRouteMetric5 = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipCidrRouteMetric5");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 16) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                ipCidrRouteEntry->ipCidrRouteStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for ipCidrRouteStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _ipCidrRouteEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 5:
+            ipCidrRouteEntry->ipCidrRouteIfIndex = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            ipCidrRouteEntry->ipCidrRouteType = &(vb->syntax.i32[0]);
+            break;
+        case 7:
+            ipCidrRouteEntry->ipCidrRouteProto = &(vb->syntax.i32[0]);
+            break;
+        case 8:
+            ipCidrRouteEntry->ipCidrRouteAge = &(vb->syntax.i32[0]);
+            break;
+        case 9:
+            ipCidrRouteEntry->_ipCidrRouteInfoLength = vb->syntax_len / sizeof(guint32);
+            ipCidrRouteEntry->ipCidrRouteInfo = vb->syntax.ui32;
+            break;
+        case 10:
+            ipCidrRouteEntry->ipCidrRouteNextHopAS = &(vb->syntax.i32[0]);
+            break;
+        case 11:
+            ipCidrRouteEntry->ipCidrRouteMetric1 = &(vb->syntax.i32[0]);
+            break;
+        case 12:
+            ipCidrRouteEntry->ipCidrRouteMetric2 = &(vb->syntax.i32[0]);
+            break;
+        case 13:
+            ipCidrRouteEntry->ipCidrRouteMetric3 = &(vb->syntax.i32[0]);
+            break;
+        case 14:
+            ipCidrRouteEntry->ipCidrRouteMetric4 = &(vb->syntax.i32[0]);
+            break;
+        case 15:
+            ipCidrRouteEntry->ipCidrRouteMetric5 = &(vb->syntax.i32[0]);
+            break;
+        case 16:
+            ipCidrRouteEntry->ipCidrRouteStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return ipCidrRouteEntry;
@@ -550,18 +474,7 @@ ip_forward_mib_get_ipCidrRouteTable(host_snmp *s, ipCidrRouteEntry_t ***ipCidrRo
 
     *ipCidrRouteEntry = NULL;
 
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
-    base[10] = 7; stls_vbl_add_null(&in, base, 11);
-    base[10] = 8; stls_vbl_add_null(&in, base, 11);
-    base[10] = 9; stls_vbl_add_null(&in, base, 11);
-    base[10] = 10; stls_vbl_add_null(&in, base, 11);
-    base[10] = 11; stls_vbl_add_null(&in, base, 11);
-    base[10] = 12; stls_vbl_add_null(&in, base, 11);
-    base[10] = 13; stls_vbl_add_null(&in, base, 11);
-    base[10] = 14; stls_vbl_add_null(&in, base, 11);
-    base[10] = 15; stls_vbl_add_null(&in, base, 11);
-    base[10] = 16; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _ipCidrRouteEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

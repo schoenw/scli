@@ -68,12 +68,31 @@ stls_identity_get_identity(stls_identity_t const *table,
  * SNMP toolkit independent functions to create and free varbind lists.
  */
 
+typedef struct {
+    guint32 const	subid;
+    GSnmpVarBindType	type;
+    gchar		*label;
+} stls_stub_attr_t;
+
+typedef struct {
+    guint32 const	*base;
+    gsize		size;
+    stls_stub_attr_t	*attributes;
+} stls_stut_obj_t;
+
 extern void
 stls_vbl_add_null(GSList **vbl, guint32 const *oid, gsize const len);
 
 extern void
 stls_vbl_free(GSList *vbl);
 
+extern void
+stls_vbl_attributes(host_snmp *s, GSList **vbl, guint32 *base, guint idx,
+		    stls_stub_attr_t *attributes);
+
+extern int
+stls_vb_lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
+	       stls_stub_attr_t *attributes, guint32 *idx);
 
 /*
  * SNMP toolkit independent API functions used by the stub code.

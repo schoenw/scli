@@ -38,6 +38,68 @@ stls_enum_t const snmp_user_based_sm_mib_enums_usmUserStatus[] = {
 };
 
 
+static guint32 const usmNoAuthProtocol[]
+	= { SNMP_USER_BASED_SM_MIB_USMNOAUTHPROTOCOL };
+static guint32 const usmHMACMD5AuthProtocol[]
+	= { SNMP_USER_BASED_SM_MIB_USMHMACMD5AUTHPROTOCOL };
+static guint32 const usmHMACSHAAuthProtocol[]
+	= { SNMP_USER_BASED_SM_MIB_USMHMACSHAAUTHPROTOCOL };
+static guint32 const usmNoPrivProtocol[]
+	= { SNMP_USER_BASED_SM_MIB_USMNOPRIVPROTOCOL };
+static guint32 const usmDESPrivProtocol[]
+	= { SNMP_USER_BASED_SM_MIB_USMDESPRIVPROTOCOL };
+
+stls_identity_t const snmp_user_based_sm_mib_identities[] = {
+    { usmNoAuthProtocol,
+      sizeof(usmNoAuthProtocol)/sizeof(guint32),
+      "usmNoAuthProtocol" },
+    { usmHMACMD5AuthProtocol,
+      sizeof(usmHMACMD5AuthProtocol)/sizeof(guint32),
+      "usmHMACMD5AuthProtocol" },
+    { usmHMACSHAAuthProtocol,
+      sizeof(usmHMACSHAAuthProtocol)/sizeof(guint32),
+      "usmHMACSHAAuthProtocol" },
+    { usmNoPrivProtocol,
+      sizeof(usmNoPrivProtocol)/sizeof(guint32),
+      "usmNoPrivProtocol" },
+    { usmDESPrivProtocol,
+      sizeof(usmDESPrivProtocol)/sizeof(guint32),
+      "usmDESPrivProtocol" },
+    { 0, 0, NULL }
+};
+
+
+static stls_stub_attr_t _usmStats[] = {
+    { 1, G_SNMP_COUNTER32, "usmStatsUnsupportedSecLevels" },
+    { 2, G_SNMP_COUNTER32, "usmStatsNotInTimeWindows" },
+    { 3, G_SNMP_COUNTER32, "usmStatsUnknownUserNames" },
+    { 4, G_SNMP_COUNTER32, "usmStatsUnknownEngineIDs" },
+    { 5, G_SNMP_COUNTER32, "usmStatsWrongDigests" },
+    { 6, G_SNMP_COUNTER32, "usmStatsDecryptionErrors" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _usmUser[] = {
+    { 1, G_SNMP_INTEGER32, "usmUserSpinLock" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _usmUserEntry[] = {
+    { 3, G_SNMP_OCTET_STRING, "usmUserSecurityName" },
+    { 4, G_SNMP_OBJECT_ID, "usmUserCloneFrom" },
+    { 5, G_SNMP_OBJECT_ID, "usmUserAuthProtocol" },
+    { 6, G_SNMP_OCTET_STRING, "usmUserAuthKeyChange" },
+    { 7, G_SNMP_OCTET_STRING, "usmUserOwnAuthKeyChange" },
+    { 8, G_SNMP_OBJECT_ID, "usmUserPrivProtocol" },
+    { 9, G_SNMP_OCTET_STRING, "usmUserPrivKeyChange" },
+    { 10, G_SNMP_OCTET_STRING, "usmUserOwnPrivKeyChange" },
+    { 11, G_SNMP_OCTET_STRING, "usmUserPublic" },
+    { 12, G_SNMP_INTEGER32, "usmUserStorageType" },
+    { 13, G_SNMP_INTEGER32, "usmUserStatus" },
+    { 0, 0, NULL }
+};
+
+
 usmStats_t *
 snmp_user_based_sm_mib_new_usmStats()
 {
@@ -52,6 +114,7 @@ assign_usmStats(GSList *vbl)
 {
     GSList *elem;
     usmStats_t *usmStats;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 15, 1, 1};
 
@@ -65,56 +128,30 @@ assign_usmStats(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 10 && vb->id[9] == 1) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                usmStats->usmStatsUnsupportedSecLevels = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for usmStatsUnsupportedSecLevels");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 2) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                usmStats->usmStatsNotInTimeWindows = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for usmStatsNotInTimeWindows");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 3) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                usmStats->usmStatsUnknownUserNames = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for usmStatsUnknownUserNames");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 4) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                usmStats->usmStatsUnknownEngineIDs = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for usmStatsUnknownEngineIDs");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 5) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                usmStats->usmStatsWrongDigests = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for usmStatsWrongDigests");
-            }
-        }
-        if (vb->id_len > 10 && vb->id[9] == 6) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                usmStats->usmStatsDecryptionErrors = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for usmStatsDecryptionErrors");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _usmStats, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            usmStats->usmStatsUnsupportedSecLevels = &(vb->syntax.ui32[0]);
+            break;
+        case 2:
+            usmStats->usmStatsNotInTimeWindows = &(vb->syntax.ui32[0]);
+            break;
+        case 3:
+            usmStats->usmStatsUnknownUserNames = &(vb->syntax.ui32[0]);
+            break;
+        case 4:
+            usmStats->usmStatsUnknownEngineIDs = &(vb->syntax.ui32[0]);
+            break;
+        case 5:
+            usmStats->usmStatsWrongDigests = &(vb->syntax.ui32[0]);
+            break;
+        case 6:
+            usmStats->usmStatsDecryptionErrors = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return usmStats;
@@ -128,12 +165,7 @@ snmp_user_based_sm_mib_get_usmStats(host_snmp *s, usmStats_t **usmStats)
 
     *usmStats = NULL;
 
-    base[9] = 1; stls_vbl_add_null(&in, base, 10);
-    base[9] = 2; stls_vbl_add_null(&in, base, 10);
-    base[9] = 3; stls_vbl_add_null(&in, base, 10);
-    base[9] = 4; stls_vbl_add_null(&in, base, 10);
-    base[9] = 5; stls_vbl_add_null(&in, base, 10);
-    base[9] = 6; stls_vbl_add_null(&in, base, 10);
+    stls_vbl_attributes(s, &in, base, 9, _usmStats);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -174,6 +206,7 @@ assign_usmUser(GSList *vbl)
 {
     GSList *elem;
     usmUser_t *usmUser;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 15, 1, 2};
 
@@ -187,21 +220,15 @@ assign_usmUser(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 10 && vb->id[9] == 1) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                usmUser->usmUserSpinLock = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for usmUserSpinLock");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _usmUser, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            usmUser->usmUserSpinLock = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return usmUser;
@@ -215,7 +242,7 @@ snmp_user_based_sm_mib_get_usmUser(host_snmp *s, usmUser_t **usmUser)
 
     *usmUser = NULL;
 
-    base[9] = 1; stls_vbl_add_null(&in, base, 10);
+    stls_vbl_attributes(s, &in, base, 9, _usmUser);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -279,6 +306,7 @@ assign_usmUserEntry(GSList *vbl)
 {
     GSList *elem;
     usmUserEntry_t *usmUserEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 6, 3, 15, 1, 2, 2, 1};
 
@@ -298,100 +326,54 @@ assign_usmUserEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 12 && vb->id[11] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                usmUserEntry->_usmUserSecurityNameLength = vb->syntax_len;
-                usmUserEntry->usmUserSecurityName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for usmUserSecurityName");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 4) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                usmUserEntry->_usmUserCloneFromLength = vb->syntax_len / sizeof(guint32);
-                usmUserEntry->usmUserCloneFrom = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for usmUserCloneFrom");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 5) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                usmUserEntry->_usmUserAuthProtocolLength = vb->syntax_len / sizeof(guint32);
-                usmUserEntry->usmUserAuthProtocol = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for usmUserAuthProtocol");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 6) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                usmUserEntry->_usmUserAuthKeyChangeLength = vb->syntax_len;
-                usmUserEntry->usmUserAuthKeyChange = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for usmUserAuthKeyChange");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 7) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                usmUserEntry->_usmUserOwnAuthKeyChangeLength = vb->syntax_len;
-                usmUserEntry->usmUserOwnAuthKeyChange = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for usmUserOwnAuthKeyChange");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 8) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                usmUserEntry->_usmUserPrivProtocolLength = vb->syntax_len / sizeof(guint32);
-                usmUserEntry->usmUserPrivProtocol = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for usmUserPrivProtocol");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 9) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                usmUserEntry->_usmUserPrivKeyChangeLength = vb->syntax_len;
-                usmUserEntry->usmUserPrivKeyChange = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for usmUserPrivKeyChange");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 10) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                usmUserEntry->_usmUserOwnPrivKeyChangeLength = vb->syntax_len;
-                usmUserEntry->usmUserOwnPrivKeyChange = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for usmUserOwnPrivKeyChange");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 11) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                usmUserEntry->_usmUserPublicLength = vb->syntax_len;
-                usmUserEntry->usmUserPublic = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for usmUserPublic");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 12) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                usmUserEntry->usmUserStorageType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for usmUserStorageType");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 13) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                usmUserEntry->usmUserStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for usmUserStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _usmUserEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 3:
+            usmUserEntry->_usmUserSecurityNameLength = vb->syntax_len;
+            usmUserEntry->usmUserSecurityName = vb->syntax.uc;
+            break;
+        case 4:
+            usmUserEntry->_usmUserCloneFromLength = vb->syntax_len / sizeof(guint32);
+            usmUserEntry->usmUserCloneFrom = vb->syntax.ui32;
+            break;
+        case 5:
+            usmUserEntry->_usmUserAuthProtocolLength = vb->syntax_len / sizeof(guint32);
+            usmUserEntry->usmUserAuthProtocol = vb->syntax.ui32;
+            break;
+        case 6:
+            usmUserEntry->_usmUserAuthKeyChangeLength = vb->syntax_len;
+            usmUserEntry->usmUserAuthKeyChange = vb->syntax.uc;
+            break;
+        case 7:
+            usmUserEntry->_usmUserOwnAuthKeyChangeLength = vb->syntax_len;
+            usmUserEntry->usmUserOwnAuthKeyChange = vb->syntax.uc;
+            break;
+        case 8:
+            usmUserEntry->_usmUserPrivProtocolLength = vb->syntax_len / sizeof(guint32);
+            usmUserEntry->usmUserPrivProtocol = vb->syntax.ui32;
+            break;
+        case 9:
+            usmUserEntry->_usmUserPrivKeyChangeLength = vb->syntax_len;
+            usmUserEntry->usmUserPrivKeyChange = vb->syntax.uc;
+            break;
+        case 10:
+            usmUserEntry->_usmUserOwnPrivKeyChangeLength = vb->syntax_len;
+            usmUserEntry->usmUserOwnPrivKeyChange = vb->syntax.uc;
+            break;
+        case 11:
+            usmUserEntry->_usmUserPublicLength = vb->syntax_len;
+            usmUserEntry->usmUserPublic = vb->syntax.uc;
+            break;
+        case 12:
+            usmUserEntry->usmUserStorageType = &(vb->syntax.i32[0]);
+            break;
+        case 13:
+            usmUserEntry->usmUserStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return usmUserEntry;
@@ -407,17 +389,7 @@ snmp_user_based_sm_mib_get_usmUserTable(host_snmp *s, usmUserEntry_t ***usmUserE
 
     *usmUserEntry = NULL;
 
-    base[11] = 3; stls_vbl_add_null(&in, base, 12);
-    base[11] = 4; stls_vbl_add_null(&in, base, 12);
-    base[11] = 5; stls_vbl_add_null(&in, base, 12);
-    base[11] = 6; stls_vbl_add_null(&in, base, 12);
-    base[11] = 7; stls_vbl_add_null(&in, base, 12);
-    base[11] = 8; stls_vbl_add_null(&in, base, 12);
-    base[11] = 9; stls_vbl_add_null(&in, base, 12);
-    base[11] = 10; stls_vbl_add_null(&in, base, 12);
-    base[11] = 11; stls_vbl_add_null(&in, base, 12);
-    base[11] = 12; stls_vbl_add_null(&in, base, 12);
-    base[11] = 13; stls_vbl_add_null(&in, base, 12);
+    stls_vbl_attributes(s, &in, base, 11, _usmUserEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

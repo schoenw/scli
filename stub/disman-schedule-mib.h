@@ -3,12 +3,20 @@
  * version 0.2.14 for the stools package.
  *
  * Derived from DISMAN-SCHEDULE-MIB:
- *   This MIB module defines a MIB which provides mechanisms
- *   to schedule SNMP set operations periodically or at
- *   specific points in time.
+ *   This MIB module defines a MIB which provides mechanisms to
+ *   schedule SNMP set operations periodically or at specific
+ *   points in time.
+ *
+ * Revision 2001-03-01 00:00:
+ *   Revised version, published as RFC XXXX.
+ *   
+ *   This revision introduces a new object type called
+ *   schedTriggers. Several clarifications have been added
+ *   to remove ambiguities that were discovered and reported
+ *   by implementors.
  *
  * Revision 1998-11-17 18:00:
- *   [Revision added by libsmi due to a LAST-UPDATED clause.]
+ *   Initial version, published as RFC 2591.
  *
  * $Id$
  */
@@ -133,6 +141,7 @@ typedef struct schedEntry {
     gsize    _schedLastFailedLength;
     gint32   *schedStorageType;
     gint32   *schedRowStatus;
+    guint32  *schedTriggers;
 } schedEntry_t;
 
 extern int

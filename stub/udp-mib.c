@@ -17,6 +17,21 @@
 
 #include "udp-mib.h"
 
+static stls_stub_attr_t _udp[] = {
+    { 1, G_SNMP_COUNTER32, "udpInDatagrams" },
+    { 2, G_SNMP_COUNTER32, "udpNoPorts" },
+    { 3, G_SNMP_COUNTER32, "udpInErrors" },
+    { 4, G_SNMP_COUNTER32, "udpOutDatagrams" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _udpEntry[] = {
+    { 1, G_SNMP_IPADDRESS, "udpLocalAddress" },
+    { 2, G_SNMP_INTEGER32, "udpLocalPort" },
+    { 0, 0, NULL }
+};
+
+
 udp_t *
 udp_mib_new_udp()
 {
@@ -31,6 +46,7 @@ assign_udp(GSList *vbl)
 {
     GSList *elem;
     udp_t *udp;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 7};
 
@@ -44,42 +60,24 @@ assign_udp(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 8 && vb->id[7] == 1) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                udp->udpInDatagrams = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for udpInDatagrams");
-            }
-        }
-        if (vb->id_len > 8 && vb->id[7] == 2) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                udp->udpNoPorts = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for udpNoPorts");
-            }
-        }
-        if (vb->id_len > 8 && vb->id[7] == 3) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                udp->udpInErrors = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for udpInErrors");
-            }
-        }
-        if (vb->id_len > 8 && vb->id[7] == 4) {
-            if (vb->type == G_SNMP_COUNTER32) {
-                udp->udpOutDatagrams = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for udpOutDatagrams");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _udp, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            udp->udpInDatagrams = &(vb->syntax.ui32[0]);
+            break;
+        case 2:
+            udp->udpNoPorts = &(vb->syntax.ui32[0]);
+            break;
+        case 3:
+            udp->udpInErrors = &(vb->syntax.ui32[0]);
+            break;
+        case 4:
+            udp->udpOutDatagrams = &(vb->syntax.ui32[0]);
+            break;
+        };
     }
 
     return udp;
@@ -93,10 +91,7 @@ udp_mib_get_udp(host_snmp *s, udp_t **udp)
 
     *udp = NULL;
 
-    base[7] = 1; stls_vbl_add_null(&in, base, 8);
-    base[7] = 2; stls_vbl_add_null(&in, base, 8);
-    base[7] = 3; stls_vbl_add_null(&in, base, 8);
-    base[7] = 4; stls_vbl_add_null(&in, base, 8);
+    stls_vbl_attributes(s, &in, base, 7, _udp);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -153,6 +148,7 @@ assign_udpEntry(GSList *vbl)
 {
     GSList *elem;
     udpEntry_t *udpEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 7, 5, 1};
 
@@ -172,14 +168,12 @@ assign_udpEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _udpEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        };
     }
 
     return udpEntry;
@@ -195,8 +189,7 @@ udp_mib_get_udpTable(host_snmp *s, udpEntry_t ***udpEntry)
 
     *udpEntry = NULL;
 
-    base[9] = 1; stls_vbl_add_null(&in, base, 10);
-    base[9] = 2; stls_vbl_add_null(&in, base, 10);
+    stls_vbl_attributes(s, &in, base, 9, _udpEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

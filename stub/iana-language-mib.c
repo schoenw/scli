@@ -36,3 +36,44 @@
 
 #include "iana-language-mib.h"
 
+static guint32 const ianaLangJavaByteCode[]
+	= { IANA_LANGUAGE_MIB_IANALANGJAVABYTECODE };
+static guint32 const ianaLangTcl[]
+	= { IANA_LANGUAGE_MIB_IANALANGTCL };
+static guint32 const ianaLangPerl[]
+	= { IANA_LANGUAGE_MIB_IANALANGPERL };
+static guint32 const ianaLangScheme[]
+	= { IANA_LANGUAGE_MIB_IANALANGSCHEME };
+static guint32 const ianaLangSRSL[]
+	= { IANA_LANGUAGE_MIB_IANALANGSRSL };
+static guint32 const ianaLangPSL[]
+	= { IANA_LANGUAGE_MIB_IANALANGPSL };
+static guint32 const ianaLangSMSL[]
+	= { IANA_LANGUAGE_MIB_IANALANGSMSL };
+
+stls_identity_t const iana_language_mib_identities[] = {
+    { ianaLangJavaByteCode,
+      sizeof(ianaLangJavaByteCode)/sizeof(guint32),
+      "ianaLangJavaByteCode" },
+    { ianaLangTcl,
+      sizeof(ianaLangTcl)/sizeof(guint32),
+      "ianaLangTcl" },
+    { ianaLangPerl,
+      sizeof(ianaLangPerl)/sizeof(guint32),
+      "ianaLangPerl" },
+    { ianaLangScheme,
+      sizeof(ianaLangScheme)/sizeof(guint32),
+      "ianaLangScheme" },
+    { ianaLangSRSL,
+      sizeof(ianaLangSRSL)/sizeof(guint32),
+      "ianaLangSRSL" },
+    { ianaLangPSL,
+      sizeof(ianaLangPSL)/sizeof(guint32),
+      "ianaLangPSL" },
+    { ianaLangSMSL,
+      sizeof(ianaLangSMSL)/sizeof(guint32),
+      "ianaLangSMSL" },
+    { 0, 0, NULL }
+};
+
+

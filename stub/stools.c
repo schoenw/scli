@@ -83,6 +83,8 @@ stls_enum_get_label(stls_enum_t const *table, gint32 const id)
     return NULL;
 }
 
+
+
 gint32
 stls_enum_get_number(stls_enum_t const *table, char const *str)
 {
@@ -97,6 +99,8 @@ stls_enum_get_number(stls_enum_t const *table, char const *str)
     return 0; /* xxx */
 }
 
+
+
 void
 stls_vbl_add_null(GSList **vbl, guint32 const *oid, gsize const len)
 {
@@ -105,6 +109,8 @@ stls_vbl_add_null(GSList **vbl, guint32 const *oid, gsize const len)
     vb = g_snmp_varbind_new(oid, len, G_SNMP_NULL, NULL, 0);
     *vbl = g_slist_append(*vbl, vb);
 }
+
+
 
 void
 stls_vbl_free(GSList *vbl)
@@ -119,11 +125,66 @@ stls_vbl_free(GSList *vbl)
     }
 }
 
+
+
+void
+stls_vbl_attributes(host_snmp *s, GSList **vbl, guint32 *base, guint idx,
+		    stls_stub_attr_t *attributes)
+{
+    int i;
+
+    for (i = 0; attributes[i].label; i++) {
+	if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
+	    base[idx] = attributes[i].subid;
+	    stls_vbl_add_null(vbl, base, idx + 1);
+	}
+    }
+}
+
+
+
+int
+stls_vb_lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
+	       stls_stub_attr_t *attributes, guint32 *idx)
+{
+    int i;
+
+    if (vb->type == G_SNMP_ENDOFMIBVIEW
+	|| (vb->type == G_SNMP_NOSUCHOBJECT)
+	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+	return -1;
+    }
+    
+    if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
+	return -2;
+    }
+
+    for (i = 0; attributes[i].label; i++) {
+	if (vb->id_len > base_len && vb->id[base_len] == attributes[i].subid) {
+	    if (vb->type != attributes[i].type) {
+		g_warning("illegal type tag 0x%02x for %s",
+			  attributes[i].type, attributes[i].label);
+		g_warning("vb->id_len = %d, base_len = %d, i = %d",
+			  vb->id_len, base_len, i);
+		return -3;
+	    }
+	    *idx = attributes[i].subid;
+	    return 0;
+	}
+    }
+    
+    return -4;
+}
+
+
+
 GSList *
 stls_snmp_getnext(host_snmp *s, GSList *vbl)
 {
     return g_sync_getnext(s, vbl);
 }
+
+
 
 GSList *
 stls_snmp_gettable(host_snmp *s, GSList *in)

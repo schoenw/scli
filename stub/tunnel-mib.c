@@ -58,6 +58,23 @@ stls_enum_t const tunnel_mib_enums_tunnelConfigStatus[] = {
 };
 
 
+static stls_stub_attr_t _tunnelIfEntry[] = {
+    { 1, G_SNMP_IPADDRESS, "tunnelIfLocalAddress" },
+    { 2, G_SNMP_IPADDRESS, "tunnelIfRemoteAddress" },
+    { 3, G_SNMP_INTEGER32, "tunnelIfEncapsMethod" },
+    { 4, G_SNMP_INTEGER32, "tunnelIfHopLimit" },
+    { 5, G_SNMP_INTEGER32, "tunnelIfSecurity" },
+    { 6, G_SNMP_INTEGER32, "tunnelIfTOS" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _tunnelConfigEntry[] = {
+    { 5, G_SNMP_INTEGER32, "tunnelConfigIfIndex" },
+    { 6, G_SNMP_INTEGER32, "tunnelConfigStatus" },
+    { 0, 0, NULL }
+};
+
+
 tunnelIfEntry_t *
 tunnel_mib_new_tunnelIfEntry()
 {
@@ -83,6 +100,7 @@ assign_tunnelIfEntry(GSList *vbl)
 {
     GSList *elem;
     tunnelIfEntry_t *tunnelIfEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 10, 131, 1, 1, 1, 1};
 
@@ -102,56 +120,30 @@ assign_tunnelIfEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 13 && vb->id[12] == 1) {
-            if (vb->type == G_SNMP_IPADDRESS) {
-                tunnelIfEntry->tunnelIfLocalAddress = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for tunnelIfLocalAddress");
-            }
-        }
-        if (vb->id_len > 13 && vb->id[12] == 2) {
-            if (vb->type == G_SNMP_IPADDRESS) {
-                tunnelIfEntry->tunnelIfRemoteAddress = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for tunnelIfRemoteAddress");
-            }
-        }
-        if (vb->id_len > 13 && vb->id[12] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                tunnelIfEntry->tunnelIfEncapsMethod = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for tunnelIfEncapsMethod");
-            }
-        }
-        if (vb->id_len > 13 && vb->id[12] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                tunnelIfEntry->tunnelIfHopLimit = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for tunnelIfHopLimit");
-            }
-        }
-        if (vb->id_len > 13 && vb->id[12] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                tunnelIfEntry->tunnelIfSecurity = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for tunnelIfSecurity");
-            }
-        }
-        if (vb->id_len > 13 && vb->id[12] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                tunnelIfEntry->tunnelIfTOS = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for tunnelIfTOS");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _tunnelIfEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 1:
+            tunnelIfEntry->tunnelIfLocalAddress = vb->syntax.uc;
+            break;
+        case 2:
+            tunnelIfEntry->tunnelIfRemoteAddress = vb->syntax.uc;
+            break;
+        case 3:
+            tunnelIfEntry->tunnelIfEncapsMethod = &(vb->syntax.i32[0]);
+            break;
+        case 4:
+            tunnelIfEntry->tunnelIfHopLimit = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            tunnelIfEntry->tunnelIfSecurity = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            tunnelIfEntry->tunnelIfTOS = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return tunnelIfEntry;
@@ -167,12 +159,7 @@ tunnel_mib_get_tunnelIfTable(host_snmp *s, tunnelIfEntry_t ***tunnelIfEntry)
 
     *tunnelIfEntry = NULL;
 
-    base[12] = 1; stls_vbl_add_null(&in, base, 13);
-    base[12] = 2; stls_vbl_add_null(&in, base, 13);
-    base[12] = 3; stls_vbl_add_null(&in, base, 13);
-    base[12] = 4; stls_vbl_add_null(&in, base, 13);
-    base[12] = 5; stls_vbl_add_null(&in, base, 13);
-    base[12] = 6; stls_vbl_add_null(&in, base, 13);
+    stls_vbl_attributes(s, &in, base, 12, _tunnelIfEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -256,6 +243,7 @@ assign_tunnelConfigEntry(GSList *vbl)
 {
     GSList *elem;
     tunnelConfigEntry_t *tunnelConfigEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 10, 131, 1, 1, 2, 1};
 
@@ -275,28 +263,18 @@ assign_tunnelConfigEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 13 && vb->id[12] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                tunnelConfigEntry->tunnelConfigIfIndex = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for tunnelConfigIfIndex");
-            }
-        }
-        if (vb->id_len > 13 && vb->id[12] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                tunnelConfigEntry->tunnelConfigStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for tunnelConfigStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _tunnelConfigEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 5:
+            tunnelConfigEntry->tunnelConfigIfIndex = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            tunnelConfigEntry->tunnelConfigStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return tunnelConfigEntry;
@@ -312,8 +290,7 @@ tunnel_mib_get_tunnelConfigTable(host_snmp *s, tunnelConfigEntry_t ***tunnelConf
 
     *tunnelConfigEntry = NULL;
 
-    base[12] = 5; stls_vbl_add_null(&in, base, 13);
-    base[12] = 6; stls_vbl_add_null(&in, base, 13);
+    stls_vbl_attributes(s, &in, base, 12, _tunnelConfigEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

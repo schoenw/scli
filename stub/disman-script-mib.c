@@ -6,8 +6,28 @@
  *   This MIB module defines a set of objects that allow to
  *   delegate management scripts to distributed managers.
  *
+ * Revision 2001-04-03 00:00:
+ *   Revised version, published as RFC XXXX.
+ *   
+ *   This revision introduces several new objects: smScriptError,
+ *   smScriptLastChange, smLaunchError, smLaunchLastChange,
+ *   smLaunchRowExpireTime, smRunResultTime, and smRunErrorTime.
+ *   
+ *   The following existing objects were updated: the maximum
+ *   value of smRunLifeTime now disables the timer, an
+ *   autostart value was added to the smLaunchAdminStatus
+ *   object, and a new expired state was added to the
+ *   smLaunchOperStatus object.
+ *   
+ *   A new smScriptException notification has been added to
+ *   support runtime error notifications.
+ *   
+ *   Clarifications have been added in several places to remove
+ *   ambiguities or contradictions that were discovered and
+ *   reported by implementors.
+ *
  * Revision 1999-02-22 18:00:
- *   [Revision added by libsmi due to a LAST-UPDATED clause.]
+ *   Initial version, published as RFC 2592.
  *
  * $Id$
  */
@@ -79,12 +99,14 @@ stls_enum_t const disman_script_mib_enums_smLaunchControl[] = {
 stls_enum_t const disman_script_mib_enums_smLaunchAdminStatus[] = {
     { DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_ENABLED,	"enabled" },
     { DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_DISABLED,	"disabled" },
+    { DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_AUTOSTART,	"autostart" },
     { 0, NULL }
 };
 
 stls_enum_t const disman_script_mib_enums_smLaunchOperStatus[] = {
     { DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_ENABLED,	"enabled" },
     { DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_DISABLED,	"disabled" },
+    { DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_EXPIRED,	"expired" },
     { 0, NULL }
 };
 
@@ -140,6 +162,81 @@ stls_enum_t const disman_script_mib_enums_smRunState[] = {
 };
 
 
+static stls_stub_attr_t _smLangEntry[] = {
+    { 2, G_SNMP_OBJECT_ID, "smLangLanguage" },
+    { 3, G_SNMP_OCTET_STRING, "smLangVersion" },
+    { 4, G_SNMP_OBJECT_ID, "smLangVendor" },
+    { 5, G_SNMP_OCTET_STRING, "smLangRevision" },
+    { 6, G_SNMP_OCTET_STRING, "smLangDescr" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _smExtsnEntry[] = {
+    { 2, G_SNMP_OBJECT_ID, "smExtsnExtension" },
+    { 3, G_SNMP_OCTET_STRING, "smExtsnVersion" },
+    { 4, G_SNMP_OBJECT_ID, "smExtsnVendor" },
+    { 5, G_SNMP_OCTET_STRING, "smExtsnRevision" },
+    { 6, G_SNMP_OCTET_STRING, "smExtsnDescr" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _smScriptEntry[] = {
+    { 3, G_SNMP_OCTET_STRING, "smScriptDescr" },
+    { 4, G_SNMP_INTEGER32, "smScriptLanguage" },
+    { 5, G_SNMP_OCTET_STRING, "smScriptSource" },
+    { 6, G_SNMP_INTEGER32, "smScriptAdminStatus" },
+    { 7, G_SNMP_INTEGER32, "smScriptOperStatus" },
+    { 8, G_SNMP_INTEGER32, "smScriptStorageType" },
+    { 9, G_SNMP_INTEGER32, "smScriptRowStatus" },
+    { 10, G_SNMP_OCTET_STRING, "smScriptError" },
+    { 11, G_SNMP_OCTET_STRING, "smScriptLastChange" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _smCodeEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, "smCodeText" },
+    { 3, G_SNMP_INTEGER32, "smCodeRowStatus" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _smLaunchEntry[] = {
+    { 3, G_SNMP_OCTET_STRING, "smLaunchScriptOwner" },
+    { 4, G_SNMP_OCTET_STRING, "smLaunchScriptName" },
+    { 5, G_SNMP_OCTET_STRING, "smLaunchArgument" },
+    { 6, G_SNMP_UNSIGNED32, "smLaunchMaxRunning" },
+    { 7, G_SNMP_UNSIGNED32, "smLaunchMaxCompleted" },
+    { 8, G_SNMP_INTEGER32, "smLaunchLifeTime" },
+    { 9, G_SNMP_INTEGER32, "smLaunchExpireTime" },
+    { 10, G_SNMP_INTEGER32, "smLaunchStart" },
+    { 11, G_SNMP_INTEGER32, "smLaunchControl" },
+    { 12, G_SNMP_INTEGER32, "smLaunchAdminStatus" },
+    { 13, G_SNMP_INTEGER32, "smLaunchOperStatus" },
+    { 14, G_SNMP_INTEGER32, "smLaunchRunIndexNext" },
+    { 15, G_SNMP_INTEGER32, "smLaunchStorageType" },
+    { 16, G_SNMP_INTEGER32, "smLaunchRowStatus" },
+    { 17, G_SNMP_OCTET_STRING, "smLaunchError" },
+    { 18, G_SNMP_OCTET_STRING, "smLaunchLastChange" },
+    { 19, G_SNMP_INTEGER32, "smLaunchRowExpireTime" },
+    { 0, 0, NULL }
+};
+
+static stls_stub_attr_t _smRunEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, "smRunArgument" },
+    { 3, G_SNMP_OCTET_STRING, "smRunStartTime" },
+    { 4, G_SNMP_OCTET_STRING, "smRunEndTime" },
+    { 5, G_SNMP_INTEGER32, "smRunLifeTime" },
+    { 6, G_SNMP_INTEGER32, "smRunExpireTime" },
+    { 7, G_SNMP_INTEGER32, "smRunExitCode" },
+    { 8, G_SNMP_OCTET_STRING, "smRunResult" },
+    { 9, G_SNMP_INTEGER32, "smRunControl" },
+    { 10, G_SNMP_INTEGER32, "smRunState" },
+    { 11, G_SNMP_OCTET_STRING, "smRunError" },
+    { 12, G_SNMP_OCTET_STRING, "smRunResultTime" },
+    { 13, G_SNMP_OCTET_STRING, "smRunErrorTime" },
+    { 0, 0, NULL }
+};
+
+
 smLangEntry_t *
 disman_script_mib_new_smLangEntry()
 {
@@ -165,6 +262,7 @@ assign_smLangEntry(GSList *vbl)
 {
     GSList *elem;
     smLangEntry_t *smLangEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1};
 
@@ -184,54 +282,32 @@ assign_smLangEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                smLangEntry->_smLangLanguageLength = vb->syntax_len / sizeof(guint32);
-                smLangEntry->smLangLanguage = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for smLangLanguage");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smLangEntry->_smLangVersionLength = vb->syntax_len;
-                smLangEntry->smLangVersion = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smLangVersion");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                smLangEntry->_smLangVendorLength = vb->syntax_len / sizeof(guint32);
-                smLangEntry->smLangVendor = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for smLangVendor");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smLangEntry->_smLangRevisionLength = vb->syntax_len;
-                smLangEntry->smLangRevision = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smLangRevision");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smLangEntry->_smLangDescrLength = vb->syntax_len;
-                smLangEntry->smLangDescr = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smLangDescr");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _smLangEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            smLangEntry->_smLangLanguageLength = vb->syntax_len / sizeof(guint32);
+            smLangEntry->smLangLanguage = vb->syntax.ui32;
+            break;
+        case 3:
+            smLangEntry->_smLangVersionLength = vb->syntax_len;
+            smLangEntry->smLangVersion = vb->syntax.uc;
+            break;
+        case 4:
+            smLangEntry->_smLangVendorLength = vb->syntax_len / sizeof(guint32);
+            smLangEntry->smLangVendor = vb->syntax.ui32;
+            break;
+        case 5:
+            smLangEntry->_smLangRevisionLength = vb->syntax_len;
+            smLangEntry->smLangRevision = vb->syntax.uc;
+            break;
+        case 6:
+            smLangEntry->_smLangDescrLength = vb->syntax_len;
+            smLangEntry->smLangDescr = vb->syntax.uc;
+            break;
+        };
     }
 
     return smLangEntry;
@@ -247,11 +323,7 @@ disman_script_mib_get_smLangTable(host_snmp *s, smLangEntry_t ***smLangEntry)
 
     *smLangEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _smLangEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -325,6 +397,7 @@ assign_smExtsnEntry(GSList *vbl)
 {
     GSList *elem;
     smExtsnEntry_t *smExtsnEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1};
 
@@ -344,54 +417,32 @@ assign_smExtsnEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 11 && vb->id[10] == 2) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                smExtsnEntry->_smExtsnExtensionLength = vb->syntax_len / sizeof(guint32);
-                smExtsnEntry->smExtsnExtension = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for smExtsnExtension");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smExtsnEntry->_smExtsnVersionLength = vb->syntax_len;
-                smExtsnEntry->smExtsnVersion = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smExtsnVersion");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 4) {
-            if (vb->type == G_SNMP_OBJECT_ID) {
-                smExtsnEntry->_smExtsnVendorLength = vb->syntax_len / sizeof(guint32);
-                smExtsnEntry->smExtsnVendor = vb->syntax.ui32;
-            } else {
-                g_warning("illegal type for smExtsnVendor");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 5) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smExtsnEntry->_smExtsnRevisionLength = vb->syntax_len;
-                smExtsnEntry->smExtsnRevision = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smExtsnRevision");
-            }
-        }
-        if (vb->id_len > 11 && vb->id[10] == 6) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smExtsnEntry->_smExtsnDescrLength = vb->syntax_len;
-                smExtsnEntry->smExtsnDescr = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smExtsnDescr");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _smExtsnEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            smExtsnEntry->_smExtsnExtensionLength = vb->syntax_len / sizeof(guint32);
+            smExtsnEntry->smExtsnExtension = vb->syntax.ui32;
+            break;
+        case 3:
+            smExtsnEntry->_smExtsnVersionLength = vb->syntax_len;
+            smExtsnEntry->smExtsnVersion = vb->syntax.uc;
+            break;
+        case 4:
+            smExtsnEntry->_smExtsnVendorLength = vb->syntax_len / sizeof(guint32);
+            smExtsnEntry->smExtsnVendor = vb->syntax.ui32;
+            break;
+        case 5:
+            smExtsnEntry->_smExtsnRevisionLength = vb->syntax_len;
+            smExtsnEntry->smExtsnRevision = vb->syntax.uc;
+            break;
+        case 6:
+            smExtsnEntry->_smExtsnDescrLength = vb->syntax_len;
+            smExtsnEntry->smExtsnDescr = vb->syntax.uc;
+            break;
+        };
     }
 
     return smExtsnEntry;
@@ -407,11 +458,7 @@ disman_script_mib_get_smExtsnTable(host_snmp *s, smExtsnEntry_t ***smExtsnEntry)
 
     *smExtsnEntry = NULL;
 
-    base[10] = 2; stls_vbl_add_null(&in, base, 11);
-    base[10] = 3; stls_vbl_add_null(&in, base, 11);
-    base[10] = 4; stls_vbl_add_null(&in, base, 11);
-    base[10] = 5; stls_vbl_add_null(&in, base, 11);
-    base[10] = 6; stls_vbl_add_null(&in, base, 11);
+    stls_vbl_attributes(s, &in, base, 10, _smExtsnEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -495,6 +542,7 @@ assign_smScriptEntry(GSList *vbl)
 {
     GSList *elem;
     smScriptEntry_t *smScriptEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1};
 
@@ -514,65 +562,43 @@ assign_smScriptEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 12 && vb->id[11] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smScriptEntry->_smScriptDescrLength = vb->syntax_len;
-                smScriptEntry->smScriptDescr = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smScriptDescr");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 4) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smScriptEntry->smScriptLanguage = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smScriptLanguage");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 5) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smScriptEntry->_smScriptSourceLength = vb->syntax_len;
-                smScriptEntry->smScriptSource = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smScriptSource");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smScriptEntry->smScriptAdminStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smScriptAdminStatus");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smScriptEntry->smScriptOperStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smScriptOperStatus");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 8) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smScriptEntry->smScriptStorageType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smScriptStorageType");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 9) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smScriptEntry->smScriptRowStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smScriptRowStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _smScriptEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 3:
+            smScriptEntry->_smScriptDescrLength = vb->syntax_len;
+            smScriptEntry->smScriptDescr = vb->syntax.uc;
+            break;
+        case 4:
+            smScriptEntry->smScriptLanguage = &(vb->syntax.i32[0]);
+            break;
+        case 5:
+            smScriptEntry->_smScriptSourceLength = vb->syntax_len;
+            smScriptEntry->smScriptSource = vb->syntax.uc;
+            break;
+        case 6:
+            smScriptEntry->smScriptAdminStatus = &(vb->syntax.i32[0]);
+            break;
+        case 7:
+            smScriptEntry->smScriptOperStatus = &(vb->syntax.i32[0]);
+            break;
+        case 8:
+            smScriptEntry->smScriptStorageType = &(vb->syntax.i32[0]);
+            break;
+        case 9:
+            smScriptEntry->smScriptRowStatus = &(vb->syntax.i32[0]);
+            break;
+        case 10:
+            smScriptEntry->_smScriptErrorLength = vb->syntax_len;
+            smScriptEntry->smScriptError = vb->syntax.uc;
+            break;
+        case 11:
+            smScriptEntry->_smScriptLastChangeLength = vb->syntax_len;
+            smScriptEntry->smScriptLastChange = vb->syntax.uc;
+            break;
+        };
     }
 
     return smScriptEntry;
@@ -588,13 +614,7 @@ disman_script_mib_get_smScriptTable(host_snmp *s, smScriptEntry_t ***smScriptEnt
 
     *smScriptEntry = NULL;
 
-    base[11] = 3; stls_vbl_add_null(&in, base, 12);
-    base[11] = 4; stls_vbl_add_null(&in, base, 12);
-    base[11] = 5; stls_vbl_add_null(&in, base, 12);
-    base[11] = 6; stls_vbl_add_null(&in, base, 12);
-    base[11] = 7; stls_vbl_add_null(&in, base, 12);
-    base[11] = 8; stls_vbl_add_null(&in, base, 12);
-    base[11] = 9; stls_vbl_add_null(&in, base, 12);
+    stls_vbl_attributes(s, &in, base, 11, _smScriptEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -680,6 +700,7 @@ assign_smCodeEntry(GSList *vbl)
 {
     GSList *elem;
     smCodeEntry_t *smCodeEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 2, 1};
 
@@ -699,29 +720,19 @@ assign_smCodeEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 12 && vb->id[11] == 2) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smCodeEntry->_smCodeTextLength = vb->syntax_len;
-                smCodeEntry->smCodeText = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smCodeText");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 3) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smCodeEntry->smCodeRowStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smCodeRowStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _smCodeEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            smCodeEntry->_smCodeTextLength = vb->syntax_len;
+            smCodeEntry->smCodeText = vb->syntax.uc;
+            break;
+        case 3:
+            smCodeEntry->smCodeRowStatus = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return smCodeEntry;
@@ -737,8 +748,7 @@ disman_script_mib_get_smCodeTable(host_snmp *s, smCodeEntry_t ***smCodeEntry)
 
     *smCodeEntry = NULL;
 
-    base[11] = 2; stls_vbl_add_null(&in, base, 12);
-    base[11] = 3; stls_vbl_add_null(&in, base, 12);
+    stls_vbl_attributes(s, &in, base, 11, _smCodeEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -822,6 +832,7 @@ assign_smLaunchEntry(GSList *vbl)
 {
     GSList *elem;
     smLaunchEntry_t *smLaunchEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1};
 
@@ -841,115 +852,68 @@ assign_smLaunchEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 12 && vb->id[11] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smLaunchEntry->_smLaunchScriptOwnerLength = vb->syntax_len;
-                smLaunchEntry->smLaunchScriptOwner = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smLaunchScriptOwner");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 4) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smLaunchEntry->_smLaunchScriptNameLength = vb->syntax_len;
-                smLaunchEntry->smLaunchScriptName = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smLaunchScriptName");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 5) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smLaunchEntry->_smLaunchArgumentLength = vb->syntax_len;
-                smLaunchEntry->smLaunchArgument = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smLaunchArgument");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 6) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
-                smLaunchEntry->smLaunchMaxRunning = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for smLaunchMaxRunning");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 7) {
-            if (vb->type == G_SNMP_UNSIGNED32) {
-                smLaunchEntry->smLaunchMaxCompleted = &(vb->syntax.ui32[0]);
-            } else {
-                g_warning("illegal type for smLaunchMaxCompleted");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 8) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smLaunchEntry->smLaunchLifeTime = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smLaunchLifeTime");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 9) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smLaunchEntry->smLaunchExpireTime = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smLaunchExpireTime");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 10) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smLaunchEntry->smLaunchStart = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smLaunchStart");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 11) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smLaunchEntry->smLaunchControl = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smLaunchControl");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 12) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smLaunchEntry->smLaunchAdminStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smLaunchAdminStatus");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 13) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smLaunchEntry->smLaunchOperStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smLaunchOperStatus");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 14) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smLaunchEntry->smLaunchRunIndexNext = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smLaunchRunIndexNext");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 15) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smLaunchEntry->smLaunchStorageType = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smLaunchStorageType");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 16) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smLaunchEntry->smLaunchRowStatus = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smLaunchRowStatus");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _smLaunchEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 3:
+            smLaunchEntry->_smLaunchScriptOwnerLength = vb->syntax_len;
+            smLaunchEntry->smLaunchScriptOwner = vb->syntax.uc;
+            break;
+        case 4:
+            smLaunchEntry->_smLaunchScriptNameLength = vb->syntax_len;
+            smLaunchEntry->smLaunchScriptName = vb->syntax.uc;
+            break;
+        case 5:
+            smLaunchEntry->_smLaunchArgumentLength = vb->syntax_len;
+            smLaunchEntry->smLaunchArgument = vb->syntax.uc;
+            break;
+        case 6:
+            smLaunchEntry->smLaunchMaxRunning = &(vb->syntax.ui32[0]);
+            break;
+        case 7:
+            smLaunchEntry->smLaunchMaxCompleted = &(vb->syntax.ui32[0]);
+            break;
+        case 8:
+            smLaunchEntry->smLaunchLifeTime = &(vb->syntax.i32[0]);
+            break;
+        case 9:
+            smLaunchEntry->smLaunchExpireTime = &(vb->syntax.i32[0]);
+            break;
+        case 10:
+            smLaunchEntry->smLaunchStart = &(vb->syntax.i32[0]);
+            break;
+        case 11:
+            smLaunchEntry->smLaunchControl = &(vb->syntax.i32[0]);
+            break;
+        case 12:
+            smLaunchEntry->smLaunchAdminStatus = &(vb->syntax.i32[0]);
+            break;
+        case 13:
+            smLaunchEntry->smLaunchOperStatus = &(vb->syntax.i32[0]);
+            break;
+        case 14:
+            smLaunchEntry->smLaunchRunIndexNext = &(vb->syntax.i32[0]);
+            break;
+        case 15:
+            smLaunchEntry->smLaunchStorageType = &(vb->syntax.i32[0]);
+            break;
+        case 16:
+            smLaunchEntry->smLaunchRowStatus = &(vb->syntax.i32[0]);
+            break;
+        case 17:
+            smLaunchEntry->_smLaunchErrorLength = vb->syntax_len;
+            smLaunchEntry->smLaunchError = vb->syntax.uc;
+            break;
+        case 18:
+            smLaunchEntry->_smLaunchLastChangeLength = vb->syntax_len;
+            smLaunchEntry->smLaunchLastChange = vb->syntax.uc;
+            break;
+        case 19:
+            smLaunchEntry->smLaunchRowExpireTime = &(vb->syntax.i32[0]);
+            break;
+        };
     }
 
     return smLaunchEntry;
@@ -965,20 +929,7 @@ disman_script_mib_get_smLaunchTable(host_snmp *s, smLaunchEntry_t ***smLaunchEnt
 
     *smLaunchEntry = NULL;
 
-    base[11] = 3; stls_vbl_add_null(&in, base, 12);
-    base[11] = 4; stls_vbl_add_null(&in, base, 12);
-    base[11] = 5; stls_vbl_add_null(&in, base, 12);
-    base[11] = 6; stls_vbl_add_null(&in, base, 12);
-    base[11] = 7; stls_vbl_add_null(&in, base, 12);
-    base[11] = 8; stls_vbl_add_null(&in, base, 12);
-    base[11] = 9; stls_vbl_add_null(&in, base, 12);
-    base[11] = 10; stls_vbl_add_null(&in, base, 12);
-    base[11] = 11; stls_vbl_add_null(&in, base, 12);
-    base[11] = 12; stls_vbl_add_null(&in, base, 12);
-    base[11] = 13; stls_vbl_add_null(&in, base, 12);
-    base[11] = 14; stls_vbl_add_null(&in, base, 12);
-    base[11] = 15; stls_vbl_add_null(&in, base, 12);
-    base[11] = 16; stls_vbl_add_null(&in, base, 12);
+    stls_vbl_attributes(s, &in, base, 11, _smLaunchEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1064,6 +1015,7 @@ assign_smRunEntry(GSList *vbl)
 {
     GSList *elem;
     smRunEntry_t *smRunEntry;
+    guint32 idx;
     char *p;
     static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1};
 
@@ -1083,89 +1035,55 @@ assign_smRunEntry(GSList *vbl)
 
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
-        if (vb->type == G_SNMP_ENDOFMIBVIEW
-            || (vb->type == G_SNMP_NOSUCHOBJECT)
-            || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-            continue;
-        }
-        if (memcmp(vb->id, base, sizeof(base)) != 0) {
-            continue;
-        }
-        if (vb->id_len > 12 && vb->id[11] == 2) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smRunEntry->_smRunArgumentLength = vb->syntax_len;
-                smRunEntry->smRunArgument = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smRunArgument");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 3) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smRunEntry->_smRunStartTimeLength = vb->syntax_len;
-                smRunEntry->smRunStartTime = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smRunStartTime");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 4) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smRunEntry->_smRunEndTimeLength = vb->syntax_len;
-                smRunEntry->smRunEndTime = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smRunEndTime");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 5) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smRunEntry->smRunLifeTime = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smRunLifeTime");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 6) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smRunEntry->smRunExpireTime = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smRunExpireTime");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 7) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smRunEntry->smRunExitCode = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smRunExitCode");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 8) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smRunEntry->_smRunResultLength = vb->syntax_len;
-                smRunEntry->smRunResult = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smRunResult");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 9) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smRunEntry->smRunControl = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smRunControl");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 10) {
-            if (vb->type == G_SNMP_INTEGER32) {
-                smRunEntry->smRunState = &(vb->syntax.i32[0]);
-            } else {
-                g_warning("illegal type for smRunState");
-            }
-        }
-        if (vb->id_len > 12 && vb->id[11] == 11) {
-            if (vb->type == G_SNMP_OCTET_STRING) {
-                smRunEntry->_smRunErrorLength = vb->syntax_len;
-                smRunEntry->smRunError = vb->syntax.uc;
-            } else {
-                g_warning("illegal type for smRunError");
-            }
-        }
+
+        if (stls_vb_lookup(vb, base, sizeof(base)/sizeof(guint32),
+                           _smRunEntry, &idx) < 0) continue;
+
+        switch (idx) {
+        case 2:
+            smRunEntry->_smRunArgumentLength = vb->syntax_len;
+            smRunEntry->smRunArgument = vb->syntax.uc;
+            break;
+        case 3:
+            smRunEntry->_smRunStartTimeLength = vb->syntax_len;
+            smRunEntry->smRunStartTime = vb->syntax.uc;
+            break;
+        case 4:
+            smRunEntry->_smRunEndTimeLength = vb->syntax_len;
+            smRunEntry->smRunEndTime = vb->syntax.uc;
+            break;
+        case 5:
+            smRunEntry->smRunLifeTime = &(vb->syntax.i32[0]);
+            break;
+        case 6:
+            smRunEntry->smRunExpireTime = &(vb->syntax.i32[0]);
+            break;
+        case 7:
+            smRunEntry->smRunExitCode = &(vb->syntax.i32[0]);
+            break;
+        case 8:
+            smRunEntry->_smRunResultLength = vb->syntax_len;
+            smRunEntry->smRunResult = vb->syntax.uc;
+            break;
+        case 9:
+            smRunEntry->smRunControl = &(vb->syntax.i32[0]);
+            break;
+        case 10:
+            smRunEntry->smRunState = &(vb->syntax.i32[0]);
+            break;
+        case 11:
+            smRunEntry->_smRunErrorLength = vb->syntax_len;
+            smRunEntry->smRunError = vb->syntax.uc;
+            break;
+        case 12:
+            smRunEntry->_smRunResultTimeLength = vb->syntax_len;
+            smRunEntry->smRunResultTime = vb->syntax.uc;
+            break;
+        case 13:
+            smRunEntry->_smRunErrorTimeLength = vb->syntax_len;
+            smRunEntry->smRunErrorTime = vb->syntax.uc;
+            break;
+        };
     }
 
     return smRunEntry;
@@ -1181,16 +1099,7 @@ disman_script_mib_get_smRunTable(host_snmp *s, smRunEntry_t ***smRunEntry)
 
     *smRunEntry = NULL;
 
-    base[11] = 2; stls_vbl_add_null(&in, base, 12);
-    base[11] = 3; stls_vbl_add_null(&in, base, 12);
-    base[11] = 4; stls_vbl_add_null(&in, base, 12);
-    base[11] = 5; stls_vbl_add_null(&in, base, 12);
-    base[11] = 6; stls_vbl_add_null(&in, base, 12);
-    base[11] = 7; stls_vbl_add_null(&in, base, 12);
-    base[11] = 8; stls_vbl_add_null(&in, base, 12);
-    base[11] = 9; stls_vbl_add_null(&in, base, 12);
-    base[11] = 10; stls_vbl_add_null(&in, base, 12);
-    base[11] = 11; stls_vbl_add_null(&in, base, 12);
+    stls_vbl_attributes(s, &in, base, 11, _smRunEntry);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
