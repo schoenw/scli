@@ -298,7 +298,7 @@ assign_prEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prEntry((GSnmpVarBind *) vbl->data, prEntry) < 0) {
-        g_warning("illegal prEntry instance identifier");
+        g_warning("prEntry: invalid instance identifier");
         g_free(prEntry);
         return NULL;
     }
@@ -311,7 +311,10 @@ assign_prEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prNames: value not within DisplayString size constraints");
+                break;
+            }
             prEntry->_prNamesLength = vb->syntax_len;
             prEntry->prNames = vb->syntax.uc;
             break;
@@ -328,7 +331,10 @@ assign_prEntry(GSList *vbl)
             prEntry->prErrorFlag = &(vb->syntax.i32[0]);
             break;
         case 101:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prErrMessage: value not within DisplayString size constraints");
+                break;
+            }
             prEntry->_prErrMessageLength = vb->syntax_len;
             prEntry->prErrMessage = vb->syntax.uc;
             break;
@@ -336,7 +342,10 @@ assign_prEntry(GSList *vbl)
             prEntry->prErrFix = &(vb->syntax.i32[0]);
             break;
         case 103:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prErrFixCmd: value not within DisplayString size constraints");
+                break;
+            }
             prEntry->_prErrFixCmdLength = vb->syntax_len;
             prEntry->prErrFixCmd = vb->syntax.uc;
             break;
@@ -385,7 +394,7 @@ ucd_snmp_mib_get_prEntry(GSnmpSession *s, ucd_snmp_mib_prEntry_t **prEntry, gint
     memcpy(base, oid_prEntry, sizeof(oid_prEntry));
     len = pack_prEntry(base, prIndex);
     if (len < 0) {
-        g_warning("illegal prEntry index values");
+        g_warning("prEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -416,7 +425,7 @@ ucd_snmp_mib_set_prEntry(GSnmpSession *s, ucd_snmp_mib_prEntry_t *prEntry, gint 
     memcpy(base, oid_prEntry, sizeof(oid_prEntry));
     len = pack_prEntry(base, prEntry->prIndex);
     if (len < 0) {
-        g_warning("illegal prEntry index values");
+        g_warning("prEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -498,7 +507,10 @@ assign_memory(GSList *vbl)
             memory->memIndex = &(vb->syntax.i32[0]);
             break;
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("memErrorName: value not within DisplayString size constraints");
+                break;
+            }
             memory->_memErrorNameLength = vb->syntax_len;
             memory->memErrorName = vb->syntax.uc;
             break;
@@ -545,7 +557,10 @@ assign_memory(GSList *vbl)
             memory->memSwapError = &(vb->syntax.i32[0]);
             break;
         case 101:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("memSwapErrorMsg: value not within DisplayString size constraints");
+                break;
+            }
             memory->_memSwapErrorMsgLength = vb->syntax_len;
             memory->memSwapErrorMsg = vb->syntax.uc;
             break;
@@ -636,7 +651,7 @@ assign_extEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_extEntry((GSnmpVarBind *) vbl->data, extEntry) < 0) {
-        g_warning("illegal extEntry instance identifier");
+        g_warning("extEntry: invalid instance identifier");
         g_free(extEntry);
         return NULL;
     }
@@ -649,12 +664,18 @@ assign_extEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("extNames: value not within DisplayString size constraints");
+                break;
+            }
             extEntry->_extNamesLength = vb->syntax_len;
             extEntry->extNames = vb->syntax.uc;
             break;
         case 3:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("extCommand: value not within DisplayString size constraints");
+                break;
+            }
             extEntry->_extCommandLength = vb->syntax_len;
             extEntry->extCommand = vb->syntax.uc;
             break;
@@ -662,7 +683,10 @@ assign_extEntry(GSList *vbl)
             extEntry->extResult = &(vb->syntax.i32[0]);
             break;
         case 101:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("extOutput: value not within DisplayString size constraints");
+                break;
+            }
             extEntry->_extOutputLength = vb->syntax_len;
             extEntry->extOutput = vb->syntax.uc;
             break;
@@ -670,7 +694,10 @@ assign_extEntry(GSList *vbl)
             extEntry->extErrFix = &(vb->syntax.i32[0]);
             break;
         case 103:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("extErrFixCmd: value not within DisplayString size constraints");
+                break;
+            }
             extEntry->_extErrFixCmdLength = vb->syntax_len;
             extEntry->extErrFixCmd = vb->syntax.uc;
             break;
@@ -719,7 +746,7 @@ ucd_snmp_mib_get_extEntry(GSnmpSession *s, ucd_snmp_mib_extEntry_t **extEntry, g
     memcpy(base, oid_extEntry, sizeof(oid_extEntry));
     len = pack_extEntry(base, extIndex);
     if (len < 0) {
-        g_warning("illegal extEntry index values");
+        g_warning("extEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -750,7 +777,7 @@ ucd_snmp_mib_set_extEntry(GSnmpSession *s, ucd_snmp_mib_extEntry_t *extEntry, gi
     memcpy(base, oid_extEntry, sizeof(oid_extEntry));
     len = pack_extEntry(base, extEntry->extIndex);
     if (len < 0) {
-        g_warning("illegal extEntry index values");
+        g_warning("extEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -842,7 +869,7 @@ assign_dskEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_dskEntry((GSnmpVarBind *) vbl->data, dskEntry) < 0) {
-        g_warning("illegal dskEntry instance identifier");
+        g_warning("dskEntry: invalid instance identifier");
         g_free(dskEntry);
         return NULL;
     }
@@ -855,12 +882,18 @@ assign_dskEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("dskPath: value not within DisplayString size constraints");
+                break;
+            }
             dskEntry->_dskPathLength = vb->syntax_len;
             dskEntry->dskPath = vb->syntax.uc;
             break;
         case 3:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("dskDevice: value not within DisplayString size constraints");
+                break;
+            }
             dskEntry->_dskDeviceLength = vb->syntax_len;
             dskEntry->dskDevice = vb->syntax.uc;
             break;
@@ -889,7 +922,10 @@ assign_dskEntry(GSList *vbl)
             dskEntry->dskErrorFlag = &(vb->syntax.i32[0]);
             break;
         case 101:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("dskErrorMsg: value not within DisplayString size constraints");
+                break;
+            }
             dskEntry->_dskErrorMsgLength = vb->syntax_len;
             dskEntry->dskErrorMsg = vb->syntax.uc;
             break;
@@ -938,7 +974,7 @@ ucd_snmp_mib_get_dskEntry(GSnmpSession *s, ucd_snmp_mib_dskEntry_t **dskEntry, g
     memcpy(base, oid_dskEntry, sizeof(oid_dskEntry));
     len = pack_dskEntry(base, dskIndex);
     if (len < 0) {
-        g_warning("illegal dskEntry index values");
+        g_warning("dskEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1031,7 +1067,7 @@ assign_laEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_laEntry((GSnmpVarBind *) vbl->data, laEntry) < 0) {
-        g_warning("illegal laEntry instance identifier");
+        g_warning("laEntry: invalid instance identifier");
         g_free(laEntry);
         return NULL;
     }
@@ -1044,17 +1080,26 @@ assign_laEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("laNames: value not within DisplayString size constraints");
+                break;
+            }
             laEntry->_laNamesLength = vb->syntax_len;
             laEntry->laNames = vb->syntax.uc;
             break;
         case 3:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("laLoad: value not within DisplayString size constraints");
+                break;
+            }
             laEntry->_laLoadLength = vb->syntax_len;
             laEntry->laLoad = vb->syntax.uc;
             break;
         case 4:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("laConfig: value not within DisplayString size constraints");
+                break;
+            }
             laEntry->_laConfigLength = vb->syntax_len;
             laEntry->laConfig = vb->syntax.uc;
             break;
@@ -1062,14 +1107,20 @@ assign_laEntry(GSList *vbl)
             laEntry->laLoadInt = &(vb->syntax.i32[0]);
             break;
         case 6:
-            if (vb->syntax_len != 7) break;
+            if ((vb->syntax_len != 7)) {
+                g_warning("laLoadFloat: value not within Float size constraints");
+                break;
+            }
             laEntry->laLoadFloat = vb->syntax.uc;
             break;
         case 100:
             laEntry->laErrorFlag = &(vb->syntax.i32[0]);
             break;
         case 101:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("laErrMessage: value not within DisplayString size constraints");
+                break;
+            }
             laEntry->_laErrMessageLength = vb->syntax_len;
             laEntry->laErrMessage = vb->syntax.uc;
             break;
@@ -1118,7 +1169,7 @@ ucd_snmp_mib_get_laEntry(GSnmpSession *s, ucd_snmp_mib_laEntry_t **laEntry, gint
     memcpy(base, oid_laEntry, sizeof(oid_laEntry));
     len = pack_laEntry(base, laIndex);
     if (len < 0) {
-        g_warning("illegal laEntry index values");
+        g_warning("laEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1201,7 +1252,10 @@ assign_systemStats(GSList *vbl)
             systemStats->ssIndex = &(vb->syntax.i32[0]);
             break;
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("ssErrorName: value not within DisplayString size constraints");
+                break;
+            }
             systemStats->_ssErrorNameLength = vb->syntax_len;
             systemStats->ssErrorName = vb->syntax.uc;
             break;
@@ -1352,7 +1406,7 @@ assign_fileEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_fileEntry((GSnmpVarBind *) vbl->data, fileEntry) < 0) {
-        g_warning("illegal fileEntry instance identifier");
+        g_warning("fileEntry: invalid instance identifier");
         g_free(fileEntry);
         return NULL;
     }
@@ -1365,7 +1419,10 @@ assign_fileEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("fileName: value not within DisplayString size constraints");
+                break;
+            }
             fileEntry->_fileNameLength = vb->syntax_len;
             fileEntry->fileName = vb->syntax.uc;
             break;
@@ -1379,7 +1436,10 @@ assign_fileEntry(GSList *vbl)
             fileEntry->fileErrorFlag = &(vb->syntax.i32[0]);
             break;
         case 101:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("fileErrorMsg: value not within DisplayString size constraints");
+                break;
+            }
             fileEntry->_fileErrorMsgLength = vb->syntax_len;
             fileEntry->fileErrorMsg = vb->syntax.uc;
             break;
@@ -1428,7 +1488,7 @@ ucd_snmp_mib_get_fileEntry(GSnmpSession *s, ucd_snmp_mib_fileEntry_t **fileEntry
     memcpy(base, oid_fileEntry, sizeof(oid_fileEntry));
     len = pack_fileEntry(base, fileIndex);
     if (len < 0) {
-        g_warning("illegal fileEntry index values");
+        g_warning("fileEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1511,27 +1571,42 @@ assign_version(GSList *vbl)
             version->versionIndex = &(vb->syntax.i32[0]);
             break;
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("versionTag: value not within DisplayString size constraints");
+                break;
+            }
             version->_versionTagLength = vb->syntax_len;
             version->versionTag = vb->syntax.uc;
             break;
         case 3:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("versionDate: value not within DisplayString size constraints");
+                break;
+            }
             version->_versionDateLength = vb->syntax_len;
             version->versionDate = vb->syntax.uc;
             break;
         case 4:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("versionCDate: value not within DisplayString size constraints");
+                break;
+            }
             version->_versionCDateLength = vb->syntax_len;
             version->versionCDate = vb->syntax.uc;
             break;
         case 5:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("versionIdent: value not within DisplayString size constraints");
+                break;
+            }
             version->_versionIdentLength = vb->syntax_len;
             version->versionIdent = vb->syntax.uc;
             break;
         case 6:
-            if (vb->syntax_len > 1023) break;
+            if ((vb->syntax_len > 1023)) {
+                g_warning("versionConfigureOptions: value not within LongDisplayString size constraints");
+                break;
+            }
             version->_versionConfigureOptionsLength = vb->syntax_len;
             version->versionConfigureOptions = vb->syntax.uc;
             break;
@@ -1666,7 +1741,10 @@ assign_snmperrs(GSList *vbl)
             snmperrs->snmperrIndex = &(vb->syntax.i32[0]);
             break;
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("snmperrNames: value not within DisplayString size constraints");
+                break;
+            }
             snmperrs->_snmperrNamesLength = vb->syntax_len;
             snmperrs->snmperrNames = vb->syntax.uc;
             break;
@@ -1674,7 +1752,10 @@ assign_snmperrs(GSList *vbl)
             snmperrs->snmperrErrorFlag = &(vb->syntax.i32[0]);
             break;
         case 101:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("snmperrErrMessage: value not within DisplayString size constraints");
+                break;
+            }
             snmperrs->_snmperrErrMessageLength = vb->syntax_len;
             snmperrs->snmperrErrMessage = vb->syntax.uc;
             break;
@@ -1777,7 +1858,7 @@ assign_mrEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_mrEntry((GSnmpVarBind *) vbl->data, mrEntry) < 0) {
-        g_warning("illegal mrEntry instance identifier");
+        g_warning("mrEntry: invalid instance identifier");
         g_free(mrEntry);
         return NULL;
     }
@@ -1790,7 +1871,10 @@ assign_mrEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("mrModuleName: value not within DisplayString size constraints");
+                break;
+            }
             mrEntry->_mrModuleNameLength = vb->syntax_len;
             mrEntry->mrModuleName = vb->syntax.uc;
             break;
@@ -1839,7 +1923,7 @@ ucd_snmp_mib_get_mrEntry(GSnmpSession *s, ucd_snmp_mib_mrEntry_t **mrEntry, guin
     memcpy(base, oid_mrEntry, sizeof(oid_mrEntry));
     len = pack_mrEntry(base, mrIndex, _mrIndexLength);
     if (len < 0) {
-        g_warning("illegal mrEntry index values");
+        g_warning("mrEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }

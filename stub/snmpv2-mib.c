@@ -181,7 +181,14 @@ assign_system(GSList *vbl)
 
         switch (idx) {
         case 1:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("sysDescr: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("sysDescr: value not within DisplayString size constraints");
+                break;
+            }
             system->_sysDescrLength = vb->syntax_len;
             system->sysDescr = vb->syntax.uc;
             break;
@@ -194,21 +201,46 @@ assign_system(GSList *vbl)
             system->sysUpTime = &(vb->syntax.ui32[0]);
             break;
         case 4:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("sysContact: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("sysContact: value not within DisplayString size constraints");
+                break;
+            }
             system->_sysContactLength = vb->syntax_len;
             system->sysContact = vb->syntax.uc;
             break;
         case 5:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("sysName: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("sysName: value not within DisplayString size constraints");
+                break;
+            }
             system->_sysNameLength = vb->syntax_len;
             system->sysName = vb->syntax.uc;
             break;
         case 6:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("sysLocation: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("sysLocation: value not within DisplayString size constraints");
+                break;
+            }
             system->_sysLocationLength = vb->syntax_len;
             system->sysLocation = vb->syntax.uc;
             break;
         case 7:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 127)) {
+                g_warning("sysServices: value not within range constraints");
+                break;
+            }
             system->sysServices = &(vb->syntax.i32[0]);
             break;
         case 8:
@@ -336,7 +368,7 @@ assign_sysOREntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_sysOREntry((GSnmpVarBind *) vbl->data, sysOREntry) < 0) {
-        g_warning("illegal sysOREntry instance identifier");
+        g_warning("sysOREntry: invalid instance identifier");
         g_free(sysOREntry);
         return NULL;
     }
@@ -354,7 +386,10 @@ assign_sysOREntry(GSList *vbl)
             sysOREntry->sysORID = vb->syntax.ui32;
             break;
         case 3:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("sysORDescr: value not within DisplayString size constraints");
+                break;
+            }
             sysOREntry->_sysORDescrLength = vb->syntax_len;
             sysOREntry->sysORDescr = vb->syntax.uc;
             break;
@@ -406,7 +441,7 @@ snmpv2_mib_get_sysOREntry(GSnmpSession *s, snmpv2_mib_sysOREntry_t **sysOREntry,
     memcpy(base, oid_sysOREntry, sizeof(oid_sysOREntry));
     len = pack_sysOREntry(base, sysORIndex);
     if (len < 0) {
-        g_warning("illegal sysOREntry index values");
+        g_warning("sysOREntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -670,6 +705,10 @@ assign_snmpSet(GSList *vbl)
 
         switch (idx) {
         case 1:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("snmpSetSerialNo: value not within TestAndIncr range constraints");
+                break;
+            }
             snmpSet->snmpSetSerialNo = &(vb->syntax.i32[0]);
             break;
         };

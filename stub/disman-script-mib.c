@@ -355,7 +355,7 @@ assign_smLangEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_smLangEntry((GSnmpVarBind *) vbl->data, smLangEntry) < 0) {
-        g_warning("illegal smLangEntry instance identifier");
+        g_warning("smLangEntry: invalid instance identifier");
         g_free(smLangEntry);
         return NULL;
     }
@@ -373,7 +373,14 @@ assign_smLangEntry(GSList *vbl)
             smLangEntry->smLangLanguage = vb->syntax.ui32;
             break;
         case 3:
-            if (vb->syntax_len > 32) break;
+            if ((vb->syntax_len > 32)) {
+                g_warning("smLangVersion: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("smLangVersion: value not within SnmpAdminString size constraints");
+                break;
+            }
             smLangEntry->_smLangVersionLength = vb->syntax_len;
             smLangEntry->smLangVersion = vb->syntax.uc;
             break;
@@ -383,12 +390,22 @@ assign_smLangEntry(GSList *vbl)
             smLangEntry->smLangVendor = vb->syntax.ui32;
             break;
         case 5:
-            if (vb->syntax_len > 32) break;
+            if ((vb->syntax_len > 32)) {
+                g_warning("smLangRevision: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("smLangRevision: value not within SnmpAdminString size constraints");
+                break;
+            }
             smLangEntry->_smLangRevisionLength = vb->syntax_len;
             smLangEntry->smLangRevision = vb->syntax.uc;
             break;
         case 6:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("smLangDescr: value not within SnmpAdminString size constraints");
+                break;
+            }
             smLangEntry->_smLangDescrLength = vb->syntax_len;
             smLangEntry->smLangDescr = vb->syntax.uc;
             break;
@@ -437,7 +454,7 @@ disman_script_mib_get_smLangEntry(GSnmpSession *s, disman_script_mib_smLangEntry
     memcpy(base, oid_smLangEntry, sizeof(oid_smLangEntry));
     len = pack_smLangEntry(base, smLangIndex);
     if (len < 0) {
-        g_warning("illegal smLangEntry index values");
+        g_warning("smLangEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -533,7 +550,7 @@ assign_smExtsnEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_smExtsnEntry((GSnmpVarBind *) vbl->data, smExtsnEntry) < 0) {
-        g_warning("illegal smExtsnEntry instance identifier");
+        g_warning("smExtsnEntry: invalid instance identifier");
         g_free(smExtsnEntry);
         return NULL;
     }
@@ -551,7 +568,14 @@ assign_smExtsnEntry(GSList *vbl)
             smExtsnEntry->smExtsnExtension = vb->syntax.ui32;
             break;
         case 3:
-            if (vb->syntax_len > 32) break;
+            if ((vb->syntax_len > 32)) {
+                g_warning("smExtsnVersion: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("smExtsnVersion: value not within SnmpAdminString size constraints");
+                break;
+            }
             smExtsnEntry->_smExtsnVersionLength = vb->syntax_len;
             smExtsnEntry->smExtsnVersion = vb->syntax.uc;
             break;
@@ -561,12 +585,22 @@ assign_smExtsnEntry(GSList *vbl)
             smExtsnEntry->smExtsnVendor = vb->syntax.ui32;
             break;
         case 5:
-            if (vb->syntax_len > 32) break;
+            if ((vb->syntax_len > 32)) {
+                g_warning("smExtsnRevision: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("smExtsnRevision: value not within SnmpAdminString size constraints");
+                break;
+            }
             smExtsnEntry->_smExtsnRevisionLength = vb->syntax_len;
             smExtsnEntry->smExtsnRevision = vb->syntax.uc;
             break;
         case 6:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("smExtsnDescr: value not within SnmpAdminString size constraints");
+                break;
+            }
             smExtsnEntry->_smExtsnDescrLength = vb->syntax_len;
             smExtsnEntry->smExtsnDescr = vb->syntax.uc;
             break;
@@ -615,7 +649,7 @@ disman_script_mib_get_smExtsnEntry(GSnmpSession *s, disman_script_mib_smExtsnEnt
     memcpy(base, oid_smExtsnEntry, sizeof(oid_smExtsnEntry));
     len = pack_smExtsnEntry(base, smLangIndex, smExtsnIndex);
     if (len < 0) {
-        g_warning("illegal smExtsnEntry index values");
+        g_warning("smExtsnEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -737,7 +771,7 @@ assign_smScriptEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_smScriptEntry((GSnmpVarBind *) vbl->data, smScriptEntry) < 0) {
-        g_warning("illegal smScriptEntry instance identifier");
+        g_warning("smScriptEntry: invalid instance identifier");
         g_free(smScriptEntry);
         return NULL;
     }
@@ -750,15 +784,25 @@ assign_smScriptEntry(GSList *vbl)
 
         switch (idx) {
         case 3:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("smScriptDescr: value not within SnmpAdminString size constraints");
+                break;
+            }
             smScriptEntry->_smScriptDescrLength = vb->syntax_len;
             smScriptEntry->smScriptDescr = vb->syntax.uc;
             break;
         case 4:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("smScriptLanguage: value not within range constraints");
+                break;
+            }
             smScriptEntry->smScriptLanguage = &(vb->syntax.i32[0]);
             break;
         case 5:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("smScriptSource: value not within DisplayString size constraints");
+                break;
+            }
             smScriptEntry->_smScriptSourceLength = vb->syntax_len;
             smScriptEntry->smScriptSource = vb->syntax.uc;
             break;
@@ -775,12 +819,19 @@ assign_smScriptEntry(GSList *vbl)
             smScriptEntry->smScriptRowStatus = &(vb->syntax.i32[0]);
             break;
         case 10:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("smScriptError: value not within SnmpAdminString size constraints");
+                break;
+            }
             smScriptEntry->_smScriptErrorLength = vb->syntax_len;
             smScriptEntry->smScriptError = vb->syntax.uc;
             break;
         case 11:
-            if (vb->syntax_len < 8 || vb->syntax_len > 11) break;
+            if ((vb->syntax_len != 8)
+                && (vb->syntax_len != 11)) {
+                g_warning("smScriptLastChange: value not within DateAndTime size constraints");
+                break;
+            }
             smScriptEntry->_smScriptLastChangeLength = vb->syntax_len;
             smScriptEntry->smScriptLastChange = vb->syntax.uc;
             break;
@@ -829,7 +880,7 @@ disman_script_mib_get_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptE
     memcpy(base, oid_smScriptEntry, sizeof(oid_smScriptEntry));
     len = pack_smScriptEntry(base, smScriptOwner, _smScriptOwnerLength, smScriptName, _smScriptNameLength);
     if (len < 0) {
-        g_warning("illegal smScriptEntry index values");
+        g_warning("smScriptEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -860,7 +911,7 @@ disman_script_mib_set_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptE
     memcpy(base, oid_smScriptEntry, sizeof(oid_smScriptEntry));
     len = pack_smScriptEntry(base, smScriptEntry->smScriptOwner, smScriptEntry->_smScriptOwnerLength, smScriptEntry->smScriptName, smScriptEntry->_smScriptNameLength);
     if (len < 0) {
-        g_warning("illegal smScriptEntry index values");
+        g_warning("smScriptEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1014,7 +1065,7 @@ assign_smCodeEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_smCodeEntry((GSnmpVarBind *) vbl->data, smCodeEntry) < 0) {
-        g_warning("illegal smCodeEntry instance identifier");
+        g_warning("smCodeEntry: invalid instance identifier");
         g_free(smCodeEntry);
         return NULL;
     }
@@ -1027,7 +1078,10 @@ assign_smCodeEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len < 1 || vb->syntax_len > 1024) break;
+            if ((vb->syntax_len < 1 || vb->syntax_len > 1024)) {
+                g_warning("smCodeText: value not within size constraints");
+                break;
+            }
             smCodeEntry->_smCodeTextLength = vb->syntax_len;
             smCodeEntry->smCodeText = vb->syntax.uc;
             break;
@@ -1079,7 +1133,7 @@ disman_script_mib_get_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry
     memcpy(base, oid_smCodeEntry, sizeof(oid_smCodeEntry));
     len = pack_smCodeEntry(base, smScriptOwner, _smScriptOwnerLength, smScriptName, _smScriptNameLength, smCodeIndex);
     if (len < 0) {
-        g_warning("illegal smCodeEntry index values");
+        g_warning("smCodeEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1110,7 +1164,7 @@ disman_script_mib_set_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry
     memcpy(base, oid_smCodeEntry, sizeof(oid_smCodeEntry));
     len = pack_smCodeEntry(base, smCodeEntry->smScriptOwner, smCodeEntry->_smScriptOwnerLength, smCodeEntry->smScriptName, smCodeEntry->_smScriptNameLength, smCodeEntry->smCodeIndex);
     if (len < 0) {
-        g_warning("illegal smCodeEntry index values");
+        g_warning("smCodeEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1237,7 +1291,7 @@ assign_smLaunchEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_smLaunchEntry((GSnmpVarBind *) vbl->data, smLaunchEntry) < 0) {
-        g_warning("illegal smLaunchEntry instance identifier");
+        g_warning("smLaunchEntry: invalid instance identifier");
         g_free(smLaunchEntry);
         return NULL;
     }
@@ -1250,12 +1304,26 @@ assign_smLaunchEntry(GSList *vbl)
 
         switch (idx) {
         case 3:
-            if (vb->syntax_len > 32) break;
+            if ((vb->syntax_len > 32)) {
+                g_warning("smLaunchScriptOwner: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("smLaunchScriptOwner: value not within SnmpAdminString size constraints");
+                break;
+            }
             smLaunchEntry->_smLaunchScriptOwnerLength = vb->syntax_len;
             smLaunchEntry->smLaunchScriptOwner = vb->syntax.uc;
             break;
         case 4:
-            if (vb->syntax_len > 32) break;
+            if ((vb->syntax_len > 32)) {
+                g_warning("smLaunchScriptName: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("smLaunchScriptName: value not within SnmpAdminString size constraints");
+                break;
+            }
             smLaunchEntry->_smLaunchScriptNameLength = vb->syntax_len;
             smLaunchEntry->smLaunchScriptName = vb->syntax.uc;
             break;
@@ -1264,18 +1332,38 @@ assign_smLaunchEntry(GSList *vbl)
             smLaunchEntry->smLaunchArgument = vb->syntax.uc;
             break;
         case 6:
+            if ((vb->syntax.ui32[0] < 1)) {
+                g_warning("smLaunchMaxRunning: value not within range constraints");
+                break;
+            }
             smLaunchEntry->smLaunchMaxRunning = &(vb->syntax.ui32[0]);
             break;
         case 7:
+            if ((vb->syntax.ui32[0] < 1)) {
+                g_warning("smLaunchMaxCompleted: value not within range constraints");
+                break;
+            }
             smLaunchEntry->smLaunchMaxCompleted = &(vb->syntax.ui32[0]);
             break;
         case 8:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("smLaunchLifeTime: value not within TimeInterval range constraints");
+                break;
+            }
             smLaunchEntry->smLaunchLifeTime = &(vb->syntax.i32[0]);
             break;
         case 9:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("smLaunchExpireTime: value not within TimeInterval range constraints");
+                break;
+            }
             smLaunchEntry->smLaunchExpireTime = &(vb->syntax.i32[0]);
             break;
         case 10:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("smLaunchStart: value not within range constraints");
+                break;
+            }
             smLaunchEntry->smLaunchStart = &(vb->syntax.i32[0]);
             break;
         case 11:
@@ -1288,6 +1376,10 @@ assign_smLaunchEntry(GSList *vbl)
             smLaunchEntry->smLaunchOperStatus = &(vb->syntax.i32[0]);
             break;
         case 14:
+            if ((vb->syntax.i32[0] < 1)) {
+                g_warning("smLaunchRunIndexNext: value not within range constraints");
+                break;
+            }
             smLaunchEntry->smLaunchRunIndexNext = &(vb->syntax.i32[0]);
             break;
         case 15:
@@ -1297,16 +1389,27 @@ assign_smLaunchEntry(GSList *vbl)
             smLaunchEntry->smLaunchRowStatus = &(vb->syntax.i32[0]);
             break;
         case 17:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("smLaunchError: value not within SnmpAdminString size constraints");
+                break;
+            }
             smLaunchEntry->_smLaunchErrorLength = vb->syntax_len;
             smLaunchEntry->smLaunchError = vb->syntax.uc;
             break;
         case 18:
-            if (vb->syntax_len < 8 || vb->syntax_len > 11) break;
+            if ((vb->syntax_len != 8)
+                && (vb->syntax_len != 11)) {
+                g_warning("smLaunchLastChange: value not within DateAndTime size constraints");
+                break;
+            }
             smLaunchEntry->_smLaunchLastChangeLength = vb->syntax_len;
             smLaunchEntry->smLaunchLastChange = vb->syntax.uc;
             break;
         case 19:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("smLaunchRowExpireTime: value not within TimeInterval range constraints");
+                break;
+            }
             smLaunchEntry->smLaunchRowExpireTime = &(vb->syntax.i32[0]);
             break;
         };
@@ -1354,7 +1457,7 @@ disman_script_mib_get_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchE
     memcpy(base, oid_smLaunchEntry, sizeof(oid_smLaunchEntry));
     len = pack_smLaunchEntry(base, smLaunchOwner, _smLaunchOwnerLength, smLaunchName, _smLaunchNameLength);
     if (len < 0) {
-        g_warning("illegal smLaunchEntry index values");
+        g_warning("smLaunchEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1385,7 +1488,7 @@ disman_script_mib_set_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchE
     memcpy(base, oid_smLaunchEntry, sizeof(oid_smLaunchEntry));
     len = pack_smLaunchEntry(base, smLaunchEntry->smLaunchOwner, smLaunchEntry->_smLaunchOwnerLength, smLaunchEntry->smLaunchName, smLaunchEntry->_smLaunchNameLength);
     if (len < 0) {
-        g_warning("illegal smLaunchEntry index values");
+        g_warning("smLaunchEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1581,7 +1684,7 @@ assign_smRunEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_smRunEntry((GSnmpVarBind *) vbl->data, smRunEntry) < 0) {
-        g_warning("illegal smRunEntry instance identifier");
+        g_warning("smRunEntry: invalid instance identifier");
         g_free(smRunEntry);
         return NULL;
     }
@@ -1598,19 +1701,35 @@ assign_smRunEntry(GSList *vbl)
             smRunEntry->smRunArgument = vb->syntax.uc;
             break;
         case 3:
-            if (vb->syntax_len < 8 || vb->syntax_len > 11) break;
+            if ((vb->syntax_len != 8)
+                && (vb->syntax_len != 11)) {
+                g_warning("smRunStartTime: value not within DateAndTime size constraints");
+                break;
+            }
             smRunEntry->_smRunStartTimeLength = vb->syntax_len;
             smRunEntry->smRunStartTime = vb->syntax.uc;
             break;
         case 4:
-            if (vb->syntax_len < 8 || vb->syntax_len > 11) break;
+            if ((vb->syntax_len != 8)
+                && (vb->syntax_len != 11)) {
+                g_warning("smRunEndTime: value not within DateAndTime size constraints");
+                break;
+            }
             smRunEntry->_smRunEndTimeLength = vb->syntax_len;
             smRunEntry->smRunEndTime = vb->syntax.uc;
             break;
         case 5:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("smRunLifeTime: value not within TimeInterval range constraints");
+                break;
+            }
             smRunEntry->smRunLifeTime = &(vb->syntax.i32[0]);
             break;
         case 6:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("smRunExpireTime: value not within TimeInterval range constraints");
+                break;
+            }
             smRunEntry->smRunExpireTime = &(vb->syntax.i32[0]);
             break;
         case 7:
@@ -1627,17 +1746,28 @@ assign_smRunEntry(GSList *vbl)
             smRunEntry->smRunState = &(vb->syntax.i32[0]);
             break;
         case 11:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("smRunError: value not within SnmpAdminString size constraints");
+                break;
+            }
             smRunEntry->_smRunErrorLength = vb->syntax_len;
             smRunEntry->smRunError = vb->syntax.uc;
             break;
         case 12:
-            if (vb->syntax_len < 8 || vb->syntax_len > 11) break;
+            if ((vb->syntax_len != 8)
+                && (vb->syntax_len != 11)) {
+                g_warning("smRunResultTime: value not within DateAndTime size constraints");
+                break;
+            }
             smRunEntry->_smRunResultTimeLength = vb->syntax_len;
             smRunEntry->smRunResultTime = vb->syntax.uc;
             break;
         case 13:
-            if (vb->syntax_len < 8 || vb->syntax_len > 11) break;
+            if ((vb->syntax_len != 8)
+                && (vb->syntax_len != 11)) {
+                g_warning("smRunErrorTime: value not within DateAndTime size constraints");
+                break;
+            }
             smRunEntry->_smRunErrorTimeLength = vb->syntax_len;
             smRunEntry->smRunErrorTime = vb->syntax.uc;
             break;
@@ -1686,7 +1816,7 @@ disman_script_mib_get_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t
     memcpy(base, oid_smRunEntry, sizeof(oid_smRunEntry));
     len = pack_smRunEntry(base, smLaunchOwner, _smLaunchOwnerLength, smLaunchName, _smLaunchNameLength, smRunIndex);
     if (len < 0) {
-        g_warning("illegal smRunEntry index values");
+        g_warning("smRunEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1717,7 +1847,7 @@ disman_script_mib_set_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t
     memcpy(base, oid_smRunEntry, sizeof(oid_smRunEntry));
     len = pack_smRunEntry(base, smRunEntry->smLaunchOwner, smRunEntry->_smLaunchOwnerLength, smRunEntry->smLaunchName, smRunEntry->_smLaunchNameLength, smRunEntry->smRunIndex);
     if (len < 0) {
-        g_warning("illegal smRunEntry index values");
+        g_warning("smRunEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }

@@ -572,7 +572,7 @@ assign_ifEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_ifEntry((GSnmpVarBind *) vbl->data, ifEntry) < 0) {
-        g_warning("illegal ifEntry instance identifier");
+        g_warning("ifEntry: invalid instance identifier");
         g_free(ifEntry);
         return NULL;
     }
@@ -585,7 +585,14 @@ assign_ifEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("ifDescr: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("ifDescr: value not within DisplayString size constraints");
+                break;
+            }
             ifEntry->_ifDescrLength = vb->syntax_len;
             ifEntry->ifDescr = vb->syntax.uc;
             break;
@@ -697,7 +704,7 @@ if_mib_get_ifEntry(GSnmpSession *s, if_mib_ifEntry_t **ifEntry, gint32 ifIndex, 
     memcpy(base, oid_ifEntry, sizeof(oid_ifEntry));
     len = pack_ifEntry(base, ifIndex);
     if (len < 0) {
-        g_warning("illegal ifEntry index values");
+        g_warning("ifEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -728,7 +735,7 @@ if_mib_set_ifEntry(GSnmpSession *s, if_mib_ifEntry_t *ifEntry, gint mask)
     memcpy(base, oid_ifEntry, sizeof(oid_ifEntry));
     len = pack_ifEntry(base, ifEntry->ifIndex);
     if (len < 0) {
-        g_warning("illegal ifEntry index values");
+        g_warning("ifEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -899,7 +906,7 @@ assign_ifXEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_ifXEntry((GSnmpVarBind *) vbl->data, ifXEntry) < 0) {
-        g_warning("illegal ifXEntry instance identifier");
+        g_warning("ifXEntry: invalid instance identifier");
         g_free(ifXEntry);
         return NULL;
     }
@@ -912,7 +919,10 @@ assign_ifXEntry(GSList *vbl)
 
         switch (idx) {
         case 1:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("ifName: value not within DisplayString size constraints");
+                break;
+            }
             ifXEntry->_ifNameLength = vb->syntax_len;
             ifXEntry->ifName = vb->syntax.uc;
             break;
@@ -965,7 +975,14 @@ assign_ifXEntry(GSList *vbl)
             ifXEntry->ifConnectorPresent = &(vb->syntax.i32[0]);
             break;
         case 18:
-            if (vb->syntax_len > 64) break;
+            if ((vb->syntax_len > 64)) {
+                g_warning("ifAlias: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("ifAlias: value not within DisplayString size constraints");
+                break;
+            }
             ifXEntry->_ifAliasLength = vb->syntax_len;
             ifXEntry->ifAlias = vb->syntax.uc;
             break;
@@ -1017,7 +1034,7 @@ if_mib_get_ifXEntry(GSnmpSession *s, if_mib_ifXEntry_t **ifXEntry, gint32 ifInde
     memcpy(base, oid_ifXEntry, sizeof(oid_ifXEntry));
     len = pack_ifXEntry(base, ifIndex);
     if (len < 0) {
-        g_warning("illegal ifXEntry index values");
+        g_warning("ifXEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1048,7 +1065,7 @@ if_mib_set_ifXEntry(GSnmpSession *s, if_mib_ifXEntry_t *ifXEntry, gint mask)
     memcpy(base, oid_ifXEntry, sizeof(oid_ifXEntry));
     len = pack_ifXEntry(base, ifXEntry->ifIndex);
     if (len < 0) {
-        g_warning("illegal ifXEntry index values");
+        g_warning("ifXEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1155,7 +1172,7 @@ assign_ifStackEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_ifStackEntry((GSnmpVarBind *) vbl->data, ifStackEntry) < 0) {
-        g_warning("illegal ifStackEntry instance identifier");
+        g_warning("ifStackEntry: invalid instance identifier");
         g_free(ifStackEntry);
         return NULL;
     }
@@ -1215,7 +1232,7 @@ if_mib_get_ifStackEntry(GSnmpSession *s, if_mib_ifStackEntry_t **ifStackEntry, g
     memcpy(base, oid_ifStackEntry, sizeof(oid_ifStackEntry));
     len = pack_ifStackEntry(base, ifStackHigherLayer, ifStackLowerLayer);
     if (len < 0) {
-        g_warning("illegal ifStackEntry index values");
+        g_warning("ifStackEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1246,7 +1263,7 @@ if_mib_set_ifStackEntry(GSnmpSession *s, if_mib_ifStackEntry_t *ifStackEntry, gi
     memcpy(base, oid_ifStackEntry, sizeof(oid_ifStackEntry));
     len = pack_ifStackEntry(base, ifStackEntry->ifStackHigherLayer, ifStackEntry->ifStackLowerLayer);
     if (len < 0) {
-        g_warning("illegal ifStackEntry index values");
+        g_warning("ifStackEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1338,7 +1355,7 @@ assign_ifTestEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_ifTestEntry((GSnmpVarBind *) vbl->data, ifTestEntry) < 0) {
-        g_warning("illegal ifTestEntry instance identifier");
+        g_warning("ifTestEntry: invalid instance identifier");
         g_free(ifTestEntry);
         return NULL;
     }
@@ -1351,6 +1368,10 @@ assign_ifTestEntry(GSList *vbl)
 
         switch (idx) {
         case 1:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("ifTestId: value not within TestAndIncr range constraints");
+                break;
+            }
             ifTestEntry->ifTestId = &(vb->syntax.i32[0]);
             break;
         case 2:
@@ -1370,7 +1391,10 @@ assign_ifTestEntry(GSList *vbl)
             ifTestEntry->ifTestCode = vb->syntax.ui32;
             break;
         case 6:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("ifTestOwner: value not within OwnerString size constraints");
+                break;
+            }
             ifTestEntry->_ifTestOwnerLength = vb->syntax_len;
             ifTestEntry->ifTestOwner = vb->syntax.uc;
             break;
@@ -1419,7 +1443,7 @@ if_mib_get_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t **ifTestEntry, gint
     memcpy(base, oid_ifTestEntry, sizeof(oid_ifTestEntry));
     len = pack_ifTestEntry(base, ifIndex);
     if (len < 0) {
-        g_warning("illegal ifTestEntry index values");
+        g_warning("ifTestEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1450,7 +1474,7 @@ if_mib_set_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t *ifTestEntry, gint 
     memcpy(base, oid_ifTestEntry, sizeof(oid_ifTestEntry));
     len = pack_ifTestEntry(base, ifTestEntry->ifIndex);
     if (len < 0) {
-        g_warning("illegal ifTestEntry index values");
+        g_warning("ifTestEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1577,7 +1601,7 @@ assign_ifRcvAddressEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_ifRcvAddressEntry((GSnmpVarBind *) vbl->data, ifRcvAddressEntry) < 0) {
-        g_warning("illegal ifRcvAddressEntry instance identifier");
+        g_warning("ifRcvAddressEntry: invalid instance identifier");
         g_free(ifRcvAddressEntry);
         return NULL;
     }
@@ -1640,7 +1664,7 @@ if_mib_get_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t **ifRcv
     memcpy(base, oid_ifRcvAddressEntry, sizeof(oid_ifRcvAddressEntry));
     len = pack_ifRcvAddressEntry(base, ifIndex, ifRcvAddressAddress, _ifRcvAddressAddressLength);
     if (len < 0) {
-        g_warning("illegal ifRcvAddressEntry index values");
+        g_warning("ifRcvAddressEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1671,7 +1695,7 @@ if_mib_set_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t *ifRcvA
     memcpy(base, oid_ifRcvAddressEntry, sizeof(oid_ifRcvAddressEntry));
     len = pack_ifRcvAddressEntry(base, ifRcvAddressEntry->ifIndex, ifRcvAddressEntry->ifRcvAddressAddress, ifRcvAddressEntry->_ifRcvAddressAddressLength);
     if (len < 0) {
-        g_warning("illegal ifRcvAddressEntry index values");
+        g_warning("ifRcvAddressEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }

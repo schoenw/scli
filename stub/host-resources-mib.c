@@ -389,15 +389,26 @@ assign_hrSystem(GSList *vbl)
             hrSystem->hrSystemUptime = &(vb->syntax.ui32[0]);
             break;
         case 2:
-            if (vb->syntax_len < 8 || vb->syntax_len > 11) break;
+            if ((vb->syntax_len != 8)
+                && (vb->syntax_len != 11)) {
+                g_warning("hrSystemDate: value not within DateAndTime size constraints");
+                break;
+            }
             hrSystem->_hrSystemDateLength = vb->syntax_len;
             hrSystem->hrSystemDate = vb->syntax.uc;
             break;
         case 3:
+            if ((vb->syntax.i32[0] < 1)) {
+                g_warning("hrSystemInitialLoadDevice: value not within range constraints");
+                break;
+            }
             hrSystem->hrSystemInitialLoadDevice = &(vb->syntax.i32[0]);
             break;
         case 4:
-            if (vb->syntax_len > 128) break;
+            if ((vb->syntax_len > 128)) {
+                g_warning("hrSystemInitialLoadParameters: value not within size constraints");
+                break;
+            }
             hrSystem->_hrSystemInitialLoadParametersLength = vb->syntax_len;
             hrSystem->hrSystemInitialLoadParameters = vb->syntax.uc;
             break;
@@ -408,6 +419,10 @@ assign_hrSystem(GSList *vbl)
             hrSystem->hrSystemProcesses = &(vb->syntax.ui32[0]);
             break;
         case 7:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("hrSystemMaxProcesses: value not within range constraints");
+                break;
+            }
             hrSystem->hrSystemMaxProcesses = &(vb->syntax.i32[0]);
             break;
         };
@@ -519,6 +534,10 @@ assign_hrStorage(GSList *vbl)
 
         switch (idx) {
         case 2:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("hrMemorySize: value not within KBytes range constraints");
+                break;
+            }
             hrStorage->hrMemorySize = &(vb->syntax.i32[0]);
             break;
         };
@@ -608,7 +627,7 @@ assign_hrStorageEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_hrStorageEntry((GSnmpVarBind *) vbl->data, hrStorageEntry) < 0) {
-        g_warning("illegal hrStorageEntry instance identifier");
+        g_warning("hrStorageEntry: invalid instance identifier");
         g_free(hrStorageEntry);
         return NULL;
     }
@@ -626,17 +645,32 @@ assign_hrStorageEntry(GSList *vbl)
             hrStorageEntry->hrStorageType = vb->syntax.ui32;
             break;
         case 3:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("hrStorageDescr: value not within DisplayString size constraints");
+                break;
+            }
             hrStorageEntry->_hrStorageDescrLength = vb->syntax_len;
             hrStorageEntry->hrStorageDescr = vb->syntax.uc;
             break;
         case 4:
+            if ((vb->syntax.i32[0] < 1)) {
+                g_warning("hrStorageAllocationUnits: value not within range constraints");
+                break;
+            }
             hrStorageEntry->hrStorageAllocationUnits = &(vb->syntax.i32[0]);
             break;
         case 5:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("hrStorageSize: value not within range constraints");
+                break;
+            }
             hrStorageEntry->hrStorageSize = &(vb->syntax.i32[0]);
             break;
         case 6:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("hrStorageUsed: value not within range constraints");
+                break;
+            }
             hrStorageEntry->hrStorageUsed = &(vb->syntax.i32[0]);
             break;
         case 7:
@@ -687,7 +721,7 @@ host_resources_mib_get_hrStorageEntry(GSnmpSession *s, host_resources_mib_hrStor
     memcpy(base, oid_hrStorageEntry, sizeof(oid_hrStorageEntry));
     len = pack_hrStorageEntry(base, hrStorageIndex);
     if (len < 0) {
-        g_warning("illegal hrStorageEntry index values");
+        g_warning("hrStorageEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -718,7 +752,7 @@ host_resources_mib_set_hrStorageEntry(GSnmpSession *s, host_resources_mib_hrStor
     memcpy(base, oid_hrStorageEntry, sizeof(oid_hrStorageEntry));
     len = pack_hrStorageEntry(base, hrStorageEntry->hrStorageIndex);
     if (len < 0) {
-        g_warning("illegal hrStorageEntry index values");
+        g_warning("hrStorageEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -810,7 +844,7 @@ assign_hrDeviceEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_hrDeviceEntry((GSnmpVarBind *) vbl->data, hrDeviceEntry) < 0) {
-        g_warning("illegal hrDeviceEntry instance identifier");
+        g_warning("hrDeviceEntry: invalid instance identifier");
         g_free(hrDeviceEntry);
         return NULL;
     }
@@ -828,7 +862,14 @@ assign_hrDeviceEntry(GSList *vbl)
             hrDeviceEntry->hrDeviceType = vb->syntax.ui32;
             break;
         case 3:
-            if (vb->syntax_len > 64) break;
+            if ((vb->syntax_len > 64)) {
+                g_warning("hrDeviceDescr: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("hrDeviceDescr: value not within DisplayString size constraints");
+                break;
+            }
             hrDeviceEntry->_hrDeviceDescrLength = vb->syntax_len;
             hrDeviceEntry->hrDeviceDescr = vb->syntax.uc;
             break;
@@ -888,7 +929,7 @@ host_resources_mib_get_hrDeviceEntry(GSnmpSession *s, host_resources_mib_hrDevic
     memcpy(base, oid_hrDeviceEntry, sizeof(oid_hrDeviceEntry));
     len = pack_hrDeviceEntry(base, hrDeviceIndex);
     if (len < 0) {
-        g_warning("illegal hrDeviceEntry index values");
+        g_warning("hrDeviceEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -981,7 +1022,7 @@ assign_hrProcessorEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_hrProcessorEntry((GSnmpVarBind *) vbl->data, hrProcessorEntry) < 0) {
-        g_warning("illegal hrProcessorEntry instance identifier");
+        g_warning("hrProcessorEntry: invalid instance identifier");
         g_free(hrProcessorEntry);
         return NULL;
     }
@@ -999,6 +1040,10 @@ assign_hrProcessorEntry(GSList *vbl)
             hrProcessorEntry->hrProcessorFrwID = vb->syntax.ui32;
             break;
         case 2:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 100)) {
+                g_warning("hrProcessorLoad: value not within range constraints");
+                break;
+            }
             hrProcessorEntry->hrProcessorLoad = &(vb->syntax.i32[0]);
             break;
         };
@@ -1046,7 +1091,7 @@ host_resources_mib_get_hrProcessorEntry(GSnmpSession *s, host_resources_mib_hrPr
     memcpy(base, oid_hrProcessorEntry, sizeof(oid_hrProcessorEntry));
     len = pack_hrProcessorEntry(base, hrDeviceIndex);
     if (len < 0) {
-        g_warning("illegal hrProcessorEntry index values");
+        g_warning("hrProcessorEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1139,7 +1184,7 @@ assign_hrNetworkEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_hrNetworkEntry((GSnmpVarBind *) vbl->data, hrNetworkEntry) < 0) {
-        g_warning("illegal hrNetworkEntry instance identifier");
+        g_warning("hrNetworkEntry: invalid instance identifier");
         g_free(hrNetworkEntry);
         return NULL;
     }
@@ -1152,6 +1197,10 @@ assign_hrNetworkEntry(GSList *vbl)
 
         switch (idx) {
         case 1:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("hrNetworkIfIndex: value not within InterfaceIndexOrZero range constraints");
+                break;
+            }
             hrNetworkEntry->hrNetworkIfIndex = &(vb->syntax.i32[0]);
             break;
         };
@@ -1199,7 +1248,7 @@ host_resources_mib_get_hrNetworkEntry(GSnmpSession *s, host_resources_mib_hrNetw
     memcpy(base, oid_hrNetworkEntry, sizeof(oid_hrNetworkEntry));
     len = pack_hrNetworkEntry(base, hrDeviceIndex);
     if (len < 0) {
-        g_warning("illegal hrNetworkEntry index values");
+        g_warning("hrNetworkEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1292,7 +1341,7 @@ assign_hrPrinterEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_hrPrinterEntry((GSnmpVarBind *) vbl->data, hrPrinterEntry) < 0) {
-        g_warning("illegal hrPrinterEntry instance identifier");
+        g_warning("hrPrinterEntry: invalid instance identifier");
         g_free(hrPrinterEntry);
         return NULL;
     }
@@ -1356,7 +1405,7 @@ host_resources_mib_get_hrPrinterEntry(GSnmpSession *s, host_resources_mib_hrPrin
     memcpy(base, oid_hrPrinterEntry, sizeof(oid_hrPrinterEntry));
     len = pack_hrPrinterEntry(base, hrDeviceIndex);
     if (len < 0) {
-        g_warning("illegal hrPrinterEntry index values");
+        g_warning("hrPrinterEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1449,7 +1498,7 @@ assign_hrDiskStorageEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_hrDiskStorageEntry((GSnmpVarBind *) vbl->data, hrDiskStorageEntry) < 0) {
-        g_warning("illegal hrDiskStorageEntry instance identifier");
+        g_warning("hrDiskStorageEntry: invalid instance identifier");
         g_free(hrDiskStorageEntry);
         return NULL;
     }
@@ -1471,6 +1520,10 @@ assign_hrDiskStorageEntry(GSList *vbl)
             hrDiskStorageEntry->hrDiskStorageRemoveble = &(vb->syntax.i32[0]);
             break;
         case 4:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("hrDiskStorageCapacity: value not within KBytes range constraints");
+                break;
+            }
             hrDiskStorageEntry->hrDiskStorageCapacity = &(vb->syntax.i32[0]);
             break;
         };
@@ -1518,7 +1571,7 @@ host_resources_mib_get_hrDiskStorageEntry(GSnmpSession *s, host_resources_mib_hr
     memcpy(base, oid_hrDiskStorageEntry, sizeof(oid_hrDiskStorageEntry));
     len = pack_hrDiskStorageEntry(base, hrDeviceIndex);
     if (len < 0) {
-        g_warning("illegal hrDiskStorageEntry index values");
+        g_warning("hrDiskStorageEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1614,7 +1667,7 @@ assign_hrPartitionEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_hrPartitionEntry((GSnmpVarBind *) vbl->data, hrPartitionEntry) < 0) {
-        g_warning("illegal hrPartitionEntry instance identifier");
+        g_warning("hrPartitionEntry: invalid instance identifier");
         g_free(hrPartitionEntry);
         return NULL;
     }
@@ -1627,7 +1680,10 @@ assign_hrPartitionEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 128) break;
+            if ((vb->syntax_len > 128)) {
+                g_warning("hrPartitionLabel: value not within size constraints");
+                break;
+            }
             hrPartitionEntry->_hrPartitionLabelLength = vb->syntax_len;
             hrPartitionEntry->hrPartitionLabel = vb->syntax.uc;
             break;
@@ -1636,9 +1692,17 @@ assign_hrPartitionEntry(GSList *vbl)
             hrPartitionEntry->hrPartitionID = vb->syntax.uc;
             break;
         case 4:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("hrPartitionSize: value not within KBytes range constraints");
+                break;
+            }
             hrPartitionEntry->hrPartitionSize = &(vb->syntax.i32[0]);
             break;
         case 5:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("hrPartitionFSIndex: value not within range constraints");
+                break;
+            }
             hrPartitionEntry->hrPartitionFSIndex = &(vb->syntax.i32[0]);
             break;
         };
@@ -1686,7 +1750,7 @@ host_resources_mib_get_hrPartitionEntry(GSnmpSession *s, host_resources_mib_hrPa
     memcpy(base, oid_hrPartitionEntry, sizeof(oid_hrPartitionEntry));
     len = pack_hrPartitionEntry(base, hrDeviceIndex, hrPartitionIndex);
     if (len < 0) {
-        g_warning("illegal hrPartitionEntry index values");
+        g_warning("hrPartitionEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1779,7 +1843,7 @@ assign_hrFSEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_hrFSEntry((GSnmpVarBind *) vbl->data, hrFSEntry) < 0) {
-        g_warning("illegal hrFSEntry instance identifier");
+        g_warning("hrFSEntry: invalid instance identifier");
         g_free(hrFSEntry);
         return NULL;
     }
@@ -1792,12 +1856,18 @@ assign_hrFSEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 128) break;
+            if ((vb->syntax_len > 128)) {
+                g_warning("hrFSMountPoint: value not within size constraints");
+                break;
+            }
             hrFSEntry->_hrFSMountPointLength = vb->syntax_len;
             hrFSEntry->hrFSMountPoint = vb->syntax.uc;
             break;
         case 3:
-            if (vb->syntax_len > 128) break;
+            if ((vb->syntax_len > 128)) {
+                g_warning("hrFSRemoteMountPoint: value not within size constraints");
+                break;
+            }
             hrFSEntry->_hrFSRemoteMountPointLength = vb->syntax_len;
             hrFSEntry->hrFSRemoteMountPoint = vb->syntax.uc;
             break;
@@ -1813,15 +1883,27 @@ assign_hrFSEntry(GSList *vbl)
             hrFSEntry->hrFSBootable = &(vb->syntax.i32[0]);
             break;
         case 7:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("hrFSStorageIndex: value not within range constraints");
+                break;
+            }
             hrFSEntry->hrFSStorageIndex = &(vb->syntax.i32[0]);
             break;
         case 8:
-            if (vb->syntax_len < 8 || vb->syntax_len > 11) break;
+            if ((vb->syntax_len != 8)
+                && (vb->syntax_len != 11)) {
+                g_warning("hrFSLastFullBackupDate: value not within DateAndTime size constraints");
+                break;
+            }
             hrFSEntry->_hrFSLastFullBackupDateLength = vb->syntax_len;
             hrFSEntry->hrFSLastFullBackupDate = vb->syntax.uc;
             break;
         case 9:
-            if (vb->syntax_len < 8 || vb->syntax_len > 11) break;
+            if ((vb->syntax_len != 8)
+                && (vb->syntax_len != 11)) {
+                g_warning("hrFSLastPartialBackupDate: value not within DateAndTime size constraints");
+                break;
+            }
             hrFSEntry->_hrFSLastPartialBackupDateLength = vb->syntax_len;
             hrFSEntry->hrFSLastPartialBackupDate = vb->syntax.uc;
             break;
@@ -1870,7 +1952,7 @@ host_resources_mib_get_hrFSEntry(GSnmpSession *s, host_resources_mib_hrFSEntry_t
     memcpy(base, oid_hrFSEntry, sizeof(oid_hrFSEntry));
     len = pack_hrFSEntry(base, hrFSIndex);
     if (len < 0) {
-        g_warning("illegal hrFSEntry index values");
+        g_warning("hrFSEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1901,7 +1983,7 @@ host_resources_mib_set_hrFSEntry(GSnmpSession *s, host_resources_mib_hrFSEntry_t
     memcpy(base, oid_hrFSEntry, sizeof(oid_hrFSEntry));
     len = pack_hrFSEntry(base, hrFSEntry->hrFSIndex);
     if (len < 0) {
-        g_warning("illegal hrFSEntry index values");
+        g_warning("hrFSEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1986,6 +2068,10 @@ assign_hrSWRun(GSList *vbl)
 
         switch (idx) {
         case 1:
+            if ((vb->syntax.i32[0] < 1)) {
+                g_warning("hrSWOSIndex: value not within range constraints");
+                break;
+            }
             hrSWRun->hrSWOSIndex = &(vb->syntax.i32[0]);
             break;
         };
@@ -2075,7 +2161,7 @@ assign_hrSWRunEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_hrSWRunEntry((GSnmpVarBind *) vbl->data, hrSWRunEntry) < 0) {
-        g_warning("illegal hrSWRunEntry instance identifier");
+        g_warning("hrSWRunEntry: invalid instance identifier");
         g_free(hrSWRunEntry);
         return NULL;
     }
@@ -2088,7 +2174,10 @@ assign_hrSWRunEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 64) break;
+            if ((vb->syntax_len > 64)) {
+                g_warning("hrSWRunName: value not within size constraints");
+                break;
+            }
             hrSWRunEntry->_hrSWRunNameLength = vb->syntax_len;
             hrSWRunEntry->hrSWRunName = vb->syntax.uc;
             break;
@@ -2098,12 +2187,18 @@ assign_hrSWRunEntry(GSList *vbl)
             hrSWRunEntry->hrSWRunID = vb->syntax.ui32;
             break;
         case 4:
-            if (vb->syntax_len > 128) break;
+            if ((vb->syntax_len > 128)) {
+                g_warning("hrSWRunPath: value not within size constraints");
+                break;
+            }
             hrSWRunEntry->_hrSWRunPathLength = vb->syntax_len;
             hrSWRunEntry->hrSWRunPath = vb->syntax.uc;
             break;
         case 5:
-            if (vb->syntax_len > 128) break;
+            if ((vb->syntax_len > 128)) {
+                g_warning("hrSWRunParameters: value not within size constraints");
+                break;
+            }
             hrSWRunEntry->_hrSWRunParametersLength = vb->syntax_len;
             hrSWRunEntry->hrSWRunParameters = vb->syntax.uc;
             break;
@@ -2158,7 +2253,7 @@ host_resources_mib_get_hrSWRunEntry(GSnmpSession *s, host_resources_mib_hrSWRunE
     memcpy(base, oid_hrSWRunEntry, sizeof(oid_hrSWRunEntry));
     len = pack_hrSWRunEntry(base, hrSWRunIndex);
     if (len < 0) {
-        g_warning("illegal hrSWRunEntry index values");
+        g_warning("hrSWRunEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -2189,7 +2284,7 @@ host_resources_mib_set_hrSWRunEntry(GSnmpSession *s, host_resources_mib_hrSWRunE
     memcpy(base, oid_hrSWRunEntry, sizeof(oid_hrSWRunEntry));
     len = pack_hrSWRunEntry(base, hrSWRunEntry->hrSWRunIndex);
     if (len < 0) {
-        g_warning("illegal hrSWRunEntry index values");
+        g_warning("hrSWRunEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -2281,7 +2376,7 @@ assign_hrSWRunPerfEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_hrSWRunPerfEntry((GSnmpVarBind *) vbl->data, hrSWRunPerfEntry) < 0) {
-        g_warning("illegal hrSWRunPerfEntry instance identifier");
+        g_warning("hrSWRunPerfEntry: invalid instance identifier");
         g_free(hrSWRunPerfEntry);
         return NULL;
     }
@@ -2294,9 +2389,17 @@ assign_hrSWRunPerfEntry(GSList *vbl)
 
         switch (idx) {
         case 1:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("hrSWRunPerfCPU: value not within range constraints");
+                break;
+            }
             hrSWRunPerfEntry->hrSWRunPerfCPU = &(vb->syntax.i32[0]);
             break;
         case 2:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("hrSWRunPerfMem: value not within KBytes range constraints");
+                break;
+            }
             hrSWRunPerfEntry->hrSWRunPerfMem = &(vb->syntax.i32[0]);
             break;
         };
@@ -2344,7 +2447,7 @@ host_resources_mib_get_hrSWRunPerfEntry(GSnmpSession *s, host_resources_mib_hrSW
     memcpy(base, oid_hrSWRunPerfEntry, sizeof(oid_hrSWRunPerfEntry));
     len = pack_hrSWRunPerfEntry(base, hrSWRunIndex);
     if (len < 0) {
-        g_warning("illegal hrSWRunPerfEntry index values");
+        g_warning("hrSWRunPerfEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -2516,7 +2619,7 @@ assign_hrSWInstalledEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_hrSWInstalledEntry((GSnmpVarBind *) vbl->data, hrSWInstalledEntry) < 0) {
-        g_warning("illegal hrSWInstalledEntry instance identifier");
+        g_warning("hrSWInstalledEntry: invalid instance identifier");
         g_free(hrSWInstalledEntry);
         return NULL;
     }
@@ -2529,7 +2632,10 @@ assign_hrSWInstalledEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 64) break;
+            if ((vb->syntax_len > 64)) {
+                g_warning("hrSWInstalledName: value not within size constraints");
+                break;
+            }
             hrSWInstalledEntry->_hrSWInstalledNameLength = vb->syntax_len;
             hrSWInstalledEntry->hrSWInstalledName = vb->syntax.uc;
             break;
@@ -2542,7 +2648,11 @@ assign_hrSWInstalledEntry(GSList *vbl)
             hrSWInstalledEntry->hrSWInstalledType = &(vb->syntax.i32[0]);
             break;
         case 5:
-            if (vb->syntax_len < 8 || vb->syntax_len > 11) break;
+            if ((vb->syntax_len != 8)
+                && (vb->syntax_len != 11)) {
+                g_warning("hrSWInstalledDate: value not within DateAndTime size constraints");
+                break;
+            }
             hrSWInstalledEntry->_hrSWInstalledDateLength = vb->syntax_len;
             hrSWInstalledEntry->hrSWInstalledDate = vb->syntax.uc;
             break;
@@ -2591,7 +2701,7 @@ host_resources_mib_get_hrSWInstalledEntry(GSnmpSession *s, host_resources_mib_hr
     memcpy(base, oid_hrSWInstalledEntry, sizeof(oid_hrSWInstalledEntry));
     len = pack_hrSWInstalledEntry(base, hrSWInstalledIndex);
     if (len < 0) {
-        g_warning("illegal hrSWInstalledEntry index values");
+        g_warning("hrSWInstalledEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }

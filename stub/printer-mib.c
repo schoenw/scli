@@ -996,7 +996,7 @@ assign_prtGeneralEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtGeneralEntry((GSnmpVarBind *) vbl->data, prtGeneralEntry) < 0) {
-        g_warning("illegal prtGeneralEntry instance identifier");
+        g_warning("prtGeneralEntry: invalid instance identifier");
         g_free(prtGeneralEntry);
         return NULL;
     }
@@ -1012,18 +1012,28 @@ assign_prtGeneralEntry(GSList *vbl)
             prtGeneralEntry->prtGeneralConfigChanges = &(vb->syntax.ui32[0]);
             break;
         case 2:
+            if ((vb->syntax.i32[0] < 1 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtGeneralCurrentLocalization: value not within range constraints");
+                break;
+            }
             prtGeneralEntry->prtGeneralCurrentLocalization = &(vb->syntax.i32[0]);
             break;
         case 3:
             prtGeneralEntry->prtGeneralReset = &(vb->syntax.i32[0]);
             break;
         case 4:
-            if (vb->syntax_len > 127) break;
+            if ((vb->syntax_len > 127)) {
+                g_warning("prtGeneralCurrentOperator: value not within size constraints");
+                break;
+            }
             prtGeneralEntry->_prtGeneralCurrentOperatorLength = vb->syntax_len;
             prtGeneralEntry->prtGeneralCurrentOperator = vb->syntax.uc;
             break;
         case 5:
-            if (vb->syntax_len > 127) break;
+            if ((vb->syntax_len > 127)) {
+                g_warning("prtGeneralServicePerson: value not within size constraints");
+                break;
+            }
             prtGeneralEntry->_prtGeneralServicePersonLength = vb->syntax_len;
             prtGeneralEntry->prtGeneralServicePerson = vb->syntax.uc;
             break;
@@ -1034,18 +1044,38 @@ assign_prtGeneralEntry(GSList *vbl)
             prtGeneralEntry->prtOutputDefaultIndex = &(vb->syntax.i32[0]);
             break;
         case 8:
+            if ((vb->syntax.i32[0] < 1 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtMarkerDefaultIndex: value not within range constraints");
+                break;
+            }
             prtGeneralEntry->prtMarkerDefaultIndex = &(vb->syntax.i32[0]);
             break;
         case 9:
+            if ((vb->syntax.i32[0] < 1 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtMediaPathDefaultIndex: value not within range constraints");
+                break;
+            }
             prtGeneralEntry->prtMediaPathDefaultIndex = &(vb->syntax.i32[0]);
             break;
         case 10:
+            if ((vb->syntax.i32[0] < 1 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtConsoleLocalization: value not within range constraints");
+                break;
+            }
             prtGeneralEntry->prtConsoleLocalization = &(vb->syntax.i32[0]);
             break;
         case 11:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtConsoleNumberOfDisplayLines: value not within range constraints");
+                break;
+            }
             prtGeneralEntry->prtConsoleNumberOfDisplayLines = &(vb->syntax.i32[0]);
             break;
         case 12:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtConsoleNumberOfDisplayChars: value not within range constraints");
+                break;
+            }
             prtGeneralEntry->prtConsoleNumberOfDisplayChars = &(vb->syntax.i32[0]);
             break;
         case 13:
@@ -1058,12 +1088,18 @@ assign_prtGeneralEntry(GSList *vbl)
             prtGeneralEntry->prtAuxiliarySheetBannerPage = &(vb->syntax.i32[0]);
             break;
         case 16:
-            if (vb->syntax_len > 127) break;
+            if ((vb->syntax_len > 127)) {
+                g_warning("prtGeneralPrinterName: value not within size constraints");
+                break;
+            }
             prtGeneralEntry->_prtGeneralPrinterNameLength = vb->syntax_len;
             prtGeneralEntry->prtGeneralPrinterName = vb->syntax.uc;
             break;
         case 17:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prtGeneralSerialNumber: value not within size constraints");
+                break;
+            }
             prtGeneralEntry->_prtGeneralSerialNumberLength = vb->syntax_len;
             prtGeneralEntry->prtGeneralSerialNumber = vb->syntax.uc;
             break;
@@ -1118,7 +1154,7 @@ printer_mib_get_prtGeneralEntry(GSnmpSession *s, printer_mib_prtGeneralEntry_t *
     memcpy(base, oid_prtGeneralEntry, sizeof(oid_prtGeneralEntry));
     len = pack_prtGeneralEntry(base, hrDeviceIndex);
     if (len < 0) {
-        g_warning("illegal prtGeneralEntry index values");
+        g_warning("prtGeneralEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1149,7 +1185,7 @@ printer_mib_set_prtGeneralEntry(GSnmpSession *s, printer_mib_prtGeneralEntry_t *
     memcpy(base, oid_prtGeneralEntry, sizeof(oid_prtGeneralEntry));
     len = pack_prtGeneralEntry(base, prtGeneralEntry->hrDeviceIndex);
     if (len < 0) {
-        g_warning("illegal prtGeneralEntry index values");
+        g_warning("prtGeneralEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1322,7 +1358,7 @@ assign_prtStorageRefEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtStorageRefEntry((GSnmpVarBind *) vbl->data, prtStorageRefEntry) < 0) {
-        g_warning("illegal prtStorageRefEntry instance identifier");
+        g_warning("prtStorageRefEntry: invalid instance identifier");
         g_free(prtStorageRefEntry);
         return NULL;
     }
@@ -1335,6 +1371,10 @@ assign_prtStorageRefEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtStorageRefIndex: value not within range constraints");
+                break;
+            }
             prtStorageRefEntry->prtStorageRefIndex = &(vb->syntax.i32[0]);
             break;
         };
@@ -1382,7 +1422,7 @@ printer_mib_get_prtStorageRefEntry(GSnmpSession *s, printer_mib_prtStorageRefEnt
     memcpy(base, oid_prtStorageRefEntry, sizeof(oid_prtStorageRefEntry));
     len = pack_prtStorageRefEntry(base, hrStorageIndex, prtStorageRefSeqNumber);
     if (len < 0) {
-        g_warning("illegal prtStorageRefEntry index values");
+        g_warning("prtStorageRefEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1478,7 +1518,7 @@ assign_prtDeviceRefEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtDeviceRefEntry((GSnmpVarBind *) vbl->data, prtDeviceRefEntry) < 0) {
-        g_warning("illegal prtDeviceRefEntry instance identifier");
+        g_warning("prtDeviceRefEntry: invalid instance identifier");
         g_free(prtDeviceRefEntry);
         return NULL;
     }
@@ -1491,6 +1531,10 @@ assign_prtDeviceRefEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtDeviceRefIndex: value not within range constraints");
+                break;
+            }
             prtDeviceRefEntry->prtDeviceRefIndex = &(vb->syntax.i32[0]);
             break;
         };
@@ -1538,7 +1582,7 @@ printer_mib_get_prtDeviceRefEntry(GSnmpSession *s, printer_mib_prtDeviceRefEntry
     memcpy(base, oid_prtDeviceRefEntry, sizeof(oid_prtDeviceRefEntry));
     len = pack_prtDeviceRefEntry(base, hrDeviceIndex, prtDeviceRefSeqNumber);
     if (len < 0) {
-        g_warning("illegal prtDeviceRefEntry index values");
+        g_warning("prtDeviceRefEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1634,7 +1678,7 @@ assign_prtCoverEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtCoverEntry((GSnmpVarBind *) vbl->data, prtCoverEntry) < 0) {
-        g_warning("illegal prtCoverEntry instance identifier");
+        g_warning("prtCoverEntry: invalid instance identifier");
         g_free(prtCoverEntry);
         return NULL;
     }
@@ -1647,7 +1691,10 @@ assign_prtCoverEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prtCoverDescription: value not within LocalizedDescriptionStringTC size constraints");
+                break;
+            }
             prtCoverEntry->_prtCoverDescriptionLength = vb->syntax_len;
             prtCoverEntry->prtCoverDescription = vb->syntax.uc;
             break;
@@ -1699,7 +1746,7 @@ printer_mib_get_prtCoverEntry(GSnmpSession *s, printer_mib_prtCoverEntry_t **prt
     memcpy(base, oid_prtCoverEntry, sizeof(oid_prtCoverEntry));
     len = pack_prtCoverEntry(base, hrDeviceIndex, prtCoverIndex);
     if (len < 0) {
-        g_warning("illegal prtCoverEntry index values");
+        g_warning("prtCoverEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1795,7 +1842,7 @@ assign_prtLocalizationEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtLocalizationEntry((GSnmpVarBind *) vbl->data, prtLocalizationEntry) < 0) {
-        g_warning("illegal prtLocalizationEntry instance identifier");
+        g_warning("prtLocalizationEntry: invalid instance identifier");
         g_free(prtLocalizationEntry);
         return NULL;
     }
@@ -1808,12 +1855,18 @@ assign_prtLocalizationEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 2) break;
+            if ((vb->syntax_len > 2)) {
+                g_warning("prtLocalizationLanguage: value not within size constraints");
+                break;
+            }
             prtLocalizationEntry->_prtLocalizationLanguageLength = vb->syntax_len;
             prtLocalizationEntry->prtLocalizationLanguage = vb->syntax.uc;
             break;
         case 3:
-            if (vb->syntax_len > 2) break;
+            if ((vb->syntax_len > 2)) {
+                g_warning("prtLocalizationCountry: value not within size constraints");
+                break;
+            }
             prtLocalizationEntry->_prtLocalizationCountryLength = vb->syntax_len;
             prtLocalizationEntry->prtLocalizationCountry = vb->syntax.uc;
             break;
@@ -1865,7 +1918,7 @@ printer_mib_get_prtLocalizationEntry(GSnmpSession *s, printer_mib_prtLocalizatio
     memcpy(base, oid_prtLocalizationEntry, sizeof(oid_prtLocalizationEntry));
     len = pack_prtLocalizationEntry(base, hrDeviceIndex, prtLocalizationIndex);
     if (len < 0) {
-        g_warning("illegal prtLocalizationEntry index values");
+        g_warning("prtLocalizationEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -1961,7 +2014,7 @@ assign_prtInputEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtInputEntry((GSnmpVarBind *) vbl->data, prtInputEntry) < 0) {
-        g_warning("illegal prtInputEntry instance identifier");
+        g_warning("prtInputEntry: invalid instance identifier");
         g_free(prtInputEntry);
         return NULL;
     }
@@ -2001,40 +2054,65 @@ assign_prtInputEntry(GSList *vbl)
             prtInputEntry->prtInputCurrentLevel = &(vb->syntax.i32[0]);
             break;
         case 11:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 126)) {
+                g_warning("prtInputStatus: value not within PrtSubUnitStatusTC range constraints");
+                break;
+            }
             prtInputEntry->prtInputStatus = &(vb->syntax.i32[0]);
             break;
         case 12:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtInputMediaName: value not within size constraints");
+                break;
+            }
             prtInputEntry->_prtInputMediaNameLength = vb->syntax_len;
             prtInputEntry->prtInputMediaName = vb->syntax.uc;
             break;
         case 13:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtInputName: value not within size constraints");
+                break;
+            }
             prtInputEntry->_prtInputNameLength = vb->syntax_len;
             prtInputEntry->prtInputName = vb->syntax.uc;
             break;
         case 14:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtInputVendorName: value not within size constraints");
+                break;
+            }
             prtInputEntry->_prtInputVendorNameLength = vb->syntax_len;
             prtInputEntry->prtInputVendorName = vb->syntax.uc;
             break;
         case 15:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtInputModel: value not within size constraints");
+                break;
+            }
             prtInputEntry->_prtInputModelLength = vb->syntax_len;
             prtInputEntry->prtInputModel = vb->syntax.uc;
             break;
         case 16:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtInputVersion: value not within size constraints");
+                break;
+            }
             prtInputEntry->_prtInputVersionLength = vb->syntax_len;
             prtInputEntry->prtInputVersion = vb->syntax.uc;
             break;
         case 17:
-            if (vb->syntax_len > 32) break;
+            if ((vb->syntax_len > 32)) {
+                g_warning("prtInputSerialNumber: value not within size constraints");
+                break;
+            }
             prtInputEntry->_prtInputSerialNumberLength = vb->syntax_len;
             prtInputEntry->prtInputSerialNumber = vb->syntax.uc;
             break;
         case 18:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prtInputDescription: value not within LocalizedDescriptionStringTC size constraints");
+                break;
+            }
             prtInputEntry->_prtInputDescriptionLength = vb->syntax_len;
             prtInputEntry->prtInputDescription = vb->syntax.uc;
             break;
@@ -2045,12 +2123,18 @@ assign_prtInputEntry(GSList *vbl)
             prtInputEntry->prtInputMediaWeight = &(vb->syntax.i32[0]);
             break;
         case 21:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtInputMediaType: value not within size constraints");
+                break;
+            }
             prtInputEntry->_prtInputMediaTypeLength = vb->syntax_len;
             prtInputEntry->prtInputMediaType = vb->syntax.uc;
             break;
         case 22:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtInputMediaColor: value not within size constraints");
+                break;
+            }
             prtInputEntry->_prtInputMediaColorLength = vb->syntax_len;
             prtInputEntry->prtInputMediaColor = vb->syntax.uc;
             break;
@@ -2108,7 +2192,7 @@ printer_mib_get_prtInputEntry(GSnmpSession *s, printer_mib_prtInputEntry_t **prt
     memcpy(base, oid_prtInputEntry, sizeof(oid_prtInputEntry));
     len = pack_prtInputEntry(base, hrDeviceIndex, prtInputIndex);
     if (len < 0) {
-        g_warning("illegal prtInputEntry index values");
+        g_warning("prtInputEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -2139,7 +2223,7 @@ printer_mib_set_prtInputEntry(GSnmpSession *s, printer_mib_prtInputEntry_t *prtI
     memcpy(base, oid_prtInputEntry, sizeof(oid_prtInputEntry));
     len = pack_prtInputEntry(base, prtInputEntry->hrDeviceIndex, prtInputEntry->prtInputIndex);
     if (len < 0) {
-        g_warning("illegal prtInputEntry index values");
+        g_warning("prtInputEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -2306,7 +2390,7 @@ assign_prtOutputEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtOutputEntry((GSnmpVarBind *) vbl->data, prtOutputEntry) < 0) {
-        g_warning("illegal prtOutputEntry instance identifier");
+        g_warning("prtOutputEntry: invalid instance identifier");
         g_free(prtOutputEntry);
         return NULL;
     }
@@ -2331,35 +2415,57 @@ assign_prtOutputEntry(GSList *vbl)
             prtOutputEntry->prtOutputRemainingCapacity = &(vb->syntax.i32[0]);
             break;
         case 6:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 126)) {
+                g_warning("prtOutputStatus: value not within PrtSubUnitStatusTC range constraints");
+                break;
+            }
             prtOutputEntry->prtOutputStatus = &(vb->syntax.i32[0]);
             break;
         case 7:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtOutputName: value not within size constraints");
+                break;
+            }
             prtOutputEntry->_prtOutputNameLength = vb->syntax_len;
             prtOutputEntry->prtOutputName = vb->syntax.uc;
             break;
         case 8:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtOutputVendorName: value not within size constraints");
+                break;
+            }
             prtOutputEntry->_prtOutputVendorNameLength = vb->syntax_len;
             prtOutputEntry->prtOutputVendorName = vb->syntax.uc;
             break;
         case 9:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtOutputModel: value not within size constraints");
+                break;
+            }
             prtOutputEntry->_prtOutputModelLength = vb->syntax_len;
             prtOutputEntry->prtOutputModel = vb->syntax.uc;
             break;
         case 10:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtOutputVersion: value not within size constraints");
+                break;
+            }
             prtOutputEntry->_prtOutputVersionLength = vb->syntax_len;
             prtOutputEntry->prtOutputVersion = vb->syntax.uc;
             break;
         case 11:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtOutputSerialNumber: value not within size constraints");
+                break;
+            }
             prtOutputEntry->_prtOutputSerialNumberLength = vb->syntax_len;
             prtOutputEntry->prtOutputSerialNumber = vb->syntax.uc;
             break;
         case 12:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prtOutputDescription: value not within LocalizedDescriptionStringTC size constraints");
+                break;
+            }
             prtOutputEntry->_prtOutputDescriptionLength = vb->syntax_len;
             prtOutputEntry->prtOutputDescription = vb->syntax.uc;
             break;
@@ -2444,7 +2550,7 @@ printer_mib_get_prtOutputEntry(GSnmpSession *s, printer_mib_prtOutputEntry_t **p
     memcpy(base, oid_prtOutputEntry, sizeof(oid_prtOutputEntry));
     len = pack_prtOutputEntry(base, hrDeviceIndex, prtOutputIndex);
     if (len < 0) {
-        g_warning("illegal prtOutputEntry index values");
+        g_warning("prtOutputEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -2475,7 +2581,7 @@ printer_mib_set_prtOutputEntry(GSnmpSession *s, printer_mib_prtOutputEntry_t *pr
     memcpy(base, oid_prtOutputEntry, sizeof(oid_prtOutputEntry));
     len = pack_prtOutputEntry(base, prtOutputEntry->hrDeviceIndex, prtOutputEntry->prtOutputIndex);
     if (len < 0) {
-        g_warning("illegal prtOutputEntry index values");
+        g_warning("prtOutputEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -2648,7 +2754,7 @@ assign_prtMarkerEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtMarkerEntry((GSnmpVarBind *) vbl->data, prtMarkerEntry) < 0) {
-        g_warning("illegal prtMarkerEntry instance identifier");
+        g_warning("prtMarkerEntry: invalid instance identifier");
         g_free(prtMarkerEntry);
         return NULL;
     }
@@ -2673,9 +2779,17 @@ assign_prtMarkerEntry(GSList *vbl)
             prtMarkerEntry->prtMarkerPowerOnCount = &(vb->syntax.ui32[0]);
             break;
         case 6:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtMarkerProcessColorants: value not within range constraints");
+                break;
+            }
             prtMarkerEntry->prtMarkerProcessColorants = &(vb->syntax.i32[0]);
             break;
         case 7:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtMarkerSpotColorants: value not within range constraints");
+                break;
+            }
             prtMarkerEntry->prtMarkerSpotColorants = &(vb->syntax.i32[0]);
             break;
         case 8:
@@ -2700,6 +2814,10 @@ assign_prtMarkerEntry(GSList *vbl)
             prtMarkerEntry->prtMarkerEastMargin = &(vb->syntax.i32[0]);
             break;
         case 15:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 126)) {
+                g_warning("prtMarkerStatus: value not within PrtSubUnitStatusTC range constraints");
+                break;
+            }
             prtMarkerEntry->prtMarkerStatus = &(vb->syntax.i32[0]);
             break;
         };
@@ -2747,7 +2865,7 @@ printer_mib_get_prtMarkerEntry(GSnmpSession *s, printer_mib_prtMarkerEntry_t **p
     memcpy(base, oid_prtMarkerEntry, sizeof(oid_prtMarkerEntry));
     len = pack_prtMarkerEntry(base, hrDeviceIndex, prtMarkerIndex);
     if (len < 0) {
-        g_warning("illegal prtMarkerEntry index values");
+        g_warning("prtMarkerEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -2843,7 +2961,7 @@ assign_prtMarkerSuppliesEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtMarkerSuppliesEntry((GSnmpVarBind *) vbl->data, prtMarkerSuppliesEntry) < 0) {
-        g_warning("illegal prtMarkerSuppliesEntry instance identifier");
+        g_warning("prtMarkerSuppliesEntry: invalid instance identifier");
         g_free(prtMarkerSuppliesEntry);
         return NULL;
     }
@@ -2856,9 +2974,17 @@ assign_prtMarkerSuppliesEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtMarkerSuppliesMarkerIndex: value not within range constraints");
+                break;
+            }
             prtMarkerSuppliesEntry->prtMarkerSuppliesMarkerIndex = &(vb->syntax.i32[0]);
             break;
         case 3:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtMarkerSuppliesColorantIndex: value not within range constraints");
+                break;
+            }
             prtMarkerSuppliesEntry->prtMarkerSuppliesColorantIndex = &(vb->syntax.i32[0]);
             break;
         case 4:
@@ -2868,7 +2994,10 @@ assign_prtMarkerSuppliesEntry(GSList *vbl)
             prtMarkerSuppliesEntry->prtMarkerSuppliesType = &(vb->syntax.i32[0]);
             break;
         case 6:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prtMarkerSuppliesDescription: value not within LocalizedDescriptionStringTC size constraints");
+                break;
+            }
             prtMarkerSuppliesEntry->_prtMarkerSuppliesDescriptionLength = vb->syntax_len;
             prtMarkerSuppliesEntry->prtMarkerSuppliesDescription = vb->syntax.uc;
             break;
@@ -2926,7 +3055,7 @@ printer_mib_get_prtMarkerSuppliesEntry(GSnmpSession *s, printer_mib_prtMarkerSup
     memcpy(base, oid_prtMarkerSuppliesEntry, sizeof(oid_prtMarkerSuppliesEntry));
     len = pack_prtMarkerSuppliesEntry(base, hrDeviceIndex, prtMarkerSuppliesIndex);
     if (len < 0) {
-        g_warning("illegal prtMarkerSuppliesEntry index values");
+        g_warning("prtMarkerSuppliesEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -2957,7 +3086,7 @@ printer_mib_set_prtMarkerSuppliesEntry(GSnmpSession *s, printer_mib_prtMarkerSup
     memcpy(base, oid_prtMarkerSuppliesEntry, sizeof(oid_prtMarkerSuppliesEntry));
     len = pack_prtMarkerSuppliesEntry(base, prtMarkerSuppliesEntry->hrDeviceIndex, prtMarkerSuppliesEntry->prtMarkerSuppliesIndex);
     if (len < 0) {
-        g_warning("illegal prtMarkerSuppliesEntry index values");
+        g_warning("prtMarkerSuppliesEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -3058,7 +3187,7 @@ assign_prtMarkerColorantEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtMarkerColorantEntry((GSnmpVarBind *) vbl->data, prtMarkerColorantEntry) < 0) {
-        g_warning("illegal prtMarkerColorantEntry instance identifier");
+        g_warning("prtMarkerColorantEntry: invalid instance identifier");
         g_free(prtMarkerColorantEntry);
         return NULL;
     }
@@ -3071,13 +3200,20 @@ assign_prtMarkerColorantEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 65535)) {
+                g_warning("prtMarkerColorantMarkerIndex: value not within range constraints");
+                break;
+            }
             prtMarkerColorantEntry->prtMarkerColorantMarkerIndex = &(vb->syntax.i32[0]);
             break;
         case 3:
             prtMarkerColorantEntry->prtMarkerColorantRole = &(vb->syntax.i32[0]);
             break;
         case 4:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prtMarkerColorantValue: value not within size constraints");
+                break;
+            }
             prtMarkerColorantEntry->_prtMarkerColorantValueLength = vb->syntax_len;
             prtMarkerColorantEntry->prtMarkerColorantValue = vb->syntax.uc;
             break;
@@ -3129,7 +3265,7 @@ printer_mib_get_prtMarkerColorantEntry(GSnmpSession *s, printer_mib_prtMarkerCol
     memcpy(base, oid_prtMarkerColorantEntry, sizeof(oid_prtMarkerColorantEntry));
     len = pack_prtMarkerColorantEntry(base, hrDeviceIndex, prtMarkerColorantIndex);
     if (len < 0) {
-        g_warning("illegal prtMarkerColorantEntry index values");
+        g_warning("prtMarkerColorantEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -3225,7 +3361,7 @@ assign_prtMediaPathEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtMediaPathEntry((GSnmpVarBind *) vbl->data, prtMediaPathEntry) < 0) {
-        g_warning("illegal prtMediaPathEntry instance identifier");
+        g_warning("prtMediaPathEntry: invalid instance identifier");
         g_free(prtMediaPathEntry);
         return NULL;
     }
@@ -3262,11 +3398,18 @@ assign_prtMediaPathEntry(GSList *vbl)
             prtMediaPathEntry->prtMediaPathType = &(vb->syntax.i32[0]);
             break;
         case 10:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prtMediaPathDescription: value not within LocalizedDescriptionStringTC size constraints");
+                break;
+            }
             prtMediaPathEntry->_prtMediaPathDescriptionLength = vb->syntax_len;
             prtMediaPathEntry->prtMediaPathDescription = vb->syntax.uc;
             break;
         case 11:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 126)) {
+                g_warning("prtMediaPathStatus: value not within PrtSubUnitStatusTC range constraints");
+                break;
+            }
             prtMediaPathEntry->prtMediaPathStatus = &(vb->syntax.i32[0]);
             break;
         };
@@ -3314,7 +3457,7 @@ printer_mib_get_prtMediaPathEntry(GSnmpSession *s, printer_mib_prtMediaPathEntry
     memcpy(base, oid_prtMediaPathEntry, sizeof(oid_prtMediaPathEntry));
     len = pack_prtMediaPathEntry(base, hrDeviceIndex, prtMediaPathIndex);
     if (len < 0) {
-        g_warning("illegal prtMediaPathEntry index values");
+        g_warning("prtMediaPathEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -3410,7 +3553,7 @@ assign_prtChannelEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtChannelEntry((GSnmpVarBind *) vbl->data, prtChannelEntry) < 0) {
-        g_warning("illegal prtChannelEntry instance identifier");
+        g_warning("prtChannelEntry: invalid instance identifier");
         g_free(prtChannelEntry);
         return NULL;
     }
@@ -3426,7 +3569,10 @@ assign_prtChannelEntry(GSList *vbl)
             prtChannelEntry->prtChannelType = &(vb->syntax.i32[0]);
             break;
         case 3:
-            if (vb->syntax_len > 63) break;
+            if ((vb->syntax_len > 63)) {
+                g_warning("prtChannelProtocolVersion: value not within size constraints");
+                break;
+            }
             prtChannelEntry->_prtChannelProtocolVersionLength = vb->syntax_len;
             prtChannelEntry->prtChannelProtocolVersion = vb->syntax.uc;
             break;
@@ -3443,10 +3589,17 @@ assign_prtChannelEntry(GSList *vbl)
             prtChannelEntry->prtChannelIfIndex = &(vb->syntax.i32[0]);
             break;
         case 8:
+            if ((vb->syntax.i32[0] < 0 || vb->syntax.i32[0] > 126)) {
+                g_warning("prtChannelStatus: value not within PrtSubUnitStatusTC range constraints");
+                break;
+            }
             prtChannelEntry->prtChannelStatus = &(vb->syntax.i32[0]);
             break;
         case 9:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prtChannelInformation: value not within size constraints");
+                break;
+            }
             prtChannelEntry->_prtChannelInformationLength = vb->syntax_len;
             prtChannelEntry->prtChannelInformation = vb->syntax.uc;
             break;
@@ -3495,7 +3648,7 @@ printer_mib_get_prtChannelEntry(GSnmpSession *s, printer_mib_prtChannelEntry_t *
     memcpy(base, oid_prtChannelEntry, sizeof(oid_prtChannelEntry));
     len = pack_prtChannelEntry(base, hrDeviceIndex, prtChannelIndex);
     if (len < 0) {
-        g_warning("illegal prtChannelEntry index values");
+        g_warning("prtChannelEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -3526,7 +3679,7 @@ printer_mib_set_prtChannelEntry(GSnmpSession *s, printer_mib_prtChannelEntry_t *
     memcpy(base, oid_prtChannelEntry, sizeof(oid_prtChannelEntry));
     len = pack_prtChannelEntry(base, prtChannelEntry->hrDeviceIndex, prtChannelEntry->prtChannelIndex);
     if (len < 0) {
-        g_warning("illegal prtChannelEntry index values");
+        g_warning("prtChannelEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -3639,7 +3792,7 @@ assign_prtInterpreterEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtInterpreterEntry((GSnmpVarBind *) vbl->data, prtInterpreterEntry) < 0) {
-        g_warning("illegal prtInterpreterEntry instance identifier");
+        g_warning("prtInterpreterEntry: invalid instance identifier");
         g_free(prtInterpreterEntry);
         return NULL;
     }
@@ -3655,22 +3808,34 @@ assign_prtInterpreterEntry(GSList *vbl)
             prtInterpreterEntry->prtInterpreterLangFamily = &(vb->syntax.i32[0]);
             break;
         case 3:
-            if (vb->syntax_len > 31) break;
+            if ((vb->syntax_len > 31)) {
+                g_warning("prtInterpreterLangLevel: value not within size constraints");
+                break;
+            }
             prtInterpreterEntry->_prtInterpreterLangLevelLength = vb->syntax_len;
             prtInterpreterEntry->prtInterpreterLangLevel = vb->syntax.uc;
             break;
         case 4:
-            if (vb->syntax_len > 31) break;
+            if ((vb->syntax_len > 31)) {
+                g_warning("prtInterpreterLangVersion: value not within size constraints");
+                break;
+            }
             prtInterpreterEntry->_prtInterpreterLangVersionLength = vb->syntax_len;
             prtInterpreterEntry->prtInterpreterLangVersion = vb->syntax.uc;
             break;
         case 5:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prtInterpreterDescription: value not within LocalizedDescriptionStringTC size constraints");
+                break;
+            }
             prtInterpreterEntry->_prtInterpreterDescriptionLength = vb->syntax_len;
             prtInterpreterEntry->prtInterpreterDescription = vb->syntax.uc;
             break;
         case 6:
-            if (vb->syntax_len > 31) break;
+            if ((vb->syntax_len > 31)) {
+                g_warning("prtInterpreterVersion: value not within size constraints");
+                break;
+            }
             prtInterpreterEntry->_prtInterpreterVersionLength = vb->syntax_len;
             prtInterpreterEntry->prtInterpreterVersion = vb->syntax.uc;
             break;
@@ -3737,7 +3902,7 @@ printer_mib_get_prtInterpreterEntry(GSnmpSession *s, printer_mib_prtInterpreterE
     memcpy(base, oid_prtInterpreterEntry, sizeof(oid_prtInterpreterEntry));
     len = pack_prtInterpreterEntry(base, hrDeviceIndex, prtInterpreterIndex);
     if (len < 0) {
-        g_warning("illegal prtInterpreterEntry index values");
+        g_warning("prtInterpreterEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -3768,7 +3933,7 @@ printer_mib_set_prtInterpreterEntry(GSnmpSession *s, printer_mib_prtInterpreterE
     memcpy(base, oid_prtInterpreterEntry, sizeof(oid_prtInterpreterEntry));
     len = pack_prtInterpreterEntry(base, prtInterpreterEntry->hrDeviceIndex, prtInterpreterEntry->prtInterpreterIndex);
     if (len < 0) {
-        g_warning("illegal prtInterpreterEntry index values");
+        g_warning("prtInterpreterEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -3875,7 +4040,7 @@ assign_prtConsoleDisplayBufferEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtConsoleDisplayBufferEntry((GSnmpVarBind *) vbl->data, prtConsoleDisplayBufferEntry) < 0) {
-        g_warning("illegal prtConsoleDisplayBufferEntry instance identifier");
+        g_warning("prtConsoleDisplayBufferEntry: invalid instance identifier");
         g_free(prtConsoleDisplayBufferEntry);
         return NULL;
     }
@@ -3888,7 +4053,10 @@ assign_prtConsoleDisplayBufferEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prtConsoleDisplayBufferText: value not within ConsoleDescriptionStringTC size constraints");
+                break;
+            }
             prtConsoleDisplayBufferEntry->_prtConsoleDisplayBufferTextLength = vb->syntax_len;
             prtConsoleDisplayBufferEntry->prtConsoleDisplayBufferText = vb->syntax.uc;
             break;
@@ -3937,7 +4105,7 @@ printer_mib_get_prtConsoleDisplayBufferEntry(GSnmpSession *s, printer_mib_prtCon
     memcpy(base, oid_prtConsoleDisplayBufferEntry, sizeof(oid_prtConsoleDisplayBufferEntry));
     len = pack_prtConsoleDisplayBufferEntry(base, hrDeviceIndex, prtConsoleDisplayBufferIndex);
     if (len < 0) {
-        g_warning("illegal prtConsoleDisplayBufferEntry index values");
+        g_warning("prtConsoleDisplayBufferEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -3968,7 +4136,7 @@ printer_mib_set_prtConsoleDisplayBufferEntry(GSnmpSession *s, printer_mib_prtCon
     memcpy(base, oid_prtConsoleDisplayBufferEntry, sizeof(oid_prtConsoleDisplayBufferEntry));
     len = pack_prtConsoleDisplayBufferEntry(base, prtConsoleDisplayBufferEntry->hrDeviceIndex, prtConsoleDisplayBufferEntry->prtConsoleDisplayBufferIndex);
     if (len < 0) {
-        g_warning("illegal prtConsoleDisplayBufferEntry index values");
+        g_warning("prtConsoleDisplayBufferEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -4063,7 +4231,7 @@ assign_prtConsoleLightEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtConsoleLightEntry((GSnmpVarBind *) vbl->data, prtConsoleLightEntry) < 0) {
-        g_warning("illegal prtConsoleLightEntry instance identifier");
+        g_warning("prtConsoleLightEntry: invalid instance identifier");
         g_free(prtConsoleLightEntry);
         return NULL;
     }
@@ -4085,7 +4253,10 @@ assign_prtConsoleLightEntry(GSList *vbl)
             prtConsoleLightEntry->prtConsoleColor = &(vb->syntax.i32[0]);
             break;
         case 5:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prtConsoleDescription: value not within ConsoleDescriptionStringTC size constraints");
+                break;
+            }
             prtConsoleLightEntry->_prtConsoleDescriptionLength = vb->syntax_len;
             prtConsoleLightEntry->prtConsoleDescription = vb->syntax.uc;
             break;
@@ -4134,7 +4305,7 @@ printer_mib_get_prtConsoleLightEntry(GSnmpSession *s, printer_mib_prtConsoleLigh
     memcpy(base, oid_prtConsoleLightEntry, sizeof(oid_prtConsoleLightEntry));
     len = pack_prtConsoleLightEntry(base, hrDeviceIndex, prtConsoleLightIndex);
     if (len < 0) {
-        g_warning("illegal prtConsoleLightEntry index values");
+        g_warning("prtConsoleLightEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -4165,7 +4336,7 @@ printer_mib_set_prtConsoleLightEntry(GSnmpSession *s, printer_mib_prtConsoleLigh
     memcpy(base, oid_prtConsoleLightEntry, sizeof(oid_prtConsoleLightEntry));
     len = pack_prtConsoleLightEntry(base, prtConsoleLightEntry->hrDeviceIndex, prtConsoleLightEntry->prtConsoleLightIndex);
     if (len < 0) {
-        g_warning("illegal prtConsoleLightEntry index values");
+        g_warning("prtConsoleLightEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -4266,7 +4437,7 @@ assign_prtAlertEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_prtAlertEntry((GSnmpVarBind *) vbl->data, prtAlertEntry) < 0) {
-        g_warning("illegal prtAlertEntry instance identifier");
+        g_warning("prtAlertEntry: invalid instance identifier");
         g_free(prtAlertEntry);
         return NULL;
     }
@@ -4297,7 +4468,10 @@ assign_prtAlertEntry(GSList *vbl)
             prtAlertEntry->prtAlertCode = &(vb->syntax.i32[0]);
             break;
         case 8:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("prtAlertDescription: value not within LocalizedDescriptionStringTC size constraints");
+                break;
+            }
             prtAlertEntry->_prtAlertDescriptionLength = vb->syntax_len;
             prtAlertEntry->prtAlertDescription = vb->syntax.uc;
             break;
@@ -4349,7 +4523,7 @@ printer_mib_get_prtAlertEntry(GSnmpSession *s, printer_mib_prtAlertEntry_t **prt
     memcpy(base, oid_prtAlertEntry, sizeof(oid_prtAlertEntry));
     len = pack_prtAlertEntry(base, hrDeviceIndex, prtAlertIndex);
     if (len < 0) {
-        g_warning("illegal prtAlertEntry index values");
+        g_warning("prtAlertEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }

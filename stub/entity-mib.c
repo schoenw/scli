@@ -208,7 +208,7 @@ assign_entPhysicalEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_entPhysicalEntry((GSnmpVarBind *) vbl->data, entPhysicalEntry) < 0) {
-        g_warning("illegal entPhysicalEntry instance identifier");
+        g_warning("entPhysicalEntry: invalid instance identifier");
         g_free(entPhysicalEntry);
         return NULL;
     }
@@ -221,7 +221,10 @@ assign_entPhysicalEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("entPhysicalDescr: value not within SnmpAdminString size constraints");
+                break;
+            }
             entPhysicalEntry->_entPhysicalDescrLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalDescr = vb->syntax.uc;
             break;
@@ -231,56 +234,103 @@ assign_entPhysicalEntry(GSList *vbl)
             entPhysicalEntry->entPhysicalVendorType = vb->syntax.ui32;
             break;
         case 4:
+            if ((vb->syntax.i32[0] < 0)) {
+                g_warning("entPhysicalContainedIn: value not within range constraints");
+                break;
+            }
             entPhysicalEntry->entPhysicalContainedIn = &(vb->syntax.i32[0]);
             break;
         case 5:
             entPhysicalEntry->entPhysicalClass = &(vb->syntax.i32[0]);
             break;
         case 6:
+            if ((vb->syntax.i32[0] < -1)) {
+                g_warning("entPhysicalParentRelPos: value not within range constraints");
+                break;
+            }
             entPhysicalEntry->entPhysicalParentRelPos = &(vb->syntax.i32[0]);
             break;
         case 7:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("entPhysicalName: value not within SnmpAdminString size constraints");
+                break;
+            }
             entPhysicalEntry->_entPhysicalNameLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalName = vb->syntax.uc;
             break;
         case 8:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("entPhysicalHardwareRev: value not within SnmpAdminString size constraints");
+                break;
+            }
             entPhysicalEntry->_entPhysicalHardwareRevLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalHardwareRev = vb->syntax.uc;
             break;
         case 9:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("entPhysicalFirmwareRev: value not within SnmpAdminString size constraints");
+                break;
+            }
             entPhysicalEntry->_entPhysicalFirmwareRevLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalFirmwareRev = vb->syntax.uc;
             break;
         case 10:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("entPhysicalSoftwareRev: value not within SnmpAdminString size constraints");
+                break;
+            }
             entPhysicalEntry->_entPhysicalSoftwareRevLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalSoftwareRev = vb->syntax.uc;
             break;
         case 11:
-            if (vb->syntax_len > 32) break;
+            if ((vb->syntax_len > 32)) {
+                g_warning("entPhysicalSerialNum: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("entPhysicalSerialNum: value not within SnmpAdminString size constraints");
+                break;
+            }
             entPhysicalEntry->_entPhysicalSerialNumLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalSerialNum = vb->syntax.uc;
             break;
         case 12:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("entPhysicalMfgName: value not within SnmpAdminString size constraints");
+                break;
+            }
             entPhysicalEntry->_entPhysicalMfgNameLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalMfgName = vb->syntax.uc;
             break;
         case 13:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("entPhysicalModelName: value not within SnmpAdminString size constraints");
+                break;
+            }
             entPhysicalEntry->_entPhysicalModelNameLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalModelName = vb->syntax.uc;
             break;
         case 14:
-            if (vb->syntax_len > 32) break;
+            if ((vb->syntax_len > 32)) {
+                g_warning("entPhysicalAlias: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("entPhysicalAlias: value not within SnmpAdminString size constraints");
+                break;
+            }
             entPhysicalEntry->_entPhysicalAliasLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalAlias = vb->syntax.uc;
             break;
         case 15:
-            if (vb->syntax_len > 32) break;
+            if ((vb->syntax_len > 32)) {
+                g_warning("entPhysicalAssetID: value not within size constraints");
+                break;
+            }
+            if ((vb->syntax_len > 255)) {
+                g_warning("entPhysicalAssetID: value not within SnmpAdminString size constraints");
+                break;
+            }
             entPhysicalEntry->_entPhysicalAssetIDLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalAssetID = vb->syntax.uc;
             break;
@@ -332,7 +382,7 @@ entity_mib_get_entPhysicalEntry(GSnmpSession *s, entity_mib_entPhysicalEntry_t *
     memcpy(base, oid_entPhysicalEntry, sizeof(oid_entPhysicalEntry));
     len = pack_entPhysicalEntry(base, entPhysicalIndex);
     if (len < 0) {
-        g_warning("illegal entPhysicalEntry index values");
+        g_warning("entPhysicalEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -363,7 +413,7 @@ entity_mib_set_entPhysicalEntry(GSnmpSession *s, entity_mib_entPhysicalEntry_t *
     memcpy(base, oid_entPhysicalEntry, sizeof(oid_entPhysicalEntry));
     len = pack_entPhysicalEntry(base, entPhysicalEntry->entPhysicalIndex);
     if (len < 0) {
-        g_warning("illegal entPhysicalEntry index values");
+        g_warning("entPhysicalEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -467,7 +517,7 @@ assign_entLogicalEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_entLogicalEntry((GSnmpVarBind *) vbl->data, entLogicalEntry) < 0) {
-        g_warning("illegal entLogicalEntry instance identifier");
+        g_warning("entLogicalEntry: invalid instance identifier");
         g_free(entLogicalEntry);
         return NULL;
     }
@@ -480,7 +530,10 @@ assign_entLogicalEntry(GSList *vbl)
 
         switch (idx) {
         case 2:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("entLogicalDescr: value not within SnmpAdminString size constraints");
+                break;
+            }
             entLogicalEntry->_entLogicalDescrLength = vb->syntax_len;
             entLogicalEntry->entLogicalDescr = vb->syntax.uc;
             break;
@@ -490,12 +543,18 @@ assign_entLogicalEntry(GSList *vbl)
             entLogicalEntry->entLogicalType = vb->syntax.ui32;
             break;
         case 4:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("entLogicalCommunity: value not within size constraints");
+                break;
+            }
             entLogicalEntry->_entLogicalCommunityLength = vb->syntax_len;
             entLogicalEntry->entLogicalCommunity = vb->syntax.uc;
             break;
         case 5:
-            if (vb->syntax_len < 1 || vb->syntax_len > 255) break;
+            if ((vb->syntax_len < 1 || vb->syntax_len > 255)) {
+                g_warning("entLogicalTAddress: value not within TAddress size constraints");
+                break;
+            }
             entLogicalEntry->_entLogicalTAddressLength = vb->syntax_len;
             entLogicalEntry->entLogicalTAddress = vb->syntax.uc;
             break;
@@ -505,12 +564,18 @@ assign_entLogicalEntry(GSList *vbl)
             entLogicalEntry->entLogicalTDomain = vb->syntax.ui32;
             break;
         case 7:
-            if (vb->syntax_len > 32) break;
+            if ((vb->syntax_len > 32)) {
+                g_warning("entLogicalContextEngineID: value not within SnmpEngineIdOrNone size constraints");
+                break;
+            }
             entLogicalEntry->_entLogicalContextEngineIDLength = vb->syntax_len;
             entLogicalEntry->entLogicalContextEngineID = vb->syntax.uc;
             break;
         case 8:
-            if (vb->syntax_len > 255) break;
+            if ((vb->syntax_len > 255)) {
+                g_warning("entLogicalContextName: value not within SnmpAdminString size constraints");
+                break;
+            }
             entLogicalEntry->_entLogicalContextNameLength = vb->syntax_len;
             entLogicalEntry->entLogicalContextName = vb->syntax.uc;
             break;
@@ -559,7 +624,7 @@ entity_mib_get_entLogicalEntry(GSnmpSession *s, entity_mib_entLogicalEntry_t **e
     memcpy(base, oid_entLogicalEntry, sizeof(oid_entLogicalEntry));
     len = pack_entLogicalEntry(base, entLogicalIndex);
     if (len < 0) {
-        g_warning("illegal entLogicalEntry index values");
+        g_warning("entLogicalEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -655,7 +720,7 @@ assign_entLPMappingEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_entLPMappingEntry((GSnmpVarBind *) vbl->data, entLPMappingEntry) < 0) {
-        g_warning("illegal entLPMappingEntry instance identifier");
+        g_warning("entLPMappingEntry: invalid instance identifier");
         g_free(entLPMappingEntry);
         return NULL;
     }
@@ -712,7 +777,7 @@ entity_mib_get_entLPMappingEntry(GSnmpSession *s, entity_mib_entLPMappingEntry_t
     memcpy(base, oid_entLPMappingEntry, sizeof(oid_entLPMappingEntry));
     len = pack_entLPMappingEntry(base, entLogicalIndex, entLPPhysicalIndex);
     if (len < 0) {
-        g_warning("illegal entLPMappingEntry index values");
+        g_warning("entLPMappingEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -808,7 +873,7 @@ assign_entAliasMappingEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_entAliasMappingEntry((GSnmpVarBind *) vbl->data, entAliasMappingEntry) < 0) {
-        g_warning("illegal entAliasMappingEntry instance identifier");
+        g_warning("entAliasMappingEntry: invalid instance identifier");
         g_free(entAliasMappingEntry);
         return NULL;
     }
@@ -870,7 +935,7 @@ entity_mib_get_entAliasMappingEntry(GSnmpSession *s, entity_mib_entAliasMappingE
     memcpy(base, oid_entAliasMappingEntry, sizeof(oid_entAliasMappingEntry));
     len = pack_entAliasMappingEntry(base, entPhysicalIndex, entAliasLogicalIndexOrZero);
     if (len < 0) {
-        g_warning("illegal entAliasMappingEntry index values");
+        g_warning("entAliasMappingEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
@@ -966,7 +1031,7 @@ assign_entPhysicalContainsEntry(GSList *vbl)
     * (GSList **) p = vbl;
 
     if (unpack_entPhysicalContainsEntry((GSnmpVarBind *) vbl->data, entPhysicalContainsEntry) < 0) {
-        g_warning("illegal entPhysicalContainsEntry instance identifier");
+        g_warning("entPhysicalContainsEntry: invalid instance identifier");
         g_free(entPhysicalContainsEntry);
         return NULL;
     }
@@ -1023,7 +1088,7 @@ entity_mib_get_entPhysicalContainsEntry(GSnmpSession *s, entity_mib_entPhysicalC
     memcpy(base, oid_entPhysicalContainsEntry, sizeof(oid_entPhysicalContainsEntry));
     len = pack_entPhysicalContainsEntry(base, entPhysicalIndex, entPhysicalChildIndex);
     if (len < 0) {
-        g_warning("illegal entPhysicalContainsEntry index values");
+        g_warning("entPhysicalContainsEntry: invalid index values");
         s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
