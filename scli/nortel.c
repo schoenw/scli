@@ -41,7 +41,7 @@ fmt_vlanStatus(GString *s, rapid_city_rcVlanEntry_t *vlanEntry)
     static GSnmpEnum const rcVlanType[] = {
 	{ RAPID_CITY_RCVLANTYPE_BYPORT,	"P" },
 	{ RAPID_CITY_RCVLANTYPE_BYIPSUBNET,	"I" },
-	{ RAPID_CITY_RCVLANTYPE_BYPROTOCOLID,	"P" },
+	{ RAPID_CITY_RCVLANTYPE_BYPROTOCOLID,	"O" },
 	{ RAPID_CITY_RCVLANTYPE_BYSRCMAC,	"S" },
 	{ RAPID_CITY_RCVLANTYPE_BYDSTMCAST,	"D" },
 	{ 0, NULL }
@@ -522,16 +522,64 @@ static void
 fmt_nortel_bridge_vlan_port(GString *s,
 			    rapid_city_rcVlanPortEntry_t *vlanPortEntry)
 {
+    static GSnmpEnum const rapid_city_enums_rcVlanPortType[] = {
+	{ RAPID_CITY_RCVLANPORTTYPE_ACCESS,	"A" },
+	{ RAPID_CITY_RCVLANPORTTYPE_TRUNK,	"T" },
+	{ 0, NULL }
+    };
+
+    static GSnmpEnum const rcVlanPortPerformTagging[] = {
+	{ RAPID_CITY_RCVLANPORTPERFORMTAGGING_TRUE,	"T" },
+	{ RAPID_CITY_RCVLANPORTPERFORMTAGGING_FALSE,	"N" },
+	{ 0, NULL }
+    };
+    
+    static GSnmpEnum const rcVlanPortDiscardTaggedFrames[] = {
+	{ RAPID_CITY_RCVLANPORTDISCARDTAGGEDFRAMES_TRUE,	"D" },
+	{ RAPID_CITY_RCVLANPORTDISCARDTAGGEDFRAMES_FALSE,	"N" },
+	{ 0, NULL }
+    };
+
+    static GSnmpEnum const rcVlanPortDiscardUntaggedFrames[] = {
+	{ RAPID_CITY_RCVLANPORTDISCARDUNTAGGEDFRAMES_TRUE,	"D" },
+	{ RAPID_CITY_RCVLANPORTDISCARDUNTAGGEDFRAMES_FALSE,	"N" },
+	{ 0, NULL }
+    };
+
     const char *e;
+    int i;
     
     g_string_sprintfa(s, "%5u ", vlanPortEntry->rcVlanPortIndex);
 
     e = fmt_enum(rapid_city_enums_rcVlanPortType,
 		 vlanPortEntry->rcVlanPortType);
-    g_string_sprintfa(s, "%-*s ", 7, e ? e : "");
+    g_string_sprintfa(s, "%s", e ? e : "-");
+
+    e = fmt_enum(rcVlanPortPerformTagging,
+		 vlanPortEntry->rcVlanPortPerformTagging);
+    g_string_sprintfa(s, "%s", e ? e : "-");
+
+    e = fmt_enum(rcVlanPortDiscardTaggedFrames,
+		 vlanPortEntry->rcVlanPortDiscardTaggedFrames);
+    g_string_sprintfa(s, "%s", e ? e : "-");
+
+    e = fmt_enum(rcVlanPortDiscardUntaggedFrames,
+		 vlanPortEntry->rcVlanPortDiscardUntaggedFrames);
+    g_string_sprintfa(s, "%s", e ? e : "-");
 
     if (vlanPortEntry->rcVlanPortDefaultVlanId) {
-	g_string_sprintfa(s, "%5u ", *vlanPortEntry->rcVlanPortDefaultVlanId);
+	g_string_sprintfa(s, "  %5u   ",
+			  *vlanPortEntry->rcVlanPortDefaultVlanId);
+    }
+
+    if (vlanPortEntry->rcVlanPortNumVlanIds
+	&& vlanPortEntry->rcVlanPortVlanIds) {
+	for (i = 0; i < *vlanPortEntry->rcVlanPortNumVlanIds; i += 2) {
+	    gint32 port;
+	    port = vlanPortEntry->rcVlanPortVlanIds[i*2] * 256
+		+ vlanPortEntry->rcVlanPortVlanIds[i*2+1];
+	    g_string_sprintfa(s, "%s%d", i ? "," : "", port);
+	}
     }
 
     g_string_sprintfa(s, "\n");
@@ -557,7 +605,7 @@ show_nortel_bridge_vlan_ports(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (vlanPortTable) {
-	g_string_sprintfa(interp->header, "PORT TYPE DEFAULT VLANS");
+	g_string_sprintfa(interp->header, " PORT FLAGS DEFAULT VLANS");
 	for (i = 0; vlanPortTable[i]; i++) {
 	    fmt_nortel_bridge_vlan_port(interp->result, vlanPortTable[i]);
 	}
@@ -793,9 +841,20 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "information about all selected vlans. The optional regular\n"
 	  "expression <regexp> is matched against the vlan names to\n"
 	  "select the vlans of interest. The command generates a table\n"
-	  "which displays the vlan number, the vlan name, the vlan type,\n"
-	  "the vlan priority, whether routing is enabled and the status\n"
-	  "of the vlan.",
+	  "with the following columns:\n"
+	  "\n"
+	  "  VLAN   vlan number\n"
+	  "  STATUS status of the vlan (see below)\n"
+	  "  NAME   vlan name\n"
+	  "  PORTS  ports assigned to the vlan\n"
+	  "\n"
+	  "The status is encoded in four characters. The first character\n"
+	  "indicates the status of the row (A=active, S=not in service,\n"
+	  "R=not ready). The second character indicates  vlan type (P=B\n"
+	  "port, I=IP-subnet, O=protocol, S=src address, D=dst address).\n"
+	  "The third character indicates the priority of the vlan (H=high,\n"
+	  "N=normal) and the fourth character indicates whether routing\n"
+	  "is enabled (R=routing, N=no routing).",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  show_nortel_bridge_vlan_info },
@@ -810,7 +869,21 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  show_nortel_bridge_vlan_details },
 
 	{ "show nortel bridge vlan ports", NULL,
-	  "The show nortel bridge vlan ports command ... xxx\n",
+	  "The show nortel bridge vlan ports command shows information\n"
+	  "for each vlan port. The command generates a table with the\n"
+	  "following columns:\n"
+	  "\n"
+	  "  PORT    port number\n"
+	  "  FLAGS   port vlan flags (see below)\n"
+	  "  DEFAULT default vlan number\n"
+	  "  VLANS   vlan numbers the port is member of\n"
+	  "\n"
+	  "The flags are encoded in four characters. The first character\n"
+	  "indicates the port type (A=access, T=trunk). The second character\n"
+	  "indicates whether the port tags frames (T=tagging, N=none). The\n"
+	  "third character indicates whether the port discards tagged frames\n"
+	  "(D=discard, N=none) and the fourth character indicates whether\n"
+	  "the port discards untagged frames (D=discard, N=none).",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  show_nortel_bridge_vlan_ports },
