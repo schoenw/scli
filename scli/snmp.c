@@ -110,40 +110,60 @@ fmt_row_status(GString *s, gint32 *status)
 
 
 
+static void
+fmt_snmp_engine(GString *s,
+		snmp_framework_mib_snmpEngine_t *snmpEngine,
+		snmpv2_mib_snmp_t *snmp)
+{
+    int const indent = 14;
+    const char *e;
+    
+    if (snmpEngine) {
+	if (snmpEngine->snmpEngineBoots) {
+	    g_string_sprintfa(s, "%-*s%u times\n",
+			      indent, "Boots:",
+			      *(snmpEngine->snmpEngineBoots));
+	}
+	if (snmpEngine->snmpEngineTime) {
+	    g_string_sprintfa(s, "%-*s%u seconds since last boot\n",
+			      indent, "Time:",
+			      *(snmpEngine->snmpEngineTime));
+	}
+	if (snmpEngine->snmpEngineMaxMessageSize) {
+	    g_string_sprintfa(s, "%-*s%u byte\n",
+			      indent, "Max Size:",
+			      *(snmpEngine->snmpEngineMaxMessageSize));
+	}
+    }
+    if (snmp) {
+	e = fmt_enum(snmpv2_mib_enums_snmpEnableAuthenTraps,
+		     snmp->snmpEnableAuthenTraps);
+	if (e) {
+	    g_string_sprintfa(s, "%-*s%s\n",
+			      indent, "Auth Traps:", e);
+	}
+    }
+}
+
+
+
 static int
 show_snmp_engine(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_framework_mib_snmpEngine_t *snmpEngine;
-    int const indent = 18;
+    snmpv2_mib_snmp_t *snmp;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
     
     if (snmp_framework_mib_get_snmpEngine(interp->peer, &snmpEngine)) {
 	return SCLI_ERROR;
     }
-    
-    if (snmpEngine) {
-	if (snmpEngine->snmpEngineBoots) {
-	    g_string_sprintfa(interp->result,
-			      "%-*s %u times\n",
-			      indent, "Boots:",
-			      *(snmpEngine->snmpEngineBoots));
-	}
-	if (snmpEngine->snmpEngineTime) {
-	    g_string_sprintfa(interp->result,
-			      "%-*s %u seconds since last boot\n",
-			      indent, "Time:",
-			      *(snmpEngine->snmpEngineTime));
-	}
-	if (snmpEngine->snmpEngineMaxMessageSize) {
-	    g_string_sprintfa(interp->result,
-			      "%-*s %u byte\n",
-			      indent, "MMSZ:",
-			      *(snmpEngine->snmpEngineMaxMessageSize));
-	}
-    }
+    (void) snmpv2_mib_get_snmp(interp->peer, &snmp);
+
+    fmt_snmp_engine(interp->result, snmpEngine, snmp);
     
     if (snmpEngine) snmp_framework_mib_free_snmpEngine(snmpEngine);
+    if (snmp) snmpv2_mib_free_snmp(snmp);
     
     return SCLI_OK;
 }
@@ -155,17 +175,30 @@ fmt_snmp_resource(GString *s,
 		  snmpv2_mib_sysOREntry_t *sysOREntry,
 		  snmpv2_mib_system_t *system)
 {
-    g_string_sprintfa(s, "%5d ", sysOREntry->sysORIndex);
+    int i;
+    int const indent = 14;
+    
+    g_string_sprintfa(s, "%-*s%d\n", indent, "MIB Resource:",
+		      sysOREntry->sysORIndex);
     if (sysOREntry->sysORUpTime && system && system->sysUpTime) {
 	guint32 dsecs = *system->sysUpTime - *sysOREntry->sysORUpTime;
-	g_string_append(s, fmt_timeticks(dsecs));
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Last Change:",
+			  fmt_timeticks(dsecs));
     }
+    
     if (sysOREntry->sysORDescr) {
-	g_string_sprintfa(s, " %.*s",
-			  (int) sysOREntry->_sysORDescrLength,
-			  sysOREntry->sysORDescr);
+	fmt_display_string(s, indent, "Description:",
+			   (int) sysOREntry->_sysORDescrLength,
+			   sysOREntry->sysORDescr);
     }
-    g_string_append(s, "\n");
+    if (sysOREntry->sysORID && sysOREntry->_sysORIDLength) {
+	g_string_sprintfa(s, "%-*s", indent, "Capabilities:");
+	for (i = 0; i < sysOREntry->_sysORIDLength; i++) {
+	    g_string_sprintfa(s, "%s%u", i ? "." : "",
+			      sysOREntry->sysORID[i]);
+	}
+	g_string_append(s, "\n");
+    }
 }
 
 
@@ -185,8 +218,10 @@ show_snmp_resources(scli_interp_t *interp, int argc, char **argv)
     (void) snmpv2_mib_get_system(interp->peer, &system);
         
     if (sysORTable) {
-	g_string_sprintfa(interp->header, "INDEX DESCRIPTION");
 	for (i = 0; sysORTable[i]; i++) {
+	    if (i) {
+		g_string_append(interp->result, "\n");
+	    }
 	    fmt_snmp_resource(interp->result, sysORTable[i], system);
 	}
     }
@@ -481,7 +516,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 
 	{ "show snmp resources", NULL,
 	  "The show snmp resources command displays information about the\n"
-	  "resources or modules supported by the SNMP agent.",
+	  "MIB resources supported by the SNMP agent.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  show_snmp_resources },

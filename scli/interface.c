@@ -953,9 +953,7 @@ foreach_interface(scli_interp_t *interp, char *regex,
     if (ifTable) {
 	for (i = 0; ifTable[i]; i++) {
 	    if (match_interface(regex_iface, ifTable[i])) {
-		g_printerr("** interface %d **\n", ifTable[i]->ifIndex);
 		(func) (interp, ifTable[i], user_data);
-		/* call function here */
 	    }
 	}
     }
@@ -1000,7 +998,7 @@ set_interface_status(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (! gsnmp_enum_get_number(if_mib_enums_ifAdminStatus, argv[2], &value)) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_VALUE;
     }
 
     status = foreach_interface(interp, argv[1], set_status, &value);
@@ -1079,7 +1077,7 @@ set_interface_promiscuous(scli_interp_t *interp, int argc, char **argv)
 
     if (! gsnmp_enum_get_number(if_mib_enums_ifPromiscuousMode,
 				argv[2], &value)) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_VALUE;
     }
 
     status = foreach_interface(interp, argv[1], set_promiscuous, &value);
@@ -1121,7 +1119,7 @@ set_interface_notifications(scli_interp_t *interp, int argc, char **argv)
 
     if (! gsnmp_enum_get_number(if_mib_enums_ifLinkUpDownTrapEnable,
 				argv[2], &value)) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_VALUE;
     }
 
     status = foreach_interface(interp, argv[1], set_notifications, &value);

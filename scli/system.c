@@ -885,7 +885,7 @@ fmt_system_info(GString *s, scli_interp_t *interp,
 			       system->sysName);
 	}
 	if (interp->peer->name) {
-	    g_string_sprintfa(s, "%-*s ", indent, "Address:");
+	    g_string_sprintfa(s, "%-*s", indent, "Address:");
 	    g_string_sprintfa(s, "%s:%d\n", interp->peer->name,
 			      interp->peer->port);
 	}
@@ -909,7 +909,7 @@ fmt_system_info(GString *s, scli_interp_t *interp,
 	    vendor = scli_get_iana_vendor(system->sysObjectID,
 					  system->_sysObjectIDLength);
 	    if (vendor && vendor->name) {
-		g_string_sprintfa(s, "%-*s ", indent, "Vendor:");
+		g_string_sprintfa(s, "%-*s", indent, "Vendor:");
 		if (vendor->id) {
 		    g_string_append(s, vendor->name);
 		    if (vendor->url) {
@@ -927,7 +927,7 @@ fmt_system_info(GString *s, scli_interp_t *interp,
 		"representation", "application", NULL
 	    };
 
-	    g_string_sprintfa(s, "%-*s ", indent, "Services:");
+	    g_string_sprintfa(s, "%-*s", indent, "Services:");
 	    for (i = 0; serv_names[i]; i++) {
 		if (*(system->sysServices) & (1 << i)) {
 		    g_string_sprintfa(s, "%s ", serv_names[i]);
@@ -977,7 +977,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     s = interp->result;
     if (hrSystem) {
 	if (hrSystem->hrSystemDate && hrSystem->_hrSystemDateLength) {
-	    g_string_sprintfa(s, "%-*s ", indent, "Current Time:");
+	    g_string_sprintfa(s, "%-*s", indent, "Current Time:");
 	    g_string_append(s, fmt_date_and_time(hrSystem->hrSystemDate,
 					 hrSystem->_hrSystemDateLength));
 	    g_string_append_c(s, '\n');
@@ -986,7 +986,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 
     if (system) {
 	if (system->sysUpTime) {
-	    g_string_sprintfa(s, "%-*s ", indent, "Agent Boot Time:");
+	    g_string_sprintfa(s, "%-*s", indent, "Agent Boot Time:");
 	    g_string_append(s, fmt_timeticks(*(system->sysUpTime)));
 	    g_string_append_c(s, '\n');
 	}
@@ -994,17 +994,22 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     
     if (hrSystem) {
 	if (hrSystem->hrSystemUptime) {
-	    g_string_sprintfa(s, "%-*s ", indent, "System Boot Time:");
+	    g_string_sprintfa(s, "%-*s", indent, "System Boot Time:");
 	    g_string_append(s, fmt_timeticks(*(hrSystem->hrSystemUptime)));
 	    g_string_append_c(s, '\n');
 	}
+	if (hrSystem->hrSystemInitialLoadParameters) {
+	    g_string_sprintfa(s, "%-*s%.*s", indent, "System Boot Args:",
+		      (int) hrSystem->_hrSystemInitialLoadParametersLength,
+			      hrSystem->hrSystemInitialLoadParameters);
+	}
 	if (hrSystem->hrSystemNumUsers) {
-	    g_string_sprintfa(s, "%-*s %u", indent, "Users:", 
+	    g_string_sprintfa(s, "%-*s%u", indent, "Users:", 
 			      *(hrSystem->hrSystemNumUsers));
 	    g_string_append_c(s, '\n');
 	}
 	if (hrSystem->hrSystemProcesses) {
-	    g_string_sprintfa(s, "%-*s %u", indent, "Processes:",
+	    g_string_sprintfa(s, "%-*s%u", indent, "Processes:",
 			      *(hrSystem->hrSystemProcesses));
 	    if (hrSystem->hrSystemMaxProcesses
 		&& *(hrSystem->hrSystemMaxProcesses)) {
@@ -1017,7 +1022,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 
     if (hrStorage) {
 	if (hrStorage->hrMemorySize) {
-	    g_string_sprintfa(s, "%-*s ", indent, "Memory:");
+	    g_string_sprintfa(s, "%-*s", indent, "Memory:");
 	    fmt_kbytes(s, *(hrStorage->hrMemorySize));
 	    g_string_append_c(s, '\n');
 	}
@@ -1025,14 +1030,14 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 
     if (interfaces) {
 	if (interfaces->ifNumber) {
-	    g_string_sprintfa(s, "%-*s %d\n", indent, "Interfaces:",
+	    g_string_sprintfa(s, "%-*s%d\n", indent, "Interfaces:",
 			      *(interfaces->ifNumber));
 	}
     }
 
     if (dot1dBase) {
 	if (dot1dBase->dot1dBaseNumPorts && *dot1dBase->dot1dBaseNumPorts) {
-	    g_string_sprintfa(s, "%-*s %d ", indent, "Bridge Ports:",
+	    g_string_sprintfa(s, "%-*s%d ", indent, "Bridge Ports:",
 			      *(dot1dBase->dot1dBaseNumPorts));
 	    if (dot1dBase->dot1dBaseType) {
 		const char *e;
@@ -1046,7 +1051,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 
     if (smLangTable) {
 	for (i = 0; smLangTable[i]; i++) ;
-	g_string_sprintfa(s, "%-*s %u\n", indent, "Script Languages:", i);
+	g_string_sprintfa(s, "%-*s%u\n", indent, "Script Languages:", i);
     }
 
     if (system)
@@ -1087,7 +1092,6 @@ set_system_contact(scli_interp_t *interp, int argc, char **argv)
 
     if (interp->peer->error_status) {
 	scli_snmp_error(interp);
-	g_string_append(interp->result, "\n");
 	return SCLI_ERROR;
     }
 
@@ -1100,7 +1104,6 @@ static int
 set_system_name(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_system_t *system = NULL;
-    int code;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1111,12 +1114,11 @@ set_system_name(scli_interp_t *interp, int argc, char **argv)
     system = snmpv2_mib_new_system();
     system->sysName = argv[1];
     system->_sysNameLength = strlen(system->sysName);
-    code = snmpv2_mib_set_system(interp->peer, system);
+    (void) snmpv2_mib_set_system(interp->peer, system);
     snmpv2_mib_free_system(system);
     
     if (interp->peer->error_status) {
 	scli_snmp_error(interp);
-	g_string_append(interp->result, "\n");
 	return SCLI_ERROR;
     }
 
@@ -1129,7 +1131,6 @@ static int
 set_system_location(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_system_t *system = NULL;
-    int code;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1140,12 +1141,11 @@ set_system_location(scli_interp_t *interp, int argc, char **argv)
     system = snmpv2_mib_new_system();
     system->sysLocation = argv[1];
     system->_sysLocationLength = strlen(system->sysLocation);
-    code = snmpv2_mib_set_system(interp->peer, system);
+    (void) snmpv2_mib_set_system(interp->peer, system);
     snmpv2_mib_free_system(system);
 
     if (interp->peer->error_status) {
 	scli_snmp_error(interp);
-	g_string_append(interp->result, "\n");
 	return SCLI_ERROR;
     }
 

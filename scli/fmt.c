@@ -103,15 +103,15 @@ fmt_date_and_time(guchar *data, gsize len)
     static char buffer[80];
     int i;
 
+    buffer[0] = 0;
     if (! data) {
-	buffer[0] = 0;
 	return buffer;
     }
     
     /*
      * Check if it is a null value consisting of all 0x00 bytes or if
      * it has a length of 0 (not really legal, but people sometimes
-     * do it this way.
+     * do it this way).
      */
 
     for (i = 0; i < len; i++) {
@@ -390,13 +390,13 @@ fmt_display_string(GString *s, int indent, char *label, int len, char *string)
 {
     int i, pos;
     
-    g_string_sprintfa(s, "%-*s ", indent, label);
+    g_string_sprintfa(s, "%-*s", indent, label);
     pos = indent;
 
     for (i = 0; i < len; i++) {
 	if (string[i] == '\r') continue;
 	if (pos > 70 && isspace(string[i])) {
-	    g_string_sprintfa(s, "\n%*s ", indent, "");
+	    g_string_sprintfa(s, "\n%*s", indent, "");
 	    pos = indent;
 	    continue;
 	}

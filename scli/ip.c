@@ -1,3 +1,4 @@
+
 /* 
  * ip.c -- scli ip mode implementation
  *
@@ -30,9 +31,17 @@
 
 
 
+GSnmpEnum const forwarding[] = {
+    { IP_MIB_IPFORWARDING_FORWARDING,	"enabled" },
+    { IP_MIB_IPFORWARDING_NOTFORWARDING,	"disabled" },
+    { 0, NULL }
+};
+
+
+
 static void
-show_ip_forward(GString *s,
-		ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry)
+fmt_ip_forward(GString *s,
+	       ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry)
 {
     g_string_append(s, "\n");
 }
@@ -40,10 +49,10 @@ show_ip_forward(GString *s,
 
 
 static void
-show_ip_route(GString *s,
-	      rfc1213_mib_ipRouteEntry_t *ipRouteEntry,
-	      if_mib_ifXEntry_t **ifXTable,
-	      if_mib_ifEntry_t **ifTable)
+fmt_ip_route(GString *s,
+	     rfc1213_mib_ipRouteEntry_t *ipRouteEntry,
+	     if_mib_ifXEntry_t **ifXTable,
+	     if_mib_ifEntry_t **ifTable)
 {
     const char *label;
     int i, pos;
@@ -104,7 +113,7 @@ show_ip_route(GString *s,
 
 
 static int
-cmd_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
+show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 {
     ip_forward_mib_ipCidrRouteEntry_t **ipCidrRouteTable = NULL;
     rfc1213_mib_ipRouteEntry_t **ipRouteTable = NULL;
@@ -132,13 +141,13 @@ cmd_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 		  "DESTINATION", "NEXT HOP", "TYPE", "PROTO", "INTERFACE");
 	if (ipCidrRouteTable) {
 	    for (i = 0; ipCidrRouteTable[i]; i++) {
-		show_ip_forward(interp->result, ipCidrRouteTable[i]);
+		fmt_ip_forward(interp->result, ipCidrRouteTable[i]);
 	    }
 	}
 	if (! ipCidrRouteTable && ipRouteTable) {
 	    for (i = 0; ipRouteTable[i]; i++) {
-		show_ip_route(interp->result, ipRouteTable[i],
-			      ifXTable, ifTable);
+		fmt_ip_route(interp->result, ipRouteTable[i],
+			     ifXTable, ifTable);
 	    }
 	}
     }
@@ -158,7 +167,7 @@ cmd_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_ip_address(GString *s, ip_mib_ipAddrEntry_t *ipAddrEntry)
+fmt_ip_address(GString *s, ip_mib_ipAddrEntry_t *ipAddrEntry)
 {
     unsigned prefix = 0;
     char *name;
@@ -200,7 +209,7 @@ show_ip_address(GString *s, ip_mib_ipAddrEntry_t *ipAddrEntry)
 
 
 static int
-cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
+show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 {
     ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
     int i;
@@ -217,9 +226,9 @@ cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 
     if (ipAddrTable) {
 	g_string_sprintfa(interp->header,
-			  "INTERFACE IP-ADDRESS     PREFIX  NAME");
+			  "INTERFACE ADDRESS        PREFIX  NAME");
 	for (i = 0; ipAddrTable[i]; i++) {
-	    show_ip_address(interp->result, ipAddrTable[i]);
+	    fmt_ip_address(interp->result, ipAddrTable[i]);
 	}
 	ip_mib_free_ipAddrTable(ipAddrTable);
     }
@@ -229,10 +238,10 @@ cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_ip_tunnel(GString *s,
-	       tunnel_mib_tunnelIfEntry_t *tunnelIfEntry,
-	       if_mib_ifXEntry_t **ifXTable,
-	       if_mib_ifEntry_t **ifTable)
+fmt_ip_tunnel(GString *s,
+	      tunnel_mib_tunnelIfEntry_t *tunnelIfEntry,
+	      if_mib_ifXEntry_t **ifXTable,
+	      if_mib_ifEntry_t **ifTable)
 {
     int i;
 
@@ -323,7 +332,7 @@ show_ip_tunnel(GString *s,
 
 
 static int
-cmd_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
+show_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 {
     tunnel_mib_tunnelIfEntry_t **tunnelIfTable = NULL;
     if_mib_ifEntry_t **ifTable = NULL;
@@ -347,8 +356,8 @@ cmd_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 	g_string_append(interp->header,
 	"LOCAL ADDRESS    REMOTE ADDRESS   TYPE    SEC.  TTL TOS INTERFACE");
 	for (i = 0; tunnelIfTable[i]; i++) {
-	    show_ip_tunnel(interp->result, tunnelIfTable[i],
-			   ifXTable, ifTable);
+	    fmt_ip_tunnel(interp->result, tunnelIfTable[i],
+			  ifXTable, ifTable);
 	}
     }
 
@@ -362,7 +371,7 @@ cmd_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_ip_arp(GString *s,
+fmt_ip_arp(GString *s,
 	    ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry,
 	    if_mib_ifEntry_t *ifEntry)
 {
@@ -407,7 +416,7 @@ show_ip_arp(GString *s,
 
 
 static int
-cmd_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
+show_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
 {
     ip_mib_ipNetToMediaEntry_t **ipNetToMediaTable = NULL;
     if_mib_ifEntry_t **ifTable = NULL, *ifEntry = NULL;
@@ -427,7 +436,7 @@ cmd_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
 
     if (ipNetToMediaTable) {
 	g_string_append(interp->header,
-		"INTERFACE TYPE     IP-ADDRESS       LOWER LAYER ADDRESS");
+		"INTERFACE TYPE     ADDRESS          LOWER LAYER ADDRESS");
 	for (i = 0; ipNetToMediaTable[i]; i++) {
 	    if (ifTable) {
 		for (j = 0; ifTable[j]; j++) {
@@ -436,7 +445,7 @@ cmd_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
 		}
 		ifEntry = ifTable[j];
 	    }
-	    show_ip_arp(interp->result, ipNetToMediaTable[i], ifEntry);
+	    fmt_ip_arp(interp->result, ipNetToMediaTable[i], ifEntry);
 	}
     }
 
@@ -449,41 +458,195 @@ cmd_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+fmt_ip_info(GString *s, ip_mib_ip_t *ip)
+{
+    int const indent = 16;
+    const char *e;
+
+    e = fmt_enum(forwarding, ip->ipForwarding);
+    if (e) {
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Forwarding:", e);
+    }
+
+    if (ip->ipDefaultTTL) {
+	g_string_sprintfa(s, "%-*s%d hops\n", indent, "Default TTL:",
+			  *ip->ipDefaultTTL);
+    }
+
+    if (ip->ipReasmTimeout) {
+	g_string_sprintfa(s, "%-*s%d seconds\n", indent, "Reasm Timeout:",
+			  *ip->ipReasmTimeout);
+    }
+}
+
+
+
+static int
+show_ip_info(scli_interp_t *interp, int argc, char **argv)
+{
+    ip_mib_ip_t *ip;
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
+    if (ip_mib_get_ip(interp->peer, &ip)) {
+	return SCLI_ERROR;
+    }
+
+    if (ip) {
+	fmt_ip_info(interp->result, ip);
+    }
+
+    if (ip) ip_mib_free_ip(ip);
+
+    return SCLI_OK;
+}
+
+
+
+static int
+set_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
+{
+    ip_mib_ip_t *ip;
+    gint32 value;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX;
+    }
+
+    if (! gsnmp_enum_get_number(forwarding, argv[1], &value)) {
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    ip = ip_mib_new_ip();
+    ip->ipForwarding = &value;
+    ip_mib_set_ip(interp->peer, ip);
+    ip_mib_free_ip(ip);
+
+    if (interp->peer->error_status) {
+	scli_snmp_error(interp);
+	return SCLI_ERROR;
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+set_ip_default_ttl(scli_interp_t *interp, int argc, char **argv)
+{
+    ip_mib_ip_t *ip;
+    gint32 value;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX;
+    }
+
+    value = atoi(argv[1]);
+    if (value < 1 || value > 255) {
+	return SCLI_SYNTAX_NUMBER;
+    }
+
+    ip = ip_mib_new_ip();
+    ip->ipDefaultTTL = &value;
+    ip_mib_set_ip(interp->peer, ip);
+    ip_mib_free_ip(ip);
+
+    if (interp->peer->error_status) {
+	scli_snmp_error(interp);
+	return SCLI_ERROR;
+    }
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_ip_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
+	{ "set ip forwarding", "<value>",
+	  "The set ip forwarding command controls whether the IP protocol\n"
+	  "engine forwards IP datagrams or not. The <value> parameter must\n"
+	  "be one of the strings \"enabled\" or \"disabled\".",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  set_ip_forwarding },
+	
+	{ "set ip default ttl", "<number>",
+	  "The set ip default ttl command can be used to change the default\n"
+	  "time to live (TTL) value used by the IP protocol engine. The\n"
+	  "<number> parameter must be a number between 1 and 255 inclusive.",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  set_ip_default_ttl },
+	
+	{ "show ip info", NULL,
+	  "The show ip info command displays paramters of the IP\n"
+	  "protocol engine, such as the default TTL or whether the\n"
+	  "node is forwarding IP packets.",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  show_ip_info },
 	
 	{ "show ip forwarding", NULL,
-	  "IP forwarding data base",
+	  "The show ip forwarding command displays the IP forwarding data\n"
+	  "base. The command generates a table with the following columns:\n"
+	  "\n"
+	  "  DESTINATION\n"
+	  "  NEXT HOP\n"
+	  "  TYPE\n"
+	  "  PROTO\n"
+	  "  INTERFACE",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_ip_forwarding },
+	  show_ip_forwarding },
 	
 	{ "show ip addresses", NULL,
-	  "IP addresses assigned to interfaces",
+	  "The show ip addresses command displays the IP addresses assigned\n"
+	  "to network interfaces. The command generates a table with the\n"
+	  "following columns:\n"
+	  "\n"
+	  "  INTERFACE network interface number\n"
+	  "  ADDRESS   IP address\n"
+	  "  PREFIX    IP address prefix length\n"
+	  "  NAME      name of the IP address",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_ip_addresses },
+	  show_ip_addresses },
 	
 	{ "show ip tunnel", NULL,
 	  "IP tunnels",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_ip_tunnel },
+	  show_ip_tunnel },
 	
 	{ "show ip mapping", NULL,
 	  "IP address to lower layer address mappings",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  cmd_ip_media_mapping },
+	  show_ip_media_mapping },
 	
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t ip_mode = {
 	"ip",
-	"scli mode to display and configure IP parameters",
+	"The ip scli mode is based on the IP-MIB as published in\n"
+	"RFC 2011, the IP-FORWARD-MIB as published in RFC 2096, the\n"
+	"IP-TUNNEL-MIB as published in RFC 2667 and the RFC1213-MIB\n"
+	"as published in RFC 1213. It provides commands to browse,\n"
+	"monitor and configure IP protocol engines.",
 	cmds
     };
     

@@ -72,6 +72,8 @@ extern char const scli_copyright[];	/* copyright message (surprise) */
 #define SCLI_EXIT		2	/* return and exit the command loop */
 #define SCLI_SYNTAX		3	/* generic syntax error */
 #define SCLI_SYNTAX_REGEXP	4	/* syntax error in regexp */
+#define SCLI_SYNTAX_NUMBER	5	/* syntax error in number */
+#define SCLI_SYNTAX_VALUE	6	/* syntax error in value */
 
 
 typedef struct scli_interp	scli_interp_t;
