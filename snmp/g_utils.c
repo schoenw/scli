@@ -107,6 +107,10 @@ gsnmp_identity_get_label(GSnmpIdentity const *table,
 {
     int i;
 
+    if (! oid || oidlen <= 0) {
+	return NULL;
+    }
+
     for (i = 0; table[i].label; i++) {
 	if (table[i].oidlen == oidlen
 	    && memcmp(table[i].oid, oid, oidlen * sizeof(guint32)) == 0) {
