@@ -602,7 +602,8 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_PARAMS);
+    if_mib_proc_get_ifTable(interp->peer, &ifTable,
+			    IF_MIB_IFENTRY_PARAMS, interp->epoch);
     if (interp->peer->error_status) {
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
@@ -644,7 +645,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 	}
     }
 
-    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifTable) if_mib_proc_free_ifTable(ifTable);
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
     if (system) snmpv2_mib_free_system(system);
     if (ipAddrTable) ip_mib_free_ipAddrTable(ipAddrTable);
@@ -743,7 +744,8 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_PARAMS);
+    if_mib_proc_get_ifTable(interp->peer, &ifTable,
+			    IF_MIB_IFENTRY_PARAMS, interp->epoch);
     if (interp->peer->error_status) {
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
@@ -774,7 +776,7 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
 	}
     }
 
-    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifTable) if_mib_proc_free_ifTable(ifTable);
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
 
     if (regex_iface) regfree(regex_iface);
@@ -873,7 +875,8 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (ifStackTable) {
-	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_PARAMS);
+	if_mib_proc_get_ifTable(interp->peer, &ifTable,
+				IF_MIB_IFENTRY_PARAMS, interp->epoch);
 	type_width = get_if_type_width(ifTable);
 
 	g_string_sprintfa(interp->header, "INTERFACE %-*s    STACKING ORDER",
@@ -897,7 +900,7 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (ifStackTable) if_mib_free_ifStackTable(ifStackTable);
-    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifTable) if_mib_proc_free_ifTable(ifTable);
     
     if (regex_iface) regfree(regex_iface);
 
@@ -1086,7 +1089,8 @@ foreach_interface(scli_interp_t *interp, char *regex,
 	return SCLI_OK;
     }
     
-    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR);
+    if_mib_proc_get_ifTable(interp->peer, &ifTable,
+			    IF_MIB_IFDESCR, interp->epoch);
     if (interp->peer->error_status) {
 	regfree(regex_iface);
 	return SCLI_SNMP;
@@ -1100,7 +1104,7 @@ foreach_interface(scli_interp_t *interp, char *regex,
 	}
     }
     
-    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifTable) if_mib_proc_free_ifTable(ifTable);
     regfree(regex_iface);
 
     return SCLI_OK;
@@ -1266,7 +1270,8 @@ dump_interface(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_CONFIG);
+    if_mib_proc_get_ifTable(interp->peer, &ifTable,
+			    IF_MIB_IFENTRY_CONFIG, interp->epoch);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
@@ -1310,7 +1315,7 @@ dump_interface(scli_interp_t *interp, int argc, char **argv)
 	}
     }
 
-    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifTable) if_mib_proc_free_ifTable(ifTable);
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
 
     return SCLI_OK;
