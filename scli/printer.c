@@ -759,6 +759,14 @@ fmt_printer_interpreter(GString *s,
     if (e) {
 	g_string_sprintfa(s, "%-*s %s\n", indent, "Language:", e);
     }
+
+    fmt_display_string(s, indent+1, "Description:",
+		       (int) prtInterpEntry->_prtInterpreterDescriptionLength,
+		       prtInterpEntry->prtInterpreterDescription);
+
+    fmt_display_string(s, indent+1, "Version:",
+		       (int) prtInterpEntry->_prtInterpreterVersionLength,
+		       prtInterpEntry->prtInterpreterVersion);
 }
 
 
