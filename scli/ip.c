@@ -232,8 +232,10 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 	for (i = 0; ipAddrTable[i]; i++) {
 	    fmt_ip_address(interp->result, ipAddrTable[i]);
 	}
-	ip_mib_free_ipAddrTable(ipAddrTable);
     }
+
+    if (ipAddrTable) ip_mib_free_ipAddrTable(ipAddrTable);
+
     return SCLI_OK;
 }
 

@@ -167,12 +167,12 @@ show_bridge_info(scli_interp_t *interp, int argc, char **argv)
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
-    bridge_mib_get_dot1dTp(interp->peer, &dot1dTp, 0);
-    bridge_mib_get_dot1dStp(interp->peer, &dot1dStp, 0);
     
     if (dot1dBase
 	&& dot1dBase->dot1dBaseNumPorts
 	&& *dot1dBase->dot1dBaseNumPorts) {
+	bridge_mib_get_dot1dTp(interp->peer, &dot1dTp, 0);
+	bridge_mib_get_dot1dStp(interp->peer, &dot1dStp, 0);
 	fmt_bridge_info(interp->result, dot1dBase, dot1dTp, dot1dStp);
     }
 
