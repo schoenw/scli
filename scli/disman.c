@@ -33,11 +33,6 @@
 #include <time.h>
 
 
-/* xxx still need to do MaxRunning and MaxCompleted */
-
-
-#define RFC2592BIS
-
 
 static guint32 const oid_javabc[] = { IANA_LANGUAGE_MIB_IANALANGJAVABYTECODE };
 static guint32 const oid_tcl[]    = { IANA_LANGUAGE_MIB_IANALANGTCL };
@@ -681,12 +676,10 @@ show_script_details(GString *s, smScriptEntry_t *smScriptEntry,
     fmt_enum(s, width, disman_script_mib_enums_smScriptStorageType,
 	     smScriptEntry->smScriptStorageType);
     g_string_append(s, "Change:   ");
-#ifdef RFC2592BIS
     if (smScriptEntry->smScriptLastChange) {
 	fmt_date_and_time(s, smScriptEntry->smScriptLastChange,
 			  smScriptEntry->_smScriptLastChangeLength);
     }
-#endif
     g_string_append(s, "\n");
     
     if (smScriptEntry->smScriptSource) {
@@ -695,13 +688,11 @@ show_script_details(GString *s, smScriptEntry_t *smScriptEntry,
 			  smScriptEntry->smScriptSource);
     }
 
-#ifdef RFC2592BIS
     if (smScriptEntry->smScriptError && smScriptEntry->_smScriptErrorLength) {
 	g_string_sprintfa(s, "Error:       %.*s\n",
 			  (int) smScriptEntry->_smScriptErrorLength,
 			  smScriptEntry->smScriptError);
     }
-#endif
 
     if (smScriptEntry->smScriptDescr) {
 	g_string_sprintfa(s, "Description: %.*s\n",
@@ -763,10 +754,8 @@ show_script_info(GString *s, smScriptEntry_t *smScriptEntry,
 
     g_string_sprintfa(s, "%-*s ", lang_width, language ? language : "");
 
-#ifdef RFC2592BIS
     fmt_last_change(s, smScriptEntry->smScriptLastChange,
 		    smScriptEntry->_smScriptLastChangeLength);
-#endif
     
     g_string_sprintfa(s, "%.*s",
 		      (int) smScriptEntry->_smScriptNameLength,
@@ -899,14 +888,8 @@ show_launch_info(GString *s, smLaunchEntry_t *smLaunchEntry,
 		      (int) smLaunchEntry->_smLaunchOwnerLength,
 		      smLaunchEntry->smLaunchOwner);
 
-#if 0
-    g_string_sprintfa(s, "%-*s ", lang_width, language ? language : "");
-#endif
-
-#ifdef RFC2592BIS
     fmt_last_change(s, smLaunchEntry->smLaunchLastChange,
 		    smLaunchEntry->_smLaunchLastChangeLength);
-#endif
     
     g_string_sprintfa(s, "%.*s",
 		      (int) smLaunchEntry->_smLaunchNameLength,
@@ -1040,7 +1023,6 @@ show_launch_details(GString *s, smLaunchEntry_t *smLaunchEntry)
     fmt_enum(s, width, disman_script_mib_enums_smLaunchRowStatus,
 	     smLaunchEntry->smLaunchRowStatus);
     g_string_append(s, "Expires:  ");
-#ifdef RFC2592BIS
     if (smLaunchEntry->smLaunchRowExpireTime) {
 	if (*smLaunchEntry->smLaunchRowExpireTime == 2147483647) {
 	    g_string_sprintfa(s, "never");
@@ -1049,19 +1031,28 @@ show_launch_details(GString *s, smLaunchEntry_t *smLaunchEntry)
 		      fmt_seconds(*smLaunchEntry->smLaunchRowExpireTime/100));
 	}
     }
-#endif
     g_string_append(s, "\n");
     
     g_string_append(s, "Storage:     ");
     fmt_enum(s, width, disman_script_mib_enums_smLaunchStorageType,
 	     smLaunchEntry->smLaunchStorageType);
     g_string_append(s, "Change:   ");
-#ifdef RFC2592BIS
     if (smLaunchEntry->smLaunchLastChange) {
 	fmt_date_and_time(s, smLaunchEntry->smLaunchLastChange,
 			  smLaunchEntry->_smLaunchLastChangeLength);
     }
-#endif
+    g_string_append(s, "\n");
+
+    g_string_append(s, "Max Running: ");
+    if (smLaunchEntry->smLaunchMaxRunning) {
+	g_string_sprintfa(s, "%-*u", width, *smLaunchEntry->smLaunchMaxRunning);
+    } else {
+	g_string_sprintfa(s, "%*s", width, "");
+    }
+    g_string_append(s, "Max Term: ");
+    if (smLaunchEntry->smLaunchMaxCompleted) {
+	g_string_sprintfa(s, "%u", *smLaunchEntry->smLaunchMaxCompleted);
+    }
     g_string_append(s, "\n");
 
     if (smLaunchEntry->smLaunchArgument
@@ -1071,13 +1062,11 @@ show_launch_details(GString *s, smLaunchEntry_t *smLaunchEntry)
 			  smLaunchEntry->smLaunchArgument);
     }
 
-#ifdef RFC2592BIS
     if (smLaunchEntry->smLaunchError && smLaunchEntry->_smLaunchErrorLength) {
 	g_string_sprintfa(s, "Error:       %.*s\n",
 			  (int) smLaunchEntry->_smLaunchErrorLength,
 			  smLaunchEntry->smLaunchError);
     }
-#endif
 }
 
 
@@ -1234,12 +1223,10 @@ show_run_details(GString *s, smRunEntry_t *smRunEntry,
     fmt_enum(s, width, disman_script_mib_enums_smRunExitCode,
 	     smRunEntry->smRunExitCode);
     g_string_append(s, "Result:   ");
-#ifdef RFC2592BIS
     if (smRunEntry->smRunResultTime) {
 	fmt_date_and_time(s, smRunEntry->smRunResultTime,
 			  smRunEntry->_smRunResultTimeLength);
     }
-#endif
     g_string_append(s, "\n");
     
     g_string_append(s, "Life Time:   ");
@@ -1254,12 +1241,10 @@ show_run_details(GString *s, smRunEntry_t *smRunEntry,
 	g_string_sprintfa(s, "%9s         ", "");
     }
     g_string_append(s, "  Error:    ");
-#ifdef RFC2592BIS
     if (smRunEntry->smRunErrorTime) {
 	fmt_date_and_time(s, smRunEntry->smRunErrorTime,
 			  smRunEntry->_smRunErrorTimeLength);
     }
-#endif
     g_string_append(s, "\n");
 
     g_string_append(s, "Expire Time: ");
