@@ -1,3 +1,75 @@
+2001-04-12 16:52  schoenw
+
+	* NEWS: Updates for release 0.1.17.
+
+2001-04-12 16:46  schoenw
+
+	* snmp/g_snmp_table.c: Got rid of a nasty warning message.
+
+2001-04-12 16:32  schoenw
+
+	* scli/disman.c: Added support for smLaunchMaxRunning and
+        smLaunchMaxCompleted.
+
+2001-04-12 16:14  schoenw
+
+	* scli/disman.c: Improved the "show disman scheduler info" command
+        and added a new "show disman scheduler details" command.
+
+2001-04-11 15:58  schoenw
+
+	* scli/snmp.c: Improved the display of VACM information.
+
+2001-04-11 15:44  schoenw
+
+	* stub/snmp-view-based-acm-mib.c: Fixed the OID instance identifier
+        unpacking code.
+
+2001-04-11 13:15  schoenw
+
+	* configure, configure.in: Bumped the version number.
+
+2001-04-11 13:14  schoenw
+
+	* stub/: snmp-community-mib.c, snmp-community-mib.h,
+	snmp-framework-mib.c, snmp-framework-mib.h, snmp-mpd-mib.c,
+	snmp-mpd-mib.h, snmp-target-mib.c, snmp-target-mib.h,
+	snmp-user-based-sm-mib.c, snmp-user-based-sm-mib.h,
+	snmp-view-based-acm-mib.c, snmp-view-based-acm-mib.h: Regenerated
+        stubs to take advantage of the new type names.
+
+2001-04-11 13:13  schoenw
+
+	* scli/snmp.c: Many updates to support the VACM MIB.
+
+2001-04-11 13:12  schoenw
+
+	* scli/system.c: Use fmt_seconds() instead of fmt_hsec32().
+
+2001-04-11 10:58  schoenw
+
+	* scli/ip.c: Implemented "show ip forwarding" based on the old RFC
+        1213 ipRouteTable.
+
+2001-04-10 18:12  schoenw
+
+	* scli/ip.c: Added code to display the broken RFC 1213 routing
+        table.
+
+2001-04-10 18:11  schoenw
+
+	* stub/: Makefile.am, Makefile.in, rfc1213-mib.c, rfc1213-mib.h:
+	Added stubs for the RFC1213-MIB (since this MIB defines the routing
+        table that most devices still support these days).
+
+2001-04-10 11:20  schoenw
+
+	* scli/basic.c: Cleanup garbage left from the progress hooks.
+
+2001-04-10 10:27  schoenw
+
+	* ChangeLog: Generated the ChangeLog via cvs2cl.
+
 2001-04-10 10:26  schoenw
 
 	* NEWS, TODO: Updates for release 0.1.16.
