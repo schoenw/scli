@@ -31,11 +31,74 @@
 
 
 static void
+show_bridge_info(GString *s, dot1dBase_t *dot1dBase, dot1dTp_t *dot1dTp,
+		 dot1dStp_t *dot1dStp)
+{
+    int const indent = 18;
+
+    if (dot1dBase->dot1dBaseNumPorts) {
+	g_string_sprintfa(s, "%-*s %d\n", indent, "Ports:",
+			  *(dot1dBase->dot1dBaseNumPorts));
+	if (dot1dBase->dot1dBaseType) {
+	    g_string_sprintfa(s, "%-*s ", indent, "Type:");
+	    fmt_enum(s, 1, bridge_mib_enums_dot1dBaseType,
+		     dot1dBase->dot1dBaseType);
+	    g_string_append(s, "\n");
+	    if (dot1dBase->dot1dBaseType
+		&& (*dot1dBase->dot1dBaseType == 2
+		    || *dot1dBase->dot1dBaseType == 4)
+		&& dot1dTp
+		&& dot1dTp->dot1dTpAgingTime) {
+		g_string_sprintfa(s, "%-*s %d sec\n", indent, "Aging Time:",
+				  *dot1dTp->dot1dTpAgingTime);
+	    }
+	    if (dot1dStp && dot1dStp->dot1dStpMaxAge) {
+		g_string_sprintfa(s, "%-*s %d sec\n", indent, "Aging Time:",
+				  *dot1dStp->dot1dStpMaxAge);
+	    }
+	}
+    }
+}
+
+
+
+static int
+cmd_bridge_info(scli_interp_t *interp, int argc, char **argv)
+{
+    dot1dBase_t *dot1dBase = NULL;
+    dot1dTp_t *dot1dTp = NULL;
+    dot1dStp_t *dot1dStp = NULL;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (bridge_mib_get_dot1dBase(interp->peer, &dot1dBase)) {
+	return SCLI_ERROR;
+    }
+    (void) bridge_mib_get_dot1dTp(interp->peer, &dot1dTp);
+    (void) bridge_mib_get_dot1dStp(interp->peer, &dot1dStp);
+    
+    if (dot1dBase
+	&& dot1dBase->dot1dBaseNumPorts
+	&& *dot1dBase->dot1dBaseNumPorts) {
+	show_bridge_info(interp->result, dot1dBase, dot1dTp, dot1dStp);
+    }
+
+    if (dot1dBase)
+	bridge_mib_free_dot1dBase(dot1dBase);
+    if (dot1dTp)
+	bridge_mib_free_dot1dTp(dot1dTp);
+    if (dot1dStp)
+	bridge_mib_free_dot1dStp(dot1dStp);
+    
+    return SCLI_OK;
+}
+
+
+
+static void
 show_bridge_port(GString *s, dot1dBasePortEntry_t *dot1dBasePortEntry,
 	  ifEntry_t *ifEntry, ifXEntry_t *ifXEntry)
 {
-    int i;
-    
     g_string_sprintfa(s, "%5u ", dot1dBasePortEntry->dot1dBasePort);
     if (dot1dBasePortEntry->dot1dBasePortIfIndex) {
 	g_string_sprintfa(s, "%7u   ",
@@ -57,7 +120,7 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
     dot1dBasePortEntry_t **dot1dBasePortTable = NULL;
     ifEntry_t **ifTable = NULL;
     ifXEntry_t **ifXTable = NULL;
-    int i, j;
+    int i, j = -1;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -80,7 +143,8 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 		}
 	    }
 	    show_bridge_port(interp->result, dot1dBasePortTable[i],
-			     ifTable[j], ifXTable ? ifXTable[j] : NULL);
+			     j > 0 ? ifTable[j] : NULL,
+			     j > 0 && ifXTable ? ifXTable[j] : NULL);
 	}
     }
 
@@ -230,6 +294,9 @@ scli_init_bridge_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 	{ "show", "bridge", NULL, NULL },
+	{ "show bridge", "info",
+	  "show bridge information",
+	  cmd_bridge_info },
 	{ "show bridge", "ports",
 	  "show bridge ports",
 	  cmd_bridge_ports },
