@@ -294,7 +294,8 @@ create_snmp_usm_user(scli_interp_t *interp, int argc, char **argv)
 static void
 fmt_snmp_engine(GString *s,
 		snmp_framework_mib_snmpEngine_t *snmpEngine,
-		snmpv2_mib_snmp_t *snmp)
+		snmpv2_mib_snmp_t *snmp,
+		notification_log_mib_nlmConfig_t *nlmConfig)
 {
     int const indent = 22;
     int i;
@@ -347,6 +348,18 @@ fmt_snmp_engine(GString *s,
 			      indent, "Authentication-Traps:", e);
 	}
     }
+    if (nlmConfig) {
+	if (nlmConfig->nlmConfigGlobalEntryLimit) {
+	    g_string_sprintfa(s, "%-*s%u\n",
+			      indent, "Notification-Log-Limit:",
+			      *nlmConfig->nlmConfigGlobalEntryLimit);
+	}
+	if (nlmConfig->nlmConfigGlobalEntryLimit) {
+	    g_string_sprintfa(s, "%-*s%u minutes\n",
+			      indent, "Notification-Log-Ageout:",
+			      *nlmConfig->nlmConfigGlobalEntryLimit);
+	}
+    }
 }
 
 
@@ -356,6 +369,7 @@ show_snmp_engine(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_framework_mib_snmpEngine_t *snmpEngine;
     snmpv2_mib_snmp_t *snmp;
+    notification_log_mib_nlmConfig_t *nlmConfig;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -372,11 +386,13 @@ show_snmp_engine(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SNMP;
     }
     snmpv2_mib_get_snmp(interp->peer, &snmp, SNMPV2_MIB_SNMPENABLEAUTHENTRAPS);
+    notification_log_mib_get_nlmConfig(interp->peer, &nlmConfig, 0);
 
-    fmt_snmp_engine(interp->result, snmpEngine, snmp);
+    fmt_snmp_engine(interp->result, snmpEngine, snmp, nlmConfig);
     
     if (snmpEngine) snmp_framework_mib_free_snmpEngine(snmpEngine);
     if (snmp) snmpv2_mib_free_snmp(snmp);
+    if (nlmConfig) notification_log_mib_free_nlmConfig(nlmConfig);
     
     return SCLI_OK;
 }
@@ -1397,6 +1413,7 @@ show_snmp_notification_log_details(scli_interp_t *interp,
 
 static void
 fmt_snmp_notification_log_info(GString *s,
+			       snmpv2_mib_system_t *system,
 		       notification_log_mib_nlmLogEntry_t *nlmLogEntry)
 {
     const char *e = NULL;
@@ -1411,8 +1428,9 @@ fmt_snmp_notification_log_info(GString *s,
     
     g_string_sprintfa(s, "%5d ", nlmLogEntry->nlmLogIndex);
 
-    if (nlmLogEntry->nlmLogTime) {
-	g_string_sprintfa(s, "%d ", *(nlmLogEntry->nlmLogTime));
+    if (nlmLogEntry->nlmLogTime && system->sysUpTime) {
+	int secs = (*system->sysUpTime - *(nlmLogEntry->nlmLogTime)) / 100;
+	g_string_sprintfa(s, "%02d:%02d ", secs/60, secs % 60);
     } else {
 	g_string_sprintfa(s, "     ");
     }
@@ -1444,6 +1462,7 @@ static int
 show_snmp_notification_log_info(scli_interp_t *interp,
 				int argc, char **argv)
 {
+    snmpv2_mib_system_t *system = NULL;
     notification_log_mib_nlmLogEntry_t **nlmLogTable;
     int i;
     
@@ -1462,14 +1481,21 @@ show_snmp_notification_log_info(scli_interp_t *interp,
 	return SCLI_SNMP;
     }
 
+    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
+    
     if (nlmLogTable) {
 	g_string_sprintfa(interp->header,
 			  "LOGNAME   NUM  TIME NOTIFICATION ORIGINATOR");
 	for (i = 0; nlmLogTable[i]; i++) {
 	}
 	for (i--; i >= 0; i--) {
-	    fmt_snmp_notification_log_info(interp->result, nlmLogTable[i]);
+	    fmt_snmp_notification_log_info(interp->result, system,
+					   nlmLogTable[i]);
 	}
+    }
+
+    if (system) {
+	snmpv2_mib_free_system(system);
     }
 
     if (nlmLogTable) {
