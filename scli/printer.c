@@ -1762,10 +1762,54 @@ show_printer_alert(scli_interp_t * interp, int argc, char **argv)
 
 
 
+static int
+set_printer_operator(scli_interp_t *interp, int argc, char **argv)
+{
+    gchar *operator;
+    gsize operator_len;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    operator = argv[1];
+    operator_len = strlen(operator);
+    if (operator_len < PRINTER_MIB_PRTGENERALCURRENTOPERATORMINLENGTH
+	|| operator_len > PRINTER_MIB_PRTGENERALCURRENTOPERATORMAXLENGTH) {
+	g_string_assign(interp->result, operator);
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    printer_mib_set_prtGeneralCurrentOperator(interp->peer, 42, /* xxx */
+					      operator, operator_len);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_printer_mode(scli_interp_t * interp)
 {
     static scli_cmd_t cmds[] = {
+
+	{ "set printer operator", "<string>",
+	  "The `set printer operator' command configures the name of the\n"
+	  "person responsible for operating a printer. As a convention,\n"
+	  "the phone number, fax number or email address should be\n"
+	  "indicated by the tel:, fax: and mailto: URL schemes.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
+	  NULL, NULL,
+	  set_printer_operator },
 
 	{ "show printer info", NULL,
 	  "The `show printer info' command shows general information about\n"
