@@ -314,8 +314,6 @@ unpack_ipAddrEntry(GSnmpVarBind *vb, ip_mib_ipAddrEntry_t *ipAddrEntry)
 
     len = 4;
     if (vb->id_len < idx + len) return -1;
-    if (len != 4) return -1;
-    if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
         ipAddrEntry->ipAdEntAddr[i] = vb->id[idx++];
     }
@@ -468,8 +466,6 @@ unpack_ipNetToMediaEntry(GSnmpVarBind *vb, ip_mib_ipNetToMediaEntry_t *ipNetToMe
     if (vb->id_len < idx) return -1;
     ipNetToMediaEntry->ipNetToMediaIfIndex = vb->id[idx++];
     len = 4;
-    if (vb->id_len < idx + len) return -1;
-    if (len != 4) return -1;
     if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
         ipNetToMediaEntry->ipNetToMediaNetAddress[i] = vb->id[idx++];

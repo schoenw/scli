@@ -154,7 +154,7 @@ tcp_mib_new_tcp()
     return tcp;
 }
 
-static tcp_mib_tcp_t *
+static inline tcp_mib_tcp_t *
 assign_tcp(GSList *vbl)
 {
     tcp_mib_tcp_t *tcp;
@@ -218,7 +218,7 @@ tcp_mib_new_tcpConnEntry()
     return tcpConnEntry;
 }
 
-static int
+static inline int
 unpack_tcpConnEntry(GSnmpVarBind *vb, tcp_mib_tcpConnEntry_t *tcpConnEntry)
 {
     guint8 idx = 10;
@@ -226,16 +226,12 @@ unpack_tcpConnEntry(GSnmpVarBind *vb, tcp_mib_tcpConnEntry_t *tcpConnEntry)
 
     len = 4;
     if (vb->id_len < idx + len) return -1;
-    if (len != 4) return -1;
-    if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
         tcpConnEntry->tcpConnLocalAddress[i] = vb->id[idx++];
     }
     if (vb->id_len < idx) return -1;
     tcpConnEntry->tcpConnLocalPort = vb->id[idx++];
     len = 4;
-    if (vb->id_len < idx + len) return -1;
-    if (len != 4) return -1;
     if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
         tcpConnEntry->tcpConnRemAddress[i] = vb->id[idx++];
@@ -246,7 +242,7 @@ unpack_tcpConnEntry(GSnmpVarBind *vb, tcp_mib_tcpConnEntry_t *tcpConnEntry)
     return 0;
 }
 
-static int
+static inline int
 pack_tcpConnEntry(guint32 *base, guchar *tcpConnLocalAddress, gint32 tcpConnLocalPort, guchar *tcpConnRemAddress, gint32 tcpConnRemPort)
 {
     guint8 idx = 10;
@@ -269,7 +265,7 @@ pack_tcpConnEntry(guint32 *base, guchar *tcpConnLocalAddress, gint32 tcpConnLoca
     return idx;
 }
 
-static tcp_mib_tcpConnEntry_t *
+static inline tcp_mib_tcpConnEntry_t *
 assign_tcpConnEntry(GSList *vbl)
 {
     tcp_mib_tcpConnEntry_t *tcpConnEntry;

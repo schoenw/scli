@@ -23,8 +23,10 @@ MIBS			= IF-MIB \
 			  SNMP-NOTIFICATION-MIB \
 			  NOTIFICATION-LOG-MIB \
 			  TUNNEL-MIB \
+			  ATM-MIB \
 			  EtherLike-MIB \
 			  MAU-MIB \
+			  RFC1213-MIB \
 			  OSPF-MIB \
 			  Printer-MIB \
 			  ISDN-MIB \
@@ -78,15 +80,6 @@ SMIDUMP			= ../../libsmi/tools/smidump
 rmstubs:
 	rm -f $(STUBS)
 
-stubs: $(STUBS)
-	$(SMIDUMP) -f scli --scli-include="VlanEntry|VlanPortEntry" RAPID-CITY
-	$(SMIDUMP) -f scli --scli-include="ipRouteEntry" RFC1213-MIB
-	$(SMIDUMP) -f scli --scli-include="a3ComVlanIfEntry|a3ComVirtualGroup" PRODUCTMIB
-	@for f in $(MIBS) ; do \
-	    echo "$(SMIDUMP) -f scli $$f" ; \
-	    $(SMIDUMP) -f scli $$f ; \
-	done
-
 if-mib.h if-mib.c:
 	$(SMIDUMP) -f scli --scli-exclude='ifTestEntry' IF-MIB
 
@@ -120,7 +113,74 @@ entity-mib.h entity-mib.c:
 bridge-mib.h bridge-mib.c:
 	$(SMIDUMP) -f scli BRIDGE-MIB
 
-# add more stuff here ...
+iana-language-mib.h iana-language-mib.c:
+	$(SMIDUMP) -f scli IANA-LANGUAGE-MIB
+
+disman-script-mib.h disman-script-mib.c:
+	$(SMIDUMP) -f scli DISMAN-SCRIPT-MIB
+
+disman-schedule-mib.h disman-schedule-mib.c:
+	$(SMIDUMP) -f scli DISMAN-SCHEDULE-MIB
+
+snmp-framework-mib.h snmp-framework-mib.c:
+	$(SMIDUMP) -f scli SNMP-FRAMEWORK-MIB
+
+snmp-mpd-mib.h snmp-mpd-mib.c:
+	$(SMIDUMP) -f scli SNMP-MPD-MIB
+
+snmp-user-based-sm-mib.h snmp-user-based-sm-mib.c:
+	$(SMIDUMP) -f scli SNMP-USER-BASED-SM-MIB
+
+snmp-community-mib.h snmp-community-mib.c:
+	$(SMIDUMP) -f scli SNMP-COMMUNITY-MIB
+
+snmp-view-based-acm-mib.h snmp-view-based-acm-mib.c:
+	$(SMIDUMP) -f scli SNMP-VIEW-BASED-ACM-MIB
+
+snmp-target-mib.h snmp-target-mib.c:
+	$(SMIDUMP) -f scli SNMP-TARGET-MIB
+
+snmp-notification-mib.h snmp-notification-mib.c:
+	$(SMIDUMP) -f scli SNMP-NOTIFICATION-MIB
+
+notification-log-mib.h notification-log-mib.c:
+	$(SMIDUMP) -f scli NOTIFICATION-LOG-MIB
+
+tunnel-mib.h tunnel-mib.c:
+	$(SMIDUMP) -f scli TUNNEL-MIB
 
 atm-mib.h atm-mib.c:
 	$(SMIDUMP) -f scli --scli-include='atmInterfaceConfEntry' ATM-MIB
+
+etherlike-mib.h etherlike-mib.c:
+	$(SMIDUMP) -f scli EtherLike-MIB
+
+mau-mib.h mau-mib.c:
+	$(SMIDUMP) -f scli MAU-MIB
+
+rfc1213-mib.h rfc1213-mib.c:
+	$(SMIDUMP) -f scli --scli-include='ipRouteEntry' RFC1213-MIB
+
+ospf-mib.h ospf-mib.c:
+	$(SMIDUMP) -f scli --scli-include='ospfGeneralGroup|ospfAreaEntry|ospfIfEntry' OSPF-MIB
+
+printer-mib.h printer-mib.c:
+	$(SMIDUMP) -f scli Printer-MIB
+
+isdn-mib.h isdn-mib.c:
+	$(SMIDUMP) -f scli ISDN-MIB
+
+rs-232-mib.h rs-232-mib.c:
+	$(SMIDUMP) -f scli RS-232-MIB
+
+old-cisco-ip-mib.h old-cisco-ip-mib.c:
+	$(SMIDUMP) -f scli OLD-CISCO-IP-MIB
+
+rapid-city.h rapid-city.c:
+	$(SMIDUMP) -f scli --scli-include='VlanEntry|VlanPortEntry' RAPID-CITY
+
+ucd-snmp-mib.h ucd-snmp-mib.c:
+	$(SMIDUMP) -f scli UCD-SNMP-MIB
+
+productmib.h productmib.c:
+	$(SMIDUMP) -f scli --scli-include='a3ComVlanIfEntry|a3ComVirtualGroup' PRODUCTMIB
