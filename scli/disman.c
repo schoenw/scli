@@ -26,17 +26,18 @@
 
 #include "scli.h"
 
+#include "iana-language-mib.h"
 #include "disman-script-mib.h"
 #include "disman-schedule-mib.h"
 
 
-static guint32 const oid_javabc[] = { 1, 3, 6, 1, 2, 1, 73, 1 };
-static guint32 const oid_tcl[] = { 1, 3, 6, 1, 2, 1, 73, 2 };
-static guint32 const oid_perl[] = { 1, 3, 6, 1, 2, 1, 73, 3 };
-static guint32 const oid_scheme[] = { 1, 3, 6, 1, 2, 1, 73, 4 };
-static guint32 const oid_srsl[] = { 1, 3, 6, 1, 2, 1, 73, 5 };
-static guint32 const oid_psl[] = { 1, 3, 6, 1, 2, 1, 73, 6 };
-static guint32 const oid_smsl[] = { 1, 3, 6, 1, 2, 1, 73, 7 };
+static guint32 const oid_javabc[] = { IANA_LANGUAGE_MIB_IANALANGJAVABYTECODE };
+static guint32 const oid_tcl[]    = { IANA_LANGUAGE_MIB_IANALANGTCL };
+static guint32 const oid_perl[]   = { IANA_LANGUAGE_MIB_IANALANGPERL };
+static guint32 const oid_scheme[] = { IANA_LANGUAGE_MIB_IANALANGSCHEME };
+static guint32 const oid_srsl[]   = { IANA_LANGUAGE_MIB_IANALANGSRSL };
+static guint32 const oid_psl[]    = { IANA_LANGUAGE_MIB_IANALANGPSL };
+static guint32 const oid_smsl[]   = { IANA_LANGUAGE_MIB_IANALANGSMSL };
 
 typedef struct lang {
     guint32 const *oid;
