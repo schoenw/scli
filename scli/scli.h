@@ -327,6 +327,9 @@ extern void
 scli_init_isdn_mode(scli_interp_t *interp);
 
 extern void
+scli_init_rs232_mode(scli_interp_t *interp);
+
+extern void
 scli_init_cisco_mode(scli_interp_t *interp);
 
 extern void
