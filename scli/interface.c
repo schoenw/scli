@@ -71,6 +71,38 @@ fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
     fmt_enum(s, 1, conn_states, conn);
     fmt_enum(s, 1, prom_states, prom);
 }
+
+
+
+static int
+match_interface(char *iface, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry)
+{
+    long l;
+    char *end;
+    
+    if (! iface) {
+	return 1;
+    }
+
+    l = strtol(iface, &end, 0);
+    if (end != iface) {
+	return (ifEntry->ifIndex == l);
+    }
+
+    if (ifXEntry && ifXEntry->ifName) {
+	if (strncmp(iface, ifXEntry->ifName, ifXEntry->_ifNameLength) == 0) {
+	    return 1;
+	}
+    }
+
+    if (ifEntry->ifDescr) {
+	if (strncmp(iface, ifEntry->ifDescr, ifEntry->_ifDescrLength) == 0) {
+	    return 1;
+	}
+    }
+
+    return 0;
+}
     
 
 
@@ -199,9 +231,14 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
     ifXEntry_t **ifXTable = NULL;
     system_t *system = NULL;
     ipAddrEntry_t **ipAddrTable = NULL;
-    int i;
+    char *iface = NULL;
+    int i, c;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	iface = argv[1];
+    }
 
     if (if_mib_get_ifTable(interp->peer, &ifTable)) {
 	return SCLI_ERROR;
@@ -211,13 +248,17 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
     (void) ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable);
 
     if (ifTable) {
-	for (i = 0; ifTable[i]; i++) {
-	    if (i) {
-		g_string_append(interp->result, "\n");
+	for (i = 0, c = 0; ifTable[i]; i++) {
+	    if (match_interface(iface, ifTable[i],
+				ifXTable ? ifXTable[i] : NULL)) {
+		if (c) {
+		    g_string_append(interp->result, "\n");
+		}
+		show_if_details(interp->result, ifTable[i],
+				ifXTable ? ifXTable[i] : NULL,
+				system, ipAddrTable);
+		c++;
 	    }
-	    show_if_details(interp->result, ifTable[i],
-			    ifXTable ? ifXTable[i] : NULL,
-			    system, ipAddrTable);
 	}
     }
 
@@ -285,9 +326,14 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
     ifXEntry_t **ifXTable = NULL;
     int name_width = 6;
     int type_width = 6;
+    char *iface = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	iface = argv[1];
+    }
 
     if (if_mib_get_ifTable(interp->peer, &ifTable)) {
 	return SCLI_ERROR;
@@ -315,9 +361,12 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 			  type_width, "Type",
 			  name_width, "Name");
 	for (i = 0; ifTable[i]; i++) {
-	    show_if_info(interp->result, ifTable[i],
-			 ifXTable ? ifXTable[i] : NULL,
-			 type_width, name_width);
+	    if (match_interface(iface, ifTable[i],
+				ifXTable ? ifXTable[i] : NULL)) {
+		show_if_info(interp->result, ifTable[i],
+			     ifXTable ? ifXTable[i] : NULL,
+			     type_width, name_width);
+	    }
 	}
     }
 
@@ -345,6 +394,13 @@ cmd_if_stack(scli_interp_t *interp, int argc, char **argv)
     return SCLI_OK;
 }
 #endif
+
+/*
+ * <man>
+ *   show interface info [name]
+ *   show interface details [name]
+ * </man>
+ */
 
 
 void
