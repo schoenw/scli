@@ -468,7 +468,7 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 		}
 		if (! name) {
 #if 1
-		    name = "<other>";
+		    name = "-";
 #else
 		    gchar *x, *y;
 		    port = tcpConnTable[i]->tcpConnLocalPort;
@@ -645,7 +645,17 @@ scli_init_tcp_mode(scli_interp_t *interp)
 	  "\n"
 	  "  COUNT number of transmission control blocks per state\n"
 	  "  STATE transmission control block state\n"
-	  "  PORTS well-known ports associated with the state",
+	  "  PORTS well-known ports associated with the state\n"
+	  "\n"
+	  "The command uses some heuristics to identify the interesting\n"
+	  "port numbers. First, all local port numbers are considered\n"
+	  "where the local port number matches one of the listening port\n"
+	  "numbers. From the remaining connections, all local port numbers\n"
+	  "are considered with a well known name. From the remaining\n"
+	  "connections, all remote port numbers are considered with a\n"
+	  "well known name. All remaining connections are aggregated\n"
+	  "under the pseudo name - (hyphen). Unspecified port numbers\n"
+	  "are show using the pseudo name * (star).",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "tcp states", NULL,
 	  show_tcp_states },
