@@ -23,6 +23,7 @@
 #include "scli.h"
 
 #include "productmib.h"
+#include "productmib-proc.h"
 #include "if-mib.h"
 
 
@@ -210,17 +211,198 @@ show_3com_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+create_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
+{
+    gint32 vlanId;
+    char *end;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 3) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    vlanId = strtol(argv[1], &end, 0);
+    if (*end) {
+	return SCLI_SYNTAX_NUMBER;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    productmib_proc_create_vlan(interp->peer, vlanId, argv[2],
+				PRODUCTMIB_A3COMVLANIFTYPE_VLANLAYER2);
+    if (interp->peer->error_status) {
+	return SCLI_ERROR;
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+delete_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
+{
+    productmib_a3ComVlanIfEntry_t **vlanTable = NULL;
+    regex_t _regex_vlan, *regex_vlan = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    regex_vlan = &_regex_vlan;
+    if (regcomp(regex_vlan, argv[1], interp->regex_flags) != 0) {
+	return SCLI_SYNTAX_REGEXP;
+    }
+
+    if (scli_interp_dry(interp)) {
+	regfree(regex_vlan);
+	return SCLI_OK;
+    }
+
+    productmib_get_a3ComVlanIfTable(interp->peer, &vlanTable,
+				    PRODUCTMIB_A3COMVLANIFDESCR);
+    if (interp->peer->error_status) {
+	regfree(regex_vlan);
+	return SCLI_SNMP;
+    }
+
+    if (vlanTable) {
+	for (i = 0; vlanTable[i]; i++) {
+	    if (match_vlan(regex_vlan, vlanTable[i])) {
+#if 0
+		rapid_city_proc_delete_vlan(interp->peer,
+					    vlanTable[i]->a3ComVlanIfIndex);
+		if (interp->peer->error_status) {
+		    vlan_snmp_error(interp, vlanTable[i]);
+		}
+#endif
+	    }
+	}
+    }
+
+    if (vlanTable) productmib_free_a3ComVlanIfTable(vlanTable);
+    regfree(regex_vlan);
+    
+    return SCLI_OK;
+}
+
+
+
+static int
+dump_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
+{
+#if 0
+    rapid_city_rcVlanEntry_t **vlanTable = NULL;
+    int i;
+    const int mask = (RAPID_CITY_RCVLANNAME
+		      | RAPID_CITY_RCVLANTYPE
+		      | RAPID_CITY_RCVLANPORTMEMBERS);
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    rapid_city_get_rcVlanTable(interp->peer, &vlanTable, mask);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (vlanTable) {
+	for (i = 0; vlanTable[i]; i++) {
+	    if (! vlanTable[i]->rcVlanName) {
+		continue;
+	    }
+	    g_string_sprintfa(interp->result,
+			      "create 3com bridge vlan \"%u\" \"%.*s\"\n",
+			      vlanTable[i]->rcVlanId,
+			      (int) vlanTable[i]->_rcVlanNameLength,
+			      vlanTable[i]->rcVlanName);
+	}
+	g_string_append(interp->result, "\n");
+	for (i = 0; vlanTable[i]; i++) {
+	    if (! vlanTable[i]->rcVlanName) {
+		continue;
+	    }
+	    if (vlanTable[i]->rcVlanPortMembers) {
+		g_string_sprintfa(interp->result,
+				  "set 3com bridge vlan ports \"%.*s\" \"",
+				  (int) vlanTable[i]->_rcVlanNameLength,
+				  vlanTable[i]->rcVlanName);
+		fmt_port_set(interp->result, vlanTable[i]->rcVlanPortMembers, 32);
+		g_string_sprintfa(interp->result, "\"\n");
+	    }
+	}
+    }
+
+    if (vlanTable) rapid_city_free_rcVlanTable(vlanTable);
+#endif
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_3com_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 
+	{ "create 3com bridge vlan", "<vlanid> <name>",
+	  "The `create 3com bridge vlan' command is used to create a\n"
+	  "new virtual LAN with the given <vlanid> and <name>.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  create_3com_bridge_vlan },
+	 
+	{ "delete 3com bridge vlan", "<regexp>",
+	  "The `delete 3com bridge vlan' command deletes all selected\n"
+	  "virtual LANs. The regular expression <regexp> is matched\n"
+	  "against the virtual LAN names to select the vlans that should\n"
+	  "be deleted.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  delete_3com_bridge_vlan },
+
 	{ "show 3com bridge vlan info", "[<regexp>]",
+	  "The `show 3com bridge vlan info' command shows summary\n"
+	  "information about all selected virtual LANs. The optional\n"
+	  "regular expression <regexp> is matched against the virtual\n"
+	  "LAN names to select the virtual LANs of interest. The\n"
+	  "command generates a table with the following columns:\n"
+	  "\n"
+	  "  VLAN   virtual LAN number\n"
+	  "  STATUS status of the virutal LAN (see below)\n"
+	  "  NAME   name of the virutal LAN\n"
+	  "  PORTS  ports assigned to the virtual LAN\n"
+	  "\n"
+	  "The status is encoded in two characters. The first character\n"
+	  "indicates the status of the row (A=active, S=not in service,\n"
+	  "R=not ready). The second character indicates virutal LAN type\n"
+	  "(P=port, I=IP-subnet, O=protocol, S=src address, D=dst address)."
 	  "",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_3com_bridge_vlan_info },
 	 
+	{ "dump 3com bridge vlan", NULL,
+	  "The `dump 3com bridge vlan' command generates a sequence of scli\n"
+	  "commands which can be used to restore the virtual LAN configuration.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  dump_3com_bridge_vlan },
+	
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
