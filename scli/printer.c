@@ -366,14 +366,15 @@ cmd_printer_info(scli_interp_t * interp, int argc, char **argv)
 static void
 show_printer_alert(GString *s, printer_mib_prtAlertEntry_t *prtAlertEntry)
 {
+    int const indent = 18;
+
     if (prtAlertEntry->prtAlertTime) {
-	g_string_append(s, "Date:        ");
-	g_string_append(s, stls_fmt_timeticks(*prtAlertEntry->prtAlertTime));
-	g_string_append(s, "\n");
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Date:",
+			  stls_fmt_timeticks(*prtAlertEntry->prtAlertTime));
     }
 
     if (prtAlertEntry->prtAlertSeverityLevel) {
-	g_string_append(s, "Severity:    ");
+	g_string_sprintfa(s, "%-*s ", indent, "Severity:");
 	fmt_enum(s, 24,
 		 printer_mib_enums_prtAlertSeverityLevel,
 		 prtAlertEntry->prtAlertSeverityLevel);
@@ -381,7 +382,7 @@ show_printer_alert(GString *s, printer_mib_prtAlertEntry_t *prtAlertEntry)
     }
 
     if (prtAlertEntry->prtAlertDescription) {
-	g_string_sprintfa(s, "Description: %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
 			  (int) prtAlertEntry->_prtAlertDescriptionLength,
 			  prtAlertEntry->prtAlertDescription);
     }
@@ -409,12 +410,12 @@ show_printer_alert(GString *s, printer_mib_prtAlertEntry_t *prtAlertEntry)
     g_string_append(s, "\n");
 
     if (prtAlertEntry->prtAlertLocation) {
-	g_string_sprintfa(s, "Location:    %u\n",
+	g_string_sprintfa(s, "%-*s %u\n", indent, "Location:",
 			  *prtAlertEntry->prtAlertLocation);
     }
     
     if (prtAlertEntry->prtAlertTrainingLevel) {
-	g_string_append(s, "Personnel:   ");
+	g_string_sprintfa(s, "%-*s ", indent, "Personnel:");
 	fmt_enum(s, 22,
 		 printer_mib_enums_prtAlertTrainingLevel,
 		 prtAlertEntry->prtAlertTrainingLevel);
@@ -951,10 +952,6 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "general printer information",
 	  cmd_printer_info },
-	{ "show printer alerts",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "printer alert information",
-	  cmd_printer_alert },
 	{ "show printer inputs",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "printer input information",
@@ -967,6 +964,10 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "printer console light information",
 	  cmd_printer_lights },
+	{ "show printer alerts",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "printer alert information",
+	  cmd_printer_alert },
 	{ NULL, 0, NULL, NULL }
     };
 
