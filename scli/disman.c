@@ -60,6 +60,57 @@ static stls_identity_t const languages[] = {
 
 
 
+static const char *weekdays[] = {
+    "sun", "mon", "tue", "wed", "thu", "fri", "sat", NULL
+};
+
+static const char *months[] = {
+    "jan", "feb", "mar", "apr", "may", "jun",
+    "jul", "aug", "sep", "oct", "nov", "dec", NULL
+};
+
+static const char *days[] = {
+    "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10",
+    "d11", "d12", "d13", "d14", "d15", "d16", "d17", "d18", "d19", "d20",
+    "d21", "d22", "d23", "d24", "d25", "d26", "d27", "d28", "d29", "d30",
+    "d31",
+    "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10",
+    "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19", "r20",
+    "r21", "r22", "r23", "r24", "r25", "r26", "r27", "r28", "r29", "r30",
+    "r31", NULL
+};
+
+static const char *ddays[] = {
+    "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10",
+    "d11", "d12", "d13", "d14", "d15", "d16", "d17", "d18", "d19", "d20",
+    "d21", "d22", "d23", "d24", "d25", "d26", "d27", "d28", "d29", "d30",
+    "d31", NULL
+};
+
+static const char *rdays[] = {
+    "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10",
+    "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19", "r20",
+    "r21", "r22", "r23", "r24", "r25", "r26", "r27", "r28", "r29", "r30",
+    "r31", NULL
+};
+
+static const char *hours[] = {
+    "h0", "h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8", "h9", "h10",
+    "h11", "h12", "h13", "h14", "h15", "h16", "h17", "h18", "h19", "h20",
+    "h21", "h22", "h23", NULL
+};
+
+static const char *minutes[] = {
+    "m0", "m1", "m2", "m3", "m4", "m5", "m6", "m7", "m8", "m9", "m10",
+    "m11", "m12", "m13", "m14", "m15", "m16", "m17", "m18", "m19", "m20",
+    "m21", "m22", "m23", "m24", "m25", "m26", "m27", "m28", "m29", "m30",
+    "m31", "m32", "m33", "m34", "m35", "m36", "m37", "m38", "m39", "m40",
+    "m41", "m42", "m43", "m44", "m45", "m46", "m47", "m48", "m49", "m50",
+    "m51", "m52", "m53", "m54", "m55", "m56", "m57", "m58", "m59", NULL
+};
+
+
+
 static time_t
 date_to_time(guchar *date, gsize len)
 {
@@ -116,6 +167,38 @@ fmt_last_change(GString *s, guchar *date, gsize len)
 
 
 static void
+fmt_storage_type(GString *s, gint32 *storage)
+{
+    static stls_enum_t const storage_types[] = {
+	{ 1, "o" },	/* other */
+	{ 2, "v" },	/* volatile */
+	{ 3, "n" },	/* nonVolatile */
+	{ 4, "p" },	/* permanent */
+	{ 5, "r" },	/* readOnly */
+	{ 0, NULL }
+    };
+
+    fmt_enum(s, 1, storage_types, storage);
+}
+
+
+
+static void
+fmt_row_status(GString *s, gint32 *status)
+{
+    static stls_enum_t const row_states[] = {
+	{ 1, "a" },	/* active */
+	{ 2, "s" },	/* notInService */
+	{ 3, "r" },	/* notReady */
+	{ 0, NULL }
+    };
+
+    fmt_enum(s, 1, row_states, status);
+}
+
+
+
+static void
 fmt_script_admin_status(GString *s, gint32 *status)
 {
     static stls_enum_t const script_admin_states[] = {
@@ -152,38 +235,6 @@ fmt_script_oper_status(GString *s, gint32 *status)
     };
 
     fmt_enum(s, 1, script_oper_states, status);
-}
-
-
-
-static void
-fmt_storage_type(GString *s, gint32 *storage)
-{
-    static stls_enum_t const storage_types[] = {
-	{ 1, "o" },	/* other */
-	{ 2, "v" },	/* volatile */
-	{ 3, "n" },	/* nonVolatile */
-	{ 4, "p" },	/* permanent */
-	{ 5, "r" },	/* readOnly */
-	{ 0, NULL }
-    };
-
-    fmt_enum(s, 1, storage_types, storage);
-}
-
-
-
-static void
-fmt_row_status(GString *s, gint32 *status)
-{
-    static stls_enum_t const row_states[] = {
-	{ 1, "a" },	/* active */
-	{ 2, "s" },	/* notInService */
-	{ 3, "r" },	/* notReady */
-	{ 0, NULL }
-    };
-
-    fmt_enum(s, 1, row_states, status);
 }
 
 
@@ -277,6 +328,131 @@ fmt_exit_code(GString *s, gint32 *code)
     } else {
 	g_string_append(s, "?");
     }
+}
+
+
+
+static void
+fmt_schedule_admin_status(GString *s, gint32 *status)
+{
+    static stls_enum_t const schedule_admin_states[] = {
+	{ DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_ENABLED,		"e" },
+	{ DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_DISABLED,	"d" },
+	{ 0, NULL }
+    };
+
+    fmt_enum(s, 1, schedule_admin_states, status);
+}
+
+
+
+static void
+fmt_schedule_oper_status(GString *s, gint32 *status)
+{
+    static stls_enum_t const schedule_oper_states[] = {
+	{ DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_ENABLED,	"e" },
+	{ DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_DISABLED,	"d" },
+	{ DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_FINISHED,	"f" },
+	{ 0, NULL }
+    };
+
+    fmt_enum(s, 1, schedule_oper_states, status);
+}
+
+
+
+static int
+fmt_item(GString *s, const char **labels, guchar *bits, gsize bits_len)
+{
+    int i, bit, start = -1;
+    int cnt = 0;
+
+    if (! bits) {
+	return 0;
+    }
+
+    for (i = 0; labels[i]; i++) {
+	bit = (i/8 < bits_len) ? bits[i/8] & 1 <<(7-(i%8)) : 0;
+	if (bit) cnt++;
+    }
+    if (cnt == i) {
+	return -1;
+    }
+
+    /* XXX should recognize / ranges (are they called ranges?) */
+    
+    for (i = 0; labels[i]; i++) {
+	bit = (i/8 < bits_len) ? bits[i/8] & 1 <<(7-(i%8)) : 0;
+	if (bit) {
+	    if (start == -1) {
+		g_string_sprintfa(s, "%s%s", s->len ? " " : "", labels[i]);
+		start = i;
+	    }
+	} else {
+	    if (start >= 0 && start != i-1) {
+		g_string_sprintfa(s, "-%s", labels[i-1]);
+	    }
+	    start = -1;
+	}
+    }
+    if (start >= 0 && start != i-1) {
+	g_string_sprintfa(s, "-%s", labels[i-1]);
+    }
+
+    return cnt;
+}
+
+
+
+static char*
+fmt_expression(schedEntry_t *schedEntry)
+{
+    static GString *s = NULL;
+    int w = 0, o = 0, d = 0, h = 0, m = 0;
+
+    if (!s) {
+	s = g_string_new(NULL);
+    } else {
+	s = g_string_truncate(s, 0);
+    }
+
+    if (! schedEntry->schedType) {
+	return "?";
+    }
+
+    switch (*schedEntry->schedType) {
+    case DISMAN_SCHEDULE_MIB_SCHEDTYPE_PERIODIC:
+	if (schedEntry->schedInterval) {
+	    g_string_sprintfa(s, "%u", *schedEntry->schedInterval);
+	} else {
+	    g_string_append(s, "?");
+	}
+	break;
+    case DISMAN_SCHEDULE_MIB_SCHEDTYPE_CALENDAR:
+    case DISMAN_SCHEDULE_MIB_SCHEDTYPE_ONESHOT:
+	w = fmt_item(s, weekdays,
+		     schedEntry->schedWeekDay, schedEntry->_schedWeekDayLength);
+	o = fmt_item(s, months,
+		     schedEntry->schedMonth, schedEntry->_schedMonthLength);
+	d = fmt_item(s, ddays,
+		     schedEntry->schedDay, schedEntry->_schedDayLength);
+	h = fmt_item(s, hours,
+		     schedEntry->schedHour, schedEntry->_schedHourLength);
+	m = fmt_item(s, minutes,
+		     schedEntry->schedMinute, schedEntry->_schedMinuteLength);
+	
+	if (w == 0 || o == 0 || d == 0 || h == 0 || m == 0) {
+	    g_string_truncate(s, 0);
+	}
+	
+	if (w == -1 && o == -1 && d == -1 && h == -1 && m == -1) {
+	    g_string_append(s, "*");
+	}
+	break;
+    default:
+	g_string_append(s, "?");
+    }
+    return s->str;
 }
 
 
@@ -475,7 +651,7 @@ show_script_details(GString *s, smScriptEntry_t *smScriptEntry,
     fmt_enum(s, width, disman_script_mib_enums_smScriptAdminStatus,
 	     smScriptEntry->smScriptAdminStatus);
     g_string_append(s, "Owner:    ");
-    g_string_sprintfa(s, "%-*.*s\n", width,
+    g_string_sprintfa(s, "%*s\n",
 		      (int) smScriptEntry->_smScriptOwnerLength,
 		      smScriptEntry->smScriptOwner);
 
@@ -483,7 +659,7 @@ show_script_details(GString *s, smScriptEntry_t *smScriptEntry,
     fmt_enum(s, width, disman_script_mib_enums_smScriptOperStatus,
 	     smScriptEntry->smScriptOperStatus);
     g_string_append(s, "Name:     ");
-    g_string_sprintfa(s, "%-*.*s\n", width,
+    g_string_sprintfa(s, "%*s\n",
 		      (int) smScriptEntry->_smScriptNameLength,
 		      smScriptEntry->smScriptName);
     
@@ -1154,36 +1330,166 @@ cmd_run_details(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+show_scheduler_info(GString *s, schedEntry_t *schedEntry,
+		    int name_width, int owner_width)
+{
+    fmt_schedule_admin_status(s, schedEntry->schedAdminStatus);
+    fmt_schedule_oper_status(s, schedEntry->schedOperStatus);
+    fmt_storage_type(s, schedEntry->schedStorageType);
+    fmt_row_status(s, schedEntry->schedRowStatus);
+
+    g_string_sprintfa(s, "  %-*.*s ", owner_width,
+		      (int) schedEntry->_schedOwnerLength,
+		      schedEntry->schedOwner);
+    
+    g_string_sprintfa(s, "%-*.*s ", name_width,
+		      (int) schedEntry->_schedNameLength,
+		      schedEntry->schedName);
+
+    fmt_enum(s, 8, disman_schedule_mib_enums_schedType,
+	     schedEntry->schedType);
+
+    g_string_sprintfa(s, " %s\n", fmt_expression(schedEntry));
+}
+
+
+
 static int
 cmd_scheduler_info(scli_interp_t *interp, int argc, char **argv)
 {
-    schedObjects_t *schedObjects = NULL;
+    schedEntry_t **schedTable = NULL;
+    int name_width = 5, owner_width = 5;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (disman_schedule_mib_get_schedTable(interp->peer, &schedTable)) {
+	return SCLI_ERROR;
+    }
+
+    if (schedTable) {
+	for (i = 0; schedTable[i]; i++) {
+	    if (schedTable[i]->_schedOwnerLength > owner_width) {
+		owner_width = schedTable[i]->_schedOwnerLength;
+	    }
+	    if (schedTable[i]->_schedNameLength > name_width) {
+		name_width = schedTable[i]->_schedNameLength;
+	    }
+	}
+	g_string_sprintfa(interp->result,
+			  "State %-*s %-*s Type     Expression\n",
+			  owner_width, "Owner", name_width, "Name");
+	for (i = 0; schedTable[i]; i++) {
+	    show_scheduler_info(interp->result, schedTable[i],
+				name_width, owner_width);
+	}
+    }
+
+    if (schedTable) disman_schedule_mib_free_schedTable(schedTable);
+	
+    return SCLI_OK;
+}
+
+
+
+static void
+show_scheduler_details(GString *s, schedEntry_t *schedEntry)
+{
+    int const width = 20;
+    int i;
+    
+    g_string_append(s, "AdminStatus: ");
+    fmt_enum(s, width, disman_schedule_mib_enums_schedAdminStatus,
+	     schedEntry->schedAdminStatus);
+    g_string_append(s, "Owner:    ");
+    g_string_sprintfa(s, "%.*s\n",
+		      (int) schedEntry->_schedOwnerLength,
+		      schedEntry->schedOwner);
+
+    g_string_append(s, "OperStatus:  ");
+    fmt_enum(s, width, disman_schedule_mib_enums_schedOperStatus,
+	     schedEntry->schedOperStatus);
+    g_string_append(s, "Name:     ");
+    g_string_sprintfa(s, "%*s\n",
+		      (int) schedEntry->_schedNameLength,
+		      schedEntry->schedName);
+
+    g_string_append(s, "RowStatus:   ");
+    fmt_enum(s, width, disman_schedule_mib_enums_schedRowStatus,
+	     schedEntry->schedRowStatus);
+    g_string_append(s, "Type:     ");
+    fmt_enum(s, 1, disman_schedule_mib_enums_schedType,
+	     schedEntry->schedType);
+    g_string_append(s, "\n");
+    
+    g_string_append(s, "Storage:     ");
+    fmt_enum(s, width, disman_schedule_mib_enums_schedStorageType,
+	     schedEntry->schedStorageType);
+    g_string_append(s, "Value:    ");
+    if (schedEntry->schedValue) {
+	g_string_sprintfa(s, "%d", *schedEntry->schedValue);
+    }
+    g_string_append(s, "\n");
+    
+    g_string_append(s, "Last Error:  ");
+    fmt_enum(s, width, disman_schedule_mib_enums_schedLastFailure,
+	     schedEntry->schedLastFailure);
+    g_string_append(s, "Error:    ");
+    if (schedEntry->schedLastFailed) {
+	fmt_date_and_time(s, schedEntry->schedLastFailed,
+			  schedEntry->_schedLastFailedLength);
+    }
+    g_string_append(s, "\n");
+    
+    if (schedEntry->schedContextName && schedEntry->_schedContextNameLength) {
+	g_string_sprintfa(s, "Context:     <%.*s>\n",
+			  (int) schedEntry->_schedContextNameLength,
+			  schedEntry->schedContextName);
+    }
+    
+    if (schedEntry->schedVariable) {
+	g_string_sprintfa(s, "Variable:    ");
+	for (i = 0; i < schedEntry->_schedVariableLength; i++) {
+	    g_string_sprintfa(s, "%s%u", i ? "." : "",
+			      schedEntry->schedVariable[i]);
+	}
+	g_string_append(s, "\n");
+    }
+    
+    g_string_sprintfa(s, "Expression:  %s\n",
+		      fmt_expression(schedEntry));
+        
+    if (schedEntry->schedDescr) {
+	g_string_sprintfa(s, "Description: %.*s\n",
+			  (int) schedEntry->_schedDescrLength,
+			  schedEntry->schedDescr);
+    }
+}
+
+
+    
+static int
+cmd_scheduler_details(scli_interp_t *interp, int argc, char **argv)
+{
     schedEntry_t **schedTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (disman_schedule_mib_get_schedObjects(interp->peer, &schedObjects)) {
+    if (disman_schedule_mib_get_schedTable(interp->peer, &schedTable)) {
 	return SCLI_ERROR;
-    }
-
-    (void) disman_schedule_mib_get_schedTable(interp->peer, &schedTable);
-
-    if (schedObjects) {
-	if (schedObjects->schedLocalTime) {
-	    fmt_date_and_time(interp->result,
-			      schedObjects->schedLocalTime, 11);
-	}
-	g_string_append(interp->result, "\n");
     }
 
     if (schedTable) {
 	for (i = 0; schedTable[i]; i++) {
-	    g_string_append(interp->result, "**\n");
+	    if (i) {
+		g_string_append(interp->result, "\n");
+	    }
+	    show_scheduler_details(interp->result, schedTable[i]);
 	}
     }
 
-    if (schedObjects) disman_schedule_mib_free_schedObjects(schedObjects);
     if (schedTable) disman_schedule_mib_free_schedTable(schedTable);
 	
     return SCLI_OK;
@@ -1227,6 +1533,10 @@ scli_init_disman_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "scheduler information",
 	  cmd_scheduler_info },
+	{ "show disman scheduler details",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "schedules on the distributed manager",
+	  cmd_scheduler_details },
 	{ NULL, 0, NULL, NULL }
     };
     
