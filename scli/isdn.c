@@ -1,7 +1,7 @@
 /* 
  * isdn.c -- scli isdn mode implementation
  *
- * Copyright (C) 2001-2002 Oliver Wellnitz, Juergen Schoenwaelder
+ * Copyright (C) 2002 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,6 +66,9 @@ show_isdn_bearer(scli_interp_t * interp, int argc, char **argv)
 
     if (bearerTable) {
 	for (i = 0; bearerTable[i]; i++) {
+	    if (i) {
+		g_string_append(interp->result, "\n");
+	    }
 	    fmt_isdn_bearer(interp->result, bearerTable[i]);
 	}
     }
