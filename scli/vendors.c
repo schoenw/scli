@@ -37,7 +37,9 @@ static scli_vendor_t iana_vendor_table[] = {
     {  311,	"Microsoft",		"http://www.microsoft.com/" },
     {  480,	"QMS",			"http://www.qms.com/" },
     {  641,	"Lexmark",		"http://www.lexmark.com/" },
+    {  762,	"Karlnet",		"http://www.karlnet.com/" },
     {  915,	"SerComm",		"http://www.sercomm.com/" },
+    {  937,	"Netgear",		"http://www.netgear.com/" },
     { 1575,	"TU Braunschweig",	"http://www.tu-braunschweig.de/" },
     { 1602,	"Canon",		"http://www.canon.com/" },
     { 1751,	"Lucent Technologies",	"http://www.lucent.com/" },
@@ -106,6 +108,9 @@ scli_get_vendor_oid(guint32 oid[], guint16 len)
  * needs of the scli package.
  */
 
+#if 1
+#include "oui.c"
+#else
 static scli_vendor_t ieee802_vendor_table[] = {
     { 0x000001, "SuperLAN-2U" },
     { 0x000002, "BBN (was internal usage only, no longer used)" },
@@ -147,7 +152,7 @@ static scli_vendor_t ieee802_vendor_table[] = {
     { 0x000052, "Optical Data Systems" },
     { 0x000055, "AT&T" },
     { 0x000058, "Racore Computer Products Inc" },
-    { 0x00005A, "SK	(Schneider & Koch in Europe and Syskonnect outside of Europe)" },
+    { 0x00005A, "SK (Schneider & Koch in Europe and Syskonnect outside of Europe)" },
     { 0x00005A, "Xerox 806 (unregistered)" },
     { 0x00005B, "Eltec" },
     { 0x00005D, "RCE" },
@@ -169,10 +174,10 @@ static scli_vendor_t ieee802_vendor_table[] = {
     { 0x000075, "Bell Northern Research (BNR)" },
     { 0x000077, "Interphase" },
     { 0x000078, "Labtam Australia" },
-    { 0x000079, "Networth Incorporated	[bought by Compaq, used in Netelligent series]" },
+    { 0x000079, "Networth Incorporated [bought by Compaq, used in Netelligent series]" },
     { 0x00007A, "Ardent" },
     { 0x00007B, "Research Machines" },
-    { 0x00007D, "Cray Research Superservers,Inc		[Also Harris (3M) (old)]" },
+    { 0x00007D, "Cray Research Superservers,Inc [Also Harris (3M) (old)]" },
     { 0x00007E, "NetFRAME multiprocessor network servers" },
     { 0x00007F, "Linotype-Hell AG" },
     { 0x000080, "Cray Communications (formerly Dowty Network Services)" },
@@ -416,7 +421,7 @@ static scli_vendor_t ieee802_vendor_table[] = {
     { 0x004091, "Procomp Industria Eletronica" },
     { 0x004092, "ASP Computer Products, Inc." },
     { 0x004094, "Shographics Inc" },
-    { 0x004095, "Eagle Technologies	[UMC also reported]" },
+    { 0x004095, "Eagle Technologies [UMC also reported]" },
     { 0x004096, "Telesystems SLW Inc" },
     { 0x00409A, "Network Express Inc" },
     { 0x00409C, "Transware" },
@@ -581,14 +586,14 @@ static scli_vendor_t ieee802_vendor_table[] = {
     { 0x008092, "Japan Computer Industry, Inc." },
     { 0x008093, "Xyron Corporation" },
     { 0x008094, "Sattcontrol AB" },
-    { 0x008096, "HDS (Human Designed Systems)	X terminals" },
+    { 0x008096, "HDS (Human Designed Systems) X terminals" },
     { 0x008098, "TDK Corporation" },
     { 0x00809A, "Novus Networks Ltd" },
     { 0x00809B, "Justsystem Corporation" },
     { 0x00809D, "Datacraft Manufactur'g Pty Ltd" },
     { 0x00809F, "Alcatel Business Systems" },
     { 0x0080A1, "Microtest" },
-    { 0x0080A3, "Lantronix	(see also 0800A3)" },
+    { 0x0080A3, "Lantronix (see also 0800A3)" },
     { 0x0080A6, "Republic Technology Inc" },
     { 0x0080A7, "Measurex Corp" },
     { 0x0080AD, "CNet Technology" },
@@ -602,7 +607,7 @@ static scli_vendor_t ieee802_vendor_table[] = {
     { 0x0080C2, "IEEE 802.1 Committee" },
     { 0x0080C6, "Soho" },
     { 0x0080C7, "Xircom, Inc." },
-    { 0x0080C8, "D-Link	(also Solectek Pocket Adapters, and LinkSys PCMCIA)" },
+    { 0x0080C8, "D-Link (also Solectek Pocket Adapters, and LinkSys PCMCIA)" },
     { 0x0080C9, "Alberta Microelectronic Centre" },
     { 0x0080CE, "Broadcast Television Systems" },
     { 0x0080D0, "Computer Products International" },
@@ -643,7 +648,7 @@ static scli_vendor_t ieee802_vendor_table[] = {
     { 0x00A092, "Intermate International" },
     { 0x00A0AE, "Network Peripherals, Inc." },
     { 0x00A0C8, "Adtran, Inc." },
-    { 0x00A0C9, "Intel (PRO100B and PRO100+)	[used on Cisco PIX firewall among others]" },
+    { 0x00A0C9, "Intel (PRO100B and PRO100+) [used on Cisco PIX firewall among others]" },
     { 0x00A0CC, "Lite-On" },
     { 0x00A0D1, "National Semiconductor" },
     { 0x00A0D2, "Allied Telesyn" },
@@ -748,7 +753,7 @@ static scli_vendor_t ieee802_vendor_table[] = {
     { 0x00C072, "KNX Ltd" },
     { 0x00C073, "Xedia Corporation" },
     { 0x00C074, "Toyoda Automatic Loom Works Ltd" },
-    { 0x00C075, "Xante Corporation	" },
+    { 0x00C075, "Xante Corporation" },
     { 0x00C076, "I-Data International A-S" },
     { 0x00C077, "Daewoo Telecom Ltd" },
     { 0x00C078, "Computer Systems Engineering" },
@@ -888,7 +893,7 @@ static scli_vendor_t ieee802_vendor_table[] = {
     { 0x00E0F9, "Cisco" },
     { 0x00E0FE, "Cisco" },
     { 0x020406, "BBN internal usage (not registered)" },
-    { 0x020701, "Interlan [now Racal-InterLAN]	DEC (UNIBUS or QBUS), Apollo, Cisco" },
+    { 0x020701, "Interlan [now Racal-InterLAN], DEC (UNIBUS or QBUS), Apollo, Cisco" },
     { 0x020701, "Racal-Datacom" },
     { 0x026060, "3Com" },
     { 0x026086, "Satelcom MegaPac (UK)" },
@@ -914,7 +919,7 @@ static scli_vendor_t ieee802_vendor_table[] = {
     { 0x08000F, "SMC (Standard Microsystems Corp.)" },
     { 0x080010, "AT&T [misrepresentation of 800010?]" },
     { 0x080011, "Tektronix, Inc." },
-    { 0x080014, "Excelan				BBN Butterfly, Masscomp, Silicon Graphics" },
+    { 0x080014, "Excelan, BBN Butterfly, Masscomp, Silicon Graphics" },
     { 0x080017, "National Semiconductor Corp. (used to have Network System Corp., wrong NSC)" },
     { 0x08001A, "Tiara? (used to have Data General)" },
     { 0x08001B, "Data General" },
@@ -987,7 +992,7 @@ static scli_vendor_t ieee802_vendor_table[] = {
     { 0x400003, "Net Ware (?)" },
     { 0x444553, "Microsoft" },
     { 0x444649, "DFI (Diamond Flower Industries)" },
-    { 0x475443, "GTC (Not registered!)		(This number is a multicast!)" },
+    { 0x475443, "GTC (Not registered!) (This number is a multicast!)" },
     { 0x484453, "HDS ???" },
     { 0x484C00, "Network Solutions" },
     { 0x4854E8, "winbond?" },
@@ -1008,6 +1013,7 @@ static scli_vendor_t ieee802_vendor_table[] = {
     { 0xE20C0F, "Kingston Technologies" },
     { 0, NULL }
 };
+#endif
 
 
 const scli_vendor_t*
@@ -1015,7 +1021,7 @@ scli_get_ieee_vendor(guint32 prefix)
 {
     int i;
     
-    for (i = 0; ieee802_vendor_table[i].id; i++) {
+    for (i = 0; ieee802_vendor_table[i].name; i++) {
 	if (ieee802_vendor_table[i].id == prefix) {
 	    return &(ieee802_vendor_table[i]);
 	}
