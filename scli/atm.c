@@ -33,23 +33,20 @@ xml_atm_interface(xmlNodePtr root,
 		  if_mib_ifXEntry_t *ifXEntry)
 {
     xmlNodePtr tree, node;
-    char buffer[80];
 
-    g_snprintf(buffer, sizeof(buffer), "%d",
-	       atmInterfaceConfEntry->ifIndex);
     tree = xmlNewChild(root, NULL, "interface", NULL);
-    xmlSetProp(tree, "index", buffer);
+    xml_set_prop(tree, "index", "%d", atmInterfaceConfEntry->ifIndex);
     
     if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
-	g_snprintf(buffer, sizeof(buffer), "%d",
-		   *atmInterfaceConfEntry->atmInterfaceMaxVpcs);
-	node = xmlNewChild(tree, NULL, "max_vpcs", buffer);
+	node = xmlNewChild(tree, NULL, "max_vpcs", NULL);
+	xml_set_content(node, "%d",
+			*atmInterfaceConfEntry->atmInterfaceMaxVpcs);
     }
 
     if (atmInterfaceConfEntry->atmInterfaceMaxVccs) {
-	g_snprintf(buffer, sizeof(buffer), "%d",
+	node = xmlNewChild(tree, NULL, "max_vccs", NULL);
+	xml_set_content(node, "%d",
 		   *atmInterfaceConfEntry->atmInterfaceMaxVccs);
-	node = xmlNewChild(tree, NULL, "max_vccs", buffer);
     }
 }
 

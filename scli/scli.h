@@ -317,5 +317,17 @@ extern void
 fmt_counter_dt(GString *s, guint32 *new_counter, guint32 *old_counter,
 	       struct timeval *last, double delta);
 
+/*
+ * XML utilities.
+ */
+
+extern void
+xml_set_prop(xmlNodePtr node, const xmlChar *name, const char *fmt, ...)
+    G_GNUC_PRINTF(3, 4);
+
+extern void
+xml_set_content(xmlNodePtr node, const char *fmt, ...)
+    G_GNUC_PRINTF(2, 3);
+
 #endif /* _SCLI_H */
 

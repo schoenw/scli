@@ -3,7 +3,8 @@ INCLUDES	= -I$(top_srcdir)/stub -I$(top_srcdir)/snmp $(GLIB_CFLAGS) $(GTK_CFLAGS
 bin_PROGRAMS	= scli # gscli
 
 scli_SOURCES	= scli.c scli.h scli.1 vendors.c \
-		  getopt.h getopt.c getopt1.c basic.c monitor.c cmds.c fmt.c \
+		  getopt.h getopt.c getopt1.c basic.c monitor.c cmds.c \
+		  fmt.c xml.c \
 		  system.c entity.c interface.c disman.c snmp.c \
 		  ip.c udp.c tcp.c \
 		  bridge.c atm.c ether.c \
