@@ -678,8 +678,7 @@ create_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     rapid_city_proc_create_vlan(interp->peer, vlanId, name, name_len,
 				RAPID_CITY_RCVLANTYPE_BYPORT);
     if (interp->peer->error_status) {
-	vlan_snmp_error(interp, NULL);
-	return SCLI_ERROR;
+	return SCLI_SNMP;
     }
 
     return SCLI_OK;
@@ -711,7 +710,8 @@ delete_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    rapid_city_get_rcVlanTable(interp->peer, &vlanTable, RAPID_CITY_RCVLANNAME);
+    rapid_city_get_rcVlanTable(interp->peer, &vlanTable,
+			       RAPID_CITY_RCVLANNAME);
     if (interp->peer->error_status) {
 	regfree(regex_vlan);
 	return SCLI_SNMP;
