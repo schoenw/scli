@@ -201,8 +201,8 @@ readline_init()
 }
 
 /*
- * Print some usage information if the user fails to call the program
- * correctly.
+ * Print some usage information if the user fails to call the
+ * program correctly.
  */
 
 static void
@@ -219,6 +219,7 @@ usage()
 	"  -p, --port        port number of the SNMP agent (default 161)\n"
 	"  -r, --retries     number of retries (default 3)\n"
 	"  -t, --timeout     timeout between retries in milliseconds (default 500)\n"
+	"  -x, --xml         produce machine readable XML output\n"
 	);
 }
 
@@ -236,6 +237,7 @@ main(int argc, char **argv)
     int c, i;
     
     int norc = 0, port = 161, delay = 5000, retries = 3, timeout = 500000;
+    int xml = 0;
 
     static scli_cmd_t cmds[] = {
         { "create scli alias",
@@ -291,10 +293,11 @@ main(int argc, char **argv)
         { "port",    required_argument, 0, 'p' },
 	{ "retries", required_argument, 0, 'r' },
 	{ "timeout", required_argument, 0, 't' },
+	{ "xml",     no_argument,	0, 'x' },
         { NULL, 0, NULL, 0}
     };
 
-    while ((c = getopt_long(argc, argv, "Vc:f:hnp:r:t:", long_options,
+    while ((c = getopt_long(argc, argv, "Vc:f:hnp:r:t:x", long_options,
                             (int *) 0)) != EOF) {
         switch (c) {
         case 'V':
@@ -328,6 +331,9 @@ main(int argc, char **argv)
 	    } else {
 		timeout = atoi(optarg) * 1000;
 	    }
+	    break;
+	case 'x':
+	    xml = 1;
 	    break;
         default:
             usage();
@@ -380,6 +386,10 @@ main(int argc, char **argv)
 	    /* xxx do a sanity-check here ? */
 	    interp->pager = g_strdup(pager);
 	}
+    }
+
+    if (xml) {
+	interp->flags |= SCLI_INTERP_FLAG_XML;
     }
 
     if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {

@@ -30,6 +30,18 @@
 
 
 static void
+xml_tcp_listener(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry, int width)
+{
+    g_string_sprintfa(s, "  <listener address=\"%s\" port=\"%s\"/>\n",
+		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress,
+				       SCLI_FMT_ADDR),
+		      fmt_udp_port(tcpConnEntry->tcpConnLocalPort,
+				   SCLI_FMT_ADDR));
+}
+
+
+
+static void
 show_tcp_listener(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry, int width)
 {
     int pos;
@@ -82,21 +94,54 @@ cmd_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 	if (cnt) {
-	    g_string_sprintfa(interp->result, "%-*s %s\n",
-			      width, "Local Address",
-			      "State");
+	    if (scli_interp_xml(interp)) {
+		g_string_append(interp->result, "<tcp>\n");
+	    } else {
+		g_string_sprintfa(interp->result, "%-*s %s\n",
+				  width, "Local Address", "State");
+	    }
 	    for (i = 0; tcpConnTable[i]; i++) {
 		if (tcpConnTable[i]->tcpConnState
 		    && (*tcpConnTable[i]->tcpConnState
 			== TCP_MIB_TCPCONNSTATE_LISTEN)) {
-		    show_tcp_listener(interp->result, tcpConnTable[i], width);
+		    if (scli_interp_xml(interp)) {
+			xml_tcp_listener(interp->result,
+					 tcpConnTable[i], width);
+		    } else {
+			show_tcp_listener(interp->result,
+					  tcpConnTable[i], width);
+		    }
 		}
+	    }
+	    if (scli_interp_xml(interp)) {
+		g_string_append(interp->result, "</tcp>\n");
 	    }
 	}
     }
 
     if (tcpConnTable) tcp_mib_free_tcpConnTable(tcpConnTable);
     return SCLI_OK;
+}
+
+
+
+static void
+xml_tcp_connection(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry,
+		   int local_width, int remote_width)
+{
+    g_string_sprintfa(s, "  <connection src=\"%s:%s\"",
+		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress,
+				       SCLI_FMT_ADDR),
+		      fmt_tcp_port(tcpConnEntry->tcpConnLocalPort,
+				   SCLI_FMT_ADDR));
+    g_string_sprintfa(s, " dst=\"%s:%s:\" state=\"",
+		      fmt_ipv4_address(tcpConnEntry->tcpConnRemAddress,
+				       SCLI_FMT_ADDR),
+		      fmt_tcp_port(tcpConnEntry->tcpConnRemPort,
+				   SCLI_FMT_ADDR));
+    fmt_enum(s, 1, tcp_mib_enums_tcpConnState,
+	     tcpConnEntry->tcpConnState);
+    g_string_append(s, "\"/>\n");
 }
 
 
@@ -171,17 +216,28 @@ cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 	if (cnt) {
-	    g_string_sprintfa(interp->result, "%-*s %-*s %s\n",
-			      local_width, "Local Address",
-			      remote_width, "Remote Address",
-			      "State");
+	    if (scli_interp_xml(interp)) {
+		g_string_append(interp->result, "<tcp>\n");
+	    } else {
+		g_string_sprintfa(interp->result, "%-*s %-*s %s\n",
+				  local_width, "Local Address",
+				  remote_width, "Remote Address", "State");
+	    }
 	    for (i = 0; tcpConnTable[i]; i++) {
 		if (tcpConnTable[i]->tcpConnState
 		    && (*tcpConnTable[i]->tcpConnState
 			!= TCP_MIB_TCPCONNSTATE_LISTEN)) {
-		    show_tcp_connection(interp->result, tcpConnTable[i],
-					local_width, remote_width);
+		    if (scli_interp_xml(interp)) {
+			xml_tcp_connection(interp->result, tcpConnTable[i],
+					   local_width, remote_width);
+		    } else {
+			show_tcp_connection(interp->result, tcpConnTable[i],
+					    local_width, remote_width);
+		    }
 		}
+	    }
+	    if (scli_interp_xml(interp)) {
+		g_string_append(interp->result, "</tcp>\n");
 	    }
 	}
     }

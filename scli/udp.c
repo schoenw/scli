@@ -31,6 +31,18 @@
 
 
 static void
+xml_udp_listener(GString *s, udp_mib_udpEntry_t *udpEntry, int width)
+{
+    g_string_sprintfa(s, "  <listener address=\"%s\" port=\"%s\"/>\n",
+		      fmt_ipv4_address(udpEntry->udpLocalAddress,
+				       SCLI_FMT_NAME_OR_ADDR),
+		      fmt_udp_port(udpEntry->udpLocalPort,
+				   SCLI_FMT_NAME_OR_ADDR));
+}
+
+
+
+static void
 show_udp_listener(GString *s, udp_mib_udpEntry_t *udpEntry, int width)
 {
     int pos;
@@ -72,11 +84,21 @@ cmd_udp_listener(scli_interp_t *interp, int argc, char **argv)
 		width = len;
 	    }
 	}
-	g_string_sprintfa(interp->result, "%-*s %s\n",
-			  width, "Local Address",
-			  "State");
+	if (scli_interp_xml(interp)) {
+	    g_string_append(interp->result, "<udp>\n");
+	} else {
+	    g_string_sprintfa(interp->result, "%-*s %s\n",
+			      width, "Local Address", "State");
+	}
 	for (i = 0; udpTable[i]; i++) {
-	    show_udp_listener(interp->result, udpTable[i], width);
+	    if (scli_interp_xml(interp)) {
+		xml_udp_listener(interp->result, udpTable[i], width);
+	    } else {
+		show_udp_listener(interp->result, udpTable[i], width);
+	    }
+	}
+	if (scli_interp_xml(interp)) {
+	    g_string_append(interp->result, "</udp>\n");
 	}
     }
 

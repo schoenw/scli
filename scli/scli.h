@@ -79,6 +79,7 @@ struct scli_alias {
 
 #define SCLI_INTERP_FLAG_INTERACTIVE	0x01
 #define SCLI_INTERP_FLAG_RECURSIVE	0x02
+#define SCLI_INTERP_FLAG_XML		0x04
 
 struct scli_interp {
     GNode *cmd_root;		/* root of the command tree */
@@ -95,6 +96,8 @@ scli_interp_create();
 
 extern void
 scli_interp_delete();
+
+#define scli_interp_xml(interp) (interp->flags & SCLI_INTERP_FLAG_XML)
 
 extern int
 scli_split(char *string, int *argc, char ***argv);

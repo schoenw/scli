@@ -333,9 +333,11 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 		    if (s->len) {
 			g_string_append(s, "\n");
 		    }
-		    g_string_sprintfa(s, "%c %s [%s]\n\n", '#',
-				      cmd->desc ? cmd->desc : "",
-			      (interp->peer) ? interp->peer->name : "?");
+		    if (! scli_interp_xml(interp)) {
+			g_string_sprintfa(s, "%c %s [%s]\n\n", '#',
+					  cmd->desc ? cmd->desc : "",
+				  (interp->peer) ? interp->peer->name : "?");
+		    }
 		    g_string_append(s, interp->result->str);
 		}
 	    }
