@@ -143,7 +143,7 @@ show_tcp_connections(WINDOW *win, host_snmp *peer, int flags)
     wmove(win, 1, 0);
     for (i = 0, p = 0; tcpConnTable[i]; i++) {
 	if (tcpConnTable[i]->tcpConnState &&
-	    *tcpConnTable[i]->tcpConnState == 2) {
+	    *tcpConnTable[i]->tcpConnState == TCP_MIB_TCPCONNSTATE_LISTEN) {
 	    continue;
 	}
 	p++;
