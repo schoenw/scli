@@ -1206,7 +1206,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  "The `create snmp vacm member' commands can be used to assign\n"
 	  "new members (security names) to vacm groups. New groups are\n"
 	  "created if they do not exist.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  create_snmp_vacm_member },
 
@@ -1214,14 +1214,14 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  "The `delete snmp vacm member' commands can be used to delete\n"
 	  "members (security names) from vacm groups. Groups are deleted\n"
 	  "if the last member is deleted.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  delete_snmp_vacm_member },
 
 	{ "create snmp usm user", "<name> <template>",
 	  "The `create snmp usm user' commands can be used to create a\n"
 	  "new user by cloning an existing template.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  create_snmp_usm_user },
 
@@ -1230,7 +1230,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  "SNMP engine generates authentication failure notifications.\n"
 	  "The <value> parameter must be one of the strings \"enabled\"\n"
 	  "or \"disabled\".",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_snmp_authentication_traps },
 

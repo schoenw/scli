@@ -672,7 +672,7 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "The set ip forwarding command controls whether the IP protocol\n"
 	  "engine forwards IP datagrams or not. The <value> parameter must\n"
 	  "be one of the strings \"enabled\" or \"disabled\".",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_ip_forwarding },
 	
@@ -680,7 +680,7 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "The set ip ttl command can be used to change the default\n"
 	  "time to live (TTL) value used by the IP protocol engine. The\n"
 	  "<number> parameter must be a number between 1 and 255 inclusive.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_ip_ttl },
 	

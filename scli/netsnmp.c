@@ -386,13 +386,13 @@ scli_init_netsnmp_mode(scli_interp_t *interp)
 	  "The `set netsnmp debugging' command controls whether the agent\n"
 	  "generates debug messages or not. The <value> parameter must\n"
 	  "be one of the strings \"enabled\" or \"disabled\".",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_netsnmp_debugging },
 	
 	{ "set netsnmp restart", NULL,
 	  "The `set netsnmp restart' command restarts the agent.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_netsnmp_restart },
 	

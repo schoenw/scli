@@ -919,7 +919,7 @@ set_scli_regex(scli_interp_t *interp, int argc, char **argv)
     GSnmpEnum const *dft;
     regex_t _regex_flags, *regex_flags = NULL;
 
-    if (argc > 2) {
+    if (argc < 1 || argc > 2) {
 	return SCLI_SYNTAX_NUMARGS;
     }
 
@@ -927,7 +927,7 @@ set_scli_regex(scli_interp_t *interp, int argc, char **argv)
 	interp->regex_flags = 0;
 	return SCLI_OK;
     }
-    
+
     regex_flags = &_regex_flags;
     if (regcomp(regex_flags, argv[1], interp->regex_flags) != 0) {
 	g_string_assign(interp->result, argv[1]);
@@ -957,7 +957,7 @@ set_scli_debugging(scli_interp_t *interp, int argc, char **argv)
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (argc > 2) {
+    if (argc < 1 || argc > 2) {
 	return SCLI_SYNTAX_NUMARGS;
     }
 
@@ -1217,14 +1217,14 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "extend scli with modules coming from other sources. Dynamic\n"
 	  "loadable modules also simplify the development and management\n"
 	  "of site-specific modules.",
-	  0,
+	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  cmd_scli_load },
 
 	{ "delete scli plugin", "<module>",
 	  "The `delete scli plugin' command removes a previously loaded\n"
 	  "modules from a running scli process.",
-	  0,
+	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  cmd_scli_unload },
 
@@ -1255,7 +1255,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "scli command (fragment) <value>. If the alias <name> already\n"
 	  "exists, then the new <value> will be assigned to the existing\n"
 	  "alias.",
-	  0,
+	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  create_scli_alias },
 	
@@ -1264,14 +1264,14 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "aliases from the scli interpreter. The regular expression\n"
 	  "<regexp> is matched against all alias names in order to\n"
 	  "select the aliases that are deleted.",
-	  0,
+	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  delete_scli_alias },
 	
         { "create scli interp", "<name>",
 	  "The `create scli interp' command creates a new internal scli\n"
 	  "interpreter with the name <name>.",
-	  0,
+	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  create_scli_interp },
 	
@@ -1280,7 +1280,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "scli interpreters from the main scli interpreter. The regular\n"
 	  "expression <regexp> is matched against all alias names in order\n"
 	  "to select the interpreter(s) to be removed.",
-	  0,
+	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  delete_scli_interp },
 	
@@ -1294,7 +1294,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "options off. The currently defined regular expression options\n"
 	  "are \"extended\" for POSIX extended regular expressions and\n"
 	  "\"case-insensitive\" for case insensitive matches.",
-	  SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_NORECURSE,
 	  "", NULL,
 	  set_scli_regex },
 	
@@ -1309,7 +1309,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "layer, \"request\" for the SNMP request handling layer, \n"
 	  "\"transport\" for the SNMP transport layer, \"packet\" for\n"
 	  "the SNMP packet layer, and \"asn1\" for the ASN.1 coding layer.",
-	  SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_NORECURSE,
 	  "", NULL,
 	  set_scli_debugging },
 	
@@ -1318,7 +1318,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "used as a pager if the output produced by an scli command does\n"
 	  "not fit on a single screen. The output is passed to the <pager>\n"
 	  "shell command via its standard input stream.",
-	  0,
+	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_scli_pager },
 	
@@ -1328,7 +1328,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "\"scli\" and \"xml\". The \"scli\" format is the default output\n"
 	  "format and described in this documentation. The \"xml\" output\n"
 	  "format is experimental and therefore not described here.",
-	  SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_NORECURSE,
 	  "", NULL,
 	  set_scli_format },
 	

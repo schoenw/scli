@@ -1617,13 +1617,13 @@ scli_init_disman_mode(scli_interp_t *interp)
 
 	{ "create disman script", "<owner> <name> <description>",
 	  "...",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  create_disman_script },	  
 
 	{ "create disman run", "<owner> <name> <args>",
 	  "...",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  create_disman_run },	  
 

@@ -977,7 +977,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	{ "create nortel bridge vlan", "<vlanid> <name>",
 	  "The `create nortel bridge vlan' command is used to create a\n"
 	  "new virtual LAN with the given <vlanid> and <name>.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  create_nortel_bridge_vlan },
 
@@ -986,14 +986,14 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "virtual LANs. The regular expression <regexp> is matched\n"
 	  "against the virtual LAN names to select the vlans that should\n"
 	  "be deleted.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  delete_nortel_bridge_vlan },
 
 	{ "set nortel bridge vlan name", "<vlanid> <name>",
 	  "The `set nortel bridge vlan name' command changes the name of\n"
 	  "a virtual LAN.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_nortel_bridge_vlan_name },
 
@@ -1004,7 +1004,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "should be modified. The <ports> argument contains a comma\n"
 	  "separated list of port numbers or port number ranges, e.g.\n"
 	  "1,5,7-8.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_nortel_bridge_vlan_ports },
 
@@ -1014,7 +1014,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "against the vlan names to select the vlan. The <ports> argument\n"
 	  "contains a comma separated list of port numbers or port number\n"
 	  "ranges, e.g. 1,5,7-8.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_nortel_bridge_vlan_default },
 

@@ -1525,13 +1525,13 @@ scli_init_interface_mode(scli_interp_t *interp)
 
 	{ "create interface stack", "<lower-regexp> <higher-regexp>",
 	  "",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  create_interface_stack },
 
 	{ "delete interface stack", "<lower-regexp> <higher-regexp>",
 	  "",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  delete_interface_stack },
 
@@ -1541,7 +1541,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest. The <value> parameter must\n"
 	  "be one of the strings \"up\", \"down\", or \"testing\".",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_interface_status },
 
@@ -1552,7 +1552,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "applications to better identify interfaces. The regular\n"
 	  "expression <regexp> is matched against the interface\n"
 	  "descriptions to select the interfaces.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_interface_alias },
 
@@ -1562,7 +1562,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "The regular expression <regexp> is matched against the interface\n"
 	  "descriptions to select the interfaces. The <value> parameter\n"
 	  "must be one of the strings \"enabled\" or \"disabled\".",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_interface_notifications },
 
@@ -1572,7 +1572,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "regular expression <regexp> is matched against the interface\n"
 	  "descriptions to select the interfaces. The <bool> parameter\n"
 	  "must be one of the strings \"true\" or \"false\".",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_interface_promiscuous },
 
