@@ -154,12 +154,25 @@ fmt_subunit_status(gint32 *status)
 
 
 
-static void
-misc_printer_printInputDimension(GString *s, gint32 * dim)
+static const char *
+fmt_dimensions(gint32 *dim)
 {
-    if (dim) {
-	xxx_enum(s, 22, printer_mib_enums_prtInputDimUnit, dim);
+    static char s[256];
+
+    if (! dim) {
+	return NULL;
     }
+
+    if (*dim == -1) {
+	return "other";
+    } else if (*dim == -2) {
+	return "unknown";
+    } else if (*dim < 0) {
+	return "-";
+    }
+
+    g_snprintf(s, sizeof(s), "%d", *dim);
+    return s;
 }
 
 
@@ -535,13 +548,13 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
 	switch (*prtInputEntry->prtInputMaxCapacity) {
 	case -1:
-	    g_string_append(s, "other)");
+	    g_string_append(s, "other");
 	    break;
 	case -2:
-	    g_string_append(s, "unknown)");
+	    g_string_append(s, "unknown");
 	    break;
 	default:
-	    g_string_sprintfa(s, "%u)",
+	    g_string_sprintfa(s, "%u ",
 			      *prtInputEntry->prtInputMaxCapacity);
 	}
 	e = fmt_enum(printer_mib_enums_prtInputCapacityUnit,
@@ -654,82 +667,27 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 	g_string_append(s, "\n");
     }
 
-    if (prtInputEntry->prtInputMediaDimFeedDirDeclared ||
+    e = fmt_enum(printer_mib_enums_prtInputDimUnit,
+		 prtInputEntry->prtInputDimUnit);
+
+    if (prtInputEntry->prtInputMediaDimFeedDirDeclared &&
 	prtInputEntry->prtInputMediaDimXFeedDirDeclared) {
-	g_string_append(s, "Declared media dimensions: ");
-	if (prtInputEntry->prtInputMediaDimFeedDirDeclared) {
-	    switch (*prtInputEntry->prtInputMediaDimFeedDirDeclared) {
-	    case -1:
-		g_string_append(s, "other");
-		break;
-	    default:
-		g_string_sprintfa(s, "%u ",
-			  *prtInputEntry->prtInputMediaDimFeedDirDeclared);
-	    }
-	}
-	else {
-	    g_string_append(s, "?");
-	}
 	
-	if (prtInputEntry->prtInputMediaDimXFeedDirDeclared) {
-	    g_string_append(s, "x ");
-	    switch (*prtInputEntry->prtInputMediaDimXFeedDirDeclared) {
-	    case -1:
-		g_string_append(s, "other");
-		break;
-	    case -2:
-		g_string_append(s, "unknown");
-		break;
-	    default:
-		g_string_sprintfa(s, "%u ",
-			  *prtInputEntry->prtInputMediaDimXFeedDirDeclared);
-	    }
-	} else {
-	    g_string_append(s, "?");
-	}
-	misc_printer_printInputDimension(s, prtInputEntry->prtInputDimUnit);
-	g_string_append(s, "\n");
+	g_string_sprintfa(s, "%-*s %s", indent, "Media Dimensions:",
+	  fmt_dimensions(prtInputEntry->prtInputMediaDimFeedDirDeclared));
+	g_string_sprintfa(s, " x %s ",
+	  fmt_dimensions(prtInputEntry->prtInputMediaDimXFeedDirDeclared));
+	g_string_sprintfa(s, "%s\n", e ? e : "");
     }
     
-    if (prtInputEntry->prtInputMediaDimFeedDirChosen ||
+    if (prtInputEntry->prtInputMediaDimFeedDirChosen &&
 	prtInputEntry->prtInputMediaDimXFeedDirChosen) {
-	g_string_append(s,
-			"Chosen media dimensions:   ");
-	if (prtInputEntry->prtInputMediaDimFeedDirChosen) {
-	    switch (*prtInputEntry->prtInputMediaDimFeedDirChosen) {
-	    case -1:
-		g_string_append(s, "other");
-		break;
-	    case -2:
-		g_string_append(s, "unknown");
-		break;
-	    default:
-		g_string_sprintfa(s, "%u ",
-			  *prtInputEntry->prtInputMediaDimFeedDirChosen);
-	    }
-	}
-	else {
-	    g_string_append(s, "?");
-	}
-	
-	if (prtInputEntry->prtInputMediaDimXFeedDirChosen) {
-	    g_string_append(s, "x ");
-	    switch (*prtInputEntry->prtInputMediaDimXFeedDirChosen) {
-	    case -1:
-		g_string_append(s, "other");
-		break;
-	    case -2:
-		g_string_append(s, "unknown");
-		break;
-	    default:
-		g_string_sprintfa(s, "%u ",
-			  *prtInputEntry->prtInputMediaDimXFeedDirChosen);
-	    }
-	} else {
-	    g_string_append(s, "?");
-	}
-	misc_printer_printInputDimension(s, prtInputEntry->prtInputDimUnit);
-	g_string_append(s, "\n");
+
+	g_string_sprintfa(s, "%-*s %s", indent, "Chosen Dimensions:",
+	  fmt_dimensions(prtInputEntry->prtInputMediaDimFeedDirChosen));
+	g_string_sprintfa(s, " x %s ",
+	  fmt_dimensions(prtInputEntry->prtInputMediaDimXFeedDirChosen));
+	g_string_sprintfa(s, "%s\n", e ? e : "");
     }
     
     if (prtInputEntry->prtInputMediaLoadTimeout) {
@@ -753,7 +711,7 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 
 
 static int
-show_printer_inputs(scli_interp_t * interp, int argc, char **argv)
+show_printer_inputs(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtInputEntry_t **prtInputTable = NULL;
     int i;
