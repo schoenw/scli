@@ -152,12 +152,6 @@ show_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry)
 {
     g_return_if_fail(tunnelIfEntry);
 
-    if (tunnelIfEntry->ifIndex) {
-	g_string_sprintfa(s, "%-2i   ", tunnelIfEntry->ifIndex);
-    } else {
-	g_string_sprintfa(s, "%2s   ", "--");
-    }
-
     if (tunnelIfEntry->tunnelIfLocalAddress) {
 	g_string_sprintfa(s, "%-15s  ",
 		  fmt_ipv4_address(tunnelIfEntry->tunnelIfLocalAddress, 0));
@@ -187,7 +181,7 @@ show_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry)
     }
 
     if (tunnelIfEntry->tunnelIfHopLimit) {
-	g_string_sprintfa(s, "%3i  ", *tunnelIfEntry->tunnelIfHopLimit);
+	g_string_sprintfa(s, "%3d  ", *tunnelIfEntry->tunnelIfHopLimit);
     } else {
 	g_string_sprintfa(s, "%3s  ", "---");
     }
@@ -206,13 +200,19 @@ show_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry)
 	    g_string_append(s, "TC");
 	    break;
         default:
-	    g_string_sprintfa(s, "%2i", *tunnelIfEntry->tunnelIfTOS);
+	    g_string_sprintfa(s, "%2d", *tunnelIfEntry->tunnelIfTOS);
 	    break;
 	}
     } else {
 	g_string_append(s, "--");
     }
     
+    if (tunnelIfEntry->ifIndex) {
+	g_string_sprintfa(s, " %5u   ", tunnelIfEntry->ifIndex);
+    } else {
+	g_string_sprintfa(s, " %5s   ", "--");
+    }
+
     g_string_append(s, "\n");
 }
 
@@ -232,7 +232,7 @@ cmd_tunnel(scli_interp_t *interp, int argc, char **argv)
 
     if (tunnelIfTable) {
 	g_string_append(interp->result,
-	"If   local address    remote address   type    sec.  TTL TOS\n");
+	"Local Address    Remote Address   Type    Sec.  TTL TOS    IF\n");
 	for (i = 0; tunnelIfTable[i]; i++) {
 	    show_tunnel(interp->result, tunnelIfTable[i]);
 	}
