@@ -35,9 +35,9 @@ xml_udp_listener(GString *s, udp_mib_udpEntry_t *udpEntry, int width)
 {
     g_string_sprintfa(s, "  <listener address=\"%s\" port=\"%s\"/>\n",
 		      fmt_ipv4_address(udpEntry->udpLocalAddress,
-				       SCLI_FMT_NAME_OR_ADDR),
+				       SCLI_FMT_ADDR),
 		      fmt_udp_port(udpEntry->udpLocalPort,
-				   SCLI_FMT_NAME_OR_ADDR));
+				   SCLI_FMT_ADDR));
 }
 
 
