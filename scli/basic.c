@@ -585,9 +585,13 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 			g_string_append(s, "\n");
 		    }
 		    if (! scli_interp_xml(interp)) {
-			g_string_sprintfa(s, "%c %s [%s]\n\n", '#',
-					  cmd->desc ? cmd->desc : "",
-				  (interp->peer) ? interp->peer->name : "?");
+			g_string_sprintfa(s, "# %s",
+					  cmd->path ? cmd->path : "");
+			if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER) {
+			    g_string_sprintfa(s, " [%s]",
+			      (interp->peer) ? interp->peer->name : "?");
+			}
+			g_string_sprintfa(s, "\n\n");
 			if (interp->header->len) {
 			    g_string_prepend_c(interp->result, '\n');
 			    g_string_prepend(interp->result, interp->header->str);

@@ -1594,7 +1594,7 @@ scli_init_disman_mode(scli_interp_t *interp)
 	  cmd_scheduler_details },
 	{ "monitor disman run", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  "running scripts",
+	  "monitor running scripts",
 	  cmd_run_info },
 	{ NULL, NULL, 0, NULL, NULL }
     };

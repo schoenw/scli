@@ -28,9 +28,10 @@
 static void
 show_containment(GString *s, char *prefix,
 		 entity_mib_entPhysicalEntry_t **entPhysicalEntry,
-		 gint32 parent)
+		 gint32 parent, int class_width)
 {
     int i, j, len;
+    const char *class;
 
     if (! entPhysicalEntry) {
 	return;
@@ -51,8 +52,13 @@ show_containment(GString *s, char *prefix,
 		}
 	    }
 	    
-	    g_string_sprintfa(s, "%5d:",
+	    g_string_sprintfa(s, "%6d",
 			      entPhysicalEntry[i]->entPhysicalIndex);
+
+	    class = fmt_enum(entity_mib_enums_entPhysicalClass,
+			     entPhysicalEntry[i]->entPhysicalClass);
+	    g_string_sprintfa(s, " %-*s", class_width, class ? class : "");
+
 	    if (len) {
 		g_string_sprintfa(s, "%s  %c- ", prefix, next ? '|' : '`');
 	    } else {
@@ -72,7 +78,8 @@ show_containment(GString *s, char *prefix,
 		    strcat(new_prefix, len ? "   " : " ");
 		}
 		show_containment(s, new_prefix, entPhysicalEntry,
-				 entPhysicalEntry[i]->entPhysicalIndex);
+				 entPhysicalEntry[i]->entPhysicalIndex,
+				 class_width);
 		g_free(new_prefix);
 	    }
 	}
@@ -85,6 +92,9 @@ static int
 show_system_entity_containment(scli_interp_t *interp, int argc, char **argv)
 {
     entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
+    int class_width = 6;
+    int i;
+    const char *class;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -97,7 +107,16 @@ show_system_entity_containment(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (entPhysicalTable) {
-	show_containment(interp->result, "", entPhysicalTable, 0);
+	for (i = 0; entPhysicalTable[i]; i++) {
+	    class = fmt_enum(entity_mib_enums_entPhysicalClass,
+			     entPhysicalTable[i]->entPhysicalClass);
+	    if (strlen(class) > class_width) {
+		class_width = strlen(class);
+	    }
+	}
+	g_string_sprintfa(interp->header, "ENTITY %-*s CONTAINMENT",
+			  class_width, "CLASS");
+	show_containment(interp->result, "", entPhysicalTable, 0, class_width);
     }
 
     if (entPhysicalTable) entity_mib_free_entPhysicalTable(entPhysicalTable);
@@ -108,7 +127,7 @@ show_system_entity_containment(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-fmt_entity(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
+fmt_entity_details(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 {
     const char *class;
     
@@ -201,7 +220,8 @@ fmt_entity(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 
 
 static void
-xml_entity(xmlNodePtr root, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
+xml_entity_details(xmlNodePtr root,
+		   entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 {
     xmlNodePtr tree;
     const char *s;
@@ -302,13 +322,94 @@ show_system_entity_details(scli_interp_t *interp, int argc, char **argv)
     if (entPhysicalTable) {
 	for (i = 0; entPhysicalTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
-		xml_entity(interp->xml_node, entPhysicalTable[i]);
+		xml_entity_details(interp->xml_node, entPhysicalTable[i]);
 	    } else {
 		if (i) {
 		    g_string_append(interp->result, "\n");
 		}
-		fmt_entity(interp->result, entPhysicalTable[i]);
+		fmt_entity_details(interp->result, entPhysicalTable[i]);
 	    }
+	}
+    }
+
+    if (entPhysicalTable) entity_mib_free_entPhysicalTable(entPhysicalTable);
+    
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_entity_info(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry,
+		int class_width, int name_width)
+{
+    const char *class;
+
+    g_string_sprintfa(s, "%6d", entPhysicalEntry->entPhysicalIndex);
+    
+    class = fmt_enum(entity_mib_enums_entPhysicalClass,
+		     entPhysicalEntry->entPhysicalClass);
+    if (class) {
+	g_string_sprintfa(s, " %-*s", class_width, class);
+    } else {
+	g_string_sprintfa(s, " %-*s", class_width, "");
+    }
+    
+    if (entPhysicalEntry->entPhysicalName) {
+	g_string_sprintfa(s, " %-*.*s", name_width,
+		    (int) entPhysicalEntry->_entPhysicalNameLength,
+			  entPhysicalEntry->entPhysicalName);
+    } else {
+	g_string_sprintfa(s, " %-*s", name_width, "");
+    }
+
+    if (entPhysicalEntry->entPhysicalDescr) {
+	g_string_sprintfa(s, " %.*s",
+		    (int) entPhysicalEntry->_entPhysicalDescrLength,
+			  entPhysicalEntry->entPhysicalDescr);
+    }
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_system_entity_info(scli_interp_t *interp, int argc, char **argv)
+{
+    entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
+    int class_width = 6, name_width = 6;
+    int i;
+    const char *class;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
+    if (entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable)) {
+	return SCLI_ERROR;
+    }
+
+    if (entPhysicalTable) {
+	for (i = 0; entPhysicalTable[i]; i++) {
+	    class = fmt_enum(entity_mib_enums_entPhysicalClass,
+			     entPhysicalTable[i]->entPhysicalClass);
+	    if (strlen(class) > class_width) {
+		class_width = strlen(class);
+	    }
+	    if (entPhysicalTable[i]->entPhysicalName
+		&& entPhysicalTable[i]->_entPhysicalNameLength > name_width) {
+		name_width = entPhysicalTable[i]->_entPhysicalNameLength;
+	    }
+	}
+	g_string_sprintfa(interp->header,
+			  "ENTITY %-*s %-*s DESCRIPTION",
+			  class_width, "CLASS",
+			  name_width, "NAME");
+	for (i = 0; entPhysicalTable[i]; i++) {
+	    fmt_entity_info(interp->result, entPhysicalTable[i],
+			    class_width, name_width);
 	}
     }
 
@@ -323,6 +424,10 @@ void
 scli_init_entity_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+	{ "show system entity info ", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "physical entities that compose the system",
+	  show_system_entity_info },
 	{ "show system entity details ", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "physical entities that compose the system",

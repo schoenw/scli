@@ -702,7 +702,7 @@ cmd_system_info(scli_interp_t *interp, int argc, char **argv)
 	    g_string_sprintfa(s, "\n%-*s %d ", indent, "Bridge Ports:",
 			      *(dot1dBase->dot1dBaseNumPorts));
 	    if (dot1dBase->dot1dBaseType) {
-		xxx_enum(s, 60, bridge_mib_enums_dot1dBaseType,
+		xxx_enum(s, 20, bridge_mib_enums_dot1dBaseType,
 			 dot1dBase->dot1dBaseType);
            }
 	}

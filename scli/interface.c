@@ -160,11 +160,11 @@ get_if_name_width(if_mib_ifXEntry_t **ifXTable)
 
 
 static void
-show_if_details(GString *s,
-		if_mib_ifEntry_t *ifEntry,
-		if_mib_ifXEntry_t *ifXEntry,
-		snmpv2_mib_system_t *system,
-		ip_mib_ipAddrEntry_t **ipAddrTable)
+fmt_interface_details(GString *s,
+		      if_mib_ifEntry_t *ifEntry,
+		      if_mib_ifXEntry_t *ifXEntry,
+		      snmpv2_mib_system_t *system,
+		      ip_mib_ipAddrEntry_t **ipAddrTable)
 {
     int j;
     char *name;
@@ -333,7 +333,7 @@ get_entity_index(gint32 ifIndex,
 
 
 static int
-cmd_if_details(scli_interp_t *interp, int argc, char **argv)
+show_interface_details(scli_interp_t *interp, int argc, char **argv)
 {
     if_mib_ifEntry_t **ifTable = NULL;
     if_mib_ifXEntry_t **ifXTable = NULL;
@@ -379,9 +379,9 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
 		}
 		(void) get_entity_index(ifTable[i]->ifIndex,
 					entAliasMappingTable, entPhysicalTable);
-		show_if_details(interp->result, ifTable[i],
-				ifXTable ? ifXTable[i] : NULL,
-				system, ipAddrTable);
+		fmt_interface_details(interp->result, ifTable[i],
+				      ifXTable ? ifXTable[i] : NULL,
+				      system, ipAddrTable);
 		c++;
 	    }
 	}
@@ -404,7 +404,7 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_if_info(GString *s,
+fmt_interface_info(GString *s,
 	     if_mib_ifEntry_t *ifEntry,
 	     if_mib_ifXEntry_t *ifXEntry,
 	     int type_width, int name_width)
@@ -459,7 +459,7 @@ show_if_info(GString *s,
 
 
 static int
-cmd_if_info(scli_interp_t *interp, int argc, char **argv)
+show_interface_info(scli_interp_t *interp, int argc, char **argv)
 {
     if_mib_ifEntry_t **ifTable = NULL;
     if_mib_ifXEntry_t **ifXTable = NULL;
@@ -496,9 +496,9 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 			  name_width, "NAME");
 	for (i = 0; ifTable[i]; i++) {
 	    if (match_interface(regex_iface, ifTable[i])) {
-		show_if_info(interp->result, ifTable[i],
-			     ifXTable ? ifXTable[i] : NULL,
-			     type_width, name_width);
+		fmt_interface_info(interp->result, ifTable[i],
+				   ifXTable ? ifXTable[i] : NULL,
+				   type_width, name_width);
 	    }
 	}
     }
@@ -514,11 +514,11 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_if_stack(GString *s,
-	      if_mib_ifStackEntry_t *ifStackEntry,
-	      if_mib_ifStackEntry_t **ifStackTable,
-	      if_mib_ifEntry_t **ifTable,
-	      int level, int type_width)
+fmt_interface_stack(GString *s,
+		    if_mib_ifStackEntry_t *ifStackEntry,
+		    if_mib_ifStackEntry_t **ifStackTable,
+		    if_mib_ifEntry_t **ifTable,
+		    int level, int type_width)
 {
     /*
      *      ,-- if2 
@@ -557,8 +557,8 @@ show_if_stack(GString *s,
 	if ((ifStackTable[i]->ifStackLowerLayer
 	     == ifStackEntry->ifStackHigherLayer)
 	    && ifStackTable[i]->ifStackHigherLayer) {
-	    show_if_stack(s, ifStackTable[i], ifStackTable, ifTable,
-			  level+1, type_width);
+	    fmt_interface_stack(s, ifStackTable[i], ifStackTable, ifTable,
+				level+1, type_width);
 	    if (ifStackTable[i]->ifStackStatus) {
 		*ifStackTable[i]->ifStackStatus = 0;
 	    }
@@ -569,7 +569,7 @@ show_if_stack(GString *s,
 
 
 static int
-cmd_if_stack(scli_interp_t *interp, int argc, char **argv)
+show_interface_stack(scli_interp_t *interp, int argc, char **argv)
 {
     if_mib_ifStackEntry_t **ifStackTable = NULL;
     if_mib_ifEntry_t **ifTable = NULL;
@@ -610,8 +610,8 @@ cmd_if_stack(scli_interp_t *interp, int argc, char **argv)
 		    continue;
 		}
 		if (match_interface(regex_iface, ifEntry)) {
-		    show_if_stack(interp->result, ifStackTable[i],
-				  ifStackTable, ifTable, 0, type_width);
+		    fmt_interface_stack(interp->result, ifStackTable[i],
+					ifStackTable, ifTable, 0, type_width);
 		}
 	    }
 	}
@@ -639,7 +639,7 @@ typedef struct {
 
 
 static int
-cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
+show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 {
     if_mib_ifEntry_t **ifTable = NULL;
     if_mib_ifXEntry_t **ifXTable = NULL;
@@ -800,7 +800,7 @@ set_status(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry)
 
 
 static int
-set_if_status(scli_interp_t *interp, int argc, char **argv)
+set_interface_status(scli_interp_t *interp, int argc, char **argv)
 {
     if_mib_ifEntry_t **ifTable = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
@@ -849,30 +849,53 @@ void
 scli_init_interface_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show interface info", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "network interface summary",
-	  cmd_if_info },
-	{ "show interface stats", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "network interface statistics",
-	  cmd_if_stats },
-	{ "show interface details", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "network interface details",
-	  cmd_if_details },
-	{ "show interface stack", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "network interface stacking",
-	  cmd_if_stack },
-	{ "monitor interface stats", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  "network interface statistics",
-	  cmd_if_stats },
+
 	{ "set interface status", "<regexp> <status>",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "set administrative interface status",
-	  set_if_status },
+	  "The set interface status command modifies the administrative\n"
+	  "status of all selected interfaces. The regular expression\n"
+	  "<regexp> is matched against the interface descriptions to\n"
+	  "select the interfaces of interest. The <value> parameter must\n"
+	  "be one of the strings \"up\", \"down\", or \"testing\".",
+	  set_interface_status },
+
+	{ "show interface info", "[<regexp>]",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "The show interface info command shows summary information\n"
+	  "about all selected interfaces. The optional regular expression\n"
+	  "<regexp> is matched against the interface descriptions to\n"
+	  "select the interfaces of interest. The command generates a\n"
+	  "table which displays the interface number, its status\n"
+	  "(administrative status, operational status, connector present,\n"
+	  "promiscuous mode), the maximum transfer unit (MTU) of the\n"
+	  "interface, the interface type and speed, the interface's local\n"
+	  "name and its description.",
+	  show_interface_info },
+	
+	{ "show interface details", "[<regexp>]",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "The show interface details command describes the selected\n"
+	  "interfaces in more detail. The optional regular expression\n"
+	  "<regexp> is matched against the interface descriptions to\n"
+	  "select the interfaces of interest. <xxx>\n",
+	  show_interface_details },
+	
+	{ "show interface stack", "[<regexp>]",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "The show interface stack command shows the stacking order\n"
+	  "of the interfaces. <xxx>",
+	  show_interface_stack },
+	
+	{ "show interface stats", "[<regexp>]",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "The show interface stats command <xxx>",
+	  show_interface_stats },
+	
+	{ "monitor interface stats", "[<regexp>]",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  "The monitor network interface stats command <xxx>",
+	  show_interface_stats },
+	
 #if 0
 	{ "set interface alias", "<regexp> <value>",
 	  SCLI_CMD_FLAG_NEED_PEER,
@@ -892,7 +915,9 @@ scli_init_interface_mode(scli_interp_t *interp)
     
     static scli_mode_t if_mib_mode = {
 	"interface",
-	"scli mode to display and configure interface parameters",
+	"The scli interface mode is based on the IF-MIB as published in\n"
+	"RFC 2863. It provides commands to browse, monitor and configure\n"
+	"arbitrary network interfaces.",
 	cmds
     };
 

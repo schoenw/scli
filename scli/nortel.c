@@ -70,11 +70,6 @@ match_vlan(regex_t *regex_vlan,
 	return 1;
     }
 
-    /*
-     * Does it really make sense to filter only on the description?
-     * This way, we do not need to read the ifXTable at all...
-     */
-
     if (vlanEntry->rcVlanName) {
 	char *string = g_malloc0(vlanEntry->_rcVlanNameLength + 1);
 	memcpy(string, vlanEntry->rcVlanName, vlanEntry->_rcVlanNameLength);
@@ -640,32 +635,56 @@ void
 scli_init_nortel_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show nortel bridge vlan info", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "nortel (baystack) vlan summary",
-	  show_nortel_baystack_vlan_info },
-	{ "show nortel bridge vlan details", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  "nortel (baystack) vlan details",
-	  show_nortel_baystack_vlan_details },
-	{ "delete nortel bridge vlan", "<regexp>",
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "delete vlans on nortel (baystack) bridges",
-	  delete_nortel_baystack_vlan },
 	{ "create nortel bridge vlan", "<vlanid> <name>",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "create a vlan on nortel (baystack) bridges",
+	  "The create nortel bridge vlan command is used to create a\n"
+	  "new vlan with the given <vlanid> and <name>.",
 	  create_nortel_baystack_vlan },
+
+	{ "delete nortel bridge vlan", "<regexp>",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "The delete nortel bridge vlan command deletes all selected\n"
+	  "vlans. The regular expression <regexp> is matched against the\n"
+	  "vlan names to select the vlans that should be deleted.",
+	  delete_nortel_baystack_vlan },
+
 	{ "set nortel bridge vlan ports", "<regexp> <ports>",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "set vlan ports on nortel (baystack) bridges",
+	  "The set nortel bridge vlan ports command allows to assign\n"
+	  "ports to port-based vlans. The regular expression <regexp>\n"
+	  "is matched against the vlan names to select the vlans that\n"
+	  "should be modified. The <ports> argument contains a comma\n"
+	  "separated list of port numbers or port number ranges, e.g\n"
+	  "1,5,7-8.",
 	  set_nortel_baystack_vlan_ports },
+
+	{ "show nortel bridge vlan info", "[<regexp>]",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "The show nortel bridge vlan info command shows summary\n"
+	  "information about all selected vlans. The optional regular\n"
+	  "expression <regexp> is matched against the vlan names to\n"
+	  "select the vlans of interest. The command generates a table\n"
+	  "which displays the vlan number, the vlan name, the vlan type,\n"
+	  "the assigned vlan color, the vlan priority, whether routing\n"
+	  "is enabled and the status of the vlan.",
+	  show_nortel_baystack_vlan_info },
+
+	{ "show nortel bridge vlan details", "[<regexp>]",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  "The  show nortel bridge vlan details command describes the\n"
+	  "selected vlans in more detail. The optional regular expression\n"
+	  "<regexp> is matched against the vlan names to select the vlans\n"
+	  "of interest. <xxx>",
+	  show_nortel_baystack_vlan_details },
+
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t nortel_mode = {
 	"nortel",
-	"scli mode to display and configure nortel parameters",
+	"The nortel scli mode allows to manipulate virtual lans (vlans)\n"
+	"on nortel bridges. It is based on the RAPIDCITY-VLAN-MIB which\n"
+	"is implemented at least on the baystack bridges.",
 	cmds
     };
 
