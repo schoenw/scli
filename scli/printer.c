@@ -533,7 +533,8 @@ xml_printer_info(xmlNodePtr root,
     xmlNodePtr tree;
     const char *e;
 
-    tree = xmlNewChild(root, NULL, "cover", NULL);
+    /* tree = xmlNewChild(root, NULL, "cover", NULL); */
+    tree = root;
 
     if (hrDeviceEntry) {
 	(void) xml_new_child(tree, NULL, "description", "%.*s",
@@ -977,6 +978,9 @@ show_printer_paths(scli_interp_t *interp, int argc, char **argv)
 						   "paths");
 		xml_printer_path(node, prtPathTable[i]);
 	    } else {
+		if (i > 0) {
+		    g_string_append(interp->result, "\n");
+		}
 		fmt_printer_path(interp->result, prtPathTable[i]);
 	    }
 	}
