@@ -529,7 +529,7 @@ help()
     mvprintw(y++, 0, "n\tToggle display of network layer summary information");
     mvprintw(y++, 0, "t\tToggle display of transport layer summary information");
     mvprintw(y++, 0, "w\tFreeze the screen until someone hits a key");
-    mvprintw(y++, 0, "T\tToggle active mode to display");
+    mvprintw(y++, 0, "T\tToggle through list of mode");
     mvprintw(y++, 0, "q\tQuit");
     y++;
     mvprintw(y++, 0, "Available modes:");
