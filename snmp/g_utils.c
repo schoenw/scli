@@ -35,6 +35,7 @@ GSnmpEnum const gsnmp_enum_version_table[] = {
 
 
 GSnmpEnum const gsnmp_error_status_table[] = {
+    { G_SNMP_ERR_PROCEDURE,	"procedureError" },
     { G_SNMP_ERR_INTERNAL,	"internalError" },
     { G_SNMP_ERR_NORESPONSE,	"noResponse" },
     { G_SNMP_ERR_NOERROR,	"noError" },
