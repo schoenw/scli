@@ -1,2 +1,2 @@
-info_TEXINFOS = stools.texinfo
-stools_TEXINFOS = gpl.texinfo
+info_TEXINFOS = scli.texinfo
+scli_TEXINFOS = gpl.texinfo
