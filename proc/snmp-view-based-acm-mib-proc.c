@@ -41,15 +41,15 @@ snmp_view_based_acm_mib_proc_create_member(GSnmpSession *s,
 	   vacmGroupEntry->_vacmSecurityNameLength);
     vacmGroupEntry->_vacmGroupNameLength = strlen(group);
     vacmGroupEntry->vacmGroupName = group;
-    vacmGroupEntry->vacmSecurityModel = 0;
+    vacmGroupEntry->vacmSecurityModel = model;
     snmp_view_based_acm_mib_set_vacmSecurityToGroupEntry(s, vacmGroupEntry, 0);
     snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(vacmGroupEntry);
 }
 
 void
 snmp_view_based_acm_mib_proc_delete_member(GSnmpSession *s,
-					   guchar *name,
-					   guchar *group,
+					   guchar *name, gsize name_len,
+					   guchar *group, gsize group_len,
 					   gint32 model)
 {
     snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t *vacmGroupEntry;
@@ -60,10 +60,10 @@ snmp_view_based_acm_mib_proc_delete_member(GSnmpSession *s,
 	s->error_status = G_SNMP_ERR_PROCEDURE;
 	return;
     }
-    vacmGroupEntry->_vacmSecurityNameLength = strlen(name);
+    vacmGroupEntry->_vacmSecurityNameLength = name_len;
     memcpy(vacmGroupEntry->vacmSecurityName, name,
 	   vacmGroupEntry->_vacmSecurityNameLength);
-    vacmGroupEntry->_vacmGroupNameLength = strlen(group);
+    vacmGroupEntry->_vacmGroupNameLength = group_len;
     vacmGroupEntry->vacmGroupName = group;
     vacmGroupEntry->vacmSecurityModel = 0;
     snmp_view_based_acm_mib_set_vacmSecurityToGroupEntry(s, vacmGroupEntry, 0);

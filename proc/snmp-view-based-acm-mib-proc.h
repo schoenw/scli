@@ -35,8 +35,8 @@ snmp_view_based_acm_mib_proc_create_member(GSnmpSession *s,
 
 extern void
 snmp_view_based_acm_mib_proc_delete_member(GSnmpSession *s,
-					   guchar *name,
-					   guchar *group,
+					   guchar *name, gsize name_len,
+					   guchar *group, gsize group_len,
 					   gint32 model);
 
 
