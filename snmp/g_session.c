@@ -381,8 +381,9 @@ g_remove_request (snmp_request *request)
   printf("Removing request: %p\n", request);
 #endif
   rq_list = g_slist_remove(rq_list, request);
-
-  if (request->auth) g_string_free(request->auth, 1);
+  if (request->auth) {
+      g_string_free(request->auth, 1);
+  }
   g_free(request);
   return TRUE;
 }
@@ -450,6 +451,9 @@ again:
 #endif
                    request->timeout(request->session, request->magic);
                 }
+	      if (request->auth) {
+		  g_string_free(request->auth, 1);
+	      }
               g_free(request);
               goto again;
             }
