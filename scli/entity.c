@@ -97,8 +97,9 @@ cmd_containment(scli_interp_t *interp, int argc, char **argv)
 
     if (entPhysicalTable) {
 	show_containment(interp->result, "", entPhysicalTable, 0);
-	entity_mib_free_entPhysicalTable(entPhysicalTable);
     }
+
+    if (entPhysicalTable) entity_mib_free_entPhysicalTable(entPhysicalTable);
     
     return SCLI_OK;
 }
@@ -213,8 +214,9 @@ cmd_components(scli_interp_t *interp, int argc, char **argv)
 	    }
 	    show_component(interp->result, entPhysicalTable[i]);
 	}
-	entity_mib_free_entPhysicalTable(entPhysicalTable);
     }
+
+    if (entPhysicalTable) entity_mib_free_entPhysicalTable(entPhysicalTable);
     
     return SCLI_OK;
 }

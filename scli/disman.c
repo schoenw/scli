@@ -60,25 +60,6 @@ static stls_identity_t const languages[] = {
 
 
 
-static char const *
-get_lang_name(smLangEntry_t *smLangEntry)
-{
-    int l;
-    
-    for (l = 0; languages[l].oidlen; l++) {
-	if (languages[l].oidlen == smLangEntry->_smLangLanguageLength) {
-	    if (memcmp(languages[l].oid, smLangEntry->smLangLanguage,
-		       languages[l].oidlen) == 0) {
-		return languages[l].label;
-	    }
-	}
-    }
-
-    return NULL;
-}
-
-
-
 static time_t
 date_to_time(guchar *date, gsize len)
 {
@@ -312,7 +293,9 @@ get_script_lang_name(smScriptEntry_t *smScriptEntry,
     
     for (i = 0; smLangTable[i]; i++) {
 	if (smLangTable[i]->smLangIndex == *smScriptEntry->smScriptLanguage) {
-	    return get_lang_name(smLangTable[i]);
+	    return stls_identity_get_label(languages,
+				   smLangTable[i]->smLangLanguage,
+				   smLangTable[i]->_smLangLanguageLength);
 	}
     }
     return NULL;

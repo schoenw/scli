@@ -27,12 +27,67 @@
 #include "scli.h"
 
 #include "host-resources-mib.h"
+#include "host-resources-types.h"
 #include "snmpv2-mib.h"
 #include "if-mib.h"
 #include "bridge-mib.h"
 #include "disman-script-mib.h"
 
 #include <ctype.h>
+
+
+static guint32 const oid_other[]
+    = { HOST_RESOURCES_TYPES_HRSTORAGEOTHER };
+static guint32 const oid_ram[]
+    = { HOST_RESOURCES_TYPES_HRSTORAGERAM };
+static guint32 const oid_virtual_memory[]
+    = { HOST_RESOURCES_TYPES_HRSTORAGEVIRTUALMEMORY };
+static guint32 const oid_fixed_disk[]
+    = { HOST_RESOURCES_TYPES_HRSTORAGEFIXEDDISK };
+static guint32 const oid_removable_disk[]
+    = { HOST_RESOURCES_TYPES_HRSTORAGEREMOVABLEDISK };
+static guint32 const oid_floppy_disk[]
+    = { HOST_RESOURCES_TYPES_HRSTORAGEFLOPPYDISK };
+static guint32 const oid_compact_disk[]
+    = { HOST_RESOURCES_TYPES_HRSTORAGECOMPACTDISC };
+static guint32 const oid_ram_disk[]
+    = { HOST_RESOURCES_TYPES_HRSTORAGERAMDISK };
+static guint32 const oid_flash_memory[]
+    = { HOST_RESOURCES_TYPES_HRSTORAGEFLASHMEMORY };
+static guint32 const oid_network_disk[]
+    = { HOST_RESOURCES_TYPES_HRSTORAGENETWORKDISK };
+
+static stls_identity_t const storage_types[] = {
+    { oid_ram,
+      sizeof(oid_ram)/sizeof(guint32),
+      "ram" },
+    { oid_virtual_memory,
+      sizeof(oid_virtual_memory)/sizeof(guint32),
+      "virtual memory" },
+    { oid_fixed_disk,
+      sizeof(oid_fixed_disk)/sizeof(guint32),
+      "fixed disk" },
+    { oid_removable_disk,
+      sizeof(oid_removable_disk)/sizeof(guint32),
+      "removable disk" },
+    { oid_floppy_disk,
+      sizeof(oid_floppy_disk)/sizeof(guint32),
+      "floppy disk" },
+    { oid_compact_disk,
+      sizeof(oid_compact_disk)/sizeof(guint32),
+      "compact disk" },
+    { oid_ram_disk,
+      sizeof(oid_ram_disk)/sizeof(guint32),
+      "ram disk" },
+    { oid_flash_memory,
+      sizeof(oid_flash_memory)/sizeof(guint32),
+      "flash memory" },
+    { oid_network_disk,
+      sizeof(oid_network_disk)/sizeof(guint32),
+      "network disk" },
+    { NULL, 0, NULL }
+};
+
 
 
 static void
@@ -103,8 +158,10 @@ fmt_x_kbytes(GString *s, guint32 bytes)
 
 
 static void
-show_device(GString *s, hrDeviceEntry_t *hrDeviceEntry)
+show_system_device(GString *s, hrDeviceEntry_t *hrDeviceEntry)
 {
+    char const *type;
+    
     g_return_if_fail(hrDeviceEntry);
 
     g_string_sprintfa(s, "%5u ", hrDeviceEntry->hrDeviceIndex);
@@ -115,7 +172,16 @@ show_device(GString *s, hrDeviceEntry_t *hrDeviceEntry)
     } else {
 	g_string_append(s, "        ");
     }
-    
+
+    if (hrDeviceEntry->hrDeviceType) {
+	type = stls_identity_get_label(host_resources_types_identities,
+				       hrDeviceEntry->hrDeviceType,
+				       hrDeviceEntry->_hrDeviceDescrLength);
+	if (type) {
+	    g_string_sprintfa(s, " (%s) ", type);
+	}
+    }
+	
     if (hrDeviceEntry->hrDeviceDescr) {
 	g_string_sprintfa(s, "%.*s\n",
 			  (int) hrDeviceEntry->_hrDeviceDescrLength,
@@ -127,7 +193,7 @@ show_device(GString *s, hrDeviceEntry_t *hrDeviceEntry)
 
 
 static int
-cmd_devices(scli_interp_t *interp, int argc, char **argv)
+cmd_system_devices(scli_interp_t *interp, int argc, char **argv)
 {
     hrDeviceEntry_t **hrDeviceTable = NULL;
     int i;
@@ -141,7 +207,7 @@ cmd_devices(scli_interp_t *interp, int argc, char **argv)
     if (hrDeviceTable) {
 	g_string_sprintfa(interp->result, "Index Status  Description\n");
 	for (i = 0; hrDeviceTable[i]; i++) {
-	    show_device(interp->result, hrDeviceTable[i]);
+	    show_system_device(interp->result, hrDeviceTable[i]);
 	}
     }
 
@@ -153,8 +219,8 @@ cmd_devices(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_process(GString *s, hrSWRunEntry_t *hrSWRunEntry,
-	     hrSWRunPerfEntry_t *hrSWRunPerfEntry)
+show_system_process(GString *s, hrSWRunEntry_t *hrSWRunEntry,
+		    hrSWRunPerfEntry_t *hrSWRunPerfEntry)
 {
     g_string_sprintfa(s, "%5d ", hrSWRunEntry->hrSWRunIndex);
     fmt_run_state_and_type(s,
@@ -195,7 +261,7 @@ show_process(GString *s, hrSWRunEntry_t *hrSWRunEntry,
 
 
 static int
-cmd_processes(scli_interp_t *interp, int argc, char **argv)
+cmd_system_processes(scli_interp_t *interp, int argc, char **argv)
 {
     hrSWRunEntry_t **hrSWRunTable = NULL;
     hrSWRunPerfEntry_t **hrSWRunPerfTable = NULL;
@@ -212,8 +278,8 @@ cmd_processes(scli_interp_t *interp, int argc, char **argv)
     if (hrSWRunTable) {
 	g_string_append(interp->result, "  PID S T MEMORY    TIME COMMAND\n");
 	for (i = 0; hrSWRunTable[i]; i++) {
-	    show_process(interp->result, hrSWRunTable[i],
-			 hrSWRunPerfTable ? hrSWRunPerfTable[i] : NULL);
+	    show_system_process(interp->result, hrSWRunTable[i],
+				hrSWRunPerfTable ? hrSWRunPerfTable[i] : NULL);
 	}
     }
 	
@@ -228,7 +294,7 @@ cmd_processes(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_mount(GString *s, hrFSEntry_t *hrFSEntry, int loc_len, int rem_len)
+show_system_mount(GString *s, hrFSEntry_t *hrFSEntry, int loc_len, int rem_len)
 {
     g_return_if_fail(hrFSEntry);
 
@@ -260,7 +326,7 @@ show_mount(GString *s, hrFSEntry_t *hrFSEntry, int loc_len, int rem_len)
 
 
 static int
-cmd_mounts(scli_interp_t *interp, int argc, char **argv)
+cmd_system_mounts(scli_interp_t *interp, int argc, char **argv)
 {
     hrFSEntry_t **hrFSTable = NULL;
     int i, loc_len = 20, rem_len = 20;
@@ -287,10 +353,11 @@ cmd_mounts(scli_interp_t *interp, int argc, char **argv)
 			  loc_len, "Local Mount Point",
 			  rem_len, "Remote Mount Point");
 	for (i = 0; hrFSTable[i]; i++) {
-	    show_mount(interp->result, hrFSTable[i], loc_len, rem_len);
+	    show_system_mount(interp->result, hrFSTable[i], loc_len, rem_len);
 	}
-	host_resources_mib_free_hrFSTable(hrFSTable);
     }
+
+    if (hrFSTable) host_resources_mib_free_hrFSTable(hrFSTable);
 
     return SCLI_OK;
 }
@@ -298,33 +365,17 @@ cmd_mounts(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_storage(GString *s, hrStorageEntry_t *hrStorageEntry, int descr_width)
+show_system_storage(GString *s, hrStorageEntry_t *hrStorageEntry,
+		    int descr_width)
 {
-    static guint32 const hrStorageTypes[] = {1, 3, 6, 1, 2, 1, 25, 2, 1};
-    guint const idx = sizeof(hrStorageTypes)/sizeof(guint32);
     gchar const *type = NULL;
 
-    static stls_enum_t const storage_types[] = {
-	{ 2, "ram" },
-	{ 3, "virtual memory" },
-	{ 4, "fixed disk" },
-	{ 5, "removable disk" },
-	{ 6, "floppy disk" },
-	{ 7, "compact disk" },
-	{ 8, "ram disk" },
-	{ 9, "flash memory" },
-	{ 10, "network disk" },
-	{ 0, NULL }
-    };
-    
     g_return_if_fail(hrStorageEntry);
 
-    if (hrStorageEntry->hrStorageType
-	&& hrStorageEntry->_hrStorageTypeLength == idx + 1
-	&& memcmp(hrStorageEntry->hrStorageType,
-		  hrStorageTypes, sizeof(hrStorageTypes)) == 0) {
-	type = stls_enum_get_label(storage_types,
-				   hrStorageEntry->hrStorageType[idx]);
+    if (hrStorageEntry->hrStorageType) {
+	type = stls_identity_get_label(storage_types,
+				       hrStorageEntry->hrStorageType,
+				       hrStorageEntry->_hrStorageTypeLength);
     }
 
     if (hrStorageEntry->hrStorageDescr
@@ -368,7 +419,7 @@ show_storage(GString *s, hrStorageEntry_t *hrStorageEntry, int descr_width)
 
 
 static int
-cmd_storage(scli_interp_t *interp, int argc, char **argv)
+cmd_system_storage(scli_interp_t *interp, int argc, char **argv)
 {
     hrStorageEntry_t **hrStorageTable = NULL;
     int descr_width = 14;
@@ -392,11 +443,12 @@ cmd_storage(scli_interp_t *interp, int argc, char **argv)
 			  "%-*s  Size [K]   Used [K]   Free [K] Use%\n",
 			  descr_width, "Storage Area");
 	for (i = 0; hrStorageTable[i]; i++) {
-	    show_storage(interp->result, hrStorageTable[i],
-			 descr_width);
+	    show_system_storage(interp->result, hrStorageTable[i],
+				descr_width);
 	}
-	host_resources_mib_free_hrStorageTable(hrStorageTable);
     }
+
+    if (hrStorageTable) host_resources_mib_free_hrStorageTable(hrStorageTable);
 
     return SCLI_OK;
 }
@@ -404,7 +456,7 @@ cmd_storage(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-cmd_system(scli_interp_t *interp, int argc, char **argv)
+cmd_system_info(scli_interp_t *interp, int argc, char **argv)
 {
     system_t *system = NULL;
     hrSystem_t *hrSystem = NULL;
@@ -580,23 +632,23 @@ scli_init_system_mode(scli_interp_t *interp)
 	{ "show system info",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "system summary information",
-	  cmd_system },
+	  cmd_system_info },
 	{ "show system devices",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "list of system devices",
-	  cmd_devices },
+	  cmd_system_devices },
 	{ "show system storage",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "storage areas attached to the system",
-	  cmd_storage },
+	  cmd_system_storage },
 	{ "show system mounts",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "file systems mounted on the system",
-	  cmd_mounts },
+	  cmd_system_mounts },
 	{ "show system processes",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "processes running on the system",
-	  cmd_processes },
+	  cmd_system_processes },
 	{ NULL, 0, NULL, NULL }
     };
     

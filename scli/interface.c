@@ -358,6 +358,6 @@ scli_init_interface_mode(scli_interp_t *interp)
 	"scli mode to display and configure interface parameters",
 	cmds
     };
-    
+
     scli_register_mode(interp, &if_mib_mode);
 }
