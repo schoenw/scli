@@ -93,11 +93,13 @@ g_async_send (host_snmp *host, GSnmpPduType type,
   else
     request->timeout  = NULL;
 
-  if (!g_setup_address(host))
-    {
-      g_free(request);
-      return NULL;
-    }
+  if (!host->address) {
+      if (!g_setup_address(host))
+      {
+	  g_free(request);
+	  return NULL;
+      }
+  }
 
   request->pdu.request.id           = id++;
   request->pdu.request.error_status = arg1;
