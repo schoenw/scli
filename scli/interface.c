@@ -27,8 +27,8 @@
 #include "if-mib-proc.h"
 #include "ip-mib.h"
 #include "entity-mib.h"
-#include "ctype.h"
 
+#include <ctype.h>
 
 
 #define IF_MIB_IFENTRY_CONFIG \
@@ -257,7 +257,7 @@ fmt_entity_root(scli_interp_t *interp,
 	    e = fmt_enum(entity_mib_enums_entPhysicalClass,
 			 entPhysicalEntry->entPhysicalClass);
 	    if (e) {
-		char *x = g_strdup_printf("%s:", e);
+		char *x = g_strconcat(e, ":", NULL);
 		x[0] = toupper(x[0]);
 		g_string_sprintfa(s, "%-*s %.*s\n", indent, x,
 			    (int) entPhysicalEntry->_entPhysicalDescrLength,
