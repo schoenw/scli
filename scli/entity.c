@@ -439,20 +439,29 @@ scli_init_entity_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 
-	{ "show entity info ", NULL,
-	  "physical entities that compose the system",
+	{ "show entity info", NULL,
+	  "The show entity info command displays summary information about\n"
+	  "the physical entities that compose the system. The command\n"
+	  "generates a table with the following columns:\n"
+	  "\n"
+	  "  ENTITY      entity number\n"
+	  "  CLASS       class of the entity (see below)\n"
+	  "  NAME        name of the entity\n"
+	  "  DESCRIPTION description of the entity",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_entity_info },
 	
 	{ "show entity details ", NULL,
-	  "physical entities that compose the system",
+	  "The show entity details command describes the physical entities\n"
+	  "in more detail.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
-	  "entity details", NULL,
+	  "entities physical", NULL,
 	  show_entity_details },
 	
 	{ "show entity containment", NULL,
-	  "physical entity containment hierarchy",
+	  "The show entity containment command displays the physical entity\n"
+	  "containment hierarchy.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_entity_containment },
@@ -471,6 +480,12 @@ scli_init_entity_mode(scli_interp_t *interp)
 	  set_entity_alias },
 
 	{ "set entity asset", NULL,
+	  "xxx",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  set_entity_serial },
+
+	{ "dump entity", NULL,
 	  "xxx",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
