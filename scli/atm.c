@@ -60,12 +60,12 @@ show_atm_interface(GString *s,
     g_string_sprintfa(s, "%6u     ", atmInterfaceConfEntry->ifIndex);
 
     if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
-	g_string_sprintfa(s, "%5d   ",
+	g_string_sprintfa(s, "%6d   ",
 			  *atmInterfaceConfEntry->atmInterfaceMaxVpcs);
     }
 
     if (atmInterfaceConfEntry->atmInterfaceMaxVccs) {
-	g_string_sprintfa(s, "%5d ",
+	g_string_sprintfa(s, "%6d ",
 			  *atmInterfaceConfEntry->atmInterfaceMaxVccs);
     }
 
@@ -95,7 +95,7 @@ cmd_atm_interface(scli_interp_t *interp, int argc, char **argv)
 	if (scli_interp_xml(interp)) {
 	    g_string_append(interp->result, "<atm>\n");
 	} else {
-	    g_string_append(interp->result, "Interface MaxVpcs MaxVccs\n");
+	    g_string_append(interp->header, "INTERFACE MAX-VPCS MAX-VCCS");
 	}
 	for (i = 0; atmInterfaceConfTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {

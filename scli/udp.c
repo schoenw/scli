@@ -87,8 +87,8 @@ cmd_udp_listener(scli_interp_t *interp, int argc, char **argv)
 	if (scli_interp_xml(interp)) {
 	    g_string_append(interp->result, "<udp>\n");
 	} else {
-	    g_string_sprintfa(interp->result, "%-*s %s\n",
-			      width, "Local Address", "State");
+	    g_string_sprintfa(interp->header, "%-*s %s",
+			      width, "LOCAL ADDRESS", "STATE");
 	}
 	for (i = 0; udpTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {

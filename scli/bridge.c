@@ -180,10 +180,10 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 		}
 	    }
 	}
-	g_string_sprintfa(interp->result,
-			  " Port Interface %-*s Speed %-*s Description\n",
-			  type_width, "Type",
-			  name_width, "Name");
+	g_string_sprintfa(interp->header,
+			  " PORT INTERFACE %-*s SPEED %-*s DESCRIPTION",
+			  type_width, "TYPE",
+			  name_width, "NAME");
 	for (i = 0; dot1dBasePortTable[i]; i++) {
 	    if (ifTable && dot1dBasePortTable[i]->dot1dBasePortIfIndex) {
 		for (j = 0; ifTable[j]; j++) {
@@ -275,9 +275,9 @@ cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 		}
 	    }
 	};
-	g_string_sprintfa(interp->result,
-			  " Port Status   Address           %-*s Vendor\n",
-			  name_width, "Name");
+	g_string_sprintfa(interp->header,
+			  " PORT STATUS   ADDRESS           %-*s VENDOR",
+			  name_width, "NAME");
 	for (p = 0; p < max+1; p++) {
 	    for (i = 0; dot1dTpFdbTable[i]; i++) {
 		if (dot1dTpFdbTable[i]->dot1dTpFdbPort

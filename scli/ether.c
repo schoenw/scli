@@ -264,6 +264,109 @@ cmd_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
 
 
 
+typedef struct {
+    /* input errors */
+    guint32 alignmentErrors;
+    guint32 fcsErrors;
+    guint32 macRecvErrors;
+    guint32 frameTooLongs;
+    /* output errors */
+    guint32 deferredTransmissions;
+    guint32 singleCollisionFrames;
+    guint32 multipleCollisionFrames;
+    guint32 excessiveCollisions;
+    guint32 lateCollisions;
+    guint32 macSendErrors;
+    guint32 carrierSenseErrors;
+} ether_stats_t;
+
+
+static int
+cmd_ether_stats(scli_interp_t *interp, int argc, char **argv)
+{
+    etherlike_mib_dot3StatsEntry_t **dot3StatsTable = NULL;
+    static struct timeval last, now;
+    double delta;
+    int i;
+    static ether_stats_t *stats = NULL;
+    static time_t epoch = 0;
+
+    if (etherlike_mib_get_dot3StatsTable(interp->peer, &dot3StatsTable)) {
+	return SCLI_ERROR;
+    }
+
+    if (epoch < interp->epoch) {
+	if (stats) g_free(stats);
+	stats = NULL;
+	last.tv_sec = last.tv_usec = 0;
+    }
+
+    if (! stats && dot3StatsTable) {
+	for (i = 0; dot3StatsTable[i]; i++) ;
+	stats = (ether_stats_t *) g_malloc0(i * sizeof(ether_stats_t));
+    }
+
+    epoch = time(NULL);
+    gettimeofday(&now, NULL);
+    delta = TV_DIFF(last, now);
+
+    if (dot3StatsTable) {
+	g_string_append(interp->header,
+			"INDEX | ALIGN   FCS   MAC  LONG | "
+			"DEFER  SCOL  MCOL  XCOL  LCOL   MAC  CARR");
+	for (i = 0; dot3StatsTable[i]; i++) {
+	    GString *s = interp->result;
+
+	    g_string_sprintfa(s, "%5u |",
+			      dot3StatsTable[i]->dot3StatsIndex);
+	    
+	    fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsAlignmentErrors,
+			   &(stats[i].alignmentErrors), &last, delta);
+	    
+	    fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsFCSErrors,
+			   &(stats[i].fcsErrors), &last, delta);
+	    
+	    fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsInternalMacReceiveErrors,
+			   &(stats[i].macRecvErrors), &last, delta);
+	    
+	    fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsFrameTooLongs,
+			   &(stats[i].frameTooLongs), &last, delta);
+	    
+	    g_string_append(s, " |");
+	    
+	    fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsDeferredTransmissions,
+			   &(stats[i].deferredTransmissions), &last, delta);
+	    
+	    fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsSingleCollisionFrames,
+			   &(stats[i].singleCollisionFrames), &last, delta);
+
+	    fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsMultipleCollisionFrames,
+			   &(stats[i].multipleCollisionFrames), &last, delta);
+	    
+	    fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsExcessiveCollisions,
+			   &(stats[i].excessiveCollisions), &last, delta);
+	    
+	    fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsLateCollisions,
+			   &(stats[i].lateCollisions), &last, delta);
+	    
+	    fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsInternalMacTransmitErrors,
+			   &(stats[i].macSendErrors), &last, delta);
+	    
+	    fmt_counter_dt(s, dot3StatsTable[i]->dot3StatsCarrierSenseErrors,
+			   &(stats[i].carrierSenseErrors), &last, delta);
+	    
+	    g_string_append(s, "\n");
+	}
+    }
+
+    last = now;
+    if (dot3StatsTable) etherlike_mib_free_dot3StatsTable(dot3StatsTable);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_ether_mode(scli_interp_t *interp)
 {
@@ -272,6 +375,14 @@ scli_init_ether_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "ethernet medium attachment unit parameters",
 	  cmd_ether_mau_info },
+	{ "show ethernet stats",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "ethernet statistics",
+	  cmd_ether_stats },
+	{ "monitor ethernet stats",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  "ethernet statistics",
+	  cmd_ether_stats },
 	{ NULL, 0, NULL, NULL }
     };
     

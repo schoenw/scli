@@ -97,8 +97,8 @@ cmd_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 	    if (scli_interp_xml(interp)) {
 		g_string_append(interp->result, "<tcp>\n");
 	    } else {
-		g_string_sprintfa(interp->result, "%-*s %s\n",
-				  width, "Local Address", "State");
+		g_string_sprintfa(interp->header, "%-*s %s",
+				  width, "LOCAL ADDRESS", "STATE");
 	    }
 	    for (i = 0; tcpConnTable[i]; i++) {
 		if (tcpConnTable[i]->tcpConnState
@@ -222,9 +222,9 @@ cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 	    if (scli_interp_xml(interp)) {
 		g_string_append(interp->result, "<tcp>\n");
 	    } else {
-		g_string_sprintfa(interp->result, "%-*s %-*s %s\n",
-				  local_width, "Local Address",
-				  remote_width, "Remote Address", "State");
+		g_string_sprintfa(interp->header, "%-*s %-*s %s",
+				  local_width, "LOCAL ADDRESS",
+				  remote_width, "REMOTE ADDRESS", "STATE");
 	    }
 	    for (i = 0; tcpConnTable[i]; i++) {
 		if (tcpConnTable[i]->tcpConnState

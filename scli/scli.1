@@ -13,7 +13,7 @@
 .\" along with this program; see the file COPYING.  If not, write to
 .\" the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 .\"
-.TH SCLI 1 "March 29, 2001"
+.TH SCLI 1 "June 18, 2001"
 .\" Please update the above date whenever this man page is modified.
 .\"
 .\" Some roff macros, for reference:
@@ -58,6 +58,10 @@ Show version of program.
 .TP
 .B \-c, \-\-command
 Process the given commands and exit.
+.TP
+.B \-d seconds, \-\-delay=seconds
+Set delay between screen updates in seconds. The default delay between
+updates is 5 seconds.
 .TP
 .B \-f, \-\-file
 Process commands from a file and exit.
@@ -107,6 +111,14 @@ Establish an association to a remote SNMP agent.
 .I show
 Show information provided by the remote SNMP agent. This command has
 many sub-commands focusing on various aspects of the system.
+.TP
+.I monitor
+Monitor information provided by the remote SNMP agent. This command
+has many sub-commands focusing on various aspects of the system.
+\fBscli\fP monitors provide a live display of network and device
+activities. Information is shown in a compact human readable format
+and updated in regular intervals. The initial update interval length
+is determined by the delay command line option.
 .PP
 \fBscli\fP supports recursive command evaluation. When a command is
 entered which is not a leaf of the command tree, then the interpreter
@@ -114,6 +126,48 @@ will recursively invoke all commands in the subtree identified by the
 entered command. In particular, entering \fIshow\fR will cause
 \fBscli\fP to retrieve and display all information accessible from the
 remote SNMP agent.
+.SH INTERACTIVE MONITOR COMMANDS
+Several single-key commands are recognized while \fBscli\fP is running
+in monitor mode:
+.TP
+.B space
+Update the display.
+.TP
+.B ^L
+Redraw the screen.
+.TP
+.B h or ?
+Print a help page.
+.TP
+.B c
+Toggle display of contact summary information.
+.TP
+.B d
+Set the delay in seconds between updates.
+.TP
+.B m
+Toggle display of mode specific summary information.
+.TP
+.B n
+Toggle display of network layer summary information.
+.TP
+.B q
+Quit the monitoring mode.
+.TP
+.B x
+Exit scli immediately.
+.TP
+.B t
+Toggle display of transport layer summary information.
+.TP
+.B w
+Freeze the screen until someone hits a key.
+.TP
+.B >
+Select next mode in the list of display modes.
+.TP
+.B <
+Select previous mode in the list of display modes.
 .SH UNITS
 \fBscli\fP displays numbers in a compact format. It uses several
 abbreviations to explain the units of the numbers. Here are some
@@ -164,6 +218,5 @@ available at:
 <http://www.ibr.cs.tu-bs.de/projects/stools/>
 .SH "SEE ALSO"
 .\" .BR foo (1), 
-.BR stop (1).
 .SH AUTHOR
 Juergen Schoenwaelder <schoenw@ibr.cs.tu-bs.de>.

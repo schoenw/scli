@@ -232,7 +232,7 @@ cmd_system_devices(scli_interp_t *interp, int argc, char **argv)
 	if (scli_interp_xml(interp)) {
 	    g_string_append(interp->result, "<system>\n");
 	} else {
-	    g_string_sprintfa(interp->result, "Index Status  Description\n");
+	    g_string_sprintfa(interp->header, "INDEX STATUS  DESCRIPTION");
 	}
 	for (i = 0; hrDeviceTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
@@ -367,8 +367,8 @@ cmd_system_processes(scli_interp_t *interp, int argc, char **argv)
 	if (scli_interp_xml(interp)) {
 	    g_string_append(interp->result, "<system>\n");
 	} else {
-	    g_string_append(interp->result,
-			    "  PID S T MEMORY     TIME COMMAND\n");
+	    g_string_append(interp->header,
+			    "  PID S T MEMORY     TIME COMMAND");
 	}
 	for (i = 0; hrSWRunTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
@@ -452,9 +452,9 @@ cmd_system_mounts(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 	loc_len++, rem_len++;
-	g_string_sprintfa(interp->result, "%-*s%-*sAccess\n",
-			  loc_len, "Local Mount Point",
-			  rem_len, "Remote Mount Point");
+	g_string_sprintfa(interp->header, "%-*s%-*sACCESS",
+			  loc_len, "LOCAL MOUNT POINT",
+			  rem_len, "REMOTE MOUNT POINT");
 	for (i = 0; hrFSTable[i]; i++) {
 	    show_system_mount(interp->result, hrFSTable[i], loc_len, rem_len);
 	}
@@ -543,9 +543,9 @@ cmd_system_storage(scli_interp_t *interp, int argc, char **argv)
 		descr_width = hrStorageTable[i]->_hrStorageDescrLength;
 	    }
 	}
-	g_string_sprintfa(interp->result,
-			  "%-*s  Size [K]   Used [K]   Free [K] Use%\n",
-			  descr_width, "Storage Area");
+	g_string_sprintfa(interp->header,
+			  "%-*s  SIZE [K]   USED [K]   FREE [K] USE%%",
+			  descr_width, "STORAGE AREA");
 	for (i = 0; hrStorageTable[i]; i++) {
 	    show_system_storage(interp->result, hrStorageTable[i],
 				descr_width);
@@ -751,6 +751,14 @@ scli_init_system_mode(scli_interp_t *interp)
 	  cmd_system_mounts },
 	{ "show system processes",
 	  SCLI_CMD_FLAG_NEED_PEER,
+	  "processes running on the system",
+	  cmd_system_processes },
+	{ "monitor system storage",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  "storage areas attached to the system",
+	  cmd_system_storage },
+	{ "monitor system processes",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "processes running on the system",
 	  cmd_system_processes },
 	{ NULL, 0, NULL, NULL }

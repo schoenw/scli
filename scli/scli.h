@@ -35,12 +35,30 @@
 #include <sys/time.h>
 #endif
 #include <time.h>
+#ifdef HAVE_NCURSES_H
+#include <ncurses.h>
+#else
+#include <curses.h>
+#endif
 
 #include "stools.h"
 
 
 extern char const scli_copyright[];
 
+
+/*
+ * Some defines used internally to compute time differences and
+ * to check whether the polling interval was too short.
+ */
+
+#define TV_DIFF(t1, t2) (1.0 * (t2.tv_sec - t1.tv_sec) + \
+                         (t2.tv_usec - t1.tv_usec) / 1000000.0)
+#define TV_DELTA	0.1
+
+/*
+ * The return codes used by the scli commands functions.
+ */
 
 #define SCLI_OK		0
 #define SCLI_ERROR	1
@@ -54,6 +72,7 @@ typedef struct scli_alias	scli_alias_t;
 
 
 #define SCLI_CMD_FLAG_NEED_PEER	0x01
+#define SCLI_CMD_FLAG_MONITOR	0x02
 
 struct scli_cmd {
     char *path;			/* path where the command is registered */
@@ -87,8 +106,11 @@ struct scli_interp {
     GSList *alias_list;		/* list of command aliases */
     int	flags;			/* interpreter flags */
     GString *result;		/* string result buffer */
+    GString *header;		/* header line to display */
     char *pager;		/* external pager we are using */
-    GSnmpSession *peer;		/* the snmp peer we are talking to */
+    GSnmpSession *peer;		/* snmp peer we are talking to */
+    gint delay;			/* delay between updates in milliseconds */
+    time_t epoch;		/* epoch used to invalidate cached data */
 };
 
 extern scli_interp_t *
@@ -99,8 +121,13 @@ scli_interp_delete();
 
 #define scli_interp_xml(interp) (interp->flags & SCLI_INTERP_FLAG_XML)
 
+#define scli_interp_interactive(interp) (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE)
+
 extern int
 scli_split(char *string, int *argc, char ***argv);
+
+extern int
+scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv);
 
 extern int
 scli_eval(scli_interp_t *interp, char *cmd);
@@ -248,6 +275,10 @@ fmt_ipv4_mask(guchar *addr);
 
 extern char*
 fmt_ether_address(guchar *addr, int flags);
+
+extern void
+fmt_counter_dt(GString *s, guint32 *new_counter, guint32 *old_counter,
+	       struct timeval *last, double delta);
 
 #endif /* _SCLI_H */
 

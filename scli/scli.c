@@ -34,11 +34,51 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <signal.h>
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif
 
 #include <readline/readline.h>
 #include <readline/history.h>
 
 static scli_interp_t *current_interp = NULL;
+
+/*
+ * Make sure we quit curses when we receive signals to abort the
+ * process. Otherwise, we might leave the terminal in an unusable
+ * state.
+ */
+
+static void
+onsignal(int n)
+{
+    (void) endwin();
+    exit(0);
+}
+
+/*
+ * Track window change events using whatever mechanism is available.
+ */
+
+static int interrupted = 0;
+
+static void
+onwinch(int n)
+{
+#ifdef HAVE_RESIZETERM
+    struct winsize size;
+
+    if (ioctl(fileno(stdout), TIOCGWINSZ, &size) == 0) {
+	resizeterm(size.ws_row, size.ws_col);
+	wrefresh(curscr);		/* Linux needs this */
+	interrupted = 0;
+    } else {
+	interrupted = 1;
+    }
+#endif
+    (void) signal(SIGWINCH, onwinch);	/* some systems need this */
+}
 
 /*
  * This is the main loop of the scli command interpreter. It reads a
@@ -47,7 +87,7 @@ static scli_interp_t *current_interp = NULL;
  */
 
 static void
-mainloop(scli_interp_t *interp, int delay)
+mainloop(scli_interp_t *interp)
 {
     char *input, *expansion, *prompt;
     int result, code = SCLI_OK;
@@ -61,7 +101,7 @@ mainloop(scli_interp_t *interp, int delay)
 	g_free(prompt);
 	current_interp = NULL;
  	if (! input) {
-	    printf("\n");
+	    g_print("\n");
 	    code = SCLI_EXIT;
 	    break;
 	}
@@ -208,11 +248,12 @@ readline_init()
 static void
 usage()
 {
-    printf("Usage: scli [OPTION] [hostname [community]]\n");
-    printf(
+    g_print("Usage: scli [OPTION] [hostname [community]]\n");
+    g_print(
 	"Options:\n"
 	"  -V, --version     show version information and exit\n"
 	"  -c, --command     process the given command and exit\n"
+	"  -d, --delay       delay in seconds between screen updates (default 5)\n"
 	"  -f, --file        process commands from a file and exit\n"
 	"  -h, --help        display this help and exit\n"
 	"  -n, --norc        do not evaluate ~/.sclirc on startup\n"
@@ -243,6 +284,7 @@ main(int argc, char **argv)
     {
         { "version", no_argument,       0, 'V' },
 	{ "command", required_argument, 0, 'c' },
+        { "delay",   required_argument, 0, 'd' },
         { "file",    required_argument, 0, 'f' },
         { "help",    no_argument,       0, 'h' },
         { "norc",    no_argument,       0, 'n' },
@@ -253,15 +295,20 @@ main(int argc, char **argv)
         { NULL, 0, NULL, 0}
     };
 
-    while ((c = getopt_long(argc, argv, "Vc:f:hnp:r:t:x", long_options,
+    while ((c = getopt_long(argc, argv, "Vc:d:f:hnp:r:t:x", long_options,
                             (int *) 0)) != EOF) {
         switch (c) {
         case 'V':
-            printf("scli %s\n", VERSION);
+            g_print("scli %s\n", VERSION);
             exit(0);
 	case 'c':
 	    cmd = optarg;
 	    break;
+        case 'd':
+            if (atoi(optarg) > 0) {
+                delay = atoi(optarg) * 1000;
+            }
+            break;
 	case 'f':
 	    file = optarg;
 	    break;
@@ -323,6 +370,17 @@ main(int argc, char **argv)
     }
 
     /*
+     * Setting up curses in such a way that we are sure to restore
+     * the tty into something useful when we are done.
+     */
+
+    signal(SIGINT, onsignal);
+    signal(SIGTERM, onsignal);
+    signal(SIGHUP, onsignal);
+    signal(SIGQUIT, onsignal);
+    signal(SIGWINCH, onwinch);
+
+    /*
      * Initialize the interpreter. Register the toplevel commands.
      */
 
@@ -332,7 +390,9 @@ main(int argc, char **argv)
 	interp->flags |= SCLI_INTERP_FLAG_INTERACTIVE;
     }
 
-    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+    interp->delay = delay;
+
+    if (scli_interp_interactive(interp)) {
 	char *pager = getenv("PAGER");
 	if (pager) {
 	    /* xxx do a sanity-check here ? */
@@ -344,12 +404,12 @@ main(int argc, char **argv)
 	interp->flags |= SCLI_INTERP_FLAG_XML;
     }
 
-    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
-	printf("scli version %s %s\n", VERSION, scli_copyright);
+    if (scli_interp_interactive(interp)) {
+	g_print("scli version %s %s\n", VERSION, scli_copyright);
     }
 
     if (scli_cmd_open(interp, argc-optind+1, argv+optind-1) != SCLI_OK) {
-	fputs(interp->result->str, stdout);
+	g_printerr(interp->result->str);
     }
 
     scli_init_scli_mode(interp);
@@ -371,7 +431,7 @@ main(int argc, char **argv)
 	(void) scli_eval_init_file(interp);
     }
 
-    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+    if (scli_interp_interactive(interp)) {
         gchar *home = g_get_home_dir();
 	gchar *path = NULL;
 	readline_init();
@@ -386,7 +446,7 @@ main(int argc, char **argv)
 		}
 	    }
 	}
-	mainloop(interp, delay);
+	mainloop(interp);
 	if (path) {
 	    if (access(path, W_OK) != 0) {
 		close(creat(path, 0600));

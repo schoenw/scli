@@ -253,7 +253,7 @@ fmt_tcp_port(int port, int flags)
 	}
     }
     if (flags & SCLI_FMT_ADDR) {
-	sprintf(buffer, "%d", port);
+	g_snprintf(buffer, sizeof(buffer), "%d", port);
 	return buffer;
     }
     return NULL;
@@ -303,7 +303,7 @@ fmt_ipv4_mask(guchar *addr)
 	    }
 	}
     }
-    sprintf(buffer, "/%u", prefix);
+    g_snprintf(buffer, sizeof(buffer), "/%u", prefix);
     return buffer;
 }
 
@@ -327,3 +327,23 @@ fmt_ether_address(guchar *addr, int flags)
     }
     return NULL;
 }
+
+
+
+void
+fmt_counter_dt(GString *s, guint32 *new_counter, guint32 *old_counter,
+	       struct timeval *last, double delta)
+{
+    if (new_counter && delta > TV_DELTA) {
+	if (last->tv_sec && last->tv_usec) {
+	    double f_val = (*new_counter - *old_counter) / delta;
+	    g_string_sprintfa(s, " %5s", fmt_kmg((guint32) f_val));
+	} else {
+	    g_string_sprintfa(s, "  ----");
+	}
+	*old_counter = *new_counter;
+    } else {
+	g_string_sprintfa(s, "  ----");
+    }
+}
+

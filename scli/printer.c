@@ -113,7 +113,7 @@ get_general_entry(host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
 
 
 
-printer_mib_prtLocalizationEntry_t *
+static printer_mib_prtLocalizationEntry_t *
 get_console_local_entry(printer_mib_prtGeneralEntry_t *prtGeneralEntry,
 			printer_mib_prtLocalizationEntry_t **prtLocalTable)
 {

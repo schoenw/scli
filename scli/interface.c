@@ -289,7 +289,13 @@ show_if_info(GString *s,
 		 ifXEntry ? ifXEntry->ifConnectorPresent : NULL,
 		 ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
 
-    g_string_append(s, "  ");
+    if (ifEntry->ifMtu) {
+	g_string_sprintfa(s, " %5d", *(ifEntry->ifMtu));
+    } else {
+	g_string_sprintfa(s, "      ");
+    }
+
+    g_string_append(s, " ");
     fmt_enum(s, type_width, if_mib_enums_ifType, ifEntry->ifType);
     g_string_append(s, " ");
 
@@ -362,10 +368,10 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 		}
 	    }
 	}
-	g_string_sprintfa(interp->result,
-			  "Interface Status %-*s  Speed %-*s Description\n",
-			  type_width, "Type",
-			  name_width, "Name");
+	g_string_sprintfa(interp->header,
+		  "INTERFACE STATUS  MTU %-*s  SPEED %-*s DESCRIPTION",
+			  type_width, "TYPE",
+			  name_width, "NAME");
 	for (i = 0; ifTable[i]; i++) {
 	    if (match_interface(iface, ifTable[i],
 				ifXTable ? ifXTable[i] : NULL)) {
@@ -376,6 +382,148 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 	}
     }
 
+    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifXTable) if_mib_free_ifXTable(ifXTable);
+
+    return SCLI_OK;
+}
+
+
+typedef struct {
+    guint32 inOctets;
+    guint32 outOctets;
+    guint32 inPkts;
+    guint32 outPkts;
+    guint32 inErrors;
+    guint32 outErrors;
+} if_stats_t;
+
+
+static int
+cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
+{
+    if_mib_ifEntry_t **ifTable = NULL;
+    if_mib_ifXEntry_t **ifXTable = NULL;
+    static struct timeval last, now;
+    double delta;
+    int i;
+    static if_stats_t *stats = NULL;
+    static time_t epoch = 0;
+
+    if (if_mib_get_ifTable(interp->peer, &ifTable)) {
+	return SCLI_ERROR;
+    }
+    (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
+
+    if (epoch < interp->epoch) {
+	if (stats) g_free(stats);
+	stats = NULL;
+	last.tv_sec = last.tv_usec = 0;
+    }
+
+    if (! stats && ifTable) {
+	for (i = 0; ifTable[i]; i++) ;
+	stats = (if_stats_t *) g_malloc0(i * sizeof(if_stats_t));
+    }
+
+    epoch = time(NULL);
+    gettimeofday(&now, NULL);
+    delta = TV_DIFF(last, now);
+
+    if (ifTable) {
+	g_string_append(interp->header, "INDEX STAT SPEED "
+			"I-BPS O-BPS I-PPS O-PPS I-ERR O-ERR  DESCRIPTION");
+	for (i = 0; ifTable[i]; i++) {
+	    GString *s = interp->result;
+	    g_string_sprintfa(s, "%5u ", ifTable[i]->ifIndex);
+	    fmt_ifStatus(s,
+			 ifTable[i]->ifAdminStatus, ifTable[i]->ifOperStatus,
+	 (ifXTable && ifXTable[i]) ? ifXTable[i]->ifConnectorPresent : NULL,
+	 (ifXTable && ifXTable[i]) ? ifXTable[i]->ifPromiscuousMode : NULL);
+
+	    if (ifTable[i]->ifSpeed) {
+		if (*(ifTable[i]->ifSpeed) == 0xffffffff
+		    && ifXTable && ifXTable[i]->ifHighSpeed) {
+		    g_string_sprintfa(s, " %5s",
+				      fmt_gtp(*(ifXTable[i]->ifHighSpeed)));
+		} else {
+		    g_string_sprintfa(s, " %5s",
+				      fmt_kmg(*(ifTable[i]->ifSpeed)));
+		}
+	    } else {
+		g_string_sprintfa(s, "  ----");
+	    }
+
+	    fmt_counter_dt(s, ifTable[i]->ifInOctets, &(stats[i].inOctets),
+			   &last, delta);
+
+	    fmt_counter_dt(s, ifTable[i]->ifOutOctets, &(stats[i].outOctets),
+			   &last, delta);
+	    
+	    if (ifTable[i]->ifInUcastPkts && delta > TV_DELTA) {
+		guint32 pkts;
+		pkts = *(ifTable[i]->ifInUcastPkts);
+		if (ifXTable && ifXTable[i]->ifInMulticastPkts
+		    && ifXTable[i]->ifInBroadcastPkts) {
+		    pkts += *(ifXTable[i]->ifInMulticastPkts);
+		    pkts += *(ifXTable[i]->ifInBroadcastPkts);
+		} else if (ifTable[i]->ifInNUcastPkts) {
+		    pkts += *(ifTable[i]->ifInNUcastPkts);
+		} else {
+		    /* might be fixed length ??? */
+		}
+		if (last.tv_sec && last.tv_usec) {
+		    double f_val = (pkts - stats[i].inPkts) / delta;
+		    g_string_sprintfa(s, " %5s",
+				      fmt_kmg((guint32) f_val));
+		} else {
+		    g_string_sprintfa(s, "  ----");
+		}
+		stats[i].inPkts = pkts;
+	    } else {
+		g_string_sprintfa(s, "  ----");
+	    }
+	    
+	    if (ifTable[i]->ifOutUcastPkts && delta > TV_DELTA) {
+		guint32 pkts;
+		pkts = *(ifTable[i]->ifOutUcastPkts);
+		if (ifXTable && ifXTable[i]->ifOutMulticastPkts
+		    && ifXTable[i]->ifOutBroadcastPkts) {
+		    pkts += *(ifXTable[i]->ifOutMulticastPkts);
+		    pkts += *(ifXTable[i]->ifOutBroadcastPkts);
+		} else if (ifTable[i]->ifOutNUcastPkts) {
+		    pkts += *(ifTable[i]->ifOutNUcastPkts);
+		} else {
+		    /* might be fixed length ??? */
+		}
+		if (last.tv_sec && last.tv_usec) {
+		    double f_val = (pkts - stats[i].outPkts) / delta;
+		    g_string_sprintfa(s, " %5s",
+				      fmt_kmg((guint32) f_val));
+		} else {
+		    g_string_sprintfa(s, "  ----");
+		}
+		stats[i].outPkts = pkts;
+	    } else {
+		g_string_sprintfa(s, "  ----");
+	    }
+	    
+	    fmt_counter_dt(s, ifTable[i]->ifInErrors, &(stats[i].inErrors),
+			   &last, delta);
+
+	    fmt_counter_dt(s, ifTable[i]->ifOutErrors, &(stats[i].outErrors),
+			   &last, delta);
+	    
+	    if (ifTable[i]->ifDescr && ifTable[i]->_ifDescrLength) {
+		g_string_sprintfa(s, "  %.*s",
+				  (int) ifTable[i]->_ifDescrLength,
+				  ifTable[i]->ifDescr);
+	    }
+	    g_string_append(s, "\n");
+	}
+    }
+    
+    last = now;
     if (ifTable) if_mib_free_ifTable(ifTable);
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
 
@@ -417,10 +565,18 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "network interface summary",
 	  cmd_if_info },
+	{ "show interface stats",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "network interface statistics",
+	  cmd_if_stats },
 	{ "show interface details",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "network interface details",
 	  cmd_if_details },
+	{ "monitor interface stats",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  "network interface statistics",
+	  cmd_if_stats },
 #if 0
 	{ "show interface stack",
 	  SCLI_CMD_FLAG_NEED_PEER,

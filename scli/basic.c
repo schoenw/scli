@@ -82,13 +82,13 @@ page(scli_interp_t *interp, GString *s)
     FILE *f = NULL;
     int i, cnt, cols, rows;
 
-    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+    if (scli_interp_interactive(interp)) {
 	if (g_snmp_list_decode_hook) {
-	    fputs("\r                         \r", stdout);
+	    g_print("\r                         \r");
 	}
     } else {
     nopager:
-	fputs(s->str, stdout);
+	g_print(s->str);
 	return;
     }
 
@@ -134,6 +134,8 @@ scli_interp_create()
     interp = g_malloc0(sizeof(scli_interp_t));
     interp->cmd_root = g_node_new(NULL);
     interp->result = g_string_new(NULL);
+    interp->header = g_string_new(NULL);
+    interp->epoch = time(NULL);
 
     return interp;
 }
@@ -152,6 +154,9 @@ scli_interp_delete(scli_interp_t *interp)
 	}
 	if (interp->result) {
 	    g_string_free(interp->result, 1);
+	}
+	if (interp->header) {
+	    g_string_free(interp->header, 1);
 	}
 	if (interp->pager) {
 	    g_free(interp->pager);
@@ -295,9 +300,9 @@ snmp_decode_hook(GSList *list)
     now = time(NULL);
     
     n++, c += g_slist_length(list), i = (i+1) % 5;
-    printf("\r%c %6.2f vps %6.2f vpm \r", x[i],
-	   (now > start) ? c / (double) (now - start) : 0,
-	   c / (double) n);
+    g_print("\r%c %6.2f vps %6.2f vpm \r", x[i],
+	    (now > start) ? c / (double) (now - start) : 0,
+	    c / (double) n);
     fflush(stdout);
 }
 
@@ -311,16 +316,25 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 
     if (cmd->func) {
 	g_string_truncate(interp->result, 0);
+	g_string_truncate(interp->header, 0);
 	if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER && ! interp->peer) {
-	    fputs("no association to a remote SNMP agent\n", stdout);
+	    g_printerr("no association to a remote SNMP agent\n");
 	    return SCLI_ERROR;
 	}
-	code = (cmd->func) (interp, argc, argv);
-	if (interp->flags & SCLI_INTERP_FLAG_RECURSIVE) {
-	    return code;
-	}
-	if (interp->result) {
-	    page(interp, interp->result);
+	if (cmd->flags & SCLI_CMD_FLAG_MONITOR) {
+	    code = scli_monitor(interp, node, argc, argv);
+	} else {
+	    code = (cmd->func) (interp, argc, argv);
+	    if (interp->flags & SCLI_INTERP_FLAG_RECURSIVE) {
+		return code;
+	    }
+	    if (interp->header->len) {
+		g_string_prepend_c(interp->result, '\n');
+		g_string_prepend(interp->result, interp->header->str);
+	    }
+	    if (interp->result->len) {
+		page(interp, interp->result);
+	    }
 	}
     }
 
@@ -349,6 +363,10 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 			g_string_sprintfa(s, "%c %s [%s]\n\n", '#',
 					  cmd->desc ? cmd->desc : "",
 				  (interp->peer) ? interp->peer->name : "?");
+		    }
+		    if (interp->header->len) {
+			g_string_prepend_c(interp->result, '\n');
+			g_string_prepend(interp->result, interp->header->str);
 		    }
 		    g_string_append(s, interp->result->str);
 		}
@@ -398,7 +416,7 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	if (i < argc-1 && ! G_NODE_IS_LEAF(node)) {
 	    node = g_node_first_child(node);
 	} else if (G_NODE_IS_LEAF(node)) {
-	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+	    if (scli_interp_interactive(interp)) {
 		snmp_decode_hook(NULL);
 		g_snmp_list_decode_hook = snmp_decode_hook;
 	    } else {
@@ -411,7 +429,7 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	    done = 1;
 	    interp->flags |= SCLI_INTERP_FLAG_RECURSIVE;
 	    s = g_string_new(NULL);
-	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+	    if (scli_interp_interactive(interp)) {
 		snmp_decode_hook(NULL);
 		g_snmp_list_decode_hook = snmp_decode_hook;
 	    } else {
@@ -427,11 +445,11 @@ scli_eval(scli_interp_t *interp, char *cmd)
 
     if (! done) {
 	int j;
-	printf("invalid command name \"");
+	g_printerr("invalid command name \"");
 	for (j = 0; j <= i; j++) {
-	    printf("%s%s", j ? " ": "", argv[j]);
+	    g_printerr("%s%s", j ? " ": "", argv[j]);
 	}
-	printf("\"\n");
+	g_printerr("\"\n");
 	code = SCLI_ERROR;
     }
 
@@ -539,27 +557,25 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 
     g_snmp_list_decode_hook = NULL;
 
-    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
-	printf("Trying SNMPv2c ... ");
-	fflush(stdout);
+    if (scli_interp_interactive(interp)) {
+	g_print("Trying SNMPv2c ... ");
     }
     if (snmpv2_mib_get_system(interp->peer, &system) == 0 && system) {
-	if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
-	    printf("good!\n");
+	if (scli_interp_interactive(interp)) {
+	    g_print("good!\n");
 	}
     } else {
-	if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
-	    printf("timeout.\nTrying SNMPv1  ... ");
-	    fflush(stdout);
+	if (scli_interp_interactive(interp)) {
+	    g_print("timeout.\nTrying SNMPv1  ... ");
 	}
 	interp->peer->version = G_SNMP_V1;
 	if (snmpv2_mib_get_system(interp->peer, &system) == 0 && system) {
-	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
-		printf("ok.\n");
+	    if (scli_interp_interactive(interp)) {
+		g_print("ok.\n");
 	    }
 	} else {
-	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
-		printf("timeout.\nGiving up!\n");
+	    if (scli_interp_interactive(interp)) {
+		g_print("timeout.\nGiving up!\n");
 	    }
 	    scli_close(interp);
 	}
@@ -567,10 +583,8 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
     if (system) {
 	snmpv2_mib_free_system(system);
     }
-    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
-	fflush(stdout);
-    }
 
+    interp->epoch = time(NULL);
     return 0;
 }
 
@@ -586,6 +600,7 @@ scli_close(scli_interp_t *interp)
 	if (interp->peer->rcomm) g_free(interp->peer->rcomm);
 	g_free(interp->peer);
 	interp->peer = NULL;
+	interp->epoch = time(NULL);
     }
 }
 

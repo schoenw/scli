@@ -113,9 +113,10 @@ cmd_scli_help(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (! scli_interp_xml(interp)) {
+	g_string_sprintfa(interp->result,
+			  "scli version " VERSION " command hierarchy:\n\n");
 	if (interp->cmd_root) {
 	    print_cmd_tree(interp->result, interp->cmd_root, "");
-	    g_string_append(interp->result, "\n");
 	}
     }
     return SCLI_OK;
@@ -316,6 +317,30 @@ cmd_scli_term(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+cmd_scli_interp(scli_interp_t *interp, int argc, char **argv)
+{
+    int const indent = 18;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    g_string_sprintfa(interp->result, "%-*s %lu\n", indent, "Epoch:",
+		      interp->epoch);
+
+    g_string_sprintfa(interp->result, "%-*s %s\n", indent, "Format:",
+		      scli_interp_xml(interp) ? "xml" : "scli");
+
+    g_string_sprintfa(interp->result, "%-*s %s\n", indent, "Interactive:",
+		      scli_interp_interactive(interp) ? "true" : "false");
+
+    g_string_sprintfa(interp->result, "%-*s %d sec\n", indent, "Delay:",
+		      interp->delay / 1000);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_scli_mode(scli_interp_t *interp)
 {
@@ -348,14 +373,18 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  "show information about scli aliases",
 	  cmd_scli_aliases },
-	{ "show scli association",
+	{ "show scli agent",
 	  0,
-	  "show information about the current scli association",
+	  "show information about the current SNMP agent",
 	  cmd_scli_peer },
 	{ "show scli term",
 	  0,
 	  "show information about the terminal parameters",
 	  cmd_scli_term },
+	{ "show scli interp",
+	  0,
+	  "show information about the interpreter",
+	  cmd_scli_interp },
 	{ "show scli modes",
 	  0,
 	  "show information about the available modes",
