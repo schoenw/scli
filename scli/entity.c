@@ -86,7 +86,7 @@ show_containment(GString *s, char *prefix,
 
 
 static int
-cmd_containment(scli_interp_t *interp, int argc, char **argv)
+show_system_containment(scli_interp_t *interp, int argc, char **argv)
 {
     entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
 
@@ -112,7 +112,7 @@ cmd_containment(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_component(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
+fmt_entity(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 {
     if (entPhysicalEntry->entPhysicalDescr) {
 	g_string_sprintfa(s, "%.*s\n",
@@ -200,8 +200,96 @@ show_component(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 
 
 
+static void
+xml_entity(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
+{
+    g_string_sprintfa(s, "  <entity index=\"%d\"/>\n",
+		      entPhysicalEntry->entPhysicalIndex);
+    
+    if (entPhysicalEntry->entPhysicalDescr) {
+	g_string_sprintfa(s, "    <description>%.*s</description>\n",
+		    (int) entPhysicalEntry->_entPhysicalDescrLength,
+			  entPhysicalEntry->entPhysicalDescr);
+    }
+
+    if (entPhysicalEntry->entPhysicalName) {
+	g_string_sprintfa(s, "    <name>%.*s</name>\n",
+		    (int) entPhysicalEntry->_entPhysicalNameLength,
+			  entPhysicalEntry->entPhysicalName);
+    }
+
+    g_string_sprintfa(s, "    <class>");
+    fmt_enum(s, 1, entity_mib_enums_entPhysicalClass,
+	     entPhysicalEntry->entPhysicalClass);
+    g_string_sprintfa(s, "</class>\n");
+
+    if (entPhysicalEntry->entPhysicalIsFRU) {
+	if (*entPhysicalEntry->entPhysicalIsFRU == 2) {
+	    g_string_append(s, "    <replaceable/>");
+	}
+    } 
+ 
+    if (entPhysicalEntry->entPhysicalMfgName) {
+	g_string_sprintfa(s, "    <manufacturer>%.*s</manufacturer>\n",
+		    (int) entPhysicalEntry->_entPhysicalMfgNameLength,
+			  entPhysicalEntry->entPhysicalMfgName);
+    }
+
+    if (entPhysicalEntry->entPhysicalModelName) {
+	g_string_sprintfa(s, "    <model>%.*s</model>\n",
+		    (int) entPhysicalEntry->_entPhysicalModelNameLength,
+			  entPhysicalEntry->entPhysicalModelName);
+    }
+    
+    if (entPhysicalEntry->entPhysicalSerialNum) {
+	g_string_sprintfa(s, "    <serial>%.*s</serial>\n",
+		    (int) entPhysicalEntry->_entPhysicalSerialNumLength,
+			  entPhysicalEntry->entPhysicalSerialNum);
+    }
+#if 0
+    
+    if (entPhysicalEntry->entPhysicalHardwareRev) {
+	g_string_sprintfa(s, "HW Rev: %-30.*s\n",
+		    (int) entPhysicalEntry->_entPhysicalHardwareRevLength,
+			  entPhysicalEntry->entPhysicalHardwareRev);
+    } else {
+	g_string_sprintfa(s, "HW Rev:\n");
+    }
+    
+    if (entPhysicalEntry->entPhysicalFirmwareRev) {
+	g_string_sprintfa(s, "FW Rev: %-30.*s\n",
+		    (int) entPhysicalEntry->_entPhysicalFirmwareRevLength,
+			  entPhysicalEntry->entPhysicalFirmwareRev);
+    } else {
+	g_string_sprintfa(s, "FW Rev:\n");
+    }
+    
+    if (entPhysicalEntry->entPhysicalSoftwareRev) {
+	g_string_sprintfa(s, "SW Rev: %-30.*s\n",
+		    (int) entPhysicalEntry->_entPhysicalSoftwareRevLength,
+			  entPhysicalEntry->entPhysicalSoftwareRev);
+    } else {
+	g_string_sprintfa(s, "SW Rev:\n");
+    }
+#endif
+    
+    if (entPhysicalEntry->entPhysicalAlias) {
+	g_string_sprintfa(s, "    <alias>%.*s</alias>\n",
+		    (int) entPhysicalEntry->_entPhysicalAliasLength,
+			  entPhysicalEntry->entPhysicalAlias);
+    }
+    if (entPhysicalEntry->entPhysicalAssetID) {
+	g_string_sprintfa(s, "    <asset>%.*s</asset>\n",
+		    (int) entPhysicalEntry->_entPhysicalAssetIDLength,
+			  entPhysicalEntry->entPhysicalAssetID);
+    }
+    g_string_append(s, "  </entity>\n");
+}
+
+
+
 static int
-cmd_components(scli_interp_t *interp, int argc, char **argv)
+show_system_entities(scli_interp_t *interp, int argc, char **argv)
 {
     entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
     int i;
@@ -217,11 +305,21 @@ cmd_components(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (entPhysicalTable) {
+        if (scli_interp_xml(interp)) {
+	    g_string_append(interp->result, "<entities>\n");
+	}
 	for (i = 0; entPhysicalTable[i]; i++) {
-	    if (i) {
-		g_string_append(interp->result, "\n");
+	    if (scli_interp_xml(interp)) {
+		xml_entity(interp->result, entPhysicalTable[i]);
+	    } else {
+		if (i) {
+		    g_string_append(interp->result, "\n");
+		}
+		fmt_entity(interp->result, entPhysicalTable[i]);
 	    }
-	    show_component(interp->result, entPhysicalTable[i]);
+	}
+        if (scli_interp_xml(interp)) {
+	    g_string_append(interp->result, "</entities>\n");
 	}
     }
 
@@ -236,14 +334,14 @@ void
 scli_init_entity_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show system components", NULL,
+	{ "show system entities", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "physical components of the system",
-	  cmd_components },
+	  "physical entities that compose the system",
+	  show_system_entities },
 	{ "show system containment", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "physical component's containment hierarchy",
-	  cmd_containment },
+	  "physical entities's containment hierarchy",
+	  show_system_containment },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
