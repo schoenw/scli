@@ -54,6 +54,14 @@ static GSnmpEnum const prtAlertGroup[] = {
 
 
 
+static GSnmpEnum const markerResolutionUnit[] = {
+    { PRINTER_MIB_PRTMARKERADDRESSABILITYUNIT_TENTHOUSANDTHSOFINCHES, "dpi" },
+    { PRINTER_MIB_PRTMARKERADDRESSABILITYUNIT_MICROMETERS,            "dpcm" },
+    { 0, NULL }
+};
+
+
+
 static const char *error_states[] = {
     "low paper", "no paper", "low toner", "no toner", "door open",
     "jammed", "offline", "service requested", "input tray missing",
@@ -366,23 +374,36 @@ fmt_media_dimensions(GString *s, gint indent, gchar *label,
 
 
 static void
-xml_media_dimensions(xmlNodePtr tree, gchar *label,
+xml_media_dimensions(xmlNodePtr root, gchar *label,
 		     gint32 *dir, gint32 *xdir,
 		     gint32 *unit, const GSnmpEnum *enums)
 {
     const char *e;
-    xmlNodePtr node;
+    const char *name;
+    xmlNodePtr node, tree;
     
     if (! dir || ! xdir || ! unit) {
 	return;
     }
-
-    node = xmlNewChild(tree, NULL, label,
+#if 0
+    node = xmlNewChild(root, NULL, label,
 		       lookup_media_name(*dir, *xdir, *unit));
     xml_set_prop(node, "direction", "%d", *dir);
     xml_set_prop(node, "cross-direction", "%d", *xdir);
-    e = fmt_enum(enums, unit);
     if (e) xml_set_prop(node, "unit", "%s", e);
+#else
+    name = lookup_media_name(*dir, *xdir, *unit);
+    
+    tree = xmlNewChild(root, NULL, label, NULL);
+    e = fmt_enum(enums, unit);
+    node = xml_new_child(tree, NULL, "direction", "%d", *dir);
+    if (e) xml_set_prop(node, "unit", "%s", e);
+    node = xml_new_child(tree, NULL, "cross-direction", "%d", *xdir);
+    if (e) xml_set_prop(node, "unit", "%s", e);
+    if (name) {
+	node = xml_new_child(tree, NULL, "description", "%s", name);
+    }
+#endif
 }
 
 
@@ -546,15 +567,11 @@ fmt_printer_info(GString *s,
 
 
 static void
-xml_printer_info(xmlNodePtr root,
+xml_printer_info(xmlNodePtr tree,
 		 host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
 		 host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
 {
-    xmlNodePtr tree;
     const char *e;
-
-    /* tree = xmlNewChild(root, NULL, "cover", NULL); */
-    tree = root;
 
     if (hrDeviceEntry) {
 	(void) xml_new_child(tree, NULL, "description", "%.*s",
@@ -1699,13 +1716,13 @@ xml_printer_outputs(xmlNodePtr root,
 
     /* ...media specific stuff begins here... */
 
-    xml_media_dimensions(tree, "min-dimensions:",
+    xml_media_dimensions(tree, "min-dimensions",
 			 prtOutputEntry->prtOutputMinDimFeedDir,
 			 prtOutputEntry->prtOutputMinDimXFeedDir,
 			 prtOutputEntry->prtOutputDimUnit,
 			 printer_mib_enums_prtOutputDimUnit);
 
-    xml_media_dimensions(tree, "max-dimensions:",
+    xml_media_dimensions(tree, "max-dimensions",
 			 prtOutputEntry->prtOutputMaxDimFeedDir,
 			 prtOutputEntry->prtOutputMaxDimXFeedDir,
 			 prtOutputEntry->prtOutputDimUnit,
@@ -1821,12 +1838,56 @@ fmt_printer_marker(GString *s, printer_mib_prtMarkerEntry_t *prtMarkerEntry)
 			  e ? e : "");
     }
 
+    if (prtMarkerEntry->prtMarkerProcessColorants) {
+	g_string_sprintfa(s, "%-*s %u\n", indent, "Process Colors:",
+			  *prtMarkerEntry->prtMarkerProcessColorants);
+    }
+
+    if (prtMarkerEntry->prtMarkerSpotColorants) {
+	g_string_sprintfa(s, "%-*s %u\n", indent, "Spot Colors:",
+			  *prtMarkerEntry->prtMarkerSpotColorants);
+    }
+
     e = fmt_enum(printer_mib_enums_prtMarkerMarkTech,
 		 prtMarkerEntry->prtMarkerMarkTech);
     if (e) {
 	g_string_sprintfa(s, "%-*s %s\n", indent, "Technology:", e);
     }
 
+    e = fmt_enum(markerResolutionUnit,
+		  prtMarkerEntry->prtMarkerAddressabilityUnit);
+    if (prtMarkerEntry->prtMarkerAddressabilityFeedDir
+	&& prtMarkerEntry->prtMarkerAddressabilityXFeedDir) {
+
+	g_string_sprintfa(s, "%-*s %s ", indent, "Resolution:",
+	  fmt_dimensions(prtMarkerEntry->prtMarkerAddressabilityFeedDir));
+
+	g_string_sprintfa(s, "x %s %s\n",
+	  fmt_dimensions(prtMarkerEntry->prtMarkerAddressabilityXFeedDir),
+			  e ? e : "");
+    }
+
+    e = fmt_enum(printer_mib_enums_prtMarkerAddressabilityUnit,
+		 prtMarkerEntry->prtMarkerAddressabilityUnit);
+    if (prtMarkerEntry->prtMarkerNorthMargin
+	&& prtMarkerEntry->prtMarkerSouthMargin
+	&& prtMarkerEntry->prtMarkerWestMargin
+	&& prtMarkerEntry->prtMarkerEastMargin) {
+
+	g_string_sprintfa(s, "%-*s %s %s\n", indent, "Margin North:",
+			  fmt_dimensions(prtMarkerEntry->prtMarkerNorthMargin),
+			  e ? e : "");
+	g_string_sprintfa(s, "%-*s %s %s\n", indent, "Margin South:",
+			  fmt_dimensions(prtMarkerEntry->prtMarkerSouthMargin),
+			  e ? e : "");
+	g_string_sprintfa(s, "%-*s %s %s\n", indent, "Margin West:",
+			  fmt_dimensions(prtMarkerEntry->prtMarkerWestMargin),
+			  e ? e : "");
+	g_string_sprintfa(s, "%-*s %s %s\n", indent, "Margin East:",
+			  fmt_dimensions(prtMarkerEntry->prtMarkerEastMargin),
+			  e ? e : "");
+    }
+    
     fmt_subunit(s, indent, prtMarkerEntry->prtMarkerStatus);
 }
 
@@ -1857,12 +1918,62 @@ xml_printer_marker(xmlNodePtr root,
 	if (e) xml_set_prop(node, "unit", "%s", e);
     }
 
+    if (prtMarkerEntry->prtMarkerProcessColorants) {
+	node = xml_new_child(tree, NULL, "process-colors", "%u",
+			  *prtMarkerEntry->prtMarkerProcessColorants);
+    }
+
+    if (prtMarkerEntry->prtMarkerSpotColorants) {
+	node = xml_new_child(tree, NULL, "spot-colors", "%u",
+			  *prtMarkerEntry->prtMarkerSpotColorants);
+    }
+
     e = fmt_enum(printer_mib_enums_prtMarkerMarkTech,
 		 prtMarkerEntry->prtMarkerMarkTech);
     if (e) {
 	(void) xml_new_child(tree, NULL, "technology", "%s", e);
     }
 
+    e = fmt_enum(markerResolutionUnit,
+		 prtMarkerEntry->prtMarkerAddressabilityUnit);
+    if (prtMarkerEntry->prtMarkerAddressabilityFeedDir 
+	&& prtMarkerEntry->prtMarkerAddressabilityXFeedDir) {
+
+	xmlNodePtr res;
+	res = xmlNewChild(tree, NULL, "resolution", NULL);
+	node = xml_new_child(res, NULL, "direction", "%s",
+	     fmt_dimensions(prtMarkerEntry->prtMarkerAddressabilityFeedDir));
+	if (e) xml_set_prop(node, "unit", "%s", e);
+
+	node = xml_new_child(res, NULL, "cross-direction", "%s",
+	     fmt_dimensions(prtMarkerEntry->prtMarkerAddressabilityXFeedDir));
+	if (e) xml_set_prop(node, "unit", "%s", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtMarkerAddressabilityUnit,
+		 prtMarkerEntry->prtMarkerAddressabilityUnit);
+    if (prtMarkerEntry->prtMarkerNorthMargin
+	&& prtMarkerEntry->prtMarkerSouthMargin
+	&& prtMarkerEntry->prtMarkerWestMargin
+	&& prtMarkerEntry->prtMarkerEastMargin) {
+
+	xmlNodePtr margins;
+	margins = xmlNewChild(tree, NULL, "margins", NULL);
+
+	node = xml_new_child(margins, NULL, "north", "%s",
+			     fmt_dimensions(prtMarkerEntry->prtMarkerNorthMargin));
+	if (e) xml_set_prop(node, "unit", "%s", e);
+	node = xml_new_child(margins, NULL, "south", "%s",
+			     fmt_dimensions(prtMarkerEntry->prtMarkerSouthMargin));
+	if (e) xml_set_prop(node, "unit", "%s", e);
+	node = xml_new_child(margins, NULL, "west", "%s",
+			     fmt_dimensions(prtMarkerEntry->prtMarkerWestMargin));
+	if (e) xml_set_prop(node, "unit", "%s", e);
+	node = xml_new_child(margins, NULL, "east", "%s",
+			     fmt_dimensions(prtMarkerEntry->prtMarkerEastMargin));
+	if (e) xml_set_prop(node, "unit", "%s", e);
+    }
+    
     xml_subunit(tree, prtMarkerEntry->prtMarkerStatus);
 }
 
@@ -2244,7 +2355,7 @@ static void
 fmt_printer_interpreter(GString *s,
 			printer_mib_prtInterpreterEntry_t *interpEntry)
 {
-    int const indent = 14;
+    int const indent = 18;
     const char *e;
 
     g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
@@ -2259,6 +2370,14 @@ fmt_printer_interpreter(GString *s,
 	g_string_sprintfa(s, "%-*s %s\n", indent, "Language:", e);
     }
 
+    fmt_display_string(s, indent+1, "Language Level:",
+		       (int) interpEntry->_prtInterpreterLangLevelLength,
+		       interpEntry->prtInterpreterLangLevel);
+
+    fmt_display_string(s, indent+1, "Language Version:",
+		       (int) interpEntry->_prtInterpreterLangVersionLength,
+		       interpEntry->prtInterpreterLangVersion);
+
     fmt_display_string(s, indent+1, "Description:",
 		       (int) interpEntry->_prtInterpreterDescriptionLength,
 		       interpEntry->prtInterpreterDescription);
@@ -2266,6 +2385,38 @@ fmt_printer_interpreter(GString *s,
     fmt_display_string(s, indent+1, "Version:",
 		       (int) interpEntry->_prtInterpreterVersionLength,
 		       interpEntry->prtInterpreterVersion);
+
+    e = fmt_enum(printer_mib_enums_prtInterpreterDefaultOrientation,
+		 interpEntry->prtInterpreterDefaultOrientation);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Orientation:", e);
+    }
+
+#if 0
+    xml_media_dimensions(tree, "addressability",
+			 interpEntry->prtInterpreterFeedAddressability,
+			 interpEntry->prtInterpreterXFeedAddressability,
+			 &unit,
+			 printer_mib_enums_prtMediaPathMediaSizeUnit);
+#endif
+
+    e = fmt_enum(printer_mib_enums_prtInterpreterDefaultCharSetIn,
+		 interpEntry->prtInterpreterDefaultCharSetIn);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Charset In:", e);
+    }
+    
+    e = fmt_enum(printer_mib_enums_prtInterpreterDefaultCharSetOut,
+		 interpEntry->prtInterpreterDefaultCharSetOut);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Charset Out:", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtInterpreterTwoWay,
+		 interpEntry->prtInterpreterTwoWay);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "TwoWay:", e);
+    }
 }
 
 
@@ -2274,17 +2425,31 @@ static void
 xml_printer_interpreter(xmlNodePtr root,
 			printer_mib_prtInterpreterEntry_t *interpEntry)
 {
-    xmlNodePtr tree;
+    xmlNodePtr tree, lang;
     const char *e;
 
     tree = xmlNewChild(root, NULL, "interpreter", NULL);
     xml_set_prop(tree, "number", "%d",
 		 interpEntry->prtInterpreterIndex);
 
+    lang = xmlNewChild(tree, NULL, "language", NULL);
+
     e = fmt_enum(printer_mib_enums_prtInterpreterLangFamily,
 		 interpEntry->prtInterpreterLangFamily);
     if (e) {
-	(void) xml_new_child(tree, NULL, "language", "%s", e);
+	(void) xml_new_child(lang, NULL, "name", "%s", e);
+    }
+
+    if (interpEntry->prtInterpreterLangLevel) {
+	(void) xml_new_child(lang, NULL, "level", "%.*s",
+		       (int) interpEntry->_prtInterpreterLangLevelLength,
+			     interpEntry->prtInterpreterLangLevel);
+    }
+
+    if (interpEntry->prtInterpreterLangVersion) {
+	(void) xml_new_child(lang, NULL, "version", "%.*s",
+		       (int) interpEntry->_prtInterpreterLangVersionLength,
+			     interpEntry->prtInterpreterLangVersion);
     }
 
     if (interpEntry->prtInterpreterDescription) {
@@ -2297,6 +2462,38 @@ xml_printer_interpreter(xmlNodePtr root,
 	(void) xml_new_child(tree, NULL, "version", "%.*s",
 			     (int) interpEntry->_prtInterpreterVersionLength,
 			     interpEntry->prtInterpreterVersion);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtInterpreterDefaultOrientation,
+		 interpEntry->prtInterpreterDefaultOrientation);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "orientation", "%s", e);
+    }
+
+#if 0
+    xml_media_dimensions(tree, "addressability",
+			 interpEntry->prtInterpreterFeedAddressability,
+			 interpEntry->prtInterpreterXFeedAddressability,
+			 &unit,
+			 printer_mib_enums_prtMediaPathMediaSizeUnit);
+#endif
+    
+    e = fmt_enum(printer_mib_enums_prtInterpreterDefaultCharSetIn,
+		 interpEntry->prtInterpreterDefaultCharSetIn);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "charset-in", "%s", e);
+    }
+    
+    e = fmt_enum(printer_mib_enums_prtInterpreterDefaultCharSetOut,
+		 interpEntry->prtInterpreterDefaultCharSetOut);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "charset-out", "%s", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtInterpreterTwoWay,
+		 interpEntry->prtInterpreterTwoWay);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "two-way", "%s", e);
     }
 }
 
@@ -2374,7 +2571,7 @@ fmt_printer_channel(GString *s,
 		    printer_mib_prtInterpreterEntry_t **interpTable)
 {
     printer_mib_prtInterpreterEntry_t *interpEntry;
-    int const indent = 14;
+    int const indent = 18;
     const char *e;
 
     g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
@@ -2780,7 +2977,7 @@ show_printer_lights(scli_interp_t *interp, int argc, char **argv)
 static void
 fmt_printer_alert(GString *s, printer_mib_prtAlertEntry_t *alertEntry)
 {
-    int const indent = 14;
+    int const indent = 18;
     const char *e;
 
     g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
