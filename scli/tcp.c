@@ -30,7 +30,8 @@
 
 
 static void
-show_tcp_connection(GString *s, tcpConnEntry_t *tcpConnEntry)
+show_tcp_connection(GString *s, tcpConnEntry_t *tcpConnEntry,
+		    int local_width, int remote_width)
 {
     int pos;
     
@@ -38,12 +39,12 @@ show_tcp_connection(GString *s, tcpConnEntry_t *tcpConnEntry)
 		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress, 1),
 		      fmt_port(tcpConnEntry->tcpConnLocalPort, 1),
 		      &pos);
-    g_string_sprintfa(s, "%*s", MAX(32-pos, 1), "");
+    g_string_sprintfa(s, "%*s", MAX(local_width-pos+1, 1), "");
     g_string_sprintfa(s, "%s:%s%n",
 		      fmt_ipv4_address(tcpConnEntry->tcpConnRemAddress, 1),
 		      fmt_port(tcpConnEntry->tcpConnRemPort, 1),
 		      &pos);
-    g_string_sprintfa(s, "%*s", MAX(32-pos, 1), "");
+    g_string_sprintfa(s, "%*s", MAX(remote_width-pos+1, 1), "");
     if (tcpConnEntry->tcpConnState) {
 	fmt_enum(s, 1, tcp_mib_enums_tcpConnState,
 		 tcpConnEntry->tcpConnState);
@@ -57,7 +58,10 @@ static int
 cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 {
     tcpConnEntry_t **tcpConnTable = NULL;
-    int i;
+    int local_width = 20;
+    int remote_width = 20;
+    char *addr, *port;
+    int i, len;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -66,10 +70,27 @@ cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (tcpConnTable) {
-	g_string_sprintfa(interp->result, "%-32s%-32s%s\n",
-			  "Local Address", "Remote Address", "State");
 	for (i = 0; tcpConnTable[i]; i++) {
-	    show_tcp_connection(interp->result, tcpConnTable[i]);
+	    addr = fmt_ipv4_address(tcpConnTable[i]->tcpConnLocalAddress, 1);
+	    port = fmt_port(tcpConnTable[i]->tcpConnLocalPort, 1);
+	    len = strlen(addr) + strlen(port) + 1;
+	    if (len > local_width) {
+		local_width = len;
+	    }
+	    addr = fmt_ipv4_address(tcpConnTable[i]->tcpConnRemAddress, 1);
+	    port = fmt_port(tcpConnTable[i]->tcpConnRemPort, 1);
+	    len = strlen(addr) + strlen(port) + 1;
+	    if (len > remote_width) {
+		remote_width = len;
+	    }
+	}
+	g_string_sprintfa(interp->result, "%-*s %-*s %s\n",
+			  local_width, "Local Address",
+			  remote_width, "Remote Address",
+			  "State");
+	for (i = 0; tcpConnTable[i]; i++) {
+	    show_tcp_connection(interp->result, tcpConnTable[i],
+				local_width, remote_width);
 	}
 	tcp_mib_free_tcpConnTable(tcpConnTable);
     }
