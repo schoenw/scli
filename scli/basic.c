@@ -63,6 +63,17 @@ scli_get_screen(int *lines, int *columns)
 
 
 
+static gint
+mode_compare(gconstpointer a, gconstpointer b)
+{
+    scli_mode_t *mode_a = (scli_mode_t *) a;
+    scli_mode_t *mode_b = (scli_mode_t *) b;
+
+    return strcmp(mode_a->name, mode_b->name);
+}
+
+
+
 static void
 page(scli_interp_t *interp, GString *s)
 {
@@ -157,7 +168,8 @@ scli_register_mode(scli_interp_t *interp, scli_mode_t *mode)
     int i;
     
     if (interp && mode) {
-	interp->mode_list = g_slist_append(interp->mode_list, mode);
+	interp->mode_list = g_slist_insert_sorted(interp->mode_list,
+						  mode, mode_compare);
     }
 
     for (i = 0; mode->cmds[i].path; i++) {
