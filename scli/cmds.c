@@ -372,6 +372,15 @@ cmd_scli_interp(scli_interp_t *interp, int argc, char **argv)
     g_string_sprintfa(interp->result, "%-*s %d seconds\n", indent, "Delay:",
 		      interp->delay / 1000);
 
+    g_string_sprintfa(interp->result, "%-*s ", indent, "Debugging:");
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
+	g_string_append(interp->result, "request ");
+    }
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_string_append(interp->result, "session ");
+    }
+    g_string_append(interp->result, "\n");
+
     return SCLI_OK;
 }
 

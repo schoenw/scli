@@ -467,9 +467,5 @@ main(int argc, char **argv)
 	(void) scli_eval_file_stream(interp, stdin);
     }
 
-#ifdef HAVE_DMALLOC_H
-    dmalloc_shutdown();
-#endif
-
     return 0;
 }

@@ -586,7 +586,7 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 	scli_close(interp);
     }
 
-    interp->peer = g_malloc0(sizeof(GSnmpSession));
+    interp->peer = g_snmp_session_new();
     interp->peer->domain = AF_INET;
     interp->peer->name = g_strdup(host);
     interp->peer->port = port;
@@ -643,9 +643,7 @@ scli_close(scli_interp_t *interp)
     g_return_if_fail(interp);
 
     if (interp->peer) {
-	if (interp->peer->name) g_free(interp->peer->name);
-	if (interp->peer->rcomm) g_free(interp->peer->rcomm);
-	g_free(interp->peer);
+	g_snmp_session_destroy(interp->peer);
 	interp->peer = NULL;
 	interp->epoch = time(NULL);
     }
