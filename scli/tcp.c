@@ -65,7 +65,8 @@ cmd_tcp_listener(scli_interp_t *interp, int argc, char **argv)
     if (tcpConnTable) {
 	for (i = 0, cnt = 0; tcpConnTable[i]; i++) {
 	    if (tcpConnTable[i]->tcpConnState
-		&& *tcpConnTable[i]->tcpConnState != 2) {
+		&& (*tcpConnTable[i]->tcpConnState
+		    != TCP_MIB_TCPCONNSTATE_LISTEN)) {
 		continue;
 	    }
 	    cnt++;
@@ -82,7 +83,8 @@ cmd_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 			      "State");
 	    for (i = 0; tcpConnTable[i]; i++) {
 		if (tcpConnTable[i]->tcpConnState
-		    && *tcpConnTable[i]->tcpConnState == 2) {
+		    && (*tcpConnTable[i]->tcpConnState
+			== TCP_MIB_TCPCONNSTATE_LISTEN)) {
 		    show_tcp_listener(interp->result, tcpConnTable[i], width);
 		}
 	    }
@@ -138,7 +140,8 @@ cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
     if (tcpConnTable) {
 	for (i = 0, cnt = 0; tcpConnTable[i]; i++) {
 	    if (tcpConnTable[i]->tcpConnState
-		&& *tcpConnTable[i]->tcpConnState == 2) {
+		&& (*tcpConnTable[i]->tcpConnState
+		    == TCP_MIB_TCPCONNSTATE_LISTEN)) {
 		continue;
 	    }
 	    cnt++;
@@ -162,7 +165,8 @@ cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 			      "State");
 	    for (i = 0; tcpConnTable[i]; i++) {
 		if (tcpConnTable[i]->tcpConnState
-		    && *tcpConnTable[i]->tcpConnState != 2) {
+		    && (*tcpConnTable[i]->tcpConnState
+			!= TCP_MIB_TCPCONNSTATE_LISTEN)) {
 		    show_tcp_connection(interp->result, tcpConnTable[i],
 					local_width, remote_width);
 		}
