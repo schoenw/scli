@@ -85,42 +85,157 @@ static GSnmpIdentity const storage_types[] = {
 };
 
 
+static guint32 const oid_fs_other[]
+    = { HOST_RESOURCES_TYPES_HRFSOTHER };
+static guint32 const oid_fs_unknown[]
+    = { HOST_RESOURCES_TYPES_HRFSUNKNOWN };
+static guint32 const oid_fs_bffs[]
+    = { HOST_RESOURCES_TYPES_HRFSBERKELEYFFS };
+static guint32 const oid_fs_sys5[]
+    = { HOST_RESOURCES_TYPES_HRFSSYS5FS };
+static guint32 const oid_fs_fat[]
+    = { HOST_RESOURCES_TYPES_HRFSFAT };
+static guint32 const oid_fs_hpfs[]
+    = { HOST_RESOURCES_TYPES_HRFSHPFS };
+static guint32 const oid_fs_hfs[]
+    = { HOST_RESOURCES_TYPES_HRFSHFS };
+static guint32 const oid_fs_mfs[]
+    = { HOST_RESOURCES_TYPES_HRFSMFS };
+static guint32 const oid_fs_ntfs[]
+    = { HOST_RESOURCES_TYPES_HRFSNTFS };
+static guint32 const oid_fs_vnode[]
+    = { HOST_RESOURCES_TYPES_HRFSVNODE };
+static guint32 const oid_fs_journal[]
+    = { HOST_RESOURCES_TYPES_HRFSJOURNALED };
+static guint32 const oid_fs_iso9660[]
+    = { HOST_RESOURCES_TYPES_HRFSISO9660 };
+static guint32 const oid_fs_rockridge[]
+    = { HOST_RESOURCES_TYPES_HRFSROCKRIDGE };
+static guint32 const oid_fs_nfs[]
+    = { HOST_RESOURCES_TYPES_HRFSNFS };
+
+static guint32 const oid_fs_netware[]
+    = { HOST_RESOURCES_TYPES_HRFSNETWARE };
+static guint32 const oid_fs_afs[]
+    = { HOST_RESOURCES_TYPES_HRFSAFS };
+static guint32 const oid_fs_dfs[]
+    = { HOST_RESOURCES_TYPES_HRFSDFS };
+static guint32 const oid_fs_apple[]
+    = { HOST_RESOURCES_TYPES_HRFSAPPLESHARE };
+static guint32 const oid_fs_rfs[]
+    = { HOST_RESOURCES_TYPES_HRFSRFS };
+static guint32 const oid_fs_dgcfs[]
+    = { HOST_RESOURCES_TYPES_HRFSDGCFS };
+static guint32 const oid_fs_bfs[]
+    = { HOST_RESOURCES_TYPES_HRFSBFS };
+static guint32 const oid_fs_fat32[]
+    = { HOST_RESOURCES_TYPES_HRFSFAT32 };
+static guint32 const oid_fs_ext2[]
+    = { HOST_RESOURCES_TYPES_HRFSLINUXEXT2 };
+
+static GSnmpIdentity const filesystem_types[] = {
+    { oid_fs_other,
+      sizeof(oid_fs_other)/sizeof(guint32),
+      "other" },
+    { oid_fs_unknown,
+      sizeof(oid_fs_unknown)/sizeof(guint32),
+      "unknown" },
+    { oid_fs_bffs,
+      sizeof(oid_fs_bffs)/sizeof(guint32),
+      "bffs" },
+    { oid_fs_sys5,
+      sizeof(oid_fs_sys5)/sizeof(guint32),
+      "sys5" },
+    { oid_fs_fat,
+      sizeof(oid_fs_fat)/sizeof(guint32),
+      "fat" },
+    { oid_fs_hpfs,
+      sizeof(oid_fs_hpfs)/sizeof(guint32),
+      "hpfs" },
+    { oid_fs_hfs,
+      sizeof(oid_fs_hfs)/sizeof(guint32),
+      "hfs" },
+    { oid_fs_mfs,
+      sizeof(oid_fs_mfs)/sizeof(guint32),
+      "mfs" },
+    { oid_fs_ntfs,
+      sizeof(oid_fs_ntfs)/sizeof(guint32),
+      "ntfs" },
+    { oid_fs_vnode,
+      sizeof(oid_fs_vnode)/sizeof(guint32),
+      "vnode" },
+    { oid_fs_journal,
+      sizeof(oid_fs_journal)/sizeof(guint32),
+      "journal" },
+    { oid_fs_iso9660,
+      sizeof(oid_fs_iso9660)/sizeof(guint32),
+      "iso9660" },
+    { oid_fs_rockridge,
+      sizeof(oid_fs_rockridge)/sizeof(guint32),
+      "rockridge" },
+    { oid_fs_nfs,
+      sizeof(oid_fs_nfs)/sizeof(guint32),
+      "nfs" },
+    { oid_fs_netware,
+      sizeof(oid_fs_netware)/sizeof(guint32),
+      "netware" },
+    { oid_fs_afs,
+      sizeof(oid_fs_afs)/sizeof(guint32),
+      "afs" },
+    { oid_fs_dfs,
+      sizeof(oid_fs_dfs)/sizeof(guint32),
+      "dfs" },
+    { oid_fs_apple,
+      sizeof(oid_fs_apple)/sizeof(guint32),
+      "apple" },
+    { oid_fs_rfs,
+      sizeof(oid_fs_rfs)/sizeof(guint32),
+      "rfs" },
+    { oid_fs_dgcfs,
+      sizeof(oid_fs_dgcfs)/sizeof(guint32),
+      "dgcfs" },
+    { oid_fs_bfs,
+      sizeof(oid_fs_bfs)/sizeof(guint32),
+      "bfs" },
+    { oid_fs_fat32,
+      sizeof(oid_fs_fat32)/sizeof(guint32),
+      "fat32" },
+    { oid_fs_ext2,
+      sizeof(oid_fs_ext2)/sizeof(guint32),
+      "ext2" },
+    { NULL, 0, NULL }
+};
+
+
+static GSnmpEnum const hrSWRunStatus[] = {
+    { HOST_RESOURCES_MIB_HRSWRUNSTATUS_RUNNING,		"C" },
+    { HOST_RESOURCES_MIB_HRSWRUNSTATUS_RUNNABLE,	"R" },
+    { HOST_RESOURCES_MIB_HRSWRUNSTATUS_NOTRUNNABLE,	"S" },
+    { HOST_RESOURCES_MIB_HRSWRUNSTATUS_INVALID,		"Z" },
+    { 0, NULL }
+};
+
+static GSnmpEnum const hrSWInstalledType[] = {
+    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_UNKNOWN,		"?" },
+    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_OPERATINGSYSTEM,	"O" },
+    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_DEVICEDRIVER,	"D" },
+    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_APPLICATION,		"A" },
+    { 0, NULL }
+};
+
+GSnmpEnum const hrFSAccess[] = {
+    { HOST_RESOURCES_MIB_HRFSACCESS_READWRITE,	"rw" },
+    { HOST_RESOURCES_MIB_HRFSACCESS_READONLY,	"ro" },
+    { 0, NULL }
+};
+
+
 
 static void
 strip_white(guchar *s, gsize *len)
 {
     while (*len && isspace(s[(*len)-1])) {
 	(*len)--;
-    }
-}
-
-
-
-static void
-fmt_run_state_and_type(GString *s, gint32 *state, gint32 *type)
-{
-    if (state) {
-	switch (*state) {
-	case 1:  g_string_append(s, "C "); break;
-	case 2:  g_string_append(s, "R "); break;
-	case 3:  g_string_append(s, "S "); break;
-	case 4:  g_string_append(s, "Z "); break;
-	default: g_string_append(s, "- "); break;
-	}
-    } else {
-	g_string_append(s, "- ");
-    }
-
-    if (type) {
-	switch (*type) {
-	case 1:  g_string_append(s, "? "); break;
-	case 2:  g_string_append(s, "O "); break;
-	case 3:  g_string_append(s, "D "); break;
-	case 4:  g_string_append(s, "A "); break;
-	default: g_string_append(s, "- "); break;
-	}
-    } else {
-	g_string_append(s, "- ");
     }
 }
 
@@ -141,14 +256,26 @@ fmt_x_kbytes(GString *s, guint32 bytes)
 
 
 static void
+fmt_kbytes(GString *s, guint32 bytes)
+{
+    if (bytes > 9999999) {
+	g_string_sprintfa(s, "%uG", bytes / 1024 / 1024);
+    } else if (bytes > 9999) {
+	g_string_sprintfa(s, "%uM", bytes / 1024);
+    } else {
+	g_string_sprintfa(s, "%uK", bytes);
+    }
+}
+
+
+
+static void
 xml_system_device(xmlNodePtr root,
 		  host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
 {
     xmlNodePtr tree;
     char const *type;
     
-    g_return_if_fail(hrDeviceEntry);
-
     tree = xmlNewChild(root, NULL, "device", NULL);
     xml_set_prop(tree, "index", "%d", hrDeviceEntry->hrDeviceIndex);
 
@@ -158,16 +285,14 @@ xml_system_device(xmlNodePtr root,
 				    hrDeviceEntry->hrDeviceStatus));
     }
 
-    if (hrDeviceEntry->hrDeviceType) {
-	type = gsnmp_identity_get_label(host_resources_types_identities,
-					hrDeviceEntry->hrDeviceType,
-					hrDeviceEntry->_hrDeviceDescrLength);
-	if (type) {
-	    (void) xmlNewChild(tree, NULL, "type", type);
-	}
+    type = gsnmp_identity_get_label(host_resources_types_identities,
+				    hrDeviceEntry->hrDeviceType,
+				    hrDeviceEntry->_hrDeviceDescrLength);
+    if (type) {
+	(void) xmlNewChild(tree, NULL, "type", type);
     }
 	
-    if (hrDeviceEntry->hrDeviceDescr) {
+    if (hrDeviceEntry->hrDeviceDescr && hrDeviceEntry->_hrDeviceDescrLength) {
 	(void) xml_new_child(tree, NULL, "description", "%.*s",
 			     (int) hrDeviceEntry->_hrDeviceDescrLength,
 			     hrDeviceEntry->hrDeviceDescr);
@@ -183,22 +308,16 @@ fmt_system_device(GString *s,
     char const *status;
     char const *type;
     
-    g_return_if_fail(hrDeviceEntry);
-
     g_string_sprintfa(s, "%5u ", hrDeviceEntry->hrDeviceIndex);
 
     status = fmt_enum(host_resources_mib_enums_hrDeviceStatus,
 		      hrDeviceEntry->hrDeviceStatus);
     g_string_sprintfa(s, "%-8s", status ? status : "");
 
-    if (hrDeviceEntry->hrDeviceType) {
-	type = gsnmp_identity_get_label(host_resources_types_identities,
-					hrDeviceEntry->hrDeviceType,
-					hrDeviceEntry->_hrDeviceDescrLength);
-	if (type) {
-	    g_string_sprintfa(s, " (%s) ", type);
-	}
-    }
+    type = gsnmp_identity_get_label(host_resources_types_identities,
+				    hrDeviceEntry->hrDeviceType,
+				    hrDeviceEntry->_hrDeviceDescrLength);
+    g_string_sprintfa(s, "%8s", type ? type : "");
 	
     if (hrDeviceEntry->hrDeviceDescr) {
 	g_string_sprintfa(s, "%.*s\n",
@@ -227,7 +346,7 @@ show_system_devices(scli_interp_t *interp, int argc, char **argv)
     
     if (hrDeviceTable) {
 	if (! scli_interp_xml(interp)) {
-	    g_string_sprintfa(interp->header, "INDEX STATUS  DESCRIPTION");
+	    g_string_sprintfa(interp->header, "INDEX STATUS  TYPE    DESCRIPTION");
 	}
 	for (i = 0; hrDeviceTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
@@ -270,12 +389,12 @@ xml_system_process(xmlNodePtr root,
     if (hrSWRunPerfEntry && hrSWRunPerfEntry->hrSWRunPerfMem) {
 	node = xml_new_child(tree, NULL, "memory", "%u",
 			     *hrSWRunPerfEntry->hrSWRunPerfMem);
-	xml_set_prop(node, "unit", "KByte");
+	xml_set_prop(node, "unit", "kilobyte");
     }
     if (hrSWRunPerfEntry && hrSWRunPerfEntry->hrSWRunPerfCPU) {
 	node = xml_new_child(tree, NULL, "cpu", "%u",
 			     *hrSWRunPerfEntry->hrSWRunPerfCPU/100);
-	xml_set_prop(node, "unit", "secs");
+	xml_set_prop(node, "unit", "seconds");
     }
 
     if (hrSWRunEntry->hrSWRunPath
@@ -303,10 +422,16 @@ fmt_system_process(GString *s,
 		    host_resources_mib_hrSWRunEntry_t *hrSWRunEntry,
 		    host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry)
 {
+    const char *e;
+    
     g_string_sprintfa(s, "%5d ", hrSWRunEntry->hrSWRunIndex);
-    fmt_run_state_and_type(s,
-			   hrSWRunEntry->hrSWRunStatus,
-			   hrSWRunEntry->hrSWRunType);
+
+    e = fmt_enum(hrSWRunStatus, hrSWRunEntry->hrSWRunStatus);
+    g_string_sprintfa(s, "%s ", e ? e : " ");
+    
+    e = fmt_enum(hrSWInstalledType, hrSWRunEntry->hrSWRunType);
+    g_string_sprintfa(s, "%s ", e ? e : " ");
+
     if (hrSWRunPerfEntry
 	&& hrSWRunPerfEntry->hrSWRunPerfMem) {
 	fmt_x_kbytes(s, *(hrSWRunPerfEntry->hrSWRunPerfMem));
@@ -388,38 +513,45 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 
 static void
 xml_system_mount(xmlNodePtr root,
-		 host_resources_mib_hrFSEntry_t *hrFSEntry)
+		 host_resources_mib_hrFSEntry_t *fsEntry)
 {
     const char *e;
+    const char *type;
     xmlNodePtr tree;
     
-    g_return_if_fail(hrFSEntry);
-
     tree = xmlNewChild(root, NULL, "filesystem", NULL);
-    xml_set_prop(tree, "index", "%d", hrFSEntry->hrFSIndex);
+    xml_set_prop(tree, "index", "%d", fsEntry->hrFSIndex);
 
-    if (hrFSEntry->hrFSMountPoint
-	&& hrFSEntry->_hrFSMountPointLength) {
+    if (fsEntry->hrFSMountPoint
+	&& fsEntry->_hrFSMountPointLength) {
 	(void) xml_new_child(tree, NULL, "local", "%.*s", 
-			     (int) hrFSEntry->_hrFSMountPointLength,
-			     hrFSEntry->hrFSMountPoint);
+			     (int) fsEntry->_hrFSMountPointLength,
+			     fsEntry->hrFSMountPoint);
     }
 
-    if (hrFSEntry->hrFSRemoteMountPoint
-	&& hrFSEntry->_hrFSRemoteMountPointLength) {
+    if (fsEntry->hrFSRemoteMountPoint
+	&& fsEntry->_hrFSRemoteMountPointLength) {
 	(void) xml_new_child(tree, NULL, "remote", "%.*s", 
-			     (int) hrFSEntry->_hrFSRemoteMountPointLength,
-			     hrFSEntry->hrFSRemoteMountPoint);
+			     (int) fsEntry->_hrFSRemoteMountPointLength,
+			     fsEntry->hrFSRemoteMountPoint);
+    }
+
+    type = gsnmp_identity_get_label(filesystem_types,
+				    fsEntry->hrFSType,
+				    fsEntry->_hrFSTypeLength);
+    if (type) {
+	(void) xml_new_child(tree, NULL, "type", "%s", type);
     }
 
     e = fmt_enum(host_resources_mib_enums_hrFSAccess,
-		 hrFSEntry->hrFSAccess);
+		 fsEntry->hrFSAccess);
     if (e) {
 	(void) xml_new_child(tree, NULL, "access", "%s", e);
     }
 
-    if (hrFSEntry->hrFSBootable && *(hrFSEntry->hrFSBootable) == 1) {
-	(void) xmlNewChild(tree, NULL, "bootable", NULL);
+    if (fsEntry->hrFSBootable
+	&& *(fsEntry->hrFSBootable) == HOST_RESOURCES_MIB_HRFSBOOTABLE_TRUE) {
+	(void) xmlNewChild(tree, NULL, "boot", NULL);
     }
 }
 
@@ -427,35 +559,40 @@ xml_system_mount(xmlNodePtr root,
 
 static void
 fmt_system_mount(GString *s,
-		 host_resources_mib_hrFSEntry_t *hrFSEntry,
-		 int loc_len, int rem_len)
+		 host_resources_mib_hrFSEntry_t *fsEntry,
+		 int loc_len, int rem_len, int type_len)
 {
     const char *e;
-    
-    g_return_if_fail(hrFSEntry);
+    const char *type;
 
-    if (hrFSEntry->hrFSMountPoint) {
+    g_string_sprintfa(s, "%5d ", fsEntry->hrFSIndex);
+
+    if (fsEntry->hrFSMountPoint) {
 	g_string_sprintfa(s, "%-*.*s", loc_len,
-			  (int) hrFSEntry->_hrFSMountPointLength,
-			  hrFSEntry->hrFSMountPoint);
+			  (int) fsEntry->_hrFSMountPointLength,
+			  fsEntry->hrFSMountPoint);
     } else {
 	g_string_sprintfa(s, "%*s", loc_len, "");
     }
-    if (hrFSEntry->hrFSRemoteMountPoint) {
+    if (fsEntry->hrFSRemoteMountPoint) {
 	g_string_sprintfa(s, "%-*.*s", rem_len,
-			  (int) hrFSEntry->_hrFSRemoteMountPointLength,
-			  hrFSEntry->hrFSRemoteMountPoint);
+			  (int) fsEntry->_hrFSRemoteMountPointLength,
+			  fsEntry->hrFSRemoteMountPoint);
     } else {
 	g_string_sprintfa(s, "%*s", rem_len, "");
     }
 
-    e = fmt_enum(host_resources_mib_enums_hrFSAccess,
-		 hrFSEntry->hrFSAccess);
+    type = gsnmp_identity_get_label(filesystem_types,
+				    fsEntry->hrFSType,
+				    fsEntry->_hrFSTypeLength);
+    g_string_sprintfa(s, "%-*s", type_len, type ? type : "");
+
+    e = fmt_enum(hrFSAccess, fsEntry->hrFSAccess);
     g_string_sprintfa(s, "%s", e ? e : "");
 
-    if (hrFSEntry->hrFSBootable
-	&& *(hrFSEntry->hrFSBootable) == 1) {
-	g_string_append(s, ", bootable");
+    if (fsEntry->hrFSBootable
+	&& *(fsEntry->hrFSBootable) == HOST_RESOURCES_MIB_HRFSBOOTABLE_TRUE) {
+	g_string_append(s, ",boot");
     }
 
     g_string_append(s, "\n");
@@ -467,7 +604,8 @@ static int
 show_system_mounts(scli_interp_t *interp, int argc, char **argv)
 {
     host_resources_mib_hrFSEntry_t **hrFSTable = NULL;
-    int i, loc_len = 20, rem_len = 20;
+    int i, loc_len = 8, rem_len = 8, type_len = 4;
+    const char *type;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -489,17 +627,24 @@ show_system_mounts(scli_interp_t *interp, int argc, char **argv)
 		rem_len = MAX(rem_len,
 			      hrFSTable[i]->_hrFSRemoteMountPointLength);
 	    }
+	    type = gsnmp_identity_get_label(filesystem_types,
+					    hrFSTable[i]->hrFSType,
+					    hrFSTable[i]->_hrFSTypeLength);
+	    if (type) {
+		type_len = MAX(type_len, strlen(type));
+	    }
 	}
-	loc_len++, rem_len++;
-	g_string_sprintfa(interp->header, "%-*s%-*sACCESS",
-			  loc_len, "LOCAL MOUNT POINT",
-			  rem_len, "REMOTE MOUNT POINT");
+	loc_len++, rem_len++, type_len++,
+	g_string_sprintfa(interp->header, "INDEX %-*s%-*s%-*sOPTIONS",
+			  loc_len, "LOCAL",
+			  rem_len, "REMOTE",
+			  type_len, "TYPE");
 	for (i = 0; hrFSTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
 		xml_system_mount(interp->xml_node, hrFSTable[i]);
 	    } else {
 		fmt_system_mount(interp->result, hrFSTable[i],
-				 loc_len, rem_len);
+				 loc_len, rem_len, type_len);
 	    }
 	}
     }
@@ -512,28 +657,27 @@ show_system_mounts(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-fmt_system_storage(GString *s,
-		   host_resources_mib_hrStorageEntry_t *hrStorageEntry,
-		   int descr_width)
+xml_system_storage(xmlNodePtr root,
+		   host_resources_mib_hrStorageEntry_t *hrStorageEntry)
 {
+    xmlNodePtr node, tree;
     gchar const *type = NULL;
 
-    g_return_if_fail(hrStorageEntry);
-
-    if (hrStorageEntry->hrStorageType) {
-	type = gsnmp_identity_get_label(storage_types,
-					hrStorageEntry->hrStorageType,
-					hrStorageEntry->_hrStorageTypeLength);
-    }
-
+    tree = xmlNewChild(root, NULL, "storage", NULL);
+    xml_set_prop(tree, "index", "%d", hrStorageEntry->hrStorageIndex);
+    
     if (hrStorageEntry->hrStorageDescr
 	&& hrStorageEntry->_hrStorageDescrLength) {
-	g_string_sprintfa(s, "%-*.*s",
-			  descr_width,
-			  (int) MIN(25, hrStorageEntry->_hrStorageDescrLength),
-			  hrStorageEntry->hrStorageDescr);
-    } else {
-	g_string_sprintfa(s, "%20s", "");
+	(void) xml_new_child(tree, NULL, "description", "%.*s",
+			     (int) hrStorageEntry->_hrStorageDescrLength,
+			     hrStorageEntry->hrStorageDescr);
+    }
+
+    type = gsnmp_identity_get_label(storage_types,
+				    hrStorageEntry->hrStorageType,
+				    hrStorageEntry->_hrStorageTypeLength);
+    if (type) {
+	(void) xmlNewChild(tree, NULL, "type", type);
     }
 
     if (hrStorageEntry->hrStorageAllocationUnits
@@ -552,14 +696,63 @@ fmt_system_storage(GString *s,
 	storage_used *= *(hrStorageEntry->hrStorageAllocationUnits);
 	storage_used /= scale;
 
-        g_string_sprintfa(s, "%10llu %10llu %10llu %3u",
-	       storage_size, storage_used, storage_size - storage_used,
-	       (guint32) (storage_size
-			  ? storage_used * 100 / storage_size : 0));
+	node = xml_new_child(tree, NULL, "size", "%llu", storage_size);
+	xml_set_prop(node, "unit", "kilobytes");
 
-	if (type) {
-	    g_string_sprintfa(s, " (%s)", type);
-	}
+	node = xml_new_child(tree, NULL, "used", "%llu", storage_used);
+	xml_set_prop(node, "unit", "kilobytes");
+
+    }
+}
+
+
+
+static void
+fmt_system_storage(GString *s,
+		   host_resources_mib_hrStorageEntry_t *hrStorageEntry,
+		   int descr_width, int type_width)
+{
+    gchar const *type = NULL;
+
+    g_string_sprintfa(s, "%5d ", hrStorageEntry->hrStorageIndex);
+
+    if (hrStorageEntry->hrStorageDescr
+	&& hrStorageEntry->_hrStorageDescrLength) {
+	g_string_sprintfa(s, "%-*.*s",
+			  descr_width,
+			  (int) MIN(25, hrStorageEntry->_hrStorageDescrLength),
+			  hrStorageEntry->hrStorageDescr);
+    } else {
+	g_string_sprintfa(s, "%*s", descr_width, "");
+    }
+
+    type = gsnmp_identity_get_label(storage_types,
+				    hrStorageEntry->hrStorageType,
+				    hrStorageEntry->_hrStorageTypeLength);
+    g_string_sprintfa(s, "%-*s", type_width, type ? type : "");
+
+    if (hrStorageEntry->hrStorageAllocationUnits
+	&& hrStorageEntry->hrStorageSize
+	&& hrStorageEntry->hrStorageUsed) {
+	
+	guint64 storage_size = 0;
+	guint64 storage_used = 0;
+	guint32 const scale = 1024;
+	
+	storage_size = *(hrStorageEntry->hrStorageSize);
+	storage_size *= *(hrStorageEntry->hrStorageAllocationUnits);
+	storage_size /= scale;
+
+    	storage_used = *(hrStorageEntry->hrStorageUsed);
+	storage_used *= *(hrStorageEntry->hrStorageAllocationUnits);
+	storage_used /= scale;
+
+	fmt_x_kbytes(s, storage_size);
+	fmt_x_kbytes(s, storage_used);
+	fmt_x_kbytes(s, storage_size - storage_used);
+	g_string_sprintfa(s, " %3u",
+			  (guint32) (storage_size
+				     ? storage_used * 100 / storage_size : 0));
     }
     g_string_append(s, "\n");
 }
@@ -570,7 +763,8 @@ static int
 show_system_storage(scli_interp_t *interp, int argc, char **argv)
 {
     host_resources_mib_hrStorageEntry_t **hrStorageTable = NULL;
-    int descr_width = 14;
+    int descr_width = 14, type_width = 4;
+    const char *type;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -590,13 +784,25 @@ show_system_storage(scli_interp_t *interp, int argc, char **argv)
 		&& hrStorageTable[i]->_hrStorageDescrLength > descr_width) {
 		descr_width = hrStorageTable[i]->_hrStorageDescrLength;
 	    }
+	    type = gsnmp_identity_get_label(storage_types,
+				    hrStorageTable[i]->hrStorageType,
+				    hrStorageTable[i]->_hrStorageTypeLength);
+	    if (type) {
+		type_width = MAX(type_width, strlen(type));
+	    }
 	}
+	descr_width++, type_width++;
 	g_string_sprintfa(interp->header,
-			  "%-*s  SIZE [K]   USED [K]   FREE [K] USE%%",
-			  descr_width, "STORAGE AREA");
+			  "INDEX %-*s%-*s  SIZE  USED  FREE USE%%",
+			  descr_width, "DESCRIPTION",
+			  type_width, "TYPE");
 	for (i = 0; hrStorageTable[i]; i++) {
-	    fmt_system_storage(interp->result, hrStorageTable[i],
-			       descr_width);
+	    if (scli_interp_xml(interp)) {
+		xml_system_storage(interp->xml_node, hrStorageTable[i]);
+	    } else {
+		fmt_system_storage(interp->result, hrStorageTable[i],
+				   descr_width, type_width);
+	    }
 	}
     }
 
@@ -708,11 +914,12 @@ fmt_system_info(GString *s, scli_interp_t *interp,
 		if (vendor->id) {
 		    g_string_append(s, vendor->name);
 		    if (vendor->url) {
-			g_string_sprintfa(s, " <%s>\n", vendor->url);
+			g_string_sprintfa(s, " <%s>", vendor->url);
 		    }
 		} else {
-		    g_string_sprintfa(s, "unknown (%s)\n", vendor->name);
+		    g_string_sprintfa(s, "unknown (%s)", vendor->name);
 		}
+		g_string_append_c(s, '\n');
 	    }
 	}
 	if (system->sysServices) {
@@ -811,8 +1018,9 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 
     if (hrStorage) {
 	if (hrStorage->hrMemorySize) {
-	    g_string_sprintfa(s, "%-*s %s\n", indent, "Memory:",
-			      fmt_kbytes(*(hrStorage->hrMemorySize)));
+	    g_string_sprintfa(s, "%-*s ", indent, "Memory:");
+	    fmt_kbytes(s, *(hrStorage->hrMemorySize));
+	    g_string_append_c(s, '\n');
 	}
     }
 
@@ -828,8 +1036,10 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	    g_string_sprintfa(s, "%-*s %d ", indent, "Bridge Ports:",
 			      *(dot1dBase->dot1dBaseNumPorts));
 	    if (dot1dBase->dot1dBaseType) {
-		xxx_enum(s, 20, bridge_mib_enums_dot1dBaseType,
-			 dot1dBase->dot1dBaseType);
+		const char *e;
+		e = fmt_enum(bridge_mib_enums_dot1dBaseType,
+			     dot1dBase->dot1dBaseType);
+		g_string_sprintfa(s, "%s", e ? e : "");
 	    }
 	    g_string_append_c(s, '\n');
 	}
@@ -1013,32 +1223,72 @@ scli_init_system_mode(scli_interp_t *interp)
 
 	{ "show system devices", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  "list of system devices",
+	  "The show system devices command shows a list of system devices.\n"
+	  "The command generates a table with the following columns:\n"
+	  "\n"
+	  "  INDEX       device number\n"
+	  "  STATUS      current status of the device\n"
+	  "  DESCRIPTION description of the device",
 	  show_system_devices },
 
 	{ "show system storage", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "storage areas attached to the system",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  "The show system storage command displays information about the\n"
+	  "logical areas attached in the system. The command generates a\n"
+	  "table with the following columns:\n"
+	  "\n"
+	  "  INDEX       logical storage area number\n"
+	  "  DESCRIPTION description of the storage area\n"
+	  "  TYPE        logical storage area type\n"
+	  "  SIZE        total size of the storage area\n"
+	  "  USED        amount of storage in use\n"
+	  "  FREE        amount of storage available\n"
+	  "  USE%        used storage in percent",
 	  show_system_storage },
 
 	{ "show system mounts", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  "file systems mounted on the system",
+	  "The show system mounts command shows the list of filesystems\n"
+	  "mounted on the system. The command generates a table with the\n"
+	  "following columns:\n"
+	  "\n"
+	  "  INDEX   filesystem identification number\n"
+	  "  LOCAL   local root path name of the filesystem\n"
+	  "  REMOTE  remote server and root path name (if any)\n"
+	  "  TYPE    filesytem type (if known)\n"
+	  "  OPTIONS access mode (ro/rw) and boot flag",
 	  show_system_mounts },
 
 	{ "show system processes", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  "processes running on the system",
+	  "The show system processes command display information about the\n"
+	  "processes currently running on the system. The command generates\n"
+	  "a table with the following columns:\n"
+	  "\n"
+	  "  PID     process identification number\n"
+	  "  S       status of the process (see below)\n"
+	  "  T       type of the process (see below)\n"
+	  "  MEMORY  memory used by the process\n"
+	  "  TIME    CPU time used by the process\n"
+	  "  COMMAND command executed by the process\n"
+	  "\n"
+	  "The process status values are C=running, R=runnable,\n"
+	  "S=not runnable, and Z=invalid. The process types values are\n"
+	  "?=unknown, O=operating system, D=device driver, and A=application.",
 	  show_system_processes },
 
 	{ "monitor system storage", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  "storage areas attached to the system",
+	  "The monitor system storage command shows the same\n"
+	  "information as the show system storage command. The\n"
+	  "information is updated periodically.",
 	  show_system_storage },
 
 	{ "monitor system processes", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  "processes running on the system",
+	  "The monitor system processes command show the same\n"
+	  "information as the show system processes command. The\n"
+	  "information is updated periodically.",
 	  show_system_processes },
 
 #ifdef MEM_DEBUG
