@@ -1,3 +1,111 @@
+2001-09-25 15:59  schoenw
+
+	* scli/nortel.c: Finished the implementation of the "show nortel
+        bridge vlan ports" command.
+
+2001-09-25 14:28  schoenw
+
+	* scli/printer.c: Added more monitoring commands.
+
+2001-09-25 11:47  schoenw
+
+	* scli/nortel.c: Show the list of port members in the "show nortel
+        bridge vlan info" command.
+
+2001-09-25 10:16  schoenw
+
+	* scli/bridge.c: Bug fixes.
+
+2001-09-25 10:07  schoenw
+
+	* scli/: bridge.c, system.c: More human friendly output, added a
+        show bridge stp ports command.
+
+2001-09-25 10:02  schoenw
+
+	* Makefile.am, TODO, configure.in: Updated to reflect the addition
+        of the proc subdirectory.
+
+2001-09-25 09:48  schoenw
+
+	* scli/: Makefile.am, atm.c, basic.c, bridge.c, cisco.c, disman.c,
+	entity.c, ether.c, interface.c, ip.c, monitor.c, nortel.c, ospf.c,
+	printer.c, scli.h, snmp.c, system.c, tcp.c, udp.c: Many updates to
+        reflect the recent changes of the stub generator.
+
+2001-09-25 09:47  schoenw
+
+	* proc/: Makefile.am, disman-script-mib-proc.c,
+	disman-script-mib-proc.h, if-mib-proc.c, if-mib-proc.h: Added first
+        bits of the procedures software layer.
+
+2001-09-25 09:46  schoenw
+
+	* snmp/: g_dispatch.c, g_session.c, g_session.h, g_sha.h, g_snmp.h,
+        g_utils.c: Minor code cleanups.
+
+2001-09-25 09:44  schoenw
+
+	* stub/: Makefile.am, atm-mib.c, atm-mib.h, bridge-mib.c,
+	bridge-mib.h, disman-schedule-mib.c, disman-schedule-mib.h,
+	disman-script-mib.c, disman-script-mib.h, entity-mib.c,
+	entity-mib.h, etherlike-mib.c, etherlike-mib.h,
+	host-resources-mib.c, host-resources-mib.h, host-resources-types.c,
+	host-resources-types.h, iana-language-mib.c, iana-language-mib.h,
+	if-mib.c, if-mib.h, ip-forward-mib.c, ip-forward-mib.h, ip-mib.c,
+	ip-mib.h, mau-mib.c, mau-mib.h, old-cisco-ip-mib.c,
+	old-cisco-ip-mib.h, ospf-mib.c, ospf-mib.h, printer-mib.c,
+	printer-mib.h, rapid-city.c, rapid-city.h, rapidcity-vlan-mib.c,
+	rapidcity-vlan-mib.h, rfc1213-mib.c, rfc1213-mib.h,
+	snmp-community-mib.c, snmp-community-mib.h, snmp-framework-mib.c,
+	snmp-framework-mib.h, snmp-mpd-mib.c, snmp-mpd-mib.h,
+	snmp-target-mib.c, snmp-target-mib.h, snmp-user-based-sm-mib.c,
+	snmp-user-based-sm-mib.h, snmp-view-based-acm-mib.c,
+	snmp-view-based-acm-mib.h, snmpv2-mib.c, snmpv2-mib.h, tcp-mib.c,
+	tcp-mib.h, tunnel-mib.c, tunnel-mib.h, udp-mib.c, udp-mib.h:
+	Regenerated stubs to reflect recent changes in the stub generator.
+        Replaced the RAPIDCITY-VLAN-MIB module with the RAPID-CITY module.
+
+2001-09-20 16:35  schoenw
+
+	* scli/: interface.c, ip.c, ospf.c: Replaced some more xxx_enum()
+        functions.
+
+2001-09-17 10:07  schoenw
+
+	* scli/: basic.c, fmt.c, interface.c, ip.c, scli.h, snmp.c,
+	system.c: Introduced new syntax error return codes. Improved the ip
+        mode implementation and its documentation.
+
+2001-09-13 20:04  schoenw
+
+	* scli/snmp.c: Documentation updates and minor improvements.
+
+2001-09-13 19:42  schoenw
+
+	* configure.in: Bumped the version number.
+
+2001-09-11 14:54  schoenw
+
+	* scli/entity.c: Improved the formatting of "show entity details".
+
+2001-09-11 14:54  schoenw
+
+	* scli/interface.c: Improved XML support.
+
+2001-09-11 10:05  schoenw
+
+	* scli/Makefile.am: Removed dependencies so that source
+        distributions will not try to build scli.1.
+
+2001-09-10 17:09  schoenw
+
+	* TODO: Minor housekeeping.
+
+2001-09-10 17:08  schoenw
+
+	* ChangeLog, NEWS: Updates for release 0.2.1.
+
 2001-09-10 16:58  schoenw
 
 	* scli/monitor.c: Use strchr() instead of index().
@@ -140,6 +248,16 @@
 2001-08-27 15:09  schoenw
 
 	* autogen.sh: Replaced stools with scli.
+
+2001-08-27 14:54  schoenw
+
+	* stop/getopt1.c: Removed stop completely from the CVS.
+
+2001-08-27 14:52  schoenw
+
+	* stop/: Makefile.am, disman.c, ether.c, fmt.c, getopt.c, getopt.h,
+	interface.c, process.c, stop.1, stop.c, stop.h, tcp.c: Removed stop
+        from the scli package.
 
 2001-08-27 13:45  schoenw
 
@@ -309,12 +427,16 @@
 
 	* scli/vendors.c: Do not mention stools anymore.
 
-2001-08-22 14:53  schoenw
+2001-08-22 14:50  schoenw
 
-	* scli/: Makefile.am, atm.c, basic.c, bridge.c, cmds.c, disman.c,
-	entity.c, ether.c, fmt.c, interface.c, ip.c, monitor.c, ospf.c,
-	printer.c, scli.c, scli.h, snmp.c, system.c, tcp.c, udp.c,
-        vendors.c: Several changes to get rid of the stools.h module.
+	* stop/Makefile.am, stop/disman.c, stop/fmt.c, stop/interface.c,
+	stop/stop.h, stop/tcp.c, scli/Makefile.am, scli/atm.c,
+	scli/basic.c, scli/bridge.c, scli/cmds.c, scli/disman.c,
+	scli/entity.c, scli/ether.c, scli/fmt.c, scli/interface.c,
+	scli/ip.c, scli/monitor.c, scli/ospf.c, scli/printer.c,
+	scli/scli.c, scli/scli.h, scli/snmp.c, scli/system.c, scli/tcp.c,
+	scli/udp.c, scli/vendors.c: Several changes to get rid of the
+        stools.h module.
 
 2001-08-21 18:48  schoenw
 
@@ -337,10 +459,10 @@
 
 2001-08-16 17:38  schoenw
 
-	* snmp/Makefile.in, stub/Makefile.in, Makefile.in, configure,
-	install-sh, missing, mkinstalldirs, doc/Makefile.in,
-	scli/Makefile.in: Removed files that are auto-generated. Use
-        autogen.sh instead.
+	* snmp/Makefile.in, stop/Makefile.in, stub/Makefile.in,
+	Makefile.in, configure, install-sh, missing, mkinstalldirs,
+	doc/Makefile.in, scli/Makefile.in: Removed files that are
+        auto-generated. Use autogen.sh instead.
 
 2001-08-16 16:17  schoenw
 
@@ -406,9 +528,9 @@
 
 2001-08-14 14:45  schoenw
 
-	* scli/basic.c: Conditionally include <termios.h> which is needed
-	on Solaris machines that have resizeterm (probably ncurses) in
-        order to get a definition of TIOCGWINSZ.
+	* scli/basic.c, stop/stop.c: Conditionally include <termios.h>
+	which is needed on Solaris machines that have resizeterm (probably
+        ncurses) in order to get a definition of TIOCGWINSZ.
 
 2001-07-31 14:38  schoenw
 
@@ -451,8 +573,8 @@
 
 	* scli/basic.c, snmp/g_dispatch.c, snmp/g_dispatch.h,
 	snmp/g_session.c, snmp/g_session.h, snmp/g_snmp.h,
-	snmp/g_snmp_table.c, snmp/g_transport.c, snmp/g_transport.h:
-        Cleaned up the SNMP transport implementation.
+	snmp/g_snmp_table.c, snmp/g_transport.c, snmp/g_transport.h,
+        stop/stop.c: Cleaned up the SNMP transport implementation.
 
 2001-06-28 09:50  schoenw
 
@@ -561,6 +683,11 @@
 	* scli/: disman.c, ip.c: Changes to make headers more consistent.
         Support DISMAN run and scheduler monitors.
 
+2001-06-18 13:10  schoenw
+
+	* stop/: ether.c, interface.c: Fixed a bug where the cache was not
+        properly invalidated.
+
 2001-06-18 13:09  schoenw
 
 	* scli/monitor.c: The monitor.c module contains the code which
@@ -663,8 +790,10 @@
 	stub/snmp-view-based-acm-mib.h, stub/snmpv2-mib.c,
 	stub/snmpv2-mib.h, stub/stools.c, stub/stools.h, stub/tcp-mib.c,
 	stub/tcp-mib.h, stub/tunnel-mib.c, stub/tunnel-mib.h,
-	stub/udp-mib.c, stub/udp-mib.h, scli/basic.c, scli/scli.h: Replaced
-        host_snmp with GSnmpSession.
+	stub/udp-mib.c, stub/udp-mib.h, stop/disman.c, stop/ether.c,
+	stop/interface.c, stop/process.c, stop/stop.c, stop/stop.h,
+	stop/tcp.c, scli/basic.c, scli/scli.h: Replaced host_snmp with
+        GSnmpSession.
 
 2001-06-13 09:17  schoenw
 
@@ -709,18 +838,24 @@
 	* scli/: Makefile.am, Makefile.in, printer.c, scli.c, scli.h: Added
         the scli printer mode contributed by Oliver Wellnitz.
 
+2001-06-12 14:19  schoenw
+
+	* stop/ether.c: Updated the type names used from the EtherLike-MIB.
+
 2001-06-12 14:18  schoenw
 
 	* stub/: Makefile.am, Makefile.in, etherlike-mib.c,
 	etherlike-mib.h, printer-mib.c, printer-mib.h: Added stubs for the
         Printer-MIB and regenerated the EtherLike-MIB stubs.
 
-2001-06-12 12:48  schoenw
+2001-06-12 12:47  schoenw
 
-	* scli/: atm.c, basic.c, bridge.c, cmds.c, disman.c, entity.c,
-	ether.c, interface.c, ip.c, ospf.c, scli.c, snmp.c, system.c,
-	tcp.c, udp.c: Updated code to use type names which include module
-        names.
+	* stop/disman.c, stop/interface.c, stop/process.c, stop/stop.c,
+	stop/tcp.c, scli/atm.c, scli/basic.c, scli/bridge.c, scli/cmds.c,
+	scli/disman.c, scli/entity.c, scli/ether.c, scli/interface.c,
+	scli/ip.c, scli/ospf.c, scli/scli.c, scli/snmp.c, scli/system.c,
+	scli/tcp.c, scli/udp.c: Updated code to use type names which
+        include module names.
 
 2001-06-12 12:46  schoenw
 
@@ -825,6 +960,11 @@
 	* snmp/g_snmp_table.c: Some fixes - I guess this really needs a
         rewrite. Thanks Erik.
 
+2001-04-17 11:40  schoenw
+
+	* stop/: disman.c, ether.c, interface.c, process.c, tcp.c: Work
+        around from Erik for glib's broken g_string_truncate().
+
 2001-04-14 17:51  schoenw
 
 	* scli/: Makefile.am, Makefile.in, ospf.c, scli.c, scli.h: Added
@@ -925,6 +1065,20 @@
 	* scli/scli.c: Stifle the history file to contain only
         $HISTFILESIZE entries.
 
+2001-04-10 10:15  schoenw
+
+	* stop/stop.c: Added a hook to indicate when stop is busy
+        retrieving data.
+
+2001-04-10 10:14  schoenw
+
+	* stop/interface.c: Removed an unnecessary delay.
+
+2001-04-10 10:14  schoenw
+
+	* stop/ether.c: Discard any old statistics if the ether mode is
+        restarted.
+
 2001-04-10 10:13  schoenw
 
 	* snmp/: g_snmp.c, g_snmp.h: Added hooks which are called when a
@@ -975,11 +1129,28 @@
 	* stub/stools.c: Use mktime() to get the gmt offset computation
         right.
 
+2001-04-03 10:12  schoenw
+
+	* stop/: disman.c, ether.c, fmt.c, interface.c, stop.h: Completed
+	the stop ether mode and moved some common formatting utilities into
+	the fmt.c module. Added ifInErrors and ifOutErrors to the interface
+        display mode.
+
+2001-04-03 10:11  schoenw
+
+	* stop/: stop.1, stop.c: Added support for moving forward and
+        backward in the list of display modes.
+
 2001-03-30 15:38  schoenw
 
-	* stub/stools.c, stub/stools.h, scli/fmt.c, scli/interface.c,
-	scli/system.c: Reworked the timeticks formatting code and started
-	to move it into the stools library so that it can be reused easily.
+	* stub/stools.c, stub/stools.h, stop/interface.c, scli/fmt.c,
+	scli/interface.c, scli/system.c: Reworked the timeticks formatting
+	code and started to move it into the stools library so that it can
+        be reused easily.
+
+2001-03-30 10:47  schoenw
+
+	* stop/stop.1: Removed some garbage characters at the end.
 
 2001-03-30 10:43  schoenw
 
@@ -987,6 +1158,11 @@
 	entity.c, ether.c, fmt.c, interface.c, ip.c, mau.c, scli.c, scli.h,
 	snmp.c, system.c, tcp.c, udp.c: Renamed mau.c to ether.c and
         updated various modules to reflect internal API changes.
+
+2001-03-30 10:21  schoenw
+
+	* stop/: disman.c, tcp.c: Updates to reflect changes in the stools
+        API.
 
 2001-03-30 10:21  schoenw
 
@@ -1002,6 +1178,15 @@
 	snmpv2-mib.h, stools.c, stools.h, tcp-mib.c, tcp-mib.h,
 	tunnel-mib.c, tunnel-mib.h: Regenerated stubs to reflect changes in
         the stls API.
+
+2001-03-30 10:17  schoenw
+
+	* stop/: Makefile.am, Makefile.in, ether.c, stop.c, stop.h: Added a
+        new ether stop mode to display ethernet specific statistics.
+
+2001-03-30 10:16  schoenw
+
+	* stop/interface.c: Added code to handle daylight saving times.
 
 2001-03-29 17:47  schoenw
 
@@ -1034,6 +1219,15 @@
 
 	* scli/disman.c: Many improvements to produce more useful output.
 
+2001-03-29 14:34  schoenw
+
+	* stop/: disman.c, fmt.c, stop.h: Added code to display the time a
+        script is/was running.
+
+2001-03-29 14:33  schoenw
+
+	* stop/stop.1: Added text to briefly describe the stop modes.
+
 2001-03-29 12:33  schoenw
 
 	* scli/scli.1: Added some more documentation to bring new users up
@@ -1043,6 +1237,11 @@
 
 	* config.h.in, configure, configure.in: Added a check for
         getaddrinfo().
+
+2001-03-29 10:49  schoenw
+
+	* stop/tcp.c: Show tcp connections in a more reasonable order
+        (sorted by state).
 
 2001-03-28 12:58  schoenw
 
@@ -1058,6 +1257,11 @@
 
 	* scli/tcp.c: Use #defines rather than numbers for enumerated
         values.
+
+2001-03-28 12:10  schoenw
+
+	* stop/tcp.c: Use #defines rather than numbers to identify
+        enumerated values.
 
 2001-03-28 12:08  schoenw
 
@@ -1090,6 +1294,10 @@
 	* scli/basic.c: Some portability fixes. I am sure this is not the
 	right solution. Need to study the POSIX termios specification to
         get it "right".
+
+2001-03-27 17:17  schoenw
+
+	* stop/: disman.c, fmt.c, tcp.c: Minor bug fixes.
 
 2001-03-27 17:16  schoenw
 
@@ -1140,6 +1348,11 @@
 	tcp.c, udp.c: Added new "show tcp listener" and "show udp listener"
         commands.
 
+2001-03-26 14:59  schoenw
+
+	* stop/: Makefile.am, Makefile.in, disman.c, stop.c, stop.h, tcp.c:
+        Added a tcp mode to view the list of current tcp connections.
+
 2001-03-23 04:27  schoenw
 
 	* stub/bridge-mib.c: Regenerated stubs to get the RFC 1155 counters
@@ -1184,8 +1397,9 @@
 
 2001-03-19 17:55  schoenw
 
-	* config.h.in, configure, configure.in, scli/fmt.c: Integrated a
-        freebsd patch from John Sellens <jsellens@generalconcepts.com>.
+	* config.h.in, configure, configure.in, scli/fmt.c,
+	stop/interface.c: Integrated a freebsd patch from John Sellens
+        <jsellens@generalconcepts.com>.
 
 2001-03-16 17:01  schoenw
 
@@ -1199,6 +1413,10 @@
 2001-03-16 16:30  schoenw
 
 	* scli/bridge.c: Fixed a bug in the "show bridge ports" command.
+
+2001-03-16 10:11  schoenw
+
+	* stop/stop.1: Improved some wordings.
 
 2001-03-16 10:10  schoenw
 
@@ -1294,10 +1512,21 @@
 	* scli/: system.c, vendors.c: Display unknown vendors to encourage
         people to update the vendor list.
 
+2001-03-13 16:46  schoenw
+
+	* stop/: Makefile.am, Makefile.in, disman.c, fmt.c, process.c,
+	stop.h: Added the fmt.c module to collect formatting utilities.
+        Updated the disman stop mode.
+
 2001-03-13 16:44  schoenw
 
 	* scli/disman.c: Added a "show disman launch info" command and some
         general cleanups.
+
+2001-03-13 12:25  schoenw
+
+	* stop/: Makefile.am, Makefile.in, disman.c, interface.c, stop.c,
+        stop.h: Added an initial version of the stop disman mode.
 
 2001-03-12 15:05  schoenw
 
@@ -1322,6 +1551,11 @@
 	tcp-mib.c, tcp-mib.h, tunnel-mib.c, tunnel-mib.h, udp-mib.c,
 	udp-mib.h: Regenerated stubs to include the MIB revision history.
         Removed the default include of all MIB stub headers from stools.h.
+
+2001-03-12 14:58  schoenw
+
+	* stop/: interface.c, process.c, stop.c, stop.h: Include only those
+        MIB stubs that are actually needed.
 
 2001-03-09 16:12  schoenw
 
@@ -1365,7 +1599,8 @@
 
 2001-03-05 15:31  schoenw
 
-	* stub/bridge-mib.c, stub/bridge-mib.h, stub/disman-schedule-mib.c,
+	* stop/interface.c, stop/process.c, stub/bridge-mib.c,
+	stub/bridge-mib.h, stub/disman-schedule-mib.c,
 	stub/disman-schedule-mib.h, stub/disman-script-mib.c,
 	stub/disman-script-mib.h, stub/entity-mib.c, stub/entity-mib.h,
 	stub/host-resources-mib.c, stub/host-resources-mib.h,
@@ -1397,6 +1632,12 @@
 
 	* scli/: Makefile.am, Makefile.in, ip.c, scli.c, scli.h, tcp.c:
         Added an initial IP mode for scli.
+
+2001-03-02 10:20  schoenw
+
+	* stop/process.c: Display CPU time in seconds rather than minutes.
+	Made sure that the process descriptions clear to the end of the
+        line.
 
 2001-03-02 10:17  schoenw
 
@@ -1454,6 +1695,11 @@
 
 2001-02-28 17:37  schoenw
 
+	* stop/: interface.c, process.c: Updated the code to use the new
+        stub interface.
+
+2001-02-28 17:37  schoenw
+
 	* scli/: disman.c, entity.c, interface.c, snmp.c, system.c:
 	Improvements of the "show disman language" and "show interface
 	info" commands. Added a new "show disman scripts" command. Updated
@@ -1463,6 +1709,14 @@
 
 	* scli/: Makefile.am, Makefile.in, scli.c, scli.h, tcp.c: Added the
         tcp mode which displays existing tcp connections.
+
+2001-02-27 12:15  schoenw
+
+	* stop/interface.c: Handle 3com's big (5 digit) interface numbers.
+
+2001-02-27 11:33  schoenw
+
+	* stop/interface.c: Check availability of ifXEntry before using it.
 
 2001-02-27 11:07  schoenw
 
@@ -1493,6 +1747,21 @@
 	info" since we are going to add a "show interface stack" command
         soon.
 
+2001-02-27 10:54  schoenw
+
+	* stop/stop.c: Do not display the system description during startup
+        to reduce latency.
+
+2001-02-27 10:54  schoenw
+
+	* stop/interface.c: Updates to better display byte and packet
+        counters.
+
+2001-02-27 08:49  schoenw
+
+	* stop/interface.c: Work better if some deprecated objects are not
+        present.
+
 2001-02-26 16:32  schoenw
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl.
@@ -1520,6 +1789,10 @@
 2001-02-26 16:09  schoenw
 
 	* scli/interface.c: Renamed "show interface" to "show interfaces".
+
+2001-02-26 16:08  schoenw
+
+	* stop/interface.c: Updates to display byte and packet counters.
 
 2001-02-26 16:03  schoenw
 
@@ -1572,7 +1845,13 @@
 
 2001-02-21 17:29  schoenw
 
-	* scli/scli.1: Frank Strauss fixed the numbers in the manual pages.
+	* scli/scli.1, stop/stop.1: Frank Strauss fixed the numbers in the
+        manual pages.
+
+2001-02-21 17:29  schoenw
+
+	* stop/process.c: Use hrSWRunPath instead of hrSWRunName. Cleaned
+        up the line truncation code.
 
 2001-02-20 15:38  schoenw
 
@@ -1586,6 +1865,19 @@
 	entity-mib.c, host-resources-mib.c, if-mib.c, ip-mib.c,
 	snmpv2-mib.c, tcp-mib.c, udp-mib.c: More compact stubs generated by
         an improved stools smidump driver.
+
+2001-02-20 15:34  schoenw
+
+	* stop/: stop.1, stop.c: Updated documentation of the `T' toggle
+        command.
+
+2001-02-20 15:34  schoenw
+
+	* stop/process.c: More compact display of process states and types.
+
+2001-02-20 15:33  schoenw
+
+	* stop/interface.c: Minor cleanup of the interface mode.
 
 2001-02-20 15:32  schoenw
 
@@ -1617,8 +1909,8 @@
 2001-02-16 15:15  schoenw
 
 	* Makefile.in, NEWS, TODO, aclocal.m4, configure, configure.in,
-	doc/Makefile.in, snmp/Makefile.in: Updates for version 0.1.9 of the
-        stools package.
+	doc/Makefile.in, snmp/Makefile.in, stop/Makefile.in: Updates for
+        version 0.1.9 of the stools package.
 
 2001-02-16 15:13  schoenw
 
@@ -1643,8 +1935,8 @@
 
 	* Makefile.in, NEWS, config.h.in, configure, configure.in,
 	doc/Makefile.in, scli/Makefile.in, snmp/Makefile.in,
-	stub/Makefile.in: Added a few more configure checks and bumped
-        version number.
+	stop/Makefile.in, stop/stop.h, stub/Makefile.in: Added a few more
+        configure checks and bumped version number.
 
 2001-02-15 12:59  schoenw
 
@@ -1657,7 +1949,8 @@
 
 2001-02-15 12:57  schoenw
 
-	* stub/: stools.c, stools.h: Some prototype fixes.
+	* stub/stools.c, stub/stools.h, stop/process.c: Some prototype
+        fixes.
 
 2001-02-14 14:27  schoenw
 
@@ -1665,6 +1958,7 @@
 	configure.in, doc/Makefile.in, scli/Makefile.in, scli/cmds.c,
 	scli/interface.c, scli/scli.1, scli/system.c, snmp/Makefile.in,
 	snmp/g_message.c, snmp/g_snmp.c, snmp/g_snmp.h, snmp/g_transport.c,
+	stop/Makefile.in, stop/interface.c, stop/stop.1, stop/stop.c,
 	stub/Makefile.in: Documentation updates, fixes for constructions
 	that violate ANSI C, minor bug fixes and improved scli help output.
 
@@ -1689,13 +1983,15 @@
 	snmp/g_security.c, snmp/g_security.h, snmp/g_session.c,
 	snmp/g_session.h, snmp/g_sha.c, snmp/g_sha.h, snmp/g_snmp.c,
 	snmp/g_snmp.h, snmp/g_snmp_table.c, snmp/g_snmp_table.h,
-	snmp/g_transport.c, snmp/g_transport.h, stub/Makefile.am,
-	stub/Makefile.in, stub/entity-mib.c, stub/entity-mib.h,
-	stub/host-resources-mib.c, stub/host-resources-mib.h,
-	stub/if-mib.c, stub/if-mib.h, stub/ip-mib.c, stub/ip-mib.h,
-	stub/snmpv2-mib.c, stub/snmpv2-mib.h, stub/stools.c, stub/stools.h,
-	stub/tcp-mib.c, stub/tcp-mib.h, stub/udp-mib.c, stub/udp-mib.h:
-        Initial revision
+	snmp/g_transport.c, snmp/g_transport.h, stop/Makefile.am,
+	stop/Makefile.in, stop/getopt.c, stop/getopt.h, stop/getopt1.c,
+	stop/interface.c, stop/process.c, stop/stop.1, stop/stop.c,
+	stop/stop.h, stub/Makefile.am, stub/Makefile.in, stub/entity-mib.c,
+	stub/entity-mib.h, stub/host-resources-mib.c,
+	stub/host-resources-mib.h, stub/if-mib.c, stub/if-mib.h,
+	stub/ip-mib.c, stub/ip-mib.h, stub/snmpv2-mib.c, stub/snmpv2-mib.h,
+	stub/stools.c, stub/stools.h, stub/tcp-mib.c, stub/tcp-mib.h,
+        stub/udp-mib.c, stub/udp-mib.h: Initial revision
 
 2001-02-13 16:16  schoenw
 
@@ -1713,11 +2009,13 @@
 	snmp/g_security.c, snmp/g_security.h, snmp/g_session.c,
 	snmp/g_session.h, snmp/g_sha.c, snmp/g_sha.h, snmp/g_snmp.c,
 	snmp/g_snmp.h, snmp/g_snmp_table.c, snmp/g_snmp_table.h,
-	snmp/g_transport.c, snmp/g_transport.h, stub/Makefile.am,
-	stub/Makefile.in, stub/entity-mib.c, stub/entity-mib.h,
-	stub/host-resources-mib.c, stub/host-resources-mib.h,
-	stub/if-mib.c, stub/if-mib.h, stub/ip-mib.c, stub/ip-mib.h,
-	stub/snmpv2-mib.c, stub/snmpv2-mib.h, stub/stools.c, stub/stools.h,
-	stub/tcp-mib.c, stub/tcp-mib.h, stub/udp-mib.c, stub/udp-mib.h:
-        initial stools version
+	snmp/g_transport.c, snmp/g_transport.h, stop/Makefile.am,
+	stop/Makefile.in, stop/getopt.c, stop/getopt.h, stop/getopt1.c,
+	stop/interface.c, stop/process.c, stop/stop.1, stop/stop.c,
+	stop/stop.h, stub/Makefile.am, stub/Makefile.in, stub/entity-mib.c,
+	stub/entity-mib.h, stub/host-resources-mib.c,
+	stub/host-resources-mib.h, stub/if-mib.c, stub/if-mib.h,
+	stub/ip-mib.c, stub/ip-mib.h, stub/snmpv2-mib.c, stub/snmpv2-mib.h,
+	stub/stools.c, stub/stools.h, stub/tcp-mib.c, stub/tcp-mib.h,
+        stub/udp-mib.c, stub/udp-mib.h: initial stools version
 

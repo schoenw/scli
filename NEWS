@@ -1,10 +1,18 @@
+Changes in scli 0.2.2:
+
+- scli supports a new "show nortel bridge vlan ports" command
+- scli supports a new "show bridge stp ports" command
+- improved the SNMP error handling
+- reworked the stub interface
+- minor bug fixes
+
 Changes in scli 0.2.1:
 
 - scli supports a new "set interface status" command
 - scli supports a new "set interface notifications" command
 - scli supports a new "set interface alias" command
 - scli supports a new "set interface promiscuous" command
-- scli supports a new "monitor printer console" command.
+- scli supports a new "monitor printer console" command
 - improved the XML formatting code
 - improved the documentation in scli.1
 - minor bug fixes
