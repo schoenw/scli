@@ -21,13 +21,11 @@ scli_LDADD	= -L../stub -lstub -L../snmp -lgsnmp $(GLIB_LIBS) $(XML_LIBS)
 #gscli_LDADD	= -L../stub -lstub -L../snmp -lgsnmp $(GTK_LIBS) $(GLIB_LIBS) $(XML_LIBS)
 man_MANS	= scli.1
 
-scli.1.modes:
+scli.1:
 	./scli -n -c "show scli modes" | \
 	awk '/^$$/		{ printf(".PP\n"); next } \
 	     /^[A-Z][A-Z  ]*$$/	{ printf(".SH %s\n", $$0); next } \
 	     /^    /		{ printf(".TP\n.B %s\n", $$0); next } \
 	     /^ $$/		{ next } \
 	     //			{ printf("%s\n", $$0) }' > scli.1.modes
-
-scli.1: scli.1.in scli.1.modes
 	m4 -P scli.1.in > scli.1
