@@ -91,7 +91,7 @@ STUBS			= if-mib.h if-mib.c \
 noinst_LIBRARIES	= libstub.a
 libstub_a_SOURCES	= $(STUBS)
 
-SMIDUMP			= ../../libsmi/tools/smidump
+SMIDUMP			= ../../libsmi/trunk/tools/smidump
 SMIPATH			= $(HOME)/mibs/cisco:$(HOME)/mibs/3com:$(HOME)/mibs/nortel:$(HOME)/mibs:/usr/local/share/mibs/ietf:/usr/local/share/mibs/iana:/usr/share/snmp/mibs
 
 export SMIPATH
