@@ -1041,12 +1041,11 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 	scli_close(interp);
     }
 
-    interp->peer = g_snmp_session_new(G_SNMP_TDOMAIN_UDP_IPV4, host);
+    interp->peer = g_snmp_session_new(G_SNMP_TDOMAIN_UDP_IPV4, host, port);
     if (! interp->peer) {
 	return SCLI_SNMP_NAME;
     }
     
-    interp->peer->port = port;
     interp->peer->rcomm = g_strdup(community ? community : "public");
     interp->peer->wcomm = g_strdup(interp->peer->rcomm);
     interp->peer->retries = 3;

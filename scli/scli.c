@@ -351,9 +351,9 @@ main(int argc, char **argv)
 	    norc = 1;
 	    break;
         case 'p':
-            if (atoi(optarg) <= 0 || atoi(optarg) > 65535) {
+            if (atoi(optarg) > 0 || atoi(optarg) < 65535) {
                 port = atoi(optarg);
-            }
+	    }
             break;
 	case 'r':
 	    if (atoi(optarg) > 0) {

@@ -994,7 +994,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "without the <regexp> argument will turn all regular expression\n"
 	  "options off. The currently defined regular expression options\n"
 	  "are \"extended\" for POSIX extended regular expressions and\n"
-	  "\"case-insensitive\" case insensitive matches.",
+	  "\"case-insensitive\" for case insensitive matches.",
 	  SCLI_CMD_FLAG_XML,
 	  "", NULL,
 	  set_scli_regex },
