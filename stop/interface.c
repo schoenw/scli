@@ -54,19 +54,28 @@ fmt_time_ticks(guint32 timeticks)
     
     now = time(NULL);
     now -= timeticks/100;
-    tm = gmtime(&now);
+    tm = localtime(&now);
 
 #ifdef HAVE_TM_ZONE
     gmt_offset = tm->tm_gmtoff;
 #else
     gmt_offset = timezone;
 #endif
+    
+    /*
+     * This code assumes that daylight savings time is always 1 hour,
+     * which is probably not true everywhere on the world. I have no
+     * clue how you get the real daylight savings time offset in a
+     * portable way.
+     */
+    
     g_snprintf(buffer, sizeof(buffer),
 	       "%04d-%02d-%02d %02d:%02d:%02d %c%02d:%02d",
 	       tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
 	       tm->tm_hour, tm->tm_min, tm->tm_sec,
 	       gmt_offset <= 0 ? '+' : '-',
-	       (int) ABS(gmt_offset) / 3600,
+	       (int) ABS(gmt_offset) / 3600
+	       + ((tm->tm_isdst > 0) ? 1 : 0),
 	       (int) (ABS(gmt_offset) / 60) % 60);
     
     return buffer;
