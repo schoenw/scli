@@ -32,20 +32,39 @@ productmib_proc_create_vlan(GSnmpSession *s, gint32 vlanId,
     gint32 createAndGo = PRODUCTMIB_A3COMVLANIFSTATUS_CREATEANDGO;
 
     productmib_get_a3ComVirtualGroup(s, &vg, 0);
+    if (s->error_status || !vg) return;
     vlanEntry = productmib_new_a3ComVlanIfEntry();
-    /* report error if there is no free index anymore ? */
-    if (vg && vg->a3ComNextAvailableVirtIfIndex && vlanEntry) {
-	/* check whether vg->a3ComNextAvailableVirtIfIndex is usable */
-	vlanEntry->a3ComVlanIfIndex = *vg->a3ComNextAvailableVirtIfIndex;
-	vlanEntry->a3ComVlanIfDescr = name;
-	vlanEntry->_a3ComVlanIfDescrLength = strlen(name);
-	vlanEntry->a3ComVlanIfGlobalIdentifier = &vlanId;
-	vlanEntry->a3ComVlanIfType = &type;
-	vlanEntry->a3ComVlanIfStatus = &createAndGo;
-	productmib_set_a3ComVlanIfEntry(s, vlanEntry, 0);
-	productmib_free_a3ComVlanIfEntry(vlanEntry);
+    if (! vlanEntry) return;
+    if (!vg->a3ComNextAvailableVirtIfIndex
+	|| vg->a3ComNextAvailableVirtIfIndex == 0) {
+	s->error_status = G_SNMP_ERR_PROCEDURE;
+	return;
     }
+    vlanEntry->a3ComVlanIfIndex = *vg->a3ComNextAvailableVirtIfIndex;
+    vlanEntry->a3ComVlanIfDescr = name;
+    vlanEntry->_a3ComVlanIfDescrLength = strlen(name);
+    vlanEntry->a3ComVlanIfGlobalIdentifier = &vlanId;
+    vlanEntry->a3ComVlanIfType = &type;
+    vlanEntry->a3ComVlanIfStatus = &createAndGo;
+    productmib_set_a3ComVlanIfEntry(s, vlanEntry, 0);
+    productmib_free_a3ComVlanIfEntry(vlanEntry);
 }
 
+
+
+void
+productmib_proc_delete_vlan(GSnmpSession *s, gint32 ifIndex)
+{
+    productmib_a3ComVlanIfEntry_t *vlanEntry;
+    gint32 destroy = PRODUCTMIB_A3COMVLANIFSTATUS_DESTROY;
+
+    productmib_get_a3ComVlanIfEntry(s, &vlanEntry, ifIndex,
+				    PRODUCTMIB_A3COMVLANIFSTATUS);
+    if (s->error_status || !vlanEntry) return;
+    vlanEntry->a3ComVlanIfStatus = &destroy;
+    productmib_set_a3ComVlanIfEntry(s, vlanEntry,
+				    PRODUCTMIB_A3COMVLANIFSTATUS);
+    productmib_free_a3ComVlanIfEntry(vlanEntry);
+}
 
 
