@@ -35,6 +35,31 @@ static GSnmpEnum const vlan_priority[] = {
 
 
 
+static void
+vlan_error(scli_interp_t *interp,
+	   rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry)
+{
+    g_string_sprintfa(interp->result, "vlan %d: ", vlanEntry->rcVlanId);
+    if (vlanEntry->rcVlanName) {
+	g_string_sprintfa(interp->result, "%.*s: ",
+			  (int) vlanEntry->_rcVlanNameLength,
+			  vlanEntry->rcVlanName);
+    }
+}
+
+
+
+static void
+vlan_snmp_error(scli_interp_t *interp,
+		rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry)
+{
+    vlan_error(interp, vlanEntry);
+    scli_snmp_error(interp);
+    g_string_append(interp->result, "\n");
+}
+
+
+
 static int
 match_vlan(regex_t *regex_vlan,
 	   rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry)
@@ -80,10 +105,13 @@ fmt_ports(GString *s, guchar *bits, gsize bits_len)
 	    }
 	} else {
 	    if (first >= 0) {
+		if (n) {
+		    g_string_append_c(s, ',');
+		}
 		if (first == i-1) {
-		    g_string_sprintfa(s, "%s%d", n ? ", " : "", first);
+		    g_string_sprintfa(s, "%d", first);
 		} else {
-		    g_string_sprintfa(s, "%s%d-%d", n ? ", " : "", first, i-1);
+		    g_string_sprintfa(s, "%d-%d", first, i-1);
 		}
 		n++;
 	    }
@@ -94,6 +122,78 @@ fmt_ports(GString *s, guchar *bits, gsize bits_len)
 	g_string_sprintfa(s, "%s%d-%d", n ? ", " : "", first, i-1);
     }
 }
+
+
+
+static int
+scan_ports(guchar *bits, gsize bits_len, char *string)
+{
+    char *p = string;
+    int i, from, to, off;
+
+    memset(bits, 0, bits_len);
+    while (*p) {
+	if (sscanf(p, "%d-%d%n", &from, &to, &off) == 2) {
+	    p += off;
+	} else if (sscanf(p, "%d%n", &from, &off) == 1) {
+	    p += off;
+	    to = from;
+	} else {
+	    memset(bits, 0, bits_len);
+	    return SCLI_ERROR;
+	}
+	if (from < 0 || to >= bits_len*8) {
+	    memset(bits, 0, bits_len);
+	    return SCLI_ERROR;
+	}
+	for (i = from; i < to+1; i++) {
+	    bits[i/8] |= (1 <<(7-(i%8)));
+	}
+	if (*p == ',') p++;
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+get_vlan_name_width(rapidcity_vlan_mib_rcVlanEntry_t **vlanTable)
+{
+    int i, name_width = 6;
+    
+    if (vlanTable) {
+	for (i = 0; vlanTable[i]; i++) {
+	    if (vlanTable[i]->_rcVlanNameLength > name_width) {
+		name_width = vlanTable[i]->_rcVlanNameLength;
+	    }
+	}
+    }
+    return name_width;
+}
+
+
+
+static int
+get_vlan_type_width(rapidcity_vlan_mib_rcVlanEntry_t **vlanTable)
+{
+    int i, type_width = 6;
+    
+    if (vlanTable) {
+	for (i = 0; vlanTable[i]; i++) {
+	    if (vlanTable[i]->rcVlanType) {
+		char const *label;
+		label = gsnmp_enum_get_label(rapidcity_vlan_mib_enums_rcVlanType,
+					     *vlanTable[i]->rcVlanType);
+		if (label && strlen(label) > type_width) {
+		    type_width = strlen(label);
+		}
+	    }
+	}
+    }
+    return type_width;
+}
+
 
 
 static void
@@ -118,8 +218,29 @@ fmt_nortel_baystack_vlan_details(GString *s,
     if (vlanEntry->rcVlanType
 	&& *vlanEntry->rcVlanType == RAPIDCITY_VLAN_MIB_RCVLANTYPE_BYPORT) {
 	if (vlanEntry->rcVlanPortMembers) {
-	    g_string_append(s, "\nPorts:       ");
+	    g_string_append(s, "\nMember:      ");
 	    fmt_ports(s, vlanEntry->rcVlanPortMembers, 32);
+	    g_string_append(s, "\n");
+	} else {
+	    g_string_append(s, "\n");
+	}
+	if (vlanEntry->rcVlanStaticMembers) {
+	    g_string_append(s, "Static:      ");
+	    fmt_ports(s, vlanEntry->rcVlanStaticMembers, 32);
+	    g_string_append(s, "\n");
+	} else {
+	    g_string_append(s, "\n");
+	}
+	if (vlanEntry->rcVlanPotentialMembers) {
+	    g_string_append(s, "Allowed:     ");
+	    fmt_ports(s, vlanEntry->rcVlanPotentialMembers, 32);
+	    g_string_append(s, "\n");
+	} else {
+	    g_string_append(s, "\n");
+	}
+	if (vlanEntry->rcVlanNotAllowToJoin) {
+	    g_string_append(s, "Disallowed:  ");
+	    fmt_ports(s, vlanEntry->rcVlanNotAllowToJoin, 32);
 	    g_string_append(s, "\n");
 	} else {
 	    g_string_append(s, "\n");
@@ -127,7 +248,8 @@ fmt_nortel_baystack_vlan_details(GString *s,
     }
 
     if (vlanEntry->rcVlanType
-	&& *vlanEntry->rcVlanType == RAPIDCITY_VLAN_MIB_RCVLANTYPE_BYPROTOCOLID) {
+	&& (*vlanEntry->rcVlanType
+	    == RAPIDCITY_VLAN_MIB_RCVLANTYPE_BYPROTOCOLID)) {
 	if (vlanEntry->rcVlanProtocolId) {
 	    g_string_append(s, " Protocol: ");
 	    xxx_enum(s, width, rapidcity_vlan_mib_enums_rcVlanProtocolId,
@@ -186,41 +308,49 @@ show_nortel_baystack_vlan_details(scli_interp_t *interp, int argc, char **argv)
 
 
 
-static int
-get_vlan_name_width(rapidcity_vlan_mib_rcVlanEntry_t **vlanTable)
+static void
+xml_nortel_baystack_vlan_info(xmlNodePtr root,
+			      rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry)
 {
-    int i, name_width = 6;
-    
-    if (vlanTable) {
-	for (i = 0; vlanTable[i]; i++) {
-	    if (vlanTable[i]->_rcVlanNameLength > name_width) {
-		name_width = vlanTable[i]->_rcVlanNameLength;
-	    }
-	}
+    xmlNodePtr tree, node;
+    const char *s;
+
+    tree = xmlNewChild(root, NULL, "vlan", NULL);
+    xml_set_prop(tree, "vlanid", "%d", vlanEntry->rcVlanId);
+
+    if (vlanEntry->rcVlanName && vlanEntry->_rcVlanNameLength) {
+	node = xmlNewChild(tree, NULL, "name", NULL);
+	xml_set_content(node, "%.*s",
+			(int) vlanEntry->_rcVlanNameLength,
+			vlanEntry->rcVlanName);
     }
-    return name_width;
-}
 
-
-
-static int
-get_vlan_type_width(rapidcity_vlan_mib_rcVlanEntry_t **vlanTable)
-{
-    int i, type_width = 6;
-    
-    if (vlanTable) {
-	for (i = 0; vlanTable[i]; i++) {
-	    if (vlanTable[i]->rcVlanType) {
-		char const *label;
-		label = gsnmp_enum_get_label(rapidcity_vlan_mib_enums_rcVlanType,
-					     *vlanTable[i]->rcVlanType);
-		if (label && strlen(label) > type_width) {
-		    type_width = strlen(label);
-		}
-	    }
-	}
+    s = fmt_enum(rapidcity_vlan_mib_enums_rcVlanType, vlanEntry->rcVlanType);
+    if (s) {
+	node = xmlNewChild(tree, NULL, "type", s);
     }
-    return type_width;
+
+    if (vlanEntry->rcVlanColor) {
+	node = xmlNewChild(tree, NULL, "color", NULL);
+	xml_set_content(node, "%d", *vlanEntry->rcVlanColor);
+    }
+
+    s = fmt_enum(vlan_priority, vlanEntry->rcVlanHighPriority);
+    if (s) {
+	node = xmlNewChild(tree, NULL, "priority", s);
+    }
+
+    s = fmt_enum(rapidcity_vlan_mib_enums_rcVlanRoutingEnable,
+		 vlanEntry->rcVlanRoutingEnable);
+    if (s) {
+	node = xmlNewChild(tree, NULL, "routing", s);
+    }
+
+    s = fmt_enum(rapidcity_vlan_mib_enums_rcVlanRowStatus,
+		 vlanEntry->rcVlanRowStatus);
+    if (s) {
+	node = xmlNewChild(tree, NULL, "status", s);
+    }
 }
 
 
@@ -292,14 +422,20 @@ show_nortel_baystack_vlan_info(scli_interp_t *interp, int argc, char **argv)
     type_width = get_vlan_type_width(vlanTable);
 
     if (vlanTable) {
-	g_string_sprintfa(interp->header,
-		  "VLAN %-*s %-*s COLOR PRIORITY ROUTING STATUS",
-			  name_width, "NAME", type_width, "TYPE");
-	
+	if (! scli_interp_xml(interp)) {
+	    g_string_sprintfa(interp->header,
+			      "VLAN %-*s %-*s COLOR PRIORITY ROUTING STATUS",
+			      name_width, "NAME", type_width, "TYPE");
+	}
 	for (i = 0; vlanTable[i]; i++) {
 	    if (match_vlan(regex_vlan, vlanTable[i])) {
-		fmt_nortel_baystack_vlan_info(interp->result, vlanTable[i],
-					      name_width, type_width);
+		if (scli_interp_xml(interp)) {
+		    xml_nortel_baystack_vlan_info(interp->xml_node,
+						  vlanTable[i]);
+		} else {
+		    fmt_nortel_baystack_vlan_info(interp->result, vlanTable[i],
+						  name_width, type_width);
+		}
 	    }
 	}
     }
@@ -328,14 +464,12 @@ delete_vlan(scli_interp_t *interp,
     xx->rcVlanRowStatus = &row_status;
 
     (void) rapidcity_vlan_mib_set_rcVlanEntry(interp->peer, xx);
-    if (interp->peer->error_status) {
-	g_string_sprintfa(interp->result, "%d: ",
-			  vlanEntry->rcVlanId);
-	scli_snmp_error(interp);
-	g_string_append(interp->result, "\n");
-    }
-
     rapidcity_vlan_mib_free_rcVlanEntry(xx);
+    
+    if (interp->peer->error_status) {
+	vlan_snmp_error(interp, vlanEntry);
+	return SCLI_ERROR;
+    }
 
     return SCLI_OK;
 }
@@ -368,7 +502,7 @@ delete_nortel_baystack_vlan(scli_interp_t *interp, int argc, char **argv)
     if (vlanTable) {
 	for (i = 0; vlanTable[i]; i++) {
 	    if (match_vlan(regex_vlan, vlanTable[i])) {
-		delete_vlan(interp, vlanTable[i]);
+		(void) delete_vlan(interp, vlanTable[i]);
 	    }
 	}
     }
@@ -385,8 +519,7 @@ static int
 create_nortel_baystack_vlan(scli_interp_t *interp, int argc, char **argv)
 {
     rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry;
-    int i, vlanId;
-    gint32 status, type;
+    gint32 vlanId, status, type;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -410,16 +543,94 @@ create_nortel_baystack_vlan(scli_interp_t *interp, int argc, char **argv)
     vlanEntry->_rcVlanNameLength = strlen(argv[2]);
     status = RAPIDCITY_VLAN_MIB_RCVLANROWSTATUS_CREATEANDGO;
     vlanEntry->rcVlanRowStatus = &status;
-    rapidcity_vlan_mib_set_rcVlanEntry(interp->peer, vlanEntry);
+
+    (void) rapidcity_vlan_mib_set_rcVlanEntry(interp->peer, vlanEntry);
+    rapidcity_vlan_mib_free_rcVlanEntry(vlanEntry);
+
     if (interp->peer->error_status) {
-	g_string_sprintfa(interp->result, "%d: ",
-			  vlanEntry->rcVlanId);
-	scli_snmp_error(interp);
-	g_string_append(interp->result, "\n");
+	vlan_snmp_error(interp, vlanEntry);
+	return SCLI_ERROR;
     }
 
-    (void) rapidcity_vlan_mib_free_rcVlanEntry(vlanEntry);
+    return SCLI_OK;
+}
 
+
+
+static int
+set_vlan_ports(scli_interp_t *interp,
+	       rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry,
+	       guchar *ports)
+{
+    rapidcity_vlan_mib_rcVlanEntry_t *xx;
+    
+    xx = rapidcity_vlan_mib_new_rcVlanEntry();
+    if (! xx) {
+	return SCLI_ERROR;
+    }
+
+    xx->rcVlanId = vlanEntry->rcVlanId;
+    xx->rcVlanPortMembers = ports;
+
+#if 0
+    /* At least the baystack switches return notWritable. */
+    xx->rcVlanPotentialMembers = ports;
+    xx->rcVlanStaticMembers = ports;
+#endif
+
+    (void) rapidcity_vlan_mib_set_rcVlanEntry(interp->peer, xx);
+    rapidcity_vlan_mib_free_rcVlanEntry(xx);
+
+    if (interp->peer->error_status) {
+	vlan_snmp_error(interp, vlanEntry);
+	return SCLI_ERROR;
+    }
+
+    return SCLI_OK;
+}
+
+
+static int
+set_nortel_baystack_vlan_ports(scli_interp_t *interp, int argc, char **argv)
+{
+    rapidcity_vlan_mib_rcVlanEntry_t **vlanTable = NULL;
+    regex_t _regex_vlan, *regex_vlan = NULL;
+    guchar ports[32];
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 3) {
+	return SCLI_SYNTAX;
+    }
+
+    regex_vlan = &_regex_vlan;
+    if (regcomp(regex_vlan, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	return SCLI_SYNTAX;
+    }
+
+    if (scan_ports(ports, sizeof(ports), argv[2]) != SCLI_OK) {
+	if (regex_vlan) regfree(regex_vlan);
+	return SCLI_SYNTAX;
+    }
+
+    if (rapidcity_vlan_mib_get_rcVlanTable(interp->peer, &vlanTable)) {
+	if (regex_vlan) regfree(regex_vlan);
+	return SCLI_ERROR;
+    }
+
+    if (vlanTable) {
+	for (i = 0; vlanTable[i]; i++) {
+	    if (match_vlan(regex_vlan, vlanTable[i])) {
+		(void) set_vlan_ports(interp, vlanTable[i], ports);
+	    }
+	}
+    }
+
+    if (vlanTable) rapidcity_vlan_mib_free_rcVlanTable(vlanTable);
+
+    if (regex_vlan) regfree(regex_vlan);
+        
     return SCLI_OK;
 }
 
@@ -445,6 +656,10 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "create a vlan on nortel (baystack) bridges",
 	  create_nortel_baystack_vlan },
+	{ "set nortel bridge vlan ports", "<regexp> <ports>",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "set vlan ports on nortel (baystack) bridges",
+	  set_nortel_baystack_vlan_ports },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
