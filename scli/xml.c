@@ -55,7 +55,8 @@ xml_set_content(xmlNodePtr node, const char *format, ...)
     va_end(args);
 
     if (s) {
-	xmlNodeSetContent(node, s);
+	xmlNodePtr text = xmlNewText(s);
+	if (text) xmlAddChild(node, text);
 	g_free(s);
     }
 }
@@ -77,7 +78,8 @@ xml_new_child(xmlNodePtr parent, xmlNsPtr ns, const xmlChar *name,
 	va_end(args);
 
 	if (s) {
-	    xmlNodeSetContent(node, s);
+	    xmlNodePtr text = xmlNewText(s);
+	    if (text) xmlAddChild(node, text);
 	    g_free(s);
 	}
     }
