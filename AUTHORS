@@ -1,6 +1,16 @@
-Juergen Schoenwaelder <schoenw@ibr.cs.tu-bs.de>
+Primary authors:
 
-The SNMP code was written by gxsnmp folks:
+- Juergen Schoenwaelder <schoenw@ibr.cs.tu-bs.de>
 
-Gregory McLean <?>
-Jochen Friedrich <jochen@scram.de>
+Many people contributed to the stools package by reporting problems,
+suggesting various improvements or submitting actual code:
+
+- Erik Schoenfelder <schoenfr@gaertner.de>
+- Frank Strauss <strauss@ibr.cs.tu-bs.de>
+- Oliver Wellnitz <wellnitz@ibr.cs.tu-bs.de>
+- John Sellens <jsellens@generalconcepts.com>
+
+The SNMP engine was written by gxsnmp folks:
+
+- Gregory McLean <?>
+- Jochen Friedrich <jochen@scram.de>
