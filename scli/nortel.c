@@ -22,14 +22,16 @@
 
 #include "scli.h"
 
+#include "snmpv2-tc.h"
+
 #include "rapid-city.h"
 #include "rapid-city-proc.h"
 
 
 
-static GSnmpEnum const vlan_priority[] = {
-    { RAPID_CITY_RCVLANHIGHPRIORITY_TRUE,	"high" },
-    { RAPID_CITY_RCVLANHIGHPRIORITY_FALSE,	"normal" },
+static GNetSnmpEnum const vlan_priority[] = {
+    { SNMPV2_TC_TRUTHVALUE_TRUE,	"high" },
+    { SNMPV2_TC_TRUTHVALUE_FALSE,	"normal" },
     { 0, NULL }
 };
 
@@ -38,7 +40,7 @@ static GSnmpEnum const vlan_priority[] = {
 static void
 fmt_vlanStatus(GString *s, rapid_city_rcVlanEntry_t *vlanEntry)
 {
-    static GSnmpEnum const rcVlanType[] = {
+    static GNetSnmpEnum const rcVlanType[] = {
 	{ RAPID_CITY_RCVLANTYPE_BYPORT,	"P" },
 	{ RAPID_CITY_RCVLANTYPE_BYIPSUBNET,	"I" },
 	{ RAPID_CITY_RCVLANTYPE_BYPROTOCOLID,	"O" },
@@ -47,25 +49,25 @@ fmt_vlanStatus(GString *s, rapid_city_rcVlanEntry_t *vlanEntry)
 	{ 0, NULL }
     };
     
-    static GSnmpEnum const rcVlanHighPriority[] = {
-	{ RAPID_CITY_RCVLANHIGHPRIORITY_TRUE,	"H" },
-	{ RAPID_CITY_RCVLANHIGHPRIORITY_FALSE,	"N" },
+    static GNetSnmpEnum const rcVlanHighPriority[] = {
+	{ SNMPV2_TC_TRUTHVALUE_TRUE,	"H" },
+	{ SNMPV2_TC_TRUTHVALUE_FALSE,	"N" },
 	{ 0, NULL }
     };
 
-    static GSnmpEnum const rcVlanRoutingEnable[] = {
-	{ RAPID_CITY_RCVLANROUTINGENABLE_TRUE,	"R" },
-	{ RAPID_CITY_RCVLANROUTINGENABLE_FALSE,	"N" },
+    static GNetSnmpEnum const rcVlanRoutingEnable[] = {
+	{ SNMPV2_TC_TRUTHVALUE_TRUE,	"R" },
+	{ SNMPV2_TC_TRUTHVALUE_FALSE,	"N" },
 	{ 0, NULL }
     };
 
-    static GSnmpEnum const rcVlanRowStatus[] = {
-	{ RAPID_CITY_RCVLANROWSTATUS_ACTIVE,	"A" },
-	{ RAPID_CITY_RCVLANROWSTATUS_NOTINSERVICE,	"S" },
-	{ RAPID_CITY_RCVLANROWSTATUS_NOTREADY,	"R" },
-	{ RAPID_CITY_RCVLANROWSTATUS_CREATEANDGO,	"G" },
-	{ RAPID_CITY_RCVLANROWSTATUS_CREATEANDWAIT,	"W" },
-	{ RAPID_CITY_RCVLANROWSTATUS_DESTROY,	"D" },
+    static GNetSnmpEnum const rcVlanRowStatus[] = {
+	{ SNMPV2_TC_ROWSTATUS_ACTIVE,	"A" },
+	{ SNMPV2_TC_ROWSTATUS_NOTINSERVICE,	"S" },
+	{ SNMPV2_TC_ROWSTATUS_NOTREADY,	"R" },
+	{ SNMPV2_TC_ROWSTATUS_CREATEANDGO,	"G" },
+	{ SNMPV2_TC_ROWSTATUS_CREATEANDWAIT,	"W" },
+	{ SNMPV2_TC_ROWSTATUS_DESTROY,	"D" },
 	{ 0, NULL }
     };
 
@@ -254,13 +256,13 @@ xml_nortel_bridge_vlan_details(xmlNodePtr root,
 	node = xmlNewChild(tree, NULL, "priority", s);
     }
 
-    s = fmt_enum(rapid_city_enums_rcVlanRoutingEnable,
+    s = fmt_enum(snmpv2_tc_enums_TruthValue,
 		 vlanEntry->rcVlanRoutingEnable);
     if (s) {
 	node = xmlNewChild(tree, NULL, "routing", s);
     }
 
-    s = fmt_enum(rapid_city_enums_rcVlanRowStatus,
+    s = fmt_enum(snmpv2_tc_enums_RowStatus,
 		 vlanEntry->rcVlanRowStatus);
     if (s) {
 	node = xmlNewChild(tree, NULL, "status", s);
@@ -318,11 +320,11 @@ fmt_nortel_bridge_vlan_details(GString *s,
     e = fmt_enum(vlan_priority, vlanEntry->rcVlanHighPriority);
     g_string_sprintfa(s, "Priority:    %-*s", width, e ? e : "");
 
-    e = fmt_enum(rapid_city_enums_rcVlanRowStatus,
+    e = fmt_enum(snmpv2_tc_enums_RowStatus,
 		 vlanEntry->rcVlanRowStatus);
     g_string_sprintfa(s, " Status:   %-*s\n", width, e ? e : "");
 
-    e = fmt_enum(rapid_city_enums_rcVlanRoutingEnable,
+    e = fmt_enum(snmpv2_tc_enums_TruthValue,
 		 vlanEntry->rcVlanRoutingEnable);
     g_string_sprintfa(s, "Routing:     %-*s", width, e ? e : "");
 
@@ -549,27 +551,27 @@ static void
 fmt_nortel_bridge_vlan_port(GString *s,
 			    rapid_city_rcVlanPortEntry_t *vlanPortEntry)
 {
-    static GSnmpEnum const rapid_city_enums_rcVlanPortType[] = {
+    static GNetSnmpEnum const rapid_city_enums_rcVlanPortType[] = {
 	{ RAPID_CITY_RCVLANPORTTYPE_ACCESS,	"A" },
 	{ RAPID_CITY_RCVLANPORTTYPE_TRUNK,	"T" },
 	{ 0, NULL }
     };
 
-    static GSnmpEnum const rcVlanPortPerformTagging[] = {
-	{ RAPID_CITY_RCVLANPORTPERFORMTAGGING_TRUE,	"T" },
-	{ RAPID_CITY_RCVLANPORTPERFORMTAGGING_FALSE,	"N" },
+    static GNetSnmpEnum const rcVlanPortPerformTagging[] = {
+	{ SNMPV2_TC_TRUTHVALUE_TRUE,	"T" },
+	{ SNMPV2_TC_TRUTHVALUE_FALSE,	"N" },
 	{ 0, NULL }
     };
     
-    static GSnmpEnum const rcVlanPortDiscardTaggedFrames[] = {
-	{ RAPID_CITY_RCVLANPORTDISCARDTAGGEDFRAMES_TRUE,	"D" },
-	{ RAPID_CITY_RCVLANPORTDISCARDTAGGEDFRAMES_FALSE,	"N" },
+    static GNetSnmpEnum const rcVlanPortDiscardTaggedFrames[] = {
+	{ SNMPV2_TC_TRUTHVALUE_TRUE,	"D" },
+	{ SNMPV2_TC_TRUTHVALUE_FALSE,	"N" },
 	{ 0, NULL }
     };
 
-    static GSnmpEnum const rcVlanPortDiscardUntaggedFrames[] = {
-	{ RAPID_CITY_RCVLANPORTDISCARDUNTAGGEDFRAMES_TRUE,	"D" },
-	{ RAPID_CITY_RCVLANPORTDISCARDUNTAGGEDFRAMES_FALSE,	"N" },
+    static GNetSnmpEnum const rcVlanPortDiscardUntaggedFrames[] = {
+	{ SNMPV2_TC_TRUTHVALUE_TRUE,	"D" },
+	{ SNMPV2_TC_TRUTHVALUE_FALSE,	"N" },
 	{ 0, NULL }
     };
 
