@@ -179,9 +179,8 @@ show_nortel_baystack_vlan_details(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (vlanTable) rapidcity_vlan_mib_free_rcVlanTable(vlanTable);
-
     if (regex_vlan) regfree(regex_vlan);
-
+    
     return SCLI_OK;
 }
 
@@ -306,7 +305,6 @@ show_nortel_baystack_vlan_info(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (vlanTable) rapidcity_vlan_mib_free_rcVlanTable(vlanTable);
-
     if (regex_vlan) regfree(regex_vlan);
     
     return SCLI_OK;
@@ -363,7 +361,7 @@ delete_nortel_baystack_vlan(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (rapidcity_vlan_mib_get_rcVlanTable(interp->peer, &vlanTable)) {
-	if (regex_vlan) regfree(regex_vlan);
+	regfree(regex_vlan);
 	return SCLI_ERROR;
     }
 
@@ -376,8 +374,7 @@ delete_nortel_baystack_vlan(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (vlanTable) rapidcity_vlan_mib_free_rcVlanTable(vlanTable);
-
-    if (regex_vlan) regfree(regex_vlan);
+    regfree(regex_vlan);
     
     return SCLI_OK;
 }
@@ -397,7 +394,9 @@ create_nortel_baystack_vlan(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    vlanId = atoi(argv[1]);
+    if (sscanf(argv[1], "%d", &vlanId) != 1) {
+	return SCLI_SYNTAX;
+    }
 
     vlanEntry = rapidcity_vlan_mib_new_rcVlanEntry();
     if (! vlanEntry) {

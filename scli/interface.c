@@ -819,12 +819,12 @@ set_if_status(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (! gsnmp_enum_get_number(if_mib_enums_ifAdminStatus, argv[2], &value)) {
-	if (regex_iface) regfree(regex_iface);
+	regfree(regex_iface);
 	return SCLI_SYNTAX;
     }
 	
     if (if_mib_get_ifTable(interp->peer, &ifTable)) {
-	if (regex_iface) regfree(regex_iface);
+	regfree(regex_iface);
 	return SCLI_ERROR;
     }
 
@@ -838,8 +838,7 @@ set_if_status(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (ifTable) if_mib_free_ifTable(ifTable);
-
-    if (regex_iface) regfree(regex_iface);
+    regfree(regex_iface);
 
     return SCLI_OK;
 }
@@ -874,6 +873,20 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "set administrative interface status",
 	  set_if_status },
+#if 0
+	{ "set interface alias", "<regexp> <value>",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "set interface alias",
+	  set_if_alias },
+	{ "set interface notifications", "<regexp> <value>",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "set interface notifications",
+	  set_if_notifications },
+	{ "set interface promiscuous", "<regexp> <bool>",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "set interface promiscuous",
+	  set_if_promiscuous },
+#endif
 	{ NULL, NULL, 0, NULL, NULL }
     };
     

@@ -13,7 +13,7 @@
 .\" along with this program; see the file COPYING.  If not, write to
 .\" the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 .\"
-.TH SCLI 1 "June 18, 2001"
+.TH SCLI 1 "August 26, 2001"
 .\" Please update the above date whenever this man page is modified.
 .\"
 .\" Some roff macros, for reference:
@@ -86,7 +86,7 @@ transmitted. The default initial timeout interval is 200 milli-seconds.
 .B \-x, \-\-xml
 Generate XML output instead of the default output which is optimized
 for humans and more difficult to parse by programs.
-.SH COMMANDS
+.SH COMMAND OVERVIEW
 \fBscli\fP is a simple command interpreter. \fBscli\fP commands are
 organized in a hierarchy. This section only describes the top-level
 commands. Invoke the \fIhelp\fP command described below to get a
@@ -126,6 +126,47 @@ will recursively invoke all commands in the subtree identified by the
 entered command. In particular, entering \fIshow\fR will cause
 \fBscli\fP to retrieve and display all information accessible from the
 remote SNMP agent.
+.SH INTERFACE MODE
+The interface mode is based on the IF-MIB as published in RFC 2863 and
+provides the following commands:
+.TP
+.B show interface info [<regexp>]
+.TP
+.B show interface details [<regexp>]
+.TP
+.B show interface stats [<regexp>]
+.TP
+.B show interface stack
+.TP
+.B set interface status <regexp> <value>
+.TP
+.B monitor interface stats [<regexp>]
+.P
+The \fBshow interface info\fP command shows summary information about
+all selected interfaces. The regular expression <regexp> is matched
+against the interface descriptions to select the interfaces of interest.
+The command generates a table which displays the interface number, its
+status (administrative status, operational status, connector present,
+promiscuous mode), the maximum transfer unit (MTU) of the interface,
+the interface type and speed, the interface's local name and its
+description.
+.P
+The \fBshow interface details\fP command describes the selected
+interfaces in more details. The regular expression <regexp> is matched
+against the interface descriptions to select the interfaces of
+interest. <xxx>
+.P
+The \fBshow interface stats\fP command <xxx>
+.P
+The \fBshow interface stack\fP command shows the stacking order of the
+interfaces. <xxx>
+.P
+THe \fBset interface status <regexp> <value>\fP command modifies the
+administrative status of all selected interfaces. The regular
+expression <regexp> is matched against the interface descriptions to
+select the interfaces of interest. The <value> parameter must be one
+of the strings "up", "down" or "testing".
+
 .SH INTERACTIVE MONITOR COMMANDS
 Several single-key commands are recognized while \fBscli\fP is running
 in monitor mode:
@@ -194,6 +235,9 @@ Alias expansion only happens once.
 .P
 Aliases are not expanded when the \fBscli\fP interpreter is running
 in non-interactive mode.
+.SH REGULAR EXPRESSIONS
+\fBscli\fP generally uses POSIX.2 Extended Regular Expressions. The
+regular expression matching is case sensitive.
 .SH READLINE
 \fBscli\fP supports the GNU readline library. The GNU readline library
 provides command line editing as well as command completion
@@ -225,6 +269,6 @@ available at:
 .PP
 <http://www.ibr.cs.tu-bs.de/projects/stools/>
 .SH "SEE ALSO"
-.\" .BR foo (1), 
+.BR regex(7)
 .SH AUTHOR
 Juergen Schoenwaelder <schoenw@ibr.cs.tu-bs.de>.

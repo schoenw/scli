@@ -319,6 +319,14 @@ next_token(char *string, char *out)
 		goto done;
 	    }
 	    break;
+	case '#':
+	    if (dquote || squote) {
+		*d++ = *p++;		/* just copy */
+	    } else {
+		*d = 0;
+		return NULL;
+	    }
+	    break;
 	default:
 	    *d++ = *p++;		/* just copy */
 	    break;
@@ -345,7 +353,7 @@ next_token(char *string, char *out)
  * to free up all of this storage.
  *
  * XXX This code should handle backslash substitutions.
- * XXX This code should handle ; as command separators.
+ * XXX This code should allow ; as command separator.
  */
 
 int
@@ -372,13 +380,11 @@ scli_split(char *string, int *argc, char ***argv)
 	return SCLI_OK;
     }
     
-    do {
+    while (p && *p) {
 	p = next_token(p, d);
-	if (*d) {
-	    (*argv)[(*argc)++] = d;
-	    d += strlen(d) + 1;
-	}
-    } while (p);
+	(*argv)[(*argc)++] = d;
+	d += strlen(d) + 1;
+    }
 
     return SCLI_OK;
 }
@@ -389,7 +395,7 @@ static char *
 expand_alias(scli_interp_t *interp, char *cmd)
 {
     char *rest, *token;
-    char *expanded_cmd = NULL;
+    char *new_cmd = NULL;
     GSList *elem;
     
     /*
@@ -403,13 +409,9 @@ expand_alias(scli_interp_t *interp, char *cmd)
 	for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
 	    scli_alias_t *alias = (scli_alias_t *) elem->data;
 	    if (strcmp(alias->name, token) == 0) {
-		expanded_cmd = g_malloc(strlen(cmd) + strlen(alias->value) + 2);
-		strcpy(expanded_cmd, alias->value);
-		strcat(expanded_cmd, " ");
-		if (rest) {
-		    strcat(expanded_cmd, rest);
-		}
-		return expanded_cmd;
+		new_cmd = g_strdup_printf("%s %s",
+					  alias->value, rest ? rest : "");
+		return new_cmd;
 	    }
 	}
     }
