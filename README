@@ -17,8 +17,7 @@ Description
 
 Compiling
 
-  To compile the package, you need to have the following packages
-  available:
+  To compile stools, you need the following packages:
 
   - GNU readline version 4.X
   - glib version 1.2.X
