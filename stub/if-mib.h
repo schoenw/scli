@@ -343,12 +343,12 @@ if_mib_free_interfaces(if_mib_interfaces_t *interfaces);
 typedef struct {
     gint32   ifIndex;
     guchar   *ifDescr;
-    gsize    _ifDescrLength;
+    guint16  _ifDescrLength;	/* (0..255) */
     gint32   *ifType;
     gint32   *ifMtu;
     guint32  *ifSpeed;
     guchar   *ifPhysAddress;
-    gsize    _ifPhysAddressLength;
+    guint16  _ifPhysAddressLength;	/* (0..65535) */
     gint32   *ifAdminStatus;
     gint32   *ifOperStatus;
     guint32  *ifLastChange;
@@ -365,7 +365,7 @@ typedef struct {
     guint32  *ifOutErrors;
     guint32  *ifOutQLen;
     guint32  *ifSpecific;
-    gsize    _ifSpecificLength;
+    guint16  _ifSpecificLength;	/* (0..128) */
 } if_mib_ifEntry_t;
 
 extern void
@@ -434,7 +434,7 @@ if_mib_free_ifMIBObjects(if_mib_ifMIBObjects_t *ifMIBObjects);
 typedef struct {
     gint32   ifIndex;
     guchar   *ifName;
-    gsize    _ifNameLength;
+    guint16  _ifNameLength;	/* (0..255) */
     guint32  *ifInMulticastPkts;
     guint32  *ifInBroadcastPkts;
     guint32  *ifOutMulticastPkts;
@@ -452,7 +452,7 @@ typedef struct {
     gint32   *ifPromiscuousMode;
     gint32   *ifConnectorPresent;
     guchar   *ifAlias;
-    gsize    _ifAliasLength;
+    guint16  _ifAliasLength;	/* (0..64) */
     guint32  *ifCounterDiscontinuityTime;
 } if_mib_ifXEntry_t;
 
@@ -520,12 +520,12 @@ typedef struct {
     gint32   *ifTestId;
     gint32   *ifTestStatus;
     guint32  *ifTestType;
-    gsize    _ifTestTypeLength;
+    guint16  _ifTestTypeLength;	/* (0..128) */
     gint32   *ifTestResult;
     guint32  *ifTestCode;
-    gsize    _ifTestCodeLength;
+    guint16  _ifTestCodeLength;	/* (0..128) */
     guchar   *ifTestOwner;
-    gsize    _ifTestOwnerLength;
+    guint16  _ifTestOwnerLength;	/* (0..255) */
 } if_mib_ifTestEntry_t;
 
 extern void
@@ -556,7 +556,7 @@ if_mib_free_ifTestEntry(if_mib_ifTestEntry_t *ifTestEntry);
 typedef struct {
     gint32   ifIndex;
     guchar   ifRcvAddressAddress[128];
-    gsize    _ifRcvAddressAddressLength;
+    guint16  _ifRcvAddressAddressLength;	/* (0..65535) */
     gint32   *ifRcvAddressStatus;
     gint32   *ifRcvAddressType;
 } if_mib_ifRcvAddressEntry_t;
@@ -571,7 +571,7 @@ extern if_mib_ifRcvAddressEntry_t *
 if_mib_new_ifRcvAddressEntry(void);
 
 extern void
-if_mib_get_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t **ifRcvAddressEntry, gint32 ifIndex, guchar *ifRcvAddressAddress, gsize _ifRcvAddressAddressLength, gint mask);
+if_mib_get_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t **ifRcvAddressEntry, gint32 ifIndex, guchar *ifRcvAddressAddress, guint16 _ifRcvAddressAddressLength, gint mask);
 
 extern void
 if_mib_set_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry, gint mask);

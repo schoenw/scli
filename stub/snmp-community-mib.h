@@ -55,7 +55,8 @@ extern GSnmpEnum const snmp_community_mib_enums_snmpCommunityStatus[];
 #define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS	0x40 
 
 typedef struct {
-    guchar   snmpCommunityIndex[32];
+#define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYINDEXLENGTH 32
+    guchar   snmpCommunityIndex[SNMP_COMMUNITY_MIB_SNMPCOMMUNITYINDEXLENGTH];
     gsize    _snmpCommunityIndexLength;
     guchar   *snmpCommunityName;
     gsize    _snmpCommunityNameLength;
@@ -97,7 +98,8 @@ snmp_community_mib_free_snmpCommunityEntry(snmp_community_mib_snmpCommunityEntry
 #define SNMP_COMMUNITY_MIB_SNMPTARGETADDRMMS	0x2 
 
 typedef struct {
-    guchar   snmpTargetAddrName[32];
+#define SNMP_TARGET_MIB_SNMPTARGETADDRNAMELENGTH 32
+    guchar   snmpTargetAddrName[SNMP_TARGET_MIB_SNMPTARGETADDRNAMELENGTH];
     gsize    _snmpTargetAddrNameLength;
     guchar   *snmpTargetAddrTMask;
     gsize    _snmpTargetAddrTMaskLength;

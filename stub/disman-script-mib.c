@@ -173,7 +173,7 @@ typedef struct {
 } attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint16 len,
                 guint idx, attribute_t *attributes, gint mask)
 {
     int i;
@@ -190,7 +190,7 @@ add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
 }
 
 static int
-lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
+lookup(GSnmpVarBind *vb, guint32 const *base, guint16 const base_len,
 	    attribute_t *attributes, guint32 *idx)
 {
     int i;
@@ -431,6 +431,7 @@ disman_script_mib_get_smLangEntry(GSnmpSession *s, disman_script_mib_smLangEntry
     len = pack_smLangEntry(base, smLangIndex);
     if (len < 0) {
         g_warning("illegal smLangEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -599,6 +600,7 @@ disman_script_mib_get_smExtsnEntry(GSnmpSession *s, disman_script_mib_smExtsnEnt
     len = pack_smExtsnEntry(base, smLangIndex, smExtsnIndex);
     if (len < 0) {
         g_warning("illegal smExtsnEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -652,10 +654,12 @@ disman_script_mib_new_smScriptEntry()
 static int
 unpack_smScriptEntry(GSnmpVarBind *vb, disman_script_mib_smScriptEntry_t *smScriptEntry)
 {
-    int i, len, idx = 12;
+    int idx = 12;
+    guint16 i, len;
 
     if (vb->id_len < idx) return -1;
     len = vb->id[idx++];
+    if (len > 32) return -1;
     if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
         smScriptEntry->smScriptOwner[i] = vb->id[idx++];
@@ -663,6 +667,7 @@ unpack_smScriptEntry(GSnmpVarBind *vb, disman_script_mib_smScriptEntry_t *smScri
     smScriptEntry->_smScriptOwnerLength = len;
     if (vb->id_len < idx) return -1;
     len = vb->id[idx++];
+    if (len < 1 || len > 32) return -1;
     if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
         smScriptEntry->smScriptName[i] = vb->id[idx++];
@@ -673,18 +678,21 @@ unpack_smScriptEntry(GSnmpVarBind *vb, disman_script_mib_smScriptEntry_t *smScri
 }
 
 static int
-pack_smScriptEntry(guint32 *base, guchar *smScriptOwner, gsize _smScriptOwnerLength, guchar *smScriptName, gsize _smScriptNameLength)
+pack_smScriptEntry(guint32 *base, guchar *smScriptOwner, guint16 _smScriptOwnerLength, guchar *smScriptName, guint16 _smScriptNameLength)
 {
-    int i, len, idx = 12;
+    int idx = 12;
+    guint16 i, len;
 
     len = _smScriptOwnerLength;
     base[idx++] = len;
+    if (len > 32) return -1;
     for (i = 0; i < len; i++) {
         base[idx++] = smScriptOwner[i];
         if (idx >= 128) return -1;
     }
     len = _smScriptNameLength;
     base[idx++] = len;
+    if (len < 1 || len > 32) return -1;
     for (i = 0; i < len; i++) {
         base[idx++] = smScriptName[i];
         if (idx >= 128) return -1;
@@ -787,7 +795,7 @@ disman_script_mib_get_smScriptTable(GSnmpSession *s, disman_script_mib_smScriptE
 }
 
 void
-disman_script_mib_get_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t **smScriptEntry, guchar *smScriptOwner, gsize _smScriptOwnerLength, guchar *smScriptName, gsize _smScriptNameLength, gint mask)
+disman_script_mib_get_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t **smScriptEntry, guchar *smScriptOwner, guint16 _smScriptOwnerLength, guchar *smScriptName, guint16 _smScriptNameLength, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     guint32 base[128];
@@ -798,6 +806,7 @@ disman_script_mib_get_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptE
     len = pack_smScriptEntry(base, smScriptOwner, _smScriptOwnerLength, smScriptName, _smScriptNameLength);
     if (len < 0) {
         g_warning("illegal smScriptEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -824,6 +833,7 @@ disman_script_mib_set_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptE
     len = pack_smScriptEntry(base, smScriptEntry->smScriptOwner, smScriptEntry->_smScriptOwnerLength, smScriptEntry->smScriptName, smScriptEntry->_smScriptNameLength);
     if (len < 0) {
         g_warning("illegal smScriptEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -910,10 +920,12 @@ disman_script_mib_new_smCodeEntry()
 static int
 unpack_smCodeEntry(GSnmpVarBind *vb, disman_script_mib_smCodeEntry_t *smCodeEntry)
 {
-    int i, len, idx = 12;
+    int idx = 12;
+    guint16 i, len;
 
     if (vb->id_len < idx) return -1;
     len = vb->id[idx++];
+    if (len > 32) return -1;
     if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
         smCodeEntry->smScriptOwner[i] = vb->id[idx++];
@@ -921,6 +933,7 @@ unpack_smCodeEntry(GSnmpVarBind *vb, disman_script_mib_smCodeEntry_t *smCodeEntr
     smCodeEntry->_smScriptOwnerLength = len;
     if (vb->id_len < idx) return -1;
     len = vb->id[idx++];
+    if (len < 1 || len > 32) return -1;
     if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
         smCodeEntry->smScriptName[i] = vb->id[idx++];
@@ -933,18 +946,21 @@ unpack_smCodeEntry(GSnmpVarBind *vb, disman_script_mib_smCodeEntry_t *smCodeEntr
 }
 
 static int
-pack_smCodeEntry(guint32 *base, guchar *smScriptOwner, gsize _smScriptOwnerLength, guchar *smScriptName, gsize _smScriptNameLength, guint32 smCodeIndex)
+pack_smCodeEntry(guint32 *base, guchar *smScriptOwner, guint16 _smScriptOwnerLength, guchar *smScriptName, guint16 _smScriptNameLength, guint32 smCodeIndex)
 {
-    int i, len, idx = 12;
+    int idx = 12;
+    guint16 i, len;
 
     len = _smScriptOwnerLength;
     base[idx++] = len;
+    if (len > 32) return -1;
     for (i = 0; i < len; i++) {
         base[idx++] = smScriptOwner[i];
         if (idx >= 128) return -1;
     }
     len = _smScriptNameLength;
     base[idx++] = len;
+    if (len < 1 || len > 32) return -1;
     for (i = 0; i < len; i++) {
         base[idx++] = smScriptName[i];
         if (idx >= 128) return -1;
@@ -1024,7 +1040,7 @@ disman_script_mib_get_smCodeTable(GSnmpSession *s, disman_script_mib_smCodeEntry
 }
 
 void
-disman_script_mib_get_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t **smCodeEntry, guchar *smScriptOwner, gsize _smScriptOwnerLength, guchar *smScriptName, gsize _smScriptNameLength, guint32 smCodeIndex, gint mask)
+disman_script_mib_get_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t **smCodeEntry, guchar *smScriptOwner, guint16 _smScriptOwnerLength, guchar *smScriptName, guint16 _smScriptNameLength, guint32 smCodeIndex, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     guint32 base[128];
@@ -1035,6 +1051,7 @@ disman_script_mib_get_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry
     len = pack_smCodeEntry(base, smScriptOwner, _smScriptOwnerLength, smScriptName, _smScriptNameLength, smCodeIndex);
     if (len < 0) {
         g_warning("illegal smCodeEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -1061,6 +1078,7 @@ disman_script_mib_set_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry
     len = pack_smCodeEntry(base, smCodeEntry->smScriptOwner, smCodeEntry->_smScriptOwnerLength, smCodeEntry->smScriptName, smCodeEntry->_smScriptNameLength, smCodeEntry->smCodeIndex);
     if (len < 0) {
         g_warning("illegal smCodeEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -1123,10 +1141,12 @@ disman_script_mib_new_smLaunchEntry()
 static int
 unpack_smLaunchEntry(GSnmpVarBind *vb, disman_script_mib_smLaunchEntry_t *smLaunchEntry)
 {
-    int i, len, idx = 12;
+    int idx = 12;
+    guint16 i, len;
 
     if (vb->id_len < idx) return -1;
     len = vb->id[idx++];
+    if (len > 32) return -1;
     if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
         smLaunchEntry->smLaunchOwner[i] = vb->id[idx++];
@@ -1134,6 +1154,7 @@ unpack_smLaunchEntry(GSnmpVarBind *vb, disman_script_mib_smLaunchEntry_t *smLaun
     smLaunchEntry->_smLaunchOwnerLength = len;
     if (vb->id_len < idx) return -1;
     len = vb->id[idx++];
+    if (len < 1 || len > 32) return -1;
     if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
         smLaunchEntry->smLaunchName[i] = vb->id[idx++];
@@ -1144,18 +1165,21 @@ unpack_smLaunchEntry(GSnmpVarBind *vb, disman_script_mib_smLaunchEntry_t *smLaun
 }
 
 static int
-pack_smLaunchEntry(guint32 *base, guchar *smLaunchOwner, gsize _smLaunchOwnerLength, guchar *smLaunchName, gsize _smLaunchNameLength)
+pack_smLaunchEntry(guint32 *base, guchar *smLaunchOwner, guint16 _smLaunchOwnerLength, guchar *smLaunchName, guint16 _smLaunchNameLength)
 {
-    int i, len, idx = 12;
+    int idx = 12;
+    guint16 i, len;
 
     len = _smLaunchOwnerLength;
     base[idx++] = len;
+    if (len > 32) return -1;
     for (i = 0; i < len; i++) {
         base[idx++] = smLaunchOwner[i];
         if (idx >= 128) return -1;
     }
     len = _smLaunchNameLength;
     base[idx++] = len;
+    if (len < 1 || len > 32) return -1;
     for (i = 0; i < len; i++) {
         base[idx++] = smLaunchName[i];
         if (idx >= 128) return -1;
@@ -1283,7 +1307,7 @@ disman_script_mib_get_smLaunchTable(GSnmpSession *s, disman_script_mib_smLaunchE
 }
 
 void
-disman_script_mib_get_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t **smLaunchEntry, guchar *smLaunchOwner, gsize _smLaunchOwnerLength, guchar *smLaunchName, gsize _smLaunchNameLength, gint mask)
+disman_script_mib_get_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t **smLaunchEntry, guchar *smLaunchOwner, guint16 _smLaunchOwnerLength, guchar *smLaunchName, guint16 _smLaunchNameLength, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     guint32 base[128];
@@ -1294,6 +1318,7 @@ disman_script_mib_get_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchE
     len = pack_smLaunchEntry(base, smLaunchOwner, _smLaunchOwnerLength, smLaunchName, _smLaunchNameLength);
     if (len < 0) {
         g_warning("illegal smLaunchEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -1320,6 +1345,7 @@ disman_script_mib_set_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchE
     len = pack_smLaunchEntry(base, smLaunchEntry->smLaunchOwner, smLaunchEntry->_smLaunchOwnerLength, smLaunchEntry->smLaunchName, smLaunchEntry->_smLaunchNameLength);
     if (len < 0) {
         g_warning("illegal smLaunchEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -1448,10 +1474,12 @@ disman_script_mib_new_smRunEntry()
 static int
 unpack_smRunEntry(GSnmpVarBind *vb, disman_script_mib_smRunEntry_t *smRunEntry)
 {
-    int i, len, idx = 12;
+    int idx = 12;
+    guint16 i, len;
 
     if (vb->id_len < idx) return -1;
     len = vb->id[idx++];
+    if (len > 32) return -1;
     if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
         smRunEntry->smLaunchOwner[i] = vb->id[idx++];
@@ -1459,6 +1487,7 @@ unpack_smRunEntry(GSnmpVarBind *vb, disman_script_mib_smRunEntry_t *smRunEntry)
     smRunEntry->_smLaunchOwnerLength = len;
     if (vb->id_len < idx) return -1;
     len = vb->id[idx++];
+    if (len < 1 || len > 32) return -1;
     if (vb->id_len < idx + len) return -1;
     for (i = 0; i < len; i++) {
         smRunEntry->smLaunchName[i] = vb->id[idx++];
@@ -1471,18 +1500,21 @@ unpack_smRunEntry(GSnmpVarBind *vb, disman_script_mib_smRunEntry_t *smRunEntry)
 }
 
 static int
-pack_smRunEntry(guint32 *base, guchar *smLaunchOwner, gsize _smLaunchOwnerLength, guchar *smLaunchName, gsize _smLaunchNameLength, gint32 smRunIndex)
+pack_smRunEntry(guint32 *base, guchar *smLaunchOwner, guint16 _smLaunchOwnerLength, guchar *smLaunchName, guint16 _smLaunchNameLength, gint32 smRunIndex)
 {
-    int i, len, idx = 12;
+    int idx = 12;
+    guint16 i, len;
 
     len = _smLaunchOwnerLength;
     base[idx++] = len;
+    if (len > 32) return -1;
     for (i = 0; i < len; i++) {
         base[idx++] = smLaunchOwner[i];
         if (idx >= 128) return -1;
     }
     len = _smLaunchNameLength;
     base[idx++] = len;
+    if (len < 1 || len > 32) return -1;
     for (i = 0; i < len; i++) {
         base[idx++] = smLaunchName[i];
         if (idx >= 128) return -1;
@@ -1598,7 +1630,7 @@ disman_script_mib_get_smRunTable(GSnmpSession *s, disman_script_mib_smRunEntry_t
 }
 
 void
-disman_script_mib_get_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t **smRunEntry, guchar *smLaunchOwner, gsize _smLaunchOwnerLength, guchar *smLaunchName, gsize _smLaunchNameLength, gint32 smRunIndex, gint mask)
+disman_script_mib_get_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t **smRunEntry, guchar *smLaunchOwner, guint16 _smLaunchOwnerLength, guchar *smLaunchName, guint16 _smLaunchNameLength, gint32 smRunIndex, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     guint32 base[128];
@@ -1609,6 +1641,7 @@ disman_script_mib_get_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t
     len = pack_smRunEntry(base, smLaunchOwner, _smLaunchOwnerLength, smLaunchName, _smLaunchNameLength, smRunIndex);
     if (len < 0) {
         g_warning("illegal smRunEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -1635,6 +1668,7 @@ disman_script_mib_set_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t
     len = pack_smRunEntry(base, smRunEntry->smLaunchOwner, smRunEntry->_smLaunchOwnerLength, smRunEntry->smLaunchName, smRunEntry->_smLaunchNameLength, smRunEntry->smRunIndex);
     if (len < 0) {
         g_warning("illegal smRunEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 

@@ -20,7 +20,6 @@ MIBS			= IF-MIB \
 			  SNMP-VIEW-BASED-ACM-MIB \
 			  SNMP-TARGET-MIB \
 			  TUNNEL-MIB \
-			  ATM-MIB \
 			  EtherLike-MIB \
 			  MAU-MIB \
 			  OSPF-MIB \
@@ -69,5 +68,6 @@ stubs:
 	    echo "$(SMIDUMP) -f scli $$f" ; \
 	    $(SMIDUMP) -f scli $$f ; \
 	done
-	$(SMIDUMP) -f scli --scli-match="VlanEntry|VlanPortEntry" RAPID-CITY-MIB
+	$(SMIDUMP) -f scli --scli-match="VlanEntry|VlanPortEntry" RAPID-CITY
 	$(SMIDUMP) -f scli --scli-match="ipRouteEntry" RFC1213-MIB
+	$(SMIDUMP) -f scli --scli-match="atmInterfaceConfEntry" ATM-MIB

@@ -172,15 +172,15 @@ extern GSnmpEnum const disman_script_mib_enums_smRunState[];
 typedef struct {
     gint32   smLangIndex;
     guint32  *smLangLanguage;
-    gsize    _smLangLanguageLength;
+    guint16  _smLangLanguageLength;	/* (0..128) */
     guchar   *smLangVersion;
-    gsize    _smLangVersionLength;
+    guint16  _smLangVersionLength;	/* (0..32) */
     guint32  *smLangVendor;
-    gsize    _smLangVendorLength;
+    guint16  _smLangVendorLength;	/* (0..128) */
     guchar   *smLangRevision;
-    gsize    _smLangRevisionLength;
+    guint16  _smLangRevisionLength;	/* (0..32) */
     guchar   *smLangDescr;
-    gsize    _smLangDescrLength;
+    guint16  _smLangDescrLength;	/* (0..255) */
 } disman_script_mib_smLangEntry_t;
 
 extern void
@@ -212,15 +212,15 @@ typedef struct {
     gint32   smLangIndex;
     gint32   smExtsnIndex;
     guint32  *smExtsnExtension;
-    gsize    _smExtsnExtensionLength;
+    guint16  _smExtsnExtensionLength;	/* (0..128) */
     guchar   *smExtsnVersion;
-    gsize    _smExtsnVersionLength;
+    guint16  _smExtsnVersionLength;	/* (0..32) */
     guint32  *smExtsnVendor;
-    gsize    _smExtsnVendorLength;
+    guint16  _smExtsnVendorLength;	/* (0..128) */
     guchar   *smExtsnRevision;
-    gsize    _smExtsnRevisionLength;
+    guint16  _smExtsnRevisionLength;	/* (0..32) */
     guchar   *smExtsnDescr;
-    gsize    _smExtsnDescrLength;
+    guint16  _smExtsnDescrLength;	/* (0..255) */
 } disman_script_mib_smExtsnEntry_t;
 
 extern void
@@ -254,22 +254,22 @@ disman_script_mib_free_smExtsnEntry(disman_script_mib_smExtsnEntry_t *smExtsnEnt
 
 typedef struct {
     guchar   smScriptOwner[32];
-    gsize    _smScriptOwnerLength;
+    guint16  _smScriptOwnerLength;	/* (0..32) */
     guchar   smScriptName[32];
-    gsize    _smScriptNameLength;
+    guint16  _smScriptNameLength;	/* (1..32) */
     guchar   *smScriptDescr;
-    gsize    _smScriptDescrLength;
+    guint16  _smScriptDescrLength;	/* (0..255) */
     gint32   *smScriptLanguage;
     guchar   *smScriptSource;
-    gsize    _smScriptSourceLength;
+    guint16  _smScriptSourceLength;	/* (0..255) */
     gint32   *smScriptAdminStatus;
     gint32   *smScriptOperStatus;
     gint32   *smScriptStorageType;
     gint32   *smScriptRowStatus;
     guchar   *smScriptError;
-    gsize    _smScriptErrorLength;
+    guint16  _smScriptErrorLength;	/* (0..255) */
     guchar   *smScriptLastChange;
-    gsize    _smScriptLastChangeLength;
+    guint16  _smScriptLastChangeLength;	/* (8..11) */
 } disman_script_mib_smScriptEntry_t;
 
 extern void
@@ -282,7 +282,7 @@ extern disman_script_mib_smScriptEntry_t *
 disman_script_mib_new_smScriptEntry(void);
 
 extern void
-disman_script_mib_get_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t **smScriptEntry, guchar *smScriptOwner, gsize _smScriptOwnerLength, guchar *smScriptName, gsize _smScriptNameLength, gint mask);
+disman_script_mib_get_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t **smScriptEntry, guchar *smScriptOwner, guint16 _smScriptOwnerLength, guchar *smScriptName, guint16 _smScriptNameLength, gint mask);
 
 extern void
 disman_script_mib_set_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t *smScriptEntry, gint mask);
@@ -299,12 +299,12 @@ disman_script_mib_free_smScriptEntry(disman_script_mib_smScriptEntry_t *smScript
 
 typedef struct {
     guchar   smScriptOwner[32];
-    gsize    _smScriptOwnerLength;
+    guint16  _smScriptOwnerLength;	/* (0..32) */
     guchar   smScriptName[32];
-    gsize    _smScriptNameLength;
+    guint16  _smScriptNameLength;	/* (1..32) */
     guint32  smCodeIndex;
     guchar   *smCodeText;
-    gsize    _smCodeTextLength;
+    guint16  _smCodeTextLength;	/* (1..1024) */
     gint32   *smCodeRowStatus;
 } disman_script_mib_smCodeEntry_t;
 
@@ -318,7 +318,7 @@ extern disman_script_mib_smCodeEntry_t *
 disman_script_mib_new_smCodeEntry(void);
 
 extern void
-disman_script_mib_get_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t **smCodeEntry, guchar *smScriptOwner, gsize _smScriptOwnerLength, guchar *smScriptName, gsize _smScriptNameLength, guint32 smCodeIndex, gint mask);
+disman_script_mib_get_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t **smCodeEntry, guchar *smScriptOwner, guint16 _smScriptOwnerLength, guchar *smScriptName, guint16 _smScriptNameLength, guint32 smCodeIndex, gint mask);
 
 extern void
 disman_script_mib_set_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t *smCodeEntry, gint mask);
@@ -350,15 +350,15 @@ disman_script_mib_free_smCodeEntry(disman_script_mib_smCodeEntry_t *smCodeEntry)
 
 typedef struct {
     guchar   smLaunchOwner[32];
-    gsize    _smLaunchOwnerLength;
+    guint16  _smLaunchOwnerLength;	/* (0..32) */
     guchar   smLaunchName[32];
-    gsize    _smLaunchNameLength;
+    guint16  _smLaunchNameLength;	/* (1..32) */
     guchar   *smLaunchScriptOwner;
-    gsize    _smLaunchScriptOwnerLength;
+    guint16  _smLaunchScriptOwnerLength;	/* (0..32) */
     guchar   *smLaunchScriptName;
-    gsize    _smLaunchScriptNameLength;
+    guint16  _smLaunchScriptNameLength;	/* (0..32) */
     guchar   *smLaunchArgument;
-    gsize    _smLaunchArgumentLength;
+    guint16  _smLaunchArgumentLength;	/* (0..65535) */
     guint32  *smLaunchMaxRunning;
     guint32  *smLaunchMaxCompleted;
     gint32   *smLaunchLifeTime;
@@ -371,9 +371,9 @@ typedef struct {
     gint32   *smLaunchStorageType;
     gint32   *smLaunchRowStatus;
     guchar   *smLaunchError;
-    gsize    _smLaunchErrorLength;
+    guint16  _smLaunchErrorLength;	/* (0..255) */
     guchar   *smLaunchLastChange;
-    gsize    _smLaunchLastChangeLength;
+    guint16  _smLaunchLastChangeLength;	/* (8..11) */
     gint32   *smLaunchRowExpireTime;
 } disman_script_mib_smLaunchEntry_t;
 
@@ -387,7 +387,7 @@ extern disman_script_mib_smLaunchEntry_t *
 disman_script_mib_new_smLaunchEntry(void);
 
 extern void
-disman_script_mib_get_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t **smLaunchEntry, guchar *smLaunchOwner, gsize _smLaunchOwnerLength, guchar *smLaunchName, gsize _smLaunchNameLength, gint mask);
+disman_script_mib_get_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t **smLaunchEntry, guchar *smLaunchOwner, guint16 _smLaunchOwnerLength, guchar *smLaunchName, guint16 _smLaunchNameLength, gint mask);
 
 extern void
 disman_script_mib_set_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t *smLaunchEntry, gint mask);
@@ -414,29 +414,29 @@ disman_script_mib_free_smLaunchEntry(disman_script_mib_smLaunchEntry_t *smLaunch
 
 typedef struct {
     guchar   smLaunchOwner[32];
-    gsize    _smLaunchOwnerLength;
+    guint16  _smLaunchOwnerLength;	/* (0..32) */
     guchar   smLaunchName[32];
-    gsize    _smLaunchNameLength;
+    guint16  _smLaunchNameLength;	/* (1..32) */
     gint32   smRunIndex;
     guchar   *smRunArgument;
-    gsize    _smRunArgumentLength;
+    guint16  _smRunArgumentLength;	/* (0..65535) */
     guchar   *smRunStartTime;
-    gsize    _smRunStartTimeLength;
+    guint16  _smRunStartTimeLength;	/* (8..11) */
     guchar   *smRunEndTime;
-    gsize    _smRunEndTimeLength;
+    guint16  _smRunEndTimeLength;	/* (8..11) */
     gint32   *smRunLifeTime;
     gint32   *smRunExpireTime;
     gint32   *smRunExitCode;
     guchar   *smRunResult;
-    gsize    _smRunResultLength;
+    guint16  _smRunResultLength;	/* (0..65535) */
     gint32   *smRunControl;
     gint32   *smRunState;
     guchar   *smRunError;
-    gsize    _smRunErrorLength;
+    guint16  _smRunErrorLength;	/* (0..255) */
     guchar   *smRunResultTime;
-    gsize    _smRunResultTimeLength;
+    guint16  _smRunResultTimeLength;	/* (8..11) */
     guchar   *smRunErrorTime;
-    gsize    _smRunErrorTimeLength;
+    guint16  _smRunErrorTimeLength;	/* (8..11) */
 } disman_script_mib_smRunEntry_t;
 
 extern void
@@ -449,7 +449,7 @@ extern disman_script_mib_smRunEntry_t *
 disman_script_mib_new_smRunEntry(void);
 
 extern void
-disman_script_mib_get_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t **smRunEntry, guchar *smLaunchOwner, gsize _smLaunchOwnerLength, guchar *smLaunchName, gsize _smLaunchNameLength, gint32 smRunIndex, gint mask);
+disman_script_mib_get_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t **smRunEntry, guchar *smLaunchOwner, guint16 _smLaunchOwnerLength, guchar *smLaunchName, guint16 _smLaunchNameLength, gint32 smRunIndex, gint mask);
 
 extern void
 disman_script_mib_set_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t *smRunEntry, gint mask);

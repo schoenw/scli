@@ -306,7 +306,7 @@ typedef struct {
 } attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint16 len,
                 guint idx, attribute_t *attributes, gint mask)
 {
     int i;
@@ -323,7 +323,7 @@ add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
 }
 
 static int
-lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
+lookup(GSnmpVarBind *vb, guint32 const *base, guint16 const base_len,
 	    attribute_t *attributes, guint32 *idx)
 {
     int i;
@@ -690,6 +690,7 @@ if_mib_get_ifEntry(GSnmpSession *s, if_mib_ifEntry_t **ifEntry, gint32 ifIndex, 
     len = pack_ifEntry(base, ifIndex);
     if (len < 0) {
         g_warning("illegal ifEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -716,6 +717,7 @@ if_mib_set_ifEntry(GSnmpSession *s, if_mib_ifEntry_t *ifEntry, gint mask)
     len = pack_ifEntry(base, ifEntry->ifIndex);
     if (len < 0) {
         g_warning("illegal ifEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -998,6 +1000,7 @@ if_mib_get_ifXEntry(GSnmpSession *s, if_mib_ifXEntry_t **ifXEntry, gint32 ifInde
     len = pack_ifXEntry(base, ifIndex);
     if (len < 0) {
         g_warning("illegal ifXEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -1024,6 +1027,7 @@ if_mib_set_ifXEntry(GSnmpSession *s, if_mib_ifXEntry_t *ifXEntry, gint mask)
     len = pack_ifXEntry(base, ifXEntry->ifIndex);
     if (len < 0) {
         g_warning("illegal ifXEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -1190,6 +1194,7 @@ if_mib_get_ifStackEntry(GSnmpSession *s, if_mib_ifStackEntry_t **ifStackEntry, g
     len = pack_ifStackEntry(base, ifStackHigherLayer, ifStackLowerLayer);
     if (len < 0) {
         g_warning("illegal ifStackEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -1216,6 +1221,7 @@ if_mib_set_ifStackEntry(GSnmpSession *s, if_mib_ifStackEntry_t *ifStackEntry, gi
     len = pack_ifStackEntry(base, ifStackEntry->ifStackHigherLayer, ifStackEntry->ifStackLowerLayer);
     if (len < 0) {
         g_warning("illegal ifStackEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -1385,6 +1391,7 @@ if_mib_get_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t **ifTestEntry, gint
     len = pack_ifTestEntry(base, ifIndex);
     if (len < 0) {
         g_warning("illegal ifTestEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -1411,6 +1418,7 @@ if_mib_set_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t *ifTestEntry, gint 
     len = pack_ifTestEntry(base, ifTestEntry->ifIndex);
     if (len < 0) {
         g_warning("illegal ifTestEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -1485,7 +1493,8 @@ if_mib_new_ifRcvAddressEntry()
 static int
 unpack_ifRcvAddressEntry(GSnmpVarBind *vb, if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry)
 {
-    int i, len, idx = 11;
+    int idx = 11;
+    guint16 i, len;
 
     if (vb->id_len < idx) return -1;
     ifRcvAddressEntry->ifIndex = vb->id[idx++];
@@ -1501,9 +1510,10 @@ unpack_ifRcvAddressEntry(GSnmpVarBind *vb, if_mib_ifRcvAddressEntry_t *ifRcvAddr
 }
 
 static int
-pack_ifRcvAddressEntry(guint32 *base, gint32 ifIndex, guchar *ifRcvAddressAddress, gsize _ifRcvAddressAddressLength)
+pack_ifRcvAddressEntry(guint32 *base, gint32 ifIndex, guchar *ifRcvAddressAddress, guint16 _ifRcvAddressAddressLength)
 {
-    int i, len, idx = 11;
+    int idx = 11;
+    guint16 i, len;
 
     base[idx++] = ifIndex;
     len = _ifRcvAddressAddressLength;
@@ -1585,7 +1595,7 @@ if_mib_get_ifRcvAddressTable(GSnmpSession *s, if_mib_ifRcvAddressEntry_t ***ifRc
 }
 
 void
-if_mib_get_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t **ifRcvAddressEntry, gint32 ifIndex, guchar *ifRcvAddressAddress, gsize _ifRcvAddressAddressLength, gint mask)
+if_mib_get_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t **ifRcvAddressEntry, gint32 ifIndex, guchar *ifRcvAddressAddress, guint16 _ifRcvAddressAddressLength, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     guint32 base[128];
@@ -1596,6 +1606,7 @@ if_mib_get_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t **ifRcv
     len = pack_ifRcvAddressEntry(base, ifIndex, ifRcvAddressAddress, _ifRcvAddressAddressLength);
     if (len < 0) {
         g_warning("illegal ifRcvAddressEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 
@@ -1622,6 +1633,7 @@ if_mib_set_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t *ifRcvA
     len = pack_ifRcvAddressEntry(base, ifRcvAddressEntry->ifIndex, ifRcvAddressEntry->ifRcvAddressAddress, ifRcvAddressEntry->_ifRcvAddressAddressLength);
     if (len < 0) {
         g_warning("illegal ifRcvAddressEntry index values");
+        s->error_status = G_SNMP_ERR_INTERNAL;
         return;
     }
 

@@ -164,24 +164,34 @@ typedef struct {
     gint32   *rcVlanResult;
     gint32   *rcVlanStgId;
     gint32   *rcVlanType;
+#define RAPID_CITY_RCVLANPORTMEMBERSLENGTH 32
     guchar   *rcVlanPortMembers;
+#define RAPID_CITY_RCVLANACTIVEMEMBERSLENGTH 32
     guchar   *rcVlanActiveMembers;
+#define RAPID_CITY_RCVLANSTATICMEMBERSLENGTH 32
     guchar   *rcVlanStaticMembers;
+#define RAPID_CITY_RCVLANNOTALLOWTOJOINLENGTH 32
     guchar   *rcVlanNotAllowToJoin;
     gint32   *rcVlanProtocolId;
+#define RAPID_CITY_RCVLANSUBNETADDRLENGTH 4
     guchar   *rcVlanSubnetAddr;
+#define RAPID_CITY_RCVLANSUBNETMASKLENGTH 4
     guchar   *rcVlanSubnetMask;
     gint32   *rcVlanAgingTime;
+#define RAPID_CITY_RCVLANMACADDRESSLENGTH 6
     guchar   *rcVlanMacAddress;
     gint32   *rcVlanRowStatus;
     gint32   *rcVlanIgmpSnoopEnable;
     gint32   *rcVlanIgmpSnoopReportProxyEnable;
     gint32   *rcVlanIgmpSnoopRobustness;
     gint32   *rcVlanIgmpSnoopQueryInterval;
+#define RAPID_CITY_RCVLANIGMPSNOOPMROUTERPORTSLENGTH 32
     guchar   *rcVlanIgmpSnoopMRouterPorts;
     gint32   *rcVlanUserDefinedPid;
+#define RAPID_CITY_RCVLANIGMPSNOOPACTIVEMROUTERPORTSLENGTH 32
     guchar   *rcVlanIgmpSnoopActiveMRouterPorts;
     gint32   *rcVlanProtocolIds;
+#define RAPID_CITY_RCVLANIGMPSNOOPACTIVEQUERIERLENGTH 4
     guchar   *rcVlanIgmpSnoopActiveQuerier;
     gint32   *rcVlanIgmpSnoopMRouterExpiration;
     gint32   *rcVlanIgmpSnoopQuerierPort;
@@ -221,6 +231,7 @@ rapid_city_free_rcVlanEntry(rapid_city_rcVlanEntry_t *rcVlanEntry);
 typedef struct {
     gint32   rcVlanPortIndex;
     gint32   *rcVlanPortNumVlanIds;
+#define RAPID_CITY_RCVLANPORTVLANIDSLENGTH 250
     guchar   *rcVlanPortVlanIds;
     gint32   *rcVlanPortType;
     gint32   *rcVlanPortDiscardTaggedFrames;

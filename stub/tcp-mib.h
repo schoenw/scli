@@ -103,9 +103,11 @@ tcp_mib_free_tcp(tcp_mib_tcp_t *tcp);
 #define TCP_MIB_TCPCONNREMPORT	0x10 
 
 typedef struct {
-    guchar   tcpConnLocalAddress[4];
+#define TCP_MIB_TCPCONNLOCALADDRESSLENGTH 4
+    guchar   tcpConnLocalAddress[TCP_MIB_TCPCONNLOCALADDRESSLENGTH];
     gint32   tcpConnLocalPort;
-    guchar   tcpConnRemAddress[4];
+#define TCP_MIB_TCPCONNREMADDRESSLENGTH 4
+    guchar   tcpConnRemAddress[TCP_MIB_TCPCONNREMADDRESSLENGTH];
     gint32   tcpConnRemPort;
     gint32   *tcpConnState;
 } tcp_mib_tcpConnEntry_t;

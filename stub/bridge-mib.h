@@ -69,6 +69,7 @@ extern GSnmpEnum const bridge_mib_enums_dot1dStaticStatus[];
 #define BRIDGE_MIB_DOT1DBASETYPE	0x4 
 
 typedef struct {
+#define BRIDGE_MIB_DOT1DBASEBRIDGEADDRESSLENGTH 6
     guchar   *dot1dBaseBridgeAddress;
     gint32   *dot1dBaseNumPorts;
     gint32   *dot1dBaseType;
@@ -141,6 +142,7 @@ typedef struct {
     gint32   *dot1dStpPriority;
     guint32  *dot1dStpTimeSinceTopologyChange;
     guint32  *dot1dStpTopChanges;
+#define BRIDGE_MIB_DOT1DSTPDESIGNATEDROOTLENGTH 8
     guchar   *dot1dStpDesignatedRoot;
     gint32   *dot1dStpRootCost;
     gint32   *dot1dStpRootPort;
@@ -186,9 +188,12 @@ typedef struct {
     gint32   *dot1dStpPortState;
     gint32   *dot1dStpPortEnable;
     gint32   *dot1dStpPortPathCost;
+#define BRIDGE_MIB_DOT1DSTPPORTDESIGNATEDROOTLENGTH 8
     guchar   *dot1dStpPortDesignatedRoot;
     gint32   *dot1dStpPortDesignatedCost;
+#define BRIDGE_MIB_DOT1DSTPPORTDESIGNATEDBRIDGELENGTH 8
     guchar   *dot1dStpPortDesignatedBridge;
+#define BRIDGE_MIB_DOT1DSTPPORTDESIGNATEDPORTLENGTH 2
     guchar   *dot1dStpPortDesignatedPort;
     guint32  *dot1dStpPortForwardTransitions;
 } bridge_mib_dot1dStpPortEntry_t;
@@ -244,7 +249,8 @@ bridge_mib_free_dot1dTp(bridge_mib_dot1dTp_t *dot1dTp);
 #define BRIDGE_MIB_DOT1DTPFDBSTATUS	0x4 
 
 typedef struct {
-    guchar   dot1dTpFdbAddress[6];
+#define BRIDGE_MIB_DOT1DTPFDBADDRESSLENGTH 6
+    guchar   dot1dTpFdbAddress[BRIDGE_MIB_DOT1DTPFDBADDRESSLENGTH];
     gint32   *dot1dTpFdbPort;
     gint32   *dot1dTpFdbStatus;
 } bridge_mib_dot1dTpFdbEntry_t;
@@ -307,7 +313,8 @@ bridge_mib_free_dot1dTpPortEntry(bridge_mib_dot1dTpPortEntry_t *dot1dTpPortEntry
 #define BRIDGE_MIB_DOT1DSTATICSTATUS	0x8 
 
 typedef struct {
-    guchar   dot1dStaticAddress[6];
+#define BRIDGE_MIB_DOT1DSTATICADDRESSLENGTH 6
+    guchar   dot1dStaticAddress[BRIDGE_MIB_DOT1DSTATICADDRESSLENGTH];
     gint32   dot1dStaticReceivePort;
     guchar   *dot1dStaticAllowedToGoTo;
     gsize    _dot1dStaticAllowedToGoToLength;
