@@ -35,37 +35,6 @@
  */
 
 extern void
-if_mib_proc_stack_interface(GSnmpSession *s,
-			    gint32 ifStackLowerLayer,
-			    gint32 ifStackHigherLayer);
-
-extern void
-if_mib_proc_unstack_interface(GSnmpSession *s,
-			      gint32 ifStackLowerLayer,
-			      gint32 ifStackHigherLayer);
-    
-extern void
-if_mib_proc_set_interface_status(GSnmpSession *s,
-				 gint32 ifIndex,
-				 gint32 ifAdminStatus);
-
-extern void
-if_mib_proc_set_interface_alias(GSnmpSession *s,
-				gint32 ifIndex,
-				guchar *alias,
-				gsize alias_len);
-
-extern void
-if_mib_proc_set_interface_promiscuous(GSnmpSession *s,
-				      gint32 ifIndex,
-				      gint32 ifPromiscuousMode);
-
-extern void
-if_mib_proc_set_notifications(GSnmpSession *s,
-			      gint32 ifIndex,
-			      gint32 ifLinkUpDownTrapEnable);
-    
-extern void
 if_mib_proc_get_ifTable(GSnmpSession *s,
 			if_mib_ifEntry_t ***ifEntry,
 			gint mask,

@@ -20,7 +20,7 @@
  * @(#) $Id$
  */
 
-#include "if-mib-proc.h"
+#include "if-mib.h"
 #include "productmib-proc.h"
 
 
@@ -87,9 +87,9 @@ productmib_proc_set_vlan_port_member(GSnmpSession *s,
 	    if (ll / 8 < bits_len) {
 		int bit = bits[ll/8] & 1 << (7-(ll%8));
 		if (! bit) {
-		    if_mib_proc_unstack_interface(s,
-					  ifStackTable[i]->ifStackLowerLayer,
-					  ifStackTable[i]->ifStackHigherLayer);
+		    if_mib_delete_ifStackEntry(s,
+					       ifStackTable[i]->ifStackHigherLayer,
+					       ifStackTable[i]->ifStackLowerLayer);
 		    /* xxx error handling ? xxx */
 		}
 	    }
@@ -99,7 +99,7 @@ productmib_proc_set_vlan_port_member(GSnmpSession *s,
     for (i = 0; i < bits_len * 8; i++) {
 	int bit = bits[i/8] & 1 << (7-(i%8));
 	if (bit) {
-	    if_mib_proc_stack_interface(s, i, ifIndex);
+	    if_mib_create_ifStackEntry(s, ifIndex, i);
 	    /* xxx error handling ? xxx */
 	}
     }
