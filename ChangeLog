@@ -1,3 +1,101 @@
+2001-03-09 16:04  schoenw
+
+	* NEWS, TODO, configure, configure.in: Preparing for the next
+        release.
+
+2001-03-08 15:40  schoenw
+
+	* snmp/g_asn1.c: Fixed a sign decoding bug in
+        g_asn1_int32_decode().
+
+2001-03-08 11:57  schoenw
+
+	* scli/: interface.c, ip.c: Oliver Wellnitz contributed a patch to
+        display tunnel information.
+
+2001-03-08 11:56  schoenw
+
+	* stub/: Makefile.am, Makefile.in, bridge-mib.c, bridge-mib.h,
+	disman-schedule-mib.c, disman-schedule-mib.h, disman-script-mib.c,
+	disman-script-mib.h, entity-mib.c, entity-mib.h,
+	host-resources-mib.c, host-resources-mib.h, if-mib.c, if-mib.h,
+	ip-forward-mib.c, ip-forward-mib.h, ip-mib.c, ip-mib.h,
+	snmp-community-mib.c, snmp-community-mib.h, snmp-framework-mib.c,
+	snmp-framework-mib.h, snmp-mpd-mib.c, snmp-mpd-mib.h,
+	snmp-target-mib.c, snmp-target-mib.h, snmp-user-based-sm-mib.c,
+	snmp-user-based-sm-mib.h, snmp-view-based-acm-mib.c,
+	snmp-view-based-acm-mib.h, snmpv2-mib.c, snmpv2-mib.h, stools.h,
+	tcp-mib.c, tcp-mib.h, tunnel-mib.c, tunnel-mib.h, udp-mib.c,
+	udp-mib.h: Added stubs for the TUNNEL-MIB and regenerated stubs
+        with the released smidump version 0.2.14.
+
+2001-03-05 15:31  schoenw
+
+	* stop/interface.c, stop/process.c, stub/bridge-mib.c,
+	stub/bridge-mib.h, stub/disman-schedule-mib.c,
+	stub/disman-schedule-mib.h, stub/disman-script-mib.c,
+	stub/disman-script-mib.h, stub/entity-mib.c, stub/entity-mib.h,
+	stub/host-resources-mib.c, stub/host-resources-mib.h,
+	scli/disman.c, scli/entity.c, scli/interface.c, scli/ip.c,
+	scli/snmp.c, scli/system.c, scli/tcp.c, stub/if-mib.c,
+	stub/if-mib.h, stub/ip-forward-mib.c, stub/ip-forward-mib.h,
+	stub/ip-mib.c, stub/ip-mib.h, stub/snmp-community-mib.c,
+	stub/snmp-community-mib.h, stub/snmp-framework-mib.c,
+	stub/snmp-framework-mib.h, stub/snmp-mpd-mib.c,
+	stub/snmp-mpd-mib.h, stub/snmp-target-mib.c,
+	stub/snmp-target-mib.h, stub/snmp-user-based-sm-mib.c,
+	stub/snmp-user-based-sm-mib.h, stub/snmp-view-based-acm-mib.c,
+	stub/snmp-view-based-acm-mib.h, stub/snmpv2-mib.c,
+	stub/snmpv2-mib.h, stub/tcp-mib.c, stub/tcp-mib.h, stub/udp-mib.c,
+        stub/udp-mib.h: Many updates to support an improved stub API.
+
+2001-03-02 10:32  schoenw
+
+	* stub/: Makefile.am, Makefile.in, bridge-mib.c,
+	disman-schedule-mib.c, disman-script-mib.c, entity-mib.c,
+	host-resources-mib.c, if-mib.c, ip-forward-mib.c, ip-forward-mib.h,
+	ip-mib.c, snmp-community-mib.c, snmp-framework-mib.c,
+	snmp-mpd-mib.c, snmp-target-mib.c, snmp-user-based-sm-mib.c,
+	snmp-view-based-acm-mib.c, snmpv2-mib.c, stools.h, tcp-mib.c,
+	udp-mib.c: Added the IP-FORWARD-MIB and regenerated the stubs to
+        take advantage of some improvements in the smidump stools driver.
+
+2001-03-02 10:28  schoenw
+
+	* scli/: Makefile.am, Makefile.in, ip.c, scli.c, scli.h, tcp.c:
+        Added an initial IP mode for scli.
+
+2001-03-02 10:20  schoenw
+
+	* stop/process.c: Display CPU time in seconds rather than minutes.
+	Made sure that the process descriptions clear to the end of the
+        line.
+
+2001-03-02 10:17  schoenw
+
+	* scli/: fmt.c, interface.c, scli.h: Added a fmt function to
+	convert IPv4 masks into a printable address prefix length. The
+	"show interface info" command now displays the prefix length rather
+        than the DNS name for each associated IP address.
+
+2001-03-02 10:10  schoenw
+
+	* scli/fmt.c: Check for the unspecified case first before doing
+        host or service name lookups.
+
+2001-03-02 10:10  schoenw
+
+	* scli/scli.c: Integrated a patch from Frank Strauss
+        <strauss@ibr.cs.tu-bs.de> to turn off filename completion.
+
+2001-03-01 09:44  schoenw
+
+	* scli/tcp.c: Fixed a formatting bug with long host names.
+
+2001-03-01 09:17  schoenw
+
+	* ChangeLog: Generated the ChangeLog via cvs2cl.
+
 2001-03-01 08:57  schoenw
 
 	* Makefile.in, NEWS, configure, configure.in: Prepare for the
