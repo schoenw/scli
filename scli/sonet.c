@@ -28,6 +28,7 @@
 
 #include "scli.h"
 
+#include "snmpv2-tc.h"
 #include "if-mib.h"
 #include "sonet-mib.h"
 
@@ -311,7 +312,7 @@ fmt_sonet_section_history(GString *s,
 
     if (sectionEntry->sonetSectionIntervalValidData
 	&& (*sectionEntry->sonetSectionIntervalValidData
-	    != SONET_MIB_SONETSECTIONINTERVALVALIDDATA_TRUE)) {
+	    != SNMPV2_TC_TRUTHVALUE_TRUE)) {
 	return;
     }
     
