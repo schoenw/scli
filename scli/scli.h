@@ -185,6 +185,9 @@ scli_init_ether_mode(scli_interp_t *interp);
 extern void
 scli_init_ospf_mode(scli_interp_t *interp);
 
+extern void
+scli_init_printer_mode(scli_interp_t *interp);
+
 /* 
  * A data structure used to obtain vendor information from the
  * enterprise OID. See the file vendors.c for details.
