@@ -1,5 +1,5 @@
 info_TEXINFOS = scli.texinfo
-scli_TEXINFOS = gpl.texinfo
+scli_TEXINFOS = gpl.texinfo modes.texinfo
 
 modes.texinfo: $(top_builddir)/scli/scli
 	$(top_builddir)/scli/scli -n -c "show scli modes" | \
