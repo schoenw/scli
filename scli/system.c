@@ -1045,16 +1045,20 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	    host_resources_mib_hrDeviceEntry_t *dev;
 	    host_resources_mib_get_hrDeviceEntry(interp->peer, &dev, *hrSystem->hrSystemInitialLoadDevice, 0);
 	    if (dev->hrDeviceDescr) {
-		g_string_sprintfa(s, "%-*s%.*s\n", indent, "System Boot Dev:",
-				  (int) dev->_hrDeviceDescrLength,
-				  dev->hrDeviceDescr);
+		strip_white(dev->hrDeviceDescr,
+			    &dev->_hrDeviceDescrLength);
+		fmt_display_string(s, indent, "System Boot Dev:",
+				   (int) dev->_hrDeviceDescrLength,
+				   dev->hrDeviceDescr);
 	    }
 	    host_resources_mib_free_hrDeviceEntry(dev);
 	}
 	if (hrSystem->hrSystemInitialLoadParameters) {
-	    g_string_sprintfa(s, "%-*s%.*s\n", indent, "System Boot Args:",
-		      (int) hrSystem->_hrSystemInitialLoadParametersLength,
-			      hrSystem->hrSystemInitialLoadParameters);
+	    strip_white(hrSystem->hrSystemInitialLoadParameters,
+			&hrSystem->_hrSystemInitialLoadParametersLength);
+	    fmt_display_string(s, indent, "System Boot Args:",
+			       (int) hrSystem->_hrSystemInitialLoadParametersLength,
+			       hrSystem->hrSystemInitialLoadParameters);
 	}
 	if (hrSystem->hrSystemNumUsers) {
 	    g_string_sprintfa(s, "%-*s%u", indent, "Users:", 
