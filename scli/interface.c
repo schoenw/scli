@@ -29,7 +29,7 @@
 
 
 static int
-cmd_interface(scli_interp_t *interp, int argc, char **argv)
+cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
 {
     ifEntry_t **ifEntry = NULL;
     ifXEntry_t **ifXEntry = NULL;
@@ -147,7 +147,7 @@ cmd_interface(scli_interp_t *interp, int argc, char **argv)
 
 	    if (ifXEntry && ifXEntry[i]
 		&& ifXEntry[i]->ifAlias && ifXEntry[i]->_ifAliasLength) {
-		g_string_sprintfa(s, "Info:        %.*s\n",
+		g_string_sprintfa(s, "Alias:       %.*s\n",
 			    (int) ifXEntry[i]->_ifAliasLength,
 				  ifXEntry[i]->ifAlias);
 	    }
@@ -172,8 +172,10 @@ void
 scli_init_interface_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "interfaces",
-	  "show information about the network interfaces", cmd_interface },
+	{ "show", "interface", NULL, NULL },
+	{ "show interface", "info",
+	  "show information about the network interfaces",
+	  cmd_interfaces },
 	{ NULL, NULL, NULL, NULL }
     };
     
