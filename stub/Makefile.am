@@ -23,11 +23,9 @@ MIBS			= IF-MIB \
 			  ATM-MIB \
 			  EtherLike-MIB \
 			  MAU-MIB \
-			  RFC1213-MIB \
 			  OSPF-MIB \
 			  Printer-MIB \
-			  OLD-CISCO-IP-MIB \
-			  RAPID-CITY
+			  OLD-CISCO-IP-MIB
 
 STUBS			= if-mib.h if-mib.c \
 			  ip-mib.h ip-mib.c \
@@ -71,3 +69,5 @@ stubs:
 	    echo "$(SMIDUMP) -f scli $$f" ; \
 	    $(SMIDUMP) -f scli $$f ; \
 	done
+	$(SMIDUMP) -f scli --scli-match="VlanEntry|VlanPortEntry" RAPID-CITY-MIB
+	$(SMIDUMP) -f scli --scli-match="ipRouteEntry" RFC1213-MIB
