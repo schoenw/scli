@@ -43,13 +43,15 @@ fmt_containment(GString *s, char *prefix,
 	if (entPhysicalEntry[i]->entPhysicalContainedIn
 	    && *(entPhysicalEntry[i]->entPhysicalContainedIn) == parent) {
 	    int next = 0;
-	    for (j = i+1; entPhysicalEntry[j]; j++) {
-		if (entPhysicalEntry[j]->entPhysicalContainedIn
-		    && entPhysicalEntry[i]->entPhysicalIndex
-		    && *(entPhysicalEntry[j]->entPhysicalContainedIn)
-		    == parent) {
-		    next = 1;
-		    break;
+	    if (parent) {
+		for (j = i+1; entPhysicalEntry[j]; j++) {
+		    if (entPhysicalEntry[j]->entPhysicalContainedIn
+			&& entPhysicalEntry[i]->entPhysicalIndex
+			&& *(entPhysicalEntry[j]->entPhysicalContainedIn)
+			== parent) {
+			next = 1;
+			break;
+		    }
 		}
 	    }
 	    
@@ -228,7 +230,7 @@ xml_entity_details(xmlNodePtr root,
 		   entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 {
     xmlNodePtr tree;
-    const char *s;
+    const char *e;
 
     tree = xmlNewChild(root, NULL, "entity", NULL);
     xml_set_prop(tree, "index", "%d", entPhysicalEntry->entPhysicalIndex);
@@ -245,10 +247,15 @@ xml_entity_details(xmlNodePtr root,
 			     entPhysicalEntry->entPhysicalName);
     }
 
-    s = fmt_enum(entity_mib_enums_entPhysicalClass,
+    e = fmt_enum(entity_mib_enums_entPhysicalClass,
 		 entPhysicalEntry->entPhysicalClass);
-    if (s) {
-	(void) xml_new_child(tree, NULL, "class", "%s", s);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "class", "%s", e);
+    }
+
+    if (entPhysicalEntry->entPhysicalContainedIn) {
+	(void) xml_new_child(tree, NULL, "contained-in", "%d",
+			     *entPhysicalEntry->entPhysicalContainedIn);
     }
 
     if (entPhysicalEntry->entPhysicalIsFRU
