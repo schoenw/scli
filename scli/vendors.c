@@ -23,6 +23,7 @@
 #include "scli.h"
 
 static scli_vendor_t iana_vendor_table[] = {
+    {    2,	"IBM",			"http://www.ibm.com/" },
     {    9,	"Cisco Systems",	"http://www.cisco.com/" },
     {   11,	"Hewlett Packard",	"http://www.hp.com/" },
     {   42,	"Sun Microsystems",	"http://www.sun.com/" },
@@ -31,16 +32,20 @@ static scli_vendor_t iana_vendor_table[] = {
     {   59,	"Silicon Graphics",	"http://www.sgi.com/" },
     {   81,	"Avaya",		"http://www.avaya.com/" },
     {   82,	"Network Computing Devices",	"http://www.ncd.com/" },
+    {  171,	"D-Link Systems",	"http://www.dlink.com/" },
     {  253,	"Xerox",		"http://www.xerox.com/" },
     {  311,	"Microsoft",		"http://www.microsoft.com/" },
-    { 1575,	"TU Braunschweig",	NULL },
+    {  641,	"Lexmark",		"http://www.lexmark.com/" },
+    { 1575,	"TU Braunschweig",	"http://www.tu-braunschweig.de/" },
+    { 1602,	"Canon",		"http://www.canon.com/" },
     { 1751,	"Lucent Technologies",	"http://www.lucent.com/" },
     { 2021,	"UCD-SNMP",		"http://ucd-snmp.ucdavis.edu/" },
     { 2272,     "Nortel Networks",	"http://www.nortelnetworks.com/" },
     { 2281,	"Ceragon",		"http://www.ceragon.com/" },
     { 2356,	"ELSA GmbH",		"http://www.elsa.de/" },
+    { 5567,	"Riverstone Networks",	"http://www.riverstonenet.com/" },
     { 7313,	"1stWave",              "http://www.1stwave.de/" },
-    { 8072,	"NET-SNMP",		"http://net-snmp.sourceforge.net/" },
+    { 8072,	"NET-SNMP",		"http://www.net-snmp.org/" },
     {    0,	NULL,			NULL },
 };
 
@@ -60,7 +65,7 @@ scli_get_vendor(guint32 id)
 
 
 const scli_vendor_t*
-scli_get_vendor_oid(guint32 oid[], gsize len)
+scli_get_vendor_oid(guint32 oid[], guint16 len)
 {
     static guint32 const enterprises[] = { 1, 3, 6, 1, 4, 1 };
     static char buffer[80];
