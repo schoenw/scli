@@ -57,6 +57,7 @@ if test $ac_cv_func_connect = no; then
 fi
 
 AC_CHECK_FUNCS(resizeterm getaddrinfo ether_ntohost)
+AC_CHECK_FUNCS(rl_completion_matches)
 
 dnl Check for configure options
 

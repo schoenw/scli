@@ -22,6 +22,9 @@
 /* Define if you have the resizeterm function.  */
 #undef HAVE_RESIZETERM
 
+/* Define if you have the rl_completion_matches function.  */
+#undef HAVE_RL_COMPLETION_MATCHES
+
 /* Define if you have the <dmalloc.h> header file.  */
 #undef HAVE_DMALLOC_H
 
