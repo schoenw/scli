@@ -21,6 +21,7 @@ MIBS			= IF-MIB \
 			  SNMP-VIEW-BASED-ACM-MIB \
 			  SNMP-TARGET-MIB \
 			  SNMP-NOTIFICATION-MIB \
+			  NOTIFICATION-LOG-MIB \
 			  TUNNEL-MIB \
 			  EtherLike-MIB \
 			  MAU-MIB \
@@ -51,6 +52,7 @@ STUBS			= if-mib.h if-mib.c \
 			  snmp-view-based-acm-mib.h snmp-view-based-acm-mib.c \
 			  snmp-target-mib.h snmp-target-mib.c \
 			  snmp-notification-mib.h snmp-notification-mib.c \
+			  notification-log-mib.h notification-log-mib.c \
 			  tunnel-mib.h tunnel-mib.c \
 			  atm-mib.h atm-mib.c \
 			  etherlike-mib.h etherlike-mib.c \
@@ -71,10 +73,10 @@ rmstubs:
 	rm -f $(STUBS)
 
 stubs:
+	$(SMIDUMP) -f scli --scli-match="VlanEntry|VlanPortEntry" RAPID-CITY
+	$(SMIDUMP) -f scli --scli-match="ipRouteEntry" RFC1213-MIB
+	$(SMIDUMP) -f scli --scli-match="atmInterfaceConfEntry" ATM-MIB
 	@for f in $(MIBS) ; do \
 	    echo "$(SMIDUMP) -f scli $$f" ; \
 	    $(SMIDUMP) -f scli $$f ; \
 	done
-	$(SMIDUMP) -f scli --scli-match="VlanEntry|VlanPortEntry" RAPID-CITY
-	$(SMIDUMP) -f scli --scli-match="ipRouteEntry" RFC1213-MIB
-	$(SMIDUMP) -f scli --scli-match="atmInterfaceConfEntry" ATM-MIB
