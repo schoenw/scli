@@ -22,10 +22,12 @@
 
 #include "scli.h"
 
-#include "iana-language-mib.h"
+#include "snmpv2-tc.h"
 #include "disman-script-mib.h"
-#include "disman-script-mib-proc.h"
 #include "disman-schedule-mib.h"
+#include "iana-language-mib.h"
+
+#include "disman-script-mib-proc.h"
 
 #include <time.h>
 
@@ -39,7 +41,7 @@ static guint32 const oid_srsl[]   = { IANA_LANGUAGE_MIB_IANALANGSRSL };
 static guint32 const oid_psl[]    = { IANA_LANGUAGE_MIB_IANALANGPSL };
 static guint32 const oid_smsl[]   = { IANA_LANGUAGE_MIB_IANALANGSMSL };
 
-static GSnmpIdentity const languages[] = {
+static GNetSnmpIdentity const languages[] = {
     { oid_javabc,	sizeof(oid_javabc) / sizeof(guint32),	"Java" },
     { oid_tcl,		sizeof(oid_tcl) / sizeof(guint32),	"Tcl" },
     { oid_perl,		sizeof(oid_perl) / sizeof(guint32),	"Perl" },
@@ -163,7 +165,7 @@ fmt_last_change(GString *s, guchar *date, gsize len)
 static void
 fmt_script_admin_status(GString *s, gint32 *status)
 {
-    static GSnmpEnum const script_admin_states[] = {
+    static GNetSnmpEnum const script_admin_states[] = {
 	{ DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_ENABLED,	"e" },
 	{ DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_DISABLED,	"d" },
 	{ DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_EDITING,	"t" },
@@ -178,7 +180,7 @@ fmt_script_admin_status(GString *s, gint32 *status)
 static void
 fmt_script_oper_status(GString *s, gint32 *status)
 {
-    static GSnmpEnum const script_oper_states[] = {
+    static GNetSnmpEnum const script_oper_states[] = {
 	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_ENABLED,		"e" },
 	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_DISABLED,	"d" },
 	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_EDITING,		"t" },
@@ -204,7 +206,7 @@ fmt_script_oper_status(GString *s, gint32 *status)
 static void
 fmt_launch_admin_status(GString *s, gint32 *status)
 {
-    static GSnmpEnum const launch_admin_states[] = {
+    static GNetSnmpEnum const launch_admin_states[] = {
 	{ DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_ENABLED,	"e" },
 	{ DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_DISABLED,	"d" },
 	{ DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_AUTOSTART,	"a" },
@@ -219,7 +221,7 @@ fmt_launch_admin_status(GString *s, gint32 *status)
 static void
 fmt_launch_oper_status(GString *s, gint32 *status)
 {
-    static GSnmpEnum const launch_oper_states[] = {
+    static GNetSnmpEnum const launch_oper_states[] = {
 	{ DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_ENABLED,		"e" },
 	{ DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_DISABLED,	"d" },
 	{ DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_EXPIRED,		"x" },
@@ -236,7 +238,7 @@ fmt_run_state(GString *s, gint32 *state)
 {
     char const *name;
     
-    static GSnmpEnum const run_states[] = {
+    static GNetSnmpEnum const run_states[] = {
 	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_INITIALIZING,	"I" },
 	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_EXECUTING,	"R" },
 	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_SUSPENDING,	"U" },
@@ -252,7 +254,7 @@ fmt_run_state(GString *s, gint32 *state)
 	return;
     }
     
-    name = gsnmp_enum_get_label(run_states, *state);
+    name = gnet_snmp_enum_get_label(run_states, *state);
     if (name) {
 	g_string_append(s, name);
     } else {
@@ -266,7 +268,7 @@ fmt_exit_code(GString *s, gint32 *code)
 {
     char const *name;
     
-    static GSnmpEnum const exit_codes[] = {
+    static GNetSnmpEnum const exit_codes[] = {
 	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_NOERROR,		"N" },
 	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_HALTED,		"H" },
 	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_LIFETIMEEXCEEDED,	"T" },
@@ -284,7 +286,7 @@ fmt_exit_code(GString *s, gint32 *code)
 	return;
     }
     
-    name = gsnmp_enum_get_label(exit_codes, *code);
+    name = gnet_snmp_enum_get_label(exit_codes, *code);
     if (name) {
 	g_string_append(s, name);
     } else {
@@ -297,7 +299,7 @@ fmt_exit_code(GString *s, gint32 *code)
 static void
 fmt_schedule_admin_status(GString *s, gint32 *status)
 {
-    static GSnmpEnum const schedule_admin_states[] = {
+    static GNetSnmpEnum const schedule_admin_states[] = {
 	{ DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_ENABLED,		"e" },
 	{ DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_DISABLED,	"d" },
 	{ 0, NULL }
@@ -311,7 +313,7 @@ fmt_schedule_admin_status(GString *s, gint32 *status)
 static void
 fmt_schedule_oper_status(GString *s, gint32 *status)
 {
-    static GSnmpEnum const schedule_oper_states[] = {
+    static GNetSnmpEnum const schedule_oper_states[] = {
 	{ DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_ENABLED,	"e" },
 	{ DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_DISABLED,	"d" },
 	{ DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_FINISHED,	"f" },
@@ -640,7 +642,7 @@ fmt_script_details(GString *s,
 		      smScriptEntry->smScriptName);
     
     g_string_append(s, "RowStatus:   ");
-    xxx_enum(s, width, disman_script_mib_enums_smScriptRowStatus,
+    xxx_enum(s, width, snmpv2_tc_enums_RowStatus,
 	     smScriptEntry->smScriptRowStatus);
     g_string_append(s, "Language: ");
     if (smScriptEntry->smScriptLanguage) {
@@ -654,7 +656,7 @@ fmt_script_details(GString *s,
     g_string_append(s, "\n");
     
     g_string_append(s, "Storage:     ");
-    xxx_enum(s, width, disman_script_mib_enums_smScriptStorageType,
+    xxx_enum(s, width, snmpv2_tc_enums_StorageType,
 	     smScriptEntry->smScriptStorageType);
     g_string_append(s, "Change:   ");
     if (smScriptEntry->smScriptLastChange) {
@@ -1037,7 +1039,7 @@ fmt_launch_details(GString *s,
     g_string_append(s, "\n");
     
     g_string_append(s, "RowStatus:   ");
-    xxx_enum(s, width, disman_script_mib_enums_smLaunchRowStatus,
+    xxx_enum(s, width, snmpv2_tc_enums_RowStatus,
 	     smLaunchEntry->smLaunchRowStatus);
     g_string_append(s, "Expires:  ");
     if (smLaunchEntry->smLaunchRowExpireTime) {
@@ -1051,7 +1053,7 @@ fmt_launch_details(GString *s,
     g_string_append(s, "\n");
     
     g_string_append(s, "Storage:     ");
-    xxx_enum(s, width, disman_script_mib_enums_smLaunchStorageType,
+    xxx_enum(s, width, snmpv2_tc_enums_StorageType,
 	     smLaunchEntry->smLaunchStorageType);
     g_string_append(s, "Change:   ");
     if (smLaunchEntry->smLaunchLastChange) {
@@ -1457,7 +1459,7 @@ fmt_scheduler_details(GString *s,
 		      schedEntry->schedName);
 
     g_string_append(s, "RowStatus:   ");
-    xxx_enum(s, width, disman_schedule_mib_enums_schedRowStatus,
+    xxx_enum(s, width, snmpv2_tc_enums_RowStatus,
 	     schedEntry->schedRowStatus);
     g_string_append(s, "Type:     ");
     xxx_enum(s, 1, disman_schedule_mib_enums_schedType,
@@ -1465,7 +1467,7 @@ fmt_scheduler_details(GString *s,
     g_string_append(s, "\n");
     
     g_string_append(s, "Storage:     ");
-    xxx_enum(s, width, disman_schedule_mib_enums_schedStorageType,
+    xxx_enum(s, width, snmpv2_tc_enums_StorageType,
 	     schedEntry->schedStorageType);
     g_string_append(s, "Value:    ");
     if (schedEntry->schedValue) {
@@ -1474,7 +1476,7 @@ fmt_scheduler_details(GString *s,
     g_string_append(s, "\n");
     
     g_string_append(s, "Last Error:  ");
-    xxx_enum(s, width, disman_schedule_mib_enums_schedLastFailure,
+    xxx_enum(s, width, disman_schedule_mib_enums_SnmpPduErrorStatus,
 	     schedEntry->schedLastFailure);
     g_string_append(s, "Error:    ");
     if (schedEntry->schedLastFailed) {
@@ -1482,6 +1484,12 @@ fmt_scheduler_details(GString *s,
 				     schedEntry->_schedLastFailedLength));
     }
     g_string_append(s, "\n");
+
+    /* this is really a counter and should not be displayed as such */
+    if (schedEntry->schedTriggers) {
+	    g_string_sprintfa(s, "Triggers:    %u\n",
+			      *schedEntry->schedTriggers);
+    }
     
     if (schedEntry->schedContextName && schedEntry->_schedContextNameLength) {
 	g_string_sprintfa(s, "Context:     <%.*s>\n",
@@ -1610,6 +1618,157 @@ create_disman_run(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+create_schedule(GNetSnmp *s, const char *owner, const char *name)
+{
+    disman_schedule_mib_schedEntry_t *schedEntry;
+    gint32 createAndGo = SNMPV2_TC_ROWSTATUS_CREATEANDGO;
+    
+    schedEntry = disman_schedule_mib_new_schedEntry();
+    if (! schedEntry) {
+	s->error_status = GNET_SNMP_ERR_PROCEDURE;
+	return;
+    }
+    strcpy(schedEntry->schedOwner, owner);
+    schedEntry->_schedOwnerLength = strlen(owner);
+    strcpy(schedEntry->schedName, name);
+    schedEntry->_schedNameLength = strlen(name);
+    schedEntry->schedRowStatus = &createAndGo;
+    disman_schedule_mib_set_schedEntry(s, schedEntry,
+				       DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS);
+    disman_schedule_mib_free_schedEntry(schedEntry);
+}
+
+
+
+static int
+create_disman_schedule(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 3) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (strlen(argv[1]) < DISMAN_SCHEDULE_MIB_SCHEDOWNERMINLENGTH 
+	|| strlen(argv[1]) > DISMAN_SCHEDULE_MIB_SCHEDOWNERMAXLENGTH) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_VALUE;
+    }
+    if (strlen(argv[2]) < DISMAN_SCHEDULE_MIB_SCHEDNAMEMINLENGTH
+	|| strlen(argv[2]) > DISMAN_SCHEDULE_MIB_SCHEDNAMEMAXLENGTH) {
+	g_string_assign(interp->result, argv[2]);
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    create_schedule(interp->peer, argv[1], argv[2]);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+delete_disman_schedule(scli_interp_t *interp, int argc, char **argv)
+{
+    disman_schedule_mib_schedEntry_t *schedEntry;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 3) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (strlen(argv[1]) < DISMAN_SCHEDULE_MIB_SCHEDOWNERMINLENGTH
+	|| strlen(argv[1]) > DISMAN_SCHEDULE_MIB_SCHEDOWNERMAXLENGTH) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_VALUE;
+    }
+    if (strlen(argv[2]) < DISMAN_SCHEDULE_MIB_SCHEDNAMEMINLENGTH
+	|| strlen(argv[2]) > DISMAN_SCHEDULE_MIB_SCHEDNAMEMAXLENGTH) {
+	g_string_assign(interp->result, argv[2]);
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    disman_schedule_mib_get_schedEntry(interp->peer, &schedEntry,
+				       argv[1], strlen(argv[1]),
+				       argv[2], strlen(argv[2]),
+				       DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS);
+    if (! schedEntry || !schedEntry->schedRowStatus) {
+	return SCLI_SNMP;
+    }
+
+    *schedEntry->schedRowStatus = SNMPV2_TC_ROWSTATUS_DESTROY;
+    disman_schedule_mib_set_schedEntry(interp->peer, schedEntry,
+				       DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS);
+    disman_schedule_mib_free_schedEntry(schedEntry);
+    return SCLI_OK;    
+}
+
+
+
+static int
+dump_schedule(scli_interp_t *interp, int argc, char **argv)
+{
+    disman_schedule_mib_schedEntry_t **schedTable = NULL;
+    int i;
+    const int mask = (DISMAN_SCHEDULE_MIB_SCHEDDESCR
+		      | DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS
+		      | DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS);
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    disman_schedule_mib_get_schedTable(interp->peer, &schedTable, mask);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (schedTable) {
+	for (i = 0; schedTable[i]; i++) {
+	    if (i) {
+		g_string_append(interp->result, "\n");
+	    }
+	    g_string_sprintfa(interp->result,
+			      "create schedule \"%.*s\" \"%.*s\"\n",
+			      schedTable[i]->_schedOwnerLength, schedTable[i]->schedOwner,
+			      schedTable[i]->_schedNameLength, schedTable[i]->schedName);
+	    if (schedTable[i]->schedDescr && schedTable[i]->_schedDescrLength) {
+		g_string_sprintfa(interp->result,
+				  "set schedule description \"^%.*s$\" \"^%.*s$\" \"%.*s\"\n",
+				  schedTable[i]->_schedOwnerLength, schedTable[i]->schedOwner,
+				  schedTable[i]->_schedNameLength, schedTable[i]->schedName,
+				  schedTable[i]->_schedDescrLength, schedTable[i]->schedDescr);
+	    }
+
+	    if (schedTable[i]->schedAdminStatus
+		&& *schedTable[i]->schedAdminStatus == DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_ENABLED) {
+		g_string_sprintfa(interp->result,
+				  "set schedule status \"^%.*s$\" \"^%.*s$\" \"enabled\"\n",
+				  schedTable[i]->_schedOwnerLength, schedTable[i]->schedOwner,
+				  schedTable[i]->_schedNameLength, schedTable[i]->schedName);
+	    }
+	    
+	}
+    }
+
+    if (schedTable) disman_schedule_mib_free_schedTable(schedTable);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_disman_mode(scli_interp_t *interp)
 {
@@ -1669,17 +1828,43 @@ scli_init_disman_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_run_details },
 
-	{ "show disman scheduler info", NULL,
-	  "scheduler information",
+	{ "show schedule info", NULL,
+	  "The `show schedule info' command displays summary\n"
+	  "information about the scheduled actions.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_scheduler_info },
 
-	{ "show disman scheduler details", NULL,
+	{ "show schedule details", NULL,
 	  "schedules on the distributed manager",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_scheduler_details },
+
+	{ "create schedule", "<owner> <name> <expression>",
+	  "...",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_NORECURSE,
+	  NULL, NULL,
+	  create_disman_schedule },	  
+
+	{ "delete schedule", "<owner> <name>",
+	  "...",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_NORECURSE,
+	  NULL, NULL,
+	  delete_disman_schedule },
+
+	{ "dump schedule", NULL,
+	  "The `dump schedule' command generates a sequence of scli\n"
+	  "commands which can be used to restore the schedule configuration.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  dump_schedule },
+
+	{ "monitor schedule info", NULL,
+	  "scheduler information",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_scheduler_info },
 
 	{ "monitor disman run", NULL,
 	  "monitor running scripts",
@@ -1692,7 +1877,7 @@ scli_init_disman_mode(scli_interp_t *interp)
     
     static scli_mode_t disman_mode = {
 	"disman",
-	"The disman scli mode is based on the DISMAN-SCRIPT-MIB as\n"
+	"The scli disman mode is based on the DISMAN-SCRIPT-MIB as\n"
 	"published in RFC 3165 and the DISMAN-SCHEDULE-MIB as\n"
 	"published in RFC 3231. It allows to browse and configure\n"
 	"distributed managers.",
