@@ -466,6 +466,7 @@ main(int argc, char **argv)
     scli_init_cisco_mode(interp);
     scli_init_nortel_mode(interp);
     scli_init_netsnmp_mode(interp);
+    scli_init_3com_mode(interp);
 
     if (optind < argc) {
 	char *margv[] = { "open", NULL, NULL, NULL };
