@@ -38,11 +38,7 @@ fmt_seconds(guint32 number)
     min  = (number / 60) % 60;
     hour = (number / 60 / 60);
 
-    if (hour) {
-	g_snprintf(buffer, sizeof(buffer), "%2d:%02d:%02d", hour, min, sec);
-    } else {
-	g_snprintf(buffer, sizeof(buffer), "   %02d:%02d", min, sec);
-    }
+    g_snprintf(buffer, sizeof(buffer), "%2d:%02d:%02d", hour, min, sec);
 
 #if 0
     if (number > 99900) {

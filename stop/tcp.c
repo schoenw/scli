@@ -130,7 +130,7 @@ show_tcp_connections(WINDOW *win, host_snmp *peer, int flags)
 	show_tcp_summary(peer);
 	wattron(win, A_REVERSE);
 	mvwprintw(win, 0, 0, "%-*s", COLS, 
-		  "Local Address            Remote Address           Status");
+		  "LOCAL ADDRESS            REMOTE ADDRESS           STATUS");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
     }
@@ -140,6 +140,7 @@ show_tcp_connections(WINDOW *win, host_snmp *peer, int flags)
 	return;
     }
 
+    wmove(win, 1, 0);
     for (i = 0, p = 0; tcpConnTable[i]; i++) {
 	if (tcpConnTable[i]->tcpConnState &&
 	    *tcpConnTable[i]->tcpConnState == 2) {

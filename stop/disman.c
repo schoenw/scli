@@ -153,6 +153,7 @@ show_runs(WINDOW *win, host_snmp *peer, int flags)
 
     (void) disman_script_mib_get_smLaunchTable(peer, &smLaunchTable);
 
+    wmove(win, 1, 0);
     for (i = 0; smRunTable[i]; i++) {
 	GString *s;
 	s = g_string_new(NULL);
