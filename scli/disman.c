@@ -32,6 +32,10 @@
 
 #include <time.h>
 
+
+/* xxx still need to do MaxRunning and MaxCompleted */
+
+
 #define RFC2592BIS
 
 
@@ -71,6 +75,61 @@ get_lang_name(smLangEntry_t *smLangEntry)
     }
 
     return NULL;
+}
+
+
+
+static time_t
+date_to_time(guchar *date, gsize len)
+{
+    struct tm tm;
+    time_t t = 0;
+    
+    if (len == 8 || len == 11) {
+	memset(&tm, 0, sizeof(struct tm));
+	tm.tm_year = ((date[0] << 8) + date[1]) - 1900;
+	tm.tm_mon  = date[2];
+	tm.tm_mday = date[3];
+	tm.tm_hour = date[4];
+	tm.tm_min  = date[5];
+	tm.tm_sec  = date[6];
+	t = mktime(&tm);
+    }
+
+    return t;
+}
+
+
+
+static void
+fmt_last_change(GString *s, guchar *date, gsize len)
+{
+    static char const *months[] = {
+	"---",
+	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+    int year;
+    time_t now, lch;
+    
+    if (! date || (len != 8 && len != 11)) {
+	g_string_sprintfa(s, "--- -- ----- ");
+	return;
+    }
+
+    now = time(NULL);
+    lch = date_to_time(date, len);
+
+    year = (date[0] << 8) + date[1];
+
+    if (now-lch > 3600 * 24 * 365) {
+	g_string_sprintfa(s, "%3s %2u  %4u ",
+			  months[date[2] < 13 ? date[2] : 0], date[3], year);
+    } else {
+	g_string_sprintfa(s, "%3s %2u %02u:%02u ",
+			  months[date[2] < 13 ? date[2] : 0], date[3],
+			  date[4], date[5]);
+    }
 }
 
 
@@ -148,57 +207,32 @@ fmt_row_status(GString *s, gint32 *status)
 
 
 
-static time_t
-date_to_time(guchar *date, gsize len)
+static void
+fmt_launch_admin_status(GString *s, gint32 *status)
 {
-    struct tm tm;
-    time_t t = 0;
-    
-    if (len == 8 || len == 11) {
-	memset(&tm, 0, sizeof(struct tm));
-	tm.tm_year = ((date[0] << 8) + date[1]) - 1900;
-	tm.tm_mon  = date[2];
-	tm.tm_mday = date[3];
-	tm.tm_hour = date[4];
-	tm.tm_min  = date[5];
-	tm.tm_sec  = date[6];
-	t = mktime(&tm);
-    }
+    static stls_enum_t const launch_admin_states[] = {
+	{ DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_ENABLED,	"e" },
+	{ DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_DISABLED,	"d" },
+	{ DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_AUTOSTART,	"a" },
+	{ 0, NULL }
+    };
 
-    return t;
+    fmt_enum(s, 1, launch_admin_states, status);
 }
 
 
 
 static void
-fmt_last_change(GString *s, guchar *date, gsize len)
+fmt_launch_oper_status(GString *s, gint32 *status)
 {
-    static char const *months[] = {
-	"---",
-	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    static stls_enum_t const launch_oper_states[] = {
+	{ DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_ENABLED,		"e" },
+	{ DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_DISABLED,	"d" },
+	{ DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_EXPIRED,		"x" },
+	{ 0, NULL }
     };
-    int year;
-    time_t now, lch;
-    
-    if (! date || (len != 8 && len != 11)) {
-	g_string_sprintfa(s, "--- -- ----- ");
-	return;
-    }
 
-    now = time(NULL);
-    lch = date_to_time(date, len);
-
-    year = (date[0] << 8) + date[1];
-
-    if (now-lch > 3600 * 24 * 365) {
-	g_string_sprintfa(s, "%3s %2u  %4u ",
-			  months[date[2] < 13 ? date[2] : 0], date[3], year);
-    } else {
-	g_string_sprintfa(s, "%3s %2u %02u:%02u ",
-			  months[date[2] < 13 ? date[2] : 0], date[3],
-			  date[4], date[5]);
-    }
+    fmt_enum(s, 1, launch_oper_states, status);
 }
 
 
@@ -618,18 +652,47 @@ cmd_script_info(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+count_runs(smLaunchEntry_t *smLaunchEntry, smRunEntry_t **smRunTable)
+{
+    int i;
+    int runs = 0;
+
+    if (! smRunTable) {
+	return 0;
+    }
+
+    for (i = 0; smRunTable[i]; i++) {
+	if ((smRunTable[i]->_smLaunchOwnerLength ==
+	     smLaunchEntry->_smLaunchOwnerLength)
+	    && (smRunTable[i]->_smLaunchNameLength ==
+		smLaunchEntry->_smLaunchNameLength)
+	    && memcmp(smRunTable[i]->smLaunchOwner,
+		      smLaunchEntry->smLaunchOwner,
+		      smLaunchEntry->_smLaunchOwnerLength) == 0
+	    && memcmp(smRunTable[i]->smLaunchName,
+		      smLaunchEntry->smLaunchName,
+		      smLaunchEntry->_smLaunchNameLength) == 0)
+	    {
+	    runs++;
+	}
+    }
+    
+    return runs;
+}
+
+
+
 static void
 show_launch_info(GString *s, smLaunchEntry_t *smLaunchEntry,
-		 int owner_width)
+		 int runs, int owner_width)
 {
-#if 0
-    fmt_script_admin_status(s, smScriptEntry->smScriptAdminStatus);
-    fmt_script_oper_status(s, smScriptEntry->smScriptOperStatus);
-    fmt_storage_type(s, smScriptEntry->smScriptStorageType);
-    fmt_row_status(s, smScriptEntry->smScriptRowStatus);
+    fmt_launch_admin_status(s, smLaunchEntry->smLaunchAdminStatus);
+    fmt_launch_oper_status(s, smLaunchEntry->smLaunchOperStatus);
+    fmt_storage_type(s, smLaunchEntry->smLaunchStorageType);
+    fmt_row_status(s, smLaunchEntry->smLaunchRowStatus);
 
-    g_string_sprintfa(s, " %3u ", launches);
-#endif
+    g_string_sprintfa(s, " %3u ", runs);
     
     g_string_sprintfa(s, "%-*.*s ", owner_width,
 		      (int) smLaunchEntry->_smLaunchOwnerLength,
@@ -647,6 +710,22 @@ show_launch_info(GString *s, smLaunchEntry_t *smLaunchEntry,
     g_string_sprintfa(s, "%.*s",
 		      (int) smLaunchEntry->_smLaunchNameLength,
 		      smLaunchEntry->smLaunchName);
+    if (smLaunchEntry->smLaunchScriptName) {
+	g_string_sprintfa(s, " -> %.*s",
+			  (int) smLaunchEntry->_smLaunchScriptNameLength,
+			  smLaunchEntry->smLaunchScriptName);
+    }
+    if (smLaunchEntry->smLaunchScriptOwner) {
+	if (smLaunchEntry->_smLaunchScriptOwnerLength
+	    != smLaunchEntry->_smLaunchOwnerLength ||
+	    memcmp(smLaunchEntry->smLaunchScriptOwner,
+		   smLaunchEntry->smLaunchOwner,
+		   smLaunchEntry->_smLaunchOwnerLength)) {
+	    g_string_sprintfa(s, " (%.*s)",
+			  (int) smLaunchEntry->_smLaunchScriptOwnerLength,
+			  smLaunchEntry->smLaunchScriptOwner);
+	}
+    }
     g_string_append(s, "\n");
 }
 
@@ -659,7 +738,7 @@ cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
     smLaunchEntry_t **smLaunchTable = NULL;
     smRunEntry_t **smRunTable = NULL;
     int i;
-    int owner_width = 8, lang_width = 8;
+    int owner_width = 8;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -677,10 +756,11 @@ cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 	g_string_sprintfa(interp->result,
-			  "State  L %-*s %-*s Last Change  Name\n",
-			  owner_width, "Owner", lang_width, "Language");
+			  "State  R %-*s Last Change  Name\n",
+			  owner_width, "Owner");
 	for (i = 0; smLaunchTable[i]; i++) {
 	    show_launch_info(interp->result, smLaunchTable[i],
+			     count_runs(smLaunchTable[i], smRunTable),
 			     owner_width);
 	}
     }
@@ -699,12 +779,14 @@ show_launch_details(GString *s, smLaunchEntry_t *smLaunchEntry)
 {
     int const width = 20;
 
-    /* still need to do MaxRunning and MaxCompleted */
-
-    g_string_append(s, "Life Time:     ");
+    g_string_append(s, "Life Time:   ");
     if (smLaunchEntry->smLaunchLifeTime) {
-	g_string_sprintfa(s, "%9s         ",
-			  fmt_seconds(*smLaunchEntry->smLaunchLifeTime/100));
+	if (*smLaunchEntry->smLaunchLifeTime == 2147483647) {
+	    g_string_sprintfa(s, "unlimited           ");
+	} else {
+	    g_string_sprintfa(s, "%9s         ",
+		      fmt_seconds(*smLaunchEntry->smLaunchLifeTime/100));
+	}
     } else {
 	g_string_sprintfa(s, "%9s         ", "");
     }
@@ -716,9 +798,9 @@ show_launch_details(GString *s, smLaunchEntry_t *smLaunchEntry)
     }
     g_string_append(s, "\n");
 
-    g_string_append(s, "Expire Time:   ");
+    g_string_append(s, "Expire Time: ");
     if (smLaunchEntry->smLaunchExpireTime) {
-	g_string_sprintfa(s, "%9s         ",
+	g_string_sprintfa(s, "%9s           ",
 			  fmt_seconds(*smLaunchEntry->smLaunchExpireTime/100));
     } else {
 	g_string_sprintfa(s, "%9s         ", "");
@@ -847,19 +929,19 @@ show_run_info(GString *s, smRunEntry_t *smRunEntry,
     
     if (smRunEntry->smRunLifeTime) {
 	if (*smRunEntry->smRunLifeTime == 2147483647) {
-	    g_string_sprintfa(s, "-       ");
+	    g_string_sprintfa(s, "         - ");
 	} else {
-	    g_string_sprintfa(s, "%7s ",
+	    g_string_sprintfa(s, "%10s ",
 			      fmt_seconds(*smRunEntry->smRunLifeTime/100));
 	}
     } else {
-	g_string_sprintfa(s, "%7s ", "");
+	g_string_sprintfa(s, "%10s ", "");
     }
     if (smRunEntry->smRunExpireTime) {
-	g_string_sprintfa(s, "%7s ", 
+	g_string_sprintfa(s, "%10s ", 
 			      fmt_seconds(*smRunEntry->smRunExpireTime/100));
     } else {
-	g_string_sprintfa(s, "%7s ", "");
+	g_string_sprintfa(s, "%10s ", "");
     }
 
     g_string_append(s, "\n");
@@ -891,7 +973,7 @@ cmd_run_info(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 	g_string_sprintfa(interp->result,
-			  "%-*s %-*s RUNID STAT    LIFE   EXPIRE\n",
+			  "%-*s %-*s RUNID STAT      LIFE     EXPIRE\n",
 			  l_owner_width, "L-OWNER", l_name_width, "L-NAME");
 	for (i = 0; smRunTable[i]; i++) {
 	    show_run_info(interp->result, smRunTable[i],
@@ -961,8 +1043,12 @@ show_run_details(GString *s, smRunEntry_t *smRunEntry,
     
     g_string_append(s, "Life Time:   ");
     if (smRunEntry->smRunLifeTime) {
-	g_string_sprintfa(s, "%9s         ",
-			  fmt_seconds(*smRunEntry->smRunLifeTime/100));
+	if (*smRunEntry->smRunLifeTime == 2147483647) {
+	    g_string_sprintfa(s, "unlimited         ");
+	} else {
+	    g_string_sprintfa(s, "%9s         ",
+			      fmt_seconds(*smRunEntry->smRunLifeTime/100));
+	}
     } else {
 	g_string_sprintfa(s, "%9s         ", "");
     }
