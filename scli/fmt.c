@@ -208,7 +208,7 @@ fmt_seconds(guint32 seconds)
     min  = (seconds / 60) % 60;
     hour = (seconds / 60 / 60);
 
-    g_snprintf(buffer, sizeof(buffer), "%2d:%02d:%02d", hour, min, sec);
+    g_snprintf(buffer, sizeof(buffer), "%3d:%02d:%02d", hour, min, sec);
 
     return buffer;
 }

@@ -374,7 +374,8 @@ xml_system_device(xmlNodePtr root,
 
 static void
 fmt_system_device(GString *s,
-		  host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
+		  host_resources_mib_hrDeviceEntry_t *hrDeviceEntry,
+		  int type_width)
 {
     char const *status;
     char const *type;
@@ -388,7 +389,7 @@ fmt_system_device(GString *s,
     type = gsnmp_identity_get_label(host_resources_types_identities,
 				    hrDeviceEntry->hrDeviceType,
 				    hrDeviceEntry->_hrDeviceDescrLength);
-    g_string_sprintfa(s, "%8s", type ? type : "");
+    g_string_sprintfa(s, "%*s ", type_width, type ? type : "");
 	
     if (hrDeviceEntry->hrDeviceDescr) {
 	g_string_sprintfa(s, "%.*s\n",
@@ -403,6 +404,8 @@ static int
 show_system_devices(scli_interp_t *interp, int argc, char **argv)
 {
     host_resources_mib_hrDeviceEntry_t **hrDeviceTable = NULL;
+    int type_width = 8;
+    char const *type;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -422,13 +425,23 @@ show_system_devices(scli_interp_t *interp, int argc, char **argv)
     
     if (hrDeviceTable) {
 	if (! scli_interp_xml(interp)) {
-	    g_string_sprintfa(interp->header, "INDEX STATUS  TYPE    DESCRIPTION");
+	    for (i = 0; hrDeviceTable[i]; i++) {
+		type = gsnmp_identity_get_label(host_resources_types_identities,
+					hrDeviceTable[i]->hrDeviceType,
+					hrDeviceTable[i]->_hrDeviceDescrLength);
+		if (type) {
+		    type_width = MAX(type_width, strlen(type));
+		}
+	    }
+	    g_string_sprintfa(interp->header, "INDEX STATUS  %-*s DESCRIPTION",
+			      type_width, "TYPE");
 	}
 	for (i = 0; hrDeviceTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
 		xml_system_device(interp->xml_node, hrDeviceTable[i]);
 	    } else {
-		fmt_system_device(interp->result, hrDeviceTable[i]);
+		fmt_system_device(interp->result, hrDeviceTable[i],
+				  type_width);
 	    }
 	}
     }
@@ -500,7 +513,7 @@ fmt_system_process(GString *s,
 {
     const char *e;
     
-    g_string_sprintfa(s, "%5d ", hrSWRunEntry->hrSWRunIndex);
+    g_string_sprintfa(s, "%7d ", hrSWRunEntry->hrSWRunIndex);
 
     e = fmt_enum(hrSWRunStatus, hrSWRunEntry->hrSWRunStatus);
     g_string_sprintfa(s, "%s ", e ? e : " ");
@@ -519,7 +532,7 @@ fmt_system_process(GString *s,
 	g_string_sprintfa(s, " %s",
 		  fmt_seconds((guint32) *(hrSWRunPerfEntry->hrSWRunPerfCPU)/100));
     } else {
-	g_string_sprintfa(s, " %5s", "--:--");
+	g_string_sprintfa(s, " %6s", "--:--");
     }
     if (hrSWRunEntry->hrSWRunPath
 	&& hrSWRunEntry->_hrSWRunPathLength) {
@@ -578,7 +591,7 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 						&hrSWRunPerfTable, 0);
 	if (! scli_interp_xml(interp)) {
 	    g_string_append(interp->header,
-			    "  PID S T MEMORY     TIME COMMAND");
+			    "    PID S T MEMORY      TIME COMMAND");
 	}
 	for (i = 0; hrSWRunTable[i]; i++) {
 	    if (match_process(regex_path, hrSWRunTable[i])) {

@@ -88,7 +88,8 @@ fmt_ip_route(GString *s,
 
 	if (ifXTable) {
 	    for (i = 0; ifXTable[i]; i++) {
-		if(ifXTable[i]->ifIndex == *ipRouteEntry->ipRouteIfIndex) {
+		if (ifXTable[i]->ifIndex == *ipRouteEntry->ipRouteIfIndex
+		    && ifXTable[i]->ifName) {
 		    g_string_sprintfa(s, " (%.*s)",
 				      (int) ifXTable[i]->_ifNameLength,
 				      ifXTable[i]->ifName);
@@ -97,7 +98,8 @@ fmt_ip_route(GString *s,
 	    }
 	} else if (ifTable) {
 	    for (i = 0; ifTable[i]; i++) {
-		if(ifTable[i]->ifIndex == *ipRouteEntry->ipRouteIfIndex) {
+		if (ifTable[i]->ifIndex == *ipRouteEntry->ipRouteIfIndex
+		    && ifTable[i]->ifDescr) {
 		    g_string_sprintfa(s, " (%.*s)",
 				      (int) ifTable[i]->_ifDescrLength,
 				      ifTable[i]->ifDescr);
