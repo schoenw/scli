@@ -31,6 +31,7 @@ MIBS			= IF-MIB \
 			  Printer-MIB \
 			  ISDN-MIB \
 			  RS-232-MIB \
+			  SONET-MIB \
 			  OLD-CISCO-IP-MIB \
 			  RAPID-CITY \
 			  UCD-SNMP-MIB \
@@ -67,6 +68,7 @@ STUBS			= if-mib.h if-mib.c \
 			  printer-mib.h printer-mib.c \
 			  isdn-mib.h isdn-mib.c \
 			  rs-232-mib.h rs-232-mib.c \
+			  sonet-mib.h sonet-mib.c \
 			  old-cisco-ip-mib.h old-cisco-ip-mib.c \
 			  rapid-city.h rapid-city.c \
 			  ucd-snmp-mib.h ucd-snmp-mib.c \
@@ -172,6 +174,9 @@ isdn-mib.h isdn-mib.c:
 
 rs-232-mib.h rs-232-mib.c:
 	$(SMIDUMP) -f scli RS-232-MIB
+
+sonet-mib.h sonet-mib.c:
+	$(SMIDUMP) -f scli --scli-include='sonetMediumEntry' SONET-MIB
 
 old-cisco-ip-mib.h old-cisco-ip-mib.c:
 	$(SMIDUMP) -f scli OLD-CISCO-IP-MIB
