@@ -57,7 +57,7 @@ show_ospf_info(scli_interp_t *interp, int argc, char **argv)
 	}
 	
 	if (ospfGeneralGroup->ospfAdminStat) {
-	    e = fmt_enum(ospf_mib_enums_ospfIfAdminStat,
+	    e = fmt_enum(ospf_mib_enums_ospfAdminStat,
 			 ospfGeneralGroup->ospfAdminStat);
 	    g_string_sprintfa(interp->result, "AdminStatus: %-*s\n",
 			      8, e ? e : "");
