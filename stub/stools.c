@@ -55,6 +55,7 @@ append_elem(gpointer key, gpointer value, gpointer user_data)
 }
 
 
+
 static void
 cb_row(GHashTable *table, int index_len, gpointer *data)
 {
@@ -65,7 +66,6 @@ cb_row(GHashTable *table, int index_len, gpointer *data)
 
     *tablelist = g_slist_append(*tablelist, rowlist);
 }
-
 
 
 
@@ -97,6 +97,24 @@ stls_enum_get_number(stls_enum_t const *table, char const *str)
     }
 
     return 0; /* xxx */
+}
+
+
+
+char const *
+stls_identity_get_label(stls_identity_t const *table,
+			guint32 const *oid, gsize oidlen)
+{
+    int i;
+
+    for (i = 0; table[i].label; i++) {
+	if (table[i].oidlen == oidlen
+	    && memcmp(table[i].oid, oid, oidlen * sizeof(guint32)) == 0) {
+	    return table[i].label;
+	}
+    }
+
+    return NULL;
 }
 
 

@@ -59,7 +59,7 @@ typedef struct {
 
 gchar const *
 stls_identity_get_label(stls_identity_t const *table,
-			guint32 const oid, gsize oidlen);
+			guint32 const *oid, gsize oidlen);
 guint32 *
 stls_identity_get_identity(stls_identity_t const *table,
 			   gchar const *str, gsize *oidlen);

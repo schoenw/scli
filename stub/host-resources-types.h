@@ -76,4 +76,6 @@
 #define HOST_RESOURCES_TYPES_HRFSFAT32	1,3,6,1,2,1,25,3,9,22
 #define HOST_RESOURCES_TYPES_HRFSLINUXEXT2	1,3,6,1,2,1,25,3,9,23
 
+extern stls_identity_t const host_resources_types_identities[];
+
 #endif /* _HOST_RESOURCES_TYPES_H_ */
