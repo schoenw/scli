@@ -29,6 +29,7 @@
 #include "snmpv2-mib.h"
 #include "if-mib.h"
 #include "ip-mib.h"
+#include "entity-mib.h"
 
 #include <regex.h>
 
@@ -283,6 +284,59 @@ show_if_details(GString *s,
 
 
 
+gint32
+getEntityIndex(gint32 ifIndex,
+	       entity_mib_entAliasMappingEntry_t **entAliasMappingTable,
+	       entity_mib_entPhysicalEntry_t **entPhysicalTable)
+{
+    int i;
+    static const gint32 ifIndex_base[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 1};
+    static const int ifIndex_base_len = sizeof(ifIndex_base)/sizeof(guint32);
+    gint32 entPhysicalIndex = 0;
+
+    if (! entAliasMappingTable || ! entPhysicalTable) {
+	return 0;
+    }
+
+    /*
+     * This piece of code does not really handle logical entities other
+     * than the zero default logical entity.
+     */
+
+    for (i = 0; entAliasMappingTable[i]; i++) {
+	if (entAliasMappingTable[i]->entAliasLogicalIndexOrZero) {
+	    continue;
+	}
+	if (entAliasMappingTable[i]->_entAliasMappingIdentifierLength
+	    == ifIndex_base_len + 1) {
+	    if (memcmp(entAliasMappingTable[i]->entAliasMappingIdentifier,
+		       ifIndex_base, sizeof(ifIndex_base)) == 0) {
+		if (entAliasMappingTable[i]->entAliasMappingIdentifier[ifIndex_base_len] == ifIndex) {
+		    entPhysicalIndex = entAliasMappingTable[i]->entPhysicalIndex;
+		    break;
+		}
+	    }
+	}
+    }
+
+    if (! entPhysicalIndex) {
+	return 0;
+    }
+
+    for (i = 0; entPhysicalTable[i]; i++) {
+	if (entPhysicalTable[i]->entPhysicalIndex == entPhysicalIndex) {
+	    /*
+	    g_printerr("%.*s\n",
+		       (int) entPhysicalTable[i]->_entPhysicalDescrLength,
+		       entPhysicalTable[i]->entPhysicalDescr);
+	    */
+	}
+    }
+    return entPhysicalIndex;
+}
+
+
+
 static int
 cmd_if_details(scli_interp_t *interp, int argc, char **argv)
 {
@@ -290,6 +344,8 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifXEntry_t **ifXTable = NULL;
     snmpv2_mib_system_t *system = NULL;
     ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
+    entity_mib_entAliasMappingEntry_t **entAliasMappingTable = NULL;
+    entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i, c;
 
@@ -314,12 +370,20 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
     (void) snmpv2_mib_get_system(interp->peer, &system);
     (void) ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable);
 
+    if (entity_mib_get_entAliasMappingTable(interp->peer,
+					    &entAliasMappingTable) == 0) {
+	(void) entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable);
+	
+    }
+
     if (ifTable) {
 	for (i = 0, c = 0; ifTable[i]; i++) {
 	    if (match_interface(regex_iface, ifTable[i])) {
 		if (c) {
 		    g_string_append(interp->result, "\n");
 		}
+		(void) getEntityIndex(ifTable[i]->ifIndex,
+				      entAliasMappingTable, entPhysicalTable);
 		show_if_details(interp->result, ifTable[i],
 				ifXTable ? ifXTable[i] : NULL,
 				system, ipAddrTable);
@@ -332,6 +396,10 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
     if (system) snmpv2_mib_free_system(system);
     if (ipAddrTable) ip_mib_free_ipAddrTable(ipAddrTable);
+    if (entAliasMappingTable)
+	entity_mib_free_entAliasMappingTable(entAliasMappingTable);
+    if (entPhysicalTable)
+	entity_mib_free_entPhysicalTable(entPhysicalTable);
 
     if (regex_iface) regfree(regex_iface);
 
