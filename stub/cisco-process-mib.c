@@ -314,7 +314,7 @@ cisco_process_mib_get_cpmCPUTotalTable(GNetSnmp *s, cisco_process_mib_cpmCPUTota
 
     gnet_snmp_attr_get(s, &in, base, 14, 13, cpmCPUTotalEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -345,11 +345,11 @@ cisco_process_mib_get_cpmCPUTotalEntry(GNetSnmp *s, cisco_process_mib_cpmCPUTota
     gnet_snmp_attr_get(s, &in, base, len, 13, cpmCPUTotalEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -366,7 +366,7 @@ cisco_process_mib_free_cpmCPUTotalEntry(cisco_process_mib_cpmCPUTotalEntry_t *cp
     if (cpmCPUTotalEntry) {
         p = (char *) cpmCPUTotalEntry + sizeof(cisco_process_mib_cpmCPUTotalEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(cpmCPUTotalEntry);
     }
@@ -454,7 +454,7 @@ cisco_process_mib_get_cpmProcessTable(GNetSnmp *s, cisco_process_mib_cpmProcessE
 
     gnet_snmp_attr_get(s, &in, base, 14, 13, cpmProcessEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -485,11 +485,11 @@ cisco_process_mib_get_cpmProcessEntry(GNetSnmp *s, cisco_process_mib_cpmProcessE
     gnet_snmp_attr_get(s, &in, base, len, 13, cpmProcessEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -506,7 +506,7 @@ cisco_process_mib_free_cpmProcessEntry(cisco_process_mib_cpmProcessEntry_t *cpmP
     if (cpmProcessEntry) {
         p = (char *) cpmProcessEntry + sizeof(cisco_process_mib_cpmProcessEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(cpmProcessEntry);
     }
@@ -594,7 +594,7 @@ cisco_process_mib_get_cpmProcessExtTable(GNetSnmp *s, cisco_process_mib_cpmProce
 
     gnet_snmp_attr_get(s, &in, base, 14, 13, cpmProcessExtEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -625,11 +625,11 @@ cisco_process_mib_get_cpmProcessExtEntry(GNetSnmp *s, cisco_process_mib_cpmProce
     gnet_snmp_attr_get(s, &in, base, len, 13, cpmProcessExtEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -655,10 +655,10 @@ cisco_process_mib_set_cpmProcessExtEntry(GNetSnmp *s, cisco_process_mib_cpmProce
     gnet_snmp_attr_set(s, &in, base, len, 13, cpmProcessExtEntry_attr, mask, cpmProcessExtEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -672,7 +672,7 @@ cisco_process_mib_free_cpmProcessExtEntry(cisco_process_mib_cpmProcessExtEntry_t
     if (cpmProcessExtEntry) {
         p = (char *) cpmProcessExtEntry + sizeof(cisco_process_mib_cpmProcessExtEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(cpmProcessExtEntry);
     }
@@ -760,7 +760,7 @@ cisco_process_mib_get_cpmProcessExtRevTable(GNetSnmp *s, cisco_process_mib_cpmPr
 
     gnet_snmp_attr_get(s, &in, base, 14, 13, cpmProcessExtRevEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -791,11 +791,11 @@ cisco_process_mib_get_cpmProcessExtRevEntry(GNetSnmp *s, cisco_process_mib_cpmPr
     gnet_snmp_attr_get(s, &in, base, len, 13, cpmProcessExtRevEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -812,7 +812,7 @@ cisco_process_mib_free_cpmProcessExtRevEntry(cisco_process_mib_cpmProcessExtRevE
     if (cpmProcessExtRevEntry) {
         p = (char *) cpmProcessExtRevEntry + sizeof(cisco_process_mib_cpmProcessExtRevEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(cpmProcessExtRevEntry);
     }

@@ -138,11 +138,11 @@ snmp_framework_mib_get_snmpEngine(GNetSnmp *s, snmp_framework_mib_snmpEngine_t *
     gnet_snmp_attr_get(s, &in, base, 10, 9, snmpEngine_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -159,7 +159,7 @@ snmp_framework_mib_free_snmpEngine(snmp_framework_mib_snmpEngine_t *snmpEngine)
     if (snmpEngine) {
         p = (char *) snmpEngine + sizeof(snmp_framework_mib_snmpEngine_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(snmpEngine);
     }

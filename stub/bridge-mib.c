@@ -398,11 +398,11 @@ bridge_mib_get_dot1dBase(GNetSnmp *s, bridge_mib_dot1dBase_t **dot1dBase, gint64
     gnet_snmp_attr_get(s, &in, base, 9, 8, dot1dBase_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -419,7 +419,7 @@ bridge_mib_free_dot1dBase(bridge_mib_dot1dBase_t *dot1dBase)
     if (dot1dBase) {
         p = (char *) dot1dBase + sizeof(bridge_mib_dot1dBase_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(dot1dBase);
     }
@@ -491,7 +491,7 @@ bridge_mib_get_dot1dBasePortTable(GNetSnmp *s, bridge_mib_dot1dBasePortEntry_t *
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, dot1dBasePortEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -522,11 +522,11 @@ bridge_mib_get_dot1dBasePortEntry(GNetSnmp *s, bridge_mib_dot1dBasePortEntry_t *
     gnet_snmp_attr_get(s, &in, base, len, 10, dot1dBasePortEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -543,7 +543,7 @@ bridge_mib_free_dot1dBasePortEntry(bridge_mib_dot1dBasePortEntry_t *dot1dBasePor
     if (dot1dBasePortEntry) {
         p = (char *) dot1dBasePortEntry + sizeof(bridge_mib_dot1dBasePortEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(dot1dBasePortEntry);
     }
@@ -598,11 +598,11 @@ bridge_mib_get_dot1dStp(GNetSnmp *s, bridge_mib_dot1dStp_t **dot1dStp, gint64 ma
     gnet_snmp_attr_get(s, &in, base, 9, 8, dot1dStp_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -619,10 +619,10 @@ bridge_mib_set_dot1dStp(GNetSnmp *s, bridge_mib_dot1dStp_t *dot1dStp, gint64 mas
     gnet_snmp_attr_set(s, &in, base, 10, 8, dot1dStp_attr, mask, dot1dStp);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -636,7 +636,7 @@ bridge_mib_free_dot1dStp(bridge_mib_dot1dStp_t *dot1dStp)
     if (dot1dStp) {
         p = (char *) dot1dStp + sizeof(bridge_mib_dot1dStp_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(dot1dStp);
     }
@@ -708,7 +708,7 @@ bridge_mib_get_dot1dStpPortTable(GNetSnmp *s, bridge_mib_dot1dStpPortEntry_t ***
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, dot1dStpPortEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -739,11 +739,11 @@ bridge_mib_get_dot1dStpPortEntry(GNetSnmp *s, bridge_mib_dot1dStpPortEntry_t **d
     gnet_snmp_attr_get(s, &in, base, len, 10, dot1dStpPortEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -769,10 +769,10 @@ bridge_mib_set_dot1dStpPortEntry(GNetSnmp *s, bridge_mib_dot1dStpPortEntry_t *do
     gnet_snmp_attr_set(s, &in, base, len, 10, dot1dStpPortEntry_attr, mask, dot1dStpPortEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -786,7 +786,7 @@ bridge_mib_free_dot1dStpPortEntry(bridge_mib_dot1dStpPortEntry_t *dot1dStpPortEn
     if (dot1dStpPortEntry) {
         p = (char *) dot1dStpPortEntry + sizeof(bridge_mib_dot1dStpPortEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(dot1dStpPortEntry);
     }
@@ -841,11 +841,11 @@ bridge_mib_get_dot1dTp(GNetSnmp *s, bridge_mib_dot1dTp_t **dot1dTp, gint64 mask)
     gnet_snmp_attr_get(s, &in, base, 9, 8, dot1dTp_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -862,10 +862,10 @@ bridge_mib_set_dot1dTp(GNetSnmp *s, bridge_mib_dot1dTp_t *dot1dTp, gint64 mask)
     gnet_snmp_attr_set(s, &in, base, 10, 8, dot1dTp_attr, mask, dot1dTp);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -879,7 +879,7 @@ bridge_mib_free_dot1dTp(bridge_mib_dot1dTp_t *dot1dTp)
     if (dot1dTp) {
         p = (char *) dot1dTp + sizeof(bridge_mib_dot1dTp_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(dot1dTp);
     }
@@ -958,7 +958,7 @@ bridge_mib_get_dot1dTpFdbTable(GNetSnmp *s, bridge_mib_dot1dTpFdbEntry_t ***dot1
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, dot1dTpFdbEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -989,11 +989,11 @@ bridge_mib_get_dot1dTpFdbEntry(GNetSnmp *s, bridge_mib_dot1dTpFdbEntry_t **dot1d
     gnet_snmp_attr_get(s, &in, base, len, 10, dot1dTpFdbEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1010,7 +1010,7 @@ bridge_mib_free_dot1dTpFdbEntry(bridge_mib_dot1dTpFdbEntry_t *dot1dTpFdbEntry)
     if (dot1dTpFdbEntry) {
         p = (char *) dot1dTpFdbEntry + sizeof(bridge_mib_dot1dTpFdbEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(dot1dTpFdbEntry);
     }
@@ -1095,7 +1095,7 @@ bridge_mib_get_dot1dTpPortTable(GNetSnmp *s, bridge_mib_dot1dTpPortEntry_t ***do
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, dot1dTpPortEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1126,11 +1126,11 @@ bridge_mib_get_dot1dTpPortEntry(GNetSnmp *s, bridge_mib_dot1dTpPortEntry_t **dot
     gnet_snmp_attr_get(s, &in, base, len, 10, dot1dTpPortEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1147,7 +1147,7 @@ bridge_mib_free_dot1dTpPortEntry(bridge_mib_dot1dTpPortEntry_t *dot1dTpPortEntry
     if (dot1dTpPortEntry) {
         p = (char *) dot1dTpPortEntry + sizeof(bridge_mib_dot1dTpPortEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(dot1dTpPortEntry);
     }
@@ -1242,7 +1242,7 @@ bridge_mib_get_dot1dStaticTable(GNetSnmp *s, bridge_mib_dot1dStaticEntry_t ***do
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, dot1dStaticEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1273,11 +1273,11 @@ bridge_mib_get_dot1dStaticEntry(GNetSnmp *s, bridge_mib_dot1dStaticEntry_t **dot
     gnet_snmp_attr_get(s, &in, base, len, 10, dot1dStaticEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1303,10 +1303,10 @@ bridge_mib_set_dot1dStaticEntry(GNetSnmp *s, bridge_mib_dot1dStaticEntry_t *dot1
     gnet_snmp_attr_set(s, &in, base, len, 10, dot1dStaticEntry_attr, mask, dot1dStaticEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -1320,7 +1320,7 @@ bridge_mib_free_dot1dStaticEntry(bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry
     if (dot1dStaticEntry) {
         p = (char *) dot1dStaticEntry + sizeof(bridge_mib_dot1dStaticEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(dot1dStaticEntry);
     }

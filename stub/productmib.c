@@ -175,7 +175,7 @@ productmib_get_a3ComVlanIfTable(GNetSnmp *s, productmib_a3ComVlanIfEntry_t ***a3
 
     gnet_snmp_attr_get(s, &in, base, 14, 13, a3ComVlanIfEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -206,11 +206,11 @@ productmib_get_a3ComVlanIfEntry(GNetSnmp *s, productmib_a3ComVlanIfEntry_t **a3C
     gnet_snmp_attr_get(s, &in, base, len, 13, a3ComVlanIfEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -236,10 +236,10 @@ productmib_set_a3ComVlanIfEntry(GNetSnmp *s, productmib_a3ComVlanIfEntry_t *a3Co
     gnet_snmp_attr_set(s, &in, base, len, 13, a3ComVlanIfEntry_attr, mask, a3ComVlanIfEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -253,7 +253,7 @@ productmib_free_a3ComVlanIfEntry(productmib_a3ComVlanIfEntry_t *a3ComVlanIfEntry
     if (a3ComVlanIfEntry) {
         p = (char *) a3ComVlanIfEntry + sizeof(productmib_a3ComVlanIfEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(a3ComVlanIfEntry);
     }
@@ -308,11 +308,11 @@ productmib_get_a3ComVirtualGroup(GNetSnmp *s, productmib_a3ComVirtualGroup_t **a
     gnet_snmp_attr_get(s, &in, base, 12, 11, a3ComVirtualGroup_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -329,7 +329,7 @@ productmib_free_a3ComVirtualGroup(productmib_a3ComVirtualGroup_t *a3ComVirtualGr
     if (a3ComVirtualGroup) {
         p = (char *) a3ComVirtualGroup + sizeof(productmib_a3ComVirtualGroup_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(a3ComVirtualGroup);
     }

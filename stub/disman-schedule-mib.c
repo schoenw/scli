@@ -245,11 +245,11 @@ disman_schedule_mib_get_schedObjects(GNetSnmp *s, disman_schedule_mib_schedObjec
     gnet_snmp_attr_get(s, &in, base, 9, 8, schedObjects_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -266,7 +266,7 @@ disman_schedule_mib_free_schedObjects(disman_schedule_mib_schedObjects_t *schedO
     if (schedObjects) {
         p = (char *) schedObjects + sizeof(disman_schedule_mib_schedObjects_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(schedObjects);
     }
@@ -364,7 +364,7 @@ disman_schedule_mib_get_schedTable(GNetSnmp *s, disman_schedule_mib_schedEntry_t
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, schedEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -395,11 +395,11 @@ disman_schedule_mib_get_schedEntry(GNetSnmp *s, disman_schedule_mib_schedEntry_t
     gnet_snmp_attr_get(s, &in, base, len, 10, schedEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -425,10 +425,10 @@ disman_schedule_mib_set_schedEntry(GNetSnmp *s, disman_schedule_mib_schedEntry_t
     gnet_snmp_attr_set(s, &in, base, len, 10, schedEntry_attr, mask, schedEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -442,7 +442,7 @@ disman_schedule_mib_free_schedEntry(disman_schedule_mib_schedEntry_t *schedEntry
     if (schedEntry) {
         p = (char *) schedEntry + sizeof(disman_schedule_mib_schedEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(schedEntry);
     }

@@ -207,7 +207,7 @@ snmp_notification_mib_get_snmpNotifyTable(GNetSnmp *s, snmp_notification_mib_snm
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, snmpNotifyEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -238,11 +238,11 @@ snmp_notification_mib_get_snmpNotifyEntry(GNetSnmp *s, snmp_notification_mib_snm
     gnet_snmp_attr_get(s, &in, base, len, 10, snmpNotifyEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -268,10 +268,10 @@ snmp_notification_mib_set_snmpNotifyEntry(GNetSnmp *s, snmp_notification_mib_snm
     gnet_snmp_attr_set(s, &in, base, len, 10, snmpNotifyEntry_attr, mask, snmpNotifyEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -285,7 +285,7 @@ snmp_notification_mib_free_snmpNotifyEntry(snmp_notification_mib_snmpNotifyEntry
     if (snmpNotifyEntry) {
         p = (char *) snmpNotifyEntry + sizeof(snmp_notification_mib_snmpNotifyEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(snmpNotifyEntry);
     }
@@ -380,7 +380,7 @@ snmp_notification_mib_get_snmpNotifyFilterProfileTable(GNetSnmp *s, snmp_notific
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, snmpNotifyFilterProfileEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -411,11 +411,11 @@ snmp_notification_mib_get_snmpNotifyFilterProfileEntry(GNetSnmp *s, snmp_notific
     gnet_snmp_attr_get(s, &in, base, len, 10, snmpNotifyFilterProfileEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -441,10 +441,10 @@ snmp_notification_mib_set_snmpNotifyFilterProfileEntry(GNetSnmp *s, snmp_notific
     gnet_snmp_attr_set(s, &in, base, len, 10, snmpNotifyFilterProfileEntry_attr, mask, snmpNotifyFilterProfileEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -458,7 +458,7 @@ snmp_notification_mib_free_snmpNotifyFilterProfileEntry(snmp_notification_mib_sn
     if (snmpNotifyFilterProfileEntry) {
         p = (char *) snmpNotifyFilterProfileEntry + sizeof(snmp_notification_mib_snmpNotifyFilterProfileEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(snmpNotifyFilterProfileEntry);
     }
@@ -567,7 +567,7 @@ snmp_notification_mib_get_snmpNotifyFilterTable(GNetSnmp *s, snmp_notification_m
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, snmpNotifyFilterEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -598,11 +598,11 @@ snmp_notification_mib_get_snmpNotifyFilterEntry(GNetSnmp *s, snmp_notification_m
     gnet_snmp_attr_get(s, &in, base, len, 10, snmpNotifyFilterEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -628,10 +628,10 @@ snmp_notification_mib_set_snmpNotifyFilterEntry(GNetSnmp *s, snmp_notification_m
     gnet_snmp_attr_set(s, &in, base, len, 10, snmpNotifyFilterEntry_attr, mask, snmpNotifyFilterEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -645,7 +645,7 @@ snmp_notification_mib_free_snmpNotifyFilterEntry(snmp_notification_mib_snmpNotif
     if (snmpNotifyFilterEntry) {
         p = (char *) snmpNotifyFilterEntry + sizeof(snmp_notification_mib_snmpNotifyFilterEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(snmpNotifyFilterEntry);
     }

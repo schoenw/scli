@@ -412,11 +412,11 @@ rs_232_mib_get_rs232(GNetSnmp *s, rs_232_mib_rs232_t **rs232, gint64 mask)
     gnet_snmp_attr_get(s, &in, base, 9, 8, rs232_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -433,7 +433,7 @@ rs_232_mib_free_rs232(rs_232_mib_rs232_t *rs232)
     if (rs232) {
         p = (char *) rs232 + sizeof(rs_232_mib_rs232_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(rs232);
     }
@@ -505,7 +505,7 @@ rs_232_mib_get_rs232PortTable(GNetSnmp *s, rs_232_mib_rs232PortEntry_t ***rs232P
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, rs232PortEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -536,11 +536,11 @@ rs_232_mib_get_rs232PortEntry(GNetSnmp *s, rs_232_mib_rs232PortEntry_t **rs232Po
     gnet_snmp_attr_get(s, &in, base, len, 10, rs232PortEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -566,10 +566,10 @@ rs_232_mib_set_rs232PortEntry(GNetSnmp *s, rs_232_mib_rs232PortEntry_t *rs232Por
     gnet_snmp_attr_set(s, &in, base, len, 10, rs232PortEntry_attr, mask, rs232PortEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -583,7 +583,7 @@ rs_232_mib_free_rs232PortEntry(rs_232_mib_rs232PortEntry_t *rs232PortEntry)
     if (rs232PortEntry) {
         p = (char *) rs232PortEntry + sizeof(rs_232_mib_rs232PortEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(rs232PortEntry);
     }
@@ -668,7 +668,7 @@ rs_232_mib_get_rs232AsyncPortTable(GNetSnmp *s, rs_232_mib_rs232AsyncPortEntry_t
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, rs232AsyncPortEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -699,11 +699,11 @@ rs_232_mib_get_rs232AsyncPortEntry(GNetSnmp *s, rs_232_mib_rs232AsyncPortEntry_t
     gnet_snmp_attr_get(s, &in, base, len, 10, rs232AsyncPortEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -729,10 +729,10 @@ rs_232_mib_set_rs232AsyncPortEntry(GNetSnmp *s, rs_232_mib_rs232AsyncPortEntry_t
     gnet_snmp_attr_set(s, &in, base, len, 10, rs232AsyncPortEntry_attr, mask, rs232AsyncPortEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -746,7 +746,7 @@ rs_232_mib_free_rs232AsyncPortEntry(rs_232_mib_rs232AsyncPortEntry_t *rs232Async
     if (rs232AsyncPortEntry) {
         p = (char *) rs232AsyncPortEntry + sizeof(rs_232_mib_rs232AsyncPortEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(rs232AsyncPortEntry);
     }
@@ -831,7 +831,7 @@ rs_232_mib_get_rs232SyncPortTable(GNetSnmp *s, rs_232_mib_rs232SyncPortEntry_t *
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, rs232SyncPortEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -862,11 +862,11 @@ rs_232_mib_get_rs232SyncPortEntry(GNetSnmp *s, rs_232_mib_rs232SyncPortEntry_t *
     gnet_snmp_attr_get(s, &in, base, len, 10, rs232SyncPortEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -892,10 +892,10 @@ rs_232_mib_set_rs232SyncPortEntry(GNetSnmp *s, rs_232_mib_rs232SyncPortEntry_t *
     gnet_snmp_attr_set(s, &in, base, len, 10, rs232SyncPortEntry_attr, mask, rs232SyncPortEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -909,7 +909,7 @@ rs_232_mib_free_rs232SyncPortEntry(rs_232_mib_rs232SyncPortEntry_t *rs232SyncPor
     if (rs232SyncPortEntry) {
         p = (char *) rs232SyncPortEntry + sizeof(rs_232_mib_rs232SyncPortEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(rs232SyncPortEntry);
     }
@@ -997,7 +997,7 @@ rs_232_mib_get_rs232InSigTable(GNetSnmp *s, rs_232_mib_rs232InSigEntry_t ***rs23
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, rs232InSigEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1028,11 +1028,11 @@ rs_232_mib_get_rs232InSigEntry(GNetSnmp *s, rs_232_mib_rs232InSigEntry_t **rs232
     gnet_snmp_attr_get(s, &in, base, len, 10, rs232InSigEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1049,7 +1049,7 @@ rs_232_mib_free_rs232InSigEntry(rs_232_mib_rs232InSigEntry_t *rs232InSigEntry)
     if (rs232InSigEntry) {
         p = (char *) rs232InSigEntry + sizeof(rs_232_mib_rs232InSigEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(rs232InSigEntry);
     }
@@ -1137,7 +1137,7 @@ rs_232_mib_get_rs232OutSigTable(GNetSnmp *s, rs_232_mib_rs232OutSigEntry_t ***rs
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, rs232OutSigEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1168,11 +1168,11 @@ rs_232_mib_get_rs232OutSigEntry(GNetSnmp *s, rs_232_mib_rs232OutSigEntry_t **rs2
     gnet_snmp_attr_get(s, &in, base, len, 10, rs232OutSigEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1189,7 +1189,7 @@ rs_232_mib_free_rs232OutSigEntry(rs_232_mib_rs232OutSigEntry_t *rs232OutSigEntry
     if (rs232OutSigEntry) {
         p = (char *) rs232OutSigEntry + sizeof(rs_232_mib_rs232OutSigEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(rs232OutSigEntry);
     }

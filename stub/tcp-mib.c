@@ -181,11 +181,11 @@ tcp_mib_get_tcp(GNetSnmp *s, tcp_mib_tcp_t **tcp, gint64 mask)
     gnet_snmp_attr_get(s, &in, base, 8, 7, tcp_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -202,7 +202,7 @@ tcp_mib_free_tcp(tcp_mib_tcp_t *tcp)
     if (tcp) {
         p = (char *) tcp + sizeof(tcp_mib_tcp_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(tcp);
     }
@@ -304,7 +304,7 @@ tcp_mib_get_tcpConnTable(GNetSnmp *s, tcp_mib_tcpConnEntry_t ***tcpConnEntry, gi
 
     gnet_snmp_attr_get(s, &in, base, 10, 9, tcpConnEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -335,11 +335,11 @@ tcp_mib_get_tcpConnEntry(GNetSnmp *s, tcp_mib_tcpConnEntry_t **tcpConnEntry, guc
     gnet_snmp_attr_get(s, &in, base, len, 9, tcpConnEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -365,10 +365,10 @@ tcp_mib_set_tcpConnEntry(GNetSnmp *s, tcp_mib_tcpConnEntry_t *tcpConnEntry, gint
     gnet_snmp_attr_set(s, &in, base, len, 9, tcpConnEntry_attr, mask, tcpConnEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -382,7 +382,7 @@ tcp_mib_free_tcpConnEntry(tcp_mib_tcpConnEntry_t *tcpConnEntry)
     if (tcpConnEntry) {
         p = (char *) tcpConnEntry + sizeof(tcp_mib_tcpConnEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(tcpConnEntry);
     }

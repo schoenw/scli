@@ -312,11 +312,11 @@ notification_log_mib_get_nlmConfig(GNetSnmp *s, notification_log_mib_nlmConfig_t
     gnet_snmp_attr_get(s, &in, base, 10, 9, nlmConfig_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -333,10 +333,10 @@ notification_log_mib_set_nlmConfig(GNetSnmp *s, notification_log_mib_nlmConfig_t
     gnet_snmp_attr_set(s, &in, base, 11, 9, nlmConfig_attr, mask, nlmConfig);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -350,7 +350,7 @@ notification_log_mib_free_nlmConfig(notification_log_mib_nlmConfig_t *nlmConfig)
     if (nlmConfig) {
         p = (char *) nlmConfig + sizeof(notification_log_mib_nlmConfig_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(nlmConfig);
     }
@@ -433,7 +433,7 @@ notification_log_mib_get_nlmConfigLogTable(GNetSnmp *s, notification_log_mib_nlm
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, nlmConfigLogEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -464,11 +464,11 @@ notification_log_mib_get_nlmConfigLogEntry(GNetSnmp *s, notification_log_mib_nlm
     gnet_snmp_attr_get(s, &in, base, len, 11, nlmConfigLogEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -494,10 +494,10 @@ notification_log_mib_set_nlmConfigLogEntry(GNetSnmp *s, notification_log_mib_nlm
     gnet_snmp_attr_set(s, &in, base, len, 11, nlmConfigLogEntry_attr, mask, nlmConfigLogEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -511,7 +511,7 @@ notification_log_mib_free_nlmConfigLogEntry(notification_log_mib_nlmConfigLogEnt
     if (nlmConfigLogEntry) {
         p = (char *) nlmConfigLogEntry + sizeof(notification_log_mib_nlmConfigLogEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(nlmConfigLogEntry);
     }
@@ -566,11 +566,11 @@ notification_log_mib_get_nlmStats(GNetSnmp *s, notification_log_mib_nlmStats_t *
     gnet_snmp_attr_get(s, &in, base, 10, 9, nlmStats_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -587,7 +587,7 @@ notification_log_mib_free_nlmStats(notification_log_mib_nlmStats_t *nlmStats)
     if (nlmStats) {
         p = (char *) nlmStats + sizeof(notification_log_mib_nlmStats_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(nlmStats);
     }
@@ -670,7 +670,7 @@ notification_log_mib_get_nlmStatsLogTable(GNetSnmp *s, notification_log_mib_nlmS
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, nlmStatsLogEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -701,11 +701,11 @@ notification_log_mib_get_nlmStatsLogEntry(GNetSnmp *s, notification_log_mib_nlmS
     gnet_snmp_attr_get(s, &in, base, len, 11, nlmStatsLogEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -722,7 +722,7 @@ notification_log_mib_free_nlmStatsLogEntry(notification_log_mib_nlmStatsLogEntry
     if (nlmStatsLogEntry) {
         p = (char *) nlmStatsLogEntry + sizeof(notification_log_mib_nlmStatsLogEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(nlmStatsLogEntry);
     }
@@ -824,7 +824,7 @@ notification_log_mib_get_nlmLogTable(GNetSnmp *s, notification_log_mib_nlmLogEnt
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, nlmLogEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -855,11 +855,11 @@ notification_log_mib_get_nlmLogEntry(GNetSnmp *s, notification_log_mib_nlmLogEnt
     gnet_snmp_attr_get(s, &in, base, len, 11, nlmLogEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -876,7 +876,7 @@ notification_log_mib_free_nlmLogEntry(notification_log_mib_nlmLogEntry_t *nlmLog
     if (nlmLogEntry) {
         p = (char *) nlmLogEntry + sizeof(notification_log_mib_nlmLogEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(nlmLogEntry);
     }
@@ -984,7 +984,7 @@ notification_log_mib_get_nlmLogVariableTable(GNetSnmp *s, notification_log_mib_n
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, nlmLogVariableEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1015,11 +1015,11 @@ notification_log_mib_get_nlmLogVariableEntry(GNetSnmp *s, notification_log_mib_n
     gnet_snmp_attr_get(s, &in, base, len, 11, nlmLogVariableEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1036,7 +1036,7 @@ notification_log_mib_free_nlmLogVariableEntry(notification_log_mib_nlmLogVariabl
     if (nlmLogVariableEntry) {
         p = (char *) nlmLogVariableEntry + sizeof(notification_log_mib_nlmLogVariableEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(nlmLogVariableEntry);
     }

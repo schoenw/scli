@@ -718,7 +718,7 @@ mau_mib_get_rpMauTable(GNetSnmp *s, mau_mib_rpMauEntry_t ***rpMauEntry, gint64 m
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, rpMauEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -749,11 +749,11 @@ mau_mib_get_rpMauEntry(GNetSnmp *s, mau_mib_rpMauEntry_t **rpMauEntry, gint32 rp
     gnet_snmp_attr_get(s, &in, base, len, 10, rpMauEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -779,10 +779,10 @@ mau_mib_set_rpMauEntry(GNetSnmp *s, mau_mib_rpMauEntry_t *rpMauEntry, gint64 mas
     gnet_snmp_attr_set(s, &in, base, len, 10, rpMauEntry_attr, mask, rpMauEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -796,7 +796,7 @@ mau_mib_free_rpMauEntry(mau_mib_rpMauEntry_t *rpMauEntry)
     if (rpMauEntry) {
         p = (char *) rpMauEntry + sizeof(mau_mib_rpMauEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(rpMauEntry);
     }
@@ -899,7 +899,7 @@ mau_mib_get_rpJackTable(GNetSnmp *s, mau_mib_rpJackEntry_t ***rpJackEntry, gint6
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, rpJackEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -930,11 +930,11 @@ mau_mib_get_rpJackEntry(GNetSnmp *s, mau_mib_rpJackEntry_t **rpJackEntry, gint32
     gnet_snmp_attr_get(s, &in, base, len, 10, rpJackEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -951,7 +951,7 @@ mau_mib_free_rpJackEntry(mau_mib_rpJackEntry_t *rpJackEntry)
     if (rpJackEntry) {
         p = (char *) rpJackEntry + sizeof(mau_mib_rpJackEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(rpJackEntry);
     }
@@ -1042,7 +1042,7 @@ mau_mib_get_ifMauTable(GNetSnmp *s, mau_mib_ifMauEntry_t ***ifMauEntry, gint64 m
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, ifMauEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1073,11 +1073,11 @@ mau_mib_get_ifMauEntry(GNetSnmp *s, mau_mib_ifMauEntry_t **ifMauEntry, gint32 if
     gnet_snmp_attr_get(s, &in, base, len, 10, ifMauEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1103,10 +1103,10 @@ mau_mib_set_ifMauEntry(GNetSnmp *s, mau_mib_ifMauEntry_t *ifMauEntry, gint64 mas
     gnet_snmp_attr_set(s, &in, base, len, 10, ifMauEntry_attr, mask, ifMauEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -1120,7 +1120,7 @@ mau_mib_free_ifMauEntry(mau_mib_ifMauEntry_t *ifMauEntry)
     if (ifMauEntry) {
         p = (char *) ifMauEntry + sizeof(mau_mib_ifMauEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(ifMauEntry);
     }
@@ -1217,7 +1217,7 @@ mau_mib_get_ifJackTable(GNetSnmp *s, mau_mib_ifJackEntry_t ***ifJackEntry, gint6
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, ifJackEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1248,11 +1248,11 @@ mau_mib_get_ifJackEntry(GNetSnmp *s, mau_mib_ifJackEntry_t **ifJackEntry, gint32
     gnet_snmp_attr_get(s, &in, base, len, 10, ifJackEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1269,7 +1269,7 @@ mau_mib_free_ifJackEntry(mau_mib_ifJackEntry_t *ifJackEntry)
     if (ifJackEntry) {
         p = (char *) ifJackEntry + sizeof(mau_mib_ifJackEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(ifJackEntry);
     }
@@ -1360,7 +1360,7 @@ mau_mib_get_ifMauAutoNegTable(GNetSnmp *s, mau_mib_ifMauAutoNegEntry_t ***ifMauA
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, ifMauAutoNegEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1391,11 +1391,11 @@ mau_mib_get_ifMauAutoNegEntry(GNetSnmp *s, mau_mib_ifMauAutoNegEntry_t **ifMauAu
     gnet_snmp_attr_get(s, &in, base, len, 10, ifMauAutoNegEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1421,10 +1421,10 @@ mau_mib_set_ifMauAutoNegEntry(GNetSnmp *s, mau_mib_ifMauAutoNegEntry_t *ifMauAut
     gnet_snmp_attr_set(s, &in, base, len, 10, ifMauAutoNegEntry_attr, mask, ifMauAutoNegEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -1438,7 +1438,7 @@ mau_mib_free_ifMauAutoNegEntry(mau_mib_ifMauAutoNegEntry_t *ifMauAutoNegEntry)
     if (ifMauAutoNegEntry) {
         p = (char *) ifMauAutoNegEntry + sizeof(mau_mib_ifMauAutoNegEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(ifMauAutoNegEntry);
     }

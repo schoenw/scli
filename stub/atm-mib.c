@@ -235,7 +235,7 @@ atm_mib_get_atmInterfaceConfTable(GNetSnmp *s, atm_mib_atmInterfaceConfEntry_t *
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, atmInterfaceConfEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -266,11 +266,11 @@ atm_mib_get_atmInterfaceConfEntry(GNetSnmp *s, atm_mib_atmInterfaceConfEntry_t *
     gnet_snmp_attr_get(s, &in, base, len, 10, atmInterfaceConfEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -296,10 +296,10 @@ atm_mib_set_atmInterfaceConfEntry(GNetSnmp *s, atm_mib_atmInterfaceConfEntry_t *
     gnet_snmp_attr_set(s, &in, base, len, 10, atmInterfaceConfEntry_attr, mask, atmInterfaceConfEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -313,7 +313,7 @@ atm_mib_free_atmInterfaceConfEntry(atm_mib_atmInterfaceConfEntry_t *atmInterface
     if (atmInterfaceConfEntry) {
         p = (char *) atmInterfaceConfEntry + sizeof(atm_mib_atmInterfaceConfEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(atmInterfaceConfEntry);
     }

@@ -316,7 +316,7 @@ entity_mib_get_entPhysicalTable(GNetSnmp *s, entity_mib_entPhysicalEntry_t ***en
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, entPhysicalEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -347,11 +347,11 @@ entity_mib_get_entPhysicalEntry(GNetSnmp *s, entity_mib_entPhysicalEntry_t **ent
     gnet_snmp_attr_get(s, &in, base, len, 11, entPhysicalEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -377,10 +377,10 @@ entity_mib_set_entPhysicalEntry(GNetSnmp *s, entity_mib_entPhysicalEntry_t *entP
     gnet_snmp_attr_set(s, &in, base, len, 11, entPhysicalEntry_attr, mask, entPhysicalEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -394,7 +394,7 @@ entity_mib_free_entPhysicalEntry(entity_mib_entPhysicalEntry_t *entPhysicalEntry
     if (entPhysicalEntry) {
         p = (char *) entPhysicalEntry + sizeof(entity_mib_entPhysicalEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(entPhysicalEntry);
     }
@@ -479,7 +479,7 @@ entity_mib_get_entLogicalTable(GNetSnmp *s, entity_mib_entLogicalEntry_t ***entL
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, entLogicalEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -510,11 +510,11 @@ entity_mib_get_entLogicalEntry(GNetSnmp *s, entity_mib_entLogicalEntry_t **entLo
     gnet_snmp_attr_get(s, &in, base, len, 11, entLogicalEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -531,7 +531,7 @@ entity_mib_free_entLogicalEntry(entity_mib_entLogicalEntry_t *entLogicalEntry)
     if (entLogicalEntry) {
         p = (char *) entLogicalEntry + sizeof(entity_mib_entLogicalEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(entLogicalEntry);
     }
@@ -622,7 +622,7 @@ entity_mib_get_entLPMappingTable(GNetSnmp *s, entity_mib_entLPMappingEntry_t ***
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, entLPMappingEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -653,11 +653,11 @@ entity_mib_get_entLPMappingEntry(GNetSnmp *s, entity_mib_entLPMappingEntry_t **e
     gnet_snmp_attr_get(s, &in, base, len, 11, entLPMappingEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -674,7 +674,7 @@ entity_mib_free_entLPMappingEntry(entity_mib_entLPMappingEntry_t *entLPMappingEn
     if (entLPMappingEntry) {
         p = (char *) entLPMappingEntry + sizeof(entity_mib_entLPMappingEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(entLPMappingEntry);
     }
@@ -765,7 +765,7 @@ entity_mib_get_entAliasMappingTable(GNetSnmp *s, entity_mib_entAliasMappingEntry
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, entAliasMappingEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -796,11 +796,11 @@ entity_mib_get_entAliasMappingEntry(GNetSnmp *s, entity_mib_entAliasMappingEntry
     gnet_snmp_attr_get(s, &in, base, len, 11, entAliasMappingEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -817,7 +817,7 @@ entity_mib_free_entAliasMappingEntry(entity_mib_entAliasMappingEntry_t *entAlias
     if (entAliasMappingEntry) {
         p = (char *) entAliasMappingEntry + sizeof(entity_mib_entAliasMappingEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(entAliasMappingEntry);
     }
@@ -908,7 +908,7 @@ entity_mib_get_entPhysicalContainsTable(GNetSnmp *s, entity_mib_entPhysicalConta
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, entPhysicalContainsEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -939,11 +939,11 @@ entity_mib_get_entPhysicalContainsEntry(GNetSnmp *s, entity_mib_entPhysicalConta
     gnet_snmp_attr_get(s, &in, base, len, 11, entPhysicalContainsEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -960,7 +960,7 @@ entity_mib_free_entPhysicalContainsEntry(entity_mib_entPhysicalContainsEntry_t *
     if (entPhysicalContainsEntry) {
         p = (char *) entPhysicalContainsEntry + sizeof(entity_mib_entPhysicalContainsEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(entPhysicalContainsEntry);
     }
@@ -1015,11 +1015,11 @@ entity_mib_get_entityGeneral(GNetSnmp *s, entity_mib_entityGeneral_t **entityGen
     gnet_snmp_attr_get(s, &in, base, 10, 9, entityGeneral_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1036,7 +1036,7 @@ entity_mib_free_entityGeneral(entity_mib_entityGeneral_t *entityGeneral)
     if (entityGeneral) {
         p = (char *) entityGeneral + sizeof(entity_mib_entityGeneral_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(entityGeneral);
     }

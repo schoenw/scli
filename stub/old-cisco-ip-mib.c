@@ -213,11 +213,11 @@ old_cisco_ip_mib_get_lip(GNetSnmp *s, old_cisco_ip_mib_lip_t **lip, gint64 mask)
     gnet_snmp_attr_get(s, &in, base, 10, 9, lip_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -234,10 +234,10 @@ old_cisco_ip_mib_set_lip(GNetSnmp *s, old_cisco_ip_mib_lip_t *lip, gint64 mask)
     gnet_snmp_attr_set(s, &in, base, 11, 9, lip_attr, mask, lip);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -251,7 +251,7 @@ old_cisco_ip_mib_free_lip(old_cisco_ip_mib_lip_t *lip)
     if (lip) {
         p = (char *) lip + sizeof(old_cisco_ip_mib_lip_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(lip);
     }
@@ -330,7 +330,7 @@ old_cisco_ip_mib_get_lipAddrTable(GNetSnmp *s, old_cisco_ip_mib_lipAddrEntry_t *
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, lipAddrEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -361,11 +361,11 @@ old_cisco_ip_mib_get_lipAddrEntry(GNetSnmp *s, old_cisco_ip_mib_lipAddrEntry_t *
     gnet_snmp_attr_get(s, &in, base, len, 11, lipAddrEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -382,7 +382,7 @@ old_cisco_ip_mib_free_lipAddrEntry(old_cisco_ip_mib_lipAddrEntry_t *lipAddrEntry
     if (lipAddrEntry) {
         p = (char *) lipAddrEntry + sizeof(old_cisco_ip_mib_lipAddrEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(lipAddrEntry);
     }
@@ -474,7 +474,7 @@ old_cisco_ip_mib_get_lipRouteTable(GNetSnmp *s, old_cisco_ip_mib_lipRouteEntry_t
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, lipRouteEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -505,11 +505,11 @@ old_cisco_ip_mib_get_lipRouteEntry(GNetSnmp *s, old_cisco_ip_mib_lipRouteEntry_t
     gnet_snmp_attr_get(s, &in, base, len, 11, lipRouteEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -526,7 +526,7 @@ old_cisco_ip_mib_free_lipRouteEntry(old_cisco_ip_mib_lipRouteEntry_t *lipRouteEn
     if (lipRouteEntry) {
         p = (char *) lipRouteEntry + sizeof(old_cisco_ip_mib_lipRouteEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(lipRouteEntry);
     }
@@ -629,7 +629,7 @@ old_cisco_ip_mib_get_lipAccountingTable(GNetSnmp *s, old_cisco_ip_mib_lipAccount
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, lipAccountEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -660,11 +660,11 @@ old_cisco_ip_mib_get_lipAccountEntry(GNetSnmp *s, old_cisco_ip_mib_lipAccountEnt
     gnet_snmp_attr_get(s, &in, base, len, 11, lipAccountEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -681,7 +681,7 @@ old_cisco_ip_mib_free_lipAccountEntry(old_cisco_ip_mib_lipAccountEntry_t *lipAcc
     if (lipAccountEntry) {
         p = (char *) lipAccountEntry + sizeof(old_cisco_ip_mib_lipAccountEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(lipAccountEntry);
     }
@@ -784,7 +784,7 @@ old_cisco_ip_mib_get_lipCkAccountingTable(GNetSnmp *s, old_cisco_ip_mib_lipCkAcc
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, lipCkAccountEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -815,11 +815,11 @@ old_cisco_ip_mib_get_lipCkAccountEntry(GNetSnmp *s, old_cisco_ip_mib_lipCkAccoun
     gnet_snmp_attr_get(s, &in, base, len, 11, lipCkAccountEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -836,7 +836,7 @@ old_cisco_ip_mib_free_lipCkAccountEntry(old_cisco_ip_mib_lipCkAccountEntry_t *li
     if (lipCkAccountEntry) {
         p = (char *) lipCkAccountEntry + sizeof(old_cisco_ip_mib_lipCkAccountEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(lipCkAccountEntry);
     }

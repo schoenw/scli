@@ -552,7 +552,7 @@ disman_script_mib_get_smLangTable(GNetSnmp *s, disman_script_mib_smLangEntry_t *
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, smLangEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -583,11 +583,11 @@ disman_script_mib_get_smLangEntry(GNetSnmp *s, disman_script_mib_smLangEntry_t *
     gnet_snmp_attr_get(s, &in, base, len, 10, smLangEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -604,7 +604,7 @@ disman_script_mib_free_smLangEntry(disman_script_mib_smLangEntry_t *smLangEntry)
     if (smLangEntry) {
         p = (char *) smLangEntry + sizeof(disman_script_mib_smLangEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(smLangEntry);
     }
@@ -695,7 +695,7 @@ disman_script_mib_get_smExtsnTable(GNetSnmp *s, disman_script_mib_smExtsnEntry_t
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, smExtsnEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -726,11 +726,11 @@ disman_script_mib_get_smExtsnEntry(GNetSnmp *s, disman_script_mib_smExtsnEntry_t
     gnet_snmp_attr_get(s, &in, base, len, 10, smExtsnEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -747,7 +747,7 @@ disman_script_mib_free_smExtsnEntry(disman_script_mib_smExtsnEntry_t *smExtsnEnt
     if (smExtsnEntry) {
         p = (char *) smExtsnEntry + sizeof(disman_script_mib_smExtsnEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(smExtsnEntry);
     }
@@ -858,7 +858,7 @@ disman_script_mib_get_smScriptTable(GNetSnmp *s, disman_script_mib_smScriptEntry
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, smScriptEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -889,11 +889,11 @@ disman_script_mib_get_smScriptEntry(GNetSnmp *s, disman_script_mib_smScriptEntry
     gnet_snmp_attr_get(s, &in, base, len, 11, smScriptEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -919,10 +919,10 @@ disman_script_mib_set_smScriptEntry(GNetSnmp *s, disman_script_mib_smScriptEntry
     gnet_snmp_attr_set(s, &in, base, len, 11, smScriptEntry_attr, mask, smScriptEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -936,7 +936,7 @@ disman_script_mib_free_smScriptEntry(disman_script_mib_smScriptEntry_t *smScript
     if (smScriptEntry) {
         p = (char *) smScriptEntry + sizeof(disman_script_mib_smScriptEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(smScriptEntry);
     }
@@ -1053,7 +1053,7 @@ disman_script_mib_get_smCodeTable(GNetSnmp *s, disman_script_mib_smCodeEntry_t *
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, smCodeEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1084,11 +1084,11 @@ disman_script_mib_get_smCodeEntry(GNetSnmp *s, disman_script_mib_smCodeEntry_t *
     gnet_snmp_attr_get(s, &in, base, len, 11, smCodeEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1114,10 +1114,10 @@ disman_script_mib_set_smCodeEntry(GNetSnmp *s, disman_script_mib_smCodeEntry_t *
     gnet_snmp_attr_set(s, &in, base, len, 11, smCodeEntry_attr, mask, smCodeEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -1131,7 +1131,7 @@ disman_script_mib_free_smCodeEntry(disman_script_mib_smCodeEntry_t *smCodeEntry)
     if (smCodeEntry) {
         p = (char *) smCodeEntry + sizeof(disman_script_mib_smCodeEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(smCodeEntry);
     }
@@ -1242,7 +1242,7 @@ disman_script_mib_get_smLaunchTable(GNetSnmp *s, disman_script_mib_smLaunchEntry
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, smLaunchEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1273,11 +1273,11 @@ disman_script_mib_get_smLaunchEntry(GNetSnmp *s, disman_script_mib_smLaunchEntry
     gnet_snmp_attr_get(s, &in, base, len, 11, smLaunchEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1303,10 +1303,10 @@ disman_script_mib_set_smLaunchEntry(GNetSnmp *s, disman_script_mib_smLaunchEntry
     gnet_snmp_attr_set(s, &in, base, len, 11, smLaunchEntry_attr, mask, smLaunchEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -1320,7 +1320,7 @@ disman_script_mib_free_smLaunchEntry(disman_script_mib_smLaunchEntry_t *smLaunch
     if (smLaunchEntry) {
         p = (char *) smLaunchEntry + sizeof(disman_script_mib_smLaunchEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(smLaunchEntry);
     }
@@ -1437,7 +1437,7 @@ disman_script_mib_get_smRunTable(GNetSnmp *s, disman_script_mib_smRunEntry_t ***
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, smRunEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1468,11 +1468,11 @@ disman_script_mib_get_smRunEntry(GNetSnmp *s, disman_script_mib_smRunEntry_t **s
     gnet_snmp_attr_get(s, &in, base, len, 11, smRunEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1498,10 +1498,10 @@ disman_script_mib_set_smRunEntry(GNetSnmp *s, disman_script_mib_smRunEntry_t *sm
     gnet_snmp_attr_set(s, &in, base, len, 11, smRunEntry_attr, mask, smRunEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -1515,7 +1515,7 @@ disman_script_mib_free_smRunEntry(disman_script_mib_smRunEntry_t *smRunEntry)
     if (smRunEntry) {
         p = (char *) smRunEntry + sizeof(disman_script_mib_smRunEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(smRunEntry);
     }

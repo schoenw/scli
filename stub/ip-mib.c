@@ -252,11 +252,11 @@ ip_mib_get_ip(GNetSnmp *s, ip_mib_ip_t **ip, gint64 mask)
     gnet_snmp_attr_get(s, &in, base, 8, 7, ip_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -273,10 +273,10 @@ ip_mib_set_ip(GNetSnmp *s, ip_mib_ip_t *ip, gint64 mask)
     gnet_snmp_attr_set(s, &in, base, 9, 7, ip_attr, mask, ip);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -290,7 +290,7 @@ ip_mib_free_ip(ip_mib_ip_t *ip)
     if (ip) {
         p = (char *) ip + sizeof(ip_mib_ip_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(ip);
     }
@@ -369,7 +369,7 @@ ip_mib_get_ipAddrTable(GNetSnmp *s, ip_mib_ipAddrEntry_t ***ipAddrEntry, gint64 
 
     gnet_snmp_attr_get(s, &in, base, 10, 9, ipAddrEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -400,11 +400,11 @@ ip_mib_get_ipAddrEntry(GNetSnmp *s, ip_mib_ipAddrEntry_t **ipAddrEntry, guchar *
     gnet_snmp_attr_get(s, &in, base, len, 9, ipAddrEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -421,7 +421,7 @@ ip_mib_free_ipAddrEntry(ip_mib_ipAddrEntry_t *ipAddrEntry)
     if (ipAddrEntry) {
         p = (char *) ipAddrEntry + sizeof(ip_mib_ipAddrEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(ipAddrEntry);
     }
@@ -519,7 +519,7 @@ ip_mib_get_ipNetToMediaTable(GNetSnmp *s, ip_mib_ipNetToMediaEntry_t ***ipNetToM
 
     gnet_snmp_attr_get(s, &in, base, 10, 9, ipNetToMediaEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -550,11 +550,11 @@ ip_mib_get_ipNetToMediaEntry(GNetSnmp *s, ip_mib_ipNetToMediaEntry_t **ipNetToMe
     gnet_snmp_attr_get(s, &in, base, len, 9, ipNetToMediaEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -580,10 +580,10 @@ ip_mib_set_ipNetToMediaEntry(GNetSnmp *s, ip_mib_ipNetToMediaEntry_t *ipNetToMed
     gnet_snmp_attr_set(s, &in, base, len, 9, ipNetToMediaEntry_attr, mask, ipNetToMediaEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -597,7 +597,7 @@ ip_mib_free_ipNetToMediaEntry(ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry)
     if (ipNetToMediaEntry) {
         p = (char *) ipNetToMediaEntry + sizeof(ip_mib_ipNetToMediaEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(ipNetToMediaEntry);
     }

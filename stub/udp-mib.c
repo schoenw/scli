@@ -106,11 +106,11 @@ udp_mib_get_udp(GNetSnmp *s, udp_mib_udp_t **udp, gint64 mask)
     gnet_snmp_attr_get(s, &in, base, 8, 7, udp_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -127,7 +127,7 @@ udp_mib_free_udp(udp_mib_udp_t *udp)
     if (udp) {
         p = (char *) udp + sizeof(udp_mib_udp_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(udp);
     }
@@ -212,7 +212,7 @@ udp_mib_get_udpTable(GNetSnmp *s, udp_mib_udpEntry_t ***udpEntry, gint64 mask)
 
     gnet_snmp_attr_get(s, &in, base, 10, 9, udpEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -243,11 +243,11 @@ udp_mib_get_udpEntry(GNetSnmp *s, udp_mib_udpEntry_t **udpEntry, guchar *udpLoca
     gnet_snmp_attr_get(s, &in, base, len, 9, udpEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -264,7 +264,7 @@ udp_mib_free_udpEntry(udp_mib_udpEntry_t *udpEntry)
     if (udpEntry) {
         p = (char *) udpEntry + sizeof(udp_mib_udpEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(udpEntry);
     }

@@ -182,7 +182,7 @@ tunnel_mib_get_tunnelIfTable(GNetSnmp *s, tunnel_mib_tunnelIfEntry_t ***tunnelIf
 
     gnet_snmp_attr_get(s, &in, base, 13, 12, tunnelIfEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -213,11 +213,11 @@ tunnel_mib_get_tunnelIfEntry(GNetSnmp *s, tunnel_mib_tunnelIfEntry_t **tunnelIfE
     gnet_snmp_attr_get(s, &in, base, len, 12, tunnelIfEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -243,10 +243,10 @@ tunnel_mib_set_tunnelIfEntry(GNetSnmp *s, tunnel_mib_tunnelIfEntry_t *tunnelIfEn
     gnet_snmp_attr_set(s, &in, base, len, 12, tunnelIfEntry_attr, mask, tunnelIfEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -260,7 +260,7 @@ tunnel_mib_free_tunnelIfEntry(tunnel_mib_tunnelIfEntry_t *tunnelIfEntry)
     if (tunnelIfEntry) {
         p = (char *) tunnelIfEntry + sizeof(tunnel_mib_tunnelIfEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(tunnelIfEntry);
     }
@@ -372,7 +372,7 @@ tunnel_mib_get_tunnelConfigTable(GNetSnmp *s, tunnel_mib_tunnelConfigEntry_t ***
 
     gnet_snmp_attr_get(s, &in, base, 13, 12, tunnelConfigEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -403,11 +403,11 @@ tunnel_mib_get_tunnelConfigEntry(GNetSnmp *s, tunnel_mib_tunnelConfigEntry_t **t
     gnet_snmp_attr_get(s, &in, base, len, 12, tunnelConfigEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -433,10 +433,10 @@ tunnel_mib_set_tunnelConfigEntry(GNetSnmp *s, tunnel_mib_tunnelConfigEntry_t *tu
     gnet_snmp_attr_set(s, &in, base, len, 12, tunnelConfigEntry_attr, mask, tunnelConfigEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -450,7 +450,7 @@ tunnel_mib_free_tunnelConfigEntry(tunnel_mib_tunnelConfigEntry_t *tunnelConfigEn
     if (tunnelConfigEntry) {
         p = (char *) tunnelConfigEntry + sizeof(tunnel_mib_tunnelConfigEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(tunnelConfigEntry);
     }

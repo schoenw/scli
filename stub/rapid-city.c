@@ -393,7 +393,7 @@ rapid_city_get_rcVlanTable(GNetSnmp *s, rapid_city_rcVlanEntry_t ***rcVlanEntry,
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, rcVlanEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -424,11 +424,11 @@ rapid_city_get_rcVlanEntry(GNetSnmp *s, rapid_city_rcVlanEntry_t **rcVlanEntry, 
     gnet_snmp_attr_get(s, &in, base, len, 11, rcVlanEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -454,10 +454,10 @@ rapid_city_set_rcVlanEntry(GNetSnmp *s, rapid_city_rcVlanEntry_t *rcVlanEntry, g
     gnet_snmp_attr_set(s, &in, base, len, 11, rcVlanEntry_attr, mask, rcVlanEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -471,7 +471,7 @@ rapid_city_free_rcVlanEntry(rapid_city_rcVlanEntry_t *rcVlanEntry)
     if (rcVlanEntry) {
         p = (char *) rcVlanEntry + sizeof(rapid_city_rcVlanEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(rcVlanEntry);
     }
@@ -553,7 +553,7 @@ rapid_city_get_rcVlanPortTable(GNetSnmp *s, rapid_city_rcVlanPortEntry_t ***rcVl
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, rcVlanPortEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -584,11 +584,11 @@ rapid_city_get_rcVlanPortEntry(GNetSnmp *s, rapid_city_rcVlanPortEntry_t **rcVla
     gnet_snmp_attr_get(s, &in, base, len, 11, rcVlanPortEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -614,10 +614,10 @@ rapid_city_set_rcVlanPortEntry(GNetSnmp *s, rapid_city_rcVlanPortEntry_t *rcVlan
     gnet_snmp_attr_set(s, &in, base, len, 11, rcVlanPortEntry_attr, mask, rcVlanPortEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -631,7 +631,7 @@ rapid_city_free_rcVlanPortEntry(rapid_city_rcVlanPortEntry_t *rcVlanPortEntry)
     if (rcVlanPortEntry) {
         p = (char *) rcVlanPortEntry + sizeof(rapid_city_rcVlanPortEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(rcVlanPortEntry);
     }

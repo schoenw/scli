@@ -329,7 +329,7 @@ isdn_mib_get_isdnBasicRateTable(GNetSnmp *s, isdn_mib_isdnBasicRateEntry_t ***is
 
     gnet_snmp_attr_get(s, &in, base, 13, 12, isdnBasicRateEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -360,11 +360,11 @@ isdn_mib_get_isdnBasicRateEntry(GNetSnmp *s, isdn_mib_isdnBasicRateEntry_t **isd
     gnet_snmp_attr_get(s, &in, base, len, 12, isdnBasicRateEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -390,10 +390,10 @@ isdn_mib_set_isdnBasicRateEntry(GNetSnmp *s, isdn_mib_isdnBasicRateEntry_t *isdn
     gnet_snmp_attr_set(s, &in, base, len, 12, isdnBasicRateEntry_attr, mask, isdnBasicRateEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -407,7 +407,7 @@ isdn_mib_free_isdnBasicRateEntry(isdn_mib_isdnBasicRateEntry_t *isdnBasicRateEnt
     if (isdnBasicRateEntry) {
         p = (char *) isdnBasicRateEntry + sizeof(isdn_mib_isdnBasicRateEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(isdnBasicRateEntry);
     }
@@ -492,7 +492,7 @@ isdn_mib_get_isdnBearerTable(GNetSnmp *s, isdn_mib_isdnBearerEntry_t ***isdnBear
 
     gnet_snmp_attr_get(s, &in, base, 13, 12, isdnBearerEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -523,11 +523,11 @@ isdn_mib_get_isdnBearerEntry(GNetSnmp *s, isdn_mib_isdnBearerEntry_t **isdnBeare
     gnet_snmp_attr_get(s, &in, base, len, 12, isdnBearerEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -553,10 +553,10 @@ isdn_mib_set_isdnBearerEntry(GNetSnmp *s, isdn_mib_isdnBearerEntry_t *isdnBearer
     gnet_snmp_attr_set(s, &in, base, len, 12, isdnBearerEntry_attr, mask, isdnBearerEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -570,7 +570,7 @@ isdn_mib_free_isdnBearerEntry(isdn_mib_isdnBearerEntry_t *isdnBearerEntry)
     if (isdnBearerEntry) {
         p = (char *) isdnBearerEntry + sizeof(isdn_mib_isdnBearerEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(isdnBearerEntry);
     }
@@ -655,7 +655,7 @@ isdn_mib_get_isdnEndpointTable(GNetSnmp *s, isdn_mib_isdnEndpointEntry_t ***isdn
 
     gnet_snmp_attr_get(s, &in, base, 13, 12, isdnEndpointEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -686,11 +686,11 @@ isdn_mib_get_isdnEndpointEntry(GNetSnmp *s, isdn_mib_isdnEndpointEntry_t **isdnE
     gnet_snmp_attr_get(s, &in, base, len, 12, isdnEndpointEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -716,10 +716,10 @@ isdn_mib_set_isdnEndpointEntry(GNetSnmp *s, isdn_mib_isdnEndpointEntry_t *isdnEn
     gnet_snmp_attr_set(s, &in, base, len, 12, isdnEndpointEntry_attr, mask, isdnEndpointEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -733,7 +733,7 @@ isdn_mib_free_isdnEndpointEntry(isdn_mib_isdnEndpointEntry_t *isdnEndpointEntry)
     if (isdnEndpointEntry) {
         p = (char *) isdnEndpointEntry + sizeof(isdn_mib_isdnEndpointEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(isdnEndpointEntry);
     }

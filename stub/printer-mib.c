@@ -1355,7 +1355,7 @@ printer_mib_get_prtGeneralTable(GNetSnmp *s, printer_mib_prtGeneralEntry_t ***pr
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtGeneralEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1386,11 +1386,11 @@ printer_mib_get_prtGeneralEntry(GNetSnmp *s, printer_mib_prtGeneralEntry_t **prt
     gnet_snmp_attr_get(s, &in, base, len, 10, prtGeneralEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1416,10 +1416,10 @@ printer_mib_set_prtGeneralEntry(GNetSnmp *s, printer_mib_prtGeneralEntry_t *prtG
     gnet_snmp_attr_set(s, &in, base, len, 10, prtGeneralEntry_attr, mask, prtGeneralEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -1433,7 +1433,7 @@ printer_mib_free_prtGeneralEntry(printer_mib_prtGeneralEntry_t *prtGeneralEntry)
     if (prtGeneralEntry) {
         p = (char *) prtGeneralEntry + sizeof(printer_mib_prtGeneralEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtGeneralEntry);
     }
@@ -1696,7 +1696,7 @@ printer_mib_get_prtStorageRefTable(GNetSnmp *s, printer_mib_prtStorageRefEntry_t
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtStorageRefEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1727,11 +1727,11 @@ printer_mib_get_prtStorageRefEntry(GNetSnmp *s, printer_mib_prtStorageRefEntry_t
     gnet_snmp_attr_get(s, &in, base, len, 10, prtStorageRefEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1748,7 +1748,7 @@ printer_mib_free_prtStorageRefEntry(printer_mib_prtStorageRefEntry_t *prtStorage
     if (prtStorageRefEntry) {
         p = (char *) prtStorageRefEntry + sizeof(printer_mib_prtStorageRefEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtStorageRefEntry);
     }
@@ -1839,7 +1839,7 @@ printer_mib_get_prtDeviceRefTable(GNetSnmp *s, printer_mib_prtDeviceRefEntry_t *
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtDeviceRefEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -1870,11 +1870,11 @@ printer_mib_get_prtDeviceRefEntry(GNetSnmp *s, printer_mib_prtDeviceRefEntry_t *
     gnet_snmp_attr_get(s, &in, base, len, 10, prtDeviceRefEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -1891,7 +1891,7 @@ printer_mib_free_prtDeviceRefEntry(printer_mib_prtDeviceRefEntry_t *prtDeviceRef
     if (prtDeviceRefEntry) {
         p = (char *) prtDeviceRefEntry + sizeof(printer_mib_prtDeviceRefEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtDeviceRefEntry);
     }
@@ -1982,7 +1982,7 @@ printer_mib_get_prtCoverTable(GNetSnmp *s, printer_mib_prtCoverEntry_t ***prtCov
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtCoverEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -2013,11 +2013,11 @@ printer_mib_get_prtCoverEntry(GNetSnmp *s, printer_mib_prtCoverEntry_t **prtCove
     gnet_snmp_attr_get(s, &in, base, len, 10, prtCoverEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -2034,7 +2034,7 @@ printer_mib_free_prtCoverEntry(printer_mib_prtCoverEntry_t *prtCoverEntry)
     if (prtCoverEntry) {
         p = (char *) prtCoverEntry + sizeof(printer_mib_prtCoverEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtCoverEntry);
     }
@@ -2125,7 +2125,7 @@ printer_mib_get_prtLocalizationTable(GNetSnmp *s, printer_mib_prtLocalizationEnt
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtLocalizationEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -2156,11 +2156,11 @@ printer_mib_get_prtLocalizationEntry(GNetSnmp *s, printer_mib_prtLocalizationEnt
     gnet_snmp_attr_get(s, &in, base, len, 10, prtLocalizationEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -2177,7 +2177,7 @@ printer_mib_free_prtLocalizationEntry(printer_mib_prtLocalizationEntry_t *prtLoc
     if (prtLocalizationEntry) {
         p = (char *) prtLocalizationEntry + sizeof(printer_mib_prtLocalizationEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtLocalizationEntry);
     }
@@ -2268,7 +2268,7 @@ printer_mib_get_prtInputTable(GNetSnmp *s, printer_mib_prtInputEntry_t ***prtInp
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtInputEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -2299,11 +2299,11 @@ printer_mib_get_prtInputEntry(GNetSnmp *s, printer_mib_prtInputEntry_t **prtInpu
     gnet_snmp_attr_get(s, &in, base, len, 10, prtInputEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -2329,10 +2329,10 @@ printer_mib_set_prtInputEntry(GNetSnmp *s, printer_mib_prtInputEntry_t *prtInput
     gnet_snmp_attr_set(s, &in, base, len, 10, prtInputEntry_attr, mask, prtInputEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -2346,7 +2346,7 @@ printer_mib_free_prtInputEntry(printer_mib_prtInputEntry_t *prtInputEntry)
     if (prtInputEntry) {
         p = (char *) prtInputEntry + sizeof(printer_mib_prtInputEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtInputEntry);
     }
@@ -2597,7 +2597,7 @@ printer_mib_get_prtOutputTable(GNetSnmp *s, printer_mib_prtOutputEntry_t ***prtO
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtOutputEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -2628,11 +2628,11 @@ printer_mib_get_prtOutputEntry(GNetSnmp *s, printer_mib_prtOutputEntry_t **prtOu
     gnet_snmp_attr_get(s, &in, base, len, 10, prtOutputEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -2658,10 +2658,10 @@ printer_mib_set_prtOutputEntry(GNetSnmp *s, printer_mib_prtOutputEntry_t *prtOut
     gnet_snmp_attr_set(s, &in, base, len, 10, prtOutputEntry_attr, mask, prtOutputEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -2675,7 +2675,7 @@ printer_mib_free_prtOutputEntry(printer_mib_prtOutputEntry_t *prtOutputEntry)
     if (prtOutputEntry) {
         p = (char *) prtOutputEntry + sizeof(printer_mib_prtOutputEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtOutputEntry);
     }
@@ -2935,7 +2935,7 @@ printer_mib_get_prtMarkerTable(GNetSnmp *s, printer_mib_prtMarkerEntry_t ***prtM
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtMarkerEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -2966,11 +2966,11 @@ printer_mib_get_prtMarkerEntry(GNetSnmp *s, printer_mib_prtMarkerEntry_t **prtMa
     gnet_snmp_attr_get(s, &in, base, len, 10, prtMarkerEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -2987,7 +2987,7 @@ printer_mib_free_prtMarkerEntry(printer_mib_prtMarkerEntry_t *prtMarkerEntry)
     if (prtMarkerEntry) {
         p = (char *) prtMarkerEntry + sizeof(printer_mib_prtMarkerEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtMarkerEntry);
     }
@@ -3078,7 +3078,7 @@ printer_mib_get_prtMarkerSuppliesTable(GNetSnmp *s, printer_mib_prtMarkerSupplie
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtMarkerSuppliesEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -3109,11 +3109,11 @@ printer_mib_get_prtMarkerSuppliesEntry(GNetSnmp *s, printer_mib_prtMarkerSupplie
     gnet_snmp_attr_get(s, &in, base, len, 10, prtMarkerSuppliesEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -3139,10 +3139,10 @@ printer_mib_set_prtMarkerSuppliesEntry(GNetSnmp *s, printer_mib_prtMarkerSupplie
     gnet_snmp_attr_set(s, &in, base, len, 10, prtMarkerSuppliesEntry_attr, mask, prtMarkerSuppliesEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -3156,7 +3156,7 @@ printer_mib_free_prtMarkerSuppliesEntry(printer_mib_prtMarkerSuppliesEntry_t *pr
     if (prtMarkerSuppliesEntry) {
         p = (char *) prtMarkerSuppliesEntry + sizeof(printer_mib_prtMarkerSuppliesEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtMarkerSuppliesEntry);
     }
@@ -3271,7 +3271,7 @@ printer_mib_get_prtMarkerColorantTable(GNetSnmp *s, printer_mib_prtMarkerColoran
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtMarkerColorantEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -3302,11 +3302,11 @@ printer_mib_get_prtMarkerColorantEntry(GNetSnmp *s, printer_mib_prtMarkerColoran
     gnet_snmp_attr_get(s, &in, base, len, 10, prtMarkerColorantEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -3323,7 +3323,7 @@ printer_mib_free_prtMarkerColorantEntry(printer_mib_prtMarkerColorantEntry_t *pr
     if (prtMarkerColorantEntry) {
         p = (char *) prtMarkerColorantEntry + sizeof(printer_mib_prtMarkerColorantEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtMarkerColorantEntry);
     }
@@ -3414,7 +3414,7 @@ printer_mib_get_prtMediaPathTable(GNetSnmp *s, printer_mib_prtMediaPathEntry_t *
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtMediaPathEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -3445,11 +3445,11 @@ printer_mib_get_prtMediaPathEntry(GNetSnmp *s, printer_mib_prtMediaPathEntry_t *
     gnet_snmp_attr_get(s, &in, base, len, 10, prtMediaPathEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -3466,7 +3466,7 @@ printer_mib_free_prtMediaPathEntry(printer_mib_prtMediaPathEntry_t *prtMediaPath
     if (prtMediaPathEntry) {
         p = (char *) prtMediaPathEntry + sizeof(printer_mib_prtMediaPathEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtMediaPathEntry);
     }
@@ -3557,7 +3557,7 @@ printer_mib_get_prtChannelTable(GNetSnmp *s, printer_mib_prtChannelEntry_t ***pr
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtChannelEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -3588,11 +3588,11 @@ printer_mib_get_prtChannelEntry(GNetSnmp *s, printer_mib_prtChannelEntry_t **prt
     gnet_snmp_attr_get(s, &in, base, len, 10, prtChannelEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -3618,10 +3618,10 @@ printer_mib_set_prtChannelEntry(GNetSnmp *s, printer_mib_prtChannelEntry_t *prtC
     gnet_snmp_attr_set(s, &in, base, len, 10, prtChannelEntry_attr, mask, prtChannelEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -3635,7 +3635,7 @@ printer_mib_free_prtChannelEntry(printer_mib_prtChannelEntry_t *prtChannelEntry)
     if (prtChannelEntry) {
         p = (char *) prtChannelEntry + sizeof(printer_mib_prtChannelEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtChannelEntry);
     }
@@ -3774,7 +3774,7 @@ printer_mib_get_prtInterpreterTable(GNetSnmp *s, printer_mib_prtInterpreterEntry
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtInterpreterEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -3805,11 +3805,11 @@ printer_mib_get_prtInterpreterEntry(GNetSnmp *s, printer_mib_prtInterpreterEntry
     gnet_snmp_attr_get(s, &in, base, len, 10, prtInterpreterEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -3835,10 +3835,10 @@ printer_mib_set_prtInterpreterEntry(GNetSnmp *s, printer_mib_prtInterpreterEntry
     gnet_snmp_attr_set(s, &in, base, len, 10, prtInterpreterEntry_attr, mask, prtInterpreterEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -3852,7 +3852,7 @@ printer_mib_free_prtInterpreterEntry(printer_mib_prtInterpreterEntry_t *prtInter
     if (prtInterpreterEntry) {
         p = (char *) prtInterpreterEntry + sizeof(printer_mib_prtInterpreterEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtInterpreterEntry);
     }
@@ -3979,7 +3979,7 @@ printer_mib_get_prtConsoleDisplayBufferTable(GNetSnmp *s, printer_mib_prtConsole
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtConsoleDisplayBufferEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -4010,11 +4010,11 @@ printer_mib_get_prtConsoleDisplayBufferEntry(GNetSnmp *s, printer_mib_prtConsole
     gnet_snmp_attr_get(s, &in, base, len, 10, prtConsoleDisplayBufferEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -4040,10 +4040,10 @@ printer_mib_set_prtConsoleDisplayBufferEntry(GNetSnmp *s, printer_mib_prtConsole
     gnet_snmp_attr_set(s, &in, base, len, 10, prtConsoleDisplayBufferEntry_attr, mask, prtConsoleDisplayBufferEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -4057,7 +4057,7 @@ printer_mib_free_prtConsoleDisplayBufferEntry(printer_mib_prtConsoleDisplayBuffe
     if (prtConsoleDisplayBufferEntry) {
         p = (char *) prtConsoleDisplayBufferEntry + sizeof(printer_mib_prtConsoleDisplayBufferEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtConsoleDisplayBufferEntry);
     }
@@ -4161,7 +4161,7 @@ printer_mib_get_prtConsoleLightTable(GNetSnmp *s, printer_mib_prtConsoleLightEnt
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtConsoleLightEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -4192,11 +4192,11 @@ printer_mib_get_prtConsoleLightEntry(GNetSnmp *s, printer_mib_prtConsoleLightEnt
     gnet_snmp_attr_get(s, &in, base, len, 10, prtConsoleLightEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -4222,10 +4222,10 @@ printer_mib_set_prtConsoleLightEntry(GNetSnmp *s, printer_mib_prtConsoleLightEnt
     gnet_snmp_attr_set(s, &in, base, len, 10, prtConsoleLightEntry_attr, mask, prtConsoleLightEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -4239,7 +4239,7 @@ printer_mib_free_prtConsoleLightEntry(printer_mib_prtConsoleLightEntry_t *prtCon
     if (prtConsoleLightEntry) {
         p = (char *) prtConsoleLightEntry + sizeof(printer_mib_prtConsoleLightEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtConsoleLightEntry);
     }
@@ -4354,7 +4354,7 @@ printer_mib_get_prtAlertTable(GNetSnmp *s, printer_mib_prtAlertEntry_t ***prtAle
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, prtAlertEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -4385,11 +4385,11 @@ printer_mib_get_prtAlertEntry(GNetSnmp *s, printer_mib_prtAlertEntry_t **prtAler
     gnet_snmp_attr_get(s, &in, base, len, 10, prtAlertEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -4406,7 +4406,7 @@ printer_mib_free_prtAlertEntry(printer_mib_prtAlertEntry_t *prtAlertEntry)
     if (prtAlertEntry) {
         p = (char *) prtAlertEntry + sizeof(printer_mib_prtAlertEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(prtAlertEntry);
     }

@@ -281,7 +281,7 @@ etherlike_mib_get_dot3StatsTable(GNetSnmp *s, etherlike_mib_dot3StatsEntry_t ***
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, dot3StatsEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -312,11 +312,11 @@ etherlike_mib_get_dot3StatsEntry(GNetSnmp *s, etherlike_mib_dot3StatsEntry_t **d
     gnet_snmp_attr_get(s, &in, base, len, 10, dot3StatsEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -333,7 +333,7 @@ etherlike_mib_free_dot3StatsEntry(etherlike_mib_dot3StatsEntry_t *dot3StatsEntry
     if (dot3StatsEntry) {
         p = (char *) dot3StatsEntry + sizeof(etherlike_mib_dot3StatsEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(dot3StatsEntry);
     }

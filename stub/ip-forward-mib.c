@@ -176,11 +176,11 @@ ip_forward_mib_get_ipForward(GNetSnmp *s, ip_forward_mib_ipForward_t **ipForward
     gnet_snmp_attr_get(s, &in, base, 9, 8, ipForward_attr, mask);
 
     out = gnet_snmp_sync_getnext(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -197,7 +197,7 @@ ip_forward_mib_free_ipForward(ip_forward_mib_ipForward_t *ipForward)
     if (ipForward) {
         p = (char *) ipForward + sizeof(ip_forward_mib_ipForward_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(ipForward);
     }
@@ -301,7 +301,7 @@ ip_forward_mib_get_ipCidrRouteTable(GNetSnmp *s, ip_forward_mib_ipCidrRouteEntry
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, ipCidrRouteEntry_attr, mask);
 
-    out = gsnmp_gettable(s, in);
+    out = gnet_snmp_sync_table(s, in);
     /* gnet_snmp_varbind_list_free(in); */
 
     if (out) {
@@ -332,11 +332,11 @@ ip_forward_mib_get_ipCidrRouteEntry(GNetSnmp *s, ip_forward_mib_ipCidrRouteEntry
     gnet_snmp_attr_get(s, &in, base, len, 10, ipCidrRouteEntry_attr, mask);
 
     out = gnet_snmp_sync_get(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
         if (s->error_status != GNET_SNMP_ERR_NOERROR) {
-            g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+            g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
         }
@@ -362,10 +362,10 @@ ip_forward_mib_set_ipCidrRouteEntry(GNetSnmp *s, ip_forward_mib_ipCidrRouteEntry
     gnet_snmp_attr_set(s, &in, base, len, 10, ipCidrRouteEntry_attr, mask, ipCidrRouteEntry);
 
     out = gnet_snmp_sync_set(s, in);
-    g_list_foreach(in, (GFunc) gnet_snmp_varbind_free, NULL);
+    g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        g_list_foreach(out, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(out);
     }
 }
@@ -379,7 +379,7 @@ ip_forward_mib_free_ipCidrRouteEntry(ip_forward_mib_ipCidrRouteEntry_t *ipCidrRo
     if (ipCidrRouteEntry) {
         p = (char *) ipCidrRouteEntry + sizeof(ip_forward_mib_ipCidrRouteEntry_t);
         vbl = * (GList **) p;
-        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_free, NULL);
+        g_list_foreach(vbl, (GFunc) gnet_snmp_varbind_delete, NULL);
         g_list_free(vbl);
         g_free(ipCidrRouteEntry);
     }
