@@ -13,7 +13,7 @@
 .\" along with this program; see the file COPYING.  If not, write to
 .\" the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 .\"
-.TH STOP 1 "March 15, 2001"
+.TH STOP 1 "March 29, 2001"
 .\" Please update the above date whenever this man page is modified.
 .\"
 .\" Some roff macros, for reference:
@@ -113,9 +113,23 @@ Freeze the screen until someone hits a key.
 .TP
 .B T
 Toggle through list of modes.
-.SH DISPLAY
+.SH MODES
+\fBstop\fP supports multiple display modes:
+.TP 10
+.I interface
+Displays some basic statistics for the network interfaces.
+.TP
+.I process
+Displays the list of running processes.
+.TP
+.I disman
+Displays the list of running or recently terminated scripts.
+.TP
+.I tcp
+Displays the list of existing TCP connections.
+.SH UNITS
 \fBstop\fP displays statistics in a compact format. It uses several
-abbreviations to explain what the numbers mean. Here are some
+abbreviations to explain the units of the numbers. Here are some
 explanations:
 .TP
 .B bps
