@@ -840,7 +840,7 @@ cmd_printer_console(scli_interp_t * interp, int argc, char **argv)
 		if (i > 0) {
 		    g_string_append(interp->result, "\n");
 		}
-		g_string_sprintfa(interp->result, "Line   Text\n");
+		g_string_sprintfa(interp->header, "LINE   TEXT");
 	    }
 	    show_printer_console_display(interp->result,
 					 prtConsoleDisplayTable[i]);
@@ -922,8 +922,8 @@ cmd_printer_lights(scli_interp_t * interp, int argc, char **argv)
 		if (i > 0) {
 		    g_string_append(interp->result, "\n");
 		}
-		g_string_sprintfa(interp->result, "Number %-*s Color      Status\n",
-				  led_width, "Description");
+		g_string_sprintfa(interp->result, "NUMBER %-*s COLOR      STATUS\n",
+				  led_width, "DESCRIPTION");
 	    }
 	    show_printer_console_light(interp->result,
 				       prtConsoleLightTable[i],
@@ -960,6 +960,12 @@ scli_init_printer_mode(scli_interp_t * interp)
 	{ "show printer console", NULL,
 	  "printer console information",
 	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  cmd_printer_console },
+
+	{ "monitor printer console", NULL,
+	  "printer console information",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  NULL, NULL,
 	  cmd_printer_console },
 
