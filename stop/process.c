@@ -179,7 +179,6 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 {
     hrSWRunEntry_t **hrSWRunEntry = NULL;
     hrSWRunPerfEntry_t **hrSWRunPerfEntry = NULL;
-    char tmp[256];
     int j, i;
     int n_idx;
     hr_sort_t *s_arr;
@@ -231,20 +230,17 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 			  fmt_kbytes(*hrSWRunPerfEntry[i]->hrSWRunPerfMem));
 	g_string_sprintfa(s, " %7s", 
 			  fmt_hsec32(*hrSWRunPerfEntry[i]->hrSWRunPerfCPU));
-
-	strncpy (tmp, (char *) hrSWRunEntry[i]->hrSWRunName, 
-		 MIN(hrSWRunEntry[i]->_hrSWRunNameLength, 
-		     MIN(COLS - 10, sizeof (tmp))));
-	/* XXX fix format */
-	tmp [MIN(hrSWRunEntry[i]->_hrSWRunNameLength, COLS - 10)] = 0;
-	g_string_sprintfa(s, " %s", tmp);
-	strncpy (tmp, (char *) hrSWRunEntry[i]->hrSWRunParameters, 
-		 MIN(hrSWRunEntry[i]->_hrSWRunParametersLength, 
-			MIN(COLS - 10, sizeof (tmp))));
-	/* XXX fix format */
-	tmp [MIN(hrSWRunEntry[i]->_hrSWRunParametersLength, COLS - 10)] = 0;
-	g_string_sprintfa(s, " %s", tmp);
-
+	if (hrSWRunEntry[i]->hrSWRunPath) {
+	    g_string_sprintfa(s, " %.*s",
+			(int) hrSWRunEntry[i]->_hrSWRunPathLength,
+			      hrSWRunEntry[i]->hrSWRunPath);
+	}
+	if (hrSWRunEntry[i]->hrSWRunParameters) {
+	    g_string_sprintfa(s, " %.*s",
+ 		        (int) hrSWRunEntry[i]->_hrSWRunParametersLength,
+			      hrSWRunEntry[i]->hrSWRunParameters);
+	}
+	g_string_truncate(s, COLS);
 	mvwprintw(win, j + 1, 0, s->str);
 	g_string_free(s, 1);
     }
