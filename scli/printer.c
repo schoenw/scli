@@ -2393,6 +2393,7 @@ fmt_printer_interpreter(GString *s,
     }
 
 #if 0
+    /* see the comments on the xml formatter why this is uncommented */
     xml_media_dimensions(tree, "addressability",
 			 interpEntry->prtInterpreterFeedAddressability,
 			 interpEntry->prtInterpreterXFeedAddressability,
@@ -2471,11 +2472,19 @@ xml_printer_interpreter(xmlNodePtr root,
     }
 
 #if 0
-    xml_media_dimensions(tree, "addressability",
+    {
+	/* This should be using prtMarkerAddressabilityUnits but
+	   it is unclear how to identify the correct instance.
+	   I have send an email to the Printer-MIB folks to get
+	   a clarification on this. */
+	
+    gint32 unit = PRINTER_MIB_PRTMEDIAPATHMEDIASIZEUNIT_MICROMETERS;
+    xml_media_dimensions(tree, "addressable",
 			 interpEntry->prtInterpreterFeedAddressability,
 			 interpEntry->prtInterpreterXFeedAddressability,
 			 &unit,
 			 printer_mib_enums_prtMediaPathMediaSizeUnit);
+    }
 #endif
     
     e = fmt_enum(printer_mib_enums_prtInterpreterDefaultCharSetIn,
