@@ -29,11 +29,14 @@
 
 - Display processor load in the stop process mode summary line.
 
-- Finish the implementation of the "show system devices" scli command.
-
 - Make index members pointers again in the stub interface? (FS)
 
 - Add a mechanism to retrieve only selections of a table? (FS)
+
+- Generally check strings for printable characters and trim white spaces.
+
+- Do some pager stuff on long results? Should we have an internal pager
+  or should we just call $PAGER?
 
 ==== GXSNMP specific things ====
 
