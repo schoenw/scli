@@ -1556,47 +1556,68 @@ void
 scli_init_disman_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
 	{ "show disman languages", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "languages supported by the distributed manager",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_languages },
+
 	{ "show disman script info", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "script summary information",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_script_info },
+
 	{ "show disman script details", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "scripts installed at the distributed manager",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_script_details },
+
 	{ "show disman launch info", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "launch summary information",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_launch_info },
+
 	{ "show disman launch details", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "launch buttons installed on the distributed manager",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_launch_details },
+
 	{ "show disman run info", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "summary information about running scripts",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_run_info },
+
 	{ "show disman run details", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "running scripts on the distributed manager",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_run_details },
+
 	{ "show disman scheduler info", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "scheduler information",
-	  cmd_scheduler_info },
-	{ "show disman scheduler details", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  cmd_scheduler_info },
+
+	{ "show disman scheduler details", NULL,
 	  "schedules on the distributed manager",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_scheduler_details },
+
 	{ "monitor disman run", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "monitor running scripts",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  NULL, NULL,
 	  cmd_run_info },
-	{ NULL, NULL, 0, NULL, NULL }
+
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t disman_mode = {

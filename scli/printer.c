@@ -946,31 +946,36 @@ scli_init_printer_mode(scli_interp_t * interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show printer info", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "general printer information",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_printer_info },
 
 	{ "show printer inputs", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "printer input information",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_printer_inputs },
 
 	{ "show printer console", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "printer console information",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_printer_console },
 
 	{ "show printer lights", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "printer console light information",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_printer_lights },
 
 	{ "show printer alerts", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "printer alert information",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_printer_alert },
 
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
 
     static scli_mode_t printer_mode = {

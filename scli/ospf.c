@@ -399,19 +399,26 @@ void
 scli_init_ospf_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
         { "show ospf area", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "show OSPF areas",
-	   show_ospf_area },
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  show_ospf_area },
+
 	{ "show ospf info", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "general OSPF information",
-	   show_ospf_info },
-	{ "show ospf interface", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  show_ospf_info },
+
+	{ "show ospf interface", NULL,
 	  "show OSPF interfaces",
-	   show_ospf_interfaces },
-	{ NULL, NULL, 0, NULL, NULL }
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  show_ospf_interfaces },
+
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t ospf_mode = {

@@ -453,23 +453,32 @@ void
 scli_init_ip_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+	
 	{ "show ip forwarding", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "IP forwarding data base",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_ip_forwarding },
+	
 	{ "show ip addresses", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "IP addresses assigned to interfaces",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_ip_addresses },
+	
 	{ "show ip tunnel", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "IP tunnels",
-	  cmd_ip_tunnel },
-	{ "show ip mapping", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  cmd_ip_tunnel },
+	
+	{ "show ip mapping", NULL,
 	  "IP address to lower layer address mappings",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_ip_media_mapping },
-	{ NULL, NULL, 0, NULL, NULL }
+	
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t ip_mode = {

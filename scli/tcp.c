@@ -257,26 +257,29 @@ scli_init_tcp_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show tcp listener", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "The show tcp listener command displays the listening TCP\n"
 	  "endpoints.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  NULL, NULL,
 	  show_tcp_listener },
 
 	{ "show tcp connections", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "The show tcp connections command displays the connected TCP\n"
 	  "endpoints including the current state of the connection as seen\n"
 	  "by the remote SNMP agent.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  NULL, NULL,
 	  show_tcp_connections },
 
 	{ "monitor tcp connections", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "The monitor tcp connections command displays the connected TCP\n"
 	  "endpoints including the current state of the connection as seen\n"
 	  "by the remote SNMP agent. The information is updated periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  NULL, NULL,
 	  show_tcp_connections },
 
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t tcp_mode = {

@@ -524,7 +524,6 @@ scli_init_scli_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "open", "<nodename> [<community>]",
-	  0,
 	  "The open command establishes an association to a remote SNMP\n"
 	  "agent. The <nodename> argument is the DNS name or the IP\n"
 	  "address of the remote node. Scli will try to talks to this\n"
@@ -537,52 +536,59 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "error. The existing established association will be closed\n"
 	  "automatically before an attempt to create a new association\n"
 	  "is started.",
+	  0,
+	  NULL, NULL,
 	  scli_cmd_open },
 
 	{ "close", NULL,
-	  0,
 	  "The close command closes an established association to a remote\n"
 	  "SNMP agent. Invoking the close command when no association is\n"
 	  "established is not considered an error and will do just nothing.",
+	  0,
+	  NULL, NULL,
 	  cmd_scli_close },
 
 	{ "exit", NULL,
-	  0,
 	  "The exit command terminates the scli interpreter. An end of file\n"
 	  "in the standard input stream will also terminate the the scli\n"
 	  "interpreter.",
+	  0,
+	  NULL, NULL,
 	  cmd_scli_exit },
 
 	{ "help", NULL,
-	  0,
 	  "The help command displays some help information including a list\n"
 	  "of all top-level scli commands.",
+	  0,
+	  NULL, NULL,
 	  help },
 
 	{ "history", NULL,
-	  0,
 	  "The history command displays the scli command history list with\n"
 	  "line numbers.",
+	  0,
+	  NULL, NULL,
 	  history },
 
         { "create scli alias", "<name> <value>",
-	  0,
 	  "The create scli alias command creates the alias <name> for the\n"
 	  "scli command (fragment) <value>. If the alias <name> already\n"
 	  "exists, then the new <value> will be assigned to the existing\n"
 	  "alias.",
+	  0,
+	  NULL, NULL,
 	  create_scli_alias },
 	
 	{ "delete scli alias", "<regexp>",
-	  0,
 	  "The delete scli alias command removes previously defined\n"
 	  "aliases from the scli interpreter. The regular expression\n"
 	  "<regexp> is matched against all alias names in order to\n"
 	  "select the aliases that are deleted.",
+	  0,
+	  NULL, NULL,
 	  delete_scli_alias },
 	
 	{ "set scli debugging", "[<regexp>]",
-	  0,
 	  "The set scli debugging command sets the debugging level of\n"
 	  "the SNMP engine. The optional regular expression <regexp> is\n"
 	  "matched against the debugging levels. A successful match turns\n"
@@ -592,54 +598,62 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "defined debugging levels are \"session\" for the SNMP session\n"
 	  "layer, \"request\" for the SNMP request handling layer, and\n"
 	  "\"transport\" for the SNMP transport layer.",
+	  0,
+	  NULL, NULL,
 	  set_scli_debugging },
 	
 	{ "set scli pager", "<pager>",
-	  0,
 	  "The set scli pager command defines the shell command which is\n"
 	  "used as a pager if the output produced by an scli command does\n"
 	  "not fit on a single screen. The output is passed to the <pager>\n"
 	  "shell command via its standard input stream.",
+	  0,
+	  NULL, NULL,
 	  set_scli_pager },
 	
 	{ "set scli format", "<fmt>",
-	  SCLI_CMD_FLAG_XML,
 	  "The set scli format command defines the output format used by\n"
 	  "subsequent scli commands. The currently supported formats are\n"
 	  "\"scli\" and \"xml\". The \"scli\" format is the default output\n"
 	  "format and described in this documentation. The \"xml\" output\n"
 	  "format is experimental and therefore not described here.",
+	  SCLI_CMD_FLAG_XML,
+	  NULL, NULL,
 	  set_scli_format },
 	
 	{ "show scli info", NULL,
-	  0,
 	  "The show scli info command displays the current status of the\n"
 	  "scli interpreter.",
+	  0,
+	  NULL, NULL,
 	  show_scli_info },
 
 	{ "show scli commands", NULL,
-	  0,
 	  "The show scli commands command displays the scli command tree.\n"
 	  "The full command syntax is displayed for each leaf node.",
+	  0,
+	  NULL, NULL,
 	  show_scli_commands },
 
 	{ "show scli aliases", NULL,
-	  0,
 	  "The show scli aliases command lists all scli command aliases.\n"
 	  "The first column in the generated table lists the aliase names\n"
 	  "while the second column shows the alias values.",
+	  0,
+	  NULL, NULL,
 	  show_scli_aliases },
 
 	{ "show scli modes", "[<regex>]",
-	  0,
 	  "The show scli modes command shows information about the scli\n"
 	  "modes. An scli mode is a logical grouping of related commands\n"
 	  "(e.g., all commands that deal with printers). The optional\n"
 	  "regular expression <regex> can be use to select a subset of\n"
 	  "the available scli modes.",
+	  0,
+	  NULL, NULL,
 	  show_scli_modes },
 
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t scli_mode = {

@@ -124,10 +124,11 @@ scli_init_atm_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 	{ "show atm interface", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "atm interfaces",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  NULL, NULL,
 	  show_atm_interface },
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t atm_mode = {

@@ -988,16 +988,16 @@ scli_init_interface_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "set interface status", "<regexp> <status>",
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "The set interface status command modifies the administrative\n"
 	  "status of all selected interfaces. The regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest. The <value> parameter must\n"
 	  "be one of the strings \"up\", \"down\", or \"testing\".",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  set_interface_status },
 
 	{ "show interface info", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "The show interface info command displays summary information\n"
 	  "for all selected interfaces. The optional regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
@@ -1020,24 +1020,27 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "connector is present (C=connector, N=none) and the fourth\n"
 	  "character indicates whether the interface is in promiscuous\n"
 	  "mode (P=promiscuous, N=normal).",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  show_interface_info },
 	
 	{ "show interface details", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "The show interface details command describes the selected\n"
 	  "interfaces in more detail. The optional regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  NULL, NULL,
 	  show_interface_details },
 	
 	{ "show interface stack", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "The show interface stack command shows the stacking order\n"
 	  "of the interfaces. <xxx>",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  show_interface_stack },
 	
 	{ "show interface stats", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "The show interface stats command displays network\n"
 	  "interface statistics for all selected interfaces.\n"
 	  "The optional regular expression <regexp> is matched\n"
@@ -1054,32 +1057,38 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "  I-ERR       input errors per second\n"
 	  "  O-ERR       output errors per second\n"
 	  "  DESCRIPTION description of the network interface",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  show_interface_stats },
 	
 	{ "monitor interface stats", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "The monitor interface stats command shows the same\n"
 	  "information as the show interface stats command. The\n"
 	  "information is updated periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  NULL, NULL,
 	  show_interface_stats },
 	
 #if 0
 	{ "set interface alias", "<regexp> <value>",
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "set interface alias",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  set_if_alias },
 
 	{ "set interface notifications", "<regexp> <value>",
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "set interface notifications",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  set_if_notifications },
 
 	{ "set interface promiscuous", "<regexp> <bool>",
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "set interface promiscuous",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  set_if_promiscuous },
 #endif
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t if_mib_mode = {

@@ -453,36 +453,63 @@ scli_init_bridge_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show bridge info", NULL,
+	  "The show bridge info command displays summary information about\n"
+	  "a bridge, such as the number of ports and the supported bridging\n"
+	  "functions and associated parameters.",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "bridge summary information",
+	  NULL, NULL,
 	  show_bridge_info },
 
 	{ "show bridge ports", NULL,
+	  "The show bridge ports command displays information about the\n"
+	  "bridge ports.",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "bridge ports",
+	  NULL, NULL,
 	  show_bridge_ports },
 
 	{ "show bridge forwarding", NULL,
+	  "The show bridge forwarding command displays the forwarding\n"
+	  "data base used by transparent bridges. The command generates\n"
+	  "a table with the following columns:\n"
+	  "\n"
+	  "  PORT    port number\n"
+	  "  STATUS  status of the forwarding entry\n"
+	  "  ADDRESS address associated with the port\n"
+	  "  NAME    name of the address (where known)\n"
+	  "  VENDOR  vendor info derived from the address",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "bridge forwarding data base",
+	  NULL, NULL,
 	  show_bridge_forwarding },
 
 	{ "show bridge filter", NULL,
+	  "The show bridge filte command shows filtering information.",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "bridge filtering data base",
+	  NULL, NULL,
 	  show_bridge_filter },
 
 	{ "show bridge stats", NULL,
+	  "The show bridge stats command displays per port statistics for\n"
+	  "transparent bridges. The command generates a table with the\n"
+	  "following columns:\n"
+	  "\n"
+	  "  PORT        port number\n"
+	  "  I-FPS       input frames per second\n"
+	  "  O-FPS       output frames per second\n"
+	  "  D-FPS       discarded frames per second\n"
+	  "  DESCRIPTION",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "xxx",
+	  NULL, NULL,
 	  show_bridge_stats },
 
 	{ "monitor bridge stats", NULL,
+	  "The monitor bridge stats command shows the same\n"
+	  "information as the show bridge stats command. The"
+	  "information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  "xxx",
+	  NULL, NULL,
 	  show_bridge_stats },
 
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t bridge_mode = {

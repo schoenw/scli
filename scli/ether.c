@@ -383,7 +383,6 @@ scli_init_ether_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show ethernet mau", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "The show ethernet mau command displays information about the\n"
 	  "medium attachment units (MAUs) for each ethernet port. The\n"
 	  "command generates a table which has the following columns:\n"
@@ -395,10 +394,11 @@ scli_init_ether_mode(scli_interp_t *interp)
 	  "  JABBER    jabber state of the medium attachment unit\n"
 	  "  AUTONEG   autonegation capabilities\n"
 	  "  TYPE      type of the medium attachment unit\n",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_ether_mau_info },
 
 	{ "show ethernet stats", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "The show ethernet stats command displays ethernet specific\n"
 	  "statistics for each ethernet interface. The command outputs\n"
 	  "a table which has the following columns:\n"
@@ -415,16 +415,19 @@ scli_init_ether_mode(scli_interp_t *interp)
           "  LCOL      late collisions per second\n"
           "  XMIT      MAC transmit errors per second\n"
           "  CARR      carrier sense errors per second",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_ether_stats },
 
 	{ "monitor ethernet stats", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "The monitor ethernet stats command shows the same information\n"
 	  "as the show ethernet stats command. The information is updated\n"
 	  "periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  NULL, NULL,
 	  cmd_ether_stats },
 
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t ether_mode = {

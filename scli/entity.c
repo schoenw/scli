@@ -426,37 +426,43 @@ scli_init_entity_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show entity info ", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "physical entities that compose the system",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  show_entity_info },
 	
 	{ "show entity details ", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "physical entities that compose the system",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  NULL, NULL,
 	  show_entity_details },
 	
 	{ "show entity containment", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "physical entity containment hierarchy",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  show_entity_containment },
 
 #if 0
 	{ "set entity serial", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "xxx",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  set_entity_serial },
 
 	{ "set entity alias", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "xxx",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  set_entity_alias },
 
 	{ "set entity asset", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "xxx",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  set_entity_serial },
 #endif
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t entity_mode = {

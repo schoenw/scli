@@ -305,27 +305,38 @@ void
 scli_init_cisco_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+	
 	{ "show cisco ip accounting info", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "cisco IP accounting info",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_cisco_ip_accounting_info },
+
 	{ "show cisco ip accounting current", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "cisco IP current accounting data",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_cisco_ip_accounting_current },
+
 	{ "show cisco ip accounting snapshot", NULL,
+	  "cisco IP snapshot accounting data",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "cisco IP snapshot accounting data",
+	  NULL, NULL,
 	  cmd_cisco_ip_accounting_snapshot },
+
 	{ "monitor cisco ip accounting current", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "cisco IP current accounting data",
-	  cmd_cisco_ip_accounting_current },
-	{ "monitor cisco ip accounting snapshot", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  NULL, NULL,
+	  cmd_cisco_ip_accounting_current },
+
+	{ "monitor cisco ip accounting snapshot", NULL,
 	  "cisco IP snapshot accounting data",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  NULL, NULL,
 	  cmd_cisco_ip_accounting_snapshot },
-	{ NULL, NULL, 0, NULL, NULL }
+
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t cisco_mode = {

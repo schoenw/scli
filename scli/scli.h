@@ -70,7 +70,7 @@ extern char const scli_copyright[];	/* copyright message (surprise) */
 #define SCLI_OK			0	/* normal return code */
 #define SCLI_ERROR		1	/* generic error return code */
 #define SCLI_EXIT		2	/* return and exit the command loop */
-#define SCLI_SYNTAX		3	/* generic syntax error return code */
+#define SCLI_SYNTAX		3	/* generic syntax error */
 #define SCLI_SYNTAX_REGEXP	4	/* syntax error in regexp */
 
 
@@ -85,12 +85,14 @@ typedef struct scli_alias	scli_alias_t;
 #define SCLI_CMD_FLAG_XML	0x04
 
 struct scli_cmd {
-    char *path;			/* path where the command is registered */
+    char *path;			/* absolute command name */
     char *options;		/* options accepted by the command */
-    int   flags;		/* command flags */
     char *desc;			/* description of the command */
+    int   flags;		/* command flags (see above) */
+    char *xpath;		/* xml path */
+    char *xsd;			/* xml schema definition */
     int (*func) (scli_interp_t *interp, int argc, char **argv);
-				/* function to implement the command */
+				/* function implementing the command */
     char *name;			/* name of the command (last elem of path) */
 };
 

@@ -458,27 +458,38 @@ void
 scli_init_snmp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
 	{ "show snmp engine", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "information about the SNMP engine",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_snmp_engine },
+
 	{ "show snmp resources", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "information about the SNMP resources",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_snmp_resources },
+
 	{ "show snmp vacm groups", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "information about the VACM groups",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_snmp_vacm_groups },
+
 	{ "show snmp vacm access", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "information about the VACM access rules",
-	  cmd_snmp_vacm_access },
-	{ "show snmp vacm views", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  cmd_snmp_vacm_access },
+
+	{ "show snmp vacm views", NULL,
 	  "information about the VACM views",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_snmp_vacm_views },
-	{ NULL, NULL, 0, NULL, NULL }
+
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t snmp_mode = {

@@ -1197,42 +1197,46 @@ scli_init_system_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "set system contact", "<contact>",
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "The set system contact command configures the system's contact\n"
 	  "information. The <contact> string should include information\n"
 	  "on how to contact a person who is responsible for this system.",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  set_system_contact },
 
 	{ "set system name", "<name>",
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "The set system name command configures the systems's name. By\n"
 	  "convention, this is the system's fully-qualified domain name.",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  set_system_name },
 
 	{ "set system location", "<location>",
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "The set system location command configures the system's physical\n"
 	  "location.",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  set_system_location },
 
 	{ "show system info", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "The show system info command shows general information about the\n"
 	  "system.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  NULL, NULL,
 	  show_system_info },
 
 	{ "show system devices", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "The show system devices command shows a list of system devices.\n"
 	  "The command generates a table with the following columns:\n"
 	  "\n"
 	  "  INDEX       device number\n"
 	  "  STATUS      current status of the device\n"
 	  "  DESCRIPTION description of the device",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  NULL, NULL,
 	  show_system_devices },
 
 	{ "show system storage", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "The show system storage command displays information about the\n"
 	  "logical areas attached in the system. The command generates a\n"
 	  "table with the following columns:\n"
@@ -1244,10 +1248,11 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "  USED        amount of storage in use\n"
 	  "  FREE        amount of storage available\n"
 	  "  USE%        used storage in percent",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  NULL, NULL,
 	  show_system_storage },
 
 	{ "show system mounts", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "The show system mounts command shows the list of filesystems\n"
 	  "mounted on the system. The command generates a table with the\n"
 	  "following columns:\n"
@@ -1257,10 +1262,11 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "  REMOTE  remote server and root path name (if any)\n"
 	  "  TYPE    filesytem type (if known)\n"
 	  "  OPTIONS access mode (ro/rw) and boot flag",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  NULL, NULL,
 	  show_system_mounts },
 
 	{ "show system processes", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "The show system processes command display information about the\n"
 	  "processes currently running on the system. The command generates\n"
 	  "a table with the following columns:\n"
@@ -1275,30 +1281,35 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "The process status values are C=running, R=runnable,\n"
 	  "S=not runnable, and Z=invalid. The process types values are\n"
 	  "?=unknown, O=operating system, D=device driver, and A=application.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  NULL, NULL,
 	  show_system_processes },
 
 	{ "monitor system storage", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "The monitor system storage command shows the same\n"
 	  "information as the show system storage command. The\n"
 	  "information is updated periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  NULL, NULL,
 	  show_system_storage },
 
 	{ "monitor system processes", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "The monitor system processes command show the same\n"
 	  "information as the show system processes command. The\n"
 	  "information is updated periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  NULL, NULL,
 	  show_system_processes },
 
 #ifdef MEM_DEBUG
 	{ "xxx", "<repetitions>",
-	  SCLI_CMD_FLAG_NEED_PEER,
 	  "xxx",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
 	  cmd_xxx },
 #endif
 
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t system_mode = {
