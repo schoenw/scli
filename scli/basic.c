@@ -264,12 +264,12 @@ next_token(char *string, char *out)
     int dquote = 0;
     int squote = 0;
 
-    while (*p && isspace(*p)) p++;	/* skip white space */
+    while (*p && isspace((int) *p)) p++;	/* skip white space */
     while (*p) {
 	switch (*p) {
 	case '\"':
 	    if (dquote) {
-		if (p[1] && !isspace(p[1])) {
+		if (p[1] && !isspace((int) p[1])) {
 		    p++;
 		    return NULL;
 		} else {
@@ -282,7 +282,7 @@ next_token(char *string, char *out)
 	    break;
 	case '\'':
 	    if (squote) {
-		if (p[1] && !isspace(p[1])) {
+		if (p[1] && !isspace((int) p[1])) {
 		    p++;
 		    return NULL;
 		} else {
@@ -415,7 +415,6 @@ expand_alias(scli_interp_t *interp, char *cmd)
 		if (rest) {
 		    strcat(expanded_cmd, rest);
 		}
-		g_printerr("** %s -> %s\n", cmd, expanded_cmd);
 		return expanded_cmd;
 	    }
 	}
