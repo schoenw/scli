@@ -3,7 +3,7 @@
  * version 0.3.1 for the scli package.
  *
  * Options:
- *   --scli-include='sonetMediumEntry'
+ *   --scli-include='sonetMediumEntry|sonetSection'
  *
  * Derived from SONET-MIB:
  *   The MIB module to describe
@@ -120,6 +120,11 @@ extern GSnmpEnum const sonet_mib_enums_sonetMediumLineCoding[];
 
 extern GSnmpEnum const sonet_mib_enums_sonetMediumLineType[];
 
+#define SONET_MIB_SONETSECTIONINTERVALVALIDDATA_TRUE  1
+#define SONET_MIB_SONETSECTIONINTERVALVALIDDATA_FALSE 2
+
+extern GSnmpEnum const sonet_mib_enums_sonetSectionIntervalValidData[];
+
 
 /*
  * C type definitions for SONET-MIB::sonetMediumEntry.
@@ -184,6 +189,75 @@ sonet_mib_set_sonetMediumCircuitIdentifier(GSnmpSession *s, gint32 ifIndex, guch
 
 extern void
 sonet_mib_set_sonetMediumLoopbackConfig(GSnmpSession *s, gint32 ifIndex, guchar *sonetMediumLoopbackConfig, guint16 _sonetMediumLoopbackConfigLength);
+
+/*
+ * C type definitions for SONET-MIB::sonetSectionCurrentEntry.
+ */
+
+#define SONET_MIB_SONETSECTIONCURRENTSTATUS (1 << 0) 
+#define SONET_MIB_SONETSECTIONCURRENTESS    (1 << 1) 
+#define SONET_MIB_SONETSECTIONCURRENTSESS   (1 << 2) 
+#define SONET_MIB_SONETSECTIONCURRENTSEFSS  (1 << 3) 
+#define SONET_MIB_SONETSECTIONCURRENTCVS    (1 << 4) 
+
+typedef struct {
+    gint32   ifIndex;
+    gint32   *sonetSectionCurrentStatus;
+    guint32  *sonetSectionCurrentESs;
+    guint32  *sonetSectionCurrentSESs;
+    guint32  *sonetSectionCurrentSEFSs;
+    guint32  *sonetSectionCurrentCVs;
+} sonet_mib_sonetSectionCurrentEntry_t;
+
+extern void
+sonet_mib_get_sonetSectionCurrentTable(GSnmpSession *s, sonet_mib_sonetSectionCurrentEntry_t ***sonetSectionCurrentEntry, gint mask);
+
+extern void
+sonet_mib_free_sonetSectionCurrentTable(sonet_mib_sonetSectionCurrentEntry_t **sonetSectionCurrentEntry);
+
+extern sonet_mib_sonetSectionCurrentEntry_t *
+sonet_mib_new_sonetSectionCurrentEntry(void);
+
+extern void
+sonet_mib_get_sonetSectionCurrentEntry(GSnmpSession *s, sonet_mib_sonetSectionCurrentEntry_t **sonetSectionCurrentEntry, gint32 ifIndex, gint mask);
+
+extern void
+sonet_mib_free_sonetSectionCurrentEntry(sonet_mib_sonetSectionCurrentEntry_t *sonetSectionCurrentEntry);
+
+/*
+ * C type definitions for SONET-MIB::sonetSectionIntervalEntry.
+ */
+
+#define SONET_MIB_SONETSECTIONINTERVALESS       (1 << 0) 
+#define SONET_MIB_SONETSECTIONINTERVALSESS      (1 << 1) 
+#define SONET_MIB_SONETSECTIONINTERVALSEFSS     (1 << 2) 
+#define SONET_MIB_SONETSECTIONINTERVALCVS       (1 << 3) 
+#define SONET_MIB_SONETSECTIONINTERVALVALIDDATA (1 << 4) 
+
+typedef struct {
+    gint32   ifIndex;
+    gint32   sonetSectionIntervalNumber;
+    guint32  *sonetSectionIntervalESs;
+    guint32  *sonetSectionIntervalSESs;
+    guint32  *sonetSectionIntervalSEFSs;
+    guint32  *sonetSectionIntervalCVs;
+    gint32   *sonetSectionIntervalValidData;
+} sonet_mib_sonetSectionIntervalEntry_t;
+
+extern void
+sonet_mib_get_sonetSectionIntervalTable(GSnmpSession *s, sonet_mib_sonetSectionIntervalEntry_t ***sonetSectionIntervalEntry, gint mask);
+
+extern void
+sonet_mib_free_sonetSectionIntervalTable(sonet_mib_sonetSectionIntervalEntry_t **sonetSectionIntervalEntry);
+
+extern sonet_mib_sonetSectionIntervalEntry_t *
+sonet_mib_new_sonetSectionIntervalEntry(void);
+
+extern void
+sonet_mib_get_sonetSectionIntervalEntry(GSnmpSession *s, sonet_mib_sonetSectionIntervalEntry_t **sonetSectionIntervalEntry, gint32 ifIndex, gint32 sonetSectionIntervalNumber, gint mask);
+
+extern void
+sonet_mib_free_sonetSectionIntervalEntry(sonet_mib_sonetSectionIntervalEntry_t *sonetSectionIntervalEntry);
 
 
 #endif /* _SONET_MIB_H_ */

@@ -3,7 +3,7 @@
  * version 0.3.1 for the scli package.
  *
  * Options:
- *   --scli-include='sonetMediumEntry'
+ *   --scli-include='sonetMediumEntry|sonetSection'
  *
  * Derived from SONET-MIB:
  *   The MIB module to describe
@@ -116,11 +116,18 @@ GSnmpEnum const sonet_mib_enums_sonetMediumLineType[] = {
     { 0, NULL }
 };
 
+GSnmpEnum const sonet_mib_enums_sonetSectionIntervalValidData[] = {
+    { SONET_MIB_SONETSECTIONINTERVALVALIDDATA_TRUE,  "true" },
+    { SONET_MIB_SONETSECTIONINTERVALVALIDDATA_FALSE, "false" },
+    { 0, NULL }
+};
+
 
 static guint32 sonetMediumTimeElapsed_constraints[] = {1L, 900L, 0, 0};
 static guint32 sonetMediumValidIntervals_constraints[] = {0L, 96L, 0, 0};
 static guint16 sonetMediumCircuitIdentifier_constraints[] = {0, 255, 0, 0};
 static guint32 sonetMediumInvalidIntervals_constraints[] = {0L, 96L, 0, 0};
+static guint32 sonetSectionCurrentStatus_constraints[] = {1L, 6L, 0, 0};
 
 
 static guint32 const sonetMediumEntry_oid[] = {1, 3, 6, 1, 2, 1, 10, 39, 1, 1, 1, 1};
@@ -174,6 +181,78 @@ static GSnmpAttribute sonetMediumEntry_attr[] = {
       G_STRUCT_OFFSET(sonet_mib_sonetMediumEntry_t, sonetMediumLoopbackConfig),
       G_STRUCT_OFFSET(sonet_mib_sonetMediumEntry_t, _sonetMediumLoopbackConfigLength),
       GSNMP_ATTR_FLAG_WRITABLE },
+    { 0, 0, 0, NULL }
+};
+
+static guint32 const sonetSectionCurrentEntry_oid[] = {1, 3, 6, 1, 2, 1, 10, 39, 1, 2, 1, 1};
+
+static GSnmpAttribute sonetSectionCurrentEntry_attr[] = {
+    { 1, G_SNMP_INTEGER32,
+      SONET_MIB_SONETSECTIONCURRENTSTATUS, "sonetSectionCurrentStatus",
+       sonetSectionCurrentStatus_constraints,
+      G_STRUCT_OFFSET(sonet_mib_sonetSectionCurrentEntry_t, sonetSectionCurrentStatus),
+      0,
+      0 },
+    { 2, G_SNMP_UNSIGNED32,
+      SONET_MIB_SONETSECTIONCURRENTESS, "sonetSectionCurrentESs",
+       NULL,
+      G_STRUCT_OFFSET(sonet_mib_sonetSectionCurrentEntry_t, sonetSectionCurrentESs),
+      0,
+      0 },
+    { 3, G_SNMP_UNSIGNED32,
+      SONET_MIB_SONETSECTIONCURRENTSESS, "sonetSectionCurrentSESs",
+       NULL,
+      G_STRUCT_OFFSET(sonet_mib_sonetSectionCurrentEntry_t, sonetSectionCurrentSESs),
+      0,
+      0 },
+    { 4, G_SNMP_UNSIGNED32,
+      SONET_MIB_SONETSECTIONCURRENTSEFSS, "sonetSectionCurrentSEFSs",
+       NULL,
+      G_STRUCT_OFFSET(sonet_mib_sonetSectionCurrentEntry_t, sonetSectionCurrentSEFSs),
+      0,
+      0 },
+    { 5, G_SNMP_UNSIGNED32,
+      SONET_MIB_SONETSECTIONCURRENTCVS, "sonetSectionCurrentCVs",
+       NULL,
+      G_STRUCT_OFFSET(sonet_mib_sonetSectionCurrentEntry_t, sonetSectionCurrentCVs),
+      0,
+      0 },
+    { 0, 0, 0, NULL }
+};
+
+static guint32 const sonetSectionIntervalEntry_oid[] = {1, 3, 6, 1, 2, 1, 10, 39, 1, 2, 2, 1};
+
+static GSnmpAttribute sonetSectionIntervalEntry_attr[] = {
+    { 2, G_SNMP_UNSIGNED32,
+      SONET_MIB_SONETSECTIONINTERVALESS, "sonetSectionIntervalESs",
+       NULL,
+      G_STRUCT_OFFSET(sonet_mib_sonetSectionIntervalEntry_t, sonetSectionIntervalESs),
+      0,
+      0 },
+    { 3, G_SNMP_UNSIGNED32,
+      SONET_MIB_SONETSECTIONINTERVALSESS, "sonetSectionIntervalSESs",
+       NULL,
+      G_STRUCT_OFFSET(sonet_mib_sonetSectionIntervalEntry_t, sonetSectionIntervalSESs),
+      0,
+      0 },
+    { 4, G_SNMP_UNSIGNED32,
+      SONET_MIB_SONETSECTIONINTERVALSEFSS, "sonetSectionIntervalSEFSs",
+       NULL,
+      G_STRUCT_OFFSET(sonet_mib_sonetSectionIntervalEntry_t, sonetSectionIntervalSEFSs),
+      0,
+      0 },
+    { 5, G_SNMP_UNSIGNED32,
+      SONET_MIB_SONETSECTIONINTERVALCVS, "sonetSectionIntervalCVs",
+       NULL,
+      G_STRUCT_OFFSET(sonet_mib_sonetSectionIntervalEntry_t, sonetSectionIntervalCVs),
+      0,
+      0 },
+    { 6, G_SNMP_INTEGER32,
+      SONET_MIB_SONETSECTIONINTERVALVALIDDATA, "sonetSectionIntervalValidData",
+       NULL,
+      G_STRUCT_OFFSET(sonet_mib_sonetSectionIntervalEntry_t, sonetSectionIntervalValidData),
+      0,
+      0 },
     { 0, 0, 0, NULL }
 };
 
@@ -403,6 +482,291 @@ sonet_mib_set_sonetMediumLoopbackConfig(GSnmpSession *s, gint32 ifIndex, guchar 
     /* ?? */
     sonet_mib_set_sonetMediumEntry(s, sonetMediumEntry, SONET_MIB_SONETMEDIUMLOOPBACKCONFIG);
     sonet_mib_free_sonetMediumEntry(sonetMediumEntry);
+}
+
+sonet_mib_sonetSectionCurrentEntry_t *
+sonet_mib_new_sonetSectionCurrentEntry()
+{
+    sonet_mib_sonetSectionCurrentEntry_t *sonetSectionCurrentEntry;
+
+    sonetSectionCurrentEntry = (sonet_mib_sonetSectionCurrentEntry_t *) g_malloc0(sizeof(sonet_mib_sonetSectionCurrentEntry_t) + sizeof(gpointer));
+    return sonetSectionCurrentEntry;
+}
+
+static inline int
+unpack_sonetSectionCurrentEntry(GSnmpVarBind *vb, sonet_mib_sonetSectionCurrentEntry_t *sonetSectionCurrentEntry)
+{
+    guint8 idx = 13;
+
+    if (vb->id_len < idx) return -1;
+    sonetSectionCurrentEntry->ifIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
+static inline gint8
+pack_sonetSectionCurrentEntry(guint32 *base, gint32 ifIndex)
+{
+    guint8 idx = 13;
+
+    base[idx++] = ifIndex;
+    return idx;
+}
+
+static inline sonet_mib_sonetSectionCurrentEntry_t *
+assign_sonetSectionCurrentEntry(GSList *vbl)
+{
+    sonet_mib_sonetSectionCurrentEntry_t *sonetSectionCurrentEntry;
+    char *p;
+
+    sonetSectionCurrentEntry = sonet_mib_new_sonetSectionCurrentEntry();
+    if (! sonetSectionCurrentEntry) {
+        return NULL;
+    }
+
+    p = (char *) sonetSectionCurrentEntry + sizeof(sonet_mib_sonetSectionCurrentEntry_t);
+    * (GSList **) p = vbl;
+
+    if (unpack_sonetSectionCurrentEntry((GSnmpVarBind *) vbl->data, sonetSectionCurrentEntry) < 0) {
+        g_warning("%s: invalid instance identifier", "sonetSectionCurrentEntry");
+        g_free(sonetSectionCurrentEntry);
+        return NULL;
+    }
+
+    gsnmp_attr_assign(vbl, sonetSectionCurrentEntry_oid, sizeof(sonetSectionCurrentEntry_oid)/sizeof(guint32),
+                      sonetSectionCurrentEntry_attr, sonetSectionCurrentEntry);
+
+    return sonetSectionCurrentEntry;
+}
+
+void
+sonet_mib_get_sonetSectionCurrentTable(GSnmpSession *s, sonet_mib_sonetSectionCurrentEntry_t ***sonetSectionCurrentEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    GSList *row;
+    int i;
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 10, 39, 1, 2, 1, 1, 0};
+
+    *sonetSectionCurrentEntry = NULL;
+
+    gsnmp_attr_get(s, &in, base, 13, 12, sonetSectionCurrentEntry_attr, mask);
+
+    out = gsnmp_gettable(s, in);
+    /* g_snmp_vbl_free(in); */
+
+    if (out) {
+        *sonetSectionCurrentEntry = (sonet_mib_sonetSectionCurrentEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(sonet_mib_sonetSectionCurrentEntry_t *));
+        if (! *sonetSectionCurrentEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*sonetSectionCurrentEntry)[i] = assign_sonetSectionCurrentEntry(row->data);
+        }
+    }
+}
+
+void
+sonet_mib_get_sonetSectionCurrentEntry(GSnmpSession *s, sonet_mib_sonetSectionCurrentEntry_t **sonetSectionCurrentEntry, gint32 ifIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    gint8 len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, sonetSectionCurrentEntry_oid, sizeof(sonetSectionCurrentEntry_oid));
+    len = pack_sonetSectionCurrentEntry(base, ifIndex);
+    if (len < 0) {
+        g_warning("%s: invalid index values", "sonetSectionCurrentEntry");
+        s->error_status = G_SNMP_ERR_INTERNAL;
+        return;
+    }
+
+    *sonetSectionCurrentEntry = NULL;
+
+    gsnmp_attr_get(s, &in, base, len, 12, sonetSectionCurrentEntry_attr, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
+        *sonetSectionCurrentEntry = assign_sonetSectionCurrentEntry(out);
+    }
+}
+
+void
+sonet_mib_free_sonetSectionCurrentEntry(sonet_mib_sonetSectionCurrentEntry_t *sonetSectionCurrentEntry)
+{
+    GSList *vbl;
+    char *p;
+
+    if (sonetSectionCurrentEntry) {
+        p = (char *) sonetSectionCurrentEntry + sizeof(sonet_mib_sonetSectionCurrentEntry_t);
+        vbl = * (GSList **) p;
+        g_snmp_vbl_free(vbl);
+        g_free(sonetSectionCurrentEntry);
+    }
+}
+
+void
+sonet_mib_free_sonetSectionCurrentTable(sonet_mib_sonetSectionCurrentEntry_t **sonetSectionCurrentEntry)
+{
+    int i;
+
+    if (sonetSectionCurrentEntry) {
+        for (i = 0; sonetSectionCurrentEntry[i]; i++) {
+            sonet_mib_free_sonetSectionCurrentEntry(sonetSectionCurrentEntry[i]);
+        }
+        g_free(sonetSectionCurrentEntry);
+    }
+}
+
+sonet_mib_sonetSectionIntervalEntry_t *
+sonet_mib_new_sonetSectionIntervalEntry()
+{
+    sonet_mib_sonetSectionIntervalEntry_t *sonetSectionIntervalEntry;
+
+    sonetSectionIntervalEntry = (sonet_mib_sonetSectionIntervalEntry_t *) g_malloc0(sizeof(sonet_mib_sonetSectionIntervalEntry_t) + sizeof(gpointer));
+    return sonetSectionIntervalEntry;
+}
+
+static inline int
+unpack_sonetSectionIntervalEntry(GSnmpVarBind *vb, sonet_mib_sonetSectionIntervalEntry_t *sonetSectionIntervalEntry)
+{
+    guint8 idx = 13;
+
+    if (vb->id_len < idx) return -1;
+    sonetSectionIntervalEntry->ifIndex = vb->id[idx++];
+    if (vb->id_len < idx) return -1;
+    sonetSectionIntervalEntry->sonetSectionIntervalNumber = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
+static inline gint8
+pack_sonetSectionIntervalEntry(guint32 *base, gint32 ifIndex, gint32 sonetSectionIntervalNumber)
+{
+    guint8 idx = 13;
+
+    base[idx++] = ifIndex;
+    base[idx++] = sonetSectionIntervalNumber;
+    return idx;
+}
+
+static inline sonet_mib_sonetSectionIntervalEntry_t *
+assign_sonetSectionIntervalEntry(GSList *vbl)
+{
+    sonet_mib_sonetSectionIntervalEntry_t *sonetSectionIntervalEntry;
+    char *p;
+
+    sonetSectionIntervalEntry = sonet_mib_new_sonetSectionIntervalEntry();
+    if (! sonetSectionIntervalEntry) {
+        return NULL;
+    }
+
+    p = (char *) sonetSectionIntervalEntry + sizeof(sonet_mib_sonetSectionIntervalEntry_t);
+    * (GSList **) p = vbl;
+
+    if (unpack_sonetSectionIntervalEntry((GSnmpVarBind *) vbl->data, sonetSectionIntervalEntry) < 0) {
+        g_warning("%s: invalid instance identifier", "sonetSectionIntervalEntry");
+        g_free(sonetSectionIntervalEntry);
+        return NULL;
+    }
+
+    gsnmp_attr_assign(vbl, sonetSectionIntervalEntry_oid, sizeof(sonetSectionIntervalEntry_oid)/sizeof(guint32),
+                      sonetSectionIntervalEntry_attr, sonetSectionIntervalEntry);
+
+    return sonetSectionIntervalEntry;
+}
+
+void
+sonet_mib_get_sonetSectionIntervalTable(GSnmpSession *s, sonet_mib_sonetSectionIntervalEntry_t ***sonetSectionIntervalEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    GSList *row;
+    int i;
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 10, 39, 1, 2, 2, 1, 0};
+
+    *sonetSectionIntervalEntry = NULL;
+
+    gsnmp_attr_get(s, &in, base, 13, 12, sonetSectionIntervalEntry_attr, mask);
+
+    out = gsnmp_gettable(s, in);
+    /* g_snmp_vbl_free(in); */
+
+    if (out) {
+        *sonetSectionIntervalEntry = (sonet_mib_sonetSectionIntervalEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(sonet_mib_sonetSectionIntervalEntry_t *));
+        if (! *sonetSectionIntervalEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*sonetSectionIntervalEntry)[i] = assign_sonetSectionIntervalEntry(row->data);
+        }
+    }
+}
+
+void
+sonet_mib_get_sonetSectionIntervalEntry(GSnmpSession *s, sonet_mib_sonetSectionIntervalEntry_t **sonetSectionIntervalEntry, gint32 ifIndex, gint32 sonetSectionIntervalNumber, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    gint8 len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, sonetSectionIntervalEntry_oid, sizeof(sonetSectionIntervalEntry_oid));
+    len = pack_sonetSectionIntervalEntry(base, ifIndex, sonetSectionIntervalNumber);
+    if (len < 0) {
+        g_warning("%s: invalid index values", "sonetSectionIntervalEntry");
+        s->error_status = G_SNMP_ERR_INTERNAL;
+        return;
+    }
+
+    *sonetSectionIntervalEntry = NULL;
+
+    gsnmp_attr_get(s, &in, base, len, 12, sonetSectionIntervalEntry_attr, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
+        *sonetSectionIntervalEntry = assign_sonetSectionIntervalEntry(out);
+    }
+}
+
+void
+sonet_mib_free_sonetSectionIntervalEntry(sonet_mib_sonetSectionIntervalEntry_t *sonetSectionIntervalEntry)
+{
+    GSList *vbl;
+    char *p;
+
+    if (sonetSectionIntervalEntry) {
+        p = (char *) sonetSectionIntervalEntry + sizeof(sonet_mib_sonetSectionIntervalEntry_t);
+        vbl = * (GSList **) p;
+        g_snmp_vbl_free(vbl);
+        g_free(sonetSectionIntervalEntry);
+    }
+}
+
+void
+sonet_mib_free_sonetSectionIntervalTable(sonet_mib_sonetSectionIntervalEntry_t **sonetSectionIntervalEntry)
+{
+    int i;
+
+    if (sonetSectionIntervalEntry) {
+        for (i = 0; sonetSectionIntervalEntry[i]; i++) {
+            sonet_mib_free_sonetSectionIntervalEntry(sonetSectionIntervalEntry[i]);
+        }
+        g_free(sonetSectionIntervalEntry);
+    }
 }
 
 

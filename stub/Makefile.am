@@ -155,10 +155,10 @@ atm-mib.h atm-mib.c:
 	$(SMIDUMP) -f scli --scli-include='atmInterfaceConfEntry' ATM-MIB
 
 etherlike-mib.h etherlike-mib.c:
-	$(SMIDUMP) -f scli EtherLike-MIB
+	$(SMIDUMP) -f scli --scli-include='dot3StatsEntry' EtherLike-MIB
 
 mau-mib.h mau-mib.c:
-	$(SMIDUMP) -f scli MAU-MIB
+	$(SMIDUMP) -f scli --scli-exclude='broadMauBasic' MAU-MIB
 
 rfc1213-mib.h rfc1213-mib.c:
 	$(SMIDUMP) -f scli --scli-include='ipRouteEntry' RFC1213-MIB
@@ -176,7 +176,7 @@ rs-232-mib.h rs-232-mib.c:
 	$(SMIDUMP) -f scli RS-232-MIB
 
 sonet-mib.h sonet-mib.c:
-	$(SMIDUMP) -f scli --scli-include='sonetMediumEntry' SONET-MIB
+	$(SMIDUMP) -f scli --scli-include='sonetMediumEntry|sonetSection' SONET-MIB
 
 old-cisco-ip-mib.h old-cisco-ip-mib.c:
 	$(SMIDUMP) -f scli OLD-CISCO-IP-MIB
