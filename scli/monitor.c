@@ -121,7 +121,7 @@ page(WINDOW *win, scli_interp_t *interp)
     wclrtobot(win);
     if (interp->result->len) {
 	for (s = interp->result->str; s; s = e ? ++e : NULL) {
-	    e = index(s, '\n');
+	    e = strchr(s, '\n');
 	    if (e) *e = 0;
 	    mvwprintw(win, y++, 0, "%s", s);
 	}
