@@ -12,6 +12,7 @@ MIBS			= IF-MIB \
 			  HOST-RESOURCES-MIB \
 			  HOST-RESOURCES-TYPES \
 			  ENTITY-MIB \
+			  ENTITY-SENSOR-MIB \
 			  BRIDGE-MIB \
 			  IANA-LANGUAGE-MIB \
 			  DISMAN-SCRIPT-MIB \
@@ -36,6 +37,7 @@ MIBS			= IF-MIB \
 			  ISDN-MIB \
 			  RS-232-MIB \
 			  SONET-MIB \
+			  RMON-MIB \
 			  OLD-CISCO-IP-MIB \
 			  RAPID-CITY \
 			  UCD-SNMP-MIB \
@@ -53,6 +55,7 @@ STUBS			= if-mib.h if-mib.c \
                           host-resources-mib.h host-resources-mib.c \
                           host-resources-types.h host-resources-types.c \
                           entity-mib.h entity-mib.c \
+			  entity-sensor-mib.h entity-sensor-mib.c \
                           bridge-mib.h bridge-mib.c \
                           iana-language-mib.h iana-language-mib.c \
 			  disman-script-mib.h disman-script-mib.c \
@@ -75,6 +78,7 @@ STUBS			= if-mib.h if-mib.c \
                           isdn-mib.h isdn-mib.c \
                           rs-232-mib.h rs-232-mib.c \
                           sonet-mib.h sonet-mib.c \
+			  rmon-mib.h rmon-mib.c \
 			  old-cisco-ip-mib.h old-cisco-ip-mib.c \
 			  rapid-city.h rapid-city.c \
 			  ucd-snmp-mib.h ucd-snmp-mib.c \
@@ -88,7 +92,7 @@ noinst_LIBRARIES	= libstub.a
 libstub_a_SOURCES	= $(STUBS)
 
 SMIDUMP			= ../../libsmi/tools/smidump
-SMIPATH			= $(HOME)/mibs/cisco:$(HOME)/mibs/3com:$(HOME)/mibs/nortel:$(HOME)/mibs:/usr/local/share/mibs/ietf:/usr/share/snmp/mibs
+SMIPATH			= $(HOME)/mibs/cisco:$(HOME)/mibs/3com:$(HOME)/mibs/nortel:$(HOME)/mibs:/usr/local/share/mibs/ietf:/usr/local/share/mibs/iana:/usr/share/snmp/mibs
 
 export SMIPATH
 
@@ -123,13 +127,16 @@ snmpv2-tm.h snmpv2-tm.c:
 	$(SMIDUMP) -f scli SNMPv2-TM
 
 host-resources-mib.h host-resources-mib.c:
-	$(SMIDUMP) -f scli --scli-exclude='hrSWInstalled' HOST-RESOURCES-MIB
+	$(SMIDUMP) -f scli HOST-RESOURCES-MIB
 
 host-resources-types.h host-resources-types.c:
 	$(SMIDUMP) -f scli HOST-RESOURCES-TYPES
 
 entity-mib.h entity-mib.c:
 	$(SMIDUMP) -f scli ENTITY-MIB
+
+entity-sensor-mib.h entity-sensor-mib.c:
+	$(SMIDUMP) -f scli ENTITY-SENSOR-MIB
 
 bridge-mib.h bridge-mib.c:
 	$(SMIDUMP) -f scli BRIDGE-MIB
@@ -202,6 +209,9 @@ rs-232-mib.h rs-232-mib.c:
 
 sonet-mib.h sonet-mib.c:
 	$(SMIDUMP) -f scli --scli-include='sonetMediumEntry|sonetSection' SONET-MIB
+
+rmon-mib.h rmon-mib.c:
+	$(SMIDUMP) -f scli --scli-include='historyControlEntry' RMON-MIB
 
 old-cisco-ip-mib.h old-cisco-ip-mib.c:
 	$(SMIDUMP) -f scli OLD-CISCO-IP-MIB
