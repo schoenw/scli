@@ -688,7 +688,7 @@ g_asn1_int32_decode ( ASN1_SCK *asn1, guchar *eoc, gint32 *integer)
 
     if (!g_asn1_octet_decode (asn1, &ch))
         return FALSE;
-    *integer = (gint) ch;
+    *integer = (gchar) ch;
     len = 1;
     while (asn1->pointer < eoc)
     {
@@ -774,7 +774,7 @@ g_asn1_int64_decode ( ASN1_SCK *asn1, guchar *eoc, gint64 *integer)
 
     if (!g_asn1_octet_decode (asn1, &ch))
         return FALSE;
-    *integer = (signed char) ch;
+    *integer = (gchar) ch;
     len = 1;
     while (asn1->pointer < eoc)
     {
