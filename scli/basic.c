@@ -33,6 +33,9 @@
 #ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
+#ifdef HAVE_TERMIOS_H
+#include <termios.h>
+#endif
 
 
 char const scli_copyright[] = "(c) 2001 Juergen Schoenwaelder";
