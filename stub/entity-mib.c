@@ -9,66 +9,6 @@
 
 #include "entity-mib.h"
 
-static guint32 const entPhysicalIndex[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 1};
-static guint32 const entPhysicalDescr[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 2};
-static guint32 const entPhysicalVendorType[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 3};
-static guint32 const entPhysicalContainedIn[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 4};
-static guint32 const entPhysicalClass[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 5};
-static guint32 const entPhysicalParentRelPos[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 6};
-static guint32 const entPhysicalName[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 7};
-static guint32 const entPhysicalHardwareRev[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 8};
-static guint32 const entPhysicalFirmwareRev[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 9};
-static guint32 const entPhysicalSoftwareRev[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 10};
-static guint32 const entPhysicalSerialNum[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 11};
-static guint32 const entPhysicalMfgName[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 12};
-static guint32 const entPhysicalModelName[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 13};
-static guint32 const entPhysicalAlias[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 14};
-static guint32 const entPhysicalAssetID[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 15};
-static guint32 const entPhysicalIsFRU[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 16};
-static guint32 const entLogicalIndex[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1, 1};
-static guint32 const entLogicalDescr[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1, 2};
-static guint32 const entLogicalType[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1, 3};
-static guint32 const entLogicalCommunity[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1, 4};
-static guint32 const entLogicalTAddress[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1, 5};
-static guint32 const entLogicalTDomain[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1, 6};
-static guint32 const entLogicalContextEngineID[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1, 7};
-static guint32 const entLogicalContextName[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1, 8};
-static guint32 const entLPPhysicalIndex[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 1, 1, 1};
-static guint32 const entAliasLogicalIndexOrZero[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 2, 1, 1};
-static guint32 const entAliasMappingIdentifier[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 2, 1, 2};
-static guint32 const entPhysicalChildIndex[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 3, 1, 1};
-static guint32 const entLastChangeTime[] = {1, 3, 6, 1, 2, 1, 47, 1, 4, 1};
-
-static gsize const _entPhysicalIndexLength = sizeof(entPhysicalIndex)/sizeof(guint32);
-static gsize const _entPhysicalDescrLength = sizeof(entPhysicalDescr)/sizeof(guint32);
-static gsize const _entPhysicalVendorTypeLength = sizeof(entPhysicalVendorType)/sizeof(guint32);
-static gsize const _entPhysicalContainedInLength = sizeof(entPhysicalContainedIn)/sizeof(guint32);
-static gsize const _entPhysicalClassLength = sizeof(entPhysicalClass)/sizeof(guint32);
-static gsize const _entPhysicalParentRelPosLength = sizeof(entPhysicalParentRelPos)/sizeof(guint32);
-static gsize const _entPhysicalNameLength = sizeof(entPhysicalName)/sizeof(guint32);
-static gsize const _entPhysicalHardwareRevLength = sizeof(entPhysicalHardwareRev)/sizeof(guint32);
-static gsize const _entPhysicalFirmwareRevLength = sizeof(entPhysicalFirmwareRev)/sizeof(guint32);
-static gsize const _entPhysicalSoftwareRevLength = sizeof(entPhysicalSoftwareRev)/sizeof(guint32);
-static gsize const _entPhysicalSerialNumLength = sizeof(entPhysicalSerialNum)/sizeof(guint32);
-static gsize const _entPhysicalMfgNameLength = sizeof(entPhysicalMfgName)/sizeof(guint32);
-static gsize const _entPhysicalModelNameLength = sizeof(entPhysicalModelName)/sizeof(guint32);
-static gsize const _entPhysicalAliasLength = sizeof(entPhysicalAlias)/sizeof(guint32);
-static gsize const _entPhysicalAssetIDLength = sizeof(entPhysicalAssetID)/sizeof(guint32);
-static gsize const _entPhysicalIsFRULength = sizeof(entPhysicalIsFRU)/sizeof(guint32);
-static gsize const _entLogicalIndexLength = sizeof(entLogicalIndex)/sizeof(guint32);
-static gsize const _entLogicalDescrLength = sizeof(entLogicalDescr)/sizeof(guint32);
-static gsize const _entLogicalTypeLength = sizeof(entLogicalType)/sizeof(guint32);
-static gsize const _entLogicalCommunityLength = sizeof(entLogicalCommunity)/sizeof(guint32);
-static gsize const _entLogicalTAddressLength = sizeof(entLogicalTAddress)/sizeof(guint32);
-static gsize const _entLogicalTDomainLength = sizeof(entLogicalTDomain)/sizeof(guint32);
-static gsize const _entLogicalContextEngineIDLength = sizeof(entLogicalContextEngineID)/sizeof(guint32);
-static gsize const _entLogicalContextNameLength = sizeof(entLogicalContextName)/sizeof(guint32);
-static gsize const _entLPPhysicalIndexLength = sizeof(entLPPhysicalIndex)/sizeof(guint32);
-static gsize const _entAliasLogicalIndexOrZeroLength = sizeof(entAliasLogicalIndexOrZero)/sizeof(guint32);
-static gsize const _entAliasMappingIdentifierLength = sizeof(entAliasMappingIdentifier)/sizeof(guint32);
-static gsize const _entPhysicalChildIndexLength = sizeof(entPhysicalChildIndex)/sizeof(guint32);
-static gsize const _entLastChangeTimeLength = sizeof(entLastChangeTime)/sizeof(guint32);
-
 stls_table_t entity_mib_enums_entPhysicalClass[] = {
     { 1, "other" },
     { 2, "unknown" },
@@ -106,6 +46,13 @@ assign_entPhysicalEntry(GSList *vbl)
     p = (char *) entPhysicalEntry + sizeof(entPhysicalEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 13) return NULL;
+        entPhysicalEntry->entPhysicalIndex = (gint32 *) &(vb->id[12]);
+        if (vb->id_len > 13) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -113,75 +60,60 @@ assign_entPhysicalEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _entPhysicalDescrLength
-            && memcmp(vb->id, entPhysicalDescr, sizeof(entPhysicalDescr)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 2) {
             entPhysicalEntry->_entPhysicalDescrLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalDescr = vb->syntax.uc;
         }
-        if (vb->id_len > _entPhysicalVendorTypeLength
-            && memcmp(vb->id, entPhysicalVendorType, sizeof(entPhysicalVendorType)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 3) {
             entPhysicalEntry->_entPhysicalVendorTypeLength = vb->syntax_len / sizeof(guint32);
             entPhysicalEntry->entPhysicalVendorType = vb->syntax.ui32;
         }
-        if (vb->id_len > _entPhysicalContainedInLength
-            && memcmp(vb->id, entPhysicalContainedIn, sizeof(entPhysicalContainedIn)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 4) {
             entPhysicalEntry->entPhysicalContainedIn = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _entPhysicalClassLength
-            && memcmp(vb->id, entPhysicalClass, sizeof(entPhysicalClass)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 5) {
             entPhysicalEntry->entPhysicalClass = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _entPhysicalParentRelPosLength
-            && memcmp(vb->id, entPhysicalParentRelPos, sizeof(entPhysicalParentRelPos)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 6) {
             entPhysicalEntry->entPhysicalParentRelPos = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _entPhysicalNameLength
-            && memcmp(vb->id, entPhysicalName, sizeof(entPhysicalName)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 7) {
             entPhysicalEntry->_entPhysicalNameLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalName = vb->syntax.uc;
         }
-        if (vb->id_len > _entPhysicalHardwareRevLength
-            && memcmp(vb->id, entPhysicalHardwareRev, sizeof(entPhysicalHardwareRev)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 8) {
             entPhysicalEntry->_entPhysicalHardwareRevLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalHardwareRev = vb->syntax.uc;
         }
-        if (vb->id_len > _entPhysicalFirmwareRevLength
-            && memcmp(vb->id, entPhysicalFirmwareRev, sizeof(entPhysicalFirmwareRev)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 9) {
             entPhysicalEntry->_entPhysicalFirmwareRevLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalFirmwareRev = vb->syntax.uc;
         }
-        if (vb->id_len > _entPhysicalSoftwareRevLength
-            && memcmp(vb->id, entPhysicalSoftwareRev, sizeof(entPhysicalSoftwareRev)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 10) {
             entPhysicalEntry->_entPhysicalSoftwareRevLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalSoftwareRev = vb->syntax.uc;
         }
-        if (vb->id_len > _entPhysicalSerialNumLength
-            && memcmp(vb->id, entPhysicalSerialNum, sizeof(entPhysicalSerialNum)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 11) {
             entPhysicalEntry->_entPhysicalSerialNumLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalSerialNum = vb->syntax.uc;
         }
-        if (vb->id_len > _entPhysicalMfgNameLength
-            && memcmp(vb->id, entPhysicalMfgName, sizeof(entPhysicalMfgName)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 12) {
             entPhysicalEntry->_entPhysicalMfgNameLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalMfgName = vb->syntax.uc;
         }
-        if (vb->id_len > _entPhysicalModelNameLength
-            && memcmp(vb->id, entPhysicalModelName, sizeof(entPhysicalModelName)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 13) {
             entPhysicalEntry->_entPhysicalModelNameLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalModelName = vb->syntax.uc;
         }
-        if (vb->id_len > _entPhysicalAliasLength
-            && memcmp(vb->id, entPhysicalAlias, sizeof(entPhysicalAlias)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 14) {
             entPhysicalEntry->_entPhysicalAliasLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalAlias = vb->syntax.uc;
         }
-        if (vb->id_len > _entPhysicalAssetIDLength
-            && memcmp(vb->id, entPhysicalAssetID, sizeof(entPhysicalAssetID)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 15) {
             entPhysicalEntry->_entPhysicalAssetIDLength = vb->syntax_len;
             entPhysicalEntry->entPhysicalAssetID = vb->syntax.uc;
         }
-        if (vb->id_len > _entPhysicalIsFRULength
-            && memcmp(vb->id, entPhysicalIsFRU, sizeof(entPhysicalIsFRU)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 16) {
             entPhysicalEntry->entPhysicalIsFRU = &(vb->syntax.i32[0]);
         }
     }
@@ -195,24 +127,25 @@ entity_mib_get_entPhysicalEntry(host_snmp *s, entPhysicalEntry_t ***entPhysicalE
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1, 0};
 
     *entPhysicalEntry = NULL;
 
-    stls_vbl_add_null(&in, entPhysicalDescr, _entPhysicalDescrLength);
-    stls_vbl_add_null(&in, entPhysicalVendorType, _entPhysicalVendorTypeLength);
-    stls_vbl_add_null(&in, entPhysicalContainedIn, _entPhysicalContainedInLength);
-    stls_vbl_add_null(&in, entPhysicalClass, _entPhysicalClassLength);
-    stls_vbl_add_null(&in, entPhysicalParentRelPos, _entPhysicalParentRelPosLength);
-    stls_vbl_add_null(&in, entPhysicalName, _entPhysicalNameLength);
-    stls_vbl_add_null(&in, entPhysicalHardwareRev, _entPhysicalHardwareRevLength);
-    stls_vbl_add_null(&in, entPhysicalFirmwareRev, _entPhysicalFirmwareRevLength);
-    stls_vbl_add_null(&in, entPhysicalSoftwareRev, _entPhysicalSoftwareRevLength);
-    stls_vbl_add_null(&in, entPhysicalSerialNum, _entPhysicalSerialNumLength);
-    stls_vbl_add_null(&in, entPhysicalMfgName, _entPhysicalMfgNameLength);
-    stls_vbl_add_null(&in, entPhysicalModelName, _entPhysicalModelNameLength);
-    stls_vbl_add_null(&in, entPhysicalAlias, _entPhysicalAliasLength);
-    stls_vbl_add_null(&in, entPhysicalAssetID, _entPhysicalAssetIDLength);
-    stls_vbl_add_null(&in, entPhysicalIsFRU, _entPhysicalIsFRULength);
+    var[11] = 2; stls_vbl_add_null(&in, var, 12);
+    var[11] = 3; stls_vbl_add_null(&in, var, 12);
+    var[11] = 4; stls_vbl_add_null(&in, var, 12);
+    var[11] = 5; stls_vbl_add_null(&in, var, 12);
+    var[11] = 6; stls_vbl_add_null(&in, var, 12);
+    var[11] = 7; stls_vbl_add_null(&in, var, 12);
+    var[11] = 8; stls_vbl_add_null(&in, var, 12);
+    var[11] = 9; stls_vbl_add_null(&in, var, 12);
+    var[11] = 10; stls_vbl_add_null(&in, var, 12);
+    var[11] = 11; stls_vbl_add_null(&in, var, 12);
+    var[11] = 12; stls_vbl_add_null(&in, var, 12);
+    var[11] = 13; stls_vbl_add_null(&in, var, 12);
+    var[11] = 14; stls_vbl_add_null(&in, var, 12);
+    var[11] = 15; stls_vbl_add_null(&in, var, 12);
+    var[11] = 16; stls_vbl_add_null(&in, var, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -265,6 +198,13 @@ assign_entLogicalEntry(GSList *vbl)
     p = (char *) entLogicalEntry + sizeof(entLogicalEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 13) return NULL;
+        entLogicalEntry->entLogicalIndex = (gint32 *) &(vb->id[12]);
+        if (vb->id_len > 13) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -272,38 +212,31 @@ assign_entLogicalEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _entLogicalDescrLength
-            && memcmp(vb->id, entLogicalDescr, sizeof(entLogicalDescr)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 2) {
             entLogicalEntry->_entLogicalDescrLength = vb->syntax_len;
             entLogicalEntry->entLogicalDescr = vb->syntax.uc;
         }
-        if (vb->id_len > _entLogicalTypeLength
-            && memcmp(vb->id, entLogicalType, sizeof(entLogicalType)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 3) {
             entLogicalEntry->_entLogicalTypeLength = vb->syntax_len / sizeof(guint32);
             entLogicalEntry->entLogicalType = vb->syntax.ui32;
         }
-        if (vb->id_len > _entLogicalCommunityLength
-            && memcmp(vb->id, entLogicalCommunity, sizeof(entLogicalCommunity)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 4) {
             entLogicalEntry->_entLogicalCommunityLength = vb->syntax_len;
             entLogicalEntry->entLogicalCommunity = vb->syntax.uc;
         }
-        if (vb->id_len > _entLogicalTAddressLength
-            && memcmp(vb->id, entLogicalTAddress, sizeof(entLogicalTAddress)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 5) {
             entLogicalEntry->_entLogicalTAddressLength = vb->syntax_len;
             entLogicalEntry->entLogicalTAddress = vb->syntax.uc;
         }
-        if (vb->id_len > _entLogicalTDomainLength
-            && memcmp(vb->id, entLogicalTDomain, sizeof(entLogicalTDomain)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 6) {
             entLogicalEntry->_entLogicalTDomainLength = vb->syntax_len / sizeof(guint32);
             entLogicalEntry->entLogicalTDomain = vb->syntax.ui32;
         }
-        if (vb->id_len > _entLogicalContextEngineIDLength
-            && memcmp(vb->id, entLogicalContextEngineID, sizeof(entLogicalContextEngineID)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 7) {
             entLogicalEntry->_entLogicalContextEngineIDLength = vb->syntax_len;
             entLogicalEntry->entLogicalContextEngineID = vb->syntax.uc;
         }
-        if (vb->id_len > _entLogicalContextNameLength
-            && memcmp(vb->id, entLogicalContextName, sizeof(entLogicalContextName)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 8) {
             entLogicalEntry->_entLogicalContextNameLength = vb->syntax_len;
             entLogicalEntry->entLogicalContextName = vb->syntax.uc;
         }
@@ -318,16 +251,17 @@ entity_mib_get_entLogicalEntry(host_snmp *s, entLogicalEntry_t ***entLogicalEntr
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1, 0};
 
     *entLogicalEntry = NULL;
 
-    stls_vbl_add_null(&in, entLogicalDescr, _entLogicalDescrLength);
-    stls_vbl_add_null(&in, entLogicalType, _entLogicalTypeLength);
-    stls_vbl_add_null(&in, entLogicalCommunity, _entLogicalCommunityLength);
-    stls_vbl_add_null(&in, entLogicalTAddress, _entLogicalTAddressLength);
-    stls_vbl_add_null(&in, entLogicalTDomain, _entLogicalTDomainLength);
-    stls_vbl_add_null(&in, entLogicalContextEngineID, _entLogicalContextEngineIDLength);
-    stls_vbl_add_null(&in, entLogicalContextName, _entLogicalContextNameLength);
+    var[11] = 2; stls_vbl_add_null(&in, var, 12);
+    var[11] = 3; stls_vbl_add_null(&in, var, 12);
+    var[11] = 4; stls_vbl_add_null(&in, var, 12);
+    var[11] = 5; stls_vbl_add_null(&in, var, 12);
+    var[11] = 6; stls_vbl_add_null(&in, var, 12);
+    var[11] = 7; stls_vbl_add_null(&in, var, 12);
+    var[11] = 8; stls_vbl_add_null(&in, var, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -380,16 +314,20 @@ assign_entLPMappingEntry(GSList *vbl)
     p = (char *) entLPMappingEntry + sizeof(entLPMappingEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 13) return NULL;
+        entLPMappingEntry->entLogicalIndex = (gint32 *) &(vb->id[12]);
+        entLPMappingEntry->entLPPhysicalIndex = (gint32 *) &(vb->id[13]);
+        if (vb->id_len > 14) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
-        }
-        if (vb->id_len > _entLPPhysicalIndexLength
-            && memcmp(vb->id, entLPPhysicalIndex, sizeof(entLPPhysicalIndex)) == 0) {
-            entLPMappingEntry->entLPPhysicalIndex = &(vb->syntax.i32[0]);
         }
     }
 
@@ -402,6 +340,7 @@ entity_mib_get_entLPMappingEntry(host_snmp *s, entLPMappingEntry_t ***entLPMappi
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 1, 1, 0};
 
     *entLPMappingEntry = NULL;
 
@@ -457,6 +396,14 @@ assign_entAliasMappingEntry(GSList *vbl)
     p = (char *) entAliasMappingEntry + sizeof(entAliasMappingEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 13) return NULL;
+        entAliasMappingEntry->entPhysicalIndex = (gint32 *) &(vb->id[12]);
+        entAliasMappingEntry->entAliasLogicalIndexOrZero = (gint32 *) &(vb->id[13]);
+        if (vb->id_len > 14) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -464,8 +411,7 @@ assign_entAliasMappingEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _entAliasMappingIdentifierLength
-            && memcmp(vb->id, entAliasMappingIdentifier, sizeof(entAliasMappingIdentifier)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 2) {
             entAliasMappingEntry->_entAliasMappingIdentifierLength = vb->syntax_len / sizeof(guint32);
             entAliasMappingEntry->entAliasMappingIdentifier = vb->syntax.ui32;
         }
@@ -480,10 +426,11 @@ entity_mib_get_entAliasMappingEntry(host_snmp *s, entAliasMappingEntry_t ***entA
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 2, 1, 0};
 
     *entAliasMappingEntry = NULL;
 
-    stls_vbl_add_null(&in, entAliasMappingIdentifier, _entAliasMappingIdentifierLength);
+    var[11] = 2; stls_vbl_add_null(&in, var, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -536,16 +483,20 @@ assign_entPhysicalContainsEntry(GSList *vbl)
     p = (char *) entPhysicalContainsEntry + sizeof(entPhysicalContainsEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 13) return NULL;
+        entPhysicalContainsEntry->entPhysicalIndex = (gint32 *) &(vb->id[12]);
+        entPhysicalContainsEntry->entPhysicalChildIndex = (gint32 *) &(vb->id[13]);
+        if (vb->id_len > 14) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
-        }
-        if (vb->id_len > _entPhysicalChildIndexLength
-            && memcmp(vb->id, entPhysicalChildIndex, sizeof(entPhysicalChildIndex)) == 0) {
-            entPhysicalContainsEntry->entPhysicalChildIndex = &(vb->syntax.i32[0]);
         }
     }
 
@@ -558,6 +509,7 @@ entity_mib_get_entPhysicalContainsEntry(host_snmp *s, entPhysicalContainsEntry_t
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 3, 1, 0};
 
     *entPhysicalContainsEntry = NULL;
 
@@ -620,8 +572,7 @@ assign_entityGeneral(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _entLastChangeTimeLength
-            && memcmp(vb->id, entLastChangeTime, sizeof(entLastChangeTime)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 1) {
             entityGeneral->entLastChangeTime = &(vb->syntax.ui32[0]);
         }
     }
@@ -633,10 +584,11 @@ int
 entity_mib_get_entityGeneral(host_snmp *s, entityGeneral_t **entityGeneral)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 47, 1, 4, 0};
 
     *entityGeneral = NULL;
 
-    stls_vbl_add_null(&in, entLastChangeTime, _entLastChangeTimeLength);
+    var[9] = 1; stls_vbl_add_null(&in, var, 10);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);

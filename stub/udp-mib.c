@@ -9,20 +9,6 @@
 
 #include "udp-mib.h"
 
-static guint32 const udpInDatagrams[] = {1, 3, 6, 1, 2, 1, 7, 1};
-static guint32 const udpNoPorts[] = {1, 3, 6, 1, 2, 1, 7, 2};
-static guint32 const udpInErrors[] = {1, 3, 6, 1, 2, 1, 7, 3};
-static guint32 const udpOutDatagrams[] = {1, 3, 6, 1, 2, 1, 7, 4};
-static guint32 const udpLocalAddress[] = {1, 3, 6, 1, 2, 1, 7, 5, 1, 1};
-static guint32 const udpLocalPort[] = {1, 3, 6, 1, 2, 1, 7, 5, 1, 2};
-
-static gsize const _udpInDatagramsLength = sizeof(udpInDatagrams)/sizeof(guint32);
-static gsize const _udpNoPortsLength = sizeof(udpNoPorts)/sizeof(guint32);
-static gsize const _udpInErrorsLength = sizeof(udpInErrors)/sizeof(guint32);
-static gsize const _udpOutDatagramsLength = sizeof(udpOutDatagrams)/sizeof(guint32);
-static gsize const _udpLocalAddressLength = sizeof(udpLocalAddress)/sizeof(guint32);
-static gsize const _udpLocalPortLength = sizeof(udpLocalPort)/sizeof(guint32);
-
 static udp_t *
 assign_udp(GSList *vbl)
 {
@@ -45,20 +31,16 @@ assign_udp(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _udpInDatagramsLength
-            && memcmp(vb->id, udpInDatagrams, sizeof(udpInDatagrams)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 1) {
             udp->udpInDatagrams = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _udpNoPortsLength
-            && memcmp(vb->id, udpNoPorts, sizeof(udpNoPorts)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 2) {
             udp->udpNoPorts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _udpInErrorsLength
-            && memcmp(vb->id, udpInErrors, sizeof(udpInErrors)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 3) {
             udp->udpInErrors = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _udpOutDatagramsLength
-            && memcmp(vb->id, udpOutDatagrams, sizeof(udpOutDatagrams)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 4) {
             udp->udpOutDatagrams = &(vb->syntax.ui32[0]);
         }
     }
@@ -70,13 +52,14 @@ int
 udp_mib_get_udp(host_snmp *s, udp_t **udp)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 7, 0};
 
     *udp = NULL;
 
-    stls_vbl_add_null(&in, udpInDatagrams, _udpInDatagramsLength);
-    stls_vbl_add_null(&in, udpNoPorts, _udpNoPortsLength);
-    stls_vbl_add_null(&in, udpInErrors, _udpInErrorsLength);
-    stls_vbl_add_null(&in, udpOutDatagrams, _udpOutDatagramsLength);
+    var[7] = 1; stls_vbl_add_null(&in, var, 8);
+    var[7] = 2; stls_vbl_add_null(&in, var, 8);
+    var[7] = 3; stls_vbl_add_null(&in, var, 8);
+    var[7] = 4; stls_vbl_add_null(&in, var, 8);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -118,20 +101,20 @@ assign_udpEntry(GSList *vbl)
     p = (char *) udpEntry + sizeof(udpEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 11) return NULL;
+        /* XXX fix this udpEntry->udpLocalAddress = ?; */
+        udpEntry->udpLocalPort = (gint32 *) &(vb->id[10]);
+        if (vb->id_len > 11) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
             || (vb->type == G_SNMP_NOSUCHOBJECT)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
-        }
-        if (vb->id_len > _udpLocalAddressLength
-            && memcmp(vb->id, udpLocalAddress, sizeof(udpLocalAddress)) == 0) {
-            udpEntry->udpLocalAddress = vb->syntax.uc;
-        }
-        if (vb->id_len > _udpLocalPortLength
-            && memcmp(vb->id, udpLocalPort, sizeof(udpLocalPort)) == 0) {
-            udpEntry->udpLocalPort = &(vb->syntax.i32[0]);
         }
     }
 
@@ -144,6 +127,7 @@ udp_mib_get_udpEntry(host_snmp *s, udpEntry_t ***udpEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 7, 5, 1, 0};
 
     *udpEntry = NULL;
 

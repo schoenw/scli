@@ -9,110 +9,6 @@
 
 #include "disman-script-mib.h"
 
-static guint32 const smLangIndex[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1, 1};
-static guint32 const smLangLanguage[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1, 2};
-static guint32 const smLangVersion[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1, 3};
-static guint32 const smLangVendor[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1, 4};
-static guint32 const smLangRevision[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1, 5};
-static guint32 const smLangDescr[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1, 6};
-static guint32 const smExtsnIndex[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1, 1};
-static guint32 const smExtsnExtension[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1, 2};
-static guint32 const smExtsnVersion[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1, 3};
-static guint32 const smExtsnVendor[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1, 4};
-static guint32 const smExtsnRevision[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1, 5};
-static guint32 const smExtsnDescr[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1, 6};
-static guint32 const smScriptOwner[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 1};
-static guint32 const smScriptName[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 2};
-static guint32 const smScriptDescr[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 3};
-static guint32 const smScriptLanguage[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 4};
-static guint32 const smScriptSource[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 5};
-static guint32 const smScriptAdminStatus[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 6};
-static guint32 const smScriptOperStatus[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 7};
-static guint32 const smScriptStorageType[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 8};
-static guint32 const smScriptRowStatus[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 9};
-static guint32 const smCodeIndex[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 2, 1, 1};
-static guint32 const smCodeText[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 2, 1, 2};
-static guint32 const smCodeRowStatus[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 2, 1, 3};
-static guint32 const smLaunchOwner[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 1};
-static guint32 const smLaunchName[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 2};
-static guint32 const smLaunchScriptOwner[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 3};
-static guint32 const smLaunchScriptName[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 4};
-static guint32 const smLaunchArgument[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 5};
-static guint32 const smLaunchMaxRunning[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 6};
-static guint32 const smLaunchMaxCompleted[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 7};
-static guint32 const smLaunchLifeTime[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 8};
-static guint32 const smLaunchExpireTime[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 9};
-static guint32 const smLaunchStart[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 10};
-static guint32 const smLaunchControl[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 11};
-static guint32 const smLaunchAdminStatus[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 12};
-static guint32 const smLaunchOperStatus[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 13};
-static guint32 const smLaunchRunIndexNext[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 14};
-static guint32 const smLaunchStorageType[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 15};
-static guint32 const smLaunchRowStatus[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 16};
-static guint32 const smRunIndex[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 1};
-static guint32 const smRunArgument[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 2};
-static guint32 const smRunStartTime[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 3};
-static guint32 const smRunEndTime[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 4};
-static guint32 const smRunLifeTime[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 5};
-static guint32 const smRunExpireTime[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 6};
-static guint32 const smRunExitCode[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 7};
-static guint32 const smRunResult[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 8};
-static guint32 const smRunControl[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 9};
-static guint32 const smRunState[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 10};
-static guint32 const smRunError[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 11};
-
-static gsize const _smLangIndexLength = sizeof(smLangIndex)/sizeof(guint32);
-static gsize const _smLangLanguageLength = sizeof(smLangLanguage)/sizeof(guint32);
-static gsize const _smLangVersionLength = sizeof(smLangVersion)/sizeof(guint32);
-static gsize const _smLangVendorLength = sizeof(smLangVendor)/sizeof(guint32);
-static gsize const _smLangRevisionLength = sizeof(smLangRevision)/sizeof(guint32);
-static gsize const _smLangDescrLength = sizeof(smLangDescr)/sizeof(guint32);
-static gsize const _smExtsnIndexLength = sizeof(smExtsnIndex)/sizeof(guint32);
-static gsize const _smExtsnExtensionLength = sizeof(smExtsnExtension)/sizeof(guint32);
-static gsize const _smExtsnVersionLength = sizeof(smExtsnVersion)/sizeof(guint32);
-static gsize const _smExtsnVendorLength = sizeof(smExtsnVendor)/sizeof(guint32);
-static gsize const _smExtsnRevisionLength = sizeof(smExtsnRevision)/sizeof(guint32);
-static gsize const _smExtsnDescrLength = sizeof(smExtsnDescr)/sizeof(guint32);
-static gsize const _smScriptOwnerLength = sizeof(smScriptOwner)/sizeof(guint32);
-static gsize const _smScriptNameLength = sizeof(smScriptName)/sizeof(guint32);
-static gsize const _smScriptDescrLength = sizeof(smScriptDescr)/sizeof(guint32);
-static gsize const _smScriptLanguageLength = sizeof(smScriptLanguage)/sizeof(guint32);
-static gsize const _smScriptSourceLength = sizeof(smScriptSource)/sizeof(guint32);
-static gsize const _smScriptAdminStatusLength = sizeof(smScriptAdminStatus)/sizeof(guint32);
-static gsize const _smScriptOperStatusLength = sizeof(smScriptOperStatus)/sizeof(guint32);
-static gsize const _smScriptStorageTypeLength = sizeof(smScriptStorageType)/sizeof(guint32);
-static gsize const _smScriptRowStatusLength = sizeof(smScriptRowStatus)/sizeof(guint32);
-static gsize const _smCodeIndexLength = sizeof(smCodeIndex)/sizeof(guint32);
-static gsize const _smCodeTextLength = sizeof(smCodeText)/sizeof(guint32);
-static gsize const _smCodeRowStatusLength = sizeof(smCodeRowStatus)/sizeof(guint32);
-static gsize const _smLaunchOwnerLength = sizeof(smLaunchOwner)/sizeof(guint32);
-static gsize const _smLaunchNameLength = sizeof(smLaunchName)/sizeof(guint32);
-static gsize const _smLaunchScriptOwnerLength = sizeof(smLaunchScriptOwner)/sizeof(guint32);
-static gsize const _smLaunchScriptNameLength = sizeof(smLaunchScriptName)/sizeof(guint32);
-static gsize const _smLaunchArgumentLength = sizeof(smLaunchArgument)/sizeof(guint32);
-static gsize const _smLaunchMaxRunningLength = sizeof(smLaunchMaxRunning)/sizeof(guint32);
-static gsize const _smLaunchMaxCompletedLength = sizeof(smLaunchMaxCompleted)/sizeof(guint32);
-static gsize const _smLaunchLifeTimeLength = sizeof(smLaunchLifeTime)/sizeof(guint32);
-static gsize const _smLaunchExpireTimeLength = sizeof(smLaunchExpireTime)/sizeof(guint32);
-static gsize const _smLaunchStartLength = sizeof(smLaunchStart)/sizeof(guint32);
-static gsize const _smLaunchControlLength = sizeof(smLaunchControl)/sizeof(guint32);
-static gsize const _smLaunchAdminStatusLength = sizeof(smLaunchAdminStatus)/sizeof(guint32);
-static gsize const _smLaunchOperStatusLength = sizeof(smLaunchOperStatus)/sizeof(guint32);
-static gsize const _smLaunchRunIndexNextLength = sizeof(smLaunchRunIndexNext)/sizeof(guint32);
-static gsize const _smLaunchStorageTypeLength = sizeof(smLaunchStorageType)/sizeof(guint32);
-static gsize const _smLaunchRowStatusLength = sizeof(smLaunchRowStatus)/sizeof(guint32);
-static gsize const _smRunIndexLength = sizeof(smRunIndex)/sizeof(guint32);
-static gsize const _smRunArgumentLength = sizeof(smRunArgument)/sizeof(guint32);
-static gsize const _smRunStartTimeLength = sizeof(smRunStartTime)/sizeof(guint32);
-static gsize const _smRunEndTimeLength = sizeof(smRunEndTime)/sizeof(guint32);
-static gsize const _smRunLifeTimeLength = sizeof(smRunLifeTime)/sizeof(guint32);
-static gsize const _smRunExpireTimeLength = sizeof(smRunExpireTime)/sizeof(guint32);
-static gsize const _smRunExitCodeLength = sizeof(smRunExitCode)/sizeof(guint32);
-static gsize const _smRunResultLength = sizeof(smRunResult)/sizeof(guint32);
-static gsize const _smRunControlLength = sizeof(smRunControl)/sizeof(guint32);
-static gsize const _smRunStateLength = sizeof(smRunState)/sizeof(guint32);
-static gsize const _smRunErrorLength = sizeof(smRunError)/sizeof(guint32);
-
 stls_table_t disman_script_mib_enums_smScriptAdminStatus[] = {
     { 1, "enabled" },
     { 2, "disabled" },
@@ -254,6 +150,13 @@ assign_smLangEntry(GSList *vbl)
     p = (char *) smLangEntry + sizeof(smLangEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        smLangEntry->smLangIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -261,28 +164,23 @@ assign_smLangEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _smLangLanguageLength
-            && memcmp(vb->id, smLangLanguage, sizeof(smLangLanguage)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             smLangEntry->_smLangLanguageLength = vb->syntax_len / sizeof(guint32);
             smLangEntry->smLangLanguage = vb->syntax.ui32;
         }
-        if (vb->id_len > _smLangVersionLength
-            && memcmp(vb->id, smLangVersion, sizeof(smLangVersion)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             smLangEntry->_smLangVersionLength = vb->syntax_len;
             smLangEntry->smLangVersion = vb->syntax.uc;
         }
-        if (vb->id_len > _smLangVendorLength
-            && memcmp(vb->id, smLangVendor, sizeof(smLangVendor)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 4) {
             smLangEntry->_smLangVendorLength = vb->syntax_len / sizeof(guint32);
             smLangEntry->smLangVendor = vb->syntax.ui32;
         }
-        if (vb->id_len > _smLangRevisionLength
-            && memcmp(vb->id, smLangRevision, sizeof(smLangRevision)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 5) {
             smLangEntry->_smLangRevisionLength = vb->syntax_len;
             smLangEntry->smLangRevision = vb->syntax.uc;
         }
-        if (vb->id_len > _smLangDescrLength
-            && memcmp(vb->id, smLangDescr, sizeof(smLangDescr)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 6) {
             smLangEntry->_smLangDescrLength = vb->syntax_len;
             smLangEntry->smLangDescr = vb->syntax.uc;
         }
@@ -297,14 +195,15 @@ disman_script_mib_get_smLangEntry(host_snmp *s, smLangEntry_t ***smLangEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1, 0};
 
     *smLangEntry = NULL;
 
-    stls_vbl_add_null(&in, smLangLanguage, _smLangLanguageLength);
-    stls_vbl_add_null(&in, smLangVersion, _smLangVersionLength);
-    stls_vbl_add_null(&in, smLangVendor, _smLangVendorLength);
-    stls_vbl_add_null(&in, smLangRevision, _smLangRevisionLength);
-    stls_vbl_add_null(&in, smLangDescr, _smLangDescrLength);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
+    var[10] = 4; stls_vbl_add_null(&in, var, 11);
+    var[10] = 5; stls_vbl_add_null(&in, var, 11);
+    var[10] = 6; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -357,6 +256,14 @@ assign_smExtsnEntry(GSList *vbl)
     p = (char *) smExtsnEntry + sizeof(smExtsnEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        smExtsnEntry->smLangIndex = (gint32 *) &(vb->id[11]);
+        smExtsnEntry->smExtsnIndex = (gint32 *) &(vb->id[12]);
+        if (vb->id_len > 13) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -364,28 +271,23 @@ assign_smExtsnEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _smExtsnExtensionLength
-            && memcmp(vb->id, smExtsnExtension, sizeof(smExtsnExtension)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             smExtsnEntry->_smExtsnExtensionLength = vb->syntax_len / sizeof(guint32);
             smExtsnEntry->smExtsnExtension = vb->syntax.ui32;
         }
-        if (vb->id_len > _smExtsnVersionLength
-            && memcmp(vb->id, smExtsnVersion, sizeof(smExtsnVersion)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             smExtsnEntry->_smExtsnVersionLength = vb->syntax_len;
             smExtsnEntry->smExtsnVersion = vb->syntax.uc;
         }
-        if (vb->id_len > _smExtsnVendorLength
-            && memcmp(vb->id, smExtsnVendor, sizeof(smExtsnVendor)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 4) {
             smExtsnEntry->_smExtsnVendorLength = vb->syntax_len / sizeof(guint32);
             smExtsnEntry->smExtsnVendor = vb->syntax.ui32;
         }
-        if (vb->id_len > _smExtsnRevisionLength
-            && memcmp(vb->id, smExtsnRevision, sizeof(smExtsnRevision)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 5) {
             smExtsnEntry->_smExtsnRevisionLength = vb->syntax_len;
             smExtsnEntry->smExtsnRevision = vb->syntax.uc;
         }
-        if (vb->id_len > _smExtsnDescrLength
-            && memcmp(vb->id, smExtsnDescr, sizeof(smExtsnDescr)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 6) {
             smExtsnEntry->_smExtsnDescrLength = vb->syntax_len;
             smExtsnEntry->smExtsnDescr = vb->syntax.uc;
         }
@@ -400,14 +302,15 @@ disman_script_mib_get_smExtsnEntry(host_snmp *s, smExtsnEntry_t ***smExtsnEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1, 0};
 
     *smExtsnEntry = NULL;
 
-    stls_vbl_add_null(&in, smExtsnExtension, _smExtsnExtensionLength);
-    stls_vbl_add_null(&in, smExtsnVersion, _smExtsnVersionLength);
-    stls_vbl_add_null(&in, smExtsnVendor, _smExtsnVendorLength);
-    stls_vbl_add_null(&in, smExtsnRevision, _smExtsnRevisionLength);
-    stls_vbl_add_null(&in, smExtsnDescr, _smExtsnDescrLength);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
+    var[10] = 4; stls_vbl_add_null(&in, var, 11);
+    var[10] = 5; stls_vbl_add_null(&in, var, 11);
+    var[10] = 6; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -460,6 +363,14 @@ assign_smScriptEntry(GSList *vbl)
     p = (char *) smScriptEntry + sizeof(smScriptEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 13) return NULL;
+        /* XXX fix this smScriptEntry->smScriptOwner = ?; */
+        /* XXX fix this smScriptEntry->smScriptName = ?; */
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -467,34 +378,27 @@ assign_smScriptEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _smScriptDescrLength
-            && memcmp(vb->id, smScriptDescr, sizeof(smScriptDescr)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 3) {
             smScriptEntry->_smScriptDescrLength = vb->syntax_len;
             smScriptEntry->smScriptDescr = vb->syntax.uc;
         }
-        if (vb->id_len > _smScriptLanguageLength
-            && memcmp(vb->id, smScriptLanguage, sizeof(smScriptLanguage)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 4) {
             smScriptEntry->smScriptLanguage = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smScriptSourceLength
-            && memcmp(vb->id, smScriptSource, sizeof(smScriptSource)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 5) {
             smScriptEntry->_smScriptSourceLength = vb->syntax_len;
             smScriptEntry->smScriptSource = vb->syntax.uc;
         }
-        if (vb->id_len > _smScriptAdminStatusLength
-            && memcmp(vb->id, smScriptAdminStatus, sizeof(smScriptAdminStatus)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 6) {
             smScriptEntry->smScriptAdminStatus = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smScriptOperStatusLength
-            && memcmp(vb->id, smScriptOperStatus, sizeof(smScriptOperStatus)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 7) {
             smScriptEntry->smScriptOperStatus = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smScriptStorageTypeLength
-            && memcmp(vb->id, smScriptStorageType, sizeof(smScriptStorageType)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 8) {
             smScriptEntry->smScriptStorageType = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smScriptRowStatusLength
-            && memcmp(vb->id, smScriptRowStatus, sizeof(smScriptRowStatus)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 9) {
             smScriptEntry->smScriptRowStatus = &(vb->syntax.i32[0]);
         }
     }
@@ -508,16 +412,17 @@ disman_script_mib_get_smScriptEntry(host_snmp *s, smScriptEntry_t ***smScriptEnt
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 0};
 
     *smScriptEntry = NULL;
 
-    stls_vbl_add_null(&in, smScriptDescr, _smScriptDescrLength);
-    stls_vbl_add_null(&in, smScriptLanguage, _smScriptLanguageLength);
-    stls_vbl_add_null(&in, smScriptSource, _smScriptSourceLength);
-    stls_vbl_add_null(&in, smScriptAdminStatus, _smScriptAdminStatusLength);
-    stls_vbl_add_null(&in, smScriptOperStatus, _smScriptOperStatusLength);
-    stls_vbl_add_null(&in, smScriptStorageType, _smScriptStorageTypeLength);
-    stls_vbl_add_null(&in, smScriptRowStatus, _smScriptRowStatusLength);
+    var[11] = 3; stls_vbl_add_null(&in, var, 12);
+    var[11] = 4; stls_vbl_add_null(&in, var, 12);
+    var[11] = 5; stls_vbl_add_null(&in, var, 12);
+    var[11] = 6; stls_vbl_add_null(&in, var, 12);
+    var[11] = 7; stls_vbl_add_null(&in, var, 12);
+    var[11] = 8; stls_vbl_add_null(&in, var, 12);
+    var[11] = 9; stls_vbl_add_null(&in, var, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -570,6 +475,15 @@ assign_smCodeEntry(GSList *vbl)
     p = (char *) smCodeEntry + sizeof(smCodeEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 13) return NULL;
+        /* XXX fix this smCodeEntry->smScriptOwner = ?; */
+        /* XXX fix this smCodeEntry->smScriptName = ?; */
+        smCodeEntry->smCodeIndex = &(vb->id[12]);
+        if (vb->id_len > 13) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -577,13 +491,11 @@ assign_smCodeEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _smCodeTextLength
-            && memcmp(vb->id, smCodeText, sizeof(smCodeText)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 2) {
             smCodeEntry->_smCodeTextLength = vb->syntax_len;
             smCodeEntry->smCodeText = vb->syntax.uc;
         }
-        if (vb->id_len > _smCodeRowStatusLength
-            && memcmp(vb->id, smCodeRowStatus, sizeof(smCodeRowStatus)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 3) {
             smCodeEntry->smCodeRowStatus = &(vb->syntax.i32[0]);
         }
     }
@@ -597,11 +509,12 @@ disman_script_mib_get_smCodeEntry(host_snmp *s, smCodeEntry_t ***smCodeEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 2, 1, 0};
 
     *smCodeEntry = NULL;
 
-    stls_vbl_add_null(&in, smCodeText, _smCodeTextLength);
-    stls_vbl_add_null(&in, smCodeRowStatus, _smCodeRowStatusLength);
+    var[11] = 2; stls_vbl_add_null(&in, var, 12);
+    var[11] = 3; stls_vbl_add_null(&in, var, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -654,6 +567,14 @@ assign_smLaunchEntry(GSList *vbl)
     p = (char *) smLaunchEntry + sizeof(smLaunchEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 13) return NULL;
+        /* XXX fix this smLaunchEntry->smLaunchOwner = ?; */
+        /* XXX fix this smLaunchEntry->smLaunchName = ?; */
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -661,63 +582,49 @@ assign_smLaunchEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _smLaunchScriptOwnerLength
-            && memcmp(vb->id, smLaunchScriptOwner, sizeof(smLaunchScriptOwner)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 3) {
             smLaunchEntry->_smLaunchScriptOwnerLength = vb->syntax_len;
             smLaunchEntry->smLaunchScriptOwner = vb->syntax.uc;
         }
-        if (vb->id_len > _smLaunchScriptNameLength
-            && memcmp(vb->id, smLaunchScriptName, sizeof(smLaunchScriptName)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 4) {
             smLaunchEntry->_smLaunchScriptNameLength = vb->syntax_len;
             smLaunchEntry->smLaunchScriptName = vb->syntax.uc;
         }
-        if (vb->id_len > _smLaunchArgumentLength
-            && memcmp(vb->id, smLaunchArgument, sizeof(smLaunchArgument)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 5) {
             smLaunchEntry->_smLaunchArgumentLength = vb->syntax_len;
             smLaunchEntry->smLaunchArgument = vb->syntax.uc;
         }
-        if (vb->id_len > _smLaunchMaxRunningLength
-            && memcmp(vb->id, smLaunchMaxRunning, sizeof(smLaunchMaxRunning)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 6) {
             smLaunchEntry->smLaunchMaxRunning = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _smLaunchMaxCompletedLength
-            && memcmp(vb->id, smLaunchMaxCompleted, sizeof(smLaunchMaxCompleted)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 7) {
             smLaunchEntry->smLaunchMaxCompleted = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _smLaunchLifeTimeLength
-            && memcmp(vb->id, smLaunchLifeTime, sizeof(smLaunchLifeTime)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 8) {
             smLaunchEntry->smLaunchLifeTime = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smLaunchExpireTimeLength
-            && memcmp(vb->id, smLaunchExpireTime, sizeof(smLaunchExpireTime)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 9) {
             smLaunchEntry->smLaunchExpireTime = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smLaunchStartLength
-            && memcmp(vb->id, smLaunchStart, sizeof(smLaunchStart)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 10) {
             smLaunchEntry->smLaunchStart = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smLaunchControlLength
-            && memcmp(vb->id, smLaunchControl, sizeof(smLaunchControl)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 11) {
             smLaunchEntry->smLaunchControl = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smLaunchAdminStatusLength
-            && memcmp(vb->id, smLaunchAdminStatus, sizeof(smLaunchAdminStatus)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 12) {
             smLaunchEntry->smLaunchAdminStatus = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smLaunchOperStatusLength
-            && memcmp(vb->id, smLaunchOperStatus, sizeof(smLaunchOperStatus)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 13) {
             smLaunchEntry->smLaunchOperStatus = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smLaunchRunIndexNextLength
-            && memcmp(vb->id, smLaunchRunIndexNext, sizeof(smLaunchRunIndexNext)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 14) {
             smLaunchEntry->smLaunchRunIndexNext = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smLaunchStorageTypeLength
-            && memcmp(vb->id, smLaunchStorageType, sizeof(smLaunchStorageType)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 15) {
             smLaunchEntry->smLaunchStorageType = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smLaunchRowStatusLength
-            && memcmp(vb->id, smLaunchRowStatus, sizeof(smLaunchRowStatus)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 16) {
             smLaunchEntry->smLaunchRowStatus = &(vb->syntax.i32[0]);
         }
     }
@@ -731,23 +638,24 @@ disman_script_mib_get_smLaunchEntry(host_snmp *s, smLaunchEntry_t ***smLaunchEnt
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 0};
 
     *smLaunchEntry = NULL;
 
-    stls_vbl_add_null(&in, smLaunchScriptOwner, _smLaunchScriptOwnerLength);
-    stls_vbl_add_null(&in, smLaunchScriptName, _smLaunchScriptNameLength);
-    stls_vbl_add_null(&in, smLaunchArgument, _smLaunchArgumentLength);
-    stls_vbl_add_null(&in, smLaunchMaxRunning, _smLaunchMaxRunningLength);
-    stls_vbl_add_null(&in, smLaunchMaxCompleted, _smLaunchMaxCompletedLength);
-    stls_vbl_add_null(&in, smLaunchLifeTime, _smLaunchLifeTimeLength);
-    stls_vbl_add_null(&in, smLaunchExpireTime, _smLaunchExpireTimeLength);
-    stls_vbl_add_null(&in, smLaunchStart, _smLaunchStartLength);
-    stls_vbl_add_null(&in, smLaunchControl, _smLaunchControlLength);
-    stls_vbl_add_null(&in, smLaunchAdminStatus, _smLaunchAdminStatusLength);
-    stls_vbl_add_null(&in, smLaunchOperStatus, _smLaunchOperStatusLength);
-    stls_vbl_add_null(&in, smLaunchRunIndexNext, _smLaunchRunIndexNextLength);
-    stls_vbl_add_null(&in, smLaunchStorageType, _smLaunchStorageTypeLength);
-    stls_vbl_add_null(&in, smLaunchRowStatus, _smLaunchRowStatusLength);
+    var[11] = 3; stls_vbl_add_null(&in, var, 12);
+    var[11] = 4; stls_vbl_add_null(&in, var, 12);
+    var[11] = 5; stls_vbl_add_null(&in, var, 12);
+    var[11] = 6; stls_vbl_add_null(&in, var, 12);
+    var[11] = 7; stls_vbl_add_null(&in, var, 12);
+    var[11] = 8; stls_vbl_add_null(&in, var, 12);
+    var[11] = 9; stls_vbl_add_null(&in, var, 12);
+    var[11] = 10; stls_vbl_add_null(&in, var, 12);
+    var[11] = 11; stls_vbl_add_null(&in, var, 12);
+    var[11] = 12; stls_vbl_add_null(&in, var, 12);
+    var[11] = 13; stls_vbl_add_null(&in, var, 12);
+    var[11] = 14; stls_vbl_add_null(&in, var, 12);
+    var[11] = 15; stls_vbl_add_null(&in, var, 12);
+    var[11] = 16; stls_vbl_add_null(&in, var, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -800,6 +708,15 @@ assign_smRunEntry(GSList *vbl)
     p = (char *) smRunEntry + sizeof(smRunEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 13) return NULL;
+        /* XXX fix this smRunEntry->smLaunchOwner = ?; */
+        /* XXX fix this smRunEntry->smLaunchName = ?; */
+        smRunEntry->smRunIndex = (gint32 *) &(vb->id[12]);
+        if (vb->id_len > 13) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -807,48 +724,38 @@ assign_smRunEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _smRunArgumentLength
-            && memcmp(vb->id, smRunArgument, sizeof(smRunArgument)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 2) {
             smRunEntry->_smRunArgumentLength = vb->syntax_len;
             smRunEntry->smRunArgument = vb->syntax.uc;
         }
-        if (vb->id_len > _smRunStartTimeLength
-            && memcmp(vb->id, smRunStartTime, sizeof(smRunStartTime)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 3) {
             smRunEntry->_smRunStartTimeLength = vb->syntax_len;
             smRunEntry->smRunStartTime = vb->syntax.uc;
         }
-        if (vb->id_len > _smRunEndTimeLength
-            && memcmp(vb->id, smRunEndTime, sizeof(smRunEndTime)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 4) {
             smRunEntry->_smRunEndTimeLength = vb->syntax_len;
             smRunEntry->smRunEndTime = vb->syntax.uc;
         }
-        if (vb->id_len > _smRunLifeTimeLength
-            && memcmp(vb->id, smRunLifeTime, sizeof(smRunLifeTime)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 5) {
             smRunEntry->smRunLifeTime = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smRunExpireTimeLength
-            && memcmp(vb->id, smRunExpireTime, sizeof(smRunExpireTime)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 6) {
             smRunEntry->smRunExpireTime = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smRunExitCodeLength
-            && memcmp(vb->id, smRunExitCode, sizeof(smRunExitCode)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 7) {
             smRunEntry->smRunExitCode = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smRunResultLength
-            && memcmp(vb->id, smRunResult, sizeof(smRunResult)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 8) {
             smRunEntry->_smRunResultLength = vb->syntax_len;
             smRunEntry->smRunResult = vb->syntax.uc;
         }
-        if (vb->id_len > _smRunControlLength
-            && memcmp(vb->id, smRunControl, sizeof(smRunControl)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 9) {
             smRunEntry->smRunControl = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smRunStateLength
-            && memcmp(vb->id, smRunState, sizeof(smRunState)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 10) {
             smRunEntry->smRunState = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _smRunErrorLength
-            && memcmp(vb->id, smRunError, sizeof(smRunError)) == 0) {
+        if (vb->id_len > 12 && vb->id[11] == 11) {
             smRunEntry->_smRunErrorLength = vb->syntax_len;
             smRunEntry->smRunError = vb->syntax.uc;
         }
@@ -863,19 +770,20 @@ disman_script_mib_get_smRunEntry(host_snmp *s, smRunEntry_t ***smRunEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 0};
 
     *smRunEntry = NULL;
 
-    stls_vbl_add_null(&in, smRunArgument, _smRunArgumentLength);
-    stls_vbl_add_null(&in, smRunStartTime, _smRunStartTimeLength);
-    stls_vbl_add_null(&in, smRunEndTime, _smRunEndTimeLength);
-    stls_vbl_add_null(&in, smRunLifeTime, _smRunLifeTimeLength);
-    stls_vbl_add_null(&in, smRunExpireTime, _smRunExpireTimeLength);
-    stls_vbl_add_null(&in, smRunExitCode, _smRunExitCodeLength);
-    stls_vbl_add_null(&in, smRunResult, _smRunResultLength);
-    stls_vbl_add_null(&in, smRunControl, _smRunControlLength);
-    stls_vbl_add_null(&in, smRunState, _smRunStateLength);
-    stls_vbl_add_null(&in, smRunError, _smRunErrorLength);
+    var[11] = 2; stls_vbl_add_null(&in, var, 12);
+    var[11] = 3; stls_vbl_add_null(&in, var, 12);
+    var[11] = 4; stls_vbl_add_null(&in, var, 12);
+    var[11] = 5; stls_vbl_add_null(&in, var, 12);
+    var[11] = 6; stls_vbl_add_null(&in, var, 12);
+    var[11] = 7; stls_vbl_add_null(&in, var, 12);
+    var[11] = 8; stls_vbl_add_null(&in, var, 12);
+    var[11] = 9; stls_vbl_add_null(&in, var, 12);
+    var[11] = 10; stls_vbl_add_null(&in, var, 12);
+    var[11] = 11; stls_vbl_add_null(&in, var, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

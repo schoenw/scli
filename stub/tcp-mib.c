@@ -9,46 +9,6 @@
 
 #include "tcp-mib.h"
 
-static guint32 const tcpRtoAlgorithm[] = {1, 3, 6, 1, 2, 1, 6, 1};
-static guint32 const tcpRtoMin[] = {1, 3, 6, 1, 2, 1, 6, 2};
-static guint32 const tcpRtoMax[] = {1, 3, 6, 1, 2, 1, 6, 3};
-static guint32 const tcpMaxConn[] = {1, 3, 6, 1, 2, 1, 6, 4};
-static guint32 const tcpActiveOpens[] = {1, 3, 6, 1, 2, 1, 6, 5};
-static guint32 const tcpPassiveOpens[] = {1, 3, 6, 1, 2, 1, 6, 6};
-static guint32 const tcpAttemptFails[] = {1, 3, 6, 1, 2, 1, 6, 7};
-static guint32 const tcpEstabResets[] = {1, 3, 6, 1, 2, 1, 6, 8};
-static guint32 const tcpCurrEstab[] = {1, 3, 6, 1, 2, 1, 6, 9};
-static guint32 const tcpInSegs[] = {1, 3, 6, 1, 2, 1, 6, 10};
-static guint32 const tcpOutSegs[] = {1, 3, 6, 1, 2, 1, 6, 11};
-static guint32 const tcpRetransSegs[] = {1, 3, 6, 1, 2, 1, 6, 12};
-static guint32 const tcpConnState[] = {1, 3, 6, 1, 2, 1, 6, 13, 1, 1};
-static guint32 const tcpConnLocalAddress[] = {1, 3, 6, 1, 2, 1, 6, 13, 1, 2};
-static guint32 const tcpConnLocalPort[] = {1, 3, 6, 1, 2, 1, 6, 13, 1, 3};
-static guint32 const tcpConnRemAddress[] = {1, 3, 6, 1, 2, 1, 6, 13, 1, 4};
-static guint32 const tcpConnRemPort[] = {1, 3, 6, 1, 2, 1, 6, 13, 1, 5};
-static guint32 const tcpInErrs[] = {1, 3, 6, 1, 2, 1, 6, 14};
-static guint32 const tcpOutRsts[] = {1, 3, 6, 1, 2, 1, 6, 15};
-
-static gsize const _tcpRtoAlgorithmLength = sizeof(tcpRtoAlgorithm)/sizeof(guint32);
-static gsize const _tcpRtoMinLength = sizeof(tcpRtoMin)/sizeof(guint32);
-static gsize const _tcpRtoMaxLength = sizeof(tcpRtoMax)/sizeof(guint32);
-static gsize const _tcpMaxConnLength = sizeof(tcpMaxConn)/sizeof(guint32);
-static gsize const _tcpActiveOpensLength = sizeof(tcpActiveOpens)/sizeof(guint32);
-static gsize const _tcpPassiveOpensLength = sizeof(tcpPassiveOpens)/sizeof(guint32);
-static gsize const _tcpAttemptFailsLength = sizeof(tcpAttemptFails)/sizeof(guint32);
-static gsize const _tcpEstabResetsLength = sizeof(tcpEstabResets)/sizeof(guint32);
-static gsize const _tcpCurrEstabLength = sizeof(tcpCurrEstab)/sizeof(guint32);
-static gsize const _tcpInSegsLength = sizeof(tcpInSegs)/sizeof(guint32);
-static gsize const _tcpOutSegsLength = sizeof(tcpOutSegs)/sizeof(guint32);
-static gsize const _tcpRetransSegsLength = sizeof(tcpRetransSegs)/sizeof(guint32);
-static gsize const _tcpConnStateLength = sizeof(tcpConnState)/sizeof(guint32);
-static gsize const _tcpConnLocalAddressLength = sizeof(tcpConnLocalAddress)/sizeof(guint32);
-static gsize const _tcpConnLocalPortLength = sizeof(tcpConnLocalPort)/sizeof(guint32);
-static gsize const _tcpConnRemAddressLength = sizeof(tcpConnRemAddress)/sizeof(guint32);
-static gsize const _tcpConnRemPortLength = sizeof(tcpConnRemPort)/sizeof(guint32);
-static gsize const _tcpInErrsLength = sizeof(tcpInErrs)/sizeof(guint32);
-static gsize const _tcpOutRstsLength = sizeof(tcpOutRsts)/sizeof(guint32);
-
 stls_table_t tcp_mib_enums_tcpRtoAlgorithm[] = {
     { 1, "other" },
     { 2, "constant" },
@@ -96,60 +56,46 @@ assign_tcp(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _tcpRtoAlgorithmLength
-            && memcmp(vb->id, tcpRtoAlgorithm, sizeof(tcpRtoAlgorithm)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 1) {
             tcp->tcpRtoAlgorithm = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _tcpRtoMinLength
-            && memcmp(vb->id, tcpRtoMin, sizeof(tcpRtoMin)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 2) {
             tcp->tcpRtoMin = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _tcpRtoMaxLength
-            && memcmp(vb->id, tcpRtoMax, sizeof(tcpRtoMax)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 3) {
             tcp->tcpRtoMax = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _tcpMaxConnLength
-            && memcmp(vb->id, tcpMaxConn, sizeof(tcpMaxConn)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 4) {
             tcp->tcpMaxConn = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _tcpActiveOpensLength
-            && memcmp(vb->id, tcpActiveOpens, sizeof(tcpActiveOpens)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 5) {
             tcp->tcpActiveOpens = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _tcpPassiveOpensLength
-            && memcmp(vb->id, tcpPassiveOpens, sizeof(tcpPassiveOpens)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 6) {
             tcp->tcpPassiveOpens = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _tcpAttemptFailsLength
-            && memcmp(vb->id, tcpAttemptFails, sizeof(tcpAttemptFails)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 7) {
             tcp->tcpAttemptFails = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _tcpEstabResetsLength
-            && memcmp(vb->id, tcpEstabResets, sizeof(tcpEstabResets)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 8) {
             tcp->tcpEstabResets = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _tcpCurrEstabLength
-            && memcmp(vb->id, tcpCurrEstab, sizeof(tcpCurrEstab)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 9) {
             tcp->tcpCurrEstab = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _tcpInSegsLength
-            && memcmp(vb->id, tcpInSegs, sizeof(tcpInSegs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 10) {
             tcp->tcpInSegs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _tcpOutSegsLength
-            && memcmp(vb->id, tcpOutSegs, sizeof(tcpOutSegs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 11) {
             tcp->tcpOutSegs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _tcpRetransSegsLength
-            && memcmp(vb->id, tcpRetransSegs, sizeof(tcpRetransSegs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 12) {
             tcp->tcpRetransSegs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _tcpInErrsLength
-            && memcmp(vb->id, tcpInErrs, sizeof(tcpInErrs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 14) {
             tcp->tcpInErrs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _tcpOutRstsLength
-            && memcmp(vb->id, tcpOutRsts, sizeof(tcpOutRsts)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 15) {
             tcp->tcpOutRsts = &(vb->syntax.ui32[0]);
         }
     }
@@ -161,23 +107,24 @@ int
 tcp_mib_get_tcp(host_snmp *s, tcp_t **tcp)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 6, 0};
 
     *tcp = NULL;
 
-    stls_vbl_add_null(&in, tcpRtoAlgorithm, _tcpRtoAlgorithmLength);
-    stls_vbl_add_null(&in, tcpRtoMin, _tcpRtoMinLength);
-    stls_vbl_add_null(&in, tcpRtoMax, _tcpRtoMaxLength);
-    stls_vbl_add_null(&in, tcpMaxConn, _tcpMaxConnLength);
-    stls_vbl_add_null(&in, tcpActiveOpens, _tcpActiveOpensLength);
-    stls_vbl_add_null(&in, tcpPassiveOpens, _tcpPassiveOpensLength);
-    stls_vbl_add_null(&in, tcpAttemptFails, _tcpAttemptFailsLength);
-    stls_vbl_add_null(&in, tcpEstabResets, _tcpEstabResetsLength);
-    stls_vbl_add_null(&in, tcpCurrEstab, _tcpCurrEstabLength);
-    stls_vbl_add_null(&in, tcpInSegs, _tcpInSegsLength);
-    stls_vbl_add_null(&in, tcpOutSegs, _tcpOutSegsLength);
-    stls_vbl_add_null(&in, tcpRetransSegs, _tcpRetransSegsLength);
-    stls_vbl_add_null(&in, tcpInErrs, _tcpInErrsLength);
-    stls_vbl_add_null(&in, tcpOutRsts, _tcpOutRstsLength);
+    var[7] = 1; stls_vbl_add_null(&in, var, 8);
+    var[7] = 2; stls_vbl_add_null(&in, var, 8);
+    var[7] = 3; stls_vbl_add_null(&in, var, 8);
+    var[7] = 4; stls_vbl_add_null(&in, var, 8);
+    var[7] = 5; stls_vbl_add_null(&in, var, 8);
+    var[7] = 6; stls_vbl_add_null(&in, var, 8);
+    var[7] = 7; stls_vbl_add_null(&in, var, 8);
+    var[7] = 8; stls_vbl_add_null(&in, var, 8);
+    var[7] = 9; stls_vbl_add_null(&in, var, 8);
+    var[7] = 10; stls_vbl_add_null(&in, var, 8);
+    var[7] = 11; stls_vbl_add_null(&in, var, 8);
+    var[7] = 12; stls_vbl_add_null(&in, var, 8);
+    var[7] = 14; stls_vbl_add_null(&in, var, 8);
+    var[7] = 15; stls_vbl_add_null(&in, var, 8);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -219,6 +166,16 @@ assign_tcpConnEntry(GSList *vbl)
     p = (char *) tcpConnEntry + sizeof(tcpConnEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 11) return NULL;
+        /* XXX fix this tcpConnEntry->tcpConnLocalAddress = ?; */
+        tcpConnEntry->tcpConnLocalPort = (gint32 *) &(vb->id[10]);
+        /* XXX fix this tcpConnEntry->tcpConnRemAddress = ?; */
+        tcpConnEntry->tcpConnRemPort = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -226,25 +183,8 @@ assign_tcpConnEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _tcpConnStateLength
-            && memcmp(vb->id, tcpConnState, sizeof(tcpConnState)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 1) {
             tcpConnEntry->tcpConnState = &(vb->syntax.i32[0]);
-        }
-        if (vb->id_len > _tcpConnLocalAddressLength
-            && memcmp(vb->id, tcpConnLocalAddress, sizeof(tcpConnLocalAddress)) == 0) {
-            tcpConnEntry->tcpConnLocalAddress = vb->syntax.uc;
-        }
-        if (vb->id_len > _tcpConnLocalPortLength
-            && memcmp(vb->id, tcpConnLocalPort, sizeof(tcpConnLocalPort)) == 0) {
-            tcpConnEntry->tcpConnLocalPort = &(vb->syntax.i32[0]);
-        }
-        if (vb->id_len > _tcpConnRemAddressLength
-            && memcmp(vb->id, tcpConnRemAddress, sizeof(tcpConnRemAddress)) == 0) {
-            tcpConnEntry->tcpConnRemAddress = vb->syntax.uc;
-        }
-        if (vb->id_len > _tcpConnRemPortLength
-            && memcmp(vb->id, tcpConnRemPort, sizeof(tcpConnRemPort)) == 0) {
-            tcpConnEntry->tcpConnRemPort = &(vb->syntax.i32[0]);
         }
     }
 
@@ -257,10 +197,11 @@ tcp_mib_get_tcpConnEntry(host_snmp *s, tcpConnEntry_t ***tcpConnEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 6, 13, 1, 0};
 
     *tcpConnEntry = NULL;
 
-    stls_vbl_add_null(&in, tcpConnState, _tcpConnStateLength);
+    var[9] = 1; stls_vbl_add_null(&in, var, 10);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

@@ -9,130 +9,6 @@
 
 #include "host-resources-mib.h"
 
-static guint32 const hrSystemUptime[] = {1, 3, 6, 1, 2, 1, 25, 1, 1};
-static guint32 const hrSystemDate[] = {1, 3, 6, 1, 2, 1, 25, 1, 2};
-static guint32 const hrSystemInitialLoadDevice[] = {1, 3, 6, 1, 2, 1, 25, 1, 3};
-static guint32 const hrSystemInitialLoadParameters[] = {1, 3, 6, 1, 2, 1, 25, 1, 4};
-static guint32 const hrSystemNumUsers[] = {1, 3, 6, 1, 2, 1, 25, 1, 5};
-static guint32 const hrSystemProcesses[] = {1, 3, 6, 1, 2, 1, 25, 1, 6};
-static guint32 const hrSystemMaxProcesses[] = {1, 3, 6, 1, 2, 1, 25, 1, 7};
-static guint32 const hrMemorySize[] = {1, 3, 6, 1, 2, 1, 25, 2, 2};
-static guint32 const hrStorageIndex[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1, 1};
-static guint32 const hrStorageType[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1, 2};
-static guint32 const hrStorageDescr[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1, 3};
-static guint32 const hrStorageAllocationUnits[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1, 4};
-static guint32 const hrStorageSize[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1, 5};
-static guint32 const hrStorageUsed[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1, 6};
-static guint32 const hrStorageAllocationFailures[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1, 7};
-static guint32 const hrDeviceIndex[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1, 1};
-static guint32 const hrDeviceType[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1, 2};
-static guint32 const hrDeviceDescr[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1, 3};
-static guint32 const hrDeviceID[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1, 4};
-static guint32 const hrDeviceStatus[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1, 5};
-static guint32 const hrDeviceErrors[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1, 6};
-static guint32 const hrProcessorFrwID[] = {1, 3, 6, 1, 2, 1, 25, 3, 3, 1, 1};
-static guint32 const hrProcessorLoad[] = {1, 3, 6, 1, 2, 1, 25, 3, 3, 1, 2};
-static guint32 const hrNetworkIfIndex[] = {1, 3, 6, 1, 2, 1, 25, 3, 4, 1, 1};
-static guint32 const hrPrinterStatus[] = {1, 3, 6, 1, 2, 1, 25, 3, 5, 1, 1};
-static guint32 const hrPrinterDetectedErrorState[] = {1, 3, 6, 1, 2, 1, 25, 3, 5, 1, 2};
-static guint32 const hrDiskStorageAccess[] = {1, 3, 6, 1, 2, 1, 25, 3, 6, 1, 1};
-static guint32 const hrDiskStorageMedia[] = {1, 3, 6, 1, 2, 1, 25, 3, 6, 1, 2};
-static guint32 const hrDiskStorageRemoveble[] = {1, 3, 6, 1, 2, 1, 25, 3, 6, 1, 3};
-static guint32 const hrDiskStorageCapacity[] = {1, 3, 6, 1, 2, 1, 25, 3, 6, 1, 4};
-static guint32 const hrPartitionIndex[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1, 1};
-static guint32 const hrPartitionLabel[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1, 2};
-static guint32 const hrPartitionID[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1, 3};
-static guint32 const hrPartitionSize[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1, 4};
-static guint32 const hrPartitionFSIndex[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1, 5};
-static guint32 const hrFSIndex[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1, 1};
-static guint32 const hrFSMountPoint[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1, 2};
-static guint32 const hrFSRemoteMountPoint[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1, 3};
-static guint32 const hrFSType[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1, 4};
-static guint32 const hrFSAccess[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1, 5};
-static guint32 const hrFSBootable[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1, 6};
-static guint32 const hrFSStorageIndex[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1, 7};
-static guint32 const hrFSLastFullBackupDate[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1, 8};
-static guint32 const hrFSLastPartialBackupDate[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1, 9};
-static guint32 const hrSWOSIndex[] = {1, 3, 6, 1, 2, 1, 25, 4, 1};
-static guint32 const hrSWRunIndex[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1, 1};
-static guint32 const hrSWRunName[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1, 2};
-static guint32 const hrSWRunID[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1, 3};
-static guint32 const hrSWRunPath[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1, 4};
-static guint32 const hrSWRunParameters[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1, 5};
-static guint32 const hrSWRunType[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1, 6};
-static guint32 const hrSWRunStatus[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1, 7};
-static guint32 const hrSWRunPerfCPU[] = {1, 3, 6, 1, 2, 1, 25, 5, 1, 1, 1};
-static guint32 const hrSWRunPerfMem[] = {1, 3, 6, 1, 2, 1, 25, 5, 1, 1, 2};
-static guint32 const hrSWInstalledLastChange[] = {1, 3, 6, 1, 2, 1, 25, 6, 1};
-static guint32 const hrSWInstalledLastUpdateTime[] = {1, 3, 6, 1, 2, 1, 25, 6, 2};
-static guint32 const hrSWInstalledIndex[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1, 1};
-static guint32 const hrSWInstalledName[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1, 2};
-static guint32 const hrSWInstalledID[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1, 3};
-static guint32 const hrSWInstalledType[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1, 4};
-static guint32 const hrSWInstalledDate[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1, 5};
-
-static gsize const _hrSystemUptimeLength = sizeof(hrSystemUptime)/sizeof(guint32);
-static gsize const _hrSystemDateLength = sizeof(hrSystemDate)/sizeof(guint32);
-static gsize const _hrSystemInitialLoadDeviceLength = sizeof(hrSystemInitialLoadDevice)/sizeof(guint32);
-static gsize const _hrSystemInitialLoadParametersLength = sizeof(hrSystemInitialLoadParameters)/sizeof(guint32);
-static gsize const _hrSystemNumUsersLength = sizeof(hrSystemNumUsers)/sizeof(guint32);
-static gsize const _hrSystemProcessesLength = sizeof(hrSystemProcesses)/sizeof(guint32);
-static gsize const _hrSystemMaxProcessesLength = sizeof(hrSystemMaxProcesses)/sizeof(guint32);
-static gsize const _hrMemorySizeLength = sizeof(hrMemorySize)/sizeof(guint32);
-static gsize const _hrStorageIndexLength = sizeof(hrStorageIndex)/sizeof(guint32);
-static gsize const _hrStorageTypeLength = sizeof(hrStorageType)/sizeof(guint32);
-static gsize const _hrStorageDescrLength = sizeof(hrStorageDescr)/sizeof(guint32);
-static gsize const _hrStorageAllocationUnitsLength = sizeof(hrStorageAllocationUnits)/sizeof(guint32);
-static gsize const _hrStorageSizeLength = sizeof(hrStorageSize)/sizeof(guint32);
-static gsize const _hrStorageUsedLength = sizeof(hrStorageUsed)/sizeof(guint32);
-static gsize const _hrStorageAllocationFailuresLength = sizeof(hrStorageAllocationFailures)/sizeof(guint32);
-static gsize const _hrDeviceIndexLength = sizeof(hrDeviceIndex)/sizeof(guint32);
-static gsize const _hrDeviceTypeLength = sizeof(hrDeviceType)/sizeof(guint32);
-static gsize const _hrDeviceDescrLength = sizeof(hrDeviceDescr)/sizeof(guint32);
-static gsize const _hrDeviceIDLength = sizeof(hrDeviceID)/sizeof(guint32);
-static gsize const _hrDeviceStatusLength = sizeof(hrDeviceStatus)/sizeof(guint32);
-static gsize const _hrDeviceErrorsLength = sizeof(hrDeviceErrors)/sizeof(guint32);
-static gsize const _hrProcessorFrwIDLength = sizeof(hrProcessorFrwID)/sizeof(guint32);
-static gsize const _hrProcessorLoadLength = sizeof(hrProcessorLoad)/sizeof(guint32);
-static gsize const _hrNetworkIfIndexLength = sizeof(hrNetworkIfIndex)/sizeof(guint32);
-static gsize const _hrPrinterStatusLength = sizeof(hrPrinterStatus)/sizeof(guint32);
-static gsize const _hrPrinterDetectedErrorStateLength = sizeof(hrPrinterDetectedErrorState)/sizeof(guint32);
-static gsize const _hrDiskStorageAccessLength = sizeof(hrDiskStorageAccess)/sizeof(guint32);
-static gsize const _hrDiskStorageMediaLength = sizeof(hrDiskStorageMedia)/sizeof(guint32);
-static gsize const _hrDiskStorageRemovebleLength = sizeof(hrDiskStorageRemoveble)/sizeof(guint32);
-static gsize const _hrDiskStorageCapacityLength = sizeof(hrDiskStorageCapacity)/sizeof(guint32);
-static gsize const _hrPartitionIndexLength = sizeof(hrPartitionIndex)/sizeof(guint32);
-static gsize const _hrPartitionLabelLength = sizeof(hrPartitionLabel)/sizeof(guint32);
-static gsize const _hrPartitionIDLength = sizeof(hrPartitionID)/sizeof(guint32);
-static gsize const _hrPartitionSizeLength = sizeof(hrPartitionSize)/sizeof(guint32);
-static gsize const _hrPartitionFSIndexLength = sizeof(hrPartitionFSIndex)/sizeof(guint32);
-static gsize const _hrFSIndexLength = sizeof(hrFSIndex)/sizeof(guint32);
-static gsize const _hrFSMountPointLength = sizeof(hrFSMountPoint)/sizeof(guint32);
-static gsize const _hrFSRemoteMountPointLength = sizeof(hrFSRemoteMountPoint)/sizeof(guint32);
-static gsize const _hrFSTypeLength = sizeof(hrFSType)/sizeof(guint32);
-static gsize const _hrFSAccessLength = sizeof(hrFSAccess)/sizeof(guint32);
-static gsize const _hrFSBootableLength = sizeof(hrFSBootable)/sizeof(guint32);
-static gsize const _hrFSStorageIndexLength = sizeof(hrFSStorageIndex)/sizeof(guint32);
-static gsize const _hrFSLastFullBackupDateLength = sizeof(hrFSLastFullBackupDate)/sizeof(guint32);
-static gsize const _hrFSLastPartialBackupDateLength = sizeof(hrFSLastPartialBackupDate)/sizeof(guint32);
-static gsize const _hrSWOSIndexLength = sizeof(hrSWOSIndex)/sizeof(guint32);
-static gsize const _hrSWRunIndexLength = sizeof(hrSWRunIndex)/sizeof(guint32);
-static gsize const _hrSWRunNameLength = sizeof(hrSWRunName)/sizeof(guint32);
-static gsize const _hrSWRunIDLength = sizeof(hrSWRunID)/sizeof(guint32);
-static gsize const _hrSWRunPathLength = sizeof(hrSWRunPath)/sizeof(guint32);
-static gsize const _hrSWRunParametersLength = sizeof(hrSWRunParameters)/sizeof(guint32);
-static gsize const _hrSWRunTypeLength = sizeof(hrSWRunType)/sizeof(guint32);
-static gsize const _hrSWRunStatusLength = sizeof(hrSWRunStatus)/sizeof(guint32);
-static gsize const _hrSWRunPerfCPULength = sizeof(hrSWRunPerfCPU)/sizeof(guint32);
-static gsize const _hrSWRunPerfMemLength = sizeof(hrSWRunPerfMem)/sizeof(guint32);
-static gsize const _hrSWInstalledLastChangeLength = sizeof(hrSWInstalledLastChange)/sizeof(guint32);
-static gsize const _hrSWInstalledLastUpdateTimeLength = sizeof(hrSWInstalledLastUpdateTime)/sizeof(guint32);
-static gsize const _hrSWInstalledIndexLength = sizeof(hrSWInstalledIndex)/sizeof(guint32);
-static gsize const _hrSWInstalledNameLength = sizeof(hrSWInstalledName)/sizeof(guint32);
-static gsize const _hrSWInstalledIDLength = sizeof(hrSWInstalledID)/sizeof(guint32);
-static gsize const _hrSWInstalledTypeLength = sizeof(hrSWInstalledType)/sizeof(guint32);
-static gsize const _hrSWInstalledDateLength = sizeof(hrSWInstalledDate)/sizeof(guint32);
-
 stls_table_t host_resources_mib_enums_hrDeviceStatus[] = {
     { 1, "unknown" },
     { 2, "running" },
@@ -234,34 +110,27 @@ assign_hrSystem(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrSystemUptimeLength
-            && memcmp(vb->id, hrSystemUptime, sizeof(hrSystemUptime)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 1) {
             hrSystem->hrSystemUptime = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _hrSystemDateLength
-            && memcmp(vb->id, hrSystemDate, sizeof(hrSystemDate)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 2) {
             hrSystem->_hrSystemDateLength = vb->syntax_len;
             hrSystem->hrSystemDate = vb->syntax.uc;
         }
-        if (vb->id_len > _hrSystemInitialLoadDeviceLength
-            && memcmp(vb->id, hrSystemInitialLoadDevice, sizeof(hrSystemInitialLoadDevice)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 3) {
             hrSystem->hrSystemInitialLoadDevice = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrSystemInitialLoadParametersLength
-            && memcmp(vb->id, hrSystemInitialLoadParameters, sizeof(hrSystemInitialLoadParameters)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 4) {
             hrSystem->_hrSystemInitialLoadParametersLength = vb->syntax_len;
             hrSystem->hrSystemInitialLoadParameters = vb->syntax.uc;
         }
-        if (vb->id_len > _hrSystemNumUsersLength
-            && memcmp(vb->id, hrSystemNumUsers, sizeof(hrSystemNumUsers)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 5) {
             hrSystem->hrSystemNumUsers = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _hrSystemProcessesLength
-            && memcmp(vb->id, hrSystemProcesses, sizeof(hrSystemProcesses)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 6) {
             hrSystem->hrSystemProcesses = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _hrSystemMaxProcessesLength
-            && memcmp(vb->id, hrSystemMaxProcesses, sizeof(hrSystemMaxProcesses)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 7) {
             hrSystem->hrSystemMaxProcesses = &(vb->syntax.i32[0]);
         }
     }
@@ -273,16 +142,17 @@ int
 host_resources_mib_get_hrSystem(host_snmp *s, hrSystem_t **hrSystem)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 1, 0};
 
     *hrSystem = NULL;
 
-    stls_vbl_add_null(&in, hrSystemUptime, _hrSystemUptimeLength);
-    stls_vbl_add_null(&in, hrSystemDate, _hrSystemDateLength);
-    stls_vbl_add_null(&in, hrSystemInitialLoadDevice, _hrSystemInitialLoadDeviceLength);
-    stls_vbl_add_null(&in, hrSystemInitialLoadParameters, _hrSystemInitialLoadParametersLength);
-    stls_vbl_add_null(&in, hrSystemNumUsers, _hrSystemNumUsersLength);
-    stls_vbl_add_null(&in, hrSystemProcesses, _hrSystemProcessesLength);
-    stls_vbl_add_null(&in, hrSystemMaxProcesses, _hrSystemMaxProcessesLength);
+    var[8] = 1; stls_vbl_add_null(&in, var, 9);
+    var[8] = 2; stls_vbl_add_null(&in, var, 9);
+    var[8] = 3; stls_vbl_add_null(&in, var, 9);
+    var[8] = 4; stls_vbl_add_null(&in, var, 9);
+    var[8] = 5; stls_vbl_add_null(&in, var, 9);
+    var[8] = 6; stls_vbl_add_null(&in, var, 9);
+    var[8] = 7; stls_vbl_add_null(&in, var, 9);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -331,8 +201,7 @@ assign_hrStorage(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrMemorySizeLength
-            && memcmp(vb->id, hrMemorySize, sizeof(hrMemorySize)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 2) {
             hrStorage->hrMemorySize = &(vb->syntax.i32[0]);
         }
     }
@@ -344,10 +213,11 @@ int
 host_resources_mib_get_hrStorage(host_snmp *s, hrStorage_t **hrStorage)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 2, 0};
 
     *hrStorage = NULL;
 
-    stls_vbl_add_null(&in, hrMemorySize, _hrMemorySizeLength);
+    var[8] = 2; stls_vbl_add_null(&in, var, 9);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -389,6 +259,13 @@ assign_hrStorageEntry(GSList *vbl)
     p = (char *) hrStorageEntry + sizeof(hrStorageEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        hrStorageEntry->hrStorageIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -396,34 +273,24 @@ assign_hrStorageEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrStorageIndexLength
-            && memcmp(vb->id, hrStorageIndex, sizeof(hrStorageIndex)) == 0) {
-            hrStorageEntry->hrStorageIndex = &(vb->syntax.i32[0]);
-        }
-        if (vb->id_len > _hrStorageTypeLength
-            && memcmp(vb->id, hrStorageType, sizeof(hrStorageType)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             hrStorageEntry->_hrStorageTypeLength = vb->syntax_len / sizeof(guint32);
             hrStorageEntry->hrStorageType = vb->syntax.ui32;
         }
-        if (vb->id_len > _hrStorageDescrLength
-            && memcmp(vb->id, hrStorageDescr, sizeof(hrStorageDescr)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             hrStorageEntry->_hrStorageDescrLength = vb->syntax_len;
             hrStorageEntry->hrStorageDescr = vb->syntax.uc;
         }
-        if (vb->id_len > _hrStorageAllocationUnitsLength
-            && memcmp(vb->id, hrStorageAllocationUnits, sizeof(hrStorageAllocationUnits)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 4) {
             hrStorageEntry->hrStorageAllocationUnits = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrStorageSizeLength
-            && memcmp(vb->id, hrStorageSize, sizeof(hrStorageSize)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 5) {
             hrStorageEntry->hrStorageSize = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrStorageUsedLength
-            && memcmp(vb->id, hrStorageUsed, sizeof(hrStorageUsed)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 6) {
             hrStorageEntry->hrStorageUsed = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrStorageAllocationFailuresLength
-            && memcmp(vb->id, hrStorageAllocationFailures, sizeof(hrStorageAllocationFailures)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 7) {
             hrStorageEntry->hrStorageAllocationFailures = &(vb->syntax.ui32[0]);
         }
     }
@@ -437,15 +304,16 @@ host_resources_mib_get_hrStorageEntry(host_snmp *s, hrStorageEntry_t ***hrStorag
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1, 0};
 
     *hrStorageEntry = NULL;
 
-    stls_vbl_add_null(&in, hrStorageType, _hrStorageTypeLength);
-    stls_vbl_add_null(&in, hrStorageDescr, _hrStorageDescrLength);
-    stls_vbl_add_null(&in, hrStorageAllocationUnits, _hrStorageAllocationUnitsLength);
-    stls_vbl_add_null(&in, hrStorageSize, _hrStorageSizeLength);
-    stls_vbl_add_null(&in, hrStorageUsed, _hrStorageUsedLength);
-    stls_vbl_add_null(&in, hrStorageAllocationFailures, _hrStorageAllocationFailuresLength);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
+    var[10] = 4; stls_vbl_add_null(&in, var, 11);
+    var[10] = 5; stls_vbl_add_null(&in, var, 11);
+    var[10] = 6; stls_vbl_add_null(&in, var, 11);
+    var[10] = 7; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -498,6 +366,13 @@ assign_hrDeviceEntry(GSList *vbl)
     p = (char *) hrDeviceEntry + sizeof(hrDeviceEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        hrDeviceEntry->hrDeviceIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -505,31 +380,22 @@ assign_hrDeviceEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrDeviceIndexLength
-            && memcmp(vb->id, hrDeviceIndex, sizeof(hrDeviceIndex)) == 0) {
-            hrDeviceEntry->hrDeviceIndex = &(vb->syntax.i32[0]);
-        }
-        if (vb->id_len > _hrDeviceTypeLength
-            && memcmp(vb->id, hrDeviceType, sizeof(hrDeviceType)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             hrDeviceEntry->_hrDeviceTypeLength = vb->syntax_len / sizeof(guint32);
             hrDeviceEntry->hrDeviceType = vb->syntax.ui32;
         }
-        if (vb->id_len > _hrDeviceDescrLength
-            && memcmp(vb->id, hrDeviceDescr, sizeof(hrDeviceDescr)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             hrDeviceEntry->_hrDeviceDescrLength = vb->syntax_len;
             hrDeviceEntry->hrDeviceDescr = vb->syntax.uc;
         }
-        if (vb->id_len > _hrDeviceIDLength
-            && memcmp(vb->id, hrDeviceID, sizeof(hrDeviceID)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 4) {
             hrDeviceEntry->_hrDeviceIDLength = vb->syntax_len / sizeof(guint32);
             hrDeviceEntry->hrDeviceID = vb->syntax.ui32;
         }
-        if (vb->id_len > _hrDeviceStatusLength
-            && memcmp(vb->id, hrDeviceStatus, sizeof(hrDeviceStatus)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 5) {
             hrDeviceEntry->hrDeviceStatus = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrDeviceErrorsLength
-            && memcmp(vb->id, hrDeviceErrors, sizeof(hrDeviceErrors)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 6) {
             hrDeviceEntry->hrDeviceErrors = &(vb->syntax.ui32[0]);
         }
     }
@@ -543,14 +409,15 @@ host_resources_mib_get_hrDeviceEntry(host_snmp *s, hrDeviceEntry_t ***hrDeviceEn
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1, 0};
 
     *hrDeviceEntry = NULL;
 
-    stls_vbl_add_null(&in, hrDeviceType, _hrDeviceTypeLength);
-    stls_vbl_add_null(&in, hrDeviceDescr, _hrDeviceDescrLength);
-    stls_vbl_add_null(&in, hrDeviceID, _hrDeviceIDLength);
-    stls_vbl_add_null(&in, hrDeviceStatus, _hrDeviceStatusLength);
-    stls_vbl_add_null(&in, hrDeviceErrors, _hrDeviceErrorsLength);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
+    var[10] = 4; stls_vbl_add_null(&in, var, 11);
+    var[10] = 5; stls_vbl_add_null(&in, var, 11);
+    var[10] = 6; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -603,6 +470,13 @@ assign_hrProcessorEntry(GSList *vbl)
     p = (char *) hrProcessorEntry + sizeof(hrProcessorEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        hrProcessorEntry->hrDeviceIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -610,13 +484,11 @@ assign_hrProcessorEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrProcessorFrwIDLength
-            && memcmp(vb->id, hrProcessorFrwID, sizeof(hrProcessorFrwID)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 1) {
             hrProcessorEntry->_hrProcessorFrwIDLength = vb->syntax_len / sizeof(guint32);
             hrProcessorEntry->hrProcessorFrwID = vb->syntax.ui32;
         }
-        if (vb->id_len > _hrProcessorLoadLength
-            && memcmp(vb->id, hrProcessorLoad, sizeof(hrProcessorLoad)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             hrProcessorEntry->hrProcessorLoad = &(vb->syntax.i32[0]);
         }
     }
@@ -630,11 +502,12 @@ host_resources_mib_get_hrProcessorEntry(host_snmp *s, hrProcessorEntry_t ***hrPr
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 3, 1, 0};
 
     *hrProcessorEntry = NULL;
 
-    stls_vbl_add_null(&in, hrProcessorFrwID, _hrProcessorFrwIDLength);
-    stls_vbl_add_null(&in, hrProcessorLoad, _hrProcessorLoadLength);
+    var[10] = 1; stls_vbl_add_null(&in, var, 11);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -687,6 +560,13 @@ assign_hrNetworkEntry(GSList *vbl)
     p = (char *) hrNetworkEntry + sizeof(hrNetworkEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        hrNetworkEntry->hrDeviceIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -694,8 +574,7 @@ assign_hrNetworkEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrNetworkIfIndexLength
-            && memcmp(vb->id, hrNetworkIfIndex, sizeof(hrNetworkIfIndex)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 1) {
             hrNetworkEntry->hrNetworkIfIndex = &(vb->syntax.i32[0]);
         }
     }
@@ -709,10 +588,11 @@ host_resources_mib_get_hrNetworkEntry(host_snmp *s, hrNetworkEntry_t ***hrNetwor
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 4, 1, 0};
 
     *hrNetworkEntry = NULL;
 
-    stls_vbl_add_null(&in, hrNetworkIfIndex, _hrNetworkIfIndexLength);
+    var[10] = 1; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -765,6 +645,13 @@ assign_hrPrinterEntry(GSList *vbl)
     p = (char *) hrPrinterEntry + sizeof(hrPrinterEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        hrPrinterEntry->hrDeviceIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -772,12 +659,10 @@ assign_hrPrinterEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrPrinterStatusLength
-            && memcmp(vb->id, hrPrinterStatus, sizeof(hrPrinterStatus)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 1) {
             hrPrinterEntry->hrPrinterStatus = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrPrinterDetectedErrorStateLength
-            && memcmp(vb->id, hrPrinterDetectedErrorState, sizeof(hrPrinterDetectedErrorState)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             hrPrinterEntry->_hrPrinterDetectedErrorStateLength = vb->syntax_len;
             hrPrinterEntry->hrPrinterDetectedErrorState = vb->syntax.uc;
         }
@@ -792,11 +677,12 @@ host_resources_mib_get_hrPrinterEntry(host_snmp *s, hrPrinterEntry_t ***hrPrinte
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 5, 1, 0};
 
     *hrPrinterEntry = NULL;
 
-    stls_vbl_add_null(&in, hrPrinterStatus, _hrPrinterStatusLength);
-    stls_vbl_add_null(&in, hrPrinterDetectedErrorState, _hrPrinterDetectedErrorStateLength);
+    var[10] = 1; stls_vbl_add_null(&in, var, 11);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -849,6 +735,13 @@ assign_hrDiskStorageEntry(GSList *vbl)
     p = (char *) hrDiskStorageEntry + sizeof(hrDiskStorageEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        hrDiskStorageEntry->hrDeviceIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -856,20 +749,16 @@ assign_hrDiskStorageEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrDiskStorageAccessLength
-            && memcmp(vb->id, hrDiskStorageAccess, sizeof(hrDiskStorageAccess)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 1) {
             hrDiskStorageEntry->hrDiskStorageAccess = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrDiskStorageMediaLength
-            && memcmp(vb->id, hrDiskStorageMedia, sizeof(hrDiskStorageMedia)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             hrDiskStorageEntry->hrDiskStorageMedia = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrDiskStorageRemovebleLength
-            && memcmp(vb->id, hrDiskStorageRemoveble, sizeof(hrDiskStorageRemoveble)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             hrDiskStorageEntry->hrDiskStorageRemoveble = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrDiskStorageCapacityLength
-            && memcmp(vb->id, hrDiskStorageCapacity, sizeof(hrDiskStorageCapacity)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 4) {
             hrDiskStorageEntry->hrDiskStorageCapacity = &(vb->syntax.i32[0]);
         }
     }
@@ -883,13 +772,14 @@ host_resources_mib_get_hrDiskStorageEntry(host_snmp *s, hrDiskStorageEntry_t ***
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 6, 1, 0};
 
     *hrDiskStorageEntry = NULL;
 
-    stls_vbl_add_null(&in, hrDiskStorageAccess, _hrDiskStorageAccessLength);
-    stls_vbl_add_null(&in, hrDiskStorageMedia, _hrDiskStorageMediaLength);
-    stls_vbl_add_null(&in, hrDiskStorageRemoveble, _hrDiskStorageRemovebleLength);
-    stls_vbl_add_null(&in, hrDiskStorageCapacity, _hrDiskStorageCapacityLength);
+    var[10] = 1; stls_vbl_add_null(&in, var, 11);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
+    var[10] = 4; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -942,6 +832,14 @@ assign_hrPartitionEntry(GSList *vbl)
     p = (char *) hrPartitionEntry + sizeof(hrPartitionEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        hrPartitionEntry->hrDeviceIndex = (gint32 *) &(vb->id[11]);
+        hrPartitionEntry->hrPartitionIndex = (gint32 *) &(vb->id[12]);
+        if (vb->id_len > 13) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -949,26 +847,18 @@ assign_hrPartitionEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrPartitionIndexLength
-            && memcmp(vb->id, hrPartitionIndex, sizeof(hrPartitionIndex)) == 0) {
-            hrPartitionEntry->hrPartitionIndex = &(vb->syntax.i32[0]);
-        }
-        if (vb->id_len > _hrPartitionLabelLength
-            && memcmp(vb->id, hrPartitionLabel, sizeof(hrPartitionLabel)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             hrPartitionEntry->_hrPartitionLabelLength = vb->syntax_len;
             hrPartitionEntry->hrPartitionLabel = vb->syntax.uc;
         }
-        if (vb->id_len > _hrPartitionIDLength
-            && memcmp(vb->id, hrPartitionID, sizeof(hrPartitionID)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             hrPartitionEntry->_hrPartitionIDLength = vb->syntax_len;
             hrPartitionEntry->hrPartitionID = vb->syntax.uc;
         }
-        if (vb->id_len > _hrPartitionSizeLength
-            && memcmp(vb->id, hrPartitionSize, sizeof(hrPartitionSize)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 4) {
             hrPartitionEntry->hrPartitionSize = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrPartitionFSIndexLength
-            && memcmp(vb->id, hrPartitionFSIndex, sizeof(hrPartitionFSIndex)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 5) {
             hrPartitionEntry->hrPartitionFSIndex = &(vb->syntax.i32[0]);
         }
     }
@@ -982,13 +872,14 @@ host_resources_mib_get_hrPartitionEntry(host_snmp *s, hrPartitionEntry_t ***hrPa
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1, 0};
 
     *hrPartitionEntry = NULL;
 
-    stls_vbl_add_null(&in, hrPartitionLabel, _hrPartitionLabelLength);
-    stls_vbl_add_null(&in, hrPartitionID, _hrPartitionIDLength);
-    stls_vbl_add_null(&in, hrPartitionSize, _hrPartitionSizeLength);
-    stls_vbl_add_null(&in, hrPartitionFSIndex, _hrPartitionFSIndexLength);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
+    var[10] = 4; stls_vbl_add_null(&in, var, 11);
+    var[10] = 5; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1041,6 +932,13 @@ assign_hrFSEntry(GSList *vbl)
     p = (char *) hrFSEntry + sizeof(hrFSEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        hrFSEntry->hrFSIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -1048,44 +946,32 @@ assign_hrFSEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrFSIndexLength
-            && memcmp(vb->id, hrFSIndex, sizeof(hrFSIndex)) == 0) {
-            hrFSEntry->hrFSIndex = &(vb->syntax.i32[0]);
-        }
-        if (vb->id_len > _hrFSMountPointLength
-            && memcmp(vb->id, hrFSMountPoint, sizeof(hrFSMountPoint)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             hrFSEntry->_hrFSMountPointLength = vb->syntax_len;
             hrFSEntry->hrFSMountPoint = vb->syntax.uc;
         }
-        if (vb->id_len > _hrFSRemoteMountPointLength
-            && memcmp(vb->id, hrFSRemoteMountPoint, sizeof(hrFSRemoteMountPoint)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             hrFSEntry->_hrFSRemoteMountPointLength = vb->syntax_len;
             hrFSEntry->hrFSRemoteMountPoint = vb->syntax.uc;
         }
-        if (vb->id_len > _hrFSTypeLength
-            && memcmp(vb->id, hrFSType, sizeof(hrFSType)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 4) {
             hrFSEntry->_hrFSTypeLength = vb->syntax_len / sizeof(guint32);
             hrFSEntry->hrFSType = vb->syntax.ui32;
         }
-        if (vb->id_len > _hrFSAccessLength
-            && memcmp(vb->id, hrFSAccess, sizeof(hrFSAccess)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 5) {
             hrFSEntry->hrFSAccess = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrFSBootableLength
-            && memcmp(vb->id, hrFSBootable, sizeof(hrFSBootable)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 6) {
             hrFSEntry->hrFSBootable = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrFSStorageIndexLength
-            && memcmp(vb->id, hrFSStorageIndex, sizeof(hrFSStorageIndex)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 7) {
             hrFSEntry->hrFSStorageIndex = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrFSLastFullBackupDateLength
-            && memcmp(vb->id, hrFSLastFullBackupDate, sizeof(hrFSLastFullBackupDate)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 8) {
             hrFSEntry->_hrFSLastFullBackupDateLength = vb->syntax_len;
             hrFSEntry->hrFSLastFullBackupDate = vb->syntax.uc;
         }
-        if (vb->id_len > _hrFSLastPartialBackupDateLength
-            && memcmp(vb->id, hrFSLastPartialBackupDate, sizeof(hrFSLastPartialBackupDate)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 9) {
             hrFSEntry->_hrFSLastPartialBackupDateLength = vb->syntax_len;
             hrFSEntry->hrFSLastPartialBackupDate = vb->syntax.uc;
         }
@@ -1100,17 +986,18 @@ host_resources_mib_get_hrFSEntry(host_snmp *s, hrFSEntry_t ***hrFSEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1, 0};
 
     *hrFSEntry = NULL;
 
-    stls_vbl_add_null(&in, hrFSMountPoint, _hrFSMountPointLength);
-    stls_vbl_add_null(&in, hrFSRemoteMountPoint, _hrFSRemoteMountPointLength);
-    stls_vbl_add_null(&in, hrFSType, _hrFSTypeLength);
-    stls_vbl_add_null(&in, hrFSAccess, _hrFSAccessLength);
-    stls_vbl_add_null(&in, hrFSBootable, _hrFSBootableLength);
-    stls_vbl_add_null(&in, hrFSStorageIndex, _hrFSStorageIndexLength);
-    stls_vbl_add_null(&in, hrFSLastFullBackupDate, _hrFSLastFullBackupDateLength);
-    stls_vbl_add_null(&in, hrFSLastPartialBackupDate, _hrFSLastPartialBackupDateLength);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
+    var[10] = 4; stls_vbl_add_null(&in, var, 11);
+    var[10] = 5; stls_vbl_add_null(&in, var, 11);
+    var[10] = 6; stls_vbl_add_null(&in, var, 11);
+    var[10] = 7; stls_vbl_add_null(&in, var, 11);
+    var[10] = 8; stls_vbl_add_null(&in, var, 11);
+    var[10] = 9; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1170,8 +1057,7 @@ assign_hrSWRun(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrSWOSIndexLength
-            && memcmp(vb->id, hrSWOSIndex, sizeof(hrSWOSIndex)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 1) {
             hrSWRun->hrSWOSIndex = &(vb->syntax.i32[0]);
         }
     }
@@ -1183,10 +1069,11 @@ int
 host_resources_mib_get_hrSWRun(host_snmp *s, hrSWRun_t **hrSWRun)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 4, 0};
 
     *hrSWRun = NULL;
 
-    stls_vbl_add_null(&in, hrSWOSIndex, _hrSWOSIndexLength);
+    var[8] = 1; stls_vbl_add_null(&in, var, 9);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -1228,6 +1115,13 @@ assign_hrSWRunEntry(GSList *vbl)
     p = (char *) hrSWRunEntry + sizeof(hrSWRunEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        hrSWRunEntry->hrSWRunIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -1235,36 +1129,26 @@ assign_hrSWRunEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrSWRunIndexLength
-            && memcmp(vb->id, hrSWRunIndex, sizeof(hrSWRunIndex)) == 0) {
-            hrSWRunEntry->hrSWRunIndex = &(vb->syntax.i32[0]);
-        }
-        if (vb->id_len > _hrSWRunNameLength
-            && memcmp(vb->id, hrSWRunName, sizeof(hrSWRunName)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             hrSWRunEntry->_hrSWRunNameLength = vb->syntax_len;
             hrSWRunEntry->hrSWRunName = vb->syntax.uc;
         }
-        if (vb->id_len > _hrSWRunIDLength
-            && memcmp(vb->id, hrSWRunID, sizeof(hrSWRunID)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             hrSWRunEntry->_hrSWRunIDLength = vb->syntax_len / sizeof(guint32);
             hrSWRunEntry->hrSWRunID = vb->syntax.ui32;
         }
-        if (vb->id_len > _hrSWRunPathLength
-            && memcmp(vb->id, hrSWRunPath, sizeof(hrSWRunPath)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 4) {
             hrSWRunEntry->_hrSWRunPathLength = vb->syntax_len;
             hrSWRunEntry->hrSWRunPath = vb->syntax.uc;
         }
-        if (vb->id_len > _hrSWRunParametersLength
-            && memcmp(vb->id, hrSWRunParameters, sizeof(hrSWRunParameters)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 5) {
             hrSWRunEntry->_hrSWRunParametersLength = vb->syntax_len;
             hrSWRunEntry->hrSWRunParameters = vb->syntax.uc;
         }
-        if (vb->id_len > _hrSWRunTypeLength
-            && memcmp(vb->id, hrSWRunType, sizeof(hrSWRunType)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 6) {
             hrSWRunEntry->hrSWRunType = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrSWRunStatusLength
-            && memcmp(vb->id, hrSWRunStatus, sizeof(hrSWRunStatus)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 7) {
             hrSWRunEntry->hrSWRunStatus = &(vb->syntax.i32[0]);
         }
     }
@@ -1278,15 +1162,16 @@ host_resources_mib_get_hrSWRunEntry(host_snmp *s, hrSWRunEntry_t ***hrSWRunEntry
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1, 0};
 
     *hrSWRunEntry = NULL;
 
-    stls_vbl_add_null(&in, hrSWRunName, _hrSWRunNameLength);
-    stls_vbl_add_null(&in, hrSWRunID, _hrSWRunIDLength);
-    stls_vbl_add_null(&in, hrSWRunPath, _hrSWRunPathLength);
-    stls_vbl_add_null(&in, hrSWRunParameters, _hrSWRunParametersLength);
-    stls_vbl_add_null(&in, hrSWRunType, _hrSWRunTypeLength);
-    stls_vbl_add_null(&in, hrSWRunStatus, _hrSWRunStatusLength);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
+    var[10] = 4; stls_vbl_add_null(&in, var, 11);
+    var[10] = 5; stls_vbl_add_null(&in, var, 11);
+    var[10] = 6; stls_vbl_add_null(&in, var, 11);
+    var[10] = 7; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1339,6 +1224,13 @@ assign_hrSWRunPerfEntry(GSList *vbl)
     p = (char *) hrSWRunPerfEntry + sizeof(hrSWRunPerfEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        hrSWRunPerfEntry->hrSWRunIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -1346,12 +1238,10 @@ assign_hrSWRunPerfEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrSWRunPerfCPULength
-            && memcmp(vb->id, hrSWRunPerfCPU, sizeof(hrSWRunPerfCPU)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 1) {
             hrSWRunPerfEntry->hrSWRunPerfCPU = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrSWRunPerfMemLength
-            && memcmp(vb->id, hrSWRunPerfMem, sizeof(hrSWRunPerfMem)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             hrSWRunPerfEntry->hrSWRunPerfMem = &(vb->syntax.i32[0]);
         }
     }
@@ -1365,11 +1255,12 @@ host_resources_mib_get_hrSWRunPerfEntry(host_snmp *s, hrSWRunPerfEntry_t ***hrSW
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 5, 1, 1, 0};
 
     *hrSWRunPerfEntry = NULL;
 
-    stls_vbl_add_null(&in, hrSWRunPerfCPU, _hrSWRunPerfCPULength);
-    stls_vbl_add_null(&in, hrSWRunPerfMem, _hrSWRunPerfMemLength);
+    var[10] = 1; stls_vbl_add_null(&in, var, 11);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1429,12 +1320,10 @@ assign_hrSWInstalled(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrSWInstalledLastChangeLength
-            && memcmp(vb->id, hrSWInstalledLastChange, sizeof(hrSWInstalledLastChange)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 1) {
             hrSWInstalled->hrSWInstalledLastChange = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _hrSWInstalledLastUpdateTimeLength
-            && memcmp(vb->id, hrSWInstalledLastUpdateTime, sizeof(hrSWInstalledLastUpdateTime)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 2) {
             hrSWInstalled->hrSWInstalledLastUpdateTime = &(vb->syntax.ui32[0]);
         }
     }
@@ -1446,11 +1335,12 @@ int
 host_resources_mib_get_hrSWInstalled(host_snmp *s, hrSWInstalled_t **hrSWInstalled)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 6, 0};
 
     *hrSWInstalled = NULL;
 
-    stls_vbl_add_null(&in, hrSWInstalledLastChange, _hrSWInstalledLastChangeLength);
-    stls_vbl_add_null(&in, hrSWInstalledLastUpdateTime, _hrSWInstalledLastUpdateTimeLength);
+    var[8] = 1; stls_vbl_add_null(&in, var, 9);
+    var[8] = 2; stls_vbl_add_null(&in, var, 9);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -1492,6 +1382,13 @@ assign_hrSWInstalledEntry(GSList *vbl)
     p = (char *) hrSWInstalledEntry + sizeof(hrSWInstalledEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        hrSWInstalledEntry->hrSWInstalledIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -1499,26 +1396,18 @@ assign_hrSWInstalledEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _hrSWInstalledIndexLength
-            && memcmp(vb->id, hrSWInstalledIndex, sizeof(hrSWInstalledIndex)) == 0) {
-            hrSWInstalledEntry->hrSWInstalledIndex = &(vb->syntax.i32[0]);
-        }
-        if (vb->id_len > _hrSWInstalledNameLength
-            && memcmp(vb->id, hrSWInstalledName, sizeof(hrSWInstalledName)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             hrSWInstalledEntry->_hrSWInstalledNameLength = vb->syntax_len;
             hrSWInstalledEntry->hrSWInstalledName = vb->syntax.uc;
         }
-        if (vb->id_len > _hrSWInstalledIDLength
-            && memcmp(vb->id, hrSWInstalledID, sizeof(hrSWInstalledID)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             hrSWInstalledEntry->_hrSWInstalledIDLength = vb->syntax_len / sizeof(guint32);
             hrSWInstalledEntry->hrSWInstalledID = vb->syntax.ui32;
         }
-        if (vb->id_len > _hrSWInstalledTypeLength
-            && memcmp(vb->id, hrSWInstalledType, sizeof(hrSWInstalledType)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 4) {
             hrSWInstalledEntry->hrSWInstalledType = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _hrSWInstalledDateLength
-            && memcmp(vb->id, hrSWInstalledDate, sizeof(hrSWInstalledDate)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 5) {
             hrSWInstalledEntry->_hrSWInstalledDateLength = vb->syntax_len;
             hrSWInstalledEntry->hrSWInstalledDate = vb->syntax.uc;
         }
@@ -1533,13 +1422,14 @@ host_resources_mib_get_hrSWInstalledEntry(host_snmp *s, hrSWInstalledEntry_t ***
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1, 0};
 
     *hrSWInstalledEntry = NULL;
 
-    stls_vbl_add_null(&in, hrSWInstalledName, _hrSWInstalledNameLength);
-    stls_vbl_add_null(&in, hrSWInstalledID, _hrSWInstalledIDLength);
-    stls_vbl_add_null(&in, hrSWInstalledType, _hrSWInstalledTypeLength);
-    stls_vbl_add_null(&in, hrSWInstalledDate, _hrSWInstalledDateLength);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
+    var[10] = 4; stls_vbl_add_null(&in, var, 11);
+    var[10] = 5; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

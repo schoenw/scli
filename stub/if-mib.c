@@ -9,120 +9,6 @@
 
 #include "if-mib.h"
 
-static guint32 const ifNumber[] = {1, 3, 6, 1, 2, 1, 2, 1};
-static guint32 const ifIndex[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 1};
-static guint32 const ifDescr[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 2};
-static guint32 const ifType[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 3};
-static guint32 const ifMtu[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 4};
-static guint32 const ifSpeed[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 5};
-static guint32 const ifPhysAddress[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 6};
-static guint32 const ifAdminStatus[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 7};
-static guint32 const ifOperStatus[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 8};
-static guint32 const ifLastChange[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 9};
-static guint32 const ifInOctets[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 10};
-static guint32 const ifInUcastPkts[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 11};
-static guint32 const ifInNUcastPkts[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 12};
-static guint32 const ifInDiscards[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 13};
-static guint32 const ifInErrors[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 14};
-static guint32 const ifInUnknownProtos[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 15};
-static guint32 const ifOutOctets[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 16};
-static guint32 const ifOutUcastPkts[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 17};
-static guint32 const ifOutNUcastPkts[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 18};
-static guint32 const ifOutDiscards[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 19};
-static guint32 const ifOutErrors[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 20};
-static guint32 const ifOutQLen[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 21};
-static guint32 const ifSpecific[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 22};
-static guint32 const ifName[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 1};
-static guint32 const ifInMulticastPkts[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 2};
-static guint32 const ifInBroadcastPkts[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 3};
-static guint32 const ifOutMulticastPkts[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 4};
-static guint32 const ifOutBroadcastPkts[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 5};
-static guint32 const ifHCInOctets[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 6};
-static guint32 const ifHCInUcastPkts[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 7};
-static guint32 const ifHCInMulticastPkts[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 8};
-static guint32 const ifHCInBroadcastPkts[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 9};
-static guint32 const ifHCOutOctets[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 10};
-static guint32 const ifHCOutUcastPkts[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 11};
-static guint32 const ifHCOutMulticastPkts[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 12};
-static guint32 const ifHCOutBroadcastPkts[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 13};
-static guint32 const ifLinkUpDownTrapEnable[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 14};
-static guint32 const ifHighSpeed[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 15};
-static guint32 const ifPromiscuousMode[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 16};
-static guint32 const ifConnectorPresent[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 17};
-static guint32 const ifAlias[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 18};
-static guint32 const ifCounterDiscontinuityTime[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 19};
-static guint32 const ifStackHigherLayer[] = {1, 3, 6, 1, 2, 1, 31, 1, 2, 1, 1};
-static guint32 const ifStackLowerLayer[] = {1, 3, 6, 1, 2, 1, 31, 1, 2, 1, 2};
-static guint32 const ifStackStatus[] = {1, 3, 6, 1, 2, 1, 31, 1, 2, 1, 3};
-static guint32 const ifTestId[] = {1, 3, 6, 1, 2, 1, 31, 1, 3, 1, 1};
-static guint32 const ifTestStatus[] = {1, 3, 6, 1, 2, 1, 31, 1, 3, 1, 2};
-static guint32 const ifTestType[] = {1, 3, 6, 1, 2, 1, 31, 1, 3, 1, 3};
-static guint32 const ifTestResult[] = {1, 3, 6, 1, 2, 1, 31, 1, 3, 1, 4};
-static guint32 const ifTestCode[] = {1, 3, 6, 1, 2, 1, 31, 1, 3, 1, 5};
-static guint32 const ifTestOwner[] = {1, 3, 6, 1, 2, 1, 31, 1, 3, 1, 6};
-static guint32 const ifRcvAddressAddress[] = {1, 3, 6, 1, 2, 1, 31, 1, 4, 1, 1};
-static guint32 const ifRcvAddressStatus[] = {1, 3, 6, 1, 2, 1, 31, 1, 4, 1, 2};
-static guint32 const ifRcvAddressType[] = {1, 3, 6, 1, 2, 1, 31, 1, 4, 1, 3};
-static guint32 const ifTableLastChange[] = {1, 3, 6, 1, 2, 1, 31, 1, 5};
-static guint32 const ifStackLastChange[] = {1, 3, 6, 1, 2, 1, 31, 1, 6};
-
-static gsize const _ifNumberLength = sizeof(ifNumber)/sizeof(guint32);
-static gsize const _ifIndexLength = sizeof(ifIndex)/sizeof(guint32);
-static gsize const _ifDescrLength = sizeof(ifDescr)/sizeof(guint32);
-static gsize const _ifTypeLength = sizeof(ifType)/sizeof(guint32);
-static gsize const _ifMtuLength = sizeof(ifMtu)/sizeof(guint32);
-static gsize const _ifSpeedLength = sizeof(ifSpeed)/sizeof(guint32);
-static gsize const _ifPhysAddressLength = sizeof(ifPhysAddress)/sizeof(guint32);
-static gsize const _ifAdminStatusLength = sizeof(ifAdminStatus)/sizeof(guint32);
-static gsize const _ifOperStatusLength = sizeof(ifOperStatus)/sizeof(guint32);
-static gsize const _ifLastChangeLength = sizeof(ifLastChange)/sizeof(guint32);
-static gsize const _ifInOctetsLength = sizeof(ifInOctets)/sizeof(guint32);
-static gsize const _ifInUcastPktsLength = sizeof(ifInUcastPkts)/sizeof(guint32);
-static gsize const _ifInNUcastPktsLength = sizeof(ifInNUcastPkts)/sizeof(guint32);
-static gsize const _ifInDiscardsLength = sizeof(ifInDiscards)/sizeof(guint32);
-static gsize const _ifInErrorsLength = sizeof(ifInErrors)/sizeof(guint32);
-static gsize const _ifInUnknownProtosLength = sizeof(ifInUnknownProtos)/sizeof(guint32);
-static gsize const _ifOutOctetsLength = sizeof(ifOutOctets)/sizeof(guint32);
-static gsize const _ifOutUcastPktsLength = sizeof(ifOutUcastPkts)/sizeof(guint32);
-static gsize const _ifOutNUcastPktsLength = sizeof(ifOutNUcastPkts)/sizeof(guint32);
-static gsize const _ifOutDiscardsLength = sizeof(ifOutDiscards)/sizeof(guint32);
-static gsize const _ifOutErrorsLength = sizeof(ifOutErrors)/sizeof(guint32);
-static gsize const _ifOutQLenLength = sizeof(ifOutQLen)/sizeof(guint32);
-static gsize const _ifSpecificLength = sizeof(ifSpecific)/sizeof(guint32);
-static gsize const _ifNameLength = sizeof(ifName)/sizeof(guint32);
-static gsize const _ifInMulticastPktsLength = sizeof(ifInMulticastPkts)/sizeof(guint32);
-static gsize const _ifInBroadcastPktsLength = sizeof(ifInBroadcastPkts)/sizeof(guint32);
-static gsize const _ifOutMulticastPktsLength = sizeof(ifOutMulticastPkts)/sizeof(guint32);
-static gsize const _ifOutBroadcastPktsLength = sizeof(ifOutBroadcastPkts)/sizeof(guint32);
-static gsize const _ifHCInOctetsLength = sizeof(ifHCInOctets)/sizeof(guint32);
-static gsize const _ifHCInUcastPktsLength = sizeof(ifHCInUcastPkts)/sizeof(guint32);
-static gsize const _ifHCInMulticastPktsLength = sizeof(ifHCInMulticastPkts)/sizeof(guint32);
-static gsize const _ifHCInBroadcastPktsLength = sizeof(ifHCInBroadcastPkts)/sizeof(guint32);
-static gsize const _ifHCOutOctetsLength = sizeof(ifHCOutOctets)/sizeof(guint32);
-static gsize const _ifHCOutUcastPktsLength = sizeof(ifHCOutUcastPkts)/sizeof(guint32);
-static gsize const _ifHCOutMulticastPktsLength = sizeof(ifHCOutMulticastPkts)/sizeof(guint32);
-static gsize const _ifHCOutBroadcastPktsLength = sizeof(ifHCOutBroadcastPkts)/sizeof(guint32);
-static gsize const _ifLinkUpDownTrapEnableLength = sizeof(ifLinkUpDownTrapEnable)/sizeof(guint32);
-static gsize const _ifHighSpeedLength = sizeof(ifHighSpeed)/sizeof(guint32);
-static gsize const _ifPromiscuousModeLength = sizeof(ifPromiscuousMode)/sizeof(guint32);
-static gsize const _ifConnectorPresentLength = sizeof(ifConnectorPresent)/sizeof(guint32);
-static gsize const _ifAliasLength = sizeof(ifAlias)/sizeof(guint32);
-static gsize const _ifCounterDiscontinuityTimeLength = sizeof(ifCounterDiscontinuityTime)/sizeof(guint32);
-static gsize const _ifStackHigherLayerLength = sizeof(ifStackHigherLayer)/sizeof(guint32);
-static gsize const _ifStackLowerLayerLength = sizeof(ifStackLowerLayer)/sizeof(guint32);
-static gsize const _ifStackStatusLength = sizeof(ifStackStatus)/sizeof(guint32);
-static gsize const _ifTestIdLength = sizeof(ifTestId)/sizeof(guint32);
-static gsize const _ifTestStatusLength = sizeof(ifTestStatus)/sizeof(guint32);
-static gsize const _ifTestTypeLength = sizeof(ifTestType)/sizeof(guint32);
-static gsize const _ifTestResultLength = sizeof(ifTestResult)/sizeof(guint32);
-static gsize const _ifTestCodeLength = sizeof(ifTestCode)/sizeof(guint32);
-static gsize const _ifTestOwnerLength = sizeof(ifTestOwner)/sizeof(guint32);
-static gsize const _ifRcvAddressAddressLength = sizeof(ifRcvAddressAddress)/sizeof(guint32);
-static gsize const _ifRcvAddressStatusLength = sizeof(ifRcvAddressStatus)/sizeof(guint32);
-static gsize const _ifRcvAddressTypeLength = sizeof(ifRcvAddressType)/sizeof(guint32);
-static gsize const _ifTableLastChangeLength = sizeof(ifTableLastChange)/sizeof(guint32);
-static gsize const _ifStackLastChangeLength = sizeof(ifStackLastChange)/sizeof(guint32);
-
 stls_table_t if_mib_enums_ifType[] = {
     { 1, "other" },
     { 2, "regular1822" },
@@ -419,8 +305,7 @@ assign_interfaces(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _ifNumberLength
-            && memcmp(vb->id, ifNumber, sizeof(ifNumber)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 1) {
             interfaces->ifNumber = &(vb->syntax.i32[0]);
         }
     }
@@ -432,10 +317,11 @@ int
 if_mib_get_interfaces(host_snmp *s, interfaces_t **interfaces)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 2, 0};
 
     *interfaces = NULL;
 
-    stls_vbl_add_null(&in, ifNumber, _ifNumberLength);
+    var[7] = 1; stls_vbl_add_null(&in, var, 8);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -477,6 +363,13 @@ assign_ifEntry(GSList *vbl)
     p = (char *) ifEntry + sizeof(ifEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 11) return NULL;
+        ifEntry->ifIndex = (gint32 *) &(vb->id[10]);
+        if (vb->id_len > 11) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -484,94 +377,69 @@ assign_ifEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _ifIndexLength
-            && memcmp(vb->id, ifIndex, sizeof(ifIndex)) == 0) {
-            ifEntry->ifIndex = &(vb->syntax.i32[0]);
-        }
-        if (vb->id_len > _ifDescrLength
-            && memcmp(vb->id, ifDescr, sizeof(ifDescr)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 2) {
             ifEntry->_ifDescrLength = vb->syntax_len;
             ifEntry->ifDescr = vb->syntax.uc;
         }
-        if (vb->id_len > _ifTypeLength
-            && memcmp(vb->id, ifType, sizeof(ifType)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 3) {
             ifEntry->ifType = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ifMtuLength
-            && memcmp(vb->id, ifMtu, sizeof(ifMtu)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 4) {
             ifEntry->ifMtu = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ifSpeedLength
-            && memcmp(vb->id, ifSpeed, sizeof(ifSpeed)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 5) {
             ifEntry->ifSpeed = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifPhysAddressLength
-            && memcmp(vb->id, ifPhysAddress, sizeof(ifPhysAddress)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 6) {
             ifEntry->_ifPhysAddressLength = vb->syntax_len;
             ifEntry->ifPhysAddress = vb->syntax.uc;
         }
-        if (vb->id_len > _ifAdminStatusLength
-            && memcmp(vb->id, ifAdminStatus, sizeof(ifAdminStatus)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 7) {
             ifEntry->ifAdminStatus = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ifOperStatusLength
-            && memcmp(vb->id, ifOperStatus, sizeof(ifOperStatus)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 8) {
             ifEntry->ifOperStatus = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ifLastChangeLength
-            && memcmp(vb->id, ifLastChange, sizeof(ifLastChange)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 9) {
             ifEntry->ifLastChange = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifInOctetsLength
-            && memcmp(vb->id, ifInOctets, sizeof(ifInOctets)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 10) {
             ifEntry->ifInOctets = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifInUcastPktsLength
-            && memcmp(vb->id, ifInUcastPkts, sizeof(ifInUcastPkts)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 11) {
             ifEntry->ifInUcastPkts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifInNUcastPktsLength
-            && memcmp(vb->id, ifInNUcastPkts, sizeof(ifInNUcastPkts)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 12) {
             ifEntry->ifInNUcastPkts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifInDiscardsLength
-            && memcmp(vb->id, ifInDiscards, sizeof(ifInDiscards)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 13) {
             ifEntry->ifInDiscards = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifInErrorsLength
-            && memcmp(vb->id, ifInErrors, sizeof(ifInErrors)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 14) {
             ifEntry->ifInErrors = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifInUnknownProtosLength
-            && memcmp(vb->id, ifInUnknownProtos, sizeof(ifInUnknownProtos)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 15) {
             ifEntry->ifInUnknownProtos = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifOutOctetsLength
-            && memcmp(vb->id, ifOutOctets, sizeof(ifOutOctets)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 16) {
             ifEntry->ifOutOctets = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifOutUcastPktsLength
-            && memcmp(vb->id, ifOutUcastPkts, sizeof(ifOutUcastPkts)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 17) {
             ifEntry->ifOutUcastPkts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifOutNUcastPktsLength
-            && memcmp(vb->id, ifOutNUcastPkts, sizeof(ifOutNUcastPkts)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 18) {
             ifEntry->ifOutNUcastPkts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifOutDiscardsLength
-            && memcmp(vb->id, ifOutDiscards, sizeof(ifOutDiscards)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 19) {
             ifEntry->ifOutDiscards = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifOutErrorsLength
-            && memcmp(vb->id, ifOutErrors, sizeof(ifOutErrors)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 20) {
             ifEntry->ifOutErrors = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifOutQLenLength
-            && memcmp(vb->id, ifOutQLen, sizeof(ifOutQLen)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 21) {
             ifEntry->ifOutQLen = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifSpecificLength
-            && memcmp(vb->id, ifSpecific, sizeof(ifSpecific)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 22) {
             ifEntry->_ifSpecificLength = vb->syntax_len / sizeof(guint32);
             ifEntry->ifSpecific = vb->syntax.ui32;
         }
@@ -586,30 +454,31 @@ if_mib_get_ifEntry(host_snmp *s, ifEntry_t ***ifEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 0};
 
     *ifEntry = NULL;
 
-    stls_vbl_add_null(&in, ifDescr, _ifDescrLength);
-    stls_vbl_add_null(&in, ifType, _ifTypeLength);
-    stls_vbl_add_null(&in, ifMtu, _ifMtuLength);
-    stls_vbl_add_null(&in, ifSpeed, _ifSpeedLength);
-    stls_vbl_add_null(&in, ifPhysAddress, _ifPhysAddressLength);
-    stls_vbl_add_null(&in, ifAdminStatus, _ifAdminStatusLength);
-    stls_vbl_add_null(&in, ifOperStatus, _ifOperStatusLength);
-    stls_vbl_add_null(&in, ifLastChange, _ifLastChangeLength);
-    stls_vbl_add_null(&in, ifInOctets, _ifInOctetsLength);
-    stls_vbl_add_null(&in, ifInUcastPkts, _ifInUcastPktsLength);
-    stls_vbl_add_null(&in, ifInNUcastPkts, _ifInNUcastPktsLength);
-    stls_vbl_add_null(&in, ifInDiscards, _ifInDiscardsLength);
-    stls_vbl_add_null(&in, ifInErrors, _ifInErrorsLength);
-    stls_vbl_add_null(&in, ifInUnknownProtos, _ifInUnknownProtosLength);
-    stls_vbl_add_null(&in, ifOutOctets, _ifOutOctetsLength);
-    stls_vbl_add_null(&in, ifOutUcastPkts, _ifOutUcastPktsLength);
-    stls_vbl_add_null(&in, ifOutNUcastPkts, _ifOutNUcastPktsLength);
-    stls_vbl_add_null(&in, ifOutDiscards, _ifOutDiscardsLength);
-    stls_vbl_add_null(&in, ifOutErrors, _ifOutErrorsLength);
-    stls_vbl_add_null(&in, ifOutQLen, _ifOutQLenLength);
-    stls_vbl_add_null(&in, ifSpecific, _ifSpecificLength);
+    var[9] = 2; stls_vbl_add_null(&in, var, 10);
+    var[9] = 3; stls_vbl_add_null(&in, var, 10);
+    var[9] = 4; stls_vbl_add_null(&in, var, 10);
+    var[9] = 5; stls_vbl_add_null(&in, var, 10);
+    var[9] = 6; stls_vbl_add_null(&in, var, 10);
+    var[9] = 7; stls_vbl_add_null(&in, var, 10);
+    var[9] = 8; stls_vbl_add_null(&in, var, 10);
+    var[9] = 9; stls_vbl_add_null(&in, var, 10);
+    var[9] = 10; stls_vbl_add_null(&in, var, 10);
+    var[9] = 11; stls_vbl_add_null(&in, var, 10);
+    var[9] = 12; stls_vbl_add_null(&in, var, 10);
+    var[9] = 13; stls_vbl_add_null(&in, var, 10);
+    var[9] = 14; stls_vbl_add_null(&in, var, 10);
+    var[9] = 15; stls_vbl_add_null(&in, var, 10);
+    var[9] = 16; stls_vbl_add_null(&in, var, 10);
+    var[9] = 17; stls_vbl_add_null(&in, var, 10);
+    var[9] = 18; stls_vbl_add_null(&in, var, 10);
+    var[9] = 19; stls_vbl_add_null(&in, var, 10);
+    var[9] = 20; stls_vbl_add_null(&in, var, 10);
+    var[9] = 21; stls_vbl_add_null(&in, var, 10);
+    var[9] = 22; stls_vbl_add_null(&in, var, 10);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -669,12 +538,10 @@ assign_ifMIBObjects(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _ifTableLastChangeLength
-            && memcmp(vb->id, ifTableLastChange, sizeof(ifTableLastChange)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 5) {
             ifMIBObjects->ifTableLastChange = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifStackLastChangeLength
-            && memcmp(vb->id, ifStackLastChange, sizeof(ifStackLastChange)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 6) {
             ifMIBObjects->ifStackLastChange = &(vb->syntax.ui32[0]);
         }
     }
@@ -686,11 +553,12 @@ int
 if_mib_get_ifMIBObjects(host_snmp *s, ifMIBObjects_t **ifMIBObjects)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 31, 1, 0};
 
     *ifMIBObjects = NULL;
 
-    stls_vbl_add_null(&in, ifTableLastChange, _ifTableLastChangeLength);
-    stls_vbl_add_null(&in, ifStackLastChange, _ifStackLastChangeLength);
+    var[8] = 5; stls_vbl_add_null(&in, var, 9);
+    var[8] = 6; stls_vbl_add_null(&in, var, 9);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -732,6 +600,13 @@ assign_ifXEntry(GSList *vbl)
     p = (char *) ifXEntry + sizeof(ifXEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        ifXEntry->ifIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -739,82 +614,63 @@ assign_ifXEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _ifNameLength
-            && memcmp(vb->id, ifName, sizeof(ifName)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 1) {
             ifXEntry->_ifNameLength = vb->syntax_len;
             ifXEntry->ifName = vb->syntax.uc;
         }
-        if (vb->id_len > _ifInMulticastPktsLength
-            && memcmp(vb->id, ifInMulticastPkts, sizeof(ifInMulticastPkts)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             ifXEntry->ifInMulticastPkts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifInBroadcastPktsLength
-            && memcmp(vb->id, ifInBroadcastPkts, sizeof(ifInBroadcastPkts)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             ifXEntry->ifInBroadcastPkts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifOutMulticastPktsLength
-            && memcmp(vb->id, ifOutMulticastPkts, sizeof(ifOutMulticastPkts)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 4) {
             ifXEntry->ifOutMulticastPkts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifOutBroadcastPktsLength
-            && memcmp(vb->id, ifOutBroadcastPkts, sizeof(ifOutBroadcastPkts)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 5) {
             ifXEntry->ifOutBroadcastPkts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifHCInOctetsLength
-            && memcmp(vb->id, ifHCInOctets, sizeof(ifHCInOctets)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 6) {
             ifXEntry->ifHCInOctets = &(vb->syntax.ui64[0]);
         }
-        if (vb->id_len > _ifHCInUcastPktsLength
-            && memcmp(vb->id, ifHCInUcastPkts, sizeof(ifHCInUcastPkts)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 7) {
             ifXEntry->ifHCInUcastPkts = &(vb->syntax.ui64[0]);
         }
-        if (vb->id_len > _ifHCInMulticastPktsLength
-            && memcmp(vb->id, ifHCInMulticastPkts, sizeof(ifHCInMulticastPkts)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 8) {
             ifXEntry->ifHCInMulticastPkts = &(vb->syntax.ui64[0]);
         }
-        if (vb->id_len > _ifHCInBroadcastPktsLength
-            && memcmp(vb->id, ifHCInBroadcastPkts, sizeof(ifHCInBroadcastPkts)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 9) {
             ifXEntry->ifHCInBroadcastPkts = &(vb->syntax.ui64[0]);
         }
-        if (vb->id_len > _ifHCOutOctetsLength
-            && memcmp(vb->id, ifHCOutOctets, sizeof(ifHCOutOctets)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 10) {
             ifXEntry->ifHCOutOctets = &(vb->syntax.ui64[0]);
         }
-        if (vb->id_len > _ifHCOutUcastPktsLength
-            && memcmp(vb->id, ifHCOutUcastPkts, sizeof(ifHCOutUcastPkts)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 11) {
             ifXEntry->ifHCOutUcastPkts = &(vb->syntax.ui64[0]);
         }
-        if (vb->id_len > _ifHCOutMulticastPktsLength
-            && memcmp(vb->id, ifHCOutMulticastPkts, sizeof(ifHCOutMulticastPkts)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 12) {
             ifXEntry->ifHCOutMulticastPkts = &(vb->syntax.ui64[0]);
         }
-        if (vb->id_len > _ifHCOutBroadcastPktsLength
-            && memcmp(vb->id, ifHCOutBroadcastPkts, sizeof(ifHCOutBroadcastPkts)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 13) {
             ifXEntry->ifHCOutBroadcastPkts = &(vb->syntax.ui64[0]);
         }
-        if (vb->id_len > _ifLinkUpDownTrapEnableLength
-            && memcmp(vb->id, ifLinkUpDownTrapEnable, sizeof(ifLinkUpDownTrapEnable)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 14) {
             ifXEntry->ifLinkUpDownTrapEnable = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ifHighSpeedLength
-            && memcmp(vb->id, ifHighSpeed, sizeof(ifHighSpeed)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 15) {
             ifXEntry->ifHighSpeed = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ifPromiscuousModeLength
-            && memcmp(vb->id, ifPromiscuousMode, sizeof(ifPromiscuousMode)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 16) {
             ifXEntry->ifPromiscuousMode = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ifConnectorPresentLength
-            && memcmp(vb->id, ifConnectorPresent, sizeof(ifConnectorPresent)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 17) {
             ifXEntry->ifConnectorPresent = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ifAliasLength
-            && memcmp(vb->id, ifAlias, sizeof(ifAlias)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 18) {
             ifXEntry->_ifAliasLength = vb->syntax_len;
             ifXEntry->ifAlias = vb->syntax.uc;
         }
-        if (vb->id_len > _ifCounterDiscontinuityTimeLength
-            && memcmp(vb->id, ifCounterDiscontinuityTime, sizeof(ifCounterDiscontinuityTime)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 19) {
             ifXEntry->ifCounterDiscontinuityTime = &(vb->syntax.ui32[0]);
         }
     }
@@ -828,44 +684,45 @@ if_mib_get_ifXEntry(host_snmp *s, ifXEntry_t ***ifXEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 0};
 
     *ifXEntry = NULL;
 
-    stls_vbl_add_null(&in, ifName, _ifNameLength);
-    stls_vbl_add_null(&in, ifInMulticastPkts, _ifInMulticastPktsLength);
-    stls_vbl_add_null(&in, ifInBroadcastPkts, _ifInBroadcastPktsLength);
-    stls_vbl_add_null(&in, ifOutMulticastPkts, _ifOutMulticastPktsLength);
-    stls_vbl_add_null(&in, ifOutBroadcastPkts, _ifOutBroadcastPktsLength);
+    var[10] = 1; stls_vbl_add_null(&in, var, 11);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
+    var[10] = 4; stls_vbl_add_null(&in, var, 11);
+    var[10] = 5; stls_vbl_add_null(&in, var, 11);
     if (s->version > G_SNMP_V1) {
-        stls_vbl_add_null(&in, ifHCInOctets, _ifHCInOctetsLength);
-}
+        var[10] = 6; stls_vbl_add_null(&in, var, 11);
+    }
     if (s->version > G_SNMP_V1) {
-        stls_vbl_add_null(&in, ifHCInUcastPkts, _ifHCInUcastPktsLength);
-}
+        var[10] = 7; stls_vbl_add_null(&in, var, 11);
+    }
     if (s->version > G_SNMP_V1) {
-        stls_vbl_add_null(&in, ifHCInMulticastPkts, _ifHCInMulticastPktsLength);
-}
+        var[10] = 8; stls_vbl_add_null(&in, var, 11);
+    }
     if (s->version > G_SNMP_V1) {
-        stls_vbl_add_null(&in, ifHCInBroadcastPkts, _ifHCInBroadcastPktsLength);
-}
+        var[10] = 9; stls_vbl_add_null(&in, var, 11);
+    }
     if (s->version > G_SNMP_V1) {
-        stls_vbl_add_null(&in, ifHCOutOctets, _ifHCOutOctetsLength);
-}
+        var[10] = 10; stls_vbl_add_null(&in, var, 11);
+    }
     if (s->version > G_SNMP_V1) {
-        stls_vbl_add_null(&in, ifHCOutUcastPkts, _ifHCOutUcastPktsLength);
-}
+        var[10] = 11; stls_vbl_add_null(&in, var, 11);
+    }
     if (s->version > G_SNMP_V1) {
-        stls_vbl_add_null(&in, ifHCOutMulticastPkts, _ifHCOutMulticastPktsLength);
-}
+        var[10] = 12; stls_vbl_add_null(&in, var, 11);
+    }
     if (s->version > G_SNMP_V1) {
-        stls_vbl_add_null(&in, ifHCOutBroadcastPkts, _ifHCOutBroadcastPktsLength);
-}
-    stls_vbl_add_null(&in, ifLinkUpDownTrapEnable, _ifLinkUpDownTrapEnableLength);
-    stls_vbl_add_null(&in, ifHighSpeed, _ifHighSpeedLength);
-    stls_vbl_add_null(&in, ifPromiscuousMode, _ifPromiscuousModeLength);
-    stls_vbl_add_null(&in, ifConnectorPresent, _ifConnectorPresentLength);
-    stls_vbl_add_null(&in, ifAlias, _ifAliasLength);
-    stls_vbl_add_null(&in, ifCounterDiscontinuityTime, _ifCounterDiscontinuityTimeLength);
+        var[10] = 13; stls_vbl_add_null(&in, var, 11);
+    }
+    var[10] = 14; stls_vbl_add_null(&in, var, 11);
+    var[10] = 15; stls_vbl_add_null(&in, var, 11);
+    var[10] = 16; stls_vbl_add_null(&in, var, 11);
+    var[10] = 17; stls_vbl_add_null(&in, var, 11);
+    var[10] = 18; stls_vbl_add_null(&in, var, 11);
+    var[10] = 19; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -918,6 +775,14 @@ assign_ifStackEntry(GSList *vbl)
     p = (char *) ifStackEntry + sizeof(ifStackEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        ifStackEntry->ifStackHigherLayer = (gint32 *) &(vb->id[11]);
+        ifStackEntry->ifStackLowerLayer = (gint32 *) &(vb->id[12]);
+        if (vb->id_len > 13) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -925,8 +790,7 @@ assign_ifStackEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _ifStackStatusLength
-            && memcmp(vb->id, ifStackStatus, sizeof(ifStackStatus)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             ifStackEntry->ifStackStatus = &(vb->syntax.i32[0]);
         }
     }
@@ -940,10 +804,11 @@ if_mib_get_ifStackEntry(host_snmp *s, ifStackEntry_t ***ifStackEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 31, 1, 2, 1, 0};
 
     *ifStackEntry = NULL;
 
-    stls_vbl_add_null(&in, ifStackStatus, _ifStackStatusLength);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -996,6 +861,13 @@ assign_ifTestEntry(GSList *vbl)
     p = (char *) ifTestEntry + sizeof(ifTestEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        ifTestEntry->ifIndex = (gint32 *) &(vb->id[11]);
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -1003,30 +875,24 @@ assign_ifTestEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _ifTestIdLength
-            && memcmp(vb->id, ifTestId, sizeof(ifTestId)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 1) {
             ifTestEntry->ifTestId = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ifTestStatusLength
-            && memcmp(vb->id, ifTestStatus, sizeof(ifTestStatus)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             ifTestEntry->ifTestStatus = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ifTestTypeLength
-            && memcmp(vb->id, ifTestType, sizeof(ifTestType)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             ifTestEntry->_ifTestTypeLength = vb->syntax_len / sizeof(guint32);
             ifTestEntry->ifTestType = vb->syntax.ui32;
         }
-        if (vb->id_len > _ifTestResultLength
-            && memcmp(vb->id, ifTestResult, sizeof(ifTestResult)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 4) {
             ifTestEntry->ifTestResult = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ifTestCodeLength
-            && memcmp(vb->id, ifTestCode, sizeof(ifTestCode)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 5) {
             ifTestEntry->_ifTestCodeLength = vb->syntax_len / sizeof(guint32);
             ifTestEntry->ifTestCode = vb->syntax.ui32;
         }
-        if (vb->id_len > _ifTestOwnerLength
-            && memcmp(vb->id, ifTestOwner, sizeof(ifTestOwner)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 6) {
             ifTestEntry->_ifTestOwnerLength = vb->syntax_len;
             ifTestEntry->ifTestOwner = vb->syntax.uc;
         }
@@ -1041,15 +907,16 @@ if_mib_get_ifTestEntry(host_snmp *s, ifTestEntry_t ***ifTestEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 31, 1, 3, 1, 0};
 
     *ifTestEntry = NULL;
 
-    stls_vbl_add_null(&in, ifTestId, _ifTestIdLength);
-    stls_vbl_add_null(&in, ifTestStatus, _ifTestStatusLength);
-    stls_vbl_add_null(&in, ifTestType, _ifTestTypeLength);
-    stls_vbl_add_null(&in, ifTestResult, _ifTestResultLength);
-    stls_vbl_add_null(&in, ifTestCode, _ifTestCodeLength);
-    stls_vbl_add_null(&in, ifTestOwner, _ifTestOwnerLength);
+    var[10] = 1; stls_vbl_add_null(&in, var, 11);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
+    var[10] = 4; stls_vbl_add_null(&in, var, 11);
+    var[10] = 5; stls_vbl_add_null(&in, var, 11);
+    var[10] = 6; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -1102,6 +969,14 @@ assign_ifRcvAddressEntry(GSList *vbl)
     p = (char *) ifRcvAddressEntry + sizeof(ifRcvAddressEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        ifRcvAddressEntry->ifIndex = (gint32 *) &(vb->id[11]);
+        /* XXX fix this ifRcvAddressEntry->ifRcvAddressAddress = ?; */
+        if (vb->id_len > 12) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -1109,12 +984,10 @@ assign_ifRcvAddressEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _ifRcvAddressStatusLength
-            && memcmp(vb->id, ifRcvAddressStatus, sizeof(ifRcvAddressStatus)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 2) {
             ifRcvAddressEntry->ifRcvAddressStatus = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ifRcvAddressTypeLength
-            && memcmp(vb->id, ifRcvAddressType, sizeof(ifRcvAddressType)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             ifRcvAddressEntry->ifRcvAddressType = &(vb->syntax.i32[0]);
         }
     }
@@ -1128,11 +1001,12 @@ if_mib_get_ifRcvAddressEntry(host_snmp *s, ifRcvAddressEntry_t ***ifRcvAddressEn
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 31, 1, 4, 1, 0};
 
     *ifRcvAddressEntry = NULL;
 
-    stls_vbl_add_null(&in, ifRcvAddressStatus, _ifRcvAddressStatusLength);
-    stls_vbl_add_null(&in, ifRcvAddressType, _ifRcvAddressTypeLength);
+    var[10] = 2; stls_vbl_add_null(&in, var, 11);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

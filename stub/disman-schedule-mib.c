@@ -9,50 +9,6 @@
 
 #include "disman-schedule-mib.h"
 
-static guint32 const schedLocalTime[] = {1, 3, 6, 1, 2, 1, 63, 1, 1};
-static guint32 const schedOwner[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 1};
-static guint32 const schedName[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 2};
-static guint32 const schedDescr[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 3};
-static guint32 const schedInterval[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 4};
-static guint32 const schedWeekDay[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 5};
-static guint32 const schedMonth[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 6};
-static guint32 const schedDay[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 7};
-static guint32 const schedHour[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 8};
-static guint32 const schedMinute[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 9};
-static guint32 const schedContextName[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 10};
-static guint32 const schedVariable[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 11};
-static guint32 const schedValue[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 12};
-static guint32 const schedType[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 13};
-static guint32 const schedAdminStatus[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 14};
-static guint32 const schedOperStatus[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 15};
-static guint32 const schedFailures[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 16};
-static guint32 const schedLastFailure[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 17};
-static guint32 const schedLastFailed[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 18};
-static guint32 const schedStorageType[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 19};
-static guint32 const schedRowStatus[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 20};
-
-static gsize const _schedLocalTimeLength = sizeof(schedLocalTime)/sizeof(guint32);
-static gsize const _schedOwnerLength = sizeof(schedOwner)/sizeof(guint32);
-static gsize const _schedNameLength = sizeof(schedName)/sizeof(guint32);
-static gsize const _schedDescrLength = sizeof(schedDescr)/sizeof(guint32);
-static gsize const _schedIntervalLength = sizeof(schedInterval)/sizeof(guint32);
-static gsize const _schedWeekDayLength = sizeof(schedWeekDay)/sizeof(guint32);
-static gsize const _schedMonthLength = sizeof(schedMonth)/sizeof(guint32);
-static gsize const _schedDayLength = sizeof(schedDay)/sizeof(guint32);
-static gsize const _schedHourLength = sizeof(schedHour)/sizeof(guint32);
-static gsize const _schedMinuteLength = sizeof(schedMinute)/sizeof(guint32);
-static gsize const _schedContextNameLength = sizeof(schedContextName)/sizeof(guint32);
-static gsize const _schedVariableLength = sizeof(schedVariable)/sizeof(guint32);
-static gsize const _schedValueLength = sizeof(schedValue)/sizeof(guint32);
-static gsize const _schedTypeLength = sizeof(schedType)/sizeof(guint32);
-static gsize const _schedAdminStatusLength = sizeof(schedAdminStatus)/sizeof(guint32);
-static gsize const _schedOperStatusLength = sizeof(schedOperStatus)/sizeof(guint32);
-static gsize const _schedFailuresLength = sizeof(schedFailures)/sizeof(guint32);
-static gsize const _schedLastFailureLength = sizeof(schedLastFailure)/sizeof(guint32);
-static gsize const _schedLastFailedLength = sizeof(schedLastFailed)/sizeof(guint32);
-static gsize const _schedStorageTypeLength = sizeof(schedStorageType)/sizeof(guint32);
-static gsize const _schedRowStatusLength = sizeof(schedRowStatus)/sizeof(guint32);
-
 stls_table_t disman_schedule_mib_enums_schedType[] = {
     { 1, "periodic" },
     { 2, "calendar" },
@@ -139,8 +95,7 @@ assign_schedObjects(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _schedLocalTimeLength
-            && memcmp(vb->id, schedLocalTime, sizeof(schedLocalTime)) == 0) {
+        if (vb->id_len > 9 && vb->id[8] == 1) {
             schedObjects->schedLocalTime = vb->syntax.uc;
         }
     }
@@ -152,10 +107,11 @@ int
 disman_schedule_mib_get_schedObjects(host_snmp *s, schedObjects_t **schedObjects)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 63, 1, 0};
 
     *schedObjects = NULL;
 
-    stls_vbl_add_null(&in, schedLocalTime, _schedLocalTimeLength);
+    var[8] = 1; stls_vbl_add_null(&in, var, 9);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -197,6 +153,14 @@ assign_schedEntry(GSList *vbl)
     p = (char *) schedEntry + sizeof(schedEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 12) return NULL;
+        /* XXX fix this schedEntry->schedOwner = ?; */
+        /* XXX fix this schedEntry->schedName = ?; */
+        if (vb->id_len > 11) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -204,85 +168,67 @@ assign_schedEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _schedDescrLength
-            && memcmp(vb->id, schedDescr, sizeof(schedDescr)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 3) {
             schedEntry->_schedDescrLength = vb->syntax_len;
             schedEntry->schedDescr = vb->syntax.uc;
         }
-        if (vb->id_len > _schedIntervalLength
-            && memcmp(vb->id, schedInterval, sizeof(schedInterval)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 4) {
             schedEntry->schedInterval = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _schedWeekDayLength
-            && memcmp(vb->id, schedWeekDay, sizeof(schedWeekDay)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 5) {
             schedEntry->_schedWeekDayLength = vb->syntax_len;
             schedEntry->schedWeekDay = vb->syntax.uc;
         }
-        if (vb->id_len > _schedMonthLength
-            && memcmp(vb->id, schedMonth, sizeof(schedMonth)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 6) {
             schedEntry->_schedMonthLength = vb->syntax_len;
             schedEntry->schedMonth = vb->syntax.uc;
         }
-        if (vb->id_len > _schedDayLength
-            && memcmp(vb->id, schedDay, sizeof(schedDay)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 7) {
             schedEntry->_schedDayLength = vb->syntax_len;
             schedEntry->schedDay = vb->syntax.uc;
         }
-        if (vb->id_len > _schedHourLength
-            && memcmp(vb->id, schedHour, sizeof(schedHour)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 8) {
             schedEntry->_schedHourLength = vb->syntax_len;
             schedEntry->schedHour = vb->syntax.uc;
         }
-        if (vb->id_len > _schedMinuteLength
-            && memcmp(vb->id, schedMinute, sizeof(schedMinute)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 9) {
             schedEntry->_schedMinuteLength = vb->syntax_len;
             schedEntry->schedMinute = vb->syntax.uc;
         }
-        if (vb->id_len > _schedContextNameLength
-            && memcmp(vb->id, schedContextName, sizeof(schedContextName)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 10) {
             schedEntry->_schedContextNameLength = vb->syntax_len;
             schedEntry->schedContextName = vb->syntax.uc;
         }
-        if (vb->id_len > _schedVariableLength
-            && memcmp(vb->id, schedVariable, sizeof(schedVariable)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 11) {
             schedEntry->_schedVariableLength = vb->syntax_len / sizeof(guint32);
             schedEntry->schedVariable = vb->syntax.ui32;
         }
-        if (vb->id_len > _schedValueLength
-            && memcmp(vb->id, schedValue, sizeof(schedValue)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 12) {
             schedEntry->schedValue = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _schedTypeLength
-            && memcmp(vb->id, schedType, sizeof(schedType)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 13) {
             schedEntry->schedType = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _schedAdminStatusLength
-            && memcmp(vb->id, schedAdminStatus, sizeof(schedAdminStatus)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 14) {
             schedEntry->schedAdminStatus = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _schedOperStatusLength
-            && memcmp(vb->id, schedOperStatus, sizeof(schedOperStatus)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 15) {
             schedEntry->schedOperStatus = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _schedFailuresLength
-            && memcmp(vb->id, schedFailures, sizeof(schedFailures)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 16) {
             schedEntry->schedFailures = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _schedLastFailureLength
-            && memcmp(vb->id, schedLastFailure, sizeof(schedLastFailure)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 17) {
             schedEntry->schedLastFailure = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _schedLastFailedLength
-            && memcmp(vb->id, schedLastFailed, sizeof(schedLastFailed)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 18) {
             schedEntry->_schedLastFailedLength = vb->syntax_len;
             schedEntry->schedLastFailed = vb->syntax.uc;
         }
-        if (vb->id_len > _schedStorageTypeLength
-            && memcmp(vb->id, schedStorageType, sizeof(schedStorageType)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 19) {
             schedEntry->schedStorageType = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _schedRowStatusLength
-            && memcmp(vb->id, schedRowStatus, sizeof(schedRowStatus)) == 0) {
+        if (vb->id_len > 11 && vb->id[10] == 20) {
             schedEntry->schedRowStatus = &(vb->syntax.i32[0]);
         }
     }
@@ -296,27 +242,28 @@ disman_schedule_mib_get_schedEntry(host_snmp *s, schedEntry_t ***schedEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 63, 1, 2, 1, 0};
 
     *schedEntry = NULL;
 
-    stls_vbl_add_null(&in, schedDescr, _schedDescrLength);
-    stls_vbl_add_null(&in, schedInterval, _schedIntervalLength);
-    stls_vbl_add_null(&in, schedWeekDay, _schedWeekDayLength);
-    stls_vbl_add_null(&in, schedMonth, _schedMonthLength);
-    stls_vbl_add_null(&in, schedDay, _schedDayLength);
-    stls_vbl_add_null(&in, schedHour, _schedHourLength);
-    stls_vbl_add_null(&in, schedMinute, _schedMinuteLength);
-    stls_vbl_add_null(&in, schedContextName, _schedContextNameLength);
-    stls_vbl_add_null(&in, schedVariable, _schedVariableLength);
-    stls_vbl_add_null(&in, schedValue, _schedValueLength);
-    stls_vbl_add_null(&in, schedType, _schedTypeLength);
-    stls_vbl_add_null(&in, schedAdminStatus, _schedAdminStatusLength);
-    stls_vbl_add_null(&in, schedOperStatus, _schedOperStatusLength);
-    stls_vbl_add_null(&in, schedFailures, _schedFailuresLength);
-    stls_vbl_add_null(&in, schedLastFailure, _schedLastFailureLength);
-    stls_vbl_add_null(&in, schedLastFailed, _schedLastFailedLength);
-    stls_vbl_add_null(&in, schedStorageType, _schedStorageTypeLength);
-    stls_vbl_add_null(&in, schedRowStatus, _schedRowStatusLength);
+    var[10] = 3; stls_vbl_add_null(&in, var, 11);
+    var[10] = 4; stls_vbl_add_null(&in, var, 11);
+    var[10] = 5; stls_vbl_add_null(&in, var, 11);
+    var[10] = 6; stls_vbl_add_null(&in, var, 11);
+    var[10] = 7; stls_vbl_add_null(&in, var, 11);
+    var[10] = 8; stls_vbl_add_null(&in, var, 11);
+    var[10] = 9; stls_vbl_add_null(&in, var, 11);
+    var[10] = 10; stls_vbl_add_null(&in, var, 11);
+    var[10] = 11; stls_vbl_add_null(&in, var, 11);
+    var[10] = 12; stls_vbl_add_null(&in, var, 11);
+    var[10] = 13; stls_vbl_add_null(&in, var, 11);
+    var[10] = 14; stls_vbl_add_null(&in, var, 11);
+    var[10] = 15; stls_vbl_add_null(&in, var, 11);
+    var[10] = 16; stls_vbl_add_null(&in, var, 11);
+    var[10] = 17; stls_vbl_add_null(&in, var, 11);
+    var[10] = 18; stls_vbl_add_null(&in, var, 11);
+    var[10] = 19; stls_vbl_add_null(&in, var, 11);
+    var[10] = 20; stls_vbl_add_null(&in, var, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

@@ -9,118 +9,6 @@
 
 #include "ip-mib.h"
 
-static guint32 const ipForwarding[] = {1, 3, 6, 1, 2, 1, 4, 1};
-static guint32 const ipDefaultTTL[] = {1, 3, 6, 1, 2, 1, 4, 2};
-static guint32 const ipInReceives[] = {1, 3, 6, 1, 2, 1, 4, 3};
-static guint32 const ipInHdrErrors[] = {1, 3, 6, 1, 2, 1, 4, 4};
-static guint32 const ipInAddrErrors[] = {1, 3, 6, 1, 2, 1, 4, 5};
-static guint32 const ipForwDatagrams[] = {1, 3, 6, 1, 2, 1, 4, 6};
-static guint32 const ipInUnknownProtos[] = {1, 3, 6, 1, 2, 1, 4, 7};
-static guint32 const ipInDiscards[] = {1, 3, 6, 1, 2, 1, 4, 8};
-static guint32 const ipInDelivers[] = {1, 3, 6, 1, 2, 1, 4, 9};
-static guint32 const ipOutRequests[] = {1, 3, 6, 1, 2, 1, 4, 10};
-static guint32 const ipOutDiscards[] = {1, 3, 6, 1, 2, 1, 4, 11};
-static guint32 const ipOutNoRoutes[] = {1, 3, 6, 1, 2, 1, 4, 12};
-static guint32 const ipReasmTimeout[] = {1, 3, 6, 1, 2, 1, 4, 13};
-static guint32 const ipReasmReqds[] = {1, 3, 6, 1, 2, 1, 4, 14};
-static guint32 const ipReasmOKs[] = {1, 3, 6, 1, 2, 1, 4, 15};
-static guint32 const ipReasmFails[] = {1, 3, 6, 1, 2, 1, 4, 16};
-static guint32 const ipFragOKs[] = {1, 3, 6, 1, 2, 1, 4, 17};
-static guint32 const ipFragFails[] = {1, 3, 6, 1, 2, 1, 4, 18};
-static guint32 const ipFragCreates[] = {1, 3, 6, 1, 2, 1, 4, 19};
-static guint32 const ipAdEntAddr[] = {1, 3, 6, 1, 2, 1, 4, 20, 1, 1};
-static guint32 const ipAdEntIfIndex[] = {1, 3, 6, 1, 2, 1, 4, 20, 1, 2};
-static guint32 const ipAdEntNetMask[] = {1, 3, 6, 1, 2, 1, 4, 20, 1, 3};
-static guint32 const ipAdEntBcastAddr[] = {1, 3, 6, 1, 2, 1, 4, 20, 1, 4};
-static guint32 const ipAdEntReasmMaxSize[] = {1, 3, 6, 1, 2, 1, 4, 20, 1, 5};
-static guint32 const ipNetToMediaIfIndex[] = {1, 3, 6, 1, 2, 1, 4, 22, 1, 1};
-static guint32 const ipNetToMediaPhysAddress[] = {1, 3, 6, 1, 2, 1, 4, 22, 1, 2};
-static guint32 const ipNetToMediaNetAddress[] = {1, 3, 6, 1, 2, 1, 4, 22, 1, 3};
-static guint32 const ipNetToMediaType[] = {1, 3, 6, 1, 2, 1, 4, 22, 1, 4};
-static guint32 const ipRoutingDiscards[] = {1, 3, 6, 1, 2, 1, 4, 23};
-static guint32 const icmpInMsgs[] = {1, 3, 6, 1, 2, 1, 5, 1};
-static guint32 const icmpInErrors[] = {1, 3, 6, 1, 2, 1, 5, 2};
-static guint32 const icmpInDestUnreachs[] = {1, 3, 6, 1, 2, 1, 5, 3};
-static guint32 const icmpInTimeExcds[] = {1, 3, 6, 1, 2, 1, 5, 4};
-static guint32 const icmpInParmProbs[] = {1, 3, 6, 1, 2, 1, 5, 5};
-static guint32 const icmpInSrcQuenchs[] = {1, 3, 6, 1, 2, 1, 5, 6};
-static guint32 const icmpInRedirects[] = {1, 3, 6, 1, 2, 1, 5, 7};
-static guint32 const icmpInEchos[] = {1, 3, 6, 1, 2, 1, 5, 8};
-static guint32 const icmpInEchoReps[] = {1, 3, 6, 1, 2, 1, 5, 9};
-static guint32 const icmpInTimestamps[] = {1, 3, 6, 1, 2, 1, 5, 10};
-static guint32 const icmpInTimestampReps[] = {1, 3, 6, 1, 2, 1, 5, 11};
-static guint32 const icmpInAddrMasks[] = {1, 3, 6, 1, 2, 1, 5, 12};
-static guint32 const icmpInAddrMaskReps[] = {1, 3, 6, 1, 2, 1, 5, 13};
-static guint32 const icmpOutMsgs[] = {1, 3, 6, 1, 2, 1, 5, 14};
-static guint32 const icmpOutErrors[] = {1, 3, 6, 1, 2, 1, 5, 15};
-static guint32 const icmpOutDestUnreachs[] = {1, 3, 6, 1, 2, 1, 5, 16};
-static guint32 const icmpOutTimeExcds[] = {1, 3, 6, 1, 2, 1, 5, 17};
-static guint32 const icmpOutParmProbs[] = {1, 3, 6, 1, 2, 1, 5, 18};
-static guint32 const icmpOutSrcQuenchs[] = {1, 3, 6, 1, 2, 1, 5, 19};
-static guint32 const icmpOutRedirects[] = {1, 3, 6, 1, 2, 1, 5, 20};
-static guint32 const icmpOutEchos[] = {1, 3, 6, 1, 2, 1, 5, 21};
-static guint32 const icmpOutEchoReps[] = {1, 3, 6, 1, 2, 1, 5, 22};
-static guint32 const icmpOutTimestamps[] = {1, 3, 6, 1, 2, 1, 5, 23};
-static guint32 const icmpOutTimestampReps[] = {1, 3, 6, 1, 2, 1, 5, 24};
-static guint32 const icmpOutAddrMasks[] = {1, 3, 6, 1, 2, 1, 5, 25};
-static guint32 const icmpOutAddrMaskReps[] = {1, 3, 6, 1, 2, 1, 5, 26};
-
-static gsize const _ipForwardingLength = sizeof(ipForwarding)/sizeof(guint32);
-static gsize const _ipDefaultTTLLength = sizeof(ipDefaultTTL)/sizeof(guint32);
-static gsize const _ipInReceivesLength = sizeof(ipInReceives)/sizeof(guint32);
-static gsize const _ipInHdrErrorsLength = sizeof(ipInHdrErrors)/sizeof(guint32);
-static gsize const _ipInAddrErrorsLength = sizeof(ipInAddrErrors)/sizeof(guint32);
-static gsize const _ipForwDatagramsLength = sizeof(ipForwDatagrams)/sizeof(guint32);
-static gsize const _ipInUnknownProtosLength = sizeof(ipInUnknownProtos)/sizeof(guint32);
-static gsize const _ipInDiscardsLength = sizeof(ipInDiscards)/sizeof(guint32);
-static gsize const _ipInDeliversLength = sizeof(ipInDelivers)/sizeof(guint32);
-static gsize const _ipOutRequestsLength = sizeof(ipOutRequests)/sizeof(guint32);
-static gsize const _ipOutDiscardsLength = sizeof(ipOutDiscards)/sizeof(guint32);
-static gsize const _ipOutNoRoutesLength = sizeof(ipOutNoRoutes)/sizeof(guint32);
-static gsize const _ipReasmTimeoutLength = sizeof(ipReasmTimeout)/sizeof(guint32);
-static gsize const _ipReasmReqdsLength = sizeof(ipReasmReqds)/sizeof(guint32);
-static gsize const _ipReasmOKsLength = sizeof(ipReasmOKs)/sizeof(guint32);
-static gsize const _ipReasmFailsLength = sizeof(ipReasmFails)/sizeof(guint32);
-static gsize const _ipFragOKsLength = sizeof(ipFragOKs)/sizeof(guint32);
-static gsize const _ipFragFailsLength = sizeof(ipFragFails)/sizeof(guint32);
-static gsize const _ipFragCreatesLength = sizeof(ipFragCreates)/sizeof(guint32);
-static gsize const _ipAdEntAddrLength = sizeof(ipAdEntAddr)/sizeof(guint32);
-static gsize const _ipAdEntIfIndexLength = sizeof(ipAdEntIfIndex)/sizeof(guint32);
-static gsize const _ipAdEntNetMaskLength = sizeof(ipAdEntNetMask)/sizeof(guint32);
-static gsize const _ipAdEntBcastAddrLength = sizeof(ipAdEntBcastAddr)/sizeof(guint32);
-static gsize const _ipAdEntReasmMaxSizeLength = sizeof(ipAdEntReasmMaxSize)/sizeof(guint32);
-static gsize const _ipNetToMediaIfIndexLength = sizeof(ipNetToMediaIfIndex)/sizeof(guint32);
-static gsize const _ipNetToMediaPhysAddressLength = sizeof(ipNetToMediaPhysAddress)/sizeof(guint32);
-static gsize const _ipNetToMediaNetAddressLength = sizeof(ipNetToMediaNetAddress)/sizeof(guint32);
-static gsize const _ipNetToMediaTypeLength = sizeof(ipNetToMediaType)/sizeof(guint32);
-static gsize const _ipRoutingDiscardsLength = sizeof(ipRoutingDiscards)/sizeof(guint32);
-static gsize const _icmpInMsgsLength = sizeof(icmpInMsgs)/sizeof(guint32);
-static gsize const _icmpInErrorsLength = sizeof(icmpInErrors)/sizeof(guint32);
-static gsize const _icmpInDestUnreachsLength = sizeof(icmpInDestUnreachs)/sizeof(guint32);
-static gsize const _icmpInTimeExcdsLength = sizeof(icmpInTimeExcds)/sizeof(guint32);
-static gsize const _icmpInParmProbsLength = sizeof(icmpInParmProbs)/sizeof(guint32);
-static gsize const _icmpInSrcQuenchsLength = sizeof(icmpInSrcQuenchs)/sizeof(guint32);
-static gsize const _icmpInRedirectsLength = sizeof(icmpInRedirects)/sizeof(guint32);
-static gsize const _icmpInEchosLength = sizeof(icmpInEchos)/sizeof(guint32);
-static gsize const _icmpInEchoRepsLength = sizeof(icmpInEchoReps)/sizeof(guint32);
-static gsize const _icmpInTimestampsLength = sizeof(icmpInTimestamps)/sizeof(guint32);
-static gsize const _icmpInTimestampRepsLength = sizeof(icmpInTimestampReps)/sizeof(guint32);
-static gsize const _icmpInAddrMasksLength = sizeof(icmpInAddrMasks)/sizeof(guint32);
-static gsize const _icmpInAddrMaskRepsLength = sizeof(icmpInAddrMaskReps)/sizeof(guint32);
-static gsize const _icmpOutMsgsLength = sizeof(icmpOutMsgs)/sizeof(guint32);
-static gsize const _icmpOutErrorsLength = sizeof(icmpOutErrors)/sizeof(guint32);
-static gsize const _icmpOutDestUnreachsLength = sizeof(icmpOutDestUnreachs)/sizeof(guint32);
-static gsize const _icmpOutTimeExcdsLength = sizeof(icmpOutTimeExcds)/sizeof(guint32);
-static gsize const _icmpOutParmProbsLength = sizeof(icmpOutParmProbs)/sizeof(guint32);
-static gsize const _icmpOutSrcQuenchsLength = sizeof(icmpOutSrcQuenchs)/sizeof(guint32);
-static gsize const _icmpOutRedirectsLength = sizeof(icmpOutRedirects)/sizeof(guint32);
-static gsize const _icmpOutEchosLength = sizeof(icmpOutEchos)/sizeof(guint32);
-static gsize const _icmpOutEchoRepsLength = sizeof(icmpOutEchoReps)/sizeof(guint32);
-static gsize const _icmpOutTimestampsLength = sizeof(icmpOutTimestamps)/sizeof(guint32);
-static gsize const _icmpOutTimestampRepsLength = sizeof(icmpOutTimestampReps)/sizeof(guint32);
-static gsize const _icmpOutAddrMasksLength = sizeof(icmpOutAddrMasks)/sizeof(guint32);
-static gsize const _icmpOutAddrMaskRepsLength = sizeof(icmpOutAddrMaskReps)/sizeof(guint32);
-
 stls_table_t ip_mib_enums_ipForwarding[] = {
     { 1, "forwarding" },
     { 2, "notForwarding" },
@@ -158,84 +46,64 @@ assign_ip(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _ipForwardingLength
-            && memcmp(vb->id, ipForwarding, sizeof(ipForwarding)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 1) {
             ip->ipForwarding = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ipDefaultTTLLength
-            && memcmp(vb->id, ipDefaultTTL, sizeof(ipDefaultTTL)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 2) {
             ip->ipDefaultTTL = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ipInReceivesLength
-            && memcmp(vb->id, ipInReceives, sizeof(ipInReceives)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 3) {
             ip->ipInReceives = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipInHdrErrorsLength
-            && memcmp(vb->id, ipInHdrErrors, sizeof(ipInHdrErrors)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 4) {
             ip->ipInHdrErrors = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipInAddrErrorsLength
-            && memcmp(vb->id, ipInAddrErrors, sizeof(ipInAddrErrors)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 5) {
             ip->ipInAddrErrors = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipForwDatagramsLength
-            && memcmp(vb->id, ipForwDatagrams, sizeof(ipForwDatagrams)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 6) {
             ip->ipForwDatagrams = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipInUnknownProtosLength
-            && memcmp(vb->id, ipInUnknownProtos, sizeof(ipInUnknownProtos)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 7) {
             ip->ipInUnknownProtos = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipInDiscardsLength
-            && memcmp(vb->id, ipInDiscards, sizeof(ipInDiscards)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 8) {
             ip->ipInDiscards = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipInDeliversLength
-            && memcmp(vb->id, ipInDelivers, sizeof(ipInDelivers)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 9) {
             ip->ipInDelivers = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipOutRequestsLength
-            && memcmp(vb->id, ipOutRequests, sizeof(ipOutRequests)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 10) {
             ip->ipOutRequests = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipOutDiscardsLength
-            && memcmp(vb->id, ipOutDiscards, sizeof(ipOutDiscards)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 11) {
             ip->ipOutDiscards = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipOutNoRoutesLength
-            && memcmp(vb->id, ipOutNoRoutes, sizeof(ipOutNoRoutes)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 12) {
             ip->ipOutNoRoutes = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipReasmTimeoutLength
-            && memcmp(vb->id, ipReasmTimeout, sizeof(ipReasmTimeout)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 13) {
             ip->ipReasmTimeout = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ipReasmReqdsLength
-            && memcmp(vb->id, ipReasmReqds, sizeof(ipReasmReqds)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 14) {
             ip->ipReasmReqds = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipReasmOKsLength
-            && memcmp(vb->id, ipReasmOKs, sizeof(ipReasmOKs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 15) {
             ip->ipReasmOKs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipReasmFailsLength
-            && memcmp(vb->id, ipReasmFails, sizeof(ipReasmFails)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 16) {
             ip->ipReasmFails = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipFragOKsLength
-            && memcmp(vb->id, ipFragOKs, sizeof(ipFragOKs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 17) {
             ip->ipFragOKs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipFragFailsLength
-            && memcmp(vb->id, ipFragFails, sizeof(ipFragFails)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 18) {
             ip->ipFragFails = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipFragCreatesLength
-            && memcmp(vb->id, ipFragCreates, sizeof(ipFragCreates)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 19) {
             ip->ipFragCreates = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _ipRoutingDiscardsLength
-            && memcmp(vb->id, ipRoutingDiscards, sizeof(ipRoutingDiscards)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 23) {
             ip->ipRoutingDiscards = &(vb->syntax.ui32[0]);
         }
     }
@@ -247,29 +115,30 @@ int
 ip_mib_get_ip(host_snmp *s, ip_t **ip)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 4, 0};
 
     *ip = NULL;
 
-    stls_vbl_add_null(&in, ipForwarding, _ipForwardingLength);
-    stls_vbl_add_null(&in, ipDefaultTTL, _ipDefaultTTLLength);
-    stls_vbl_add_null(&in, ipInReceives, _ipInReceivesLength);
-    stls_vbl_add_null(&in, ipInHdrErrors, _ipInHdrErrorsLength);
-    stls_vbl_add_null(&in, ipInAddrErrors, _ipInAddrErrorsLength);
-    stls_vbl_add_null(&in, ipForwDatagrams, _ipForwDatagramsLength);
-    stls_vbl_add_null(&in, ipInUnknownProtos, _ipInUnknownProtosLength);
-    stls_vbl_add_null(&in, ipInDiscards, _ipInDiscardsLength);
-    stls_vbl_add_null(&in, ipInDelivers, _ipInDeliversLength);
-    stls_vbl_add_null(&in, ipOutRequests, _ipOutRequestsLength);
-    stls_vbl_add_null(&in, ipOutDiscards, _ipOutDiscardsLength);
-    stls_vbl_add_null(&in, ipOutNoRoutes, _ipOutNoRoutesLength);
-    stls_vbl_add_null(&in, ipReasmTimeout, _ipReasmTimeoutLength);
-    stls_vbl_add_null(&in, ipReasmReqds, _ipReasmReqdsLength);
-    stls_vbl_add_null(&in, ipReasmOKs, _ipReasmOKsLength);
-    stls_vbl_add_null(&in, ipReasmFails, _ipReasmFailsLength);
-    stls_vbl_add_null(&in, ipFragOKs, _ipFragOKsLength);
-    stls_vbl_add_null(&in, ipFragFails, _ipFragFailsLength);
-    stls_vbl_add_null(&in, ipFragCreates, _ipFragCreatesLength);
-    stls_vbl_add_null(&in, ipRoutingDiscards, _ipRoutingDiscardsLength);
+    var[7] = 1; stls_vbl_add_null(&in, var, 8);
+    var[7] = 2; stls_vbl_add_null(&in, var, 8);
+    var[7] = 3; stls_vbl_add_null(&in, var, 8);
+    var[7] = 4; stls_vbl_add_null(&in, var, 8);
+    var[7] = 5; stls_vbl_add_null(&in, var, 8);
+    var[7] = 6; stls_vbl_add_null(&in, var, 8);
+    var[7] = 7; stls_vbl_add_null(&in, var, 8);
+    var[7] = 8; stls_vbl_add_null(&in, var, 8);
+    var[7] = 9; stls_vbl_add_null(&in, var, 8);
+    var[7] = 10; stls_vbl_add_null(&in, var, 8);
+    var[7] = 11; stls_vbl_add_null(&in, var, 8);
+    var[7] = 12; stls_vbl_add_null(&in, var, 8);
+    var[7] = 13; stls_vbl_add_null(&in, var, 8);
+    var[7] = 14; stls_vbl_add_null(&in, var, 8);
+    var[7] = 15; stls_vbl_add_null(&in, var, 8);
+    var[7] = 16; stls_vbl_add_null(&in, var, 8);
+    var[7] = 17; stls_vbl_add_null(&in, var, 8);
+    var[7] = 18; stls_vbl_add_null(&in, var, 8);
+    var[7] = 19; stls_vbl_add_null(&in, var, 8);
+    var[7] = 23; stls_vbl_add_null(&in, var, 8);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -311,6 +180,13 @@ assign_ipAddrEntry(GSList *vbl)
     p = (char *) ipAddrEntry + sizeof(ipAddrEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 11) return NULL;
+        /* XXX fix this ipAddrEntry->ipAdEntAddr = ?; */
+        if (vb->id_len > 10) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -318,24 +194,16 @@ assign_ipAddrEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _ipAdEntAddrLength
-            && memcmp(vb->id, ipAdEntAddr, sizeof(ipAdEntAddr)) == 0) {
-            ipAddrEntry->ipAdEntAddr = vb->syntax.uc;
-        }
-        if (vb->id_len > _ipAdEntIfIndexLength
-            && memcmp(vb->id, ipAdEntIfIndex, sizeof(ipAdEntIfIndex)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 2) {
             ipAddrEntry->ipAdEntIfIndex = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ipAdEntNetMaskLength
-            && memcmp(vb->id, ipAdEntNetMask, sizeof(ipAdEntNetMask)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 3) {
             ipAddrEntry->ipAdEntNetMask = vb->syntax.uc;
         }
-        if (vb->id_len > _ipAdEntBcastAddrLength
-            && memcmp(vb->id, ipAdEntBcastAddr, sizeof(ipAdEntBcastAddr)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 4) {
             ipAddrEntry->ipAdEntBcastAddr = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _ipAdEntReasmMaxSizeLength
-            && memcmp(vb->id, ipAdEntReasmMaxSize, sizeof(ipAdEntReasmMaxSize)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 5) {
             ipAddrEntry->ipAdEntReasmMaxSize = &(vb->syntax.i32[0]);
         }
     }
@@ -349,13 +217,14 @@ ip_mib_get_ipAddrEntry(host_snmp *s, ipAddrEntry_t ***ipAddrEntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 4, 20, 1, 0};
 
     *ipAddrEntry = NULL;
 
-    stls_vbl_add_null(&in, ipAdEntIfIndex, _ipAdEntIfIndexLength);
-    stls_vbl_add_null(&in, ipAdEntNetMask, _ipAdEntNetMaskLength);
-    stls_vbl_add_null(&in, ipAdEntBcastAddr, _ipAdEntBcastAddrLength);
-    stls_vbl_add_null(&in, ipAdEntReasmMaxSize, _ipAdEntReasmMaxSizeLength);
+    var[9] = 2; stls_vbl_add_null(&in, var, 10);
+    var[9] = 3; stls_vbl_add_null(&in, var, 10);
+    var[9] = 4; stls_vbl_add_null(&in, var, 10);
+    var[9] = 5; stls_vbl_add_null(&in, var, 10);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -408,6 +277,14 @@ assign_ipNetToMediaEntry(GSList *vbl)
     p = (char *) ipNetToMediaEntry + sizeof(ipNetToMediaEntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 11) return NULL;
+        ipNetToMediaEntry->ipNetToMediaIfIndex = (gint32 *) &(vb->id[10]);
+        /* XXX fix this ipNetToMediaEntry->ipNetToMediaNetAddress = ?; */
+        if (vb->id_len > 11) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -415,21 +292,11 @@ assign_ipNetToMediaEntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _ipNetToMediaIfIndexLength
-            && memcmp(vb->id, ipNetToMediaIfIndex, sizeof(ipNetToMediaIfIndex)) == 0) {
-            ipNetToMediaEntry->ipNetToMediaIfIndex = &(vb->syntax.i32[0]);
-        }
-        if (vb->id_len > _ipNetToMediaPhysAddressLength
-            && memcmp(vb->id, ipNetToMediaPhysAddress, sizeof(ipNetToMediaPhysAddress)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 2) {
             ipNetToMediaEntry->_ipNetToMediaPhysAddressLength = vb->syntax_len;
             ipNetToMediaEntry->ipNetToMediaPhysAddress = vb->syntax.uc;
         }
-        if (vb->id_len > _ipNetToMediaNetAddressLength
-            && memcmp(vb->id, ipNetToMediaNetAddress, sizeof(ipNetToMediaNetAddress)) == 0) {
-            ipNetToMediaEntry->ipNetToMediaNetAddress = vb->syntax.uc;
-        }
-        if (vb->id_len > _ipNetToMediaTypeLength
-            && memcmp(vb->id, ipNetToMediaType, sizeof(ipNetToMediaType)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 4) {
             ipNetToMediaEntry->ipNetToMediaType = &(vb->syntax.i32[0]);
         }
     }
@@ -443,11 +310,12 @@ ip_mib_get_ipNetToMediaEntry(host_snmp *s, ipNetToMediaEntry_t ***ipNetToMediaEn
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 4, 22, 1, 0};
 
     *ipNetToMediaEntry = NULL;
 
-    stls_vbl_add_null(&in, ipNetToMediaPhysAddress, _ipNetToMediaPhysAddressLength);
-    stls_vbl_add_null(&in, ipNetToMediaType, _ipNetToMediaTypeLength);
+    var[9] = 2; stls_vbl_add_null(&in, var, 10);
+    var[9] = 4; stls_vbl_add_null(&in, var, 10);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -507,108 +375,82 @@ assign_icmp(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _icmpInMsgsLength
-            && memcmp(vb->id, icmpInMsgs, sizeof(icmpInMsgs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 1) {
             icmp->icmpInMsgs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpInErrorsLength
-            && memcmp(vb->id, icmpInErrors, sizeof(icmpInErrors)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 2) {
             icmp->icmpInErrors = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpInDestUnreachsLength
-            && memcmp(vb->id, icmpInDestUnreachs, sizeof(icmpInDestUnreachs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 3) {
             icmp->icmpInDestUnreachs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpInTimeExcdsLength
-            && memcmp(vb->id, icmpInTimeExcds, sizeof(icmpInTimeExcds)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 4) {
             icmp->icmpInTimeExcds = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpInParmProbsLength
-            && memcmp(vb->id, icmpInParmProbs, sizeof(icmpInParmProbs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 5) {
             icmp->icmpInParmProbs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpInSrcQuenchsLength
-            && memcmp(vb->id, icmpInSrcQuenchs, sizeof(icmpInSrcQuenchs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 6) {
             icmp->icmpInSrcQuenchs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpInRedirectsLength
-            && memcmp(vb->id, icmpInRedirects, sizeof(icmpInRedirects)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 7) {
             icmp->icmpInRedirects = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpInEchosLength
-            && memcmp(vb->id, icmpInEchos, sizeof(icmpInEchos)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 8) {
             icmp->icmpInEchos = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpInEchoRepsLength
-            && memcmp(vb->id, icmpInEchoReps, sizeof(icmpInEchoReps)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 9) {
             icmp->icmpInEchoReps = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpInTimestampsLength
-            && memcmp(vb->id, icmpInTimestamps, sizeof(icmpInTimestamps)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 10) {
             icmp->icmpInTimestamps = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpInTimestampRepsLength
-            && memcmp(vb->id, icmpInTimestampReps, sizeof(icmpInTimestampReps)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 11) {
             icmp->icmpInTimestampReps = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpInAddrMasksLength
-            && memcmp(vb->id, icmpInAddrMasks, sizeof(icmpInAddrMasks)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 12) {
             icmp->icmpInAddrMasks = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpInAddrMaskRepsLength
-            && memcmp(vb->id, icmpInAddrMaskReps, sizeof(icmpInAddrMaskReps)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 13) {
             icmp->icmpInAddrMaskReps = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutMsgsLength
-            && memcmp(vb->id, icmpOutMsgs, sizeof(icmpOutMsgs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 14) {
             icmp->icmpOutMsgs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutErrorsLength
-            && memcmp(vb->id, icmpOutErrors, sizeof(icmpOutErrors)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 15) {
             icmp->icmpOutErrors = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutDestUnreachsLength
-            && memcmp(vb->id, icmpOutDestUnreachs, sizeof(icmpOutDestUnreachs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 16) {
             icmp->icmpOutDestUnreachs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutTimeExcdsLength
-            && memcmp(vb->id, icmpOutTimeExcds, sizeof(icmpOutTimeExcds)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 17) {
             icmp->icmpOutTimeExcds = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutParmProbsLength
-            && memcmp(vb->id, icmpOutParmProbs, sizeof(icmpOutParmProbs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 18) {
             icmp->icmpOutParmProbs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutSrcQuenchsLength
-            && memcmp(vb->id, icmpOutSrcQuenchs, sizeof(icmpOutSrcQuenchs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 19) {
             icmp->icmpOutSrcQuenchs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutRedirectsLength
-            && memcmp(vb->id, icmpOutRedirects, sizeof(icmpOutRedirects)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 20) {
             icmp->icmpOutRedirects = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutEchosLength
-            && memcmp(vb->id, icmpOutEchos, sizeof(icmpOutEchos)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 21) {
             icmp->icmpOutEchos = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutEchoRepsLength
-            && memcmp(vb->id, icmpOutEchoReps, sizeof(icmpOutEchoReps)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 22) {
             icmp->icmpOutEchoReps = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutTimestampsLength
-            && memcmp(vb->id, icmpOutTimestamps, sizeof(icmpOutTimestamps)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 23) {
             icmp->icmpOutTimestamps = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutTimestampRepsLength
-            && memcmp(vb->id, icmpOutTimestampReps, sizeof(icmpOutTimestampReps)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 24) {
             icmp->icmpOutTimestampReps = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutAddrMasksLength
-            && memcmp(vb->id, icmpOutAddrMasks, sizeof(icmpOutAddrMasks)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 25) {
             icmp->icmpOutAddrMasks = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _icmpOutAddrMaskRepsLength
-            && memcmp(vb->id, icmpOutAddrMaskReps, sizeof(icmpOutAddrMaskReps)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 26) {
             icmp->icmpOutAddrMaskReps = &(vb->syntax.ui32[0]);
         }
     }
@@ -620,35 +462,36 @@ int
 ip_mib_get_icmp(host_snmp *s, icmp_t **icmp)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 5, 0};
 
     *icmp = NULL;
 
-    stls_vbl_add_null(&in, icmpInMsgs, _icmpInMsgsLength);
-    stls_vbl_add_null(&in, icmpInErrors, _icmpInErrorsLength);
-    stls_vbl_add_null(&in, icmpInDestUnreachs, _icmpInDestUnreachsLength);
-    stls_vbl_add_null(&in, icmpInTimeExcds, _icmpInTimeExcdsLength);
-    stls_vbl_add_null(&in, icmpInParmProbs, _icmpInParmProbsLength);
-    stls_vbl_add_null(&in, icmpInSrcQuenchs, _icmpInSrcQuenchsLength);
-    stls_vbl_add_null(&in, icmpInRedirects, _icmpInRedirectsLength);
-    stls_vbl_add_null(&in, icmpInEchos, _icmpInEchosLength);
-    stls_vbl_add_null(&in, icmpInEchoReps, _icmpInEchoRepsLength);
-    stls_vbl_add_null(&in, icmpInTimestamps, _icmpInTimestampsLength);
-    stls_vbl_add_null(&in, icmpInTimestampReps, _icmpInTimestampRepsLength);
-    stls_vbl_add_null(&in, icmpInAddrMasks, _icmpInAddrMasksLength);
-    stls_vbl_add_null(&in, icmpInAddrMaskReps, _icmpInAddrMaskRepsLength);
-    stls_vbl_add_null(&in, icmpOutMsgs, _icmpOutMsgsLength);
-    stls_vbl_add_null(&in, icmpOutErrors, _icmpOutErrorsLength);
-    stls_vbl_add_null(&in, icmpOutDestUnreachs, _icmpOutDestUnreachsLength);
-    stls_vbl_add_null(&in, icmpOutTimeExcds, _icmpOutTimeExcdsLength);
-    stls_vbl_add_null(&in, icmpOutParmProbs, _icmpOutParmProbsLength);
-    stls_vbl_add_null(&in, icmpOutSrcQuenchs, _icmpOutSrcQuenchsLength);
-    stls_vbl_add_null(&in, icmpOutRedirects, _icmpOutRedirectsLength);
-    stls_vbl_add_null(&in, icmpOutEchos, _icmpOutEchosLength);
-    stls_vbl_add_null(&in, icmpOutEchoReps, _icmpOutEchoRepsLength);
-    stls_vbl_add_null(&in, icmpOutTimestamps, _icmpOutTimestampsLength);
-    stls_vbl_add_null(&in, icmpOutTimestampReps, _icmpOutTimestampRepsLength);
-    stls_vbl_add_null(&in, icmpOutAddrMasks, _icmpOutAddrMasksLength);
-    stls_vbl_add_null(&in, icmpOutAddrMaskReps, _icmpOutAddrMaskRepsLength);
+    var[7] = 1; stls_vbl_add_null(&in, var, 8);
+    var[7] = 2; stls_vbl_add_null(&in, var, 8);
+    var[7] = 3; stls_vbl_add_null(&in, var, 8);
+    var[7] = 4; stls_vbl_add_null(&in, var, 8);
+    var[7] = 5; stls_vbl_add_null(&in, var, 8);
+    var[7] = 6; stls_vbl_add_null(&in, var, 8);
+    var[7] = 7; stls_vbl_add_null(&in, var, 8);
+    var[7] = 8; stls_vbl_add_null(&in, var, 8);
+    var[7] = 9; stls_vbl_add_null(&in, var, 8);
+    var[7] = 10; stls_vbl_add_null(&in, var, 8);
+    var[7] = 11; stls_vbl_add_null(&in, var, 8);
+    var[7] = 12; stls_vbl_add_null(&in, var, 8);
+    var[7] = 13; stls_vbl_add_null(&in, var, 8);
+    var[7] = 14; stls_vbl_add_null(&in, var, 8);
+    var[7] = 15; stls_vbl_add_null(&in, var, 8);
+    var[7] = 16; stls_vbl_add_null(&in, var, 8);
+    var[7] = 17; stls_vbl_add_null(&in, var, 8);
+    var[7] = 18; stls_vbl_add_null(&in, var, 8);
+    var[7] = 19; stls_vbl_add_null(&in, var, 8);
+    var[7] = 20; stls_vbl_add_null(&in, var, 8);
+    var[7] = 21; stls_vbl_add_null(&in, var, 8);
+    var[7] = 22; stls_vbl_add_null(&in, var, 8);
+    var[7] = 23; stls_vbl_add_null(&in, var, 8);
+    var[7] = 24; stls_vbl_add_null(&in, var, 8);
+    var[7] = 25; stls_vbl_add_null(&in, var, 8);
+    var[7] = 26; stls_vbl_add_null(&in, var, 8);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);

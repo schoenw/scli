@@ -9,94 +9,6 @@
 
 #include "snmpv2-mib.h"
 
-static guint32 const sysDescr[] = {1, 3, 6, 1, 2, 1, 1, 1};
-static guint32 const sysObjectID[] = {1, 3, 6, 1, 2, 1, 1, 2};
-static guint32 const sysUpTime[] = {1, 3, 6, 1, 2, 1, 1, 3};
-static guint32 const sysContact[] = {1, 3, 6, 1, 2, 1, 1, 4};
-static guint32 const sysName[] = {1, 3, 6, 1, 2, 1, 1, 5};
-static guint32 const sysLocation[] = {1, 3, 6, 1, 2, 1, 1, 6};
-static guint32 const sysServices[] = {1, 3, 6, 1, 2, 1, 1, 7};
-static guint32 const sysORLastChange[] = {1, 3, 6, 1, 2, 1, 1, 8};
-static guint32 const sysORIndex[] = {1, 3, 6, 1, 2, 1, 1, 9, 1, 1};
-static guint32 const sysORID[] = {1, 3, 6, 1, 2, 1, 1, 9, 1, 2};
-static guint32 const sysORDescr[] = {1, 3, 6, 1, 2, 1, 1, 9, 1, 3};
-static guint32 const sysORUpTime[] = {1, 3, 6, 1, 2, 1, 1, 9, 1, 4};
-static guint32 const snmpInPkts[] = {1, 3, 6, 1, 2, 1, 11, 1};
-static guint32 const snmpOutPkts[] = {1, 3, 6, 1, 2, 1, 11, 2};
-static guint32 const snmpInBadVersions[] = {1, 3, 6, 1, 2, 1, 11, 3};
-static guint32 const snmpInBadCommunityNames[] = {1, 3, 6, 1, 2, 1, 11, 4};
-static guint32 const snmpInBadCommunityUses[] = {1, 3, 6, 1, 2, 1, 11, 5};
-static guint32 const snmpInASNParseErrs[] = {1, 3, 6, 1, 2, 1, 11, 6};
-static guint32 const snmpInTooBigs[] = {1, 3, 6, 1, 2, 1, 11, 8};
-static guint32 const snmpInNoSuchNames[] = {1, 3, 6, 1, 2, 1, 11, 9};
-static guint32 const snmpInBadValues[] = {1, 3, 6, 1, 2, 1, 11, 10};
-static guint32 const snmpInReadOnlys[] = {1, 3, 6, 1, 2, 1, 11, 11};
-static guint32 const snmpInGenErrs[] = {1, 3, 6, 1, 2, 1, 11, 12};
-static guint32 const snmpInTotalReqVars[] = {1, 3, 6, 1, 2, 1, 11, 13};
-static guint32 const snmpInTotalSetVars[] = {1, 3, 6, 1, 2, 1, 11, 14};
-static guint32 const snmpInGetRequests[] = {1, 3, 6, 1, 2, 1, 11, 15};
-static guint32 const snmpInGetNexts[] = {1, 3, 6, 1, 2, 1, 11, 16};
-static guint32 const snmpInSetRequests[] = {1, 3, 6, 1, 2, 1, 11, 17};
-static guint32 const snmpInGetResponses[] = {1, 3, 6, 1, 2, 1, 11, 18};
-static guint32 const snmpInTraps[] = {1, 3, 6, 1, 2, 1, 11, 19};
-static guint32 const snmpOutTooBigs[] = {1, 3, 6, 1, 2, 1, 11, 20};
-static guint32 const snmpOutNoSuchNames[] = {1, 3, 6, 1, 2, 1, 11, 21};
-static guint32 const snmpOutBadValues[] = {1, 3, 6, 1, 2, 1, 11, 22};
-static guint32 const snmpOutGenErrs[] = {1, 3, 6, 1, 2, 1, 11, 24};
-static guint32 const snmpOutGetRequests[] = {1, 3, 6, 1, 2, 1, 11, 25};
-static guint32 const snmpOutGetNexts[] = {1, 3, 6, 1, 2, 1, 11, 26};
-static guint32 const snmpOutSetRequests[] = {1, 3, 6, 1, 2, 1, 11, 27};
-static guint32 const snmpOutGetResponses[] = {1, 3, 6, 1, 2, 1, 11, 28};
-static guint32 const snmpOutTraps[] = {1, 3, 6, 1, 2, 1, 11, 29};
-static guint32 const snmpEnableAuthenTraps[] = {1, 3, 6, 1, 2, 1, 11, 30};
-static guint32 const snmpSilentDrops[] = {1, 3, 6, 1, 2, 1, 11, 31};
-static guint32 const snmpProxyDrops[] = {1, 3, 6, 1, 2, 1, 11, 32};
-static guint32 const snmpSetSerialNo[] = {1, 3, 6, 1, 6, 3, 1, 1, 6, 1};
-
-static gsize const _sysDescrLength = sizeof(sysDescr)/sizeof(guint32);
-static gsize const _sysObjectIDLength = sizeof(sysObjectID)/sizeof(guint32);
-static gsize const _sysUpTimeLength = sizeof(sysUpTime)/sizeof(guint32);
-static gsize const _sysContactLength = sizeof(sysContact)/sizeof(guint32);
-static gsize const _sysNameLength = sizeof(sysName)/sizeof(guint32);
-static gsize const _sysLocationLength = sizeof(sysLocation)/sizeof(guint32);
-static gsize const _sysServicesLength = sizeof(sysServices)/sizeof(guint32);
-static gsize const _sysORLastChangeLength = sizeof(sysORLastChange)/sizeof(guint32);
-static gsize const _sysORIndexLength = sizeof(sysORIndex)/sizeof(guint32);
-static gsize const _sysORIDLength = sizeof(sysORID)/sizeof(guint32);
-static gsize const _sysORDescrLength = sizeof(sysORDescr)/sizeof(guint32);
-static gsize const _sysORUpTimeLength = sizeof(sysORUpTime)/sizeof(guint32);
-static gsize const _snmpInPktsLength = sizeof(snmpInPkts)/sizeof(guint32);
-static gsize const _snmpOutPktsLength = sizeof(snmpOutPkts)/sizeof(guint32);
-static gsize const _snmpInBadVersionsLength = sizeof(snmpInBadVersions)/sizeof(guint32);
-static gsize const _snmpInBadCommunityNamesLength = sizeof(snmpInBadCommunityNames)/sizeof(guint32);
-static gsize const _snmpInBadCommunityUsesLength = sizeof(snmpInBadCommunityUses)/sizeof(guint32);
-static gsize const _snmpInASNParseErrsLength = sizeof(snmpInASNParseErrs)/sizeof(guint32);
-static gsize const _snmpInTooBigsLength = sizeof(snmpInTooBigs)/sizeof(guint32);
-static gsize const _snmpInNoSuchNamesLength = sizeof(snmpInNoSuchNames)/sizeof(guint32);
-static gsize const _snmpInBadValuesLength = sizeof(snmpInBadValues)/sizeof(guint32);
-static gsize const _snmpInReadOnlysLength = sizeof(snmpInReadOnlys)/sizeof(guint32);
-static gsize const _snmpInGenErrsLength = sizeof(snmpInGenErrs)/sizeof(guint32);
-static gsize const _snmpInTotalReqVarsLength = sizeof(snmpInTotalReqVars)/sizeof(guint32);
-static gsize const _snmpInTotalSetVarsLength = sizeof(snmpInTotalSetVars)/sizeof(guint32);
-static gsize const _snmpInGetRequestsLength = sizeof(snmpInGetRequests)/sizeof(guint32);
-static gsize const _snmpInGetNextsLength = sizeof(snmpInGetNexts)/sizeof(guint32);
-static gsize const _snmpInSetRequestsLength = sizeof(snmpInSetRequests)/sizeof(guint32);
-static gsize const _snmpInGetResponsesLength = sizeof(snmpInGetResponses)/sizeof(guint32);
-static gsize const _snmpInTrapsLength = sizeof(snmpInTraps)/sizeof(guint32);
-static gsize const _snmpOutTooBigsLength = sizeof(snmpOutTooBigs)/sizeof(guint32);
-static gsize const _snmpOutNoSuchNamesLength = sizeof(snmpOutNoSuchNames)/sizeof(guint32);
-static gsize const _snmpOutBadValuesLength = sizeof(snmpOutBadValues)/sizeof(guint32);
-static gsize const _snmpOutGenErrsLength = sizeof(snmpOutGenErrs)/sizeof(guint32);
-static gsize const _snmpOutGetRequestsLength = sizeof(snmpOutGetRequests)/sizeof(guint32);
-static gsize const _snmpOutGetNextsLength = sizeof(snmpOutGetNexts)/sizeof(guint32);
-static gsize const _snmpOutSetRequestsLength = sizeof(snmpOutSetRequests)/sizeof(guint32);
-static gsize const _snmpOutGetResponsesLength = sizeof(snmpOutGetResponses)/sizeof(guint32);
-static gsize const _snmpOutTrapsLength = sizeof(snmpOutTraps)/sizeof(guint32);
-static gsize const _snmpEnableAuthenTrapsLength = sizeof(snmpEnableAuthenTraps)/sizeof(guint32);
-static gsize const _snmpSilentDropsLength = sizeof(snmpSilentDrops)/sizeof(guint32);
-static gsize const _snmpProxyDropsLength = sizeof(snmpProxyDrops)/sizeof(guint32);
-static gsize const _snmpSetSerialNoLength = sizeof(snmpSetSerialNo)/sizeof(guint32);
-
 stls_table_t snmpv2_mib_enums_snmpEnableAuthenTraps[] = {
     { 1, "enabled" },
     { 2, "disabled" },
@@ -126,41 +38,33 @@ assign_system(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _sysDescrLength
-            && memcmp(vb->id, sysDescr, sizeof(sysDescr)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 1) {
             system->_sysDescrLength = vb->syntax_len;
             system->sysDescr = vb->syntax.uc;
         }
-        if (vb->id_len > _sysObjectIDLength
-            && memcmp(vb->id, sysObjectID, sizeof(sysObjectID)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 2) {
             system->_sysObjectIDLength = vb->syntax_len / sizeof(guint32);
             system->sysObjectID = vb->syntax.ui32;
         }
-        if (vb->id_len > _sysUpTimeLength
-            && memcmp(vb->id, sysUpTime, sizeof(sysUpTime)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 3) {
             system->sysUpTime = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _sysContactLength
-            && memcmp(vb->id, sysContact, sizeof(sysContact)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 4) {
             system->_sysContactLength = vb->syntax_len;
             system->sysContact = vb->syntax.uc;
         }
-        if (vb->id_len > _sysNameLength
-            && memcmp(vb->id, sysName, sizeof(sysName)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 5) {
             system->_sysNameLength = vb->syntax_len;
             system->sysName = vb->syntax.uc;
         }
-        if (vb->id_len > _sysLocationLength
-            && memcmp(vb->id, sysLocation, sizeof(sysLocation)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 6) {
             system->_sysLocationLength = vb->syntax_len;
             system->sysLocation = vb->syntax.uc;
         }
-        if (vb->id_len > _sysServicesLength
-            && memcmp(vb->id, sysServices, sizeof(sysServices)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 7) {
             system->sysServices = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _sysORLastChangeLength
-            && memcmp(vb->id, sysORLastChange, sizeof(sysORLastChange)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 8) {
             system->sysORLastChange = &(vb->syntax.ui32[0]);
         }
     }
@@ -172,17 +76,18 @@ int
 snmpv2_mib_get_system(host_snmp *s, system_t **system)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 1, 0};
 
     *system = NULL;
 
-    stls_vbl_add_null(&in, sysDescr, _sysDescrLength);
-    stls_vbl_add_null(&in, sysObjectID, _sysObjectIDLength);
-    stls_vbl_add_null(&in, sysUpTime, _sysUpTimeLength);
-    stls_vbl_add_null(&in, sysContact, _sysContactLength);
-    stls_vbl_add_null(&in, sysName, _sysNameLength);
-    stls_vbl_add_null(&in, sysLocation, _sysLocationLength);
-    stls_vbl_add_null(&in, sysServices, _sysServicesLength);
-    stls_vbl_add_null(&in, sysORLastChange, _sysORLastChangeLength);
+    var[7] = 1; stls_vbl_add_null(&in, var, 8);
+    var[7] = 2; stls_vbl_add_null(&in, var, 8);
+    var[7] = 3; stls_vbl_add_null(&in, var, 8);
+    var[7] = 4; stls_vbl_add_null(&in, var, 8);
+    var[7] = 5; stls_vbl_add_null(&in, var, 8);
+    var[7] = 6; stls_vbl_add_null(&in, var, 8);
+    var[7] = 7; stls_vbl_add_null(&in, var, 8);
+    var[7] = 8; stls_vbl_add_null(&in, var, 8);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -224,6 +129,13 @@ assign_sysOREntry(GSList *vbl)
     p = (char *) sysOREntry + sizeof(sysOREntry_t);
     * (GSList **) p = vbl;
 
+    {
+        GSnmpVarBind *vb = (GSnmpVarBind *) vbl->data;
+        if (vb->id_len < 11) return NULL;
+        sysOREntry->sysORIndex = (gint32 *) &(vb->id[10]);
+        if (vb->id_len > 11) return NULL;
+    }
+
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
         if (vb->type == G_SNMP_ENDOFMIBVIEW
@@ -231,18 +143,15 @@ assign_sysOREntry(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _sysORIDLength
-            && memcmp(vb->id, sysORID, sizeof(sysORID)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 2) {
             sysOREntry->_sysORIDLength = vb->syntax_len / sizeof(guint32);
             sysOREntry->sysORID = vb->syntax.ui32;
         }
-        if (vb->id_len > _sysORDescrLength
-            && memcmp(vb->id, sysORDescr, sizeof(sysORDescr)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 3) {
             sysOREntry->_sysORDescrLength = vb->syntax_len;
             sysOREntry->sysORDescr = vb->syntax.uc;
         }
-        if (vb->id_len > _sysORUpTimeLength
-            && memcmp(vb->id, sysORUpTime, sizeof(sysORUpTime)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 4) {
             sysOREntry->sysORUpTime = &(vb->syntax.ui32[0]);
         }
     }
@@ -256,12 +165,13 @@ snmpv2_mib_get_sysOREntry(host_snmp *s, sysOREntry_t ***sysOREntry)
     GSList *in = NULL, *out = NULL;
     GSList *row;
     int i;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 1, 9, 1, 0};
 
     *sysOREntry = NULL;
 
-    stls_vbl_add_null(&in, sysORID, _sysORIDLength);
-    stls_vbl_add_null(&in, sysORDescr, _sysORDescrLength);
-    stls_vbl_add_null(&in, sysORUpTime, _sysORUpTimeLength);
+    var[9] = 2; stls_vbl_add_null(&in, var, 10);
+    var[9] = 3; stls_vbl_add_null(&in, var, 10);
+    var[9] = 4; stls_vbl_add_null(&in, var, 10);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -321,124 +231,94 @@ assign_snmp(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _snmpInPktsLength
-            && memcmp(vb->id, snmpInPkts, sizeof(snmpInPkts)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 1) {
             snmp->snmpInPkts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpOutPktsLength
-            && memcmp(vb->id, snmpOutPkts, sizeof(snmpOutPkts)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 2) {
             snmp->snmpOutPkts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInBadVersionsLength
-            && memcmp(vb->id, snmpInBadVersions, sizeof(snmpInBadVersions)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 3) {
             snmp->snmpInBadVersions = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInBadCommunityNamesLength
-            && memcmp(vb->id, snmpInBadCommunityNames, sizeof(snmpInBadCommunityNames)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 4) {
             snmp->snmpInBadCommunityNames = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInBadCommunityUsesLength
-            && memcmp(vb->id, snmpInBadCommunityUses, sizeof(snmpInBadCommunityUses)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 5) {
             snmp->snmpInBadCommunityUses = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInASNParseErrsLength
-            && memcmp(vb->id, snmpInASNParseErrs, sizeof(snmpInASNParseErrs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 6) {
             snmp->snmpInASNParseErrs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInTooBigsLength
-            && memcmp(vb->id, snmpInTooBigs, sizeof(snmpInTooBigs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 8) {
             snmp->snmpInTooBigs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInNoSuchNamesLength
-            && memcmp(vb->id, snmpInNoSuchNames, sizeof(snmpInNoSuchNames)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 9) {
             snmp->snmpInNoSuchNames = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInBadValuesLength
-            && memcmp(vb->id, snmpInBadValues, sizeof(snmpInBadValues)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 10) {
             snmp->snmpInBadValues = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInReadOnlysLength
-            && memcmp(vb->id, snmpInReadOnlys, sizeof(snmpInReadOnlys)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 11) {
             snmp->snmpInReadOnlys = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInGenErrsLength
-            && memcmp(vb->id, snmpInGenErrs, sizeof(snmpInGenErrs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 12) {
             snmp->snmpInGenErrs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInTotalReqVarsLength
-            && memcmp(vb->id, snmpInTotalReqVars, sizeof(snmpInTotalReqVars)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 13) {
             snmp->snmpInTotalReqVars = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInTotalSetVarsLength
-            && memcmp(vb->id, snmpInTotalSetVars, sizeof(snmpInTotalSetVars)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 14) {
             snmp->snmpInTotalSetVars = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInGetRequestsLength
-            && memcmp(vb->id, snmpInGetRequests, sizeof(snmpInGetRequests)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 15) {
             snmp->snmpInGetRequests = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInGetNextsLength
-            && memcmp(vb->id, snmpInGetNexts, sizeof(snmpInGetNexts)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 16) {
             snmp->snmpInGetNexts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInSetRequestsLength
-            && memcmp(vb->id, snmpInSetRequests, sizeof(snmpInSetRequests)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 17) {
             snmp->snmpInSetRequests = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInGetResponsesLength
-            && memcmp(vb->id, snmpInGetResponses, sizeof(snmpInGetResponses)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 18) {
             snmp->snmpInGetResponses = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpInTrapsLength
-            && memcmp(vb->id, snmpInTraps, sizeof(snmpInTraps)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 19) {
             snmp->snmpInTraps = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpOutTooBigsLength
-            && memcmp(vb->id, snmpOutTooBigs, sizeof(snmpOutTooBigs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 20) {
             snmp->snmpOutTooBigs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpOutNoSuchNamesLength
-            && memcmp(vb->id, snmpOutNoSuchNames, sizeof(snmpOutNoSuchNames)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 21) {
             snmp->snmpOutNoSuchNames = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpOutBadValuesLength
-            && memcmp(vb->id, snmpOutBadValues, sizeof(snmpOutBadValues)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 22) {
             snmp->snmpOutBadValues = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpOutGenErrsLength
-            && memcmp(vb->id, snmpOutGenErrs, sizeof(snmpOutGenErrs)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 24) {
             snmp->snmpOutGenErrs = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpOutGetRequestsLength
-            && memcmp(vb->id, snmpOutGetRequests, sizeof(snmpOutGetRequests)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 25) {
             snmp->snmpOutGetRequests = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpOutGetNextsLength
-            && memcmp(vb->id, snmpOutGetNexts, sizeof(snmpOutGetNexts)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 26) {
             snmp->snmpOutGetNexts = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpOutSetRequestsLength
-            && memcmp(vb->id, snmpOutSetRequests, sizeof(snmpOutSetRequests)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 27) {
             snmp->snmpOutSetRequests = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpOutGetResponsesLength
-            && memcmp(vb->id, snmpOutGetResponses, sizeof(snmpOutGetResponses)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 28) {
             snmp->snmpOutGetResponses = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpOutTrapsLength
-            && memcmp(vb->id, snmpOutTraps, sizeof(snmpOutTraps)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 29) {
             snmp->snmpOutTraps = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpEnableAuthenTrapsLength
-            && memcmp(vb->id, snmpEnableAuthenTraps, sizeof(snmpEnableAuthenTraps)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 30) {
             snmp->snmpEnableAuthenTraps = &(vb->syntax.i32[0]);
         }
-        if (vb->id_len > _snmpSilentDropsLength
-            && memcmp(vb->id, snmpSilentDrops, sizeof(snmpSilentDrops)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 31) {
             snmp->snmpSilentDrops = &(vb->syntax.ui32[0]);
         }
-        if (vb->id_len > _snmpProxyDropsLength
-            && memcmp(vb->id, snmpProxyDrops, sizeof(snmpProxyDrops)) == 0) {
+        if (vb->id_len > 8 && vb->id[7] == 32) {
             snmp->snmpProxyDrops = &(vb->syntax.ui32[0]);
         }
     }
@@ -450,39 +330,40 @@ int
 snmpv2_mib_get_snmp(host_snmp *s, snmp_t **snmp)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 2, 1, 11, 0};
 
     *snmp = NULL;
 
-    stls_vbl_add_null(&in, snmpInPkts, _snmpInPktsLength);
-    stls_vbl_add_null(&in, snmpOutPkts, _snmpOutPktsLength);
-    stls_vbl_add_null(&in, snmpInBadVersions, _snmpInBadVersionsLength);
-    stls_vbl_add_null(&in, snmpInBadCommunityNames, _snmpInBadCommunityNamesLength);
-    stls_vbl_add_null(&in, snmpInBadCommunityUses, _snmpInBadCommunityUsesLength);
-    stls_vbl_add_null(&in, snmpInASNParseErrs, _snmpInASNParseErrsLength);
-    stls_vbl_add_null(&in, snmpInTooBigs, _snmpInTooBigsLength);
-    stls_vbl_add_null(&in, snmpInNoSuchNames, _snmpInNoSuchNamesLength);
-    stls_vbl_add_null(&in, snmpInBadValues, _snmpInBadValuesLength);
-    stls_vbl_add_null(&in, snmpInReadOnlys, _snmpInReadOnlysLength);
-    stls_vbl_add_null(&in, snmpInGenErrs, _snmpInGenErrsLength);
-    stls_vbl_add_null(&in, snmpInTotalReqVars, _snmpInTotalReqVarsLength);
-    stls_vbl_add_null(&in, snmpInTotalSetVars, _snmpInTotalSetVarsLength);
-    stls_vbl_add_null(&in, snmpInGetRequests, _snmpInGetRequestsLength);
-    stls_vbl_add_null(&in, snmpInGetNexts, _snmpInGetNextsLength);
-    stls_vbl_add_null(&in, snmpInSetRequests, _snmpInSetRequestsLength);
-    stls_vbl_add_null(&in, snmpInGetResponses, _snmpInGetResponsesLength);
-    stls_vbl_add_null(&in, snmpInTraps, _snmpInTrapsLength);
-    stls_vbl_add_null(&in, snmpOutTooBigs, _snmpOutTooBigsLength);
-    stls_vbl_add_null(&in, snmpOutNoSuchNames, _snmpOutNoSuchNamesLength);
-    stls_vbl_add_null(&in, snmpOutBadValues, _snmpOutBadValuesLength);
-    stls_vbl_add_null(&in, snmpOutGenErrs, _snmpOutGenErrsLength);
-    stls_vbl_add_null(&in, snmpOutGetRequests, _snmpOutGetRequestsLength);
-    stls_vbl_add_null(&in, snmpOutGetNexts, _snmpOutGetNextsLength);
-    stls_vbl_add_null(&in, snmpOutSetRequests, _snmpOutSetRequestsLength);
-    stls_vbl_add_null(&in, snmpOutGetResponses, _snmpOutGetResponsesLength);
-    stls_vbl_add_null(&in, snmpOutTraps, _snmpOutTrapsLength);
-    stls_vbl_add_null(&in, snmpEnableAuthenTraps, _snmpEnableAuthenTrapsLength);
-    stls_vbl_add_null(&in, snmpSilentDrops, _snmpSilentDropsLength);
-    stls_vbl_add_null(&in, snmpProxyDrops, _snmpProxyDropsLength);
+    var[7] = 1; stls_vbl_add_null(&in, var, 8);
+    var[7] = 2; stls_vbl_add_null(&in, var, 8);
+    var[7] = 3; stls_vbl_add_null(&in, var, 8);
+    var[7] = 4; stls_vbl_add_null(&in, var, 8);
+    var[7] = 5; stls_vbl_add_null(&in, var, 8);
+    var[7] = 6; stls_vbl_add_null(&in, var, 8);
+    var[7] = 8; stls_vbl_add_null(&in, var, 8);
+    var[7] = 9; stls_vbl_add_null(&in, var, 8);
+    var[7] = 10; stls_vbl_add_null(&in, var, 8);
+    var[7] = 11; stls_vbl_add_null(&in, var, 8);
+    var[7] = 12; stls_vbl_add_null(&in, var, 8);
+    var[7] = 13; stls_vbl_add_null(&in, var, 8);
+    var[7] = 14; stls_vbl_add_null(&in, var, 8);
+    var[7] = 15; stls_vbl_add_null(&in, var, 8);
+    var[7] = 16; stls_vbl_add_null(&in, var, 8);
+    var[7] = 17; stls_vbl_add_null(&in, var, 8);
+    var[7] = 18; stls_vbl_add_null(&in, var, 8);
+    var[7] = 19; stls_vbl_add_null(&in, var, 8);
+    var[7] = 20; stls_vbl_add_null(&in, var, 8);
+    var[7] = 21; stls_vbl_add_null(&in, var, 8);
+    var[7] = 22; stls_vbl_add_null(&in, var, 8);
+    var[7] = 24; stls_vbl_add_null(&in, var, 8);
+    var[7] = 25; stls_vbl_add_null(&in, var, 8);
+    var[7] = 26; stls_vbl_add_null(&in, var, 8);
+    var[7] = 27; stls_vbl_add_null(&in, var, 8);
+    var[7] = 28; stls_vbl_add_null(&in, var, 8);
+    var[7] = 29; stls_vbl_add_null(&in, var, 8);
+    var[7] = 30; stls_vbl_add_null(&in, var, 8);
+    var[7] = 31; stls_vbl_add_null(&in, var, 8);
+    var[7] = 32; stls_vbl_add_null(&in, var, 8);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
@@ -531,8 +412,7 @@ assign_snmpSet(GSList *vbl)
             || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
             continue;
         }
-        if (vb->id_len > _snmpSetSerialNoLength
-            && memcmp(vb->id, snmpSetSerialNo, sizeof(snmpSetSerialNo)) == 0) {
+        if (vb->id_len > 10 && vb->id[9] == 1) {
             snmpSet->snmpSetSerialNo = &(vb->syntax.i32[0]);
         }
     }
@@ -544,10 +424,11 @@ int
 snmpv2_mib_get_snmpSet(host_snmp *s, snmpSet_t **snmpSet)
 {
     GSList *in = NULL, *out = NULL;
+    static guint32 var[] = {1, 3, 6, 1, 6, 3, 1, 1, 6, 0};
 
     *snmpSet = NULL;
 
-    stls_vbl_add_null(&in, snmpSetSerialNo, _snmpSetSerialNoLength);
+    var[9] = 1; stls_vbl_add_null(&in, var, 10);
 
     out = stls_snmp_getnext(s, in);
     stls_vbl_free(in);
