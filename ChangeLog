@@ -1,3 +1,170 @@
+2001-06-12 17:15  schoenw
+
+	* scli/printer.c: Fixed a bug where unterminated strings were
+        passed to snprintf().
+
+2001-06-12 17:05  schoenw
+
+	* NEWS, configure, configure.in: Downgraded the version number to
+        0.1.18 since this was never released.
+
+2001-06-12 16:45  schoenw
+
+	* scli/: cmds.c, scli.c, scli.h: Added some experimental code to
+	create, delete and show command aliases.  Aliases are not yet used
+        by the interpreter.
+
+2001-06-12 14:27  schoenw
+
+	* NEWS, configure, configure.in, snmp/Makefile.in: Bumped the
+        version number and updated the NEWS file.
+
+2001-06-12 14:21  schoenw
+
+	* scli/: Makefile.am, Makefile.in, printer.c, scli.c, scli.h: Added
+        the scli printer mode contributed by Oliver Wellnitz.
+
+2001-06-12 14:19  schoenw
+
+	* stop/ether.c: Updated the type names used from the EtherLike-MIB.
+
+2001-06-12 14:18  schoenw
+
+	* stub/: Makefile.am, Makefile.in, etherlike-mib.c,
+	etherlike-mib.h, printer-mib.c, printer-mib.h: Added stubs for the
+        Printer-MIB and regenerated the EtherLike-MIB stubs.
+
+2001-06-12 12:47  schoenw
+
+	* stop/disman.c, stop/interface.c, stop/process.c, stop/stop.c,
+	stop/tcp.c, scli/atm.c, scli/basic.c, scli/bridge.c, scli/cmds.c,
+	scli/disman.c, scli/entity.c, scli/ether.c, scli/interface.c,
+	scli/ip.c, scli/ospf.c, scli/scli.c, scli/snmp.c, scli/system.c,
+	scli/tcp.c, scli/udp.c: Updated code to use type names which
+        include module names.
+
+2001-06-12 12:46  schoenw
+
+	* stub/: atm-mib.c, atm-mib.h, bridge-mib.c, bridge-mib.h,
+	disman-schedule-mib.c, disman-schedule-mib.h, disman-script-mib.c,
+	disman-script-mib.h, entity-mib.c, entity-mib.h,
+	host-resources-mib.c, host-resources-mib.h, if-mib.c, if-mib.h,
+	ip-forward-mib.c, ip-forward-mib.h, ip-mib.c, ip-mib.h, mau-mib.c,
+	mau-mib.h, snmpv2-mib.c, snmpv2-mib.h, tcp-mib.c, tcp-mib.h,
+	tunnel-mib.c, tunnel-mib.h, udp-mib.c, udp-mib.h: Regenerated stubs
+        to include module names in the typedefs.
+
+2001-06-12 12:06  schoenw
+
+	* scli/: basic.c, cmds.c, scli.c, scli.h, snmp.c: Split the "show
+	scli" command into multiple sub-commands. Added an exported
+        function to retrieve the rows/cols of the terminal.
+
+2001-06-07 12:57  schoenw
+
+	* scli/interface.c: Implemented an optional argument to select
+        interfaces by index or name.
+
+2001-06-07 12:56  schoenw
+
+	* snmp/: g_snmp.c, g_snmp.h: Added utility functions to manipulate
+        varbind lists.
+
+2001-06-07 12:53  schoenw
+
+	* stub/stools.c: Cleaned up a warning message.
+
+2001-05-23 10:37  schoenw
+
+	* scli/vendors.c: Added NCD and Microsoft.
+
+2001-05-23 10:37  schoenw
+
+	* scli/ether.c: Show the actual type for the MAUs.
+
+2001-05-09 18:17  schoenw
+
+	* NEWS, configure, configure.in: Bumped the version number to
+        0.1.18.
+
+2001-05-09 18:12  schoenw
+
+	* scli/: basic.c, cmds.c, ip.c, scli.c, scli.h: Added a "show scli"
+        command to display the current interpreter state.
+
+2001-05-09 18:09  schoenw
+
+	* scli/scli.c: Initialize the interpreter's pager attribute from
+        the environement.
+
+2001-05-09 18:05  schoenw
+
+	* scli/basic.c: Minor cleanup of the pager implementation.
+
+2001-05-03 09:43  schoenw
+
+	* scli/bridge.c: Display more interface information in the port
+        table.
+
+2001-04-27 15:59  schoenw
+
+	* scli/ip.c: Fixed even more address formatting bugs.
+
+2001-04-27 15:51  schoenw
+
+	* scli/: bridge.c, ip.c: Fixed two formatting bugs just introduced
+        in the rewrite.
+
+2001-04-27 15:42  schoenw
+
+	* config.h.in, configure, configure.in: Added more tests for
+        headers which might define ether_ntohost().
+
+2001-04-27 15:41  schoenw
+
+	* scli/: bridge.c, fmt.c, interface.c, ip.c, ospf.c, scli.h, tcp.c,
+	udp.c: Rewrote the address formating code. The "show interface
+	details" and the "show ip mapping" commands now also report
+        ethernet names.
+
+2001-04-27 13:45  schoenw
+
+	* config.h.in, configure, configure.in: Added some tests for
+        ethernet name lookup functions.
+
+2001-04-27 13:44  schoenw
+
+	* scli/ip.c: Updated some command descriptions.
+
+2001-04-27 13:43  schoenw
+
+	* scli/: bridge.c, fmt.c, scli.h: Added a function to format
+        ethernet addresses.
+
+2001-04-17 11:47  schoenw
+
+	* snmp/g_snmp_table.c: Some fixes - I guess this really needs a
+        rewrite. Thanks Erik.
+
+2001-04-17 11:40  schoenw
+
+	* stop/: disman.c, ether.c, interface.c, process.c, tcp.c: Work
+        around from Erik for glib's broken g_string_truncate().
+
+2001-04-14 17:51  schoenw
+
+	* scli/: Makefile.am, Makefile.in, ospf.c, scli.c, scli.h: Added
+        the ospf scli mode implementation contributed by Oliver Wellnitz.
+
+2001-04-14 17:48  schoenw
+
+	* stub/: Makefile.am, Makefile.in, ospf-mib.c, ospf-mib.h: Added
+        stubs for the OSPF-MIB.
+
+2001-04-12 16:53  schoenw
+
+	* ChangeLog: Generated the ChangeLog via cvs2cl.
+
 2001-04-12 16:52  schoenw
 
 	* NEWS: Updates for release 0.1.17.
