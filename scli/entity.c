@@ -131,29 +131,15 @@ fmt_entity_details(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 {
     const char *class;
     
-    if (entPhysicalEntry->entPhysicalDescr) {
-	g_string_sprintfa(s, "%.*s\n",
-		    (int) entPhysicalEntry->_entPhysicalDescrLength,
-			  entPhysicalEntry->entPhysicalDescr);
-    }
+    g_string_sprintfa(s, "Entity: %-*d", 30,
+		      entPhysicalEntry->entPhysicalIndex);
     
     if (entPhysicalEntry->entPhysicalName) {
-	g_string_sprintfa(s, "Name:   %-30.*s",
+	g_string_sprintfa(s, "Name:   %.*s\n",
 		    (int) entPhysicalEntry->_entPhysicalNameLength,
 			  entPhysicalEntry->entPhysicalName);
     } else {
-	g_string_sprintfa(s, "Name:   %-30s", "");
-    }
-    class = fmt_enum(entity_mib_enums_entPhysicalClass,
-		     entPhysicalEntry->entPhysicalClass);
-    if (class) {
-	g_string_sprintfa(s, "Class:  %s", class);
-	if (entPhysicalEntry->entPhysicalIsFRU) {
-	    if (*entPhysicalEntry->entPhysicalIsFRU == 2) {
-		g_string_append(s, " (replaceable)");
-	    }
-	}
-	g_string_append(s, "\n");
+	g_string_sprintfa(s, "Name:\n");
     }
     
     if (entPhysicalEntry->entPhysicalMfgName) {
@@ -201,20 +187,32 @@ fmt_entity_details(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 	g_string_sprintfa(s, "SW Rev:\n");
     }
     
-    if (entPhysicalEntry->entPhysicalAlias) {
-	g_string_sprintfa(s, "Alias:  %-30.*s",
-		    (int) entPhysicalEntry->_entPhysicalAliasLength,
-			  entPhysicalEntry->entPhysicalAlias);
-    } else {
-	g_string_sprintfa(s, "Alias:  %-30s", "");
-    }
     if (entPhysicalEntry->entPhysicalAssetID) {
-	g_string_sprintfa(s, "Asset:  %.*s\n",
+	g_string_sprintfa(s, "Asset:  %-30.*s",
 		    (int) entPhysicalEntry->_entPhysicalAssetIDLength,
 			  entPhysicalEntry->entPhysicalAssetID);
     } else {
-	g_string_append(s, "Asset:\n");
+	g_string_sprintfa(s, "Asset:  %-30s", "");
     }
+
+    class = fmt_enum(entity_mib_enums_entPhysicalClass,
+		     entPhysicalEntry->entPhysicalClass);
+    if (class) {
+	g_string_sprintfa(s, "Class:  %s", class);
+	if (entPhysicalEntry->entPhysicalIsFRU) {
+	    if (*entPhysicalEntry->entPhysicalIsFRU == 2) {
+		g_string_append(s, " (replaceable)");
+	    }
+	}
+	g_string_append(s, "\n");
+    }
+    
+    fmt_display_string(s, 7, "Alias:",
+		       entPhysicalEntry->_entPhysicalAliasLength,
+		       entPhysicalEntry->entPhysicalAlias);
+    fmt_display_string(s, 7, "Descr:",
+		       entPhysicalEntry->_entPhysicalDescrLength,
+		       entPhysicalEntry->entPhysicalDescr);
 }
 
 
