@@ -163,6 +163,12 @@ extern GSnmpEnum const disman_script_mib_enums_smRunState[];
  * C type definitions for DISMAN-SCRIPT-MIB::smLangEntry.
  */
 
+#define DISMAN_SCRIPT_MIB_SMLANGLANGUAGE	0x1 
+#define DISMAN_SCRIPT_MIB_SMLANGVERSION	0x2 
+#define DISMAN_SCRIPT_MIB_SMLANGVENDOR	0x4 
+#define DISMAN_SCRIPT_MIB_SMLANGREVISION	0x8 
+#define DISMAN_SCRIPT_MIB_SMLANGDESCR	0x10 
+
 typedef struct {
     gint32   smLangIndex;
     guint32  *smLangLanguage;
@@ -177,17 +183,17 @@ typedef struct {
     gsize    _smLangDescrLength;
 } disman_script_mib_smLangEntry_t;
 
-extern int
-disman_script_mib_get_smLangTable(GSnmpSession *s, disman_script_mib_smLangEntry_t ***smLangEntry);
+extern void
+disman_script_mib_get_smLangTable(GSnmpSession *s, disman_script_mib_smLangEntry_t ***smLangEntry, gint mask);
 
 extern void
 disman_script_mib_free_smLangTable(disman_script_mib_smLangEntry_t **smLangEntry);
 
 extern disman_script_mib_smLangEntry_t *
-disman_script_mib_new_smLangEntry();
+disman_script_mib_new_smLangEntry(void);
 
-extern int
-disman_script_mib_get_smLangEntry(GSnmpSession *s, disman_script_mib_smLangEntry_t **smLangEntry);
+extern void
+disman_script_mib_get_smLangEntry(GSnmpSession *s, disman_script_mib_smLangEntry_t **smLangEntry, gint32 smLangIndex, gint mask);
 
 extern void
 disman_script_mib_free_smLangEntry(disman_script_mib_smLangEntry_t *smLangEntry);
@@ -195,6 +201,12 @@ disman_script_mib_free_smLangEntry(disman_script_mib_smLangEntry_t *smLangEntry)
 /*
  * C type definitions for DISMAN-SCRIPT-MIB::smExtsnEntry.
  */
+
+#define DISMAN_SCRIPT_MIB_SMEXTSNEXTENSION	0x1 
+#define DISMAN_SCRIPT_MIB_SMEXTSNVERSION	0x2 
+#define DISMAN_SCRIPT_MIB_SMEXTSNVENDOR	0x4 
+#define DISMAN_SCRIPT_MIB_SMEXTSNREVISION	0x8 
+#define DISMAN_SCRIPT_MIB_SMEXTSNDESCR	0x10 
 
 typedef struct {
     gint32   smLangIndex;
@@ -211,17 +223,17 @@ typedef struct {
     gsize    _smExtsnDescrLength;
 } disman_script_mib_smExtsnEntry_t;
 
-extern int
-disman_script_mib_get_smExtsnTable(GSnmpSession *s, disman_script_mib_smExtsnEntry_t ***smExtsnEntry);
+extern void
+disman_script_mib_get_smExtsnTable(GSnmpSession *s, disman_script_mib_smExtsnEntry_t ***smExtsnEntry, gint mask);
 
 extern void
 disman_script_mib_free_smExtsnTable(disman_script_mib_smExtsnEntry_t **smExtsnEntry);
 
 extern disman_script_mib_smExtsnEntry_t *
-disman_script_mib_new_smExtsnEntry();
+disman_script_mib_new_smExtsnEntry(void);
 
-extern int
-disman_script_mib_get_smExtsnEntry(GSnmpSession *s, disman_script_mib_smExtsnEntry_t **smExtsnEntry);
+extern void
+disman_script_mib_get_smExtsnEntry(GSnmpSession *s, disman_script_mib_smExtsnEntry_t **smExtsnEntry, gint32 smLangIndex, gint32 smExtsnIndex, gint mask);
 
 extern void
 disman_script_mib_free_smExtsnEntry(disman_script_mib_smExtsnEntry_t *smExtsnEntry);
@@ -229,6 +241,16 @@ disman_script_mib_free_smExtsnEntry(disman_script_mib_smExtsnEntry_t *smExtsnEnt
 /*
  * C type definitions for DISMAN-SCRIPT-MIB::smScriptEntry.
  */
+
+#define DISMAN_SCRIPT_MIB_SMSCRIPTDESCR	0x1 
+#define DISMAN_SCRIPT_MIB_SMSCRIPTLANGUAGE	0x2 
+#define DISMAN_SCRIPT_MIB_SMSCRIPTSOURCE	0x4 
+#define DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS	0x8 
+#define DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS	0x10 
+#define DISMAN_SCRIPT_MIB_SMSCRIPTSTORAGETYPE	0x20 
+#define DISMAN_SCRIPT_MIB_SMSCRIPTROWSTATUS	0x40 
+#define DISMAN_SCRIPT_MIB_SMSCRIPTERROR	0x80 
+#define DISMAN_SCRIPT_MIB_SMSCRIPTLASTCHANGE	0x100 
 
 typedef struct {
     guchar   smScriptOwner[32];
@@ -250,20 +272,20 @@ typedef struct {
     gsize    _smScriptLastChangeLength;
 } disman_script_mib_smScriptEntry_t;
 
-extern int
-disman_script_mib_get_smScriptTable(GSnmpSession *s, disman_script_mib_smScriptEntry_t ***smScriptEntry);
+extern void
+disman_script_mib_get_smScriptTable(GSnmpSession *s, disman_script_mib_smScriptEntry_t ***smScriptEntry, gint mask);
 
 extern void
 disman_script_mib_free_smScriptTable(disman_script_mib_smScriptEntry_t **smScriptEntry);
 
 extern disman_script_mib_smScriptEntry_t *
-disman_script_mib_new_smScriptEntry();
+disman_script_mib_new_smScriptEntry(void);
 
-extern int
-disman_script_mib_get_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t **smScriptEntry);
+extern void
+disman_script_mib_get_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t **smScriptEntry, guchar *smScriptOwner, gsize _smScriptOwnerLength, guchar *smScriptName, gsize _smScriptNameLength, gint mask);
 
-extern int
-disman_script_mib_set_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t *smScriptEntry);
+extern void
+disman_script_mib_set_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t *smScriptEntry, gint mask);
 
 extern void
 disman_script_mib_free_smScriptEntry(disman_script_mib_smScriptEntry_t *smScriptEntry);
@@ -271,6 +293,9 @@ disman_script_mib_free_smScriptEntry(disman_script_mib_smScriptEntry_t *smScript
 /*
  * C type definitions for DISMAN-SCRIPT-MIB::smCodeEntry.
  */
+
+#define DISMAN_SCRIPT_MIB_SMCODETEXT	0x1 
+#define DISMAN_SCRIPT_MIB_SMCODEROWSTATUS	0x2 
 
 typedef struct {
     guchar   smScriptOwner[32];
@@ -283,20 +308,20 @@ typedef struct {
     gint32   *smCodeRowStatus;
 } disman_script_mib_smCodeEntry_t;
 
-extern int
-disman_script_mib_get_smCodeTable(GSnmpSession *s, disman_script_mib_smCodeEntry_t ***smCodeEntry);
+extern void
+disman_script_mib_get_smCodeTable(GSnmpSession *s, disman_script_mib_smCodeEntry_t ***smCodeEntry, gint mask);
 
 extern void
 disman_script_mib_free_smCodeTable(disman_script_mib_smCodeEntry_t **smCodeEntry);
 
 extern disman_script_mib_smCodeEntry_t *
-disman_script_mib_new_smCodeEntry();
+disman_script_mib_new_smCodeEntry(void);
 
-extern int
-disman_script_mib_get_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t **smCodeEntry);
+extern void
+disman_script_mib_get_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t **smCodeEntry, guchar *smScriptOwner, gsize _smScriptOwnerLength, guchar *smScriptName, gsize _smScriptNameLength, guint32 smCodeIndex, gint mask);
 
-extern int
-disman_script_mib_set_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t *smCodeEntry);
+extern void
+disman_script_mib_set_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t *smCodeEntry, gint mask);
 
 extern void
 disman_script_mib_free_smCodeEntry(disman_script_mib_smCodeEntry_t *smCodeEntry);
@@ -304,6 +329,24 @@ disman_script_mib_free_smCodeEntry(disman_script_mib_smCodeEntry_t *smCodeEntry)
 /*
  * C type definitions for DISMAN-SCRIPT-MIB::smLaunchEntry.
  */
+
+#define DISMAN_SCRIPT_MIB_SMLAUNCHSCRIPTOWNER	0x1 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHSCRIPTNAME	0x2 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHARGUMENT	0x4 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHMAXRUNNING	0x8 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHMAXCOMPLETED	0x10 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHLIFETIME	0x20 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHEXPIRETIME	0x40 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHSTART	0x80 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHCONTROL	0x100 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS	0x200 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS	0x400 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHRUNINDEXNEXT	0x800 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHSTORAGETYPE	0x1000 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHROWSTATUS	0x2000 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHERROR	0x4000 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHLASTCHANGE	0x8000 
+#define DISMAN_SCRIPT_MIB_SMLAUNCHROWEXPIRETIME	0x10000 
 
 typedef struct {
     guchar   smLaunchOwner[32];
@@ -334,20 +377,20 @@ typedef struct {
     gint32   *smLaunchRowExpireTime;
 } disman_script_mib_smLaunchEntry_t;
 
-extern int
-disman_script_mib_get_smLaunchTable(GSnmpSession *s, disman_script_mib_smLaunchEntry_t ***smLaunchEntry);
+extern void
+disman_script_mib_get_smLaunchTable(GSnmpSession *s, disman_script_mib_smLaunchEntry_t ***smLaunchEntry, gint mask);
 
 extern void
 disman_script_mib_free_smLaunchTable(disman_script_mib_smLaunchEntry_t **smLaunchEntry);
 
 extern disman_script_mib_smLaunchEntry_t *
-disman_script_mib_new_smLaunchEntry();
+disman_script_mib_new_smLaunchEntry(void);
 
-extern int
-disman_script_mib_get_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t **smLaunchEntry);
+extern void
+disman_script_mib_get_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t **smLaunchEntry, guchar *smLaunchOwner, gsize _smLaunchOwnerLength, guchar *smLaunchName, gsize _smLaunchNameLength, gint mask);
 
-extern int
-disman_script_mib_set_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t *smLaunchEntry);
+extern void
+disman_script_mib_set_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t *smLaunchEntry, gint mask);
 
 extern void
 disman_script_mib_free_smLaunchEntry(disman_script_mib_smLaunchEntry_t *smLaunchEntry);
@@ -355,6 +398,19 @@ disman_script_mib_free_smLaunchEntry(disman_script_mib_smLaunchEntry_t *smLaunch
 /*
  * C type definitions for DISMAN-SCRIPT-MIB::smRunEntry.
  */
+
+#define DISMAN_SCRIPT_MIB_SMRUNARGUMENT	0x1 
+#define DISMAN_SCRIPT_MIB_SMRUNSTARTTIME	0x2 
+#define DISMAN_SCRIPT_MIB_SMRUNENDTIME	0x4 
+#define DISMAN_SCRIPT_MIB_SMRUNLIFETIME	0x8 
+#define DISMAN_SCRIPT_MIB_SMRUNEXPIRETIME	0x10 
+#define DISMAN_SCRIPT_MIB_SMRUNEXITCODE	0x20 
+#define DISMAN_SCRIPT_MIB_SMRUNRESULT	0x40 
+#define DISMAN_SCRIPT_MIB_SMRUNCONTROL	0x80 
+#define DISMAN_SCRIPT_MIB_SMRUNSTATE	0x100 
+#define DISMAN_SCRIPT_MIB_SMRUNERROR	0x200 
+#define DISMAN_SCRIPT_MIB_SMRUNRESULTTIME	0x400 
+#define DISMAN_SCRIPT_MIB_SMRUNERRORTIME	0x800 
 
 typedef struct {
     guchar   smLaunchOwner[32];
@@ -383,20 +439,20 @@ typedef struct {
     gsize    _smRunErrorTimeLength;
 } disman_script_mib_smRunEntry_t;
 
-extern int
-disman_script_mib_get_smRunTable(GSnmpSession *s, disman_script_mib_smRunEntry_t ***smRunEntry);
+extern void
+disman_script_mib_get_smRunTable(GSnmpSession *s, disman_script_mib_smRunEntry_t ***smRunEntry, gint mask);
 
 extern void
 disman_script_mib_free_smRunTable(disman_script_mib_smRunEntry_t **smRunEntry);
 
 extern disman_script_mib_smRunEntry_t *
-disman_script_mib_new_smRunEntry();
+disman_script_mib_new_smRunEntry(void);
 
-extern int
-disman_script_mib_get_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t **smRunEntry);
+extern void
+disman_script_mib_get_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t **smRunEntry, guchar *smLaunchOwner, gsize _smLaunchOwnerLength, guchar *smLaunchName, gsize _smLaunchNameLength, gint32 smRunIndex, gint mask);
 
-extern int
-disman_script_mib_set_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t *smRunEntry);
+extern void
+disman_script_mib_set_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t *smRunEntry, gint mask);
 
 extern void
 disman_script_mib_free_smRunEntry(disman_script_mib_smRunEntry_t *smRunEntry);

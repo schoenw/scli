@@ -45,33 +45,37 @@ GSnmpEnum const entity_mib_enums_entPhysicalIsFRU[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -93,54 +97,66 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _entPhysicalEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "entPhysicalDescr" },
-    { 3, G_SNMP_OBJECT_ID, "entPhysicalVendorType" },
-    { 4, G_SNMP_INTEGER32, "entPhysicalContainedIn" },
-    { 5, G_SNMP_INTEGER32, "entPhysicalClass" },
-    { 6, G_SNMP_INTEGER32, "entPhysicalParentRelPos" },
-    { 7, G_SNMP_OCTET_STRING, "entPhysicalName" },
-    { 8, G_SNMP_OCTET_STRING, "entPhysicalHardwareRev" },
-    { 9, G_SNMP_OCTET_STRING, "entPhysicalFirmwareRev" },
-    { 10, G_SNMP_OCTET_STRING, "entPhysicalSoftwareRev" },
-    { 11, G_SNMP_OCTET_STRING, "entPhysicalSerialNum" },
-    { 12, G_SNMP_OCTET_STRING, "entPhysicalMfgName" },
-    { 13, G_SNMP_OCTET_STRING, "entPhysicalModelName" },
-    { 14, G_SNMP_OCTET_STRING, "entPhysicalAlias" },
-    { 15, G_SNMP_OCTET_STRING, "entPhysicalAssetID" },
-    { 16, G_SNMP_INTEGER32, "entPhysicalIsFRU" },
-    { 0, 0, NULL }
+static guint32 const oid_entPhysicalEntry[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1};
+
+static attribute_t attr_entPhysicalEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTPHYSICALDESCR, "entPhysicalDescr" },
+    { 3, G_SNMP_OBJECT_ID, ENTITY_MIB_ENTPHYSICALVENDORTYPE, "entPhysicalVendorType" },
+    { 4, G_SNMP_INTEGER32, ENTITY_MIB_ENTPHYSICALCONTAINEDIN, "entPhysicalContainedIn" },
+    { 5, G_SNMP_INTEGER32, ENTITY_MIB_ENTPHYSICALCLASS, "entPhysicalClass" },
+    { 6, G_SNMP_INTEGER32, ENTITY_MIB_ENTPHYSICALPARENTRELPOS, "entPhysicalParentRelPos" },
+    { 7, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTPHYSICALNAME, "entPhysicalName" },
+    { 8, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTPHYSICALHARDWAREREV, "entPhysicalHardwareRev" },
+    { 9, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTPHYSICALFIRMWAREREV, "entPhysicalFirmwareRev" },
+    { 10, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTPHYSICALSOFTWAREREV, "entPhysicalSoftwareRev" },
+    { 11, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTPHYSICALSERIALNUM, "entPhysicalSerialNum" },
+    { 12, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTPHYSICALMFGNAME, "entPhysicalMfgName" },
+    { 13, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTPHYSICALMODELNAME, "entPhysicalModelName" },
+    { 14, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTPHYSICALALIAS, "entPhysicalAlias" },
+    { 15, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTPHYSICALASSETID, "entPhysicalAssetID" },
+    { 16, G_SNMP_INTEGER32, ENTITY_MIB_ENTPHYSICALISFRU, "entPhysicalIsFRU" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _entLogicalEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "entLogicalDescr" },
-    { 3, G_SNMP_OBJECT_ID, "entLogicalType" },
-    { 4, G_SNMP_OCTET_STRING, "entLogicalCommunity" },
-    { 5, G_SNMP_OCTET_STRING, "entLogicalTAddress" },
-    { 6, G_SNMP_OBJECT_ID, "entLogicalTDomain" },
-    { 7, G_SNMP_OCTET_STRING, "entLogicalContextEngineID" },
-    { 8, G_SNMP_OCTET_STRING, "entLogicalContextName" },
-    { 0, 0, NULL }
+static guint32 const oid_entLogicalEntry[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1};
+
+static attribute_t attr_entLogicalEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTLOGICALDESCR, "entLogicalDescr" },
+    { 3, G_SNMP_OBJECT_ID, ENTITY_MIB_ENTLOGICALTYPE, "entLogicalType" },
+    { 4, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTLOGICALCOMMUNITY, "entLogicalCommunity" },
+    { 5, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTLOGICALTADDRESS, "entLogicalTAddress" },
+    { 6, G_SNMP_OBJECT_ID, ENTITY_MIB_ENTLOGICALTDOMAIN, "entLogicalTDomain" },
+    { 7, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTLOGICALCONTEXTENGINEID, "entLogicalContextEngineID" },
+    { 8, G_SNMP_OCTET_STRING, ENTITY_MIB_ENTLOGICALCONTEXTNAME, "entLogicalContextName" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _entLPMappingEntry[] = {
-    { 1, G_SNMP_INTEGER32, "entLPPhysicalIndex" },
-    { 0, 0, NULL }
+static guint32 const oid_entLPMappingEntry[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 1, 1};
+
+static attribute_t attr_entLPMappingEntry[] = {
+    { 1, G_SNMP_INTEGER32, ENTITY_MIB_ENTLPPHYSICALINDEX, "entLPPhysicalIndex" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _entAliasMappingEntry[] = {
-    { 2, G_SNMP_OBJECT_ID, "entAliasMappingIdentifier" },
-    { 0, 0, NULL }
+static guint32 const oid_entAliasMappingEntry[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 2, 1};
+
+static attribute_t attr_entAliasMappingEntry[] = {
+    { 2, G_SNMP_OBJECT_ID, ENTITY_MIB_ENTALIASMAPPINGIDENTIFIER, "entAliasMappingIdentifier" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _entPhysicalContainsEntry[] = {
-    { 1, G_SNMP_INTEGER32, "entPhysicalChildIndex" },
-    { 0, 0, NULL }
+static guint32 const oid_entPhysicalContainsEntry[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 3, 1};
+
+static attribute_t attr_entPhysicalContainsEntry[] = {
+    { 1, G_SNMP_INTEGER32, ENTITY_MIB_ENTPHYSICALCHILDINDEX, "entPhysicalChildIndex" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _entityGeneral[] = {
-    { 1, G_SNMP_TIMETICKS, "entLastChangeTime" },
-    { 0, 0, NULL }
+static guint32 const oid_entityGeneral[] = {1, 3, 6, 1, 2, 1, 47, 1, 4};
+
+static attribute_t attr_entityGeneral[] = {
+    { 1, G_SNMP_TIMETICKS, ENTITY_MIB_ENTLASTCHANGETIME, "entLastChangeTime" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -164,6 +180,15 @@ unpack_entPhysicalEntry(GSnmpVarBind *vb, entity_mib_entPhysicalEntry_t *entPhys
     return 0;
 }
 
+static int
+pack_entPhysicalEntry(guint32 *base, gint32 entPhysicalIndex)
+{
+    int idx = 12;
+
+    base[idx++] = entPhysicalIndex;
+    return idx;
+}
+
 static entity_mib_entPhysicalEntry_t *
 assign_entPhysicalEntry(GSList *vbl)
 {
@@ -171,7 +196,6 @@ assign_entPhysicalEntry(GSList *vbl)
     entity_mib_entPhysicalEntry_t *entPhysicalEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 1, 1, 1};
 
     entPhysicalEntry = entity_mib_new_entPhysicalEntry();
     if (! entPhysicalEntry) {
@@ -190,8 +214,8 @@ assign_entPhysicalEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _entPhysicalEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_entPhysicalEntry, sizeof(oid_entPhysicalEntry)/sizeof(guint32),
+                   attr_entPhysicalEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -256,8 +280,8 @@ assign_entPhysicalEntry(GSList *vbl)
     return entPhysicalEntry;
 }
 
-int
-entity_mib_get_entPhysicalTable(GSnmpSession *s, entity_mib_entPhysicalEntry_t ***entPhysicalEntry)
+void
+entity_mib_get_entPhysicalTable(GSnmpSession *s, entity_mib_entPhysicalEntry_t ***entPhysicalEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -266,24 +290,89 @@ entity_mib_get_entPhysicalTable(GSnmpSession *s, entity_mib_entPhysicalEntry_t *
 
     *entPhysicalEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _entPhysicalEntry);
+    add_attributes(s, &in, base, 12, 11, attr_entPhysicalEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *entPhysicalEntry = (entity_mib_entPhysicalEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(entity_mib_entPhysicalEntry_t *));
+        if (! *entPhysicalEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*entPhysicalEntry)[i] = assign_entPhysicalEntry(row->data);
+        }
+    }
+}
+
+void
+entity_mib_get_entPhysicalEntry(GSnmpSession *s, entity_mib_entPhysicalEntry_t **entPhysicalEntry, gint32 entPhysicalIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_entPhysicalEntry, sizeof(oid_entPhysicalEntry));
+    len = pack_entPhysicalEntry(base, entPhysicalIndex);
+    if (len < 0) {
+        g_warning("illegal entPhysicalEntry index values");
+        return;
     }
 
-    *entPhysicalEntry = (entity_mib_entPhysicalEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(entity_mib_entPhysicalEntry_t *));
-    if (! *entPhysicalEntry) {
-        return -4;
+    *entPhysicalEntry = NULL;
+
+    add_attributes(s, &in, base, len, 11, attr_entPhysicalEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *entPhysicalEntry = assign_entPhysicalEntry(out);
+    }
+}
+
+void
+entity_mib_set_entPhysicalEntry(GSnmpSession *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_entPhysicalEntry, sizeof(oid_entPhysicalEntry));
+    len = pack_entPhysicalEntry(base, entPhysicalEntry->entPhysicalIndex);
+    if (len < 0) {
+        g_warning("illegal entPhysicalEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*entPhysicalEntry)[i] = assign_entPhysicalEntry(row->data);
+    if (entPhysicalEntry->entPhysicalSerialNum) {
+        base[11] = 11;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       entPhysicalEntry->entPhysicalSerialNum,
+                       entPhysicalEntry->_entPhysicalSerialNumLength);
+    }
+    if (entPhysicalEntry->entPhysicalAlias) {
+        base[11] = 14;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       entPhysicalEntry->entPhysicalAlias,
+                       entPhysicalEntry->_entPhysicalAliasLength);
+    }
+    if (entPhysicalEntry->entPhysicalAssetID) {
+        base[11] = 15;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       entPhysicalEntry->entPhysicalAssetID,
+                       entPhysicalEntry->_entPhysicalAssetIDLength);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -333,6 +422,15 @@ unpack_entLogicalEntry(GSnmpVarBind *vb, entity_mib_entLogicalEntry_t *entLogica
     return 0;
 }
 
+static int
+pack_entLogicalEntry(guint32 *base, gint32 entLogicalIndex)
+{
+    int idx = 12;
+
+    base[idx++] = entLogicalIndex;
+    return idx;
+}
+
 static entity_mib_entLogicalEntry_t *
 assign_entLogicalEntry(GSList *vbl)
 {
@@ -340,7 +438,6 @@ assign_entLogicalEntry(GSList *vbl)
     entity_mib_entLogicalEntry_t *entLogicalEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 2, 1, 1};
 
     entLogicalEntry = entity_mib_new_entLogicalEntry();
     if (! entLogicalEntry) {
@@ -359,8 +456,8 @@ assign_entLogicalEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _entLogicalEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_entLogicalEntry, sizeof(oid_entLogicalEntry)/sizeof(guint32),
+                   attr_entLogicalEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -397,8 +494,8 @@ assign_entLogicalEntry(GSList *vbl)
     return entLogicalEntry;
 }
 
-int
-entity_mib_get_entLogicalTable(GSnmpSession *s, entity_mib_entLogicalEntry_t ***entLogicalEntry)
+void
+entity_mib_get_entLogicalTable(GSnmpSession *s, entity_mib_entLogicalEntry_t ***entLogicalEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -407,24 +504,48 @@ entity_mib_get_entLogicalTable(GSnmpSession *s, entity_mib_entLogicalEntry_t ***
 
     *entLogicalEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _entLogicalEntry);
+    add_attributes(s, &in, base, 12, 11, attr_entLogicalEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *entLogicalEntry = (entity_mib_entLogicalEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(entity_mib_entLogicalEntry_t *));
+        if (! *entLogicalEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*entLogicalEntry)[i] = assign_entLogicalEntry(row->data);
+        }
+    }
+}
+
+void
+entity_mib_get_entLogicalEntry(GSnmpSession *s, entity_mib_entLogicalEntry_t **entLogicalEntry, gint32 entLogicalIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_entLogicalEntry, sizeof(oid_entLogicalEntry));
+    len = pack_entLogicalEntry(base, entLogicalIndex);
+    if (len < 0) {
+        g_warning("illegal entLogicalEntry index values");
+        return;
     }
 
-    *entLogicalEntry = (entity_mib_entLogicalEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(entity_mib_entLogicalEntry_t *));
-    if (! *entLogicalEntry) {
-        return -4;
-    }
+    *entLogicalEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*entLogicalEntry)[i] = assign_entLogicalEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 11, attr_entLogicalEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *entLogicalEntry = assign_entLogicalEntry(out);
+    }
 }
 
 void
@@ -476,6 +597,16 @@ unpack_entLPMappingEntry(GSnmpVarBind *vb, entity_mib_entLPMappingEntry_t *entLP
     return 0;
 }
 
+static int
+pack_entLPMappingEntry(guint32 *base, gint32 entLogicalIndex, gint32 entLPPhysicalIndex)
+{
+    int idx = 12;
+
+    base[idx++] = entLogicalIndex;
+    base[idx++] = entLPPhysicalIndex;
+    return idx;
+}
+
 static entity_mib_entLPMappingEntry_t *
 assign_entLPMappingEntry(GSList *vbl)
 {
@@ -483,7 +614,6 @@ assign_entLPMappingEntry(GSList *vbl)
     entity_mib_entLPMappingEntry_t *entLPMappingEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 1, 1};
 
     entLPMappingEntry = entity_mib_new_entLPMappingEntry();
     if (! entLPMappingEntry) {
@@ -502,8 +632,8 @@ assign_entLPMappingEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _entLPMappingEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_entLPMappingEntry, sizeof(oid_entLPMappingEntry)/sizeof(guint32),
+                   attr_entLPMappingEntry, &idx) < 0) continue;
 
         switch (idx) {
         };
@@ -512,8 +642,8 @@ assign_entLPMappingEntry(GSList *vbl)
     return entLPMappingEntry;
 }
 
-int
-entity_mib_get_entLPMappingTable(GSnmpSession *s, entity_mib_entLPMappingEntry_t ***entLPMappingEntry)
+void
+entity_mib_get_entLPMappingTable(GSnmpSession *s, entity_mib_entLPMappingEntry_t ***entLPMappingEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -522,24 +652,48 @@ entity_mib_get_entLPMappingTable(GSnmpSession *s, entity_mib_entLPMappingEntry_t
 
     *entLPMappingEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _entLPMappingEntry);
+    add_attributes(s, &in, base, 12, 11, attr_entLPMappingEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *entLPMappingEntry = (entity_mib_entLPMappingEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(entity_mib_entLPMappingEntry_t *));
+        if (! *entLPMappingEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*entLPMappingEntry)[i] = assign_entLPMappingEntry(row->data);
+        }
+    }
+}
+
+void
+entity_mib_get_entLPMappingEntry(GSnmpSession *s, entity_mib_entLPMappingEntry_t **entLPMappingEntry, gint32 entLogicalIndex, gint32 entLPPhysicalIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_entLPMappingEntry, sizeof(oid_entLPMappingEntry));
+    len = pack_entLPMappingEntry(base, entLogicalIndex, entLPPhysicalIndex);
+    if (len < 0) {
+        g_warning("illegal entLPMappingEntry index values");
+        return;
     }
 
-    *entLPMappingEntry = (entity_mib_entLPMappingEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(entity_mib_entLPMappingEntry_t *));
-    if (! *entLPMappingEntry) {
-        return -4;
-    }
+    *entLPMappingEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*entLPMappingEntry)[i] = assign_entLPMappingEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 11, attr_entLPMappingEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *entLPMappingEntry = assign_entLPMappingEntry(out);
+    }
 }
 
 void
@@ -591,6 +745,16 @@ unpack_entAliasMappingEntry(GSnmpVarBind *vb, entity_mib_entAliasMappingEntry_t 
     return 0;
 }
 
+static int
+pack_entAliasMappingEntry(guint32 *base, gint32 entPhysicalIndex, gint32 entAliasLogicalIndexOrZero)
+{
+    int idx = 12;
+
+    base[idx++] = entPhysicalIndex;
+    base[idx++] = entAliasLogicalIndexOrZero;
+    return idx;
+}
+
 static entity_mib_entAliasMappingEntry_t *
 assign_entAliasMappingEntry(GSList *vbl)
 {
@@ -598,7 +762,6 @@ assign_entAliasMappingEntry(GSList *vbl)
     entity_mib_entAliasMappingEntry_t *entAliasMappingEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 2, 1};
 
     entAliasMappingEntry = entity_mib_new_entAliasMappingEntry();
     if (! entAliasMappingEntry) {
@@ -617,8 +780,8 @@ assign_entAliasMappingEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _entAliasMappingEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_entAliasMappingEntry, sizeof(oid_entAliasMappingEntry)/sizeof(guint32),
+                   attr_entAliasMappingEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -631,8 +794,8 @@ assign_entAliasMappingEntry(GSList *vbl)
     return entAliasMappingEntry;
 }
 
-int
-entity_mib_get_entAliasMappingTable(GSnmpSession *s, entity_mib_entAliasMappingEntry_t ***entAliasMappingEntry)
+void
+entity_mib_get_entAliasMappingTable(GSnmpSession *s, entity_mib_entAliasMappingEntry_t ***entAliasMappingEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -641,24 +804,48 @@ entity_mib_get_entAliasMappingTable(GSnmpSession *s, entity_mib_entAliasMappingE
 
     *entAliasMappingEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _entAliasMappingEntry);
+    add_attributes(s, &in, base, 12, 11, attr_entAliasMappingEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *entAliasMappingEntry = (entity_mib_entAliasMappingEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(entity_mib_entAliasMappingEntry_t *));
+        if (! *entAliasMappingEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*entAliasMappingEntry)[i] = assign_entAliasMappingEntry(row->data);
+        }
+    }
+}
+
+void
+entity_mib_get_entAliasMappingEntry(GSnmpSession *s, entity_mib_entAliasMappingEntry_t **entAliasMappingEntry, gint32 entPhysicalIndex, gint32 entAliasLogicalIndexOrZero, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_entAliasMappingEntry, sizeof(oid_entAliasMappingEntry));
+    len = pack_entAliasMappingEntry(base, entPhysicalIndex, entAliasLogicalIndexOrZero);
+    if (len < 0) {
+        g_warning("illegal entAliasMappingEntry index values");
+        return;
     }
 
-    *entAliasMappingEntry = (entity_mib_entAliasMappingEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(entity_mib_entAliasMappingEntry_t *));
-    if (! *entAliasMappingEntry) {
-        return -4;
-    }
+    *entAliasMappingEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*entAliasMappingEntry)[i] = assign_entAliasMappingEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 11, attr_entAliasMappingEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *entAliasMappingEntry = assign_entAliasMappingEntry(out);
+    }
 }
 
 void
@@ -710,6 +897,16 @@ unpack_entPhysicalContainsEntry(GSnmpVarBind *vb, entity_mib_entPhysicalContains
     return 0;
 }
 
+static int
+pack_entPhysicalContainsEntry(guint32 *base, gint32 entPhysicalIndex, gint32 entPhysicalChildIndex)
+{
+    int idx = 12;
+
+    base[idx++] = entPhysicalIndex;
+    base[idx++] = entPhysicalChildIndex;
+    return idx;
+}
+
 static entity_mib_entPhysicalContainsEntry_t *
 assign_entPhysicalContainsEntry(GSList *vbl)
 {
@@ -717,7 +914,6 @@ assign_entPhysicalContainsEntry(GSList *vbl)
     entity_mib_entPhysicalContainsEntry_t *entPhysicalContainsEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 3, 3, 1};
 
     entPhysicalContainsEntry = entity_mib_new_entPhysicalContainsEntry();
     if (! entPhysicalContainsEntry) {
@@ -736,8 +932,8 @@ assign_entPhysicalContainsEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _entPhysicalContainsEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_entPhysicalContainsEntry, sizeof(oid_entPhysicalContainsEntry)/sizeof(guint32),
+                   attr_entPhysicalContainsEntry, &idx) < 0) continue;
 
         switch (idx) {
         };
@@ -746,8 +942,8 @@ assign_entPhysicalContainsEntry(GSList *vbl)
     return entPhysicalContainsEntry;
 }
 
-int
-entity_mib_get_entPhysicalContainsTable(GSnmpSession *s, entity_mib_entPhysicalContainsEntry_t ***entPhysicalContainsEntry)
+void
+entity_mib_get_entPhysicalContainsTable(GSnmpSession *s, entity_mib_entPhysicalContainsEntry_t ***entPhysicalContainsEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -756,24 +952,48 @@ entity_mib_get_entPhysicalContainsTable(GSnmpSession *s, entity_mib_entPhysicalC
 
     *entPhysicalContainsEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _entPhysicalContainsEntry);
+    add_attributes(s, &in, base, 12, 11, attr_entPhysicalContainsEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *entPhysicalContainsEntry = (entity_mib_entPhysicalContainsEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(entity_mib_entPhysicalContainsEntry_t *));
+        if (! *entPhysicalContainsEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*entPhysicalContainsEntry)[i] = assign_entPhysicalContainsEntry(row->data);
+        }
+    }
+}
+
+void
+entity_mib_get_entPhysicalContainsEntry(GSnmpSession *s, entity_mib_entPhysicalContainsEntry_t **entPhysicalContainsEntry, gint32 entPhysicalIndex, gint32 entPhysicalChildIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_entPhysicalContainsEntry, sizeof(oid_entPhysicalContainsEntry));
+    len = pack_entPhysicalContainsEntry(base, entPhysicalIndex, entPhysicalChildIndex);
+    if (len < 0) {
+        g_warning("illegal entPhysicalContainsEntry index values");
+        return;
     }
 
-    *entPhysicalContainsEntry = (entity_mib_entPhysicalContainsEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(entity_mib_entPhysicalContainsEntry_t *));
-    if (! *entPhysicalContainsEntry) {
-        return -4;
-    }
+    *entPhysicalContainsEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*entPhysicalContainsEntry)[i] = assign_entPhysicalContainsEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 11, attr_entPhysicalContainsEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *entPhysicalContainsEntry = assign_entPhysicalContainsEntry(out);
+    }
 }
 
 void
@@ -819,7 +1039,6 @@ assign_entityGeneral(GSList *vbl)
     entity_mib_entityGeneral_t *entityGeneral;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 47, 1, 4};
 
     entityGeneral = entity_mib_new_entityGeneral();
     if (! entityGeneral) {
@@ -832,8 +1051,8 @@ assign_entityGeneral(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _entityGeneral, &idx) < 0) continue;
+        if (lookup(vb, oid_entityGeneral, sizeof(oid_entityGeneral)/sizeof(guint32),
+                   attr_entityGeneral, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -845,25 +1064,21 @@ assign_entityGeneral(GSList *vbl)
     return entityGeneral;
 }
 
-int
-entity_mib_get_entityGeneral(GSnmpSession *s, entity_mib_entityGeneral_t **entityGeneral)
+void
+entity_mib_get_entityGeneral(GSnmpSession *s, entity_mib_entityGeneral_t **entityGeneral, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 47, 1, 4, 0};
 
     *entityGeneral = NULL;
 
-    add_attributes(s, &in, base, 9, _entityGeneral);
+    add_attributes(s, &in, base, 10, 9, attr_entityGeneral, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *entityGeneral = assign_entityGeneral(out);
     }
-
-    *entityGeneral = assign_entityGeneral(out);
-
-    return 0;
 }
 
 void

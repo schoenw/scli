@@ -94,33 +94,37 @@ GSnmpIdentity const etherlike_mib_identities[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -142,42 +146,50 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _dot3StatsEntry[] = {
-    { 2, G_SNMP_COUNTER32, "dot3StatsAlignmentErrors" },
-    { 3, G_SNMP_COUNTER32, "dot3StatsFCSErrors" },
-    { 4, G_SNMP_COUNTER32, "dot3StatsSingleCollisionFrames" },
-    { 5, G_SNMP_COUNTER32, "dot3StatsMultipleCollisionFrames" },
-    { 6, G_SNMP_COUNTER32, "dot3StatsSQETestErrors" },
-    { 7, G_SNMP_COUNTER32, "dot3StatsDeferredTransmissions" },
-    { 8, G_SNMP_COUNTER32, "dot3StatsLateCollisions" },
-    { 9, G_SNMP_COUNTER32, "dot3StatsExcessiveCollisions" },
-    { 10, G_SNMP_COUNTER32, "dot3StatsInternalMacTransmitErrors" },
-    { 11, G_SNMP_COUNTER32, "dot3StatsCarrierSenseErrors" },
-    { 13, G_SNMP_COUNTER32, "dot3StatsFrameTooLongs" },
-    { 16, G_SNMP_COUNTER32, "dot3StatsInternalMacReceiveErrors" },
-    { 17, G_SNMP_OBJECT_ID, "dot3StatsEtherChipSet" },
-    { 18, G_SNMP_COUNTER32, "dot3StatsSymbolErrors" },
-    { 19, G_SNMP_INTEGER32, "dot3StatsDuplexStatus" },
-    { 0, 0, NULL }
+static guint32 const oid_dot3StatsEntry[] = {1, 3, 6, 1, 2, 1, 10, 7, 2, 1};
+
+static attribute_t attr_dot3StatsEntry[] = {
+    { 2, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSALIGNMENTERRORS, "dot3StatsAlignmentErrors" },
+    { 3, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSFCSERRORS, "dot3StatsFCSErrors" },
+    { 4, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSSINGLECOLLISIONFRAMES, "dot3StatsSingleCollisionFrames" },
+    { 5, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSMULTIPLECOLLISIONFRAMES, "dot3StatsMultipleCollisionFrames" },
+    { 6, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSSQETESTERRORS, "dot3StatsSQETestErrors" },
+    { 7, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSDEFERREDTRANSMISSIONS, "dot3StatsDeferredTransmissions" },
+    { 8, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSLATECOLLISIONS, "dot3StatsLateCollisions" },
+    { 9, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSEXCESSIVECOLLISIONS, "dot3StatsExcessiveCollisions" },
+    { 10, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSINTERNALMACTRANSMITERRORS, "dot3StatsInternalMacTransmitErrors" },
+    { 11, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSCARRIERSENSEERRORS, "dot3StatsCarrierSenseErrors" },
+    { 13, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSFRAMETOOLONGS, "dot3StatsFrameTooLongs" },
+    { 16, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSINTERNALMACRECEIVEERRORS, "dot3StatsInternalMacReceiveErrors" },
+    { 17, G_SNMP_OBJECT_ID, ETHERLIKE_MIB_DOT3STATSETHERCHIPSET, "dot3StatsEtherChipSet" },
+    { 18, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3STATSSYMBOLERRORS, "dot3StatsSymbolErrors" },
+    { 19, G_SNMP_INTEGER32, ETHERLIKE_MIB_DOT3STATSDUPLEXSTATUS, "dot3StatsDuplexStatus" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _dot3CollEntry[] = {
-    { 3, G_SNMP_COUNTER32, "dot3CollFrequencies" },
-    { 0, 0, NULL }
+static guint32 const oid_dot3CollEntry[] = {1, 3, 6, 1, 2, 1, 10, 7, 5, 1};
+
+static attribute_t attr_dot3CollEntry[] = {
+    { 3, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3COLLFREQUENCIES, "dot3CollFrequencies" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _dot3ControlEntry[] = {
-    { 1, G_SNMP_OCTET_STRING, "dot3ControlFunctionsSupported" },
-    { 2, G_SNMP_COUNTER32, "dot3ControlInUnknownOpcodes" },
-    { 0, 0, NULL }
+static guint32 const oid_dot3ControlEntry[] = {1, 3, 6, 1, 2, 1, 10, 7, 9, 1};
+
+static attribute_t attr_dot3ControlEntry[] = {
+    { 1, G_SNMP_OCTET_STRING, ETHERLIKE_MIB_DOT3CONTROLFUNCTIONSSUPPORTED, "dot3ControlFunctionsSupported" },
+    { 2, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3CONTROLINUNKNOWNOPCODES, "dot3ControlInUnknownOpcodes" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _dot3PauseEntry[] = {
-    { 1, G_SNMP_INTEGER32, "dot3PauseAdminMode" },
-    { 2, G_SNMP_INTEGER32, "dot3PauseOperMode" },
-    { 3, G_SNMP_COUNTER32, "dot3InPauseFrames" },
-    { 4, G_SNMP_COUNTER32, "dot3OutPauseFrames" },
-    { 0, 0, NULL }
+static guint32 const oid_dot3PauseEntry[] = {1, 3, 6, 1, 2, 1, 10, 7, 10, 1};
+
+static attribute_t attr_dot3PauseEntry[] = {
+    { 1, G_SNMP_INTEGER32, ETHERLIKE_MIB_DOT3PAUSEADMINMODE, "dot3PauseAdminMode" },
+    { 2, G_SNMP_INTEGER32, ETHERLIKE_MIB_DOT3PAUSEOPERMODE, "dot3PauseOperMode" },
+    { 3, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3INPAUSEFRAMES, "dot3InPauseFrames" },
+    { 4, G_SNMP_COUNTER32, ETHERLIKE_MIB_DOT3OUTPAUSEFRAMES, "dot3OutPauseFrames" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -201,6 +213,15 @@ unpack_dot3StatsEntry(GSnmpVarBind *vb, etherlike_mib_dot3StatsEntry_t *dot3Stat
     return 0;
 }
 
+static int
+pack_dot3StatsEntry(guint32 *base, gint32 dot3StatsIndex)
+{
+    int idx = 11;
+
+    base[idx++] = dot3StatsIndex;
+    return idx;
+}
+
 static etherlike_mib_dot3StatsEntry_t *
 assign_dot3StatsEntry(GSList *vbl)
 {
@@ -208,7 +229,6 @@ assign_dot3StatsEntry(GSList *vbl)
     etherlike_mib_dot3StatsEntry_t *dot3StatsEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 10, 7, 2, 1};
 
     dot3StatsEntry = etherlike_mib_new_dot3StatsEntry();
     if (! dot3StatsEntry) {
@@ -227,8 +247,8 @@ assign_dot3StatsEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _dot3StatsEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_dot3StatsEntry, sizeof(oid_dot3StatsEntry)/sizeof(guint32),
+                   attr_dot3StatsEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -283,8 +303,8 @@ assign_dot3StatsEntry(GSList *vbl)
     return dot3StatsEntry;
 }
 
-int
-etherlike_mib_get_dot3StatsTable(GSnmpSession *s, etherlike_mib_dot3StatsEntry_t ***dot3StatsEntry)
+void
+etherlike_mib_get_dot3StatsTable(GSnmpSession *s, etherlike_mib_dot3StatsEntry_t ***dot3StatsEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -293,24 +313,48 @@ etherlike_mib_get_dot3StatsTable(GSnmpSession *s, etherlike_mib_dot3StatsEntry_t
 
     *dot3StatsEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _dot3StatsEntry);
+    add_attributes(s, &in, base, 11, 10, attr_dot3StatsEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *dot3StatsEntry = (etherlike_mib_dot3StatsEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(etherlike_mib_dot3StatsEntry_t *));
+        if (! *dot3StatsEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*dot3StatsEntry)[i] = assign_dot3StatsEntry(row->data);
+        }
+    }
+}
+
+void
+etherlike_mib_get_dot3StatsEntry(GSnmpSession *s, etherlike_mib_dot3StatsEntry_t **dot3StatsEntry, gint32 dot3StatsIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_dot3StatsEntry, sizeof(oid_dot3StatsEntry));
+    len = pack_dot3StatsEntry(base, dot3StatsIndex);
+    if (len < 0) {
+        g_warning("illegal dot3StatsEntry index values");
+        return;
     }
 
-    *dot3StatsEntry = (etherlike_mib_dot3StatsEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(etherlike_mib_dot3StatsEntry_t *));
-    if (! *dot3StatsEntry) {
-        return -4;
-    }
+    *dot3StatsEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*dot3StatsEntry)[i] = assign_dot3StatsEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_dot3StatsEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *dot3StatsEntry = assign_dot3StatsEntry(out);
+    }
 }
 
 void
@@ -362,6 +406,16 @@ unpack_dot3CollEntry(GSnmpVarBind *vb, etherlike_mib_dot3CollEntry_t *dot3CollEn
     return 0;
 }
 
+static int
+pack_dot3CollEntry(guint32 *base, gint32 ifIndex, gint32 dot3CollCount)
+{
+    int idx = 11;
+
+    base[idx++] = ifIndex;
+    base[idx++] = dot3CollCount;
+    return idx;
+}
+
 static etherlike_mib_dot3CollEntry_t *
 assign_dot3CollEntry(GSList *vbl)
 {
@@ -369,7 +423,6 @@ assign_dot3CollEntry(GSList *vbl)
     etherlike_mib_dot3CollEntry_t *dot3CollEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 10, 7, 5, 1};
 
     dot3CollEntry = etherlike_mib_new_dot3CollEntry();
     if (! dot3CollEntry) {
@@ -388,8 +441,8 @@ assign_dot3CollEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _dot3CollEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_dot3CollEntry, sizeof(oid_dot3CollEntry)/sizeof(guint32),
+                   attr_dot3CollEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -401,8 +454,8 @@ assign_dot3CollEntry(GSList *vbl)
     return dot3CollEntry;
 }
 
-int
-etherlike_mib_get_dot3CollTable(GSnmpSession *s, etherlike_mib_dot3CollEntry_t ***dot3CollEntry)
+void
+etherlike_mib_get_dot3CollTable(GSnmpSession *s, etherlike_mib_dot3CollEntry_t ***dot3CollEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -411,24 +464,48 @@ etherlike_mib_get_dot3CollTable(GSnmpSession *s, etherlike_mib_dot3CollEntry_t *
 
     *dot3CollEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _dot3CollEntry);
+    add_attributes(s, &in, base, 11, 10, attr_dot3CollEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *dot3CollEntry = (etherlike_mib_dot3CollEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(etherlike_mib_dot3CollEntry_t *));
+        if (! *dot3CollEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*dot3CollEntry)[i] = assign_dot3CollEntry(row->data);
+        }
+    }
+}
+
+void
+etherlike_mib_get_dot3CollEntry(GSnmpSession *s, etherlike_mib_dot3CollEntry_t **dot3CollEntry, gint32 ifIndex, gint32 dot3CollCount, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_dot3CollEntry, sizeof(oid_dot3CollEntry));
+    len = pack_dot3CollEntry(base, ifIndex, dot3CollCount);
+    if (len < 0) {
+        g_warning("illegal dot3CollEntry index values");
+        return;
     }
 
-    *dot3CollEntry = (etherlike_mib_dot3CollEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(etherlike_mib_dot3CollEntry_t *));
-    if (! *dot3CollEntry) {
-        return -4;
-    }
+    *dot3CollEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*dot3CollEntry)[i] = assign_dot3CollEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_dot3CollEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *dot3CollEntry = assign_dot3CollEntry(out);
+    }
 }
 
 void
@@ -478,6 +555,15 @@ unpack_dot3ControlEntry(GSnmpVarBind *vb, etherlike_mib_dot3ControlEntry_t *dot3
     return 0;
 }
 
+static int
+pack_dot3ControlEntry(guint32 *base, gint32 dot3StatsIndex)
+{
+    int idx = 11;
+
+    base[idx++] = dot3StatsIndex;
+    return idx;
+}
+
 static etherlike_mib_dot3ControlEntry_t *
 assign_dot3ControlEntry(GSList *vbl)
 {
@@ -485,7 +571,6 @@ assign_dot3ControlEntry(GSList *vbl)
     etherlike_mib_dot3ControlEntry_t *dot3ControlEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 10, 7, 9, 1};
 
     dot3ControlEntry = etherlike_mib_new_dot3ControlEntry();
     if (! dot3ControlEntry) {
@@ -504,8 +589,8 @@ assign_dot3ControlEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _dot3ControlEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_dot3ControlEntry, sizeof(oid_dot3ControlEntry)/sizeof(guint32),
+                   attr_dot3ControlEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -521,8 +606,8 @@ assign_dot3ControlEntry(GSList *vbl)
     return dot3ControlEntry;
 }
 
-int
-etherlike_mib_get_dot3ControlTable(GSnmpSession *s, etherlike_mib_dot3ControlEntry_t ***dot3ControlEntry)
+void
+etherlike_mib_get_dot3ControlTable(GSnmpSession *s, etherlike_mib_dot3ControlEntry_t ***dot3ControlEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -531,24 +616,48 @@ etherlike_mib_get_dot3ControlTable(GSnmpSession *s, etherlike_mib_dot3ControlEnt
 
     *dot3ControlEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _dot3ControlEntry);
+    add_attributes(s, &in, base, 11, 10, attr_dot3ControlEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *dot3ControlEntry = (etherlike_mib_dot3ControlEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(etherlike_mib_dot3ControlEntry_t *));
+        if (! *dot3ControlEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*dot3ControlEntry)[i] = assign_dot3ControlEntry(row->data);
+        }
+    }
+}
+
+void
+etherlike_mib_get_dot3ControlEntry(GSnmpSession *s, etherlike_mib_dot3ControlEntry_t **dot3ControlEntry, gint32 dot3StatsIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_dot3ControlEntry, sizeof(oid_dot3ControlEntry));
+    len = pack_dot3ControlEntry(base, dot3StatsIndex);
+    if (len < 0) {
+        g_warning("illegal dot3ControlEntry index values");
+        return;
     }
 
-    *dot3ControlEntry = (etherlike_mib_dot3ControlEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(etherlike_mib_dot3ControlEntry_t *));
-    if (! *dot3ControlEntry) {
-        return -4;
-    }
+    *dot3ControlEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*dot3ControlEntry)[i] = assign_dot3ControlEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_dot3ControlEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *dot3ControlEntry = assign_dot3ControlEntry(out);
+    }
 }
 
 void
@@ -598,6 +707,15 @@ unpack_dot3PauseEntry(GSnmpVarBind *vb, etherlike_mib_dot3PauseEntry_t *dot3Paus
     return 0;
 }
 
+static int
+pack_dot3PauseEntry(guint32 *base, gint32 dot3StatsIndex)
+{
+    int idx = 11;
+
+    base[idx++] = dot3StatsIndex;
+    return idx;
+}
+
 static etherlike_mib_dot3PauseEntry_t *
 assign_dot3PauseEntry(GSList *vbl)
 {
@@ -605,7 +723,6 @@ assign_dot3PauseEntry(GSList *vbl)
     etherlike_mib_dot3PauseEntry_t *dot3PauseEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 10, 7, 10, 1};
 
     dot3PauseEntry = etherlike_mib_new_dot3PauseEntry();
     if (! dot3PauseEntry) {
@@ -624,8 +741,8 @@ assign_dot3PauseEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _dot3PauseEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_dot3PauseEntry, sizeof(oid_dot3PauseEntry)/sizeof(guint32),
+                   attr_dot3PauseEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -646,8 +763,8 @@ assign_dot3PauseEntry(GSList *vbl)
     return dot3PauseEntry;
 }
 
-int
-etherlike_mib_get_dot3PauseTable(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t ***dot3PauseEntry)
+void
+etherlike_mib_get_dot3PauseTable(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t ***dot3PauseEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -656,24 +773,77 @@ etherlike_mib_get_dot3PauseTable(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t
 
     *dot3PauseEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _dot3PauseEntry);
+    add_attributes(s, &in, base, 11, 10, attr_dot3PauseEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *dot3PauseEntry = (etherlike_mib_dot3PauseEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(etherlike_mib_dot3PauseEntry_t *));
+        if (! *dot3PauseEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*dot3PauseEntry)[i] = assign_dot3PauseEntry(row->data);
+        }
+    }
+}
+
+void
+etherlike_mib_get_dot3PauseEntry(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t **dot3PauseEntry, gint32 dot3StatsIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_dot3PauseEntry, sizeof(oid_dot3PauseEntry));
+    len = pack_dot3PauseEntry(base, dot3StatsIndex);
+    if (len < 0) {
+        g_warning("illegal dot3PauseEntry index values");
+        return;
     }
 
-    *dot3PauseEntry = (etherlike_mib_dot3PauseEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(etherlike_mib_dot3PauseEntry_t *));
-    if (! *dot3PauseEntry) {
-        return -4;
+    *dot3PauseEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_dot3PauseEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *dot3PauseEntry = assign_dot3PauseEntry(out);
+    }
+}
+
+void
+etherlike_mib_set_dot3PauseEntry(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t *dot3PauseEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_dot3PauseEntry, sizeof(oid_dot3PauseEntry));
+    len = pack_dot3PauseEntry(base, dot3PauseEntry->dot3StatsIndex);
+    if (len < 0) {
+        g_warning("illegal dot3PauseEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*dot3PauseEntry)[i] = assign_dot3PauseEntry(row->data);
+    if (dot3PauseEntry->dot3PauseAdminMode) {
+        base[10] = 1;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       dot3PauseEntry->dot3PauseAdminMode,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void

@@ -23,6 +23,10 @@
  * C type definitions for SNMP-MPD-MIB::snmpMPDStats.
  */
 
+#define SNMP_MPD_MIB_SNMPUNKNOWNSECURITYMODELS	0x1 
+#define SNMP_MPD_MIB_SNMPINVALIDMSGS	0x2 
+#define SNMP_MPD_MIB_SNMPUNKNOWNPDUHANDLERS	0x4 
+
 typedef struct {
     guint32  *snmpUnknownSecurityModels;
     guint32  *snmpInvalidMsgs;
@@ -30,10 +34,10 @@ typedef struct {
 } snmp_mpd_mib_snmpMPDStats_t;
 
 extern snmp_mpd_mib_snmpMPDStats_t *
-snmp_mpd_mib_new_snmpMPDStats();
+snmp_mpd_mib_new_snmpMPDStats(void);
 
-extern int
-snmp_mpd_mib_get_snmpMPDStats(GSnmpSession *s, snmp_mpd_mib_snmpMPDStats_t **snmpMPDStats);
+extern void
+snmp_mpd_mib_get_snmpMPDStats(GSnmpSession *s, snmp_mpd_mib_snmpMPDStats_t **snmpMPDStats, gint mask);
 
 extern void
 snmp_mpd_mib_free_snmpMPDStats(snmp_mpd_mib_snmpMPDStats_t *snmpMPDStats);

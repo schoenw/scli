@@ -84,6 +84,23 @@ extern GSnmpIdentity const etherlike_mib_identities[];
  * C type definitions for EtherLike-MIB::dot3StatsEntry.
  */
 
+#define ETHERLIKE_MIB_DOT3STATSINDEX	0x1 
+#define ETHERLIKE_MIB_DOT3STATSALIGNMENTERRORS	0x2 
+#define ETHERLIKE_MIB_DOT3STATSFCSERRORS	0x4 
+#define ETHERLIKE_MIB_DOT3STATSSINGLECOLLISIONFRAMES	0x8 
+#define ETHERLIKE_MIB_DOT3STATSMULTIPLECOLLISIONFRAMES	0x10 
+#define ETHERLIKE_MIB_DOT3STATSSQETESTERRORS	0x20 
+#define ETHERLIKE_MIB_DOT3STATSDEFERREDTRANSMISSIONS	0x40 
+#define ETHERLIKE_MIB_DOT3STATSLATECOLLISIONS	0x80 
+#define ETHERLIKE_MIB_DOT3STATSEXCESSIVECOLLISIONS	0x100 
+#define ETHERLIKE_MIB_DOT3STATSINTERNALMACTRANSMITERRORS	0x200 
+#define ETHERLIKE_MIB_DOT3STATSCARRIERSENSEERRORS	0x400 
+#define ETHERLIKE_MIB_DOT3STATSFRAMETOOLONGS	0x800 
+#define ETHERLIKE_MIB_DOT3STATSINTERNALMACRECEIVEERRORS	0x1000 
+#define ETHERLIKE_MIB_DOT3STATSETHERCHIPSET	0x2000 
+#define ETHERLIKE_MIB_DOT3STATSSYMBOLERRORS	0x4000 
+#define ETHERLIKE_MIB_DOT3STATSDUPLEXSTATUS	0x8000 
+
 typedef struct {
     gint32   dot3StatsIndex;
     guint32  *dot3StatsAlignmentErrors;
@@ -104,17 +121,17 @@ typedef struct {
     gint32   *dot3StatsDuplexStatus;
 } etherlike_mib_dot3StatsEntry_t;
 
-extern int
-etherlike_mib_get_dot3StatsTable(GSnmpSession *s, etherlike_mib_dot3StatsEntry_t ***dot3StatsEntry);
+extern void
+etherlike_mib_get_dot3StatsTable(GSnmpSession *s, etherlike_mib_dot3StatsEntry_t ***dot3StatsEntry, gint mask);
 
 extern void
 etherlike_mib_free_dot3StatsTable(etherlike_mib_dot3StatsEntry_t **dot3StatsEntry);
 
 extern etherlike_mib_dot3StatsEntry_t *
-etherlike_mib_new_dot3StatsEntry();
+etherlike_mib_new_dot3StatsEntry(void);
 
-extern int
-etherlike_mib_get_dot3StatsEntry(GSnmpSession *s, etherlike_mib_dot3StatsEntry_t **dot3StatsEntry);
+extern void
+etherlike_mib_get_dot3StatsEntry(GSnmpSession *s, etherlike_mib_dot3StatsEntry_t **dot3StatsEntry, gint32 dot3StatsIndex, gint mask);
 
 extern void
 etherlike_mib_free_dot3StatsEntry(etherlike_mib_dot3StatsEntry_t *dot3StatsEntry);
@@ -123,23 +140,25 @@ etherlike_mib_free_dot3StatsEntry(etherlike_mib_dot3StatsEntry_t *dot3StatsEntry
  * C type definitions for EtherLike-MIB::dot3CollEntry.
  */
 
+#define ETHERLIKE_MIB_DOT3COLLFREQUENCIES	0x1 
+
 typedef struct {
     gint32   ifIndex;
     gint32   dot3CollCount;
     guint32  *dot3CollFrequencies;
 } etherlike_mib_dot3CollEntry_t;
 
-extern int
-etherlike_mib_get_dot3CollTable(GSnmpSession *s, etherlike_mib_dot3CollEntry_t ***dot3CollEntry);
+extern void
+etherlike_mib_get_dot3CollTable(GSnmpSession *s, etherlike_mib_dot3CollEntry_t ***dot3CollEntry, gint mask);
 
 extern void
 etherlike_mib_free_dot3CollTable(etherlike_mib_dot3CollEntry_t **dot3CollEntry);
 
 extern etherlike_mib_dot3CollEntry_t *
-etherlike_mib_new_dot3CollEntry();
+etherlike_mib_new_dot3CollEntry(void);
 
-extern int
-etherlike_mib_get_dot3CollEntry(GSnmpSession *s, etherlike_mib_dot3CollEntry_t **dot3CollEntry);
+extern void
+etherlike_mib_get_dot3CollEntry(GSnmpSession *s, etherlike_mib_dot3CollEntry_t **dot3CollEntry, gint32 ifIndex, gint32 dot3CollCount, gint mask);
 
 extern void
 etherlike_mib_free_dot3CollEntry(etherlike_mib_dot3CollEntry_t *dot3CollEntry);
@@ -148,6 +167,9 @@ etherlike_mib_free_dot3CollEntry(etherlike_mib_dot3CollEntry_t *dot3CollEntry);
  * C type definitions for EtherLike-MIB::dot3ControlEntry.
  */
 
+#define ETHERLIKE_MIB_DOT3CONTROLFUNCTIONSSUPPORTED	0x1 
+#define ETHERLIKE_MIB_DOT3CONTROLINUNKNOWNOPCODES	0x2 
+
 typedef struct {
     gint32   dot3StatsIndex;
     guchar   *dot3ControlFunctionsSupported;
@@ -155,17 +177,17 @@ typedef struct {
     guint32  *dot3ControlInUnknownOpcodes;
 } etherlike_mib_dot3ControlEntry_t;
 
-extern int
-etherlike_mib_get_dot3ControlTable(GSnmpSession *s, etherlike_mib_dot3ControlEntry_t ***dot3ControlEntry);
+extern void
+etherlike_mib_get_dot3ControlTable(GSnmpSession *s, etherlike_mib_dot3ControlEntry_t ***dot3ControlEntry, gint mask);
 
 extern void
 etherlike_mib_free_dot3ControlTable(etherlike_mib_dot3ControlEntry_t **dot3ControlEntry);
 
 extern etherlike_mib_dot3ControlEntry_t *
-etherlike_mib_new_dot3ControlEntry();
+etherlike_mib_new_dot3ControlEntry(void);
 
-extern int
-etherlike_mib_get_dot3ControlEntry(GSnmpSession *s, etherlike_mib_dot3ControlEntry_t **dot3ControlEntry);
+extern void
+etherlike_mib_get_dot3ControlEntry(GSnmpSession *s, etherlike_mib_dot3ControlEntry_t **dot3ControlEntry, gint32 dot3StatsIndex, gint mask);
 
 extern void
 etherlike_mib_free_dot3ControlEntry(etherlike_mib_dot3ControlEntry_t *dot3ControlEntry);
@@ -173,6 +195,11 @@ etherlike_mib_free_dot3ControlEntry(etherlike_mib_dot3ControlEntry_t *dot3Contro
 /*
  * C type definitions for EtherLike-MIB::dot3PauseEntry.
  */
+
+#define ETHERLIKE_MIB_DOT3PAUSEADMINMODE	0x1 
+#define ETHERLIKE_MIB_DOT3PAUSEOPERMODE	0x2 
+#define ETHERLIKE_MIB_DOT3INPAUSEFRAMES	0x4 
+#define ETHERLIKE_MIB_DOT3OUTPAUSEFRAMES	0x8 
 
 typedef struct {
     gint32   dot3StatsIndex;
@@ -182,20 +209,20 @@ typedef struct {
     guint32  *dot3OutPauseFrames;
 } etherlike_mib_dot3PauseEntry_t;
 
-extern int
-etherlike_mib_get_dot3PauseTable(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t ***dot3PauseEntry);
+extern void
+etherlike_mib_get_dot3PauseTable(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t ***dot3PauseEntry, gint mask);
 
 extern void
 etherlike_mib_free_dot3PauseTable(etherlike_mib_dot3PauseEntry_t **dot3PauseEntry);
 
 extern etherlike_mib_dot3PauseEntry_t *
-etherlike_mib_new_dot3PauseEntry();
+etherlike_mib_new_dot3PauseEntry(void);
 
-extern int
-etherlike_mib_get_dot3PauseEntry(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t **dot3PauseEntry);
+extern void
+etherlike_mib_get_dot3PauseEntry(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t **dot3PauseEntry, gint32 dot3StatsIndex, gint mask);
 
-extern int
-etherlike_mib_set_dot3PauseEntry(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t *dot3PauseEntry);
+extern void
+etherlike_mib_set_dot3PauseEntry(GSnmpSession *s, etherlike_mib_dot3PauseEntry_t *dot3PauseEntry, gint mask);
 
 extern void
 etherlike_mib_free_dot3PauseEntry(etherlike_mib_dot3PauseEntry_t *dot3PauseEntry);

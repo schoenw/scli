@@ -45,33 +45,37 @@ GSnmpEnum const tcp_mib_enums_tcpConnState[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -93,27 +97,31 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _tcp[] = {
-    { 1, G_SNMP_INTEGER32, "tcpRtoAlgorithm" },
-    { 2, G_SNMP_INTEGER32, "tcpRtoMin" },
-    { 3, G_SNMP_INTEGER32, "tcpRtoMax" },
-    { 4, G_SNMP_INTEGER32, "tcpMaxConn" },
-    { 5, G_SNMP_COUNTER32, "tcpActiveOpens" },
-    { 6, G_SNMP_COUNTER32, "tcpPassiveOpens" },
-    { 7, G_SNMP_COUNTER32, "tcpAttemptFails" },
-    { 8, G_SNMP_COUNTER32, "tcpEstabResets" },
-    { 9, G_SNMP_UNSIGNED32, "tcpCurrEstab" },
-    { 10, G_SNMP_COUNTER32, "tcpInSegs" },
-    { 11, G_SNMP_COUNTER32, "tcpOutSegs" },
-    { 12, G_SNMP_COUNTER32, "tcpRetransSegs" },
-    { 14, G_SNMP_COUNTER32, "tcpInErrs" },
-    { 15, G_SNMP_COUNTER32, "tcpOutRsts" },
-    { 0, 0, NULL }
+static guint32 const oid_tcp[] = {1, 3, 6, 1, 2, 1, 6};
+
+static attribute_t attr_tcp[] = {
+    { 1, G_SNMP_INTEGER32, TCP_MIB_TCPRTOALGORITHM, "tcpRtoAlgorithm" },
+    { 2, G_SNMP_INTEGER32, TCP_MIB_TCPRTOMIN, "tcpRtoMin" },
+    { 3, G_SNMP_INTEGER32, TCP_MIB_TCPRTOMAX, "tcpRtoMax" },
+    { 4, G_SNMP_INTEGER32, TCP_MIB_TCPMAXCONN, "tcpMaxConn" },
+    { 5, G_SNMP_COUNTER32, TCP_MIB_TCPACTIVEOPENS, "tcpActiveOpens" },
+    { 6, G_SNMP_COUNTER32, TCP_MIB_TCPPASSIVEOPENS, "tcpPassiveOpens" },
+    { 7, G_SNMP_COUNTER32, TCP_MIB_TCPATTEMPTFAILS, "tcpAttemptFails" },
+    { 8, G_SNMP_COUNTER32, TCP_MIB_TCPESTABRESETS, "tcpEstabResets" },
+    { 9, G_SNMP_UNSIGNED32, TCP_MIB_TCPCURRESTAB, "tcpCurrEstab" },
+    { 10, G_SNMP_COUNTER32, TCP_MIB_TCPINSEGS, "tcpInSegs" },
+    { 11, G_SNMP_COUNTER32, TCP_MIB_TCPOUTSEGS, "tcpOutSegs" },
+    { 12, G_SNMP_COUNTER32, TCP_MIB_TCPRETRANSSEGS, "tcpRetransSegs" },
+    { 14, G_SNMP_COUNTER32, TCP_MIB_TCPINERRS, "tcpInErrs" },
+    { 15, G_SNMP_COUNTER32, TCP_MIB_TCPOUTRSTS, "tcpOutRsts" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _tcpConnEntry[] = {
-    { 1, G_SNMP_INTEGER32, "tcpConnState" },
-    { 0, 0, NULL }
+static guint32 const oid_tcpConnEntry[] = {1, 3, 6, 1, 2, 1, 6, 13, 1};
+
+static attribute_t attr_tcpConnEntry[] = {
+    { 1, G_SNMP_INTEGER32, TCP_MIB_TCPCONNSTATE, "tcpConnState" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -133,7 +141,6 @@ assign_tcp(GSList *vbl)
     tcp_mib_tcp_t *tcp;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 6};
 
     tcp = tcp_mib_new_tcp();
     if (! tcp) {
@@ -146,8 +153,8 @@ assign_tcp(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _tcp, &idx) < 0) continue;
+        if (lookup(vb, oid_tcp, sizeof(oid_tcp)/sizeof(guint32),
+                   attr_tcp, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -198,25 +205,21 @@ assign_tcp(GSList *vbl)
     return tcp;
 }
 
-int
-tcp_mib_get_tcp(GSnmpSession *s, tcp_mib_tcp_t **tcp)
+void
+tcp_mib_get_tcp(GSnmpSession *s, tcp_mib_tcp_t **tcp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 6, 0};
 
     *tcp = NULL;
 
-    add_attributes(s, &in, base, 7, _tcp);
+    add_attributes(s, &in, base, 8, 7, attr_tcp, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *tcp = assign_tcp(out);
     }
-
-    *tcp = assign_tcp(out);
-
-    return 0;
 }
 
 void
@@ -265,6 +268,26 @@ unpack_tcpConnEntry(GSnmpVarBind *vb, tcp_mib_tcpConnEntry_t *tcpConnEntry)
     return 0;
 }
 
+static int
+pack_tcpConnEntry(guint32 *base, guchar *tcpConnLocalAddress, gint32 tcpConnLocalPort, guchar *tcpConnRemAddress, gint32 tcpConnRemPort)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = tcpConnLocalAddress[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = tcpConnLocalPort;
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = tcpConnRemAddress[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = tcpConnRemPort;
+    return idx;
+}
+
 static tcp_mib_tcpConnEntry_t *
 assign_tcpConnEntry(GSList *vbl)
 {
@@ -272,7 +295,6 @@ assign_tcpConnEntry(GSList *vbl)
     tcp_mib_tcpConnEntry_t *tcpConnEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 6, 13, 1};
 
     tcpConnEntry = tcp_mib_new_tcpConnEntry();
     if (! tcpConnEntry) {
@@ -291,8 +313,8 @@ assign_tcpConnEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _tcpConnEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_tcpConnEntry, sizeof(oid_tcpConnEntry)/sizeof(guint32),
+                   attr_tcpConnEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -304,8 +326,8 @@ assign_tcpConnEntry(GSList *vbl)
     return tcpConnEntry;
 }
 
-int
-tcp_mib_get_tcpConnTable(GSnmpSession *s, tcp_mib_tcpConnEntry_t ***tcpConnEntry)
+void
+tcp_mib_get_tcpConnTable(GSnmpSession *s, tcp_mib_tcpConnEntry_t ***tcpConnEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -314,24 +336,77 @@ tcp_mib_get_tcpConnTable(GSnmpSession *s, tcp_mib_tcpConnEntry_t ***tcpConnEntry
 
     *tcpConnEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _tcpConnEntry);
+    add_attributes(s, &in, base, 10, 9, attr_tcpConnEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *tcpConnEntry = (tcp_mib_tcpConnEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(tcp_mib_tcpConnEntry_t *));
+        if (! *tcpConnEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*tcpConnEntry)[i] = assign_tcpConnEntry(row->data);
+        }
+    }
+}
+
+void
+tcp_mib_get_tcpConnEntry(GSnmpSession *s, tcp_mib_tcpConnEntry_t **tcpConnEntry, guchar *tcpConnLocalAddress, gint32 tcpConnLocalPort, guchar *tcpConnRemAddress, gint32 tcpConnRemPort, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_tcpConnEntry, sizeof(oid_tcpConnEntry));
+    len = pack_tcpConnEntry(base, tcpConnLocalAddress, tcpConnLocalPort, tcpConnRemAddress, tcpConnRemPort);
+    if (len < 0) {
+        g_warning("illegal tcpConnEntry index values");
+        return;
     }
 
-    *tcpConnEntry = (tcp_mib_tcpConnEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(tcp_mib_tcpConnEntry_t *));
-    if (! *tcpConnEntry) {
-        return -4;
+    *tcpConnEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_tcpConnEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *tcpConnEntry = assign_tcpConnEntry(out);
+    }
+}
+
+void
+tcp_mib_set_tcpConnEntry(GSnmpSession *s, tcp_mib_tcpConnEntry_t *tcpConnEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_tcpConnEntry, sizeof(oid_tcpConnEntry));
+    len = pack_tcpConnEntry(base, tcpConnEntry->tcpConnLocalAddress, tcpConnEntry->tcpConnLocalPort, tcpConnEntry->tcpConnRemAddress, tcpConnEntry->tcpConnRemPort);
+    if (len < 0) {
+        g_warning("illegal tcpConnEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*tcpConnEntry)[i] = assign_tcpConnEntry(row->data);
+    if (tcpConnEntry->tcpConnState) {
+        base[9] = 1;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       tcpConnEntry->tcpConnState,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void

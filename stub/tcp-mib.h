@@ -51,6 +51,21 @@ extern GSnmpEnum const tcp_mib_enums_tcpConnState[];
  * C type definitions for TCP-MIB::tcp.
  */
 
+#define TCP_MIB_TCPRTOALGORITHM	0x1 
+#define TCP_MIB_TCPRTOMIN	0x2 
+#define TCP_MIB_TCPRTOMAX	0x4 
+#define TCP_MIB_TCPMAXCONN	0x8 
+#define TCP_MIB_TCPACTIVEOPENS	0x10 
+#define TCP_MIB_TCPPASSIVEOPENS	0x20 
+#define TCP_MIB_TCPATTEMPTFAILS	0x40 
+#define TCP_MIB_TCPESTABRESETS	0x80 
+#define TCP_MIB_TCPCURRESTAB	0x100 
+#define TCP_MIB_TCPINSEGS	0x200 
+#define TCP_MIB_TCPOUTSEGS	0x400 
+#define TCP_MIB_TCPRETRANSSEGS	0x800 
+#define TCP_MIB_TCPINERRS	0x1000 
+#define TCP_MIB_TCPOUTRSTS	0x2000 
+
 typedef struct {
     gint32   *tcpRtoAlgorithm;
     gint32   *tcpRtoMin;
@@ -69,10 +84,10 @@ typedef struct {
 } tcp_mib_tcp_t;
 
 extern tcp_mib_tcp_t *
-tcp_mib_new_tcp();
+tcp_mib_new_tcp(void);
 
-extern int
-tcp_mib_get_tcp(GSnmpSession *s, tcp_mib_tcp_t **tcp);
+extern void
+tcp_mib_get_tcp(GSnmpSession *s, tcp_mib_tcp_t **tcp, gint mask);
 
 extern void
 tcp_mib_free_tcp(tcp_mib_tcp_t *tcp);
@@ -80,6 +95,12 @@ tcp_mib_free_tcp(tcp_mib_tcp_t *tcp);
 /*
  * C type definitions for TCP-MIB::tcpConnEntry.
  */
+
+#define TCP_MIB_TCPCONNSTATE	0x1 
+#define TCP_MIB_TCPCONNLOCALADDRESS	0x2 
+#define TCP_MIB_TCPCONNLOCALPORT	0x4 
+#define TCP_MIB_TCPCONNREMADDRESS	0x8 
+#define TCP_MIB_TCPCONNREMPORT	0x10 
 
 typedef struct {
     guchar   tcpConnLocalAddress[4];
@@ -89,20 +110,20 @@ typedef struct {
     gint32   *tcpConnState;
 } tcp_mib_tcpConnEntry_t;
 
-extern int
-tcp_mib_get_tcpConnTable(GSnmpSession *s, tcp_mib_tcpConnEntry_t ***tcpConnEntry);
+extern void
+tcp_mib_get_tcpConnTable(GSnmpSession *s, tcp_mib_tcpConnEntry_t ***tcpConnEntry, gint mask);
 
 extern void
 tcp_mib_free_tcpConnTable(tcp_mib_tcpConnEntry_t **tcpConnEntry);
 
 extern tcp_mib_tcpConnEntry_t *
-tcp_mib_new_tcpConnEntry();
+tcp_mib_new_tcpConnEntry(void);
 
-extern int
-tcp_mib_get_tcpConnEntry(GSnmpSession *s, tcp_mib_tcpConnEntry_t **tcpConnEntry);
+extern void
+tcp_mib_get_tcpConnEntry(GSnmpSession *s, tcp_mib_tcpConnEntry_t **tcpConnEntry, guchar *tcpConnLocalAddress, gint32 tcpConnLocalPort, guchar *tcpConnRemAddress, gint32 tcpConnRemPort, gint mask);
 
-extern int
-tcp_mib_set_tcpConnEntry(GSnmpSession *s, tcp_mib_tcpConnEntry_t *tcpConnEntry);
+extern void
+tcp_mib_set_tcpConnEntry(GSnmpSession *s, tcp_mib_tcpConnEntry_t *tcpConnEntry, gint mask);
 
 extern void
 tcp_mib_free_tcpConnEntry(tcp_mib_tcpConnEntry_t *tcpConnEntry);

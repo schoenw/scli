@@ -34,6 +34,15 @@ extern GSnmpEnum const snmpv2_mib_enums_snmpEnableAuthenTraps[];
  * C type definitions for SNMPv2-MIB::system.
  */
 
+#define SNMPV2_MIB_SYSDESCR	0x1 
+#define SNMPV2_MIB_SYSOBJECTID	0x2 
+#define SNMPV2_MIB_SYSUPTIME	0x4 
+#define SNMPV2_MIB_SYSCONTACT	0x8 
+#define SNMPV2_MIB_SYSNAME	0x10 
+#define SNMPV2_MIB_SYSLOCATION	0x20 
+#define SNMPV2_MIB_SYSSERVICES	0x40 
+#define SNMPV2_MIB_SYSORLASTCHANGE	0x80 
+
 typedef struct {
     guchar   *sysDescr;
     gsize    _sysDescrLength;
@@ -51,13 +60,13 @@ typedef struct {
 } snmpv2_mib_system_t;
 
 extern snmpv2_mib_system_t *
-snmpv2_mib_new_system();
+snmpv2_mib_new_system(void);
 
-extern int
-snmpv2_mib_get_system(GSnmpSession *s, snmpv2_mib_system_t **system);
+extern void
+snmpv2_mib_get_system(GSnmpSession *s, snmpv2_mib_system_t **system, gint mask);
 
-extern int
-snmpv2_mib_set_system(GSnmpSession *s, snmpv2_mib_system_t *system);
+extern void
+snmpv2_mib_set_system(GSnmpSession *s, snmpv2_mib_system_t *system, gint mask);
 
 extern void
 snmpv2_mib_free_system(snmpv2_mib_system_t *system);
@@ -65,6 +74,10 @@ snmpv2_mib_free_system(snmpv2_mib_system_t *system);
 /*
  * C type definitions for SNMPv2-MIB::sysOREntry.
  */
+
+#define SNMPV2_MIB_SYSORID	0x1 
+#define SNMPV2_MIB_SYSORDESCR	0x2 
+#define SNMPV2_MIB_SYSORUPTIME	0x4 
 
 typedef struct {
     gint32   sysORIndex;
@@ -75,17 +88,17 @@ typedef struct {
     guint32  *sysORUpTime;
 } snmpv2_mib_sysOREntry_t;
 
-extern int
-snmpv2_mib_get_sysORTable(GSnmpSession *s, snmpv2_mib_sysOREntry_t ***sysOREntry);
+extern void
+snmpv2_mib_get_sysORTable(GSnmpSession *s, snmpv2_mib_sysOREntry_t ***sysOREntry, gint mask);
 
 extern void
 snmpv2_mib_free_sysORTable(snmpv2_mib_sysOREntry_t **sysOREntry);
 
 extern snmpv2_mib_sysOREntry_t *
-snmpv2_mib_new_sysOREntry();
+snmpv2_mib_new_sysOREntry(void);
 
-extern int
-snmpv2_mib_get_sysOREntry(GSnmpSession *s, snmpv2_mib_sysOREntry_t **sysOREntry);
+extern void
+snmpv2_mib_get_sysOREntry(GSnmpSession *s, snmpv2_mib_sysOREntry_t **sysOREntry, gint32 sysORIndex, gint mask);
 
 extern void
 snmpv2_mib_free_sysOREntry(snmpv2_mib_sysOREntry_t *sysOREntry);
@@ -93,6 +106,37 @@ snmpv2_mib_free_sysOREntry(snmpv2_mib_sysOREntry_t *sysOREntry);
 /*
  * C type definitions for SNMPv2-MIB::snmp.
  */
+
+#define SNMPV2_MIB_SNMPINPKTS	0x1 
+#define SNMPV2_MIB_SNMPOUTPKTS	0x2 
+#define SNMPV2_MIB_SNMPINBADVERSIONS	0x4 
+#define SNMPV2_MIB_SNMPINBADCOMMUNITYNAMES	0x8 
+#define SNMPV2_MIB_SNMPINBADCOMMUNITYUSES	0x10 
+#define SNMPV2_MIB_SNMPINASNPARSEERRS	0x20 
+#define SNMPV2_MIB_SNMPINTOOBIGS	0x40 
+#define SNMPV2_MIB_SNMPINNOSUCHNAMES	0x80 
+#define SNMPV2_MIB_SNMPINBADVALUES	0x100 
+#define SNMPV2_MIB_SNMPINREADONLYS	0x200 
+#define SNMPV2_MIB_SNMPINGENERRS	0x400 
+#define SNMPV2_MIB_SNMPINTOTALREQVARS	0x800 
+#define SNMPV2_MIB_SNMPINTOTALSETVARS	0x1000 
+#define SNMPV2_MIB_SNMPINGETREQUESTS	0x2000 
+#define SNMPV2_MIB_SNMPINGETNEXTS	0x4000 
+#define SNMPV2_MIB_SNMPINSETREQUESTS	0x8000 
+#define SNMPV2_MIB_SNMPINGETRESPONSES	0x10000 
+#define SNMPV2_MIB_SNMPINTRAPS	0x20000 
+#define SNMPV2_MIB_SNMPOUTTOOBIGS	0x40000 
+#define SNMPV2_MIB_SNMPOUTNOSUCHNAMES	0x80000 
+#define SNMPV2_MIB_SNMPOUTBADVALUES	0x100000 
+#define SNMPV2_MIB_SNMPOUTGENERRS	0x200000 
+#define SNMPV2_MIB_SNMPOUTGETREQUESTS	0x400000 
+#define SNMPV2_MIB_SNMPOUTGETNEXTS	0x800000 
+#define SNMPV2_MIB_SNMPOUTSETREQUESTS	0x1000000 
+#define SNMPV2_MIB_SNMPOUTGETRESPONSES	0x2000000 
+#define SNMPV2_MIB_SNMPOUTTRAPS	0x4000000 
+#define SNMPV2_MIB_SNMPENABLEAUTHENTRAPS	0x8000000 
+#define SNMPV2_MIB_SNMPSILENTDROPS	0x10000000 
+#define SNMPV2_MIB_SNMPPROXYDROPS	0x20000000 
 
 typedef struct {
     guint32  *snmpInPkts;
@@ -128,13 +172,13 @@ typedef struct {
 } snmpv2_mib_snmp_t;
 
 extern snmpv2_mib_snmp_t *
-snmpv2_mib_new_snmp();
+snmpv2_mib_new_snmp(void);
 
-extern int
-snmpv2_mib_get_snmp(GSnmpSession *s, snmpv2_mib_snmp_t **snmp);
+extern void
+snmpv2_mib_get_snmp(GSnmpSession *s, snmpv2_mib_snmp_t **snmp, gint mask);
 
-extern int
-snmpv2_mib_set_snmp(GSnmpSession *s, snmpv2_mib_snmp_t *snmp);
+extern void
+snmpv2_mib_set_snmp(GSnmpSession *s, snmpv2_mib_snmp_t *snmp, gint mask);
 
 extern void
 snmpv2_mib_free_snmp(snmpv2_mib_snmp_t *snmp);
@@ -143,18 +187,20 @@ snmpv2_mib_free_snmp(snmpv2_mib_snmp_t *snmp);
  * C type definitions for SNMPv2-MIB::snmpSet.
  */
 
+#define SNMPV2_MIB_SNMPSETSERIALNO	0x1 
+
 typedef struct {
     gint32   *snmpSetSerialNo;
 } snmpv2_mib_snmpSet_t;
 
 extern snmpv2_mib_snmpSet_t *
-snmpv2_mib_new_snmpSet();
+snmpv2_mib_new_snmpSet(void);
 
-extern int
-snmpv2_mib_get_snmpSet(GSnmpSession *s, snmpv2_mib_snmpSet_t **snmpSet);
+extern void
+snmpv2_mib_get_snmpSet(GSnmpSession *s, snmpv2_mib_snmpSet_t **snmpSet, gint mask);
 
-extern int
-snmpv2_mib_set_snmpSet(GSnmpSession *s, snmpv2_mib_snmpSet_t *snmpSet);
+extern void
+snmpv2_mib_set_snmpSet(GSnmpSession *s, snmpv2_mib_snmpSet_t *snmpSet, gint mask);
 
 extern void
 snmpv2_mib_free_snmpSet(snmpv2_mib_snmpSet_t *snmpSet);

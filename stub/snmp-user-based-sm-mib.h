@@ -59,6 +59,13 @@ extern GSnmpIdentity const snmp_user_based_sm_mib_identities[];
  * C type definitions for SNMP-USER-BASED-SM-MIB::usmStats.
  */
 
+#define SNMP_USER_BASED_SM_MIB_USMSTATSUNSUPPORTEDSECLEVELS	0x1 
+#define SNMP_USER_BASED_SM_MIB_USMSTATSNOTINTIMEWINDOWS	0x2 
+#define SNMP_USER_BASED_SM_MIB_USMSTATSUNKNOWNUSERNAMES	0x4 
+#define SNMP_USER_BASED_SM_MIB_USMSTATSUNKNOWNENGINEIDS	0x8 
+#define SNMP_USER_BASED_SM_MIB_USMSTATSWRONGDIGESTS	0x10 
+#define SNMP_USER_BASED_SM_MIB_USMSTATSDECRYPTIONERRORS	0x20 
+
 typedef struct {
     guint32  *usmStatsUnsupportedSecLevels;
     guint32  *usmStatsNotInTimeWindows;
@@ -69,10 +76,10 @@ typedef struct {
 } snmp_user_based_sm_mib_usmStats_t;
 
 extern snmp_user_based_sm_mib_usmStats_t *
-snmp_user_based_sm_mib_new_usmStats();
+snmp_user_based_sm_mib_new_usmStats(void);
 
-extern int
-snmp_user_based_sm_mib_get_usmStats(GSnmpSession *s, snmp_user_based_sm_mib_usmStats_t **usmStats);
+extern void
+snmp_user_based_sm_mib_get_usmStats(GSnmpSession *s, snmp_user_based_sm_mib_usmStats_t **usmStats, gint mask);
 
 extern void
 snmp_user_based_sm_mib_free_usmStats(snmp_user_based_sm_mib_usmStats_t *usmStats);
@@ -81,18 +88,20 @@ snmp_user_based_sm_mib_free_usmStats(snmp_user_based_sm_mib_usmStats_t *usmStats
  * C type definitions for SNMP-USER-BASED-SM-MIB::usmUser.
  */
 
+#define SNMP_USER_BASED_SM_MIB_USMUSERSPINLOCK	0x1 
+
 typedef struct {
     gint32   *usmUserSpinLock;
 } snmp_user_based_sm_mib_usmUser_t;
 
 extern snmp_user_based_sm_mib_usmUser_t *
-snmp_user_based_sm_mib_new_usmUser();
+snmp_user_based_sm_mib_new_usmUser(void);
 
-extern int
-snmp_user_based_sm_mib_get_usmUser(GSnmpSession *s, snmp_user_based_sm_mib_usmUser_t **usmUser);
+extern void
+snmp_user_based_sm_mib_get_usmUser(GSnmpSession *s, snmp_user_based_sm_mib_usmUser_t **usmUser, gint mask);
 
-extern int
-snmp_user_based_sm_mib_set_usmUser(GSnmpSession *s, snmp_user_based_sm_mib_usmUser_t *usmUser);
+extern void
+snmp_user_based_sm_mib_set_usmUser(GSnmpSession *s, snmp_user_based_sm_mib_usmUser_t *usmUser, gint mask);
 
 extern void
 snmp_user_based_sm_mib_free_usmUser(snmp_user_based_sm_mib_usmUser_t *usmUser);
@@ -100,6 +109,18 @@ snmp_user_based_sm_mib_free_usmUser(snmp_user_based_sm_mib_usmUser_t *usmUser);
 /*
  * C type definitions for SNMP-USER-BASED-SM-MIB::usmUserEntry.
  */
+
+#define SNMP_USER_BASED_SM_MIB_USMUSERSECURITYNAME	0x1 
+#define SNMP_USER_BASED_SM_MIB_USMUSERCLONEFROM	0x2 
+#define SNMP_USER_BASED_SM_MIB_USMUSERAUTHPROTOCOL	0x4 
+#define SNMP_USER_BASED_SM_MIB_USMUSERAUTHKEYCHANGE	0x8 
+#define SNMP_USER_BASED_SM_MIB_USMUSEROWNAUTHKEYCHANGE	0x10 
+#define SNMP_USER_BASED_SM_MIB_USMUSERPRIVPROTOCOL	0x20 
+#define SNMP_USER_BASED_SM_MIB_USMUSERPRIVKEYCHANGE	0x40 
+#define SNMP_USER_BASED_SM_MIB_USMUSEROWNPRIVKEYCHANGE	0x80 
+#define SNMP_USER_BASED_SM_MIB_USMUSERPUBLIC	0x100 
+#define SNMP_USER_BASED_SM_MIB_USMUSERSTORAGETYPE	0x200 
+#define SNMP_USER_BASED_SM_MIB_USMUSERSTATUS	0x400 
 
 typedef struct {
     guchar   usmUserEngineID[32];
@@ -128,20 +149,20 @@ typedef struct {
     gint32   *usmUserStatus;
 } snmp_user_based_sm_mib_usmUserEntry_t;
 
-extern int
-snmp_user_based_sm_mib_get_usmUserTable(GSnmpSession *s, snmp_user_based_sm_mib_usmUserEntry_t ***usmUserEntry);
+extern void
+snmp_user_based_sm_mib_get_usmUserTable(GSnmpSession *s, snmp_user_based_sm_mib_usmUserEntry_t ***usmUserEntry, gint mask);
 
 extern void
 snmp_user_based_sm_mib_free_usmUserTable(snmp_user_based_sm_mib_usmUserEntry_t **usmUserEntry);
 
 extern snmp_user_based_sm_mib_usmUserEntry_t *
-snmp_user_based_sm_mib_new_usmUserEntry();
+snmp_user_based_sm_mib_new_usmUserEntry(void);
 
-extern int
-snmp_user_based_sm_mib_get_usmUserEntry(GSnmpSession *s, snmp_user_based_sm_mib_usmUserEntry_t **usmUserEntry);
+extern void
+snmp_user_based_sm_mib_get_usmUserEntry(GSnmpSession *s, snmp_user_based_sm_mib_usmUserEntry_t **usmUserEntry, guchar *usmUserEngineID, gsize _usmUserEngineIDLength, guchar *usmUserName, gsize _usmUserNameLength, gint mask);
 
-extern int
-snmp_user_based_sm_mib_set_usmUserEntry(GSnmpSession *s, snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry);
+extern void
+snmp_user_based_sm_mib_set_usmUserEntry(GSnmpSession *s, snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry, gint mask);
 
 extern void
 snmp_user_based_sm_mib_free_usmUserEntry(snmp_user_based_sm_mib_usmUserEntry_t *usmUserEntry);

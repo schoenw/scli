@@ -61,33 +61,37 @@ GSnmpEnum const tunnel_mib_enums_tunnelConfigStatus[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -109,20 +113,24 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _tunnelIfEntry[] = {
-    { 1, G_SNMP_IPADDRESS, "tunnelIfLocalAddress" },
-    { 2, G_SNMP_IPADDRESS, "tunnelIfRemoteAddress" },
-    { 3, G_SNMP_INTEGER32, "tunnelIfEncapsMethod" },
-    { 4, G_SNMP_INTEGER32, "tunnelIfHopLimit" },
-    { 5, G_SNMP_INTEGER32, "tunnelIfSecurity" },
-    { 6, G_SNMP_INTEGER32, "tunnelIfTOS" },
-    { 0, 0, NULL }
+static guint32 const oid_tunnelIfEntry[] = {1, 3, 6, 1, 2, 1, 10, 131, 1, 1, 1, 1};
+
+static attribute_t attr_tunnelIfEntry[] = {
+    { 1, G_SNMP_IPADDRESS, TUNNEL_MIB_TUNNELIFLOCALADDRESS, "tunnelIfLocalAddress" },
+    { 2, G_SNMP_IPADDRESS, TUNNEL_MIB_TUNNELIFREMOTEADDRESS, "tunnelIfRemoteAddress" },
+    { 3, G_SNMP_INTEGER32, TUNNEL_MIB_TUNNELIFENCAPSMETHOD, "tunnelIfEncapsMethod" },
+    { 4, G_SNMP_INTEGER32, TUNNEL_MIB_TUNNELIFHOPLIMIT, "tunnelIfHopLimit" },
+    { 5, G_SNMP_INTEGER32, TUNNEL_MIB_TUNNELIFSECURITY, "tunnelIfSecurity" },
+    { 6, G_SNMP_INTEGER32, TUNNEL_MIB_TUNNELIFTOS, "tunnelIfTOS" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _tunnelConfigEntry[] = {
-    { 5, G_SNMP_INTEGER32, "tunnelConfigIfIndex" },
-    { 6, G_SNMP_INTEGER32, "tunnelConfigStatus" },
-    { 0, 0, NULL }
+static guint32 const oid_tunnelConfigEntry[] = {1, 3, 6, 1, 2, 1, 10, 131, 1, 1, 2, 1};
+
+static attribute_t attr_tunnelConfigEntry[] = {
+    { 5, G_SNMP_INTEGER32, TUNNEL_MIB_TUNNELCONFIGIFINDEX, "tunnelConfigIfIndex" },
+    { 6, G_SNMP_INTEGER32, TUNNEL_MIB_TUNNELCONFIGSTATUS, "tunnelConfigStatus" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -146,6 +154,15 @@ unpack_tunnelIfEntry(GSnmpVarBind *vb, tunnel_mib_tunnelIfEntry_t *tunnelIfEntry
     return 0;
 }
 
+static int
+pack_tunnelIfEntry(guint32 *base, gint32 ifIndex)
+{
+    int idx = 13;
+
+    base[idx++] = ifIndex;
+    return idx;
+}
+
 static tunnel_mib_tunnelIfEntry_t *
 assign_tunnelIfEntry(GSList *vbl)
 {
@@ -153,7 +170,6 @@ assign_tunnelIfEntry(GSList *vbl)
     tunnel_mib_tunnelIfEntry_t *tunnelIfEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 10, 131, 1, 1, 1, 1};
 
     tunnelIfEntry = tunnel_mib_new_tunnelIfEntry();
     if (! tunnelIfEntry) {
@@ -172,8 +188,8 @@ assign_tunnelIfEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _tunnelIfEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_tunnelIfEntry, sizeof(oid_tunnelIfEntry)/sizeof(guint32),
+                   attr_tunnelIfEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -200,8 +216,8 @@ assign_tunnelIfEntry(GSList *vbl)
     return tunnelIfEntry;
 }
 
-int
-tunnel_mib_get_tunnelIfTable(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t ***tunnelIfEntry)
+void
+tunnel_mib_get_tunnelIfTable(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t ***tunnelIfEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -210,24 +226,83 @@ tunnel_mib_get_tunnelIfTable(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t ***tunn
 
     *tunnelIfEntry = NULL;
 
-    add_attributes(s, &in, base, 12, _tunnelIfEntry);
+    add_attributes(s, &in, base, 13, 12, attr_tunnelIfEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *tunnelIfEntry = (tunnel_mib_tunnelIfEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(tunnel_mib_tunnelIfEntry_t *));
+        if (! *tunnelIfEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*tunnelIfEntry)[i] = assign_tunnelIfEntry(row->data);
+        }
+    }
+}
+
+void
+tunnel_mib_get_tunnelIfEntry(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t **tunnelIfEntry, gint32 ifIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_tunnelIfEntry, sizeof(oid_tunnelIfEntry));
+    len = pack_tunnelIfEntry(base, ifIndex);
+    if (len < 0) {
+        g_warning("illegal tunnelIfEntry index values");
+        return;
     }
 
-    *tunnelIfEntry = (tunnel_mib_tunnelIfEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(tunnel_mib_tunnelIfEntry_t *));
-    if (! *tunnelIfEntry) {
-        return -4;
+    *tunnelIfEntry = NULL;
+
+    add_attributes(s, &in, base, len, 12, attr_tunnelIfEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *tunnelIfEntry = assign_tunnelIfEntry(out);
+    }
+}
+
+void
+tunnel_mib_set_tunnelIfEntry(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t *tunnelIfEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_tunnelIfEntry, sizeof(oid_tunnelIfEntry));
+    len = pack_tunnelIfEntry(base, tunnelIfEntry->ifIndex);
+    if (len < 0) {
+        g_warning("illegal tunnelIfEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*tunnelIfEntry)[i] = assign_tunnelIfEntry(row->data);
+    if (tunnelIfEntry->tunnelIfHopLimit) {
+        base[12] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       tunnelIfEntry->tunnelIfHopLimit,
+                       0);
+    }
+    if (tunnelIfEntry->tunnelIfTOS) {
+        base[12] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       tunnelIfEntry->tunnelIfTOS,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -289,6 +364,26 @@ unpack_tunnelConfigEntry(GSnmpVarBind *vb, tunnel_mib_tunnelConfigEntry_t *tunne
     return 0;
 }
 
+static int
+pack_tunnelConfigEntry(guint32 *base, guchar *tunnelConfigLocalAddress, guchar *tunnelConfigRemoteAddress, gint32 tunnelConfigEncapsMethod, gint32 tunnelConfigID)
+{
+    int i, len, idx = 13;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = tunnelConfigLocalAddress[i];
+        if (idx >= 128) return -1;
+    }
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = tunnelConfigRemoteAddress[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = tunnelConfigEncapsMethod;
+    base[idx++] = tunnelConfigID;
+    return idx;
+}
+
 static tunnel_mib_tunnelConfigEntry_t *
 assign_tunnelConfigEntry(GSList *vbl)
 {
@@ -296,7 +391,6 @@ assign_tunnelConfigEntry(GSList *vbl)
     tunnel_mib_tunnelConfigEntry_t *tunnelConfigEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 10, 131, 1, 1, 2, 1};
 
     tunnelConfigEntry = tunnel_mib_new_tunnelConfigEntry();
     if (! tunnelConfigEntry) {
@@ -315,8 +409,8 @@ assign_tunnelConfigEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _tunnelConfigEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_tunnelConfigEntry, sizeof(oid_tunnelConfigEntry)/sizeof(guint32),
+                   attr_tunnelConfigEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 5:
@@ -331,8 +425,8 @@ assign_tunnelConfigEntry(GSList *vbl)
     return tunnelConfigEntry;
 }
 
-int
-tunnel_mib_get_tunnelConfigTable(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t ***tunnelConfigEntry)
+void
+tunnel_mib_get_tunnelConfigTable(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t ***tunnelConfigEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -341,24 +435,77 @@ tunnel_mib_get_tunnelConfigTable(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t
 
     *tunnelConfigEntry = NULL;
 
-    add_attributes(s, &in, base, 12, _tunnelConfigEntry);
+    add_attributes(s, &in, base, 13, 12, attr_tunnelConfigEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *tunnelConfigEntry = (tunnel_mib_tunnelConfigEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(tunnel_mib_tunnelConfigEntry_t *));
+        if (! *tunnelConfigEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*tunnelConfigEntry)[i] = assign_tunnelConfigEntry(row->data);
+        }
+    }
+}
+
+void
+tunnel_mib_get_tunnelConfigEntry(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t **tunnelConfigEntry, guchar *tunnelConfigLocalAddress, guchar *tunnelConfigRemoteAddress, gint32 tunnelConfigEncapsMethod, gint32 tunnelConfigID, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_tunnelConfigEntry, sizeof(oid_tunnelConfigEntry));
+    len = pack_tunnelConfigEntry(base, tunnelConfigLocalAddress, tunnelConfigRemoteAddress, tunnelConfigEncapsMethod, tunnelConfigID);
+    if (len < 0) {
+        g_warning("illegal tunnelConfigEntry index values");
+        return;
     }
 
-    *tunnelConfigEntry = (tunnel_mib_tunnelConfigEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(tunnel_mib_tunnelConfigEntry_t *));
-    if (! *tunnelConfigEntry) {
-        return -4;
+    *tunnelConfigEntry = NULL;
+
+    add_attributes(s, &in, base, len, 12, attr_tunnelConfigEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *tunnelConfigEntry = assign_tunnelConfigEntry(out);
+    }
+}
+
+void
+tunnel_mib_set_tunnelConfigEntry(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t *tunnelConfigEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_tunnelConfigEntry, sizeof(oid_tunnelConfigEntry));
+    len = pack_tunnelConfigEntry(base, tunnelConfigEntry->tunnelConfigLocalAddress, tunnelConfigEntry->tunnelConfigRemoteAddress, tunnelConfigEntry->tunnelConfigEncapsMethod, tunnelConfigEntry->tunnelConfigID);
+    if (len < 0) {
+        g_warning("illegal tunnelConfigEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*tunnelConfigEntry)[i] = assign_tunnelConfigEntry(row->data);
+    if (tunnelConfigEntry->tunnelConfigStatus) {
+        base[12] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       tunnelConfigEntry->tunnelConfigStatus,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void

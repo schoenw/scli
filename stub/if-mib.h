@@ -298,15 +298,17 @@ extern GSnmpEnum const if_mib_enums_ifRcvAddressType[];
  * C type definitions for IF-MIB::interfaces.
  */
 
+#define IF_MIB_IFNUMBER	0x1 
+
 typedef struct {
     gint32   *ifNumber;
 } if_mib_interfaces_t;
 
 extern if_mib_interfaces_t *
-if_mib_new_interfaces();
+if_mib_new_interfaces(void);
 
-extern int
-if_mib_get_interfaces(GSnmpSession *s, if_mib_interfaces_t **interfaces);
+extern void
+if_mib_get_interfaces(GSnmpSession *s, if_mib_interfaces_t **interfaces, gint mask);
 
 extern void
 if_mib_free_interfaces(if_mib_interfaces_t *interfaces);
@@ -314,6 +316,29 @@ if_mib_free_interfaces(if_mib_interfaces_t *interfaces);
 /*
  * C type definitions for IF-MIB::ifEntry.
  */
+
+#define IF_MIB_IFINDEX	0x1 
+#define IF_MIB_IFDESCR	0x2 
+#define IF_MIB_IFTYPE	0x4 
+#define IF_MIB_IFMTU	0x8 
+#define IF_MIB_IFSPEED	0x10 
+#define IF_MIB_IFPHYSADDRESS	0x20 
+#define IF_MIB_IFADMINSTATUS	0x40 
+#define IF_MIB_IFOPERSTATUS	0x80 
+#define IF_MIB_IFLASTCHANGE	0x100 
+#define IF_MIB_IFINOCTETS	0x200 
+#define IF_MIB_IFINUCASTPKTS	0x400 
+#define IF_MIB_IFINNUCASTPKTS	0x800 
+#define IF_MIB_IFINDISCARDS	0x1000 
+#define IF_MIB_IFINERRORS	0x2000 
+#define IF_MIB_IFINUNKNOWNPROTOS	0x4000 
+#define IF_MIB_IFOUTOCTETS	0x8000 
+#define IF_MIB_IFOUTUCASTPKTS	0x10000 
+#define IF_MIB_IFOUTNUCASTPKTS	0x20000 
+#define IF_MIB_IFOUTDISCARDS	0x40000 
+#define IF_MIB_IFOUTERRORS	0x80000 
+#define IF_MIB_IFOUTQLEN	0x100000 
+#define IF_MIB_IFSPECIFIC	0x200000 
 
 typedef struct {
     gint32   ifIndex;
@@ -343,20 +368,20 @@ typedef struct {
     gsize    _ifSpecificLength;
 } if_mib_ifEntry_t;
 
-extern int
-if_mib_get_ifTable(GSnmpSession *s, if_mib_ifEntry_t ***ifEntry);
+extern void
+if_mib_get_ifTable(GSnmpSession *s, if_mib_ifEntry_t ***ifEntry, gint mask);
 
 extern void
 if_mib_free_ifTable(if_mib_ifEntry_t **ifEntry);
 
 extern if_mib_ifEntry_t *
-if_mib_new_ifEntry();
+if_mib_new_ifEntry(void);
 
-extern int
-if_mib_get_ifEntry(GSnmpSession *s, if_mib_ifEntry_t **ifEntry);
+extern void
+if_mib_get_ifEntry(GSnmpSession *s, if_mib_ifEntry_t **ifEntry, gint32 ifIndex, gint mask);
 
-extern int
-if_mib_set_ifEntry(GSnmpSession *s, if_mib_ifEntry_t *ifEntry);
+extern void
+if_mib_set_ifEntry(GSnmpSession *s, if_mib_ifEntry_t *ifEntry, gint mask);
 
 extern void
 if_mib_free_ifEntry(if_mib_ifEntry_t *ifEntry);
@@ -365,16 +390,19 @@ if_mib_free_ifEntry(if_mib_ifEntry_t *ifEntry);
  * C type definitions for IF-MIB::ifMIBObjects.
  */
 
+#define IF_MIB_IFTABLELASTCHANGE	0x1 
+#define IF_MIB_IFSTACKLASTCHANGE	0x2 
+
 typedef struct {
     guint32  *ifTableLastChange;
     guint32  *ifStackLastChange;
 } if_mib_ifMIBObjects_t;
 
 extern if_mib_ifMIBObjects_t *
-if_mib_new_ifMIBObjects();
+if_mib_new_ifMIBObjects(void);
 
-extern int
-if_mib_get_ifMIBObjects(GSnmpSession *s, if_mib_ifMIBObjects_t **ifMIBObjects);
+extern void
+if_mib_get_ifMIBObjects(GSnmpSession *s, if_mib_ifMIBObjects_t **ifMIBObjects, gint mask);
 
 extern void
 if_mib_free_ifMIBObjects(if_mib_ifMIBObjects_t *ifMIBObjects);
@@ -382,6 +410,26 @@ if_mib_free_ifMIBObjects(if_mib_ifMIBObjects_t *ifMIBObjects);
 /*
  * C type definitions for IF-MIB::ifXEntry.
  */
+
+#define IF_MIB_IFNAME	0x1 
+#define IF_MIB_IFINMULTICASTPKTS	0x2 
+#define IF_MIB_IFINBROADCASTPKTS	0x4 
+#define IF_MIB_IFOUTMULTICASTPKTS	0x8 
+#define IF_MIB_IFOUTBROADCASTPKTS	0x10 
+#define IF_MIB_IFHCINOCTETS	0x20 
+#define IF_MIB_IFHCINUCASTPKTS	0x40 
+#define IF_MIB_IFHCINMULTICASTPKTS	0x80 
+#define IF_MIB_IFHCINBROADCASTPKTS	0x100 
+#define IF_MIB_IFHCOUTOCTETS	0x200 
+#define IF_MIB_IFHCOUTUCASTPKTS	0x400 
+#define IF_MIB_IFHCOUTMULTICASTPKTS	0x800 
+#define IF_MIB_IFHCOUTBROADCASTPKTS	0x1000 
+#define IF_MIB_IFLINKUPDOWNTRAPENABLE	0x2000 
+#define IF_MIB_IFHIGHSPEED	0x4000 
+#define IF_MIB_IFPROMISCUOUSMODE	0x8000 
+#define IF_MIB_IFCONNECTORPRESENT	0x10000 
+#define IF_MIB_IFALIAS	0x20000 
+#define IF_MIB_IFCOUNTERDISCONTINUITYTIME	0x40000 
 
 typedef struct {
     gint32   ifIndex;
@@ -408,20 +456,20 @@ typedef struct {
     guint32  *ifCounterDiscontinuityTime;
 } if_mib_ifXEntry_t;
 
-extern int
-if_mib_get_ifXTable(GSnmpSession *s, if_mib_ifXEntry_t ***ifXEntry);
+extern void
+if_mib_get_ifXTable(GSnmpSession *s, if_mib_ifXEntry_t ***ifXEntry, gint mask);
 
 extern void
 if_mib_free_ifXTable(if_mib_ifXEntry_t **ifXEntry);
 
 extern if_mib_ifXEntry_t *
-if_mib_new_ifXEntry();
+if_mib_new_ifXEntry(void);
 
-extern int
-if_mib_get_ifXEntry(GSnmpSession *s, if_mib_ifXEntry_t **ifXEntry);
+extern void
+if_mib_get_ifXEntry(GSnmpSession *s, if_mib_ifXEntry_t **ifXEntry, gint32 ifIndex, gint mask);
 
-extern int
-if_mib_set_ifXEntry(GSnmpSession *s, if_mib_ifXEntry_t *ifXEntry);
+extern void
+if_mib_set_ifXEntry(GSnmpSession *s, if_mib_ifXEntry_t *ifXEntry, gint mask);
 
 extern void
 if_mib_free_ifXEntry(if_mib_ifXEntry_t *ifXEntry);
@@ -430,26 +478,28 @@ if_mib_free_ifXEntry(if_mib_ifXEntry_t *ifXEntry);
  * C type definitions for IF-MIB::ifStackEntry.
  */
 
+#define IF_MIB_IFSTACKSTATUS	0x1 
+
 typedef struct {
     gint32   ifStackHigherLayer;
     gint32   ifStackLowerLayer;
     gint32   *ifStackStatus;
 } if_mib_ifStackEntry_t;
 
-extern int
-if_mib_get_ifStackTable(GSnmpSession *s, if_mib_ifStackEntry_t ***ifStackEntry);
+extern void
+if_mib_get_ifStackTable(GSnmpSession *s, if_mib_ifStackEntry_t ***ifStackEntry, gint mask);
 
 extern void
 if_mib_free_ifStackTable(if_mib_ifStackEntry_t **ifStackEntry);
 
 extern if_mib_ifStackEntry_t *
-if_mib_new_ifStackEntry();
+if_mib_new_ifStackEntry(void);
 
-extern int
-if_mib_get_ifStackEntry(GSnmpSession *s, if_mib_ifStackEntry_t **ifStackEntry);
+extern void
+if_mib_get_ifStackEntry(GSnmpSession *s, if_mib_ifStackEntry_t **ifStackEntry, gint32 ifStackHigherLayer, gint32 ifStackLowerLayer, gint mask);
 
-extern int
-if_mib_set_ifStackEntry(GSnmpSession *s, if_mib_ifStackEntry_t *ifStackEntry);
+extern void
+if_mib_set_ifStackEntry(GSnmpSession *s, if_mib_ifStackEntry_t *ifStackEntry, gint mask);
 
 extern void
 if_mib_free_ifStackEntry(if_mib_ifStackEntry_t *ifStackEntry);
@@ -457,6 +507,13 @@ if_mib_free_ifStackEntry(if_mib_ifStackEntry_t *ifStackEntry);
 /*
  * C type definitions for IF-MIB::ifTestEntry.
  */
+
+#define IF_MIB_IFTESTID	0x1 
+#define IF_MIB_IFTESTSTATUS	0x2 
+#define IF_MIB_IFTESTTYPE	0x4 
+#define IF_MIB_IFTESTRESULT	0x8 
+#define IF_MIB_IFTESTCODE	0x10 
+#define IF_MIB_IFTESTOWNER	0x20 
 
 typedef struct {
     gint32   ifIndex;
@@ -471,20 +528,20 @@ typedef struct {
     gsize    _ifTestOwnerLength;
 } if_mib_ifTestEntry_t;
 
-extern int
-if_mib_get_ifTestTable(GSnmpSession *s, if_mib_ifTestEntry_t ***ifTestEntry);
+extern void
+if_mib_get_ifTestTable(GSnmpSession *s, if_mib_ifTestEntry_t ***ifTestEntry, gint mask);
 
 extern void
 if_mib_free_ifTestTable(if_mib_ifTestEntry_t **ifTestEntry);
 
 extern if_mib_ifTestEntry_t *
-if_mib_new_ifTestEntry();
+if_mib_new_ifTestEntry(void);
 
-extern int
-if_mib_get_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t **ifTestEntry);
+extern void
+if_mib_get_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t **ifTestEntry, gint32 ifIndex, gint mask);
 
-extern int
-if_mib_set_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t *ifTestEntry);
+extern void
+if_mib_set_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t *ifTestEntry, gint mask);
 
 extern void
 if_mib_free_ifTestEntry(if_mib_ifTestEntry_t *ifTestEntry);
@@ -492,6 +549,9 @@ if_mib_free_ifTestEntry(if_mib_ifTestEntry_t *ifTestEntry);
 /*
  * C type definitions for IF-MIB::ifRcvAddressEntry.
  */
+
+#define IF_MIB_IFRCVADDRESSSTATUS	0x1 
+#define IF_MIB_IFRCVADDRESSTYPE	0x2 
 
 typedef struct {
     gint32   ifIndex;
@@ -501,20 +561,20 @@ typedef struct {
     gint32   *ifRcvAddressType;
 } if_mib_ifRcvAddressEntry_t;
 
-extern int
-if_mib_get_ifRcvAddressTable(GSnmpSession *s, if_mib_ifRcvAddressEntry_t ***ifRcvAddressEntry);
+extern void
+if_mib_get_ifRcvAddressTable(GSnmpSession *s, if_mib_ifRcvAddressEntry_t ***ifRcvAddressEntry, gint mask);
 
 extern void
 if_mib_free_ifRcvAddressTable(if_mib_ifRcvAddressEntry_t **ifRcvAddressEntry);
 
 extern if_mib_ifRcvAddressEntry_t *
-if_mib_new_ifRcvAddressEntry();
+if_mib_new_ifRcvAddressEntry(void);
 
-extern int
-if_mib_get_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t **ifRcvAddressEntry);
+extern void
+if_mib_get_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t **ifRcvAddressEntry, gint32 ifIndex, guchar *ifRcvAddressAddress, gsize _ifRcvAddressAddressLength, gint mask);
 
-extern int
-if_mib_set_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry);
+extern void
+if_mib_set_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry, gint mask);
 
 extern void
 if_mib_free_ifRcvAddressEntry(if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry);

@@ -168,33 +168,37 @@ GSnmpEnum const disman_script_mib_enums_smRunState[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -216,78 +220,90 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _smLangEntry[] = {
-    { 2, G_SNMP_OBJECT_ID, "smLangLanguage" },
-    { 3, G_SNMP_OCTET_STRING, "smLangVersion" },
-    { 4, G_SNMP_OBJECT_ID, "smLangVendor" },
-    { 5, G_SNMP_OCTET_STRING, "smLangRevision" },
-    { 6, G_SNMP_OCTET_STRING, "smLangDescr" },
-    { 0, 0, NULL }
+static guint32 const oid_smLangEntry[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1};
+
+static attribute_t attr_smLangEntry[] = {
+    { 2, G_SNMP_OBJECT_ID, DISMAN_SCRIPT_MIB_SMLANGLANGUAGE, "smLangLanguage" },
+    { 3, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMLANGVERSION, "smLangVersion" },
+    { 4, G_SNMP_OBJECT_ID, DISMAN_SCRIPT_MIB_SMLANGVENDOR, "smLangVendor" },
+    { 5, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMLANGREVISION, "smLangRevision" },
+    { 6, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMLANGDESCR, "smLangDescr" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _smExtsnEntry[] = {
-    { 2, G_SNMP_OBJECT_ID, "smExtsnExtension" },
-    { 3, G_SNMP_OCTET_STRING, "smExtsnVersion" },
-    { 4, G_SNMP_OBJECT_ID, "smExtsnVendor" },
-    { 5, G_SNMP_OCTET_STRING, "smExtsnRevision" },
-    { 6, G_SNMP_OCTET_STRING, "smExtsnDescr" },
-    { 0, 0, NULL }
+static guint32 const oid_smExtsnEntry[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1};
+
+static attribute_t attr_smExtsnEntry[] = {
+    { 2, G_SNMP_OBJECT_ID, DISMAN_SCRIPT_MIB_SMEXTSNEXTENSION, "smExtsnExtension" },
+    { 3, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMEXTSNVERSION, "smExtsnVersion" },
+    { 4, G_SNMP_OBJECT_ID, DISMAN_SCRIPT_MIB_SMEXTSNVENDOR, "smExtsnVendor" },
+    { 5, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMEXTSNREVISION, "smExtsnRevision" },
+    { 6, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMEXTSNDESCR, "smExtsnDescr" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _smScriptEntry[] = {
-    { 3, G_SNMP_OCTET_STRING, "smScriptDescr" },
-    { 4, G_SNMP_INTEGER32, "smScriptLanguage" },
-    { 5, G_SNMP_OCTET_STRING, "smScriptSource" },
-    { 6, G_SNMP_INTEGER32, "smScriptAdminStatus" },
-    { 7, G_SNMP_INTEGER32, "smScriptOperStatus" },
-    { 8, G_SNMP_INTEGER32, "smScriptStorageType" },
-    { 9, G_SNMP_INTEGER32, "smScriptRowStatus" },
-    { 10, G_SNMP_OCTET_STRING, "smScriptError" },
-    { 11, G_SNMP_OCTET_STRING, "smScriptLastChange" },
-    { 0, 0, NULL }
+static guint32 const oid_smScriptEntry[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1};
+
+static attribute_t attr_smScriptEntry[] = {
+    { 3, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMSCRIPTDESCR, "smScriptDescr" },
+    { 4, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMSCRIPTLANGUAGE, "smScriptLanguage" },
+    { 5, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMSCRIPTSOURCE, "smScriptSource" },
+    { 6, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS, "smScriptAdminStatus" },
+    { 7, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS, "smScriptOperStatus" },
+    { 8, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMSCRIPTSTORAGETYPE, "smScriptStorageType" },
+    { 9, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMSCRIPTROWSTATUS, "smScriptRowStatus" },
+    { 10, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMSCRIPTERROR, "smScriptError" },
+    { 11, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMSCRIPTLASTCHANGE, "smScriptLastChange" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _smCodeEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "smCodeText" },
-    { 3, G_SNMP_INTEGER32, "smCodeRowStatus" },
-    { 0, 0, NULL }
+static guint32 const oid_smCodeEntry[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 2, 1};
+
+static attribute_t attr_smCodeEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMCODETEXT, "smCodeText" },
+    { 3, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMCODEROWSTATUS, "smCodeRowStatus" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _smLaunchEntry[] = {
-    { 3, G_SNMP_OCTET_STRING, "smLaunchScriptOwner" },
-    { 4, G_SNMP_OCTET_STRING, "smLaunchScriptName" },
-    { 5, G_SNMP_OCTET_STRING, "smLaunchArgument" },
-    { 6, G_SNMP_UNSIGNED32, "smLaunchMaxRunning" },
-    { 7, G_SNMP_UNSIGNED32, "smLaunchMaxCompleted" },
-    { 8, G_SNMP_INTEGER32, "smLaunchLifeTime" },
-    { 9, G_SNMP_INTEGER32, "smLaunchExpireTime" },
-    { 10, G_SNMP_INTEGER32, "smLaunchStart" },
-    { 11, G_SNMP_INTEGER32, "smLaunchControl" },
-    { 12, G_SNMP_INTEGER32, "smLaunchAdminStatus" },
-    { 13, G_SNMP_INTEGER32, "smLaunchOperStatus" },
-    { 14, G_SNMP_INTEGER32, "smLaunchRunIndexNext" },
-    { 15, G_SNMP_INTEGER32, "smLaunchStorageType" },
-    { 16, G_SNMP_INTEGER32, "smLaunchRowStatus" },
-    { 17, G_SNMP_OCTET_STRING, "smLaunchError" },
-    { 18, G_SNMP_OCTET_STRING, "smLaunchLastChange" },
-    { 19, G_SNMP_INTEGER32, "smLaunchRowExpireTime" },
-    { 0, 0, NULL }
+static guint32 const oid_smLaunchEntry[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1};
+
+static attribute_t attr_smLaunchEntry[] = {
+    { 3, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMLAUNCHSCRIPTOWNER, "smLaunchScriptOwner" },
+    { 4, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMLAUNCHSCRIPTNAME, "smLaunchScriptName" },
+    { 5, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMLAUNCHARGUMENT, "smLaunchArgument" },
+    { 6, G_SNMP_UNSIGNED32, DISMAN_SCRIPT_MIB_SMLAUNCHMAXRUNNING, "smLaunchMaxRunning" },
+    { 7, G_SNMP_UNSIGNED32, DISMAN_SCRIPT_MIB_SMLAUNCHMAXCOMPLETED, "smLaunchMaxCompleted" },
+    { 8, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMLAUNCHLIFETIME, "smLaunchLifeTime" },
+    { 9, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMLAUNCHEXPIRETIME, "smLaunchExpireTime" },
+    { 10, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMLAUNCHSTART, "smLaunchStart" },
+    { 11, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMLAUNCHCONTROL, "smLaunchControl" },
+    { 12, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS, "smLaunchAdminStatus" },
+    { 13, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS, "smLaunchOperStatus" },
+    { 14, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMLAUNCHRUNINDEXNEXT, "smLaunchRunIndexNext" },
+    { 15, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMLAUNCHSTORAGETYPE, "smLaunchStorageType" },
+    { 16, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMLAUNCHROWSTATUS, "smLaunchRowStatus" },
+    { 17, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMLAUNCHERROR, "smLaunchError" },
+    { 18, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMLAUNCHLASTCHANGE, "smLaunchLastChange" },
+    { 19, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMLAUNCHROWEXPIRETIME, "smLaunchRowExpireTime" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _smRunEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "smRunArgument" },
-    { 3, G_SNMP_OCTET_STRING, "smRunStartTime" },
-    { 4, G_SNMP_OCTET_STRING, "smRunEndTime" },
-    { 5, G_SNMP_INTEGER32, "smRunLifeTime" },
-    { 6, G_SNMP_INTEGER32, "smRunExpireTime" },
-    { 7, G_SNMP_INTEGER32, "smRunExitCode" },
-    { 8, G_SNMP_OCTET_STRING, "smRunResult" },
-    { 9, G_SNMP_INTEGER32, "smRunControl" },
-    { 10, G_SNMP_INTEGER32, "smRunState" },
-    { 11, G_SNMP_OCTET_STRING, "smRunError" },
-    { 12, G_SNMP_OCTET_STRING, "smRunResultTime" },
-    { 13, G_SNMP_OCTET_STRING, "smRunErrorTime" },
-    { 0, 0, NULL }
+static guint32 const oid_smRunEntry[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1};
+
+static attribute_t attr_smRunEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMRUNARGUMENT, "smRunArgument" },
+    { 3, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMRUNSTARTTIME, "smRunStartTime" },
+    { 4, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMRUNENDTIME, "smRunEndTime" },
+    { 5, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMRUNLIFETIME, "smRunLifeTime" },
+    { 6, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMRUNEXPIRETIME, "smRunExpireTime" },
+    { 7, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMRUNEXITCODE, "smRunExitCode" },
+    { 8, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMRUNRESULT, "smRunResult" },
+    { 9, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMRUNCONTROL, "smRunControl" },
+    { 10, G_SNMP_INTEGER32, DISMAN_SCRIPT_MIB_SMRUNSTATE, "smRunState" },
+    { 11, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMRUNERROR, "smRunError" },
+    { 12, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMRUNRESULTTIME, "smRunResultTime" },
+    { 13, G_SNMP_OCTET_STRING, DISMAN_SCRIPT_MIB_SMRUNERRORTIME, "smRunErrorTime" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -311,6 +327,15 @@ unpack_smLangEntry(GSnmpVarBind *vb, disman_script_mib_smLangEntry_t *smLangEntr
     return 0;
 }
 
+static int
+pack_smLangEntry(guint32 *base, gint32 smLangIndex)
+{
+    int idx = 11;
+
+    base[idx++] = smLangIndex;
+    return idx;
+}
+
 static disman_script_mib_smLangEntry_t *
 assign_smLangEntry(GSList *vbl)
 {
@@ -318,7 +343,6 @@ assign_smLangEntry(GSList *vbl)
     disman_script_mib_smLangEntry_t *smLangEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 1, 1};
 
     smLangEntry = disman_script_mib_new_smLangEntry();
     if (! smLangEntry) {
@@ -337,8 +361,8 @@ assign_smLangEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _smLangEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_smLangEntry, sizeof(oid_smLangEntry)/sizeof(guint32),
+                   attr_smLangEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -367,8 +391,8 @@ assign_smLangEntry(GSList *vbl)
     return smLangEntry;
 }
 
-int
-disman_script_mib_get_smLangTable(GSnmpSession *s, disman_script_mib_smLangEntry_t ***smLangEntry)
+void
+disman_script_mib_get_smLangTable(GSnmpSession *s, disman_script_mib_smLangEntry_t ***smLangEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -377,24 +401,48 @@ disman_script_mib_get_smLangTable(GSnmpSession *s, disman_script_mib_smLangEntry
 
     *smLangEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _smLangEntry);
+    add_attributes(s, &in, base, 11, 10, attr_smLangEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *smLangEntry = (disman_script_mib_smLangEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(disman_script_mib_smLangEntry_t *));
+        if (! *smLangEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*smLangEntry)[i] = assign_smLangEntry(row->data);
+        }
+    }
+}
+
+void
+disman_script_mib_get_smLangEntry(GSnmpSession *s, disman_script_mib_smLangEntry_t **smLangEntry, gint32 smLangIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_smLangEntry, sizeof(oid_smLangEntry));
+    len = pack_smLangEntry(base, smLangIndex);
+    if (len < 0) {
+        g_warning("illegal smLangEntry index values");
+        return;
     }
 
-    *smLangEntry = (disman_script_mib_smLangEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(disman_script_mib_smLangEntry_t *));
-    if (! *smLangEntry) {
-        return -4;
-    }
+    *smLangEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*smLangEntry)[i] = assign_smLangEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_smLangEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *smLangEntry = assign_smLangEntry(out);
+    }
 }
 
 void
@@ -446,6 +494,16 @@ unpack_smExtsnEntry(GSnmpVarBind *vb, disman_script_mib_smExtsnEntry_t *smExtsnE
     return 0;
 }
 
+static int
+pack_smExtsnEntry(guint32 *base, gint32 smLangIndex, gint32 smExtsnIndex)
+{
+    int idx = 11;
+
+    base[idx++] = smLangIndex;
+    base[idx++] = smExtsnIndex;
+    return idx;
+}
+
 static disman_script_mib_smExtsnEntry_t *
 assign_smExtsnEntry(GSList *vbl)
 {
@@ -453,7 +511,6 @@ assign_smExtsnEntry(GSList *vbl)
     disman_script_mib_smExtsnEntry_t *smExtsnEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 2, 1};
 
     smExtsnEntry = disman_script_mib_new_smExtsnEntry();
     if (! smExtsnEntry) {
@@ -472,8 +529,8 @@ assign_smExtsnEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _smExtsnEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_smExtsnEntry, sizeof(oid_smExtsnEntry)/sizeof(guint32),
+                   attr_smExtsnEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -502,8 +559,8 @@ assign_smExtsnEntry(GSList *vbl)
     return smExtsnEntry;
 }
 
-int
-disman_script_mib_get_smExtsnTable(GSnmpSession *s, disman_script_mib_smExtsnEntry_t ***smExtsnEntry)
+void
+disman_script_mib_get_smExtsnTable(GSnmpSession *s, disman_script_mib_smExtsnEntry_t ***smExtsnEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -512,24 +569,48 @@ disman_script_mib_get_smExtsnTable(GSnmpSession *s, disman_script_mib_smExtsnEnt
 
     *smExtsnEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _smExtsnEntry);
+    add_attributes(s, &in, base, 11, 10, attr_smExtsnEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *smExtsnEntry = (disman_script_mib_smExtsnEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(disman_script_mib_smExtsnEntry_t *));
+        if (! *smExtsnEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*smExtsnEntry)[i] = assign_smExtsnEntry(row->data);
+        }
+    }
+}
+
+void
+disman_script_mib_get_smExtsnEntry(GSnmpSession *s, disman_script_mib_smExtsnEntry_t **smExtsnEntry, gint32 smLangIndex, gint32 smExtsnIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_smExtsnEntry, sizeof(oid_smExtsnEntry));
+    len = pack_smExtsnEntry(base, smLangIndex, smExtsnIndex);
+    if (len < 0) {
+        g_warning("illegal smExtsnEntry index values");
+        return;
     }
 
-    *smExtsnEntry = (disman_script_mib_smExtsnEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(disman_script_mib_smExtsnEntry_t *));
-    if (! *smExtsnEntry) {
-        return -4;
-    }
+    *smExtsnEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*smExtsnEntry)[i] = assign_smExtsnEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_smExtsnEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *smExtsnEntry = assign_smExtsnEntry(out);
+    }
 }
 
 void
@@ -591,13 +672,24 @@ unpack_smScriptEntry(GSnmpVarBind *vb, disman_script_mib_smScriptEntry_t *smScri
     return 0;
 }
 
-static void
-pack_smScriptEntry(guint32 *base, disman_script_mib_smScriptEntry_t *smScriptEntry)
+static int
+pack_smScriptEntry(guint32 *base, guchar *smScriptOwner, gsize _smScriptOwnerLength, guchar *smScriptName, gsize _smScriptNameLength)
 {
     int i, len, idx = 12;
 
-    /* XXX how to pack smScriptEntry->smScriptOwner ? */
-    /* XXX how to pack smScriptEntry->smScriptName ? */
+    len = _smScriptOwnerLength;
+    base[idx++] = len;
+    for (i = 0; i < len; i++) {
+        base[idx++] = smScriptOwner[i];
+        if (idx >= 128) return -1;
+    }
+    len = _smScriptNameLength;
+    base[idx++] = len;
+    for (i = 0; i < len; i++) {
+        base[idx++] = smScriptName[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
 }
 
 static disman_script_mib_smScriptEntry_t *
@@ -607,7 +699,6 @@ assign_smScriptEntry(GSList *vbl)
     disman_script_mib_smScriptEntry_t *smScriptEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1};
 
     smScriptEntry = disman_script_mib_new_smScriptEntry();
     if (! smScriptEntry) {
@@ -626,8 +717,8 @@ assign_smScriptEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _smScriptEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_smScriptEntry, sizeof(oid_smScriptEntry)/sizeof(guint32),
+                   attr_smScriptEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -667,8 +758,8 @@ assign_smScriptEntry(GSList *vbl)
     return smScriptEntry;
 }
 
-int
-disman_script_mib_get_smScriptTable(GSnmpSession *s, disman_script_mib_smScriptEntry_t ***smScriptEntry)
+void
+disman_script_mib_get_smScriptTable(GSnmpSession *s, disman_script_mib_smScriptEntry_t ***smScriptEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -677,85 +768,107 @@ disman_script_mib_get_smScriptTable(GSnmpSession *s, disman_script_mib_smScriptE
 
     *smScriptEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _smScriptEntry);
+    add_attributes(s, &in, base, 12, 11, attr_smScriptEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
-    }
 
-    *smScriptEntry = (disman_script_mib_smScriptEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(disman_script_mib_smScriptEntry_t *));
-    if (! *smScriptEntry) {
-        return -4;
+    if (out) {
+        *smScriptEntry = (disman_script_mib_smScriptEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(disman_script_mib_smScriptEntry_t *));
+        if (! *smScriptEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*smScriptEntry)[i] = assign_smScriptEntry(row->data);
+        }
     }
-
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*smScriptEntry)[i] = assign_smScriptEntry(row->data);
-    }
-
-    return 0;
 }
 
-int
-disman_script_mib_set_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t *smScriptEntry)
+void
+disman_script_mib_get_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t **smScriptEntry, guchar *smScriptOwner, gsize _smScriptOwnerLength, guchar *smScriptName, gsize _smScriptNameLength, gint mask)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 base[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 1, 1, 0, 0};
+    guint32 base[128];
+    int len;
 
-    pack_smScriptEntry(base, smScriptEntry);
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_smScriptEntry, sizeof(oid_smScriptEntry));
+    len = pack_smScriptEntry(base, smScriptOwner, _smScriptOwnerLength, smScriptName, _smScriptNameLength);
+    if (len < 0) {
+        g_warning("illegal smScriptEntry index values");
+        return;
+    }
+
+    *smScriptEntry = NULL;
+
+    add_attributes(s, &in, base, len, 11, attr_smScriptEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *smScriptEntry = assign_smScriptEntry(out);
+    }
+}
+
+void
+disman_script_mib_set_smScriptEntry(GSnmpSession *s, disman_script_mib_smScriptEntry_t *smScriptEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_smScriptEntry, sizeof(oid_smScriptEntry));
+    len = pack_smScriptEntry(base, smScriptEntry->smScriptOwner, smScriptEntry->_smScriptOwnerLength, smScriptEntry->smScriptName, smScriptEntry->_smScriptNameLength);
+    if (len < 0) {
+        g_warning("illegal smScriptEntry index values");
+        return;
+    }
 
     if (smScriptEntry->smScriptDescr) {
         base[11] = 3;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
                        smScriptEntry->smScriptDescr,
                        smScriptEntry->_smScriptDescrLength);
     }
     if (smScriptEntry->smScriptLanguage) {
         base[11] = 4;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smScriptEntry->smScriptLanguage,
                        0);
     }
     if (smScriptEntry->smScriptSource) {
         base[11] = 5;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
                        smScriptEntry->smScriptSource,
                        smScriptEntry->_smScriptSourceLength);
     }
     if (smScriptEntry->smScriptAdminStatus) {
         base[11] = 6;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smScriptEntry->smScriptAdminStatus,
                        0);
     }
     if (smScriptEntry->smScriptStorageType) {
         base[11] = 8;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smScriptEntry->smScriptStorageType,
                        0);
     }
     if (smScriptEntry->smScriptRowStatus) {
         base[11] = 9;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smScriptEntry->smScriptRowStatus,
                        0);
     }
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void
@@ -819,14 +932,25 @@ unpack_smCodeEntry(GSnmpVarBind *vb, disman_script_mib_smCodeEntry_t *smCodeEntr
     return 0;
 }
 
-static void
-pack_smCodeEntry(guint32 *base, disman_script_mib_smCodeEntry_t *smCodeEntry)
+static int
+pack_smCodeEntry(guint32 *base, guchar *smScriptOwner, gsize _smScriptOwnerLength, guchar *smScriptName, gsize _smScriptNameLength, guint32 smCodeIndex)
 {
     int i, len, idx = 12;
 
-    /* XXX how to pack smCodeEntry->smScriptOwner ? */
-    /* XXX how to pack smCodeEntry->smScriptName ? */
-    base[idx++] = smCodeEntry->smCodeIndex;
+    len = _smScriptOwnerLength;
+    base[idx++] = len;
+    for (i = 0; i < len; i++) {
+        base[idx++] = smScriptOwner[i];
+        if (idx >= 128) return -1;
+    }
+    len = _smScriptNameLength;
+    base[idx++] = len;
+    for (i = 0; i < len; i++) {
+        base[idx++] = smScriptName[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = smCodeIndex;
+    return idx;
 }
 
 static disman_script_mib_smCodeEntry_t *
@@ -836,7 +960,6 @@ assign_smCodeEntry(GSList *vbl)
     disman_script_mib_smCodeEntry_t *smCodeEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 2, 1};
 
     smCodeEntry = disman_script_mib_new_smCodeEntry();
     if (! smCodeEntry) {
@@ -855,8 +978,8 @@ assign_smCodeEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _smCodeEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_smCodeEntry, sizeof(oid_smCodeEntry)/sizeof(guint32),
+                   attr_smCodeEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -872,8 +995,8 @@ assign_smCodeEntry(GSList *vbl)
     return smCodeEntry;
 }
 
-int
-disman_script_mib_get_smCodeTable(GSnmpSession *s, disman_script_mib_smCodeEntry_t ***smCodeEntry)
+void
+disman_script_mib_get_smCodeTable(GSnmpSession *s, disman_script_mib_smCodeEntry_t ***smCodeEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -882,57 +1005,83 @@ disman_script_mib_get_smCodeTable(GSnmpSession *s, disman_script_mib_smCodeEntry
 
     *smCodeEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _smCodeEntry);
+    add_attributes(s, &in, base, 12, 11, attr_smCodeEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
-    }
 
-    *smCodeEntry = (disman_script_mib_smCodeEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(disman_script_mib_smCodeEntry_t *));
-    if (! *smCodeEntry) {
-        return -4;
+    if (out) {
+        *smCodeEntry = (disman_script_mib_smCodeEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(disman_script_mib_smCodeEntry_t *));
+        if (! *smCodeEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*smCodeEntry)[i] = assign_smCodeEntry(row->data);
+        }
     }
-
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*smCodeEntry)[i] = assign_smCodeEntry(row->data);
-    }
-
-    return 0;
 }
 
-int
-disman_script_mib_set_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t *smCodeEntry)
+void
+disman_script_mib_get_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t **smCodeEntry, guchar *smScriptOwner, gsize _smScriptOwnerLength, guchar *smScriptName, gsize _smScriptNameLength, guint32 smCodeIndex, gint mask)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 base[] = {1, 3, 6, 1, 2, 1, 64, 1, 3, 2, 1, 0, 0};
+    guint32 base[128];
+    int len;
 
-    pack_smCodeEntry(base, smCodeEntry);
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_smCodeEntry, sizeof(oid_smCodeEntry));
+    len = pack_smCodeEntry(base, smScriptOwner, _smScriptOwnerLength, smScriptName, _smScriptNameLength, smCodeIndex);
+    if (len < 0) {
+        g_warning("illegal smCodeEntry index values");
+        return;
+    }
+
+    *smCodeEntry = NULL;
+
+    add_attributes(s, &in, base, len, 11, attr_smCodeEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *smCodeEntry = assign_smCodeEntry(out);
+    }
+}
+
+void
+disman_script_mib_set_smCodeEntry(GSnmpSession *s, disman_script_mib_smCodeEntry_t *smCodeEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_smCodeEntry, sizeof(oid_smCodeEntry));
+    len = pack_smCodeEntry(base, smCodeEntry->smScriptOwner, smCodeEntry->_smScriptOwnerLength, smCodeEntry->smScriptName, smCodeEntry->_smScriptNameLength, smCodeEntry->smCodeIndex);
+    if (len < 0) {
+        g_warning("illegal smCodeEntry index values");
+        return;
+    }
 
     if (smCodeEntry->smCodeText) {
         base[11] = 2;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
                        smCodeEntry->smCodeText,
                        smCodeEntry->_smCodeTextLength);
     }
     if (smCodeEntry->smCodeRowStatus) {
         base[11] = 3;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smCodeEntry->smCodeRowStatus,
                        0);
     }
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void
@@ -994,13 +1143,24 @@ unpack_smLaunchEntry(GSnmpVarBind *vb, disman_script_mib_smLaunchEntry_t *smLaun
     return 0;
 }
 
-static void
-pack_smLaunchEntry(guint32 *base, disman_script_mib_smLaunchEntry_t *smLaunchEntry)
+static int
+pack_smLaunchEntry(guint32 *base, guchar *smLaunchOwner, gsize _smLaunchOwnerLength, guchar *smLaunchName, gsize _smLaunchNameLength)
 {
     int i, len, idx = 12;
 
-    /* XXX how to pack smLaunchEntry->smLaunchOwner ? */
-    /* XXX how to pack smLaunchEntry->smLaunchName ? */
+    len = _smLaunchOwnerLength;
+    base[idx++] = len;
+    for (i = 0; i < len; i++) {
+        base[idx++] = smLaunchOwner[i];
+        if (idx >= 128) return -1;
+    }
+    len = _smLaunchNameLength;
+    base[idx++] = len;
+    for (i = 0; i < len; i++) {
+        base[idx++] = smLaunchName[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
 }
 
 static disman_script_mib_smLaunchEntry_t *
@@ -1010,7 +1170,6 @@ assign_smLaunchEntry(GSList *vbl)
     disman_script_mib_smLaunchEntry_t *smLaunchEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1};
 
     smLaunchEntry = disman_script_mib_new_smLaunchEntry();
     if (! smLaunchEntry) {
@@ -1029,8 +1188,8 @@ assign_smLaunchEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _smLaunchEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_smLaunchEntry, sizeof(oid_smLaunchEntry)/sizeof(guint32),
+                   attr_smLaunchEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -1095,8 +1254,8 @@ assign_smLaunchEntry(GSList *vbl)
     return smLaunchEntry;
 }
 
-int
-disman_script_mib_get_smLaunchTable(GSnmpSession *s, disman_script_mib_smLaunchEntry_t ***smLaunchEntry)
+void
+disman_script_mib_get_smLaunchTable(GSnmpSession *s, disman_script_mib_smLaunchEntry_t ***smLaunchEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1105,134 +1264,149 @@ disman_script_mib_get_smLaunchTable(GSnmpSession *s, disman_script_mib_smLaunchE
 
     *smLaunchEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _smLaunchEntry);
+    add_attributes(s, &in, base, 12, 11, attr_smLaunchEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
-    }
 
-    *smLaunchEntry = (disman_script_mib_smLaunchEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(disman_script_mib_smLaunchEntry_t *));
-    if (! *smLaunchEntry) {
-        return -4;
+    if (out) {
+        *smLaunchEntry = (disman_script_mib_smLaunchEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(disman_script_mib_smLaunchEntry_t *));
+        if (! *smLaunchEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*smLaunchEntry)[i] = assign_smLaunchEntry(row->data);
+        }
     }
-
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*smLaunchEntry)[i] = assign_smLaunchEntry(row->data);
-    }
-
-    return 0;
 }
 
-int
-disman_script_mib_set_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t *smLaunchEntry)
+void
+disman_script_mib_get_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t **smLaunchEntry, guchar *smLaunchOwner, gsize _smLaunchOwnerLength, guchar *smLaunchName, gsize _smLaunchNameLength, gint mask)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 base[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 1, 1, 0, 0};
+    guint32 base[128];
+    int len;
 
-    pack_smLaunchEntry(base, smLaunchEntry);
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_smLaunchEntry, sizeof(oid_smLaunchEntry));
+    len = pack_smLaunchEntry(base, smLaunchOwner, _smLaunchOwnerLength, smLaunchName, _smLaunchNameLength);
+    if (len < 0) {
+        g_warning("illegal smLaunchEntry index values");
+        return;
+    }
+
+    *smLaunchEntry = NULL;
+
+    add_attributes(s, &in, base, len, 11, attr_smLaunchEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *smLaunchEntry = assign_smLaunchEntry(out);
+    }
+}
+
+void
+disman_script_mib_set_smLaunchEntry(GSnmpSession *s, disman_script_mib_smLaunchEntry_t *smLaunchEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_smLaunchEntry, sizeof(oid_smLaunchEntry));
+    len = pack_smLaunchEntry(base, smLaunchEntry->smLaunchOwner, smLaunchEntry->_smLaunchOwnerLength, smLaunchEntry->smLaunchName, smLaunchEntry->_smLaunchNameLength);
+    if (len < 0) {
+        g_warning("illegal smLaunchEntry index values");
+        return;
+    }
 
     if (smLaunchEntry->smLaunchScriptOwner) {
         base[11] = 3;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
                        smLaunchEntry->smLaunchScriptOwner,
                        smLaunchEntry->_smLaunchScriptOwnerLength);
     }
     if (smLaunchEntry->smLaunchScriptName) {
         base[11] = 4;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
                        smLaunchEntry->smLaunchScriptName,
                        smLaunchEntry->_smLaunchScriptNameLength);
     }
     if (smLaunchEntry->smLaunchArgument) {
         base[11] = 5;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_OCTET_STRING,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
                        smLaunchEntry->smLaunchArgument,
                        smLaunchEntry->_smLaunchArgumentLength);
     }
     if (smLaunchEntry->smLaunchMaxRunning) {
         base[11] = 6;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_UNSIGNED32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_UNSIGNED32,
                        smLaunchEntry->smLaunchMaxRunning,
                        0);
     }
     if (smLaunchEntry->smLaunchMaxCompleted) {
         base[11] = 7;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_UNSIGNED32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_UNSIGNED32,
                        smLaunchEntry->smLaunchMaxCompleted,
                        0);
     }
     if (smLaunchEntry->smLaunchLifeTime) {
         base[11] = 8;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smLaunchEntry->smLaunchLifeTime,
                        0);
     }
     if (smLaunchEntry->smLaunchExpireTime) {
         base[11] = 9;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smLaunchEntry->smLaunchExpireTime,
                        0);
     }
     if (smLaunchEntry->smLaunchStart) {
         base[11] = 10;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smLaunchEntry->smLaunchStart,
                        0);
     }
     if (smLaunchEntry->smLaunchControl) {
         base[11] = 11;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smLaunchEntry->smLaunchControl,
                        0);
     }
     if (smLaunchEntry->smLaunchAdminStatus) {
         base[11] = 12;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smLaunchEntry->smLaunchAdminStatus,
                        0);
     }
     if (smLaunchEntry->smLaunchStorageType) {
         base[11] = 15;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smLaunchEntry->smLaunchStorageType,
                        0);
     }
     if (smLaunchEntry->smLaunchRowStatus) {
         base[11] = 16;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smLaunchEntry->smLaunchRowStatus,
                        0);
     }
     if (smLaunchEntry->smLaunchRowExpireTime) {
         base[11] = 19;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smLaunchEntry->smLaunchRowExpireTime,
                        0);
     }
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void
@@ -1296,14 +1470,25 @@ unpack_smRunEntry(GSnmpVarBind *vb, disman_script_mib_smRunEntry_t *smRunEntry)
     return 0;
 }
 
-static void
-pack_smRunEntry(guint32 *base, disman_script_mib_smRunEntry_t *smRunEntry)
+static int
+pack_smRunEntry(guint32 *base, guchar *smLaunchOwner, gsize _smLaunchOwnerLength, guchar *smLaunchName, gsize _smLaunchNameLength, gint32 smRunIndex)
 {
     int i, len, idx = 12;
 
-    /* XXX how to pack smRunEntry->smLaunchOwner ? */
-    /* XXX how to pack smRunEntry->smLaunchName ? */
-    base[idx++] = smRunEntry->smRunIndex;
+    len = _smLaunchOwnerLength;
+    base[idx++] = len;
+    for (i = 0; i < len; i++) {
+        base[idx++] = smLaunchOwner[i];
+        if (idx >= 128) return -1;
+    }
+    len = _smLaunchNameLength;
+    base[idx++] = len;
+    for (i = 0; i < len; i++) {
+        base[idx++] = smLaunchName[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = smRunIndex;
+    return idx;
 }
 
 static disman_script_mib_smRunEntry_t *
@@ -1313,7 +1498,6 @@ assign_smRunEntry(GSList *vbl)
     disman_script_mib_smRunEntry_t *smRunEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1};
 
     smRunEntry = disman_script_mib_new_smRunEntry();
     if (! smRunEntry) {
@@ -1332,8 +1516,8 @@ assign_smRunEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _smRunEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_smRunEntry, sizeof(oid_smRunEntry)/sizeof(guint32),
+                   attr_smRunEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -1385,8 +1569,8 @@ assign_smRunEntry(GSList *vbl)
     return smRunEntry;
 }
 
-int
-disman_script_mib_get_smRunTable(GSnmpSession *s, disman_script_mib_smRunEntry_t ***smRunEntry)
+void
+disman_script_mib_get_smRunTable(GSnmpSession *s, disman_script_mib_smRunEntry_t ***smRunEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1395,64 +1579,89 @@ disman_script_mib_get_smRunTable(GSnmpSession *s, disman_script_mib_smRunEntry_t
 
     *smRunEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _smRunEntry);
+    add_attributes(s, &in, base, 12, 11, attr_smRunEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
-    }
 
-    *smRunEntry = (disman_script_mib_smRunEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(disman_script_mib_smRunEntry_t *));
-    if (! *smRunEntry) {
-        return -4;
+    if (out) {
+        *smRunEntry = (disman_script_mib_smRunEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(disman_script_mib_smRunEntry_t *));
+        if (! *smRunEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*smRunEntry)[i] = assign_smRunEntry(row->data);
+        }
     }
-
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*smRunEntry)[i] = assign_smRunEntry(row->data);
-    }
-
-    return 0;
 }
 
-int
-disman_script_mib_set_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t *smRunEntry)
+void
+disman_script_mib_get_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t **smRunEntry, guchar *smLaunchOwner, gsize _smLaunchOwnerLength, guchar *smLaunchName, gsize _smLaunchNameLength, gint32 smRunIndex, gint mask)
 {
     GSList *in = NULL, *out = NULL;
-    static guint32 base[] = {1, 3, 6, 1, 2, 1, 64, 1, 4, 2, 1, 0, 0};
+    guint32 base[128];
+    int len;
 
-    pack_smRunEntry(base, smRunEntry);
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_smRunEntry, sizeof(oid_smRunEntry));
+    len = pack_smRunEntry(base, smLaunchOwner, _smLaunchOwnerLength, smLaunchName, _smLaunchNameLength, smRunIndex);
+    if (len < 0) {
+        g_warning("illegal smRunEntry index values");
+        return;
+    }
+
+    *smRunEntry = NULL;
+
+    add_attributes(s, &in, base, len, 11, attr_smRunEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *smRunEntry = assign_smRunEntry(out);
+    }
+}
+
+void
+disman_script_mib_set_smRunEntry(GSnmpSession *s, disman_script_mib_smRunEntry_t *smRunEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_smRunEntry, sizeof(oid_smRunEntry));
+    len = pack_smRunEntry(base, smRunEntry->smLaunchOwner, smRunEntry->_smLaunchOwnerLength, smRunEntry->smLaunchName, smRunEntry->_smLaunchNameLength, smRunEntry->smRunIndex);
+    if (len < 0) {
+        g_warning("illegal smRunEntry index values");
+        return;
+    }
 
     if (smRunEntry->smRunLifeTime) {
         base[11] = 5;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smRunEntry->smRunLifeTime,
                        0);
     }
     if (smRunEntry->smRunExpireTime) {
         base[11] = 6;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smRunEntry->smRunExpireTime,
                        0);
     }
     if (smRunEntry->smRunControl) {
         base[11] = 9;
-        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
-                       G_SNMP_INTEGER32,
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
                        smRunEntry->smRunControl,
                        0);
     }
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void

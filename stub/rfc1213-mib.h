@@ -149,6 +149,14 @@ extern GSnmpEnum const rfc1213_mib_enums_snmpEnableAuthenTraps[];
  * C type definitions for RFC1213-MIB::system.
  */
 
+#define RFC1213_MIB_SYSDESCR	0x1 
+#define RFC1213_MIB_SYSOBJECTID	0x2 
+#define RFC1213_MIB_SYSUPTIME	0x4 
+#define RFC1213_MIB_SYSCONTACT	0x8 
+#define RFC1213_MIB_SYSNAME	0x10 
+#define RFC1213_MIB_SYSLOCATION	0x20 
+#define RFC1213_MIB_SYSSERVICES	0x40 
+
 typedef struct {
     guchar   *sysDescr;
     gsize    _sysDescrLength;
@@ -165,13 +173,13 @@ typedef struct {
 } rfc1213_mib_system_t;
 
 extern rfc1213_mib_system_t *
-rfc1213_mib_new_system();
+rfc1213_mib_new_system(void);
 
-extern int
-rfc1213_mib_get_system(GSnmpSession *s, rfc1213_mib_system_t **system);
+extern void
+rfc1213_mib_get_system(GSnmpSession *s, rfc1213_mib_system_t **system, gint mask);
 
-extern int
-rfc1213_mib_set_system(GSnmpSession *s, rfc1213_mib_system_t *system);
+extern void
+rfc1213_mib_set_system(GSnmpSession *s, rfc1213_mib_system_t *system, gint mask);
 
 extern void
 rfc1213_mib_free_system(rfc1213_mib_system_t *system);
@@ -180,15 +188,17 @@ rfc1213_mib_free_system(rfc1213_mib_system_t *system);
  * C type definitions for RFC1213-MIB::interfaces.
  */
 
+#define RFC1213_MIB_IFNUMBER	0x1 
+
 typedef struct {
     gint32   *ifNumber;
 } rfc1213_mib_interfaces_t;
 
 extern rfc1213_mib_interfaces_t *
-rfc1213_mib_new_interfaces();
+rfc1213_mib_new_interfaces(void);
 
-extern int
-rfc1213_mib_get_interfaces(GSnmpSession *s, rfc1213_mib_interfaces_t **interfaces);
+extern void
+rfc1213_mib_get_interfaces(GSnmpSession *s, rfc1213_mib_interfaces_t **interfaces, gint mask);
 
 extern void
 rfc1213_mib_free_interfaces(rfc1213_mib_interfaces_t *interfaces);
@@ -196,6 +206,29 @@ rfc1213_mib_free_interfaces(rfc1213_mib_interfaces_t *interfaces);
 /*
  * C type definitions for RFC1213-MIB::ifEntry.
  */
+
+#define RFC1213_MIB_IFINDEX	0x1 
+#define RFC1213_MIB_IFDESCR	0x2 
+#define RFC1213_MIB_IFTYPE	0x4 
+#define RFC1213_MIB_IFMTU	0x8 
+#define RFC1213_MIB_IFSPEED	0x10 
+#define RFC1213_MIB_IFPHYSADDRESS	0x20 
+#define RFC1213_MIB_IFADMINSTATUS	0x40 
+#define RFC1213_MIB_IFOPERSTATUS	0x80 
+#define RFC1213_MIB_IFLASTCHANGE	0x100 
+#define RFC1213_MIB_IFINOCTETS	0x200 
+#define RFC1213_MIB_IFINUCASTPKTS	0x400 
+#define RFC1213_MIB_IFINNUCASTPKTS	0x800 
+#define RFC1213_MIB_IFINDISCARDS	0x1000 
+#define RFC1213_MIB_IFINERRORS	0x2000 
+#define RFC1213_MIB_IFINUNKNOWNPROTOS	0x4000 
+#define RFC1213_MIB_IFOUTOCTETS	0x8000 
+#define RFC1213_MIB_IFOUTUCASTPKTS	0x10000 
+#define RFC1213_MIB_IFOUTNUCASTPKTS	0x20000 
+#define RFC1213_MIB_IFOUTDISCARDS	0x40000 
+#define RFC1213_MIB_IFOUTERRORS	0x80000 
+#define RFC1213_MIB_IFOUTQLEN	0x100000 
+#define RFC1213_MIB_IFSPECIFIC	0x200000 
 
 typedef struct {
     gint32   ifIndex;
@@ -225,20 +258,20 @@ typedef struct {
     gsize    _ifSpecificLength;
 } rfc1213_mib_ifEntry_t;
 
-extern int
-rfc1213_mib_get_ifTable(GSnmpSession *s, rfc1213_mib_ifEntry_t ***ifEntry);
+extern void
+rfc1213_mib_get_ifTable(GSnmpSession *s, rfc1213_mib_ifEntry_t ***ifEntry, gint mask);
 
 extern void
 rfc1213_mib_free_ifTable(rfc1213_mib_ifEntry_t **ifEntry);
 
 extern rfc1213_mib_ifEntry_t *
-rfc1213_mib_new_ifEntry();
+rfc1213_mib_new_ifEntry(void);
 
-extern int
-rfc1213_mib_get_ifEntry(GSnmpSession *s, rfc1213_mib_ifEntry_t **ifEntry);
+extern void
+rfc1213_mib_get_ifEntry(GSnmpSession *s, rfc1213_mib_ifEntry_t **ifEntry, gint32 ifIndex, gint mask);
 
-extern int
-rfc1213_mib_set_ifEntry(GSnmpSession *s, rfc1213_mib_ifEntry_t *ifEntry);
+extern void
+rfc1213_mib_set_ifEntry(GSnmpSession *s, rfc1213_mib_ifEntry_t *ifEntry, gint mask);
 
 extern void
 rfc1213_mib_free_ifEntry(rfc1213_mib_ifEntry_t *ifEntry);
@@ -247,6 +280,10 @@ rfc1213_mib_free_ifEntry(rfc1213_mib_ifEntry_t *ifEntry);
  * C type definitions for RFC1213-MIB::atEntry.
  */
 
+#define RFC1213_MIB_ATIFINDEX	0x1 
+#define RFC1213_MIB_ATPHYSADDRESS	0x2 
+#define RFC1213_MIB_ATNETADDRESS	0x4 
+
 typedef struct {
     gint32   atIfIndex;
     guchar   atNetAddress[4];
@@ -254,20 +291,20 @@ typedef struct {
     gsize    _atPhysAddressLength;
 } rfc1213_mib_atEntry_t;
 
-extern int
-rfc1213_mib_get_atTable(GSnmpSession *s, rfc1213_mib_atEntry_t ***atEntry);
+extern void
+rfc1213_mib_get_atTable(GSnmpSession *s, rfc1213_mib_atEntry_t ***atEntry, gint mask);
 
 extern void
 rfc1213_mib_free_atTable(rfc1213_mib_atEntry_t **atEntry);
 
 extern rfc1213_mib_atEntry_t *
-rfc1213_mib_new_atEntry();
+rfc1213_mib_new_atEntry(void);
 
-extern int
-rfc1213_mib_get_atEntry(GSnmpSession *s, rfc1213_mib_atEntry_t **atEntry);
+extern void
+rfc1213_mib_get_atEntry(GSnmpSession *s, rfc1213_mib_atEntry_t **atEntry, gint32 atIfIndex, guchar *atNetAddress, gint mask);
 
-extern int
-rfc1213_mib_set_atEntry(GSnmpSession *s, rfc1213_mib_atEntry_t *atEntry);
+extern void
+rfc1213_mib_set_atEntry(GSnmpSession *s, rfc1213_mib_atEntry_t *atEntry, gint mask);
 
 extern void
 rfc1213_mib_free_atEntry(rfc1213_mib_atEntry_t *atEntry);
@@ -275,6 +312,27 @@ rfc1213_mib_free_atEntry(rfc1213_mib_atEntry_t *atEntry);
 /*
  * C type definitions for RFC1213-MIB::ip.
  */
+
+#define RFC1213_MIB_IPFORWARDING	0x1 
+#define RFC1213_MIB_IPDEFAULTTTL	0x2 
+#define RFC1213_MIB_IPINRECEIVES	0x4 
+#define RFC1213_MIB_IPINHDRERRORS	0x8 
+#define RFC1213_MIB_IPINADDRERRORS	0x10 
+#define RFC1213_MIB_IPFORWDATAGRAMS	0x20 
+#define RFC1213_MIB_IPINUNKNOWNPROTOS	0x40 
+#define RFC1213_MIB_IPINDISCARDS	0x80 
+#define RFC1213_MIB_IPINDELIVERS	0x100 
+#define RFC1213_MIB_IPOUTREQUESTS	0x200 
+#define RFC1213_MIB_IPOUTDISCARDS	0x400 
+#define RFC1213_MIB_IPOUTNOROUTES	0x800 
+#define RFC1213_MIB_IPREASMTIMEOUT	0x1000 
+#define RFC1213_MIB_IPREASMREQDS	0x2000 
+#define RFC1213_MIB_IPREASMOKS	0x4000 
+#define RFC1213_MIB_IPREASMFAILS	0x8000 
+#define RFC1213_MIB_IPFRAGOKS	0x10000 
+#define RFC1213_MIB_IPFRAGFAILS	0x20000 
+#define RFC1213_MIB_IPFRAGCREATES	0x40000 
+#define RFC1213_MIB_IPROUTINGDISCARDS	0x80000 
 
 typedef struct {
     gint32   *ipForwarding;
@@ -300,13 +358,13 @@ typedef struct {
 } rfc1213_mib_ip_t;
 
 extern rfc1213_mib_ip_t *
-rfc1213_mib_new_ip();
+rfc1213_mib_new_ip(void);
 
-extern int
-rfc1213_mib_get_ip(GSnmpSession *s, rfc1213_mib_ip_t **ip);
+extern void
+rfc1213_mib_get_ip(GSnmpSession *s, rfc1213_mib_ip_t **ip, gint mask);
 
-extern int
-rfc1213_mib_set_ip(GSnmpSession *s, rfc1213_mib_ip_t *ip);
+extern void
+rfc1213_mib_set_ip(GSnmpSession *s, rfc1213_mib_ip_t *ip, gint mask);
 
 extern void
 rfc1213_mib_free_ip(rfc1213_mib_ip_t *ip);
@@ -314,6 +372,12 @@ rfc1213_mib_free_ip(rfc1213_mib_ip_t *ip);
 /*
  * C type definitions for RFC1213-MIB::ipAddrEntry.
  */
+
+#define RFC1213_MIB_IPADENTADDR	0x1 
+#define RFC1213_MIB_IPADENTIFINDEX	0x2 
+#define RFC1213_MIB_IPADENTNETMASK	0x4 
+#define RFC1213_MIB_IPADENTBCASTADDR	0x8 
+#define RFC1213_MIB_IPADENTREASMMAXSIZE	0x10 
 
 typedef struct {
     guchar   ipAdEntAddr[4];
@@ -323,17 +387,17 @@ typedef struct {
     gint32   *ipAdEntReasmMaxSize;
 } rfc1213_mib_ipAddrEntry_t;
 
-extern int
-rfc1213_mib_get_ipAddrTable(GSnmpSession *s, rfc1213_mib_ipAddrEntry_t ***ipAddrEntry);
+extern void
+rfc1213_mib_get_ipAddrTable(GSnmpSession *s, rfc1213_mib_ipAddrEntry_t ***ipAddrEntry, gint mask);
 
 extern void
 rfc1213_mib_free_ipAddrTable(rfc1213_mib_ipAddrEntry_t **ipAddrEntry);
 
 extern rfc1213_mib_ipAddrEntry_t *
-rfc1213_mib_new_ipAddrEntry();
+rfc1213_mib_new_ipAddrEntry(void);
 
-extern int
-rfc1213_mib_get_ipAddrEntry(GSnmpSession *s, rfc1213_mib_ipAddrEntry_t **ipAddrEntry);
+extern void
+rfc1213_mib_get_ipAddrEntry(GSnmpSession *s, rfc1213_mib_ipAddrEntry_t **ipAddrEntry, guchar *ipAdEntAddr, gint mask);
 
 extern void
 rfc1213_mib_free_ipAddrEntry(rfc1213_mib_ipAddrEntry_t *ipAddrEntry);
@@ -341,6 +405,20 @@ rfc1213_mib_free_ipAddrEntry(rfc1213_mib_ipAddrEntry_t *ipAddrEntry);
 /*
  * C type definitions for RFC1213-MIB::ipRouteEntry.
  */
+
+#define RFC1213_MIB_IPROUTEDEST	0x1 
+#define RFC1213_MIB_IPROUTEIFINDEX	0x2 
+#define RFC1213_MIB_IPROUTEMETRIC1	0x4 
+#define RFC1213_MIB_IPROUTEMETRIC2	0x8 
+#define RFC1213_MIB_IPROUTEMETRIC3	0x10 
+#define RFC1213_MIB_IPROUTEMETRIC4	0x20 
+#define RFC1213_MIB_IPROUTENEXTHOP	0x40 
+#define RFC1213_MIB_IPROUTETYPE	0x80 
+#define RFC1213_MIB_IPROUTEPROTO	0x100 
+#define RFC1213_MIB_IPROUTEAGE	0x200 
+#define RFC1213_MIB_IPROUTEMASK	0x400 
+#define RFC1213_MIB_IPROUTEMETRIC5	0x800 
+#define RFC1213_MIB_IPROUTEINFO	0x1000 
 
 typedef struct {
     guchar   ipRouteDest[4];
@@ -359,20 +437,20 @@ typedef struct {
     gsize    _ipRouteInfoLength;
 } rfc1213_mib_ipRouteEntry_t;
 
-extern int
-rfc1213_mib_get_ipRouteTable(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t ***ipRouteEntry);
+extern void
+rfc1213_mib_get_ipRouteTable(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t ***ipRouteEntry, gint mask);
 
 extern void
 rfc1213_mib_free_ipRouteTable(rfc1213_mib_ipRouteEntry_t **ipRouteEntry);
 
 extern rfc1213_mib_ipRouteEntry_t *
-rfc1213_mib_new_ipRouteEntry();
+rfc1213_mib_new_ipRouteEntry(void);
 
-extern int
-rfc1213_mib_get_ipRouteEntry(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t **ipRouteEntry);
+extern void
+rfc1213_mib_get_ipRouteEntry(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t **ipRouteEntry, guchar *ipRouteDest, gint mask);
 
-extern int
-rfc1213_mib_set_ipRouteEntry(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t *ipRouteEntry);
+extern void
+rfc1213_mib_set_ipRouteEntry(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t *ipRouteEntry, gint mask);
 
 extern void
 rfc1213_mib_free_ipRouteEntry(rfc1213_mib_ipRouteEntry_t *ipRouteEntry);
@@ -380,6 +458,11 @@ rfc1213_mib_free_ipRouteEntry(rfc1213_mib_ipRouteEntry_t *ipRouteEntry);
 /*
  * C type definitions for RFC1213-MIB::ipNetToMediaEntry.
  */
+
+#define RFC1213_MIB_IPNETTOMEDIAIFINDEX	0x1 
+#define RFC1213_MIB_IPNETTOMEDIAPHYSADDRESS	0x2 
+#define RFC1213_MIB_IPNETTOMEDIANETADDRESS	0x4 
+#define RFC1213_MIB_IPNETTOMEDIATYPE	0x8 
 
 typedef struct {
     gint32   ipNetToMediaIfIndex;
@@ -389,20 +472,20 @@ typedef struct {
     gint32   *ipNetToMediaType;
 } rfc1213_mib_ipNetToMediaEntry_t;
 
-extern int
-rfc1213_mib_get_ipNetToMediaTable(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry);
+extern void
+rfc1213_mib_get_ipNetToMediaTable(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry, gint mask);
 
 extern void
 rfc1213_mib_free_ipNetToMediaTable(rfc1213_mib_ipNetToMediaEntry_t **ipNetToMediaEntry);
 
 extern rfc1213_mib_ipNetToMediaEntry_t *
-rfc1213_mib_new_ipNetToMediaEntry();
+rfc1213_mib_new_ipNetToMediaEntry(void);
 
-extern int
-rfc1213_mib_get_ipNetToMediaEntry(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t **ipNetToMediaEntry);
+extern void
+rfc1213_mib_get_ipNetToMediaEntry(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t **ipNetToMediaEntry, gint32 ipNetToMediaIfIndex, guchar *ipNetToMediaNetAddress, gint mask);
 
-extern int
-rfc1213_mib_set_ipNetToMediaEntry(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t *ipNetToMediaEntry);
+extern void
+rfc1213_mib_set_ipNetToMediaEntry(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t *ipNetToMediaEntry, gint mask);
 
 extern void
 rfc1213_mib_free_ipNetToMediaEntry(rfc1213_mib_ipNetToMediaEntry_t *ipNetToMediaEntry);
@@ -410,6 +493,33 @@ rfc1213_mib_free_ipNetToMediaEntry(rfc1213_mib_ipNetToMediaEntry_t *ipNetToMedia
 /*
  * C type definitions for RFC1213-MIB::icmp.
  */
+
+#define RFC1213_MIB_ICMPINMSGS	0x1 
+#define RFC1213_MIB_ICMPINERRORS	0x2 
+#define RFC1213_MIB_ICMPINDESTUNREACHS	0x4 
+#define RFC1213_MIB_ICMPINTIMEEXCDS	0x8 
+#define RFC1213_MIB_ICMPINPARMPROBS	0x10 
+#define RFC1213_MIB_ICMPINSRCQUENCHS	0x20 
+#define RFC1213_MIB_ICMPINREDIRECTS	0x40 
+#define RFC1213_MIB_ICMPINECHOS	0x80 
+#define RFC1213_MIB_ICMPINECHOREPS	0x100 
+#define RFC1213_MIB_ICMPINTIMESTAMPS	0x200 
+#define RFC1213_MIB_ICMPINTIMESTAMPREPS	0x400 
+#define RFC1213_MIB_ICMPINADDRMASKS	0x800 
+#define RFC1213_MIB_ICMPINADDRMASKREPS	0x1000 
+#define RFC1213_MIB_ICMPOUTMSGS	0x2000 
+#define RFC1213_MIB_ICMPOUTERRORS	0x4000 
+#define RFC1213_MIB_ICMPOUTDESTUNREACHS	0x8000 
+#define RFC1213_MIB_ICMPOUTTIMEEXCDS	0x10000 
+#define RFC1213_MIB_ICMPOUTPARMPROBS	0x20000 
+#define RFC1213_MIB_ICMPOUTSRCQUENCHS	0x40000 
+#define RFC1213_MIB_ICMPOUTREDIRECTS	0x80000 
+#define RFC1213_MIB_ICMPOUTECHOS	0x100000 
+#define RFC1213_MIB_ICMPOUTECHOREPS	0x200000 
+#define RFC1213_MIB_ICMPOUTTIMESTAMPS	0x400000 
+#define RFC1213_MIB_ICMPOUTTIMESTAMPREPS	0x800000 
+#define RFC1213_MIB_ICMPOUTADDRMASKS	0x1000000 
+#define RFC1213_MIB_ICMPOUTADDRMASKREPS	0x2000000 
 
 typedef struct {
     guint32  *icmpInMsgs;
@@ -441,10 +551,10 @@ typedef struct {
 } rfc1213_mib_icmp_t;
 
 extern rfc1213_mib_icmp_t *
-rfc1213_mib_new_icmp();
+rfc1213_mib_new_icmp(void);
 
-extern int
-rfc1213_mib_get_icmp(GSnmpSession *s, rfc1213_mib_icmp_t **icmp);
+extern void
+rfc1213_mib_get_icmp(GSnmpSession *s, rfc1213_mib_icmp_t **icmp, gint mask);
 
 extern void
 rfc1213_mib_free_icmp(rfc1213_mib_icmp_t *icmp);
@@ -452,6 +562,21 @@ rfc1213_mib_free_icmp(rfc1213_mib_icmp_t *icmp);
 /*
  * C type definitions for RFC1213-MIB::tcp.
  */
+
+#define RFC1213_MIB_TCPRTOALGORITHM	0x1 
+#define RFC1213_MIB_TCPRTOMIN	0x2 
+#define RFC1213_MIB_TCPRTOMAX	0x4 
+#define RFC1213_MIB_TCPMAXCONN	0x8 
+#define RFC1213_MIB_TCPACTIVEOPENS	0x10 
+#define RFC1213_MIB_TCPPASSIVEOPENS	0x20 
+#define RFC1213_MIB_TCPATTEMPTFAILS	0x40 
+#define RFC1213_MIB_TCPESTABRESETS	0x80 
+#define RFC1213_MIB_TCPCURRESTAB	0x100 
+#define RFC1213_MIB_TCPINSEGS	0x200 
+#define RFC1213_MIB_TCPOUTSEGS	0x400 
+#define RFC1213_MIB_TCPRETRANSSEGS	0x800 
+#define RFC1213_MIB_TCPINERRS	0x1000 
+#define RFC1213_MIB_TCPOUTRSTS	0x2000 
 
 typedef struct {
     gint32   *tcpRtoAlgorithm;
@@ -471,10 +596,10 @@ typedef struct {
 } rfc1213_mib_tcp_t;
 
 extern rfc1213_mib_tcp_t *
-rfc1213_mib_new_tcp();
+rfc1213_mib_new_tcp(void);
 
-extern int
-rfc1213_mib_get_tcp(GSnmpSession *s, rfc1213_mib_tcp_t **tcp);
+extern void
+rfc1213_mib_get_tcp(GSnmpSession *s, rfc1213_mib_tcp_t **tcp, gint mask);
 
 extern void
 rfc1213_mib_free_tcp(rfc1213_mib_tcp_t *tcp);
@@ -482,6 +607,12 @@ rfc1213_mib_free_tcp(rfc1213_mib_tcp_t *tcp);
 /*
  * C type definitions for RFC1213-MIB::tcpConnEntry.
  */
+
+#define RFC1213_MIB_TCPCONNSTATE	0x1 
+#define RFC1213_MIB_TCPCONNLOCALADDRESS	0x2 
+#define RFC1213_MIB_TCPCONNLOCALPORT	0x4 
+#define RFC1213_MIB_TCPCONNREMADDRESS	0x8 
+#define RFC1213_MIB_TCPCONNREMPORT	0x10 
 
 typedef struct {
     guchar   tcpConnLocalAddress[4];
@@ -491,20 +622,20 @@ typedef struct {
     gint32   *tcpConnState;
 } rfc1213_mib_tcpConnEntry_t;
 
-extern int
-rfc1213_mib_get_tcpConnTable(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t ***tcpConnEntry);
+extern void
+rfc1213_mib_get_tcpConnTable(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t ***tcpConnEntry, gint mask);
 
 extern void
 rfc1213_mib_free_tcpConnTable(rfc1213_mib_tcpConnEntry_t **tcpConnEntry);
 
 extern rfc1213_mib_tcpConnEntry_t *
-rfc1213_mib_new_tcpConnEntry();
+rfc1213_mib_new_tcpConnEntry(void);
 
-extern int
-rfc1213_mib_get_tcpConnEntry(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t **tcpConnEntry);
+extern void
+rfc1213_mib_get_tcpConnEntry(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t **tcpConnEntry, guchar *tcpConnLocalAddress, gint32 tcpConnLocalPort, guchar *tcpConnRemAddress, gint32 tcpConnRemPort, gint mask);
 
-extern int
-rfc1213_mib_set_tcpConnEntry(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t *tcpConnEntry);
+extern void
+rfc1213_mib_set_tcpConnEntry(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t *tcpConnEntry, gint mask);
 
 extern void
 rfc1213_mib_free_tcpConnEntry(rfc1213_mib_tcpConnEntry_t *tcpConnEntry);
@@ -512,6 +643,11 @@ rfc1213_mib_free_tcpConnEntry(rfc1213_mib_tcpConnEntry_t *tcpConnEntry);
 /*
  * C type definitions for RFC1213-MIB::udp.
  */
+
+#define RFC1213_MIB_UDPINDATAGRAMS	0x1 
+#define RFC1213_MIB_UDPNOPORTS	0x2 
+#define RFC1213_MIB_UDPINERRORS	0x4 
+#define RFC1213_MIB_UDPOUTDATAGRAMS	0x8 
 
 typedef struct {
     guint32  *udpInDatagrams;
@@ -521,10 +657,10 @@ typedef struct {
 } rfc1213_mib_udp_t;
 
 extern rfc1213_mib_udp_t *
-rfc1213_mib_new_udp();
+rfc1213_mib_new_udp(void);
 
-extern int
-rfc1213_mib_get_udp(GSnmpSession *s, rfc1213_mib_udp_t **udp);
+extern void
+rfc1213_mib_get_udp(GSnmpSession *s, rfc1213_mib_udp_t **udp, gint mask);
 
 extern void
 rfc1213_mib_free_udp(rfc1213_mib_udp_t *udp);
@@ -533,22 +669,25 @@ rfc1213_mib_free_udp(rfc1213_mib_udp_t *udp);
  * C type definitions for RFC1213-MIB::udpEntry.
  */
 
+#define RFC1213_MIB_UDPLOCALADDRESS	0x1 
+#define RFC1213_MIB_UDPLOCALPORT	0x2 
+
 typedef struct {
     guchar   udpLocalAddress[4];
     gint32   udpLocalPort;
 } rfc1213_mib_udpEntry_t;
 
-extern int
-rfc1213_mib_get_udpTable(GSnmpSession *s, rfc1213_mib_udpEntry_t ***udpEntry);
+extern void
+rfc1213_mib_get_udpTable(GSnmpSession *s, rfc1213_mib_udpEntry_t ***udpEntry, gint mask);
 
 extern void
 rfc1213_mib_free_udpTable(rfc1213_mib_udpEntry_t **udpEntry);
 
 extern rfc1213_mib_udpEntry_t *
-rfc1213_mib_new_udpEntry();
+rfc1213_mib_new_udpEntry(void);
 
-extern int
-rfc1213_mib_get_udpEntry(GSnmpSession *s, rfc1213_mib_udpEntry_t **udpEntry);
+extern void
+rfc1213_mib_get_udpEntry(GSnmpSession *s, rfc1213_mib_udpEntry_t **udpEntry, guchar *udpLocalAddress, gint32 udpLocalPort, gint mask);
 
 extern void
 rfc1213_mib_free_udpEntry(rfc1213_mib_udpEntry_t *udpEntry);
@@ -556,6 +695,12 @@ rfc1213_mib_free_udpEntry(rfc1213_mib_udpEntry_t *udpEntry);
 /*
  * C type definitions for RFC1213-MIB::egp.
  */
+
+#define RFC1213_MIB_EGPINMSGS	0x1 
+#define RFC1213_MIB_EGPINERRORS	0x2 
+#define RFC1213_MIB_EGPOUTMSGS	0x4 
+#define RFC1213_MIB_EGPOUTERRORS	0x8 
+#define RFC1213_MIB_EGPAS	0x10 
 
 typedef struct {
     guint32  *egpInMsgs;
@@ -566,10 +711,10 @@ typedef struct {
 } rfc1213_mib_egp_t;
 
 extern rfc1213_mib_egp_t *
-rfc1213_mib_new_egp();
+rfc1213_mib_new_egp(void);
 
-extern int
-rfc1213_mib_get_egp(GSnmpSession *s, rfc1213_mib_egp_t **egp);
+extern void
+rfc1213_mib_get_egp(GSnmpSession *s, rfc1213_mib_egp_t **egp, gint mask);
 
 extern void
 rfc1213_mib_free_egp(rfc1213_mib_egp_t *egp);
@@ -577,6 +722,22 @@ rfc1213_mib_free_egp(rfc1213_mib_egp_t *egp);
 /*
  * C type definitions for RFC1213-MIB::egpNeighEntry.
  */
+
+#define RFC1213_MIB_EGPNEIGHSTATE	0x1 
+#define RFC1213_MIB_EGPNEIGHADDR	0x2 
+#define RFC1213_MIB_EGPNEIGHAS	0x4 
+#define RFC1213_MIB_EGPNEIGHINMSGS	0x8 
+#define RFC1213_MIB_EGPNEIGHINERRS	0x10 
+#define RFC1213_MIB_EGPNEIGHOUTMSGS	0x20 
+#define RFC1213_MIB_EGPNEIGHOUTERRS	0x40 
+#define RFC1213_MIB_EGPNEIGHINERRMSGS	0x80 
+#define RFC1213_MIB_EGPNEIGHOUTERRMSGS	0x100 
+#define RFC1213_MIB_EGPNEIGHSTATEUPS	0x200 
+#define RFC1213_MIB_EGPNEIGHSTATEDOWNS	0x400 
+#define RFC1213_MIB_EGPNEIGHINTERVALHELLO	0x800 
+#define RFC1213_MIB_EGPNEIGHINTERVALPOLL	0x1000 
+#define RFC1213_MIB_EGPNEIGHMODE	0x2000 
+#define RFC1213_MIB_EGPNEIGHEVENTTRIGGER	0x4000 
 
 typedef struct {
     guchar   egpNeighAddr[4];
@@ -596,20 +757,20 @@ typedef struct {
     gint32   *egpNeighEventTrigger;
 } rfc1213_mib_egpNeighEntry_t;
 
-extern int
-rfc1213_mib_get_egpNeighTable(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t ***egpNeighEntry);
+extern void
+rfc1213_mib_get_egpNeighTable(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t ***egpNeighEntry, gint mask);
 
 extern void
 rfc1213_mib_free_egpNeighTable(rfc1213_mib_egpNeighEntry_t **egpNeighEntry);
 
 extern rfc1213_mib_egpNeighEntry_t *
-rfc1213_mib_new_egpNeighEntry();
+rfc1213_mib_new_egpNeighEntry(void);
 
-extern int
-rfc1213_mib_get_egpNeighEntry(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t **egpNeighEntry);
+extern void
+rfc1213_mib_get_egpNeighEntry(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t **egpNeighEntry, guchar *egpNeighAddr, gint mask);
 
-extern int
-rfc1213_mib_set_egpNeighEntry(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t *egpNeighEntry);
+extern void
+rfc1213_mib_set_egpNeighEntry(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t *egpNeighEntry, gint mask);
 
 extern void
 rfc1213_mib_free_egpNeighEntry(rfc1213_mib_egpNeighEntry_t *egpNeighEntry);
@@ -617,6 +778,35 @@ rfc1213_mib_free_egpNeighEntry(rfc1213_mib_egpNeighEntry_t *egpNeighEntry);
 /*
  * C type definitions for RFC1213-MIB::snmp.
  */
+
+#define RFC1213_MIB_SNMPINPKTS	0x1 
+#define RFC1213_MIB_SNMPOUTPKTS	0x2 
+#define RFC1213_MIB_SNMPINBADVERSIONS	0x4 
+#define RFC1213_MIB_SNMPINBADCOMMUNITYNAMES	0x8 
+#define RFC1213_MIB_SNMPINBADCOMMUNITYUSES	0x10 
+#define RFC1213_MIB_SNMPINASNPARSEERRS	0x20 
+#define RFC1213_MIB_SNMPINTOOBIGS	0x40 
+#define RFC1213_MIB_SNMPINNOSUCHNAMES	0x80 
+#define RFC1213_MIB_SNMPINBADVALUES	0x100 
+#define RFC1213_MIB_SNMPINREADONLYS	0x200 
+#define RFC1213_MIB_SNMPINGENERRS	0x400 
+#define RFC1213_MIB_SNMPINTOTALREQVARS	0x800 
+#define RFC1213_MIB_SNMPINTOTALSETVARS	0x1000 
+#define RFC1213_MIB_SNMPINGETREQUESTS	0x2000 
+#define RFC1213_MIB_SNMPINGETNEXTS	0x4000 
+#define RFC1213_MIB_SNMPINSETREQUESTS	0x8000 
+#define RFC1213_MIB_SNMPINGETRESPONSES	0x10000 
+#define RFC1213_MIB_SNMPINTRAPS	0x20000 
+#define RFC1213_MIB_SNMPOUTTOOBIGS	0x40000 
+#define RFC1213_MIB_SNMPOUTNOSUCHNAMES	0x80000 
+#define RFC1213_MIB_SNMPOUTBADVALUES	0x100000 
+#define RFC1213_MIB_SNMPOUTGENERRS	0x200000 
+#define RFC1213_MIB_SNMPOUTGETREQUESTS	0x400000 
+#define RFC1213_MIB_SNMPOUTGETNEXTS	0x800000 
+#define RFC1213_MIB_SNMPOUTSETREQUESTS	0x1000000 
+#define RFC1213_MIB_SNMPOUTGETRESPONSES	0x2000000 
+#define RFC1213_MIB_SNMPOUTTRAPS	0x4000000 
+#define RFC1213_MIB_SNMPENABLEAUTHENTRAPS	0x8000000 
 
 typedef struct {
     guint32  *snmpInPkts;
@@ -650,13 +840,13 @@ typedef struct {
 } rfc1213_mib_snmp_t;
 
 extern rfc1213_mib_snmp_t *
-rfc1213_mib_new_snmp();
+rfc1213_mib_new_snmp(void);
 
-extern int
-rfc1213_mib_get_snmp(GSnmpSession *s, rfc1213_mib_snmp_t **snmp);
+extern void
+rfc1213_mib_get_snmp(GSnmpSession *s, rfc1213_mib_snmp_t **snmp, gint mask);
 
-extern int
-rfc1213_mib_set_snmp(GSnmpSession *s, rfc1213_mib_snmp_t *snmp);
+extern void
+rfc1213_mib_set_snmp(GSnmpSession *s, rfc1213_mib_snmp_t *snmp, gint mask);
 
 extern void
 rfc1213_mib_free_snmp(rfc1213_mib_snmp_t *snmp);

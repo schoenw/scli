@@ -46,6 +46,14 @@ extern GSnmpEnum const snmp_community_mib_enums_snmpCommunityStatus[];
  * C type definitions for SNMP-COMMUNITY-MIB::snmpCommunityEntry.
  */
 
+#define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYNAME	0x1 
+#define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSECURITYNAME	0x2 
+#define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYCONTEXTENGINEID	0x4 
+#define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYCONTEXTNAME	0x8 
+#define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYTRANSPORTTAG	0x10 
+#define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTORAGETYPE	0x20 
+#define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS	0x40 
+
 typedef struct {
     guchar   snmpCommunityIndex[32];
     gsize    _snmpCommunityIndexLength;
@@ -63,20 +71,20 @@ typedef struct {
     gint32   *snmpCommunityStatus;
 } snmp_community_mib_snmpCommunityEntry_t;
 
-extern int
-snmp_community_mib_get_snmpCommunityTable(GSnmpSession *s, snmp_community_mib_snmpCommunityEntry_t ***snmpCommunityEntry);
+extern void
+snmp_community_mib_get_snmpCommunityTable(GSnmpSession *s, snmp_community_mib_snmpCommunityEntry_t ***snmpCommunityEntry, gint mask);
 
 extern void
 snmp_community_mib_free_snmpCommunityTable(snmp_community_mib_snmpCommunityEntry_t **snmpCommunityEntry);
 
 extern snmp_community_mib_snmpCommunityEntry_t *
-snmp_community_mib_new_snmpCommunityEntry();
+snmp_community_mib_new_snmpCommunityEntry(void);
 
-extern int
-snmp_community_mib_get_snmpCommunityEntry(GSnmpSession *s, snmp_community_mib_snmpCommunityEntry_t **snmpCommunityEntry);
+extern void
+snmp_community_mib_get_snmpCommunityEntry(GSnmpSession *s, snmp_community_mib_snmpCommunityEntry_t **snmpCommunityEntry, guchar *snmpCommunityIndex, gsize _snmpCommunityIndexLength, gint mask);
 
-extern int
-snmp_community_mib_set_snmpCommunityEntry(GSnmpSession *s, snmp_community_mib_snmpCommunityEntry_t *snmpCommunityEntry);
+extern void
+snmp_community_mib_set_snmpCommunityEntry(GSnmpSession *s, snmp_community_mib_snmpCommunityEntry_t *snmpCommunityEntry, gint mask);
 
 extern void
 snmp_community_mib_free_snmpCommunityEntry(snmp_community_mib_snmpCommunityEntry_t *snmpCommunityEntry);
@@ -84,6 +92,9 @@ snmp_community_mib_free_snmpCommunityEntry(snmp_community_mib_snmpCommunityEntry
 /*
  * C type definitions for SNMP-COMMUNITY-MIB::snmpTargetAddrExtEntry.
  */
+
+#define SNMP_COMMUNITY_MIB_SNMPTARGETADDRTMASK	0x1 
+#define SNMP_COMMUNITY_MIB_SNMPTARGETADDRMMS	0x2 
 
 typedef struct {
     guchar   snmpTargetAddrName[32];
@@ -93,20 +104,20 @@ typedef struct {
     gint32   *snmpTargetAddrMMS;
 } snmp_community_mib_snmpTargetAddrExtEntry_t;
 
-extern int
-snmp_community_mib_get_snmpTargetAddrExtTable(GSnmpSession *s, snmp_community_mib_snmpTargetAddrExtEntry_t ***snmpTargetAddrExtEntry);
+extern void
+snmp_community_mib_get_snmpTargetAddrExtTable(GSnmpSession *s, snmp_community_mib_snmpTargetAddrExtEntry_t ***snmpTargetAddrExtEntry, gint mask);
 
 extern void
 snmp_community_mib_free_snmpTargetAddrExtTable(snmp_community_mib_snmpTargetAddrExtEntry_t **snmpTargetAddrExtEntry);
 
 extern snmp_community_mib_snmpTargetAddrExtEntry_t *
-snmp_community_mib_new_snmpTargetAddrExtEntry();
+snmp_community_mib_new_snmpTargetAddrExtEntry(void);
 
-extern int
-snmp_community_mib_get_snmpTargetAddrExtEntry(GSnmpSession *s, snmp_community_mib_snmpTargetAddrExtEntry_t **snmpTargetAddrExtEntry);
+extern void
+snmp_community_mib_get_snmpTargetAddrExtEntry(GSnmpSession *s, snmp_community_mib_snmpTargetAddrExtEntry_t **snmpTargetAddrExtEntry, guchar *snmpTargetAddrName, gsize _snmpTargetAddrNameLength, gint mask);
 
-extern int
-snmp_community_mib_set_snmpTargetAddrExtEntry(GSnmpSession *s, snmp_community_mib_snmpTargetAddrExtEntry_t *snmpTargetAddrExtEntry);
+extern void
+snmp_community_mib_set_snmpTargetAddrExtEntry(GSnmpSession *s, snmp_community_mib_snmpTargetAddrExtEntry_t *snmpTargetAddrExtEntry, gint mask);
 
 extern void
 snmp_community_mib_free_snmpTargetAddrExtEntry(snmp_community_mib_snmpTargetAddrExtEntry_t *snmpTargetAddrExtEntry);

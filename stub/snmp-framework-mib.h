@@ -35,6 +35,11 @@ extern GSnmpIdentity const snmp_framework_mib_identities[];
  * C type definitions for SNMP-FRAMEWORK-MIB::snmpEngine.
  */
 
+#define SNMP_FRAMEWORK_MIB_SNMPENGINEID	0x1 
+#define SNMP_FRAMEWORK_MIB_SNMPENGINEBOOTS	0x2 
+#define SNMP_FRAMEWORK_MIB_SNMPENGINETIME	0x4 
+#define SNMP_FRAMEWORK_MIB_SNMPENGINEMAXMESSAGESIZE	0x8 
+
 typedef struct {
     guchar   *snmpEngineID;
     gsize    _snmpEngineIDLength;
@@ -44,10 +49,10 @@ typedef struct {
 } snmp_framework_mib_snmpEngine_t;
 
 extern snmp_framework_mib_snmpEngine_t *
-snmp_framework_mib_new_snmpEngine();
+snmp_framework_mib_new_snmpEngine(void);
 
-extern int
-snmp_framework_mib_get_snmpEngine(GSnmpSession *s, snmp_framework_mib_snmpEngine_t **snmpEngine);
+extern void
+snmp_framework_mib_get_snmpEngine(GSnmpSession *s, snmp_framework_mib_snmpEngine_t **snmpEngine, gint mask);
 
 extern void
 snmp_framework_mib_free_snmpEngine(snmp_framework_mib_snmpEngine_t *snmpEngine);

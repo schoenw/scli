@@ -38,33 +38,37 @@ GSnmpIdentity const snmp_framework_mib_identities[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -86,12 +90,14 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _snmpEngine[] = {
-    { 1, G_SNMP_OCTET_STRING, "snmpEngineID" },
-    { 2, G_SNMP_INTEGER32, "snmpEngineBoots" },
-    { 3, G_SNMP_INTEGER32, "snmpEngineTime" },
-    { 4, G_SNMP_INTEGER32, "snmpEngineMaxMessageSize" },
-    { 0, 0, NULL }
+static guint32 const oid_snmpEngine[] = {1, 3, 6, 1, 6, 3, 10, 2, 1};
+
+static attribute_t attr_snmpEngine[] = {
+    { 1, G_SNMP_OCTET_STRING, SNMP_FRAMEWORK_MIB_SNMPENGINEID, "snmpEngineID" },
+    { 2, G_SNMP_INTEGER32, SNMP_FRAMEWORK_MIB_SNMPENGINEBOOTS, "snmpEngineBoots" },
+    { 3, G_SNMP_INTEGER32, SNMP_FRAMEWORK_MIB_SNMPENGINETIME, "snmpEngineTime" },
+    { 4, G_SNMP_INTEGER32, SNMP_FRAMEWORK_MIB_SNMPENGINEMAXMESSAGESIZE, "snmpEngineMaxMessageSize" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -111,7 +117,6 @@ assign_snmpEngine(GSList *vbl)
     snmp_framework_mib_snmpEngine_t *snmpEngine;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 6, 3, 10, 2, 1};
 
     snmpEngine = snmp_framework_mib_new_snmpEngine();
     if (! snmpEngine) {
@@ -124,8 +129,8 @@ assign_snmpEngine(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _snmpEngine, &idx) < 0) continue;
+        if (lookup(vb, oid_snmpEngine, sizeof(oid_snmpEngine)/sizeof(guint32),
+                   attr_snmpEngine, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -147,25 +152,21 @@ assign_snmpEngine(GSList *vbl)
     return snmpEngine;
 }
 
-int
-snmp_framework_mib_get_snmpEngine(GSnmpSession *s, snmp_framework_mib_snmpEngine_t **snmpEngine)
+void
+snmp_framework_mib_get_snmpEngine(GSnmpSession *s, snmp_framework_mib_snmpEngine_t **snmpEngine, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 10, 2, 1, 0};
 
     *snmpEngine = NULL;
 
-    add_attributes(s, &in, base, 9, _snmpEngine);
+    add_attributes(s, &in, base, 10, 9, attr_snmpEngine, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *snmpEngine = assign_snmpEngine(out);
     }
-
-    *snmpEngine = assign_snmpEngine(out);
-
-    return 0;
 }
 
 void

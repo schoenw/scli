@@ -24,6 +24,11 @@
  * C type definitions for UDP-MIB::udp.
  */
 
+#define UDP_MIB_UDPINDATAGRAMS	0x1 
+#define UDP_MIB_UDPNOPORTS	0x2 
+#define UDP_MIB_UDPINERRORS	0x4 
+#define UDP_MIB_UDPOUTDATAGRAMS	0x8 
+
 typedef struct {
     guint32  *udpInDatagrams;
     guint32  *udpNoPorts;
@@ -32,10 +37,10 @@ typedef struct {
 } udp_mib_udp_t;
 
 extern udp_mib_udp_t *
-udp_mib_new_udp();
+udp_mib_new_udp(void);
 
-extern int
-udp_mib_get_udp(GSnmpSession *s, udp_mib_udp_t **udp);
+extern void
+udp_mib_get_udp(GSnmpSession *s, udp_mib_udp_t **udp, gint mask);
 
 extern void
 udp_mib_free_udp(udp_mib_udp_t *udp);
@@ -44,22 +49,25 @@ udp_mib_free_udp(udp_mib_udp_t *udp);
  * C type definitions for UDP-MIB::udpEntry.
  */
 
+#define UDP_MIB_UDPLOCALADDRESS	0x1 
+#define UDP_MIB_UDPLOCALPORT	0x2 
+
 typedef struct {
     guchar   udpLocalAddress[4];
     gint32   udpLocalPort;
 } udp_mib_udpEntry_t;
 
-extern int
-udp_mib_get_udpTable(GSnmpSession *s, udp_mib_udpEntry_t ***udpEntry);
+extern void
+udp_mib_get_udpTable(GSnmpSession *s, udp_mib_udpEntry_t ***udpEntry, gint mask);
 
 extern void
 udp_mib_free_udpTable(udp_mib_udpEntry_t **udpEntry);
 
 extern udp_mib_udpEntry_t *
-udp_mib_new_udpEntry();
+udp_mib_new_udpEntry(void);
 
-extern int
-udp_mib_get_udpEntry(GSnmpSession *s, udp_mib_udpEntry_t **udpEntry);
+extern void
+udp_mib_get_udpEntry(GSnmpSession *s, udp_mib_udpEntry_t **udpEntry, guchar *udpLocalAddress, gint32 udpLocalPort, gint mask);
 
 extern void
 udp_mib_free_udpEntry(udp_mib_udpEntry_t *udpEntry);

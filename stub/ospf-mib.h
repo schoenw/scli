@@ -257,6 +257,21 @@ extern GSnmpEnum const ospf_mib_enums_ospfAreaAggregateEffect[];
  * C type definitions for OSPF-MIB::ospfGeneralGroup.
  */
 
+#define OSPF_MIB_OSPFROUTERID	0x1 
+#define OSPF_MIB_OSPFADMINSTAT	0x2 
+#define OSPF_MIB_OSPFVERSIONNUMBER	0x4 
+#define OSPF_MIB_OSPFAREABDRRTRSTATUS	0x8 
+#define OSPF_MIB_OSPFASBDRRTRSTATUS	0x10 
+#define OSPF_MIB_OSPFEXTERNLSACOUNT	0x20 
+#define OSPF_MIB_OSPFEXTERNLSACKSUMSUM	0x40 
+#define OSPF_MIB_OSPFTOSSUPPORT	0x80 
+#define OSPF_MIB_OSPFORIGINATENEWLSAS	0x100 
+#define OSPF_MIB_OSPFRXNEWLSAS	0x200 
+#define OSPF_MIB_OSPFEXTLSDBLIMIT	0x400 
+#define OSPF_MIB_OSPFMULTICASTEXTENSIONS	0x800 
+#define OSPF_MIB_OSPFEXITOVERFLOWINTERVAL	0x1000 
+#define OSPF_MIB_OSPFDEMANDEXTENSIONS	0x2000 
+
 typedef struct {
     guchar   *ospfRouterId;
     gint32   *ospfAdminStat;
@@ -275,13 +290,13 @@ typedef struct {
 } ospf_mib_ospfGeneralGroup_t;
 
 extern ospf_mib_ospfGeneralGroup_t *
-ospf_mib_new_ospfGeneralGroup();
+ospf_mib_new_ospfGeneralGroup(void);
 
-extern int
-ospf_mib_get_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t **ospfGeneralGroup);
+extern void
+ospf_mib_get_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t **ospfGeneralGroup, gint mask);
 
-extern int
-ospf_mib_set_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup);
+extern void
+ospf_mib_set_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup, gint mask);
 
 extern void
 ospf_mib_free_ospfGeneralGroup(ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup);
@@ -289,6 +304,17 @@ ospf_mib_free_ospfGeneralGroup(ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup);
 /*
  * C type definitions for OSPF-MIB::ospfAreaEntry.
  */
+
+#define OSPF_MIB_OSPFAREAID	0x1 
+#define OSPF_MIB_OSPFAUTHTYPE	0x2 
+#define OSPF_MIB_OSPFIMPORTASEXTERN	0x4 
+#define OSPF_MIB_OSPFSPFRUNS	0x8 
+#define OSPF_MIB_OSPFAREABDRRTRCOUNT	0x10 
+#define OSPF_MIB_OSPFASBDRRTRCOUNT	0x20 
+#define OSPF_MIB_OSPFAREALSACOUNT	0x40 
+#define OSPF_MIB_OSPFAREALSACKSUMSUM	0x80 
+#define OSPF_MIB_OSPFAREASUMMARY	0x100 
+#define OSPF_MIB_OSPFAREASTATUS	0x200 
 
 typedef struct {
     guchar   ospfAreaId[4];
@@ -303,20 +329,20 @@ typedef struct {
     gint32   *ospfAreaStatus;
 } ospf_mib_ospfAreaEntry_t;
 
-extern int
-ospf_mib_get_ospfAreaTable(GSnmpSession *s, ospf_mib_ospfAreaEntry_t ***ospfAreaEntry);
+extern void
+ospf_mib_get_ospfAreaTable(GSnmpSession *s, ospf_mib_ospfAreaEntry_t ***ospfAreaEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfAreaTable(ospf_mib_ospfAreaEntry_t **ospfAreaEntry);
 
 extern ospf_mib_ospfAreaEntry_t *
-ospf_mib_new_ospfAreaEntry();
+ospf_mib_new_ospfAreaEntry(void);
 
-extern int
-ospf_mib_get_ospfAreaEntry(GSnmpSession *s, ospf_mib_ospfAreaEntry_t **ospfAreaEntry);
+extern void
+ospf_mib_get_ospfAreaEntry(GSnmpSession *s, ospf_mib_ospfAreaEntry_t **ospfAreaEntry, guchar *ospfAreaId, gint mask);
 
-extern int
-ospf_mib_set_ospfAreaEntry(GSnmpSession *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry);
+extern void
+ospf_mib_set_ospfAreaEntry(GSnmpSession *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfAreaEntry(ospf_mib_ospfAreaEntry_t *ospfAreaEntry);
@@ -324,6 +350,12 @@ ospf_mib_free_ospfAreaEntry(ospf_mib_ospfAreaEntry_t *ospfAreaEntry);
 /*
  * C type definitions for OSPF-MIB::ospfStubAreaEntry.
  */
+
+#define OSPF_MIB_OSPFSTUBAREAID	0x1 
+#define OSPF_MIB_OSPFSTUBTOS	0x2 
+#define OSPF_MIB_OSPFSTUBMETRIC	0x4 
+#define OSPF_MIB_OSPFSTUBSTATUS	0x8 
+#define OSPF_MIB_OSPFSTUBMETRICTYPE	0x10 
 
 typedef struct {
     guchar   ospfStubAreaId[4];
@@ -333,20 +365,20 @@ typedef struct {
     gint32   *ospfStubMetricType;
 } ospf_mib_ospfStubAreaEntry_t;
 
-extern int
-ospf_mib_get_ospfStubAreaTable(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t ***ospfStubAreaEntry);
+extern void
+ospf_mib_get_ospfStubAreaTable(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t ***ospfStubAreaEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfStubAreaTable(ospf_mib_ospfStubAreaEntry_t **ospfStubAreaEntry);
 
 extern ospf_mib_ospfStubAreaEntry_t *
-ospf_mib_new_ospfStubAreaEntry();
+ospf_mib_new_ospfStubAreaEntry(void);
 
-extern int
-ospf_mib_get_ospfStubAreaEntry(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t **ospfStubAreaEntry);
+extern void
+ospf_mib_get_ospfStubAreaEntry(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t **ospfStubAreaEntry, guchar *ospfStubAreaId, gint32 ospfStubTOS, gint mask);
 
-extern int
-ospf_mib_set_ospfStubAreaEntry(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t *ospfStubAreaEntry);
+extern void
+ospf_mib_set_ospfStubAreaEntry(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t *ospfStubAreaEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfStubAreaEntry(ospf_mib_ospfStubAreaEntry_t *ospfStubAreaEntry);
@@ -354,6 +386,15 @@ ospf_mib_free_ospfStubAreaEntry(ospf_mib_ospfStubAreaEntry_t *ospfStubAreaEntry)
 /*
  * C type definitions for OSPF-MIB::ospfLsdbEntry.
  */
+
+#define OSPF_MIB_OSPFLSDBAREAID	0x1 
+#define OSPF_MIB_OSPFLSDBTYPE	0x2 
+#define OSPF_MIB_OSPFLSDBLSID	0x4 
+#define OSPF_MIB_OSPFLSDBROUTERID	0x8 
+#define OSPF_MIB_OSPFLSDBSEQUENCE	0x10 
+#define OSPF_MIB_OSPFLSDBAGE	0x20 
+#define OSPF_MIB_OSPFLSDBCHECKSUM	0x40 
+#define OSPF_MIB_OSPFLSDBADVERTISEMENT	0x80 
 
 typedef struct {
     guchar   ospfLsdbAreaId[4];
@@ -367,17 +408,17 @@ typedef struct {
     gsize    _ospfLsdbAdvertisementLength;
 } ospf_mib_ospfLsdbEntry_t;
 
-extern int
-ospf_mib_get_ospfLsdbTable(GSnmpSession *s, ospf_mib_ospfLsdbEntry_t ***ospfLsdbEntry);
+extern void
+ospf_mib_get_ospfLsdbTable(GSnmpSession *s, ospf_mib_ospfLsdbEntry_t ***ospfLsdbEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfLsdbTable(ospf_mib_ospfLsdbEntry_t **ospfLsdbEntry);
 
 extern ospf_mib_ospfLsdbEntry_t *
-ospf_mib_new_ospfLsdbEntry();
+ospf_mib_new_ospfLsdbEntry(void);
 
-extern int
-ospf_mib_get_ospfLsdbEntry(GSnmpSession *s, ospf_mib_ospfLsdbEntry_t **ospfLsdbEntry);
+extern void
+ospf_mib_get_ospfLsdbEntry(GSnmpSession *s, ospf_mib_ospfLsdbEntry_t **ospfLsdbEntry, guchar *ospfLsdbAreaId, gint32 ospfLsdbType, guchar *ospfLsdbLsid, guchar *ospfLsdbRouterId, gint mask);
 
 extern void
 ospf_mib_free_ospfLsdbEntry(ospf_mib_ospfLsdbEntry_t *ospfLsdbEntry);
@@ -385,6 +426,12 @@ ospf_mib_free_ospfLsdbEntry(ospf_mib_ospfLsdbEntry_t *ospfLsdbEntry);
 /*
  * C type definitions for OSPF-MIB::ospfAreaRangeEntry.
  */
+
+#define OSPF_MIB_OSPFAREARANGEAREAID	0x1 
+#define OSPF_MIB_OSPFAREARANGENET	0x2 
+#define OSPF_MIB_OSPFAREARANGEMASK	0x4 
+#define OSPF_MIB_OSPFAREARANGESTATUS	0x8 
+#define OSPF_MIB_OSPFAREARANGEEFFECT	0x10 
 
 typedef struct {
     guchar   ospfAreaRangeAreaId[4];
@@ -394,20 +441,20 @@ typedef struct {
     gint32   *ospfAreaRangeEffect;
 } ospf_mib_ospfAreaRangeEntry_t;
 
-extern int
-ospf_mib_get_ospfAreaRangeTable(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t ***ospfAreaRangeEntry);
+extern void
+ospf_mib_get_ospfAreaRangeTable(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t ***ospfAreaRangeEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfAreaRangeTable(ospf_mib_ospfAreaRangeEntry_t **ospfAreaRangeEntry);
 
 extern ospf_mib_ospfAreaRangeEntry_t *
-ospf_mib_new_ospfAreaRangeEntry();
+ospf_mib_new_ospfAreaRangeEntry(void);
 
-extern int
-ospf_mib_get_ospfAreaRangeEntry(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t **ospfAreaRangeEntry);
+extern void
+ospf_mib_get_ospfAreaRangeEntry(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t **ospfAreaRangeEntry, guchar *ospfAreaRangeAreaId, guchar *ospfAreaRangeNet, gint mask);
 
-extern int
-ospf_mib_set_ospfAreaRangeEntry(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t *ospfAreaRangeEntry);
+extern void
+ospf_mib_set_ospfAreaRangeEntry(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t *ospfAreaRangeEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfAreaRangeEntry(ospf_mib_ospfAreaRangeEntry_t *ospfAreaRangeEntry);
@@ -415,6 +462,12 @@ ospf_mib_free_ospfAreaRangeEntry(ospf_mib_ospfAreaRangeEntry_t *ospfAreaRangeEnt
 /*
  * C type definitions for OSPF-MIB::ospfHostEntry.
  */
+
+#define OSPF_MIB_OSPFHOSTIPADDRESS	0x1 
+#define OSPF_MIB_OSPFHOSTTOS	0x2 
+#define OSPF_MIB_OSPFHOSTMETRIC	0x4 
+#define OSPF_MIB_OSPFHOSTSTATUS	0x8 
+#define OSPF_MIB_OSPFHOSTAREAID	0x10 
 
 typedef struct {
     guchar   ospfHostIpAddress[4];
@@ -424,20 +477,20 @@ typedef struct {
     guchar   *ospfHostAreaID;
 } ospf_mib_ospfHostEntry_t;
 
-extern int
-ospf_mib_get_ospfHostTable(GSnmpSession *s, ospf_mib_ospfHostEntry_t ***ospfHostEntry);
+extern void
+ospf_mib_get_ospfHostTable(GSnmpSession *s, ospf_mib_ospfHostEntry_t ***ospfHostEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfHostTable(ospf_mib_ospfHostEntry_t **ospfHostEntry);
 
 extern ospf_mib_ospfHostEntry_t *
-ospf_mib_new_ospfHostEntry();
+ospf_mib_new_ospfHostEntry(void);
 
-extern int
-ospf_mib_get_ospfHostEntry(GSnmpSession *s, ospf_mib_ospfHostEntry_t **ospfHostEntry);
+extern void
+ospf_mib_get_ospfHostEntry(GSnmpSession *s, ospf_mib_ospfHostEntry_t **ospfHostEntry, guchar *ospfHostIpAddress, gint32 ospfHostTOS, gint mask);
 
-extern int
-ospf_mib_set_ospfHostEntry(GSnmpSession *s, ospf_mib_ospfHostEntry_t *ospfHostEntry);
+extern void
+ospf_mib_set_ospfHostEntry(GSnmpSession *s, ospf_mib_ospfHostEntry_t *ospfHostEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfHostEntry(ospf_mib_ospfHostEntry_t *ospfHostEntry);
@@ -445,6 +498,27 @@ ospf_mib_free_ospfHostEntry(ospf_mib_ospfHostEntry_t *ospfHostEntry);
 /*
  * C type definitions for OSPF-MIB::ospfIfEntry.
  */
+
+#define OSPF_MIB_OSPFIFIPADDRESS	0x1 
+#define OSPF_MIB_OSPFADDRESSLESSIF	0x2 
+#define OSPF_MIB_OSPFIFAREAID	0x4 
+#define OSPF_MIB_OSPFIFTYPE	0x8 
+#define OSPF_MIB_OSPFIFADMINSTAT	0x10 
+#define OSPF_MIB_OSPFIFRTRPRIORITY	0x20 
+#define OSPF_MIB_OSPFIFTRANSITDELAY	0x40 
+#define OSPF_MIB_OSPFIFRETRANSINTERVAL	0x80 
+#define OSPF_MIB_OSPFIFHELLOINTERVAL	0x100 
+#define OSPF_MIB_OSPFIFRTRDEADINTERVAL	0x200 
+#define OSPF_MIB_OSPFIFPOLLINTERVAL	0x400 
+#define OSPF_MIB_OSPFIFSTATE	0x800 
+#define OSPF_MIB_OSPFIFDESIGNATEDROUTER	0x1000 
+#define OSPF_MIB_OSPFIFBACKUPDESIGNATEDROUTER	0x2000 
+#define OSPF_MIB_OSPFIFEVENTS	0x4000 
+#define OSPF_MIB_OSPFIFAUTHKEY	0x8000 
+#define OSPF_MIB_OSPFIFSTATUS	0x10000 
+#define OSPF_MIB_OSPFIFMULTICASTFORWARDING	0x20000 
+#define OSPF_MIB_OSPFIFDEMAND	0x40000 
+#define OSPF_MIB_OSPFIFAUTHTYPE	0x80000 
 
 typedef struct {
     guchar   ospfIfIpAddress[4];
@@ -470,20 +544,20 @@ typedef struct {
     gint32   *ospfIfAuthType;
 } ospf_mib_ospfIfEntry_t;
 
-extern int
-ospf_mib_get_ospfIfTable(GSnmpSession *s, ospf_mib_ospfIfEntry_t ***ospfIfEntry);
+extern void
+ospf_mib_get_ospfIfTable(GSnmpSession *s, ospf_mib_ospfIfEntry_t ***ospfIfEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfIfTable(ospf_mib_ospfIfEntry_t **ospfIfEntry);
 
 extern ospf_mib_ospfIfEntry_t *
-ospf_mib_new_ospfIfEntry();
+ospf_mib_new_ospfIfEntry(void);
 
-extern int
-ospf_mib_get_ospfIfEntry(GSnmpSession *s, ospf_mib_ospfIfEntry_t **ospfIfEntry);
+extern void
+ospf_mib_get_ospfIfEntry(GSnmpSession *s, ospf_mib_ospfIfEntry_t **ospfIfEntry, guchar *ospfIfIpAddress, gint32 ospfAddressLessIf, gint mask);
 
-extern int
-ospf_mib_set_ospfIfEntry(GSnmpSession *s, ospf_mib_ospfIfEntry_t *ospfIfEntry);
+extern void
+ospf_mib_set_ospfIfEntry(GSnmpSession *s, ospf_mib_ospfIfEntry_t *ospfIfEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfIfEntry(ospf_mib_ospfIfEntry_t *ospfIfEntry);
@@ -491,6 +565,12 @@ ospf_mib_free_ospfIfEntry(ospf_mib_ospfIfEntry_t *ospfIfEntry);
 /*
  * C type definitions for OSPF-MIB::ospfIfMetricEntry.
  */
+
+#define OSPF_MIB_OSPFIFMETRICIPADDRESS	0x1 
+#define OSPF_MIB_OSPFIFMETRICADDRESSLESSIF	0x2 
+#define OSPF_MIB_OSPFIFMETRICTOS	0x4 
+#define OSPF_MIB_OSPFIFMETRICVALUE	0x8 
+#define OSPF_MIB_OSPFIFMETRICSTATUS	0x10 
 
 typedef struct {
     guchar   ospfIfMetricIpAddress[4];
@@ -500,20 +580,20 @@ typedef struct {
     gint32   *ospfIfMetricStatus;
 } ospf_mib_ospfIfMetricEntry_t;
 
-extern int
-ospf_mib_get_ospfIfMetricTable(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t ***ospfIfMetricEntry);
+extern void
+ospf_mib_get_ospfIfMetricTable(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t ***ospfIfMetricEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfIfMetricTable(ospf_mib_ospfIfMetricEntry_t **ospfIfMetricEntry);
 
 extern ospf_mib_ospfIfMetricEntry_t *
-ospf_mib_new_ospfIfMetricEntry();
+ospf_mib_new_ospfIfMetricEntry(void);
 
-extern int
-ospf_mib_get_ospfIfMetricEntry(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t **ospfIfMetricEntry);
+extern void
+ospf_mib_get_ospfIfMetricEntry(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t **ospfIfMetricEntry, guchar *ospfIfMetricIpAddress, gint32 ospfIfMetricAddressLessIf, gint32 ospfIfMetricTOS, gint mask);
 
-extern int
-ospf_mib_set_ospfIfMetricEntry(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t *ospfIfMetricEntry);
+extern void
+ospf_mib_set_ospfIfMetricEntry(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t *ospfIfMetricEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfIfMetricEntry(ospf_mib_ospfIfMetricEntry_t *ospfIfMetricEntry);
@@ -521,6 +601,18 @@ ospf_mib_free_ospfIfMetricEntry(ospf_mib_ospfIfMetricEntry_t *ospfIfMetricEntry)
 /*
  * C type definitions for OSPF-MIB::ospfVirtIfEntry.
  */
+
+#define OSPF_MIB_OSPFVIRTIFAREAID	0x1 
+#define OSPF_MIB_OSPFVIRTIFNEIGHBOR	0x2 
+#define OSPF_MIB_OSPFVIRTIFTRANSITDELAY	0x4 
+#define OSPF_MIB_OSPFVIRTIFRETRANSINTERVAL	0x8 
+#define OSPF_MIB_OSPFVIRTIFHELLOINTERVAL	0x10 
+#define OSPF_MIB_OSPFVIRTIFRTRDEADINTERVAL	0x20 
+#define OSPF_MIB_OSPFVIRTIFSTATE	0x40 
+#define OSPF_MIB_OSPFVIRTIFEVENTS	0x80 
+#define OSPF_MIB_OSPFVIRTIFAUTHKEY	0x100 
+#define OSPF_MIB_OSPFVIRTIFSTATUS	0x200 
+#define OSPF_MIB_OSPFVIRTIFAUTHTYPE	0x400 
 
 typedef struct {
     guchar   ospfVirtIfAreaId[4];
@@ -537,20 +629,20 @@ typedef struct {
     gint32   *ospfVirtIfAuthType;
 } ospf_mib_ospfVirtIfEntry_t;
 
-extern int
-ospf_mib_get_ospfVirtIfTable(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t ***ospfVirtIfEntry);
+extern void
+ospf_mib_get_ospfVirtIfTable(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t ***ospfVirtIfEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfVirtIfTable(ospf_mib_ospfVirtIfEntry_t **ospfVirtIfEntry);
 
 extern ospf_mib_ospfVirtIfEntry_t *
-ospf_mib_new_ospfVirtIfEntry();
+ospf_mib_new_ospfVirtIfEntry(void);
 
-extern int
-ospf_mib_get_ospfVirtIfEntry(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t **ospfVirtIfEntry);
+extern void
+ospf_mib_get_ospfVirtIfEntry(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t **ospfVirtIfEntry, guchar *ospfVirtIfAreaId, guchar *ospfVirtIfNeighbor, gint mask);
 
-extern int
-ospf_mib_set_ospfVirtIfEntry(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t *ospfVirtIfEntry);
+extern void
+ospf_mib_set_ospfVirtIfEntry(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t *ospfVirtIfEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfVirtIfEntry(ospf_mib_ospfVirtIfEntry_t *ospfVirtIfEntry);
@@ -558,6 +650,18 @@ ospf_mib_free_ospfVirtIfEntry(ospf_mib_ospfVirtIfEntry_t *ospfVirtIfEntry);
 /*
  * C type definitions for OSPF-MIB::ospfNbrEntry.
  */
+
+#define OSPF_MIB_OSPFNBRIPADDR	0x1 
+#define OSPF_MIB_OSPFNBRADDRESSLESSINDEX	0x2 
+#define OSPF_MIB_OSPFNBRRTRID	0x4 
+#define OSPF_MIB_OSPFNBROPTIONS	0x8 
+#define OSPF_MIB_OSPFNBRPRIORITY	0x10 
+#define OSPF_MIB_OSPFNBRSTATE	0x20 
+#define OSPF_MIB_OSPFNBREVENTS	0x40 
+#define OSPF_MIB_OSPFNBRLSRETRANSQLEN	0x80 
+#define OSPF_MIB_OSPFNBMANBRSTATUS	0x100 
+#define OSPF_MIB_OSPFNBMANBRPERMANENCE	0x200 
+#define OSPF_MIB_OSPFNBRHELLOSUPPRESSED	0x400 
 
 typedef struct {
     guchar   ospfNbrIpAddr[4];
@@ -573,20 +677,20 @@ typedef struct {
     gint32   *ospfNbrHelloSuppressed;
 } ospf_mib_ospfNbrEntry_t;
 
-extern int
-ospf_mib_get_ospfNbrTable(GSnmpSession *s, ospf_mib_ospfNbrEntry_t ***ospfNbrEntry);
+extern void
+ospf_mib_get_ospfNbrTable(GSnmpSession *s, ospf_mib_ospfNbrEntry_t ***ospfNbrEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfNbrTable(ospf_mib_ospfNbrEntry_t **ospfNbrEntry);
 
 extern ospf_mib_ospfNbrEntry_t *
-ospf_mib_new_ospfNbrEntry();
+ospf_mib_new_ospfNbrEntry(void);
 
-extern int
-ospf_mib_get_ospfNbrEntry(GSnmpSession *s, ospf_mib_ospfNbrEntry_t **ospfNbrEntry);
+extern void
+ospf_mib_get_ospfNbrEntry(GSnmpSession *s, ospf_mib_ospfNbrEntry_t **ospfNbrEntry, guchar *ospfNbrIpAddr, gint32 ospfNbrAddressLessIndex, gint mask);
 
-extern int
-ospf_mib_set_ospfNbrEntry(GSnmpSession *s, ospf_mib_ospfNbrEntry_t *ospfNbrEntry);
+extern void
+ospf_mib_set_ospfNbrEntry(GSnmpSession *s, ospf_mib_ospfNbrEntry_t *ospfNbrEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfNbrEntry(ospf_mib_ospfNbrEntry_t *ospfNbrEntry);
@@ -594,6 +698,15 @@ ospf_mib_free_ospfNbrEntry(ospf_mib_ospfNbrEntry_t *ospfNbrEntry);
 /*
  * C type definitions for OSPF-MIB::ospfVirtNbrEntry.
  */
+
+#define OSPF_MIB_OSPFVIRTNBRAREA	0x1 
+#define OSPF_MIB_OSPFVIRTNBRRTRID	0x2 
+#define OSPF_MIB_OSPFVIRTNBRIPADDR	0x4 
+#define OSPF_MIB_OSPFVIRTNBROPTIONS	0x8 
+#define OSPF_MIB_OSPFVIRTNBRSTATE	0x10 
+#define OSPF_MIB_OSPFVIRTNBREVENTS	0x20 
+#define OSPF_MIB_OSPFVIRTNBRLSRETRANSQLEN	0x40 
+#define OSPF_MIB_OSPFVIRTNBRHELLOSUPPRESSED	0x80 
 
 typedef struct {
     guchar   ospfVirtNbrArea[4];
@@ -606,17 +719,17 @@ typedef struct {
     gint32   *ospfVirtNbrHelloSuppressed;
 } ospf_mib_ospfVirtNbrEntry_t;
 
-extern int
-ospf_mib_get_ospfVirtNbrTable(GSnmpSession *s, ospf_mib_ospfVirtNbrEntry_t ***ospfVirtNbrEntry);
+extern void
+ospf_mib_get_ospfVirtNbrTable(GSnmpSession *s, ospf_mib_ospfVirtNbrEntry_t ***ospfVirtNbrEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfVirtNbrTable(ospf_mib_ospfVirtNbrEntry_t **ospfVirtNbrEntry);
 
 extern ospf_mib_ospfVirtNbrEntry_t *
-ospf_mib_new_ospfVirtNbrEntry();
+ospf_mib_new_ospfVirtNbrEntry(void);
 
-extern int
-ospf_mib_get_ospfVirtNbrEntry(GSnmpSession *s, ospf_mib_ospfVirtNbrEntry_t **ospfVirtNbrEntry);
+extern void
+ospf_mib_get_ospfVirtNbrEntry(GSnmpSession *s, ospf_mib_ospfVirtNbrEntry_t **ospfVirtNbrEntry, guchar *ospfVirtNbrArea, guchar *ospfVirtNbrRtrId, gint mask);
 
 extern void
 ospf_mib_free_ospfVirtNbrEntry(ospf_mib_ospfVirtNbrEntry_t *ospfVirtNbrEntry);
@@ -624,6 +737,14 @@ ospf_mib_free_ospfVirtNbrEntry(ospf_mib_ospfVirtNbrEntry_t *ospfVirtNbrEntry);
 /*
  * C type definitions for OSPF-MIB::ospfExtLsdbEntry.
  */
+
+#define OSPF_MIB_OSPFEXTLSDBTYPE	0x1 
+#define OSPF_MIB_OSPFEXTLSDBLSID	0x2 
+#define OSPF_MIB_OSPFEXTLSDBROUTERID	0x4 
+#define OSPF_MIB_OSPFEXTLSDBSEQUENCE	0x8 
+#define OSPF_MIB_OSPFEXTLSDBAGE	0x10 
+#define OSPF_MIB_OSPFEXTLSDBCHECKSUM	0x20 
+#define OSPF_MIB_OSPFEXTLSDBADVERTISEMENT	0x40 
 
 typedef struct {
     gint32   ospfExtLsdbType;
@@ -635,17 +756,17 @@ typedef struct {
     guchar   *ospfExtLsdbAdvertisement;
 } ospf_mib_ospfExtLsdbEntry_t;
 
-extern int
-ospf_mib_get_ospfExtLsdbTable(GSnmpSession *s, ospf_mib_ospfExtLsdbEntry_t ***ospfExtLsdbEntry);
+extern void
+ospf_mib_get_ospfExtLsdbTable(GSnmpSession *s, ospf_mib_ospfExtLsdbEntry_t ***ospfExtLsdbEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfExtLsdbTable(ospf_mib_ospfExtLsdbEntry_t **ospfExtLsdbEntry);
 
 extern ospf_mib_ospfExtLsdbEntry_t *
-ospf_mib_new_ospfExtLsdbEntry();
+ospf_mib_new_ospfExtLsdbEntry(void);
 
-extern int
-ospf_mib_get_ospfExtLsdbEntry(GSnmpSession *s, ospf_mib_ospfExtLsdbEntry_t **ospfExtLsdbEntry);
+extern void
+ospf_mib_get_ospfExtLsdbEntry(GSnmpSession *s, ospf_mib_ospfExtLsdbEntry_t **ospfExtLsdbEntry, gint32 ospfExtLsdbType, guchar *ospfExtLsdbLsid, guchar *ospfExtLsdbRouterId, gint mask);
 
 extern void
 ospf_mib_free_ospfExtLsdbEntry(ospf_mib_ospfExtLsdbEntry_t *ospfExtLsdbEntry);
@@ -653,6 +774,13 @@ ospf_mib_free_ospfExtLsdbEntry(ospf_mib_ospfExtLsdbEntry_t *ospfExtLsdbEntry);
 /*
  * C type definitions for OSPF-MIB::ospfAreaAggregateEntry.
  */
+
+#define OSPF_MIB_OSPFAREAAGGREGATEAREAID	0x1 
+#define OSPF_MIB_OSPFAREAAGGREGATELSDBTYPE	0x2 
+#define OSPF_MIB_OSPFAREAAGGREGATENET	0x4 
+#define OSPF_MIB_OSPFAREAAGGREGATEMASK	0x8 
+#define OSPF_MIB_OSPFAREAAGGREGATESTATUS	0x10 
+#define OSPF_MIB_OSPFAREAAGGREGATEEFFECT	0x20 
 
 typedef struct {
     guchar   ospfAreaAggregateAreaID[4];
@@ -663,20 +791,20 @@ typedef struct {
     gint32   *ospfAreaAggregateEffect;
 } ospf_mib_ospfAreaAggregateEntry_t;
 
-extern int
-ospf_mib_get_ospfAreaAggregateTable(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t ***ospfAreaAggregateEntry);
+extern void
+ospf_mib_get_ospfAreaAggregateTable(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t ***ospfAreaAggregateEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfAreaAggregateTable(ospf_mib_ospfAreaAggregateEntry_t **ospfAreaAggregateEntry);
 
 extern ospf_mib_ospfAreaAggregateEntry_t *
-ospf_mib_new_ospfAreaAggregateEntry();
+ospf_mib_new_ospfAreaAggregateEntry(void);
 
-extern int
-ospf_mib_get_ospfAreaAggregateEntry(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t **ospfAreaAggregateEntry);
+extern void
+ospf_mib_get_ospfAreaAggregateEntry(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t **ospfAreaAggregateEntry, guchar *ospfAreaAggregateAreaID, gint32 ospfAreaAggregateLsdbType, guchar *ospfAreaAggregateNet, guchar *ospfAreaAggregateMask, gint mask);
 
-extern int
-ospf_mib_set_ospfAreaAggregateEntry(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t *ospfAreaAggregateEntry);
+extern void
+ospf_mib_set_ospfAreaAggregateEntry(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t *ospfAreaAggregateEntry, gint mask);
 
 extern void
 ospf_mib_free_ospfAreaAggregateEntry(ospf_mib_ospfAreaAggregateEntry_t *ospfAreaAggregateEntry);

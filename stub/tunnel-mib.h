@@ -65,6 +65,13 @@ extern GSnmpEnum const tunnel_mib_enums_tunnelConfigStatus[];
  * C type definitions for TUNNEL-MIB::tunnelIfEntry.
  */
 
+#define TUNNEL_MIB_TUNNELIFLOCALADDRESS	0x1 
+#define TUNNEL_MIB_TUNNELIFREMOTEADDRESS	0x2 
+#define TUNNEL_MIB_TUNNELIFENCAPSMETHOD	0x4 
+#define TUNNEL_MIB_TUNNELIFHOPLIMIT	0x8 
+#define TUNNEL_MIB_TUNNELIFSECURITY	0x10 
+#define TUNNEL_MIB_TUNNELIFTOS	0x20 
+
 typedef struct {
     gint32   ifIndex;
     guchar   *tunnelIfLocalAddress;
@@ -75,20 +82,20 @@ typedef struct {
     gint32   *tunnelIfTOS;
 } tunnel_mib_tunnelIfEntry_t;
 
-extern int
-tunnel_mib_get_tunnelIfTable(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t ***tunnelIfEntry);
+extern void
+tunnel_mib_get_tunnelIfTable(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t ***tunnelIfEntry, gint mask);
 
 extern void
 tunnel_mib_free_tunnelIfTable(tunnel_mib_tunnelIfEntry_t **tunnelIfEntry);
 
 extern tunnel_mib_tunnelIfEntry_t *
-tunnel_mib_new_tunnelIfEntry();
+tunnel_mib_new_tunnelIfEntry(void);
 
-extern int
-tunnel_mib_get_tunnelIfEntry(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t **tunnelIfEntry);
+extern void
+tunnel_mib_get_tunnelIfEntry(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t **tunnelIfEntry, gint32 ifIndex, gint mask);
 
-extern int
-tunnel_mib_set_tunnelIfEntry(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t *tunnelIfEntry);
+extern void
+tunnel_mib_set_tunnelIfEntry(GSnmpSession *s, tunnel_mib_tunnelIfEntry_t *tunnelIfEntry, gint mask);
 
 extern void
 tunnel_mib_free_tunnelIfEntry(tunnel_mib_tunnelIfEntry_t *tunnelIfEntry);
@@ -96,6 +103,9 @@ tunnel_mib_free_tunnelIfEntry(tunnel_mib_tunnelIfEntry_t *tunnelIfEntry);
 /*
  * C type definitions for TUNNEL-MIB::tunnelConfigEntry.
  */
+
+#define TUNNEL_MIB_TUNNELCONFIGIFINDEX	0x1 
+#define TUNNEL_MIB_TUNNELCONFIGSTATUS	0x2 
 
 typedef struct {
     guchar   tunnelConfigLocalAddress[4];
@@ -106,20 +116,20 @@ typedef struct {
     gint32   *tunnelConfigStatus;
 } tunnel_mib_tunnelConfigEntry_t;
 
-extern int
-tunnel_mib_get_tunnelConfigTable(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t ***tunnelConfigEntry);
+extern void
+tunnel_mib_get_tunnelConfigTable(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t ***tunnelConfigEntry, gint mask);
 
 extern void
 tunnel_mib_free_tunnelConfigTable(tunnel_mib_tunnelConfigEntry_t **tunnelConfigEntry);
 
 extern tunnel_mib_tunnelConfigEntry_t *
-tunnel_mib_new_tunnelConfigEntry();
+tunnel_mib_new_tunnelConfigEntry(void);
 
-extern int
-tunnel_mib_get_tunnelConfigEntry(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t **tunnelConfigEntry);
+extern void
+tunnel_mib_get_tunnelConfigEntry(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t **tunnelConfigEntry, guchar *tunnelConfigLocalAddress, guchar *tunnelConfigRemoteAddress, gint32 tunnelConfigEncapsMethod, gint32 tunnelConfigID, gint mask);
 
-extern int
-tunnel_mib_set_tunnelConfigEntry(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t *tunnelConfigEntry);
+extern void
+tunnel_mib_set_tunnelConfigEntry(GSnmpSession *s, tunnel_mib_tunnelConfigEntry_t *tunnelConfigEntry, gint mask);
 
 extern void
 tunnel_mib_free_tunnelConfigEntry(tunnel_mib_tunnelConfigEntry_t *tunnelConfigEntry);

@@ -20,33 +20,37 @@
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -68,18 +72,22 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _udp[] = {
-    { 1, G_SNMP_COUNTER32, "udpInDatagrams" },
-    { 2, G_SNMP_COUNTER32, "udpNoPorts" },
-    { 3, G_SNMP_COUNTER32, "udpInErrors" },
-    { 4, G_SNMP_COUNTER32, "udpOutDatagrams" },
-    { 0, 0, NULL }
+static guint32 const oid_udp[] = {1, 3, 6, 1, 2, 1, 7};
+
+static attribute_t attr_udp[] = {
+    { 1, G_SNMP_COUNTER32, UDP_MIB_UDPINDATAGRAMS, "udpInDatagrams" },
+    { 2, G_SNMP_COUNTER32, UDP_MIB_UDPNOPORTS, "udpNoPorts" },
+    { 3, G_SNMP_COUNTER32, UDP_MIB_UDPINERRORS, "udpInErrors" },
+    { 4, G_SNMP_COUNTER32, UDP_MIB_UDPOUTDATAGRAMS, "udpOutDatagrams" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _udpEntry[] = {
-    { 1, G_SNMP_IPADDRESS, "udpLocalAddress" },
-    { 2, G_SNMP_INTEGER32, "udpLocalPort" },
-    { 0, 0, NULL }
+static guint32 const oid_udpEntry[] = {1, 3, 6, 1, 2, 1, 7, 5, 1};
+
+static attribute_t attr_udpEntry[] = {
+    { 1, G_SNMP_IPADDRESS, UDP_MIB_UDPLOCALADDRESS, "udpLocalAddress" },
+    { 2, G_SNMP_INTEGER32, UDP_MIB_UDPLOCALPORT, "udpLocalPort" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -99,7 +107,6 @@ assign_udp(GSList *vbl)
     udp_mib_udp_t *udp;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 7};
 
     udp = udp_mib_new_udp();
     if (! udp) {
@@ -112,8 +119,8 @@ assign_udp(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _udp, &idx) < 0) continue;
+        if (lookup(vb, oid_udp, sizeof(oid_udp)/sizeof(guint32),
+                   attr_udp, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -134,25 +141,21 @@ assign_udp(GSList *vbl)
     return udp;
 }
 
-int
-udp_mib_get_udp(GSnmpSession *s, udp_mib_udp_t **udp)
+void
+udp_mib_get_udp(GSnmpSession *s, udp_mib_udp_t **udp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 7, 0};
 
     *udp = NULL;
 
-    add_attributes(s, &in, base, 7, _udp);
+    add_attributes(s, &in, base, 8, 7, attr_udp, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *udp = assign_udp(out);
     }
-
-    *udp = assign_udp(out);
-
-    return 0;
 }
 
 void
@@ -194,6 +197,20 @@ unpack_udpEntry(GSnmpVarBind *vb, udp_mib_udpEntry_t *udpEntry)
     return 0;
 }
 
+static int
+pack_udpEntry(guint32 *base, guchar *udpLocalAddress, gint32 udpLocalPort)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = udpLocalAddress[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = udpLocalPort;
+    return idx;
+}
+
 static udp_mib_udpEntry_t *
 assign_udpEntry(GSList *vbl)
 {
@@ -201,7 +218,6 @@ assign_udpEntry(GSList *vbl)
     udp_mib_udpEntry_t *udpEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 7, 5, 1};
 
     udpEntry = udp_mib_new_udpEntry();
     if (! udpEntry) {
@@ -220,8 +236,8 @@ assign_udpEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _udpEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_udpEntry, sizeof(oid_udpEntry)/sizeof(guint32),
+                   attr_udpEntry, &idx) < 0) continue;
 
         switch (idx) {
         };
@@ -230,8 +246,8 @@ assign_udpEntry(GSList *vbl)
     return udpEntry;
 }
 
-int
-udp_mib_get_udpTable(GSnmpSession *s, udp_mib_udpEntry_t ***udpEntry)
+void
+udp_mib_get_udpTable(GSnmpSession *s, udp_mib_udpEntry_t ***udpEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -240,24 +256,48 @@ udp_mib_get_udpTable(GSnmpSession *s, udp_mib_udpEntry_t ***udpEntry)
 
     *udpEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _udpEntry);
+    add_attributes(s, &in, base, 10, 9, attr_udpEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *udpEntry = (udp_mib_udpEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(udp_mib_udpEntry_t *));
+        if (! *udpEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*udpEntry)[i] = assign_udpEntry(row->data);
+        }
+    }
+}
+
+void
+udp_mib_get_udpEntry(GSnmpSession *s, udp_mib_udpEntry_t **udpEntry, guchar *udpLocalAddress, gint32 udpLocalPort, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_udpEntry, sizeof(oid_udpEntry));
+    len = pack_udpEntry(base, udpLocalAddress, udpLocalPort);
+    if (len < 0) {
+        g_warning("illegal udpEntry index values");
+        return;
     }
 
-    *udpEntry = (udp_mib_udpEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(udp_mib_udpEntry_t *));
-    if (! *udpEntry) {
-        return -4;
-    }
+    *udpEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*udpEntry)[i] = assign_udpEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 9, attr_udpEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *udpEntry = assign_udpEntry(out);
+    }
 }
 
 void

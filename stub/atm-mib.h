@@ -241,6 +241,10 @@ extern GSnmpEnum const atm_mib_enums_atmVcCrossConnectRowStatus[];
  * C type definitions for ATM-MIB::atmMIBObjects.
  */
 
+#define ATM_MIB_ATMVPCROSSCONNECTINDEXNEXT	0x1 
+#define ATM_MIB_ATMVCCROSSCONNECTINDEXNEXT	0x2 
+#define ATM_MIB_ATMTRAFFICDESCRPARAMINDEXNEXT	0x4 
+
 typedef struct {
     gint32   *atmVpCrossConnectIndexNext;
     gint32   *atmVcCrossConnectIndexNext;
@@ -248,10 +252,10 @@ typedef struct {
 } atm_mib_atmMIBObjects_t;
 
 extern atm_mib_atmMIBObjects_t *
-atm_mib_new_atmMIBObjects();
+atm_mib_new_atmMIBObjects(void);
 
-extern int
-atm_mib_get_atmMIBObjects(GSnmpSession *s, atm_mib_atmMIBObjects_t **atmMIBObjects);
+extern void
+atm_mib_get_atmMIBObjects(GSnmpSession *s, atm_mib_atmMIBObjects_t **atmMIBObjects, gint mask);
 
 extern void
 atm_mib_free_atmMIBObjects(atm_mib_atmMIBObjects_t *atmMIBObjects);
@@ -259,6 +263,22 @@ atm_mib_free_atmMIBObjects(atm_mib_atmMIBObjects_t *atmMIBObjects);
 /*
  * C type definitions for ATM-MIB::atmInterfaceConfEntry.
  */
+
+#define ATM_MIB_ATMINTERFACEMAXVPCS	0x1 
+#define ATM_MIB_ATMINTERFACEMAXVCCS	0x2 
+#define ATM_MIB_ATMINTERFACECONFVPCS	0x4 
+#define ATM_MIB_ATMINTERFACECONFVCCS	0x8 
+#define ATM_MIB_ATMINTERFACEMAXACTIVEVPIBITS	0x10 
+#define ATM_MIB_ATMINTERFACEMAXACTIVEVCIBITS	0x20 
+#define ATM_MIB_ATMINTERFACEILMIVPI	0x40 
+#define ATM_MIB_ATMINTERFACEILMIVCI	0x80 
+#define ATM_MIB_ATMINTERFACEADDRESSTYPE	0x100 
+#define ATM_MIB_ATMINTERFACEADMINADDRESS	0x200 
+#define ATM_MIB_ATMINTERFACEMYNEIGHBORIPADDRESS	0x400 
+#define ATM_MIB_ATMINTERFACEMYNEIGHBORIFNAME	0x800 
+#define ATM_MIB_ATMINTERFACECURRENTMAXVPIBITS	0x1000 
+#define ATM_MIB_ATMINTERFACECURRENTMAXVCIBITS	0x2000 
+#define ATM_MIB_ATMINTERFACESUBSCRADDRESS	0x4000 
 
 typedef struct {
     gint32   ifIndex;
@@ -282,20 +302,20 @@ typedef struct {
     gsize    _atmInterfaceSubscrAddressLength;
 } atm_mib_atmInterfaceConfEntry_t;
 
-extern int
-atm_mib_get_atmInterfaceConfTable(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t ***atmInterfaceConfEntry);
+extern void
+atm_mib_get_atmInterfaceConfTable(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t ***atmInterfaceConfEntry, gint mask);
 
 extern void
 atm_mib_free_atmInterfaceConfTable(atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfEntry);
 
 extern atm_mib_atmInterfaceConfEntry_t *
-atm_mib_new_atmInterfaceConfEntry();
+atm_mib_new_atmInterfaceConfEntry(void);
 
-extern int
-atm_mib_get_atmInterfaceConfEntry(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfEntry);
+extern void
+atm_mib_get_atmInterfaceConfEntry(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfEntry, gint32 ifIndex, gint mask);
 
-extern int
-atm_mib_set_atmInterfaceConfEntry(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry);
+extern void
+atm_mib_set_atmInterfaceConfEntry(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry, gint mask);
 
 extern void
 atm_mib_free_atmInterfaceConfEntry(atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry);
@@ -304,6 +324,10 @@ atm_mib_free_atmInterfaceConfEntry(atm_mib_atmInterfaceConfEntry_t *atmInterface
  * C type definitions for ATM-MIB::atmInterfaceDs3PlcpEntry.
  */
 
+#define ATM_MIB_ATMINTERFACEDS3PLCPSEFSS	0x1 
+#define ATM_MIB_ATMINTERFACEDS3PLCPALARMSTATE	0x2 
+#define ATM_MIB_ATMINTERFACEDS3PLCPUASS	0x4 
+
 typedef struct {
     gint32   ifIndex;
     guint32  *atmInterfaceDs3PlcpSEFSs;
@@ -311,17 +335,17 @@ typedef struct {
     guint32  *atmInterfaceDs3PlcpUASs;
 } atm_mib_atmInterfaceDs3PlcpEntry_t;
 
-extern int
-atm_mib_get_atmInterfaceDs3PlcpTable(GSnmpSession *s, atm_mib_atmInterfaceDs3PlcpEntry_t ***atmInterfaceDs3PlcpEntry);
+extern void
+atm_mib_get_atmInterfaceDs3PlcpTable(GSnmpSession *s, atm_mib_atmInterfaceDs3PlcpEntry_t ***atmInterfaceDs3PlcpEntry, gint mask);
 
 extern void
 atm_mib_free_atmInterfaceDs3PlcpTable(atm_mib_atmInterfaceDs3PlcpEntry_t **atmInterfaceDs3PlcpEntry);
 
 extern atm_mib_atmInterfaceDs3PlcpEntry_t *
-atm_mib_new_atmInterfaceDs3PlcpEntry();
+atm_mib_new_atmInterfaceDs3PlcpEntry(void);
 
-extern int
-atm_mib_get_atmInterfaceDs3PlcpEntry(GSnmpSession *s, atm_mib_atmInterfaceDs3PlcpEntry_t **atmInterfaceDs3PlcpEntry);
+extern void
+atm_mib_get_atmInterfaceDs3PlcpEntry(GSnmpSession *s, atm_mib_atmInterfaceDs3PlcpEntry_t **atmInterfaceDs3PlcpEntry, gint32 ifIndex, gint mask);
 
 extern void
 atm_mib_free_atmInterfaceDs3PlcpEntry(atm_mib_atmInterfaceDs3PlcpEntry_t *atmInterfaceDs3PlcpEntry);
@@ -330,23 +354,26 @@ atm_mib_free_atmInterfaceDs3PlcpEntry(atm_mib_atmInterfaceDs3PlcpEntry_t *atmInt
  * C type definitions for ATM-MIB::atmInterfaceTCEntry.
  */
 
+#define ATM_MIB_ATMINTERFACEOCDEVENTS	0x1 
+#define ATM_MIB_ATMINTERFACETCALARMSTATE	0x2 
+
 typedef struct {
     gint32   ifIndex;
     guint32  *atmInterfaceOCDEvents;
     gint32   *atmInterfaceTCAlarmState;
 } atm_mib_atmInterfaceTCEntry_t;
 
-extern int
-atm_mib_get_atmInterfaceTCTable(GSnmpSession *s, atm_mib_atmInterfaceTCEntry_t ***atmInterfaceTCEntry);
+extern void
+atm_mib_get_atmInterfaceTCTable(GSnmpSession *s, atm_mib_atmInterfaceTCEntry_t ***atmInterfaceTCEntry, gint mask);
 
 extern void
 atm_mib_free_atmInterfaceTCTable(atm_mib_atmInterfaceTCEntry_t **atmInterfaceTCEntry);
 
 extern atm_mib_atmInterfaceTCEntry_t *
-atm_mib_new_atmInterfaceTCEntry();
+atm_mib_new_atmInterfaceTCEntry(void);
 
-extern int
-atm_mib_get_atmInterfaceTCEntry(GSnmpSession *s, atm_mib_atmInterfaceTCEntry_t **atmInterfaceTCEntry);
+extern void
+atm_mib_get_atmInterfaceTCEntry(GSnmpSession *s, atm_mib_atmInterfaceTCEntry_t **atmInterfaceTCEntry, gint32 ifIndex, gint mask);
 
 extern void
 atm_mib_free_atmInterfaceTCEntry(atm_mib_atmInterfaceTCEntry_t *atmInterfaceTCEntry);
@@ -354,6 +381,17 @@ atm_mib_free_atmInterfaceTCEntry(atm_mib_atmInterfaceTCEntry_t *atmInterfaceTCEn
 /*
  * C type definitions for ATM-MIB::atmTrafficDescrParamEntry.
  */
+
+#define ATM_MIB_ATMTRAFFICDESCRTYPE	0x1 
+#define ATM_MIB_ATMTRAFFICDESCRPARAM1	0x2 
+#define ATM_MIB_ATMTRAFFICDESCRPARAM2	0x4 
+#define ATM_MIB_ATMTRAFFICDESCRPARAM3	0x8 
+#define ATM_MIB_ATMTRAFFICDESCRPARAM4	0x10 
+#define ATM_MIB_ATMTRAFFICDESCRPARAM5	0x20 
+#define ATM_MIB_ATMTRAFFICQOSCLASS	0x40 
+#define ATM_MIB_ATMTRAFFICDESCRROWSTATUS	0x80 
+#define ATM_MIB_ATMSERVICECATEGORY	0x100 
+#define ATM_MIB_ATMTRAFFICFRAMEDISCARD	0x200 
 
 typedef struct {
     gint32   atmTrafficDescrParamIndex;
@@ -370,20 +408,20 @@ typedef struct {
     gint32   *atmTrafficFrameDiscard;
 } atm_mib_atmTrafficDescrParamEntry_t;
 
-extern int
-atm_mib_get_atmTrafficDescrParamTable(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t ***atmTrafficDescrParamEntry);
+extern void
+atm_mib_get_atmTrafficDescrParamTable(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t ***atmTrafficDescrParamEntry, gint mask);
 
 extern void
 atm_mib_free_atmTrafficDescrParamTable(atm_mib_atmTrafficDescrParamEntry_t **atmTrafficDescrParamEntry);
 
 extern atm_mib_atmTrafficDescrParamEntry_t *
-atm_mib_new_atmTrafficDescrParamEntry();
+atm_mib_new_atmTrafficDescrParamEntry(void);
 
-extern int
-atm_mib_get_atmTrafficDescrParamEntry(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t **atmTrafficDescrParamEntry);
+extern void
+atm_mib_get_atmTrafficDescrParamEntry(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t **atmTrafficDescrParamEntry, gint32 atmTrafficDescrParamIndex, gint mask);
 
-extern int
-atm_mib_set_atmTrafficDescrParamEntry(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t *atmTrafficDescrParamEntry);
+extern void
+atm_mib_set_atmTrafficDescrParamEntry(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t *atmTrafficDescrParamEntry, gint mask);
 
 extern void
 atm_mib_free_atmTrafficDescrParamEntry(atm_mib_atmTrafficDescrParamEntry_t *atmTrafficDescrParamEntry);
@@ -391,6 +429,16 @@ atm_mib_free_atmTrafficDescrParamEntry(atm_mib_atmTrafficDescrParamEntry_t *atmT
 /*
  * C type definitions for ATM-MIB::atmVplEntry.
  */
+
+#define ATM_MIB_ATMVPLADMINSTATUS	0x1 
+#define ATM_MIB_ATMVPLOPERSTATUS	0x2 
+#define ATM_MIB_ATMVPLLASTCHANGE	0x4 
+#define ATM_MIB_ATMVPLRECEIVETRAFFICDESCRINDEX	0x8 
+#define ATM_MIB_ATMVPLTRANSMITTRAFFICDESCRINDEX	0x10 
+#define ATM_MIB_ATMVPLCROSSCONNECTIDENTIFIER	0x20 
+#define ATM_MIB_ATMVPLROWSTATUS	0x40 
+#define ATM_MIB_ATMVPLCASTTYPE	0x80 
+#define ATM_MIB_ATMVPLCONNKIND	0x100 
 
 typedef struct {
     gint32   ifIndex;
@@ -406,20 +454,20 @@ typedef struct {
     gint32   *atmVplConnKind;
 } atm_mib_atmVplEntry_t;
 
-extern int
-atm_mib_get_atmVplTable(GSnmpSession *s, atm_mib_atmVplEntry_t ***atmVplEntry);
+extern void
+atm_mib_get_atmVplTable(GSnmpSession *s, atm_mib_atmVplEntry_t ***atmVplEntry, gint mask);
 
 extern void
 atm_mib_free_atmVplTable(atm_mib_atmVplEntry_t **atmVplEntry);
 
 extern atm_mib_atmVplEntry_t *
-atm_mib_new_atmVplEntry();
+atm_mib_new_atmVplEntry(void);
 
-extern int
-atm_mib_get_atmVplEntry(GSnmpSession *s, atm_mib_atmVplEntry_t **atmVplEntry);
+extern void
+atm_mib_get_atmVplEntry(GSnmpSession *s, atm_mib_atmVplEntry_t **atmVplEntry, gint32 ifIndex, gint32 atmVplVpi, gint mask);
 
-extern int
-atm_mib_set_atmVplEntry(GSnmpSession *s, atm_mib_atmVplEntry_t *atmVplEntry);
+extern void
+atm_mib_set_atmVplEntry(GSnmpSession *s, atm_mib_atmVplEntry_t *atmVplEntry, gint mask);
 
 extern void
 atm_mib_free_atmVplEntry(atm_mib_atmVplEntry_t *atmVplEntry);
@@ -427,6 +475,20 @@ atm_mib_free_atmVplEntry(atm_mib_atmVplEntry_t *atmVplEntry);
 /*
  * C type definitions for ATM-MIB::atmVclEntry.
  */
+
+#define ATM_MIB_ATMVCLADMINSTATUS	0x1 
+#define ATM_MIB_ATMVCLOPERSTATUS	0x2 
+#define ATM_MIB_ATMVCLLASTCHANGE	0x4 
+#define ATM_MIB_ATMVCLRECEIVETRAFFICDESCRINDEX	0x8 
+#define ATM_MIB_ATMVCLTRANSMITTRAFFICDESCRINDEX	0x10 
+#define ATM_MIB_ATMVCCAALTYPE	0x20 
+#define ATM_MIB_ATMVCCAAL5CPCSTRANSMITSDUSIZE	0x40 
+#define ATM_MIB_ATMVCCAAL5CPCSRECEIVESDUSIZE	0x80 
+#define ATM_MIB_ATMVCCAAL5ENCAPSTYPE	0x100 
+#define ATM_MIB_ATMVCLCROSSCONNECTIDENTIFIER	0x200 
+#define ATM_MIB_ATMVCLROWSTATUS	0x400 
+#define ATM_MIB_ATMVCLCASTTYPE	0x800 
+#define ATM_MIB_ATMVCLCONNKIND	0x1000 
 
 typedef struct {
     gint32   ifIndex;
@@ -447,20 +509,20 @@ typedef struct {
     gint32   *atmVclConnKind;
 } atm_mib_atmVclEntry_t;
 
-extern int
-atm_mib_get_atmVclTable(GSnmpSession *s, atm_mib_atmVclEntry_t ***atmVclEntry);
+extern void
+atm_mib_get_atmVclTable(GSnmpSession *s, atm_mib_atmVclEntry_t ***atmVclEntry, gint mask);
 
 extern void
 atm_mib_free_atmVclTable(atm_mib_atmVclEntry_t **atmVclEntry);
 
 extern atm_mib_atmVclEntry_t *
-atm_mib_new_atmVclEntry();
+atm_mib_new_atmVclEntry(void);
 
-extern int
-atm_mib_get_atmVclEntry(GSnmpSession *s, atm_mib_atmVclEntry_t **atmVclEntry);
+extern void
+atm_mib_get_atmVclEntry(GSnmpSession *s, atm_mib_atmVclEntry_t **atmVclEntry, gint32 ifIndex, gint32 atmVclVpi, gint32 atmVclVci, gint mask);
 
-extern int
-atm_mib_set_atmVclEntry(GSnmpSession *s, atm_mib_atmVclEntry_t *atmVclEntry);
+extern void
+atm_mib_set_atmVclEntry(GSnmpSession *s, atm_mib_atmVclEntry_t *atmVclEntry, gint mask);
 
 extern void
 atm_mib_free_atmVclEntry(atm_mib_atmVclEntry_t *atmVclEntry);
@@ -468,6 +530,13 @@ atm_mib_free_atmVclEntry(atm_mib_atmVclEntry_t *atmVclEntry);
 /*
  * C type definitions for ATM-MIB::atmVpCrossConnectEntry.
  */
+
+#define ATM_MIB_ATMVPCROSSCONNECTADMINSTATUS	0x1 
+#define ATM_MIB_ATMVPCROSSCONNECTL2HOPERSTATUS	0x2 
+#define ATM_MIB_ATMVPCROSSCONNECTH2LOPERSTATUS	0x4 
+#define ATM_MIB_ATMVPCROSSCONNECTL2HLASTCHANGE	0x8 
+#define ATM_MIB_ATMVPCROSSCONNECTH2LLASTCHANGE	0x10 
+#define ATM_MIB_ATMVPCROSSCONNECTROWSTATUS	0x20 
 
 typedef struct {
     gint32   atmVpCrossConnectIndex;
@@ -483,20 +552,20 @@ typedef struct {
     gint32   *atmVpCrossConnectRowStatus;
 } atm_mib_atmVpCrossConnectEntry_t;
 
-extern int
-atm_mib_get_atmVpCrossConnectTable(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t ***atmVpCrossConnectEntry);
+extern void
+atm_mib_get_atmVpCrossConnectTable(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t ***atmVpCrossConnectEntry, gint mask);
 
 extern void
 atm_mib_free_atmVpCrossConnectTable(atm_mib_atmVpCrossConnectEntry_t **atmVpCrossConnectEntry);
 
 extern atm_mib_atmVpCrossConnectEntry_t *
-atm_mib_new_atmVpCrossConnectEntry();
+atm_mib_new_atmVpCrossConnectEntry(void);
 
-extern int
-atm_mib_get_atmVpCrossConnectEntry(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t **atmVpCrossConnectEntry);
+extern void
+atm_mib_get_atmVpCrossConnectEntry(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t **atmVpCrossConnectEntry, gint32 atmVpCrossConnectIndex, gint32 atmVpCrossConnectLowIfIndex, gint32 atmVpCrossConnectLowVpi, gint32 atmVpCrossConnectHighIfIndex, gint32 atmVpCrossConnectHighVpi, gint mask);
 
-extern int
-atm_mib_set_atmVpCrossConnectEntry(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t *atmVpCrossConnectEntry);
+extern void
+atm_mib_set_atmVpCrossConnectEntry(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t *atmVpCrossConnectEntry, gint mask);
 
 extern void
 atm_mib_free_atmVpCrossConnectEntry(atm_mib_atmVpCrossConnectEntry_t *atmVpCrossConnectEntry);
@@ -504,6 +573,13 @@ atm_mib_free_atmVpCrossConnectEntry(atm_mib_atmVpCrossConnectEntry_t *atmVpCross
 /*
  * C type definitions for ATM-MIB::atmVcCrossConnectEntry.
  */
+
+#define ATM_MIB_ATMVCCROSSCONNECTADMINSTATUS	0x1 
+#define ATM_MIB_ATMVCCROSSCONNECTL2HOPERSTATUS	0x2 
+#define ATM_MIB_ATMVCCROSSCONNECTH2LOPERSTATUS	0x4 
+#define ATM_MIB_ATMVCCROSSCONNECTL2HLASTCHANGE	0x8 
+#define ATM_MIB_ATMVCCROSSCONNECTH2LLASTCHANGE	0x10 
+#define ATM_MIB_ATMVCCROSSCONNECTROWSTATUS	0x20 
 
 typedef struct {
     gint32   atmVcCrossConnectIndex;
@@ -521,20 +597,20 @@ typedef struct {
     gint32   *atmVcCrossConnectRowStatus;
 } atm_mib_atmVcCrossConnectEntry_t;
 
-extern int
-atm_mib_get_atmVcCrossConnectTable(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t ***atmVcCrossConnectEntry);
+extern void
+atm_mib_get_atmVcCrossConnectTable(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t ***atmVcCrossConnectEntry, gint mask);
 
 extern void
 atm_mib_free_atmVcCrossConnectTable(atm_mib_atmVcCrossConnectEntry_t **atmVcCrossConnectEntry);
 
 extern atm_mib_atmVcCrossConnectEntry_t *
-atm_mib_new_atmVcCrossConnectEntry();
+atm_mib_new_atmVcCrossConnectEntry(void);
 
-extern int
-atm_mib_get_atmVcCrossConnectEntry(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t **atmVcCrossConnectEntry);
+extern void
+atm_mib_get_atmVcCrossConnectEntry(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t **atmVcCrossConnectEntry, gint32 atmVcCrossConnectIndex, gint32 atmVcCrossConnectLowIfIndex, gint32 atmVcCrossConnectLowVpi, gint32 atmVcCrossConnectLowVci, gint32 atmVcCrossConnectHighIfIndex, gint32 atmVcCrossConnectHighVpi, gint32 atmVcCrossConnectHighVci, gint mask);
 
-extern int
-atm_mib_set_atmVcCrossConnectEntry(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t *atmVcCrossConnectEntry);
+extern void
+atm_mib_set_atmVcCrossConnectEntry(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t *atmVcCrossConnectEntry, gint mask);
 
 extern void
 atm_mib_free_atmVcCrossConnectEntry(atm_mib_atmVcCrossConnectEntry_t *atmVcCrossConnectEntry);
@@ -542,6 +618,10 @@ atm_mib_free_atmVcCrossConnectEntry(atm_mib_atmVcCrossConnectEntry_t *atmVcCross
 /*
  * C type definitions for ATM-MIB::aal5VccEntry.
  */
+
+#define ATM_MIB_AAL5VCCCRCERRORS	0x1 
+#define ATM_MIB_AAL5VCCSARTIMEOUTS	0x2 
+#define ATM_MIB_AAL5VCCOVERSIZEDSDUS	0x4 
 
 typedef struct {
     gint32   ifIndex;
@@ -552,17 +632,17 @@ typedef struct {
     guint32  *aal5VccOverSizedSDUs;
 } atm_mib_aal5VccEntry_t;
 
-extern int
-atm_mib_get_aal5VccTable(GSnmpSession *s, atm_mib_aal5VccEntry_t ***aal5VccEntry);
+extern void
+atm_mib_get_aal5VccTable(GSnmpSession *s, atm_mib_aal5VccEntry_t ***aal5VccEntry, gint mask);
 
 extern void
 atm_mib_free_aal5VccTable(atm_mib_aal5VccEntry_t **aal5VccEntry);
 
 extern atm_mib_aal5VccEntry_t *
-atm_mib_new_aal5VccEntry();
+atm_mib_new_aal5VccEntry(void);
 
-extern int
-atm_mib_get_aal5VccEntry(GSnmpSession *s, atm_mib_aal5VccEntry_t **aal5VccEntry);
+extern void
+atm_mib_get_aal5VccEntry(GSnmpSession *s, atm_mib_aal5VccEntry_t **aal5VccEntry, gint32 ifIndex, gint32 aal5VccVpi, gint32 aal5VccVci, gint mask);
 
 extern void
 atm_mib_free_aal5VccEntry(atm_mib_aal5VccEntry_t *aal5VccEntry);

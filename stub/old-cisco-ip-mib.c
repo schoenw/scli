@@ -12,33 +12,37 @@
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -60,46 +64,56 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _lip[] = {
-    { 4, G_SNMP_INTEGER32, "actThresh" },
-    { 5, G_SNMP_INTEGER32, "actLostPkts" },
-    { 6, G_SNMP_INTEGER32, "actLostByts" },
-    { 8, G_SNMP_TIMETICKS, "actAge" },
-    { 10, G_SNMP_TIMETICKS, "ckactAge" },
-    { 11, G_SNMP_INTEGER32, "actCheckPoint" },
-    { 12, G_SNMP_COUNTER32, "ipNoaccess" },
-    { 0, 0, NULL }
+static guint32 const oid_lip[] = {1, 3, 6, 1, 4, 1, 9, 2, 4};
+
+static attribute_t attr_lip[] = {
+    { 4, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_ACTTHRESH, "actThresh" },
+    { 5, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_ACTLOSTPKTS, "actLostPkts" },
+    { 6, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_ACTLOSTBYTS, "actLostByts" },
+    { 8, G_SNMP_TIMETICKS, OLD_CISCO_IP_MIB_ACTAGE, "actAge" },
+    { 10, G_SNMP_TIMETICKS, OLD_CISCO_IP_MIB_CKACTAGE, "ckactAge" },
+    { 11, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_ACTCHECKPOINT, "actCheckPoint" },
+    { 12, G_SNMP_COUNTER32, OLD_CISCO_IP_MIB_IPNOACCESS, "ipNoaccess" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _lipAddrEntry[] = {
-    { 1, G_SNMP_OCTET_STRING, "locIPHow" },
-    { 2, G_SNMP_IPADDRESS, "locIPWho" },
-    { 3, G_SNMP_IPADDRESS, "locIPHelper" },
-    { 4, G_SNMP_INTEGER32, "locIPSecurity" },
-    { 5, G_SNMP_INTEGER32, "locIPRedirects" },
-    { 6, G_SNMP_INTEGER32, "locIPUnreach" },
-    { 0, 0, NULL }
+static guint32 const oid_lipAddrEntry[] = {1, 3, 6, 1, 4, 1, 9, 2, 4, 1, 1};
+
+static attribute_t attr_lipAddrEntry[] = {
+    { 1, G_SNMP_OCTET_STRING, OLD_CISCO_IP_MIB_LOCIPHOW, "locIPHow" },
+    { 2, G_SNMP_IPADDRESS, OLD_CISCO_IP_MIB_LOCIPWHO, "locIPWho" },
+    { 3, G_SNMP_IPADDRESS, OLD_CISCO_IP_MIB_LOCIPHELPER, "locIPHelper" },
+    { 4, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_LOCIPSECURITY, "locIPSecurity" },
+    { 5, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_LOCIPREDIRECTS, "locIPRedirects" },
+    { 6, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_LOCIPUNREACH, "locIPUnreach" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _lipRouteEntry[] = {
-    { 1, G_SNMP_IPADDRESS, "locRtMask" },
-    { 2, G_SNMP_INTEGER32, "locRtCount" },
-    { 3, G_SNMP_INTEGER32, "locRtUses" },
-    { 0, 0, NULL }
+static guint32 const oid_lipRouteEntry[] = {1, 3, 6, 1, 4, 1, 9, 2, 4, 2, 1};
+
+static attribute_t attr_lipRouteEntry[] = {
+    { 1, G_SNMP_IPADDRESS, OLD_CISCO_IP_MIB_LOCRTMASK, "locRtMask" },
+    { 2, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_LOCRTCOUNT, "locRtCount" },
+    { 3, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_LOCRTUSES, "locRtUses" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _lipAccountEntry[] = {
-    { 3, G_SNMP_INTEGER32, "actPkts" },
-    { 4, G_SNMP_INTEGER32, "actByts" },
-    { 5, G_SNMP_INTEGER32, "actViolation" },
-    { 0, 0, NULL }
+static guint32 const oid_lipAccountEntry[] = {1, 3, 6, 1, 4, 1, 9, 2, 4, 7, 1};
+
+static attribute_t attr_lipAccountEntry[] = {
+    { 3, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_ACTPKTS, "actPkts" },
+    { 4, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_ACTBYTS, "actByts" },
+    { 5, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_ACTVIOLATION, "actViolation" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _lipCkAccountEntry[] = {
-    { 3, G_SNMP_INTEGER32, "ckactPkts" },
-    { 4, G_SNMP_INTEGER32, "ckactByts" },
-    { 5, G_SNMP_INTEGER32, "ckactViolation" },
-    { 0, 0, NULL }
+static guint32 const oid_lipCkAccountEntry[] = {1, 3, 6, 1, 4, 1, 9, 2, 4, 9, 1};
+
+static attribute_t attr_lipCkAccountEntry[] = {
+    { 3, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_CKACTPKTS, "ckactPkts" },
+    { 4, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_CKACTBYTS, "ckactByts" },
+    { 5, G_SNMP_INTEGER32, OLD_CISCO_IP_MIB_CKACTVIOLATION, "ckactViolation" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -119,7 +133,6 @@ assign_lip(GSList *vbl)
     old_cisco_ip_mib_lip_t *lip;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 4, 1, 9, 2, 4};
 
     lip = old_cisco_ip_mib_new_lip();
     if (! lip) {
@@ -132,8 +145,8 @@ assign_lip(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _lip, &idx) < 0) continue;
+        if (lookup(vb, oid_lip, sizeof(oid_lip)/sizeof(guint32),
+                   attr_lip, &idx) < 0) continue;
 
         switch (idx) {
         case 4:
@@ -163,29 +176,25 @@ assign_lip(GSList *vbl)
     return lip;
 }
 
-int
-old_cisco_ip_mib_get_lip(GSnmpSession *s, old_cisco_ip_mib_lip_t **lip)
+void
+old_cisco_ip_mib_get_lip(GSnmpSession *s, old_cisco_ip_mib_lip_t **lip, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 4, 1, 9, 2, 4, 0};
 
     *lip = NULL;
 
-    add_attributes(s, &in, base, 9, _lip);
+    add_attributes(s, &in, base, 10, 9, attr_lip, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *lip = assign_lip(out);
     }
-
-    *lip = assign_lip(out);
-
-    return 0;
 }
 
-int
-old_cisco_ip_mib_set_lip(GSnmpSession *s, old_cisco_ip_mib_lip_t *lip)
+void
+old_cisco_ip_mib_set_lip(GSnmpSession *s, old_cisco_ip_mib_lip_t *lip, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 4, 1, 9, 2, 4, 0, 0};
@@ -200,12 +209,9 @@ old_cisco_ip_mib_set_lip(GSnmpSession *s, old_cisco_ip_mib_lip_t *lip)
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void
@@ -245,6 +251,19 @@ unpack_lipAddrEntry(GSnmpVarBind *vb, old_cisco_ip_mib_lipAddrEntry_t *lipAddrEn
     return 0;
 }
 
+static int
+pack_lipAddrEntry(guint32 *base, guchar *ipAdEntAddr)
+{
+    int i, len, idx = 12;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ipAdEntAddr[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static old_cisco_ip_mib_lipAddrEntry_t *
 assign_lipAddrEntry(GSList *vbl)
 {
@@ -252,7 +271,6 @@ assign_lipAddrEntry(GSList *vbl)
     old_cisco_ip_mib_lipAddrEntry_t *lipAddrEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 4, 1, 9, 2, 4, 1, 1};
 
     lipAddrEntry = old_cisco_ip_mib_new_lipAddrEntry();
     if (! lipAddrEntry) {
@@ -271,8 +289,8 @@ assign_lipAddrEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _lipAddrEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_lipAddrEntry, sizeof(oid_lipAddrEntry)/sizeof(guint32),
+                   attr_lipAddrEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -300,8 +318,8 @@ assign_lipAddrEntry(GSList *vbl)
     return lipAddrEntry;
 }
 
-int
-old_cisco_ip_mib_get_lipAddrTable(GSnmpSession *s, old_cisco_ip_mib_lipAddrEntry_t ***lipAddrEntry)
+void
+old_cisco_ip_mib_get_lipAddrTable(GSnmpSession *s, old_cisco_ip_mib_lipAddrEntry_t ***lipAddrEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -310,24 +328,48 @@ old_cisco_ip_mib_get_lipAddrTable(GSnmpSession *s, old_cisco_ip_mib_lipAddrEntry
 
     *lipAddrEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _lipAddrEntry);
+    add_attributes(s, &in, base, 12, 11, attr_lipAddrEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *lipAddrEntry = (old_cisco_ip_mib_lipAddrEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(old_cisco_ip_mib_lipAddrEntry_t *));
+        if (! *lipAddrEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*lipAddrEntry)[i] = assign_lipAddrEntry(row->data);
+        }
+    }
+}
+
+void
+old_cisco_ip_mib_get_lipAddrEntry(GSnmpSession *s, old_cisco_ip_mib_lipAddrEntry_t **lipAddrEntry, guchar *ipAdEntAddr, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_lipAddrEntry, sizeof(oid_lipAddrEntry));
+    len = pack_lipAddrEntry(base, ipAdEntAddr);
+    if (len < 0) {
+        g_warning("illegal lipAddrEntry index values");
+        return;
     }
 
-    *lipAddrEntry = (old_cisco_ip_mib_lipAddrEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(old_cisco_ip_mib_lipAddrEntry_t *));
-    if (! *lipAddrEntry) {
-        return -4;
-    }
+    *lipAddrEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*lipAddrEntry)[i] = assign_lipAddrEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 11, attr_lipAddrEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *lipAddrEntry = assign_lipAddrEntry(out);
+    }
 }
 
 void
@@ -380,6 +422,19 @@ unpack_lipRouteEntry(GSnmpVarBind *vb, old_cisco_ip_mib_lipRouteEntry_t *lipRout
     return 0;
 }
 
+static int
+pack_lipRouteEntry(guint32 *base, guchar *ipRouteDest)
+{
+    int i, len, idx = 12;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ipRouteDest[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static old_cisco_ip_mib_lipRouteEntry_t *
 assign_lipRouteEntry(GSList *vbl)
 {
@@ -387,7 +442,6 @@ assign_lipRouteEntry(GSList *vbl)
     old_cisco_ip_mib_lipRouteEntry_t *lipRouteEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 4, 1, 9, 2, 4, 2, 1};
 
     lipRouteEntry = old_cisco_ip_mib_new_lipRouteEntry();
     if (! lipRouteEntry) {
@@ -406,8 +460,8 @@ assign_lipRouteEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _lipRouteEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_lipRouteEntry, sizeof(oid_lipRouteEntry)/sizeof(guint32),
+                   attr_lipRouteEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -425,8 +479,8 @@ assign_lipRouteEntry(GSList *vbl)
     return lipRouteEntry;
 }
 
-int
-old_cisco_ip_mib_get_lipRouteTable(GSnmpSession *s, old_cisco_ip_mib_lipRouteEntry_t ***lipRouteEntry)
+void
+old_cisco_ip_mib_get_lipRouteTable(GSnmpSession *s, old_cisco_ip_mib_lipRouteEntry_t ***lipRouteEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -435,24 +489,48 @@ old_cisco_ip_mib_get_lipRouteTable(GSnmpSession *s, old_cisco_ip_mib_lipRouteEnt
 
     *lipRouteEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _lipRouteEntry);
+    add_attributes(s, &in, base, 12, 11, attr_lipRouteEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *lipRouteEntry = (old_cisco_ip_mib_lipRouteEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(old_cisco_ip_mib_lipRouteEntry_t *));
+        if (! *lipRouteEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*lipRouteEntry)[i] = assign_lipRouteEntry(row->data);
+        }
+    }
+}
+
+void
+old_cisco_ip_mib_get_lipRouteEntry(GSnmpSession *s, old_cisco_ip_mib_lipRouteEntry_t **lipRouteEntry, guchar *ipRouteDest, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_lipRouteEntry, sizeof(oid_lipRouteEntry));
+    len = pack_lipRouteEntry(base, ipRouteDest);
+    if (len < 0) {
+        g_warning("illegal lipRouteEntry index values");
+        return;
     }
 
-    *lipRouteEntry = (old_cisco_ip_mib_lipRouteEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(old_cisco_ip_mib_lipRouteEntry_t *));
-    if (! *lipRouteEntry) {
-        return -4;
-    }
+    *lipRouteEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*lipRouteEntry)[i] = assign_lipRouteEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 11, attr_lipRouteEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *lipRouteEntry = assign_lipRouteEntry(out);
+    }
 }
 
 void
@@ -510,6 +588,24 @@ unpack_lipAccountEntry(GSnmpVarBind *vb, old_cisco_ip_mib_lipAccountEntry_t *lip
     return 0;
 }
 
+static int
+pack_lipAccountEntry(guint32 *base, guchar *actSrc, guchar *actDst)
+{
+    int i, len, idx = 12;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = actSrc[i];
+        if (idx >= 128) return -1;
+    }
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = actDst[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static old_cisco_ip_mib_lipAccountEntry_t *
 assign_lipAccountEntry(GSList *vbl)
 {
@@ -517,7 +613,6 @@ assign_lipAccountEntry(GSList *vbl)
     old_cisco_ip_mib_lipAccountEntry_t *lipAccountEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 4, 1, 9, 2, 4, 7, 1};
 
     lipAccountEntry = old_cisco_ip_mib_new_lipAccountEntry();
     if (! lipAccountEntry) {
@@ -536,8 +631,8 @@ assign_lipAccountEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _lipAccountEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_lipAccountEntry, sizeof(oid_lipAccountEntry)/sizeof(guint32),
+                   attr_lipAccountEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -555,8 +650,8 @@ assign_lipAccountEntry(GSList *vbl)
     return lipAccountEntry;
 }
 
-int
-old_cisco_ip_mib_get_lipAccountingTable(GSnmpSession *s, old_cisco_ip_mib_lipAccountEntry_t ***lipAccountEntry)
+void
+old_cisco_ip_mib_get_lipAccountingTable(GSnmpSession *s, old_cisco_ip_mib_lipAccountEntry_t ***lipAccountEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -565,24 +660,48 @@ old_cisco_ip_mib_get_lipAccountingTable(GSnmpSession *s, old_cisco_ip_mib_lipAcc
 
     *lipAccountEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _lipAccountEntry);
+    add_attributes(s, &in, base, 12, 11, attr_lipAccountEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *lipAccountEntry = (old_cisco_ip_mib_lipAccountEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(old_cisco_ip_mib_lipAccountEntry_t *));
+        if (! *lipAccountEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*lipAccountEntry)[i] = assign_lipAccountEntry(row->data);
+        }
+    }
+}
+
+void
+old_cisco_ip_mib_get_lipAccountEntry(GSnmpSession *s, old_cisco_ip_mib_lipAccountEntry_t **lipAccountEntry, guchar *actSrc, guchar *actDst, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_lipAccountEntry, sizeof(oid_lipAccountEntry));
+    len = pack_lipAccountEntry(base, actSrc, actDst);
+    if (len < 0) {
+        g_warning("illegal lipAccountEntry index values");
+        return;
     }
 
-    *lipAccountEntry = (old_cisco_ip_mib_lipAccountEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(old_cisco_ip_mib_lipAccountEntry_t *));
-    if (! *lipAccountEntry) {
-        return -4;
-    }
+    *lipAccountEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*lipAccountEntry)[i] = assign_lipAccountEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 11, attr_lipAccountEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *lipAccountEntry = assign_lipAccountEntry(out);
+    }
 }
 
 void
@@ -640,6 +759,24 @@ unpack_lipCkAccountEntry(GSnmpVarBind *vb, old_cisco_ip_mib_lipCkAccountEntry_t 
     return 0;
 }
 
+static int
+pack_lipCkAccountEntry(guint32 *base, guchar *ckactSrc, guchar *ckactDst)
+{
+    int i, len, idx = 12;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ckactSrc[i];
+        if (idx >= 128) return -1;
+    }
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ckactDst[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static old_cisco_ip_mib_lipCkAccountEntry_t *
 assign_lipCkAccountEntry(GSList *vbl)
 {
@@ -647,7 +784,6 @@ assign_lipCkAccountEntry(GSList *vbl)
     old_cisco_ip_mib_lipCkAccountEntry_t *lipCkAccountEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 4, 1, 9, 2, 4, 9, 1};
 
     lipCkAccountEntry = old_cisco_ip_mib_new_lipCkAccountEntry();
     if (! lipCkAccountEntry) {
@@ -666,8 +802,8 @@ assign_lipCkAccountEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _lipCkAccountEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_lipCkAccountEntry, sizeof(oid_lipCkAccountEntry)/sizeof(guint32),
+                   attr_lipCkAccountEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -685,8 +821,8 @@ assign_lipCkAccountEntry(GSList *vbl)
     return lipCkAccountEntry;
 }
 
-int
-old_cisco_ip_mib_get_lipCkAccountingTable(GSnmpSession *s, old_cisco_ip_mib_lipCkAccountEntry_t ***lipCkAccountEntry)
+void
+old_cisco_ip_mib_get_lipCkAccountingTable(GSnmpSession *s, old_cisco_ip_mib_lipCkAccountEntry_t ***lipCkAccountEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -695,24 +831,48 @@ old_cisco_ip_mib_get_lipCkAccountingTable(GSnmpSession *s, old_cisco_ip_mib_lipC
 
     *lipCkAccountEntry = NULL;
 
-    add_attributes(s, &in, base, 11, _lipCkAccountEntry);
+    add_attributes(s, &in, base, 12, 11, attr_lipCkAccountEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *lipCkAccountEntry = (old_cisco_ip_mib_lipCkAccountEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(old_cisco_ip_mib_lipCkAccountEntry_t *));
+        if (! *lipCkAccountEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*lipCkAccountEntry)[i] = assign_lipCkAccountEntry(row->data);
+        }
+    }
+}
+
+void
+old_cisco_ip_mib_get_lipCkAccountEntry(GSnmpSession *s, old_cisco_ip_mib_lipCkAccountEntry_t **lipCkAccountEntry, guchar *ckactSrc, guchar *ckactDst, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_lipCkAccountEntry, sizeof(oid_lipCkAccountEntry));
+    len = pack_lipCkAccountEntry(base, ckactSrc, ckactDst);
+    if (len < 0) {
+        g_warning("illegal lipCkAccountEntry index values");
+        return;
     }
 
-    *lipCkAccountEntry = (old_cisco_ip_mib_lipCkAccountEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(old_cisco_ip_mib_lipCkAccountEntry_t *));
-    if (! *lipCkAccountEntry) {
-        return -4;
-    }
+    *lipCkAccountEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*lipCkAccountEntry)[i] = assign_lipCkAccountEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 11, attr_lipCkAccountEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *lipCkAccountEntry = assign_lipCkAccountEntry(out);
+    }
 }
 
 void

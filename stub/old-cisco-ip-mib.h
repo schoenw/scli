@@ -16,6 +16,14 @@
  * C type definitions for OLD-CISCO-IP-MIB::lip.
  */
 
+#define OLD_CISCO_IP_MIB_ACTTHRESH	0x1 
+#define OLD_CISCO_IP_MIB_ACTLOSTPKTS	0x2 
+#define OLD_CISCO_IP_MIB_ACTLOSTBYTS	0x4 
+#define OLD_CISCO_IP_MIB_ACTAGE	0x8 
+#define OLD_CISCO_IP_MIB_CKACTAGE	0x10 
+#define OLD_CISCO_IP_MIB_ACTCHECKPOINT	0x20 
+#define OLD_CISCO_IP_MIB_IPNOACCESS	0x40 
+
 typedef struct {
     gint32   *actThresh;
     gint32   *actLostPkts;
@@ -27,13 +35,13 @@ typedef struct {
 } old_cisco_ip_mib_lip_t;
 
 extern old_cisco_ip_mib_lip_t *
-old_cisco_ip_mib_new_lip();
+old_cisco_ip_mib_new_lip(void);
 
-extern int
-old_cisco_ip_mib_get_lip(GSnmpSession *s, old_cisco_ip_mib_lip_t **lip);
+extern void
+old_cisco_ip_mib_get_lip(GSnmpSession *s, old_cisco_ip_mib_lip_t **lip, gint mask);
 
-extern int
-old_cisco_ip_mib_set_lip(GSnmpSession *s, old_cisco_ip_mib_lip_t *lip);
+extern void
+old_cisco_ip_mib_set_lip(GSnmpSession *s, old_cisco_ip_mib_lip_t *lip, gint mask);
 
 extern void
 old_cisco_ip_mib_free_lip(old_cisco_ip_mib_lip_t *lip);
@@ -41,6 +49,13 @@ old_cisco_ip_mib_free_lip(old_cisco_ip_mib_lip_t *lip);
 /*
  * C type definitions for OLD-CISCO-IP-MIB::lipAddrEntry.
  */
+
+#define OLD_CISCO_IP_MIB_LOCIPHOW	0x1 
+#define OLD_CISCO_IP_MIB_LOCIPWHO	0x2 
+#define OLD_CISCO_IP_MIB_LOCIPHELPER	0x4 
+#define OLD_CISCO_IP_MIB_LOCIPSECURITY	0x8 
+#define OLD_CISCO_IP_MIB_LOCIPREDIRECTS	0x10 
+#define OLD_CISCO_IP_MIB_LOCIPUNREACH	0x20 
 
 typedef struct {
     guchar   ipAdEntAddr[4];
@@ -53,17 +68,17 @@ typedef struct {
     gint32   *locIPUnreach;
 } old_cisco_ip_mib_lipAddrEntry_t;
 
-extern int
-old_cisco_ip_mib_get_lipAddrTable(GSnmpSession *s, old_cisco_ip_mib_lipAddrEntry_t ***lipAddrEntry);
+extern void
+old_cisco_ip_mib_get_lipAddrTable(GSnmpSession *s, old_cisco_ip_mib_lipAddrEntry_t ***lipAddrEntry, gint mask);
 
 extern void
 old_cisco_ip_mib_free_lipAddrTable(old_cisco_ip_mib_lipAddrEntry_t **lipAddrEntry);
 
 extern old_cisco_ip_mib_lipAddrEntry_t *
-old_cisco_ip_mib_new_lipAddrEntry();
+old_cisco_ip_mib_new_lipAddrEntry(void);
 
-extern int
-old_cisco_ip_mib_get_lipAddrEntry(GSnmpSession *s, old_cisco_ip_mib_lipAddrEntry_t **lipAddrEntry);
+extern void
+old_cisco_ip_mib_get_lipAddrEntry(GSnmpSession *s, old_cisco_ip_mib_lipAddrEntry_t **lipAddrEntry, guchar *ipAdEntAddr, gint mask);
 
 extern void
 old_cisco_ip_mib_free_lipAddrEntry(old_cisco_ip_mib_lipAddrEntry_t *lipAddrEntry);
@@ -72,6 +87,10 @@ old_cisco_ip_mib_free_lipAddrEntry(old_cisco_ip_mib_lipAddrEntry_t *lipAddrEntry
  * C type definitions for OLD-CISCO-IP-MIB::lipRouteEntry.
  */
 
+#define OLD_CISCO_IP_MIB_LOCRTMASK	0x1 
+#define OLD_CISCO_IP_MIB_LOCRTCOUNT	0x2 
+#define OLD_CISCO_IP_MIB_LOCRTUSES	0x4 
+
 typedef struct {
     guchar   ipRouteDest[4];
     guchar   *locRtMask;
@@ -79,17 +98,17 @@ typedef struct {
     gint32   *locRtUses;
 } old_cisco_ip_mib_lipRouteEntry_t;
 
-extern int
-old_cisco_ip_mib_get_lipRouteTable(GSnmpSession *s, old_cisco_ip_mib_lipRouteEntry_t ***lipRouteEntry);
+extern void
+old_cisco_ip_mib_get_lipRouteTable(GSnmpSession *s, old_cisco_ip_mib_lipRouteEntry_t ***lipRouteEntry, gint mask);
 
 extern void
 old_cisco_ip_mib_free_lipRouteTable(old_cisco_ip_mib_lipRouteEntry_t **lipRouteEntry);
 
 extern old_cisco_ip_mib_lipRouteEntry_t *
-old_cisco_ip_mib_new_lipRouteEntry();
+old_cisco_ip_mib_new_lipRouteEntry(void);
 
-extern int
-old_cisco_ip_mib_get_lipRouteEntry(GSnmpSession *s, old_cisco_ip_mib_lipRouteEntry_t **lipRouteEntry);
+extern void
+old_cisco_ip_mib_get_lipRouteEntry(GSnmpSession *s, old_cisco_ip_mib_lipRouteEntry_t **lipRouteEntry, guchar *ipRouteDest, gint mask);
 
 extern void
 old_cisco_ip_mib_free_lipRouteEntry(old_cisco_ip_mib_lipRouteEntry_t *lipRouteEntry);
@@ -97,6 +116,12 @@ old_cisco_ip_mib_free_lipRouteEntry(old_cisco_ip_mib_lipRouteEntry_t *lipRouteEn
 /*
  * C type definitions for OLD-CISCO-IP-MIB::lipAccountEntry.
  */
+
+#define OLD_CISCO_IP_MIB_ACTSRC	0x1 
+#define OLD_CISCO_IP_MIB_ACTDST	0x2 
+#define OLD_CISCO_IP_MIB_ACTPKTS	0x4 
+#define OLD_CISCO_IP_MIB_ACTBYTS	0x8 
+#define OLD_CISCO_IP_MIB_ACTVIOLATION	0x10 
 
 typedef struct {
     guchar   actSrc[4];
@@ -106,17 +131,17 @@ typedef struct {
     gint32   *actViolation;
 } old_cisco_ip_mib_lipAccountEntry_t;
 
-extern int
-old_cisco_ip_mib_get_lipAccountingTable(GSnmpSession *s, old_cisco_ip_mib_lipAccountEntry_t ***lipAccountEntry);
+extern void
+old_cisco_ip_mib_get_lipAccountingTable(GSnmpSession *s, old_cisco_ip_mib_lipAccountEntry_t ***lipAccountEntry, gint mask);
 
 extern void
 old_cisco_ip_mib_free_lipAccountingTable(old_cisco_ip_mib_lipAccountEntry_t **lipAccountEntry);
 
 extern old_cisco_ip_mib_lipAccountEntry_t *
-old_cisco_ip_mib_new_lipAccountEntry();
+old_cisco_ip_mib_new_lipAccountEntry(void);
 
-extern int
-old_cisco_ip_mib_get_lipAccountEntry(GSnmpSession *s, old_cisco_ip_mib_lipAccountEntry_t **lipAccountEntry);
+extern void
+old_cisco_ip_mib_get_lipAccountEntry(GSnmpSession *s, old_cisco_ip_mib_lipAccountEntry_t **lipAccountEntry, guchar *actSrc, guchar *actDst, gint mask);
 
 extern void
 old_cisco_ip_mib_free_lipAccountEntry(old_cisco_ip_mib_lipAccountEntry_t *lipAccountEntry);
@@ -124,6 +149,12 @@ old_cisco_ip_mib_free_lipAccountEntry(old_cisco_ip_mib_lipAccountEntry_t *lipAcc
 /*
  * C type definitions for OLD-CISCO-IP-MIB::lipCkAccountEntry.
  */
+
+#define OLD_CISCO_IP_MIB_CKACTSRC	0x1 
+#define OLD_CISCO_IP_MIB_CKACTDST	0x2 
+#define OLD_CISCO_IP_MIB_CKACTPKTS	0x4 
+#define OLD_CISCO_IP_MIB_CKACTBYTS	0x8 
+#define OLD_CISCO_IP_MIB_CKACTVIOLATION	0x10 
 
 typedef struct {
     guchar   ckactSrc[4];
@@ -133,17 +164,17 @@ typedef struct {
     gint32   *ckactViolation;
 } old_cisco_ip_mib_lipCkAccountEntry_t;
 
-extern int
-old_cisco_ip_mib_get_lipCkAccountingTable(GSnmpSession *s, old_cisco_ip_mib_lipCkAccountEntry_t ***lipCkAccountEntry);
+extern void
+old_cisco_ip_mib_get_lipCkAccountingTable(GSnmpSession *s, old_cisco_ip_mib_lipCkAccountEntry_t ***lipCkAccountEntry, gint mask);
 
 extern void
 old_cisco_ip_mib_free_lipCkAccountingTable(old_cisco_ip_mib_lipCkAccountEntry_t **lipCkAccountEntry);
 
 extern old_cisco_ip_mib_lipCkAccountEntry_t *
-old_cisco_ip_mib_new_lipCkAccountEntry();
+old_cisco_ip_mib_new_lipCkAccountEntry(void);
 
-extern int
-old_cisco_ip_mib_get_lipCkAccountEntry(GSnmpSession *s, old_cisco_ip_mib_lipCkAccountEntry_t **lipCkAccountEntry);
+extern void
+old_cisco_ip_mib_get_lipCkAccountEntry(GSnmpSession *s, old_cisco_ip_mib_lipCkAccountEntry_t **lipCkAccountEntry, guchar *ckactSrc, guchar *ckactDst, gint mask);
 
 extern void
 old_cisco_ip_mib_free_lipCkAccountEntry(old_cisco_ip_mib_lipCkAccountEntry_t *lipCkAccountEntry);

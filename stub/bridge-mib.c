@@ -62,33 +62,37 @@ GSnmpEnum const bridge_mib_enums_dot1dStaticStatus[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -110,76 +114,92 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _dot1dBase[] = {
-    { 1, G_SNMP_OCTET_STRING, "dot1dBaseBridgeAddress" },
-    { 2, G_SNMP_INTEGER32, "dot1dBaseNumPorts" },
-    { 3, G_SNMP_INTEGER32, "dot1dBaseType" },
-    { 0, 0, NULL }
+static guint32 const oid_dot1dBase[] = {1, 3, 6, 1, 2, 1, 17, 1};
+
+static attribute_t attr_dot1dBase[] = {
+    { 1, G_SNMP_OCTET_STRING, BRIDGE_MIB_DOT1DBASEBRIDGEADDRESS, "dot1dBaseBridgeAddress" },
+    { 2, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DBASENUMPORTS, "dot1dBaseNumPorts" },
+    { 3, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DBASETYPE, "dot1dBaseType" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _dot1dBasePortEntry[] = {
-    { 2, G_SNMP_INTEGER32, "dot1dBasePortIfIndex" },
-    { 3, G_SNMP_OBJECT_ID, "dot1dBasePortCircuit" },
-    { 4, G_SNMP_COUNTER32, "dot1dBasePortDelayExceededDiscards" },
-    { 5, G_SNMP_COUNTER32, "dot1dBasePortMtuExceededDiscards" },
-    { 0, 0, NULL }
+static guint32 const oid_dot1dBasePortEntry[] = {1, 3, 6, 1, 2, 1, 17, 1, 4, 1};
+
+static attribute_t attr_dot1dBasePortEntry[] = {
+    { 2, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DBASEPORTIFINDEX, "dot1dBasePortIfIndex" },
+    { 3, G_SNMP_OBJECT_ID, BRIDGE_MIB_DOT1DBASEPORTCIRCUIT, "dot1dBasePortCircuit" },
+    { 4, G_SNMP_COUNTER32, BRIDGE_MIB_DOT1DBASEPORTDELAYEXCEEDEDDISCARDS, "dot1dBasePortDelayExceededDiscards" },
+    { 5, G_SNMP_COUNTER32, BRIDGE_MIB_DOT1DBASEPORTMTUEXCEEDEDDISCARDS, "dot1dBasePortMtuExceededDiscards" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _dot1dStp[] = {
-    { 1, G_SNMP_INTEGER32, "dot1dStpProtocolSpecification" },
-    { 2, G_SNMP_INTEGER32, "dot1dStpPriority" },
-    { 3, G_SNMP_TIMETICKS, "dot1dStpTimeSinceTopologyChange" },
-    { 4, G_SNMP_COUNTER32, "dot1dStpTopChanges" },
-    { 5, G_SNMP_OCTET_STRING, "dot1dStpDesignatedRoot" },
-    { 6, G_SNMP_INTEGER32, "dot1dStpRootCost" },
-    { 7, G_SNMP_INTEGER32, "dot1dStpRootPort" },
-    { 8, G_SNMP_INTEGER32, "dot1dStpMaxAge" },
-    { 9, G_SNMP_INTEGER32, "dot1dStpHelloTime" },
-    { 10, G_SNMP_INTEGER32, "dot1dStpHoldTime" },
-    { 11, G_SNMP_INTEGER32, "dot1dStpForwardDelay" },
-    { 12, G_SNMP_INTEGER32, "dot1dStpBridgeMaxAge" },
-    { 13, G_SNMP_INTEGER32, "dot1dStpBridgeHelloTime" },
-    { 14, G_SNMP_INTEGER32, "dot1dStpBridgeForwardDelay" },
-    { 0, 0, NULL }
+static guint32 const oid_dot1dStp[] = {1, 3, 6, 1, 2, 1, 17, 2};
+
+static attribute_t attr_dot1dStp[] = {
+    { 1, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION, "dot1dStpProtocolSpecification" },
+    { 2, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPPRIORITY, "dot1dStpPriority" },
+    { 3, G_SNMP_TIMETICKS, BRIDGE_MIB_DOT1DSTPTIMESINCETOPOLOGYCHANGE, "dot1dStpTimeSinceTopologyChange" },
+    { 4, G_SNMP_COUNTER32, BRIDGE_MIB_DOT1DSTPTOPCHANGES, "dot1dStpTopChanges" },
+    { 5, G_SNMP_OCTET_STRING, BRIDGE_MIB_DOT1DSTPDESIGNATEDROOT, "dot1dStpDesignatedRoot" },
+    { 6, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPROOTCOST, "dot1dStpRootCost" },
+    { 7, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPROOTPORT, "dot1dStpRootPort" },
+    { 8, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPMAXAGE, "dot1dStpMaxAge" },
+    { 9, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPHELLOTIME, "dot1dStpHelloTime" },
+    { 10, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPHOLDTIME, "dot1dStpHoldTime" },
+    { 11, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPFORWARDDELAY, "dot1dStpForwardDelay" },
+    { 12, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPBRIDGEMAXAGE, "dot1dStpBridgeMaxAge" },
+    { 13, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPBRIDGEHELLOTIME, "dot1dStpBridgeHelloTime" },
+    { 14, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPBRIDGEFORWARDDELAY, "dot1dStpBridgeForwardDelay" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _dot1dStpPortEntry[] = {
-    { 2, G_SNMP_INTEGER32, "dot1dStpPortPriority" },
-    { 3, G_SNMP_INTEGER32, "dot1dStpPortState" },
-    { 4, G_SNMP_INTEGER32, "dot1dStpPortEnable" },
-    { 5, G_SNMP_INTEGER32, "dot1dStpPortPathCost" },
-    { 6, G_SNMP_OCTET_STRING, "dot1dStpPortDesignatedRoot" },
-    { 7, G_SNMP_INTEGER32, "dot1dStpPortDesignatedCost" },
-    { 8, G_SNMP_OCTET_STRING, "dot1dStpPortDesignatedBridge" },
-    { 9, G_SNMP_OCTET_STRING, "dot1dStpPortDesignatedPort" },
-    { 10, G_SNMP_COUNTER32, "dot1dStpPortForwardTransitions" },
-    { 0, 0, NULL }
+static guint32 const oid_dot1dStpPortEntry[] = {1, 3, 6, 1, 2, 1, 17, 2, 15, 1};
+
+static attribute_t attr_dot1dStpPortEntry[] = {
+    { 2, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPPORTPRIORITY, "dot1dStpPortPriority" },
+    { 3, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPPORTSTATE, "dot1dStpPortState" },
+    { 4, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPPORTENABLE, "dot1dStpPortEnable" },
+    { 5, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPPORTPATHCOST, "dot1dStpPortPathCost" },
+    { 6, G_SNMP_OCTET_STRING, BRIDGE_MIB_DOT1DSTPPORTDESIGNATEDROOT, "dot1dStpPortDesignatedRoot" },
+    { 7, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTPPORTDESIGNATEDCOST, "dot1dStpPortDesignatedCost" },
+    { 8, G_SNMP_OCTET_STRING, BRIDGE_MIB_DOT1DSTPPORTDESIGNATEDBRIDGE, "dot1dStpPortDesignatedBridge" },
+    { 9, G_SNMP_OCTET_STRING, BRIDGE_MIB_DOT1DSTPPORTDESIGNATEDPORT, "dot1dStpPortDesignatedPort" },
+    { 10, G_SNMP_COUNTER32, BRIDGE_MIB_DOT1DSTPPORTFORWARDTRANSITIONS, "dot1dStpPortForwardTransitions" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _dot1dTp[] = {
-    { 1, G_SNMP_COUNTER32, "dot1dTpLearnedEntryDiscards" },
-    { 2, G_SNMP_INTEGER32, "dot1dTpAgingTime" },
-    { 0, 0, NULL }
+static guint32 const oid_dot1dTp[] = {1, 3, 6, 1, 2, 1, 17, 4};
+
+static attribute_t attr_dot1dTp[] = {
+    { 1, G_SNMP_COUNTER32, BRIDGE_MIB_DOT1DTPLEARNEDENTRYDISCARDS, "dot1dTpLearnedEntryDiscards" },
+    { 2, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DTPAGINGTIME, "dot1dTpAgingTime" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _dot1dTpFdbEntry[] = {
-    { 2, G_SNMP_INTEGER32, "dot1dTpFdbPort" },
-    { 3, G_SNMP_INTEGER32, "dot1dTpFdbStatus" },
-    { 0, 0, NULL }
+static guint32 const oid_dot1dTpFdbEntry[] = {1, 3, 6, 1, 2, 1, 17, 4, 3, 1};
+
+static attribute_t attr_dot1dTpFdbEntry[] = {
+    { 2, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DTPFDBPORT, "dot1dTpFdbPort" },
+    { 3, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DTPFDBSTATUS, "dot1dTpFdbStatus" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _dot1dTpPortEntry[] = {
-    { 2, G_SNMP_INTEGER32, "dot1dTpPortMaxInfo" },
-    { 3, G_SNMP_COUNTER32, "dot1dTpPortInFrames" },
-    { 4, G_SNMP_COUNTER32, "dot1dTpPortOutFrames" },
-    { 5, G_SNMP_COUNTER32, "dot1dTpPortInDiscards" },
-    { 0, 0, NULL }
+static guint32 const oid_dot1dTpPortEntry[] = {1, 3, 6, 1, 2, 1, 17, 4, 4, 1};
+
+static attribute_t attr_dot1dTpPortEntry[] = {
+    { 2, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DTPPORTMAXINFO, "dot1dTpPortMaxInfo" },
+    { 3, G_SNMP_COUNTER32, BRIDGE_MIB_DOT1DTPPORTINFRAMES, "dot1dTpPortInFrames" },
+    { 4, G_SNMP_COUNTER32, BRIDGE_MIB_DOT1DTPPORTOUTFRAMES, "dot1dTpPortOutFrames" },
+    { 5, G_SNMP_COUNTER32, BRIDGE_MIB_DOT1DTPPORTINDISCARDS, "dot1dTpPortInDiscards" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _dot1dStaticEntry[] = {
-    { 3, G_SNMP_OCTET_STRING, "dot1dStaticAllowedToGoTo" },
-    { 4, G_SNMP_INTEGER32, "dot1dStaticStatus" },
-    { 0, 0, NULL }
+static guint32 const oid_dot1dStaticEntry[] = {1, 3, 6, 1, 2, 1, 17, 5, 1, 1};
+
+static attribute_t attr_dot1dStaticEntry[] = {
+    { 3, G_SNMP_OCTET_STRING, BRIDGE_MIB_DOT1DSTATICALLOWEDTOGOTO, "dot1dStaticAllowedToGoTo" },
+    { 4, G_SNMP_INTEGER32, BRIDGE_MIB_DOT1DSTATICSTATUS, "dot1dStaticStatus" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -199,7 +219,6 @@ assign_dot1dBase(GSList *vbl)
     bridge_mib_dot1dBase_t *dot1dBase;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 1};
 
     dot1dBase = bridge_mib_new_dot1dBase();
     if (! dot1dBase) {
@@ -212,8 +231,8 @@ assign_dot1dBase(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _dot1dBase, &idx) < 0) continue;
+        if (lookup(vb, oid_dot1dBase, sizeof(oid_dot1dBase)/sizeof(guint32),
+                   attr_dot1dBase, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -231,25 +250,21 @@ assign_dot1dBase(GSList *vbl)
     return dot1dBase;
 }
 
-int
-bridge_mib_get_dot1dBase(GSnmpSession *s, bridge_mib_dot1dBase_t **dot1dBase)
+void
+bridge_mib_get_dot1dBase(GSnmpSession *s, bridge_mib_dot1dBase_t **dot1dBase, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 17, 1, 0};
 
     *dot1dBase = NULL;
 
-    add_attributes(s, &in, base, 8, _dot1dBase);
+    add_attributes(s, &in, base, 9, 8, attr_dot1dBase, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *dot1dBase = assign_dot1dBase(out);
     }
-
-    *dot1dBase = assign_dot1dBase(out);
-
-    return 0;
 }
 
 void
@@ -286,6 +301,15 @@ unpack_dot1dBasePortEntry(GSnmpVarBind *vb, bridge_mib_dot1dBasePortEntry_t *dot
     return 0;
 }
 
+static int
+pack_dot1dBasePortEntry(guint32 *base, gint32 dot1dBasePort)
+{
+    int idx = 11;
+
+    base[idx++] = dot1dBasePort;
+    return idx;
+}
+
 static bridge_mib_dot1dBasePortEntry_t *
 assign_dot1dBasePortEntry(GSList *vbl)
 {
@@ -293,7 +317,6 @@ assign_dot1dBasePortEntry(GSList *vbl)
     bridge_mib_dot1dBasePortEntry_t *dot1dBasePortEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 1, 4, 1};
 
     dot1dBasePortEntry = bridge_mib_new_dot1dBasePortEntry();
     if (! dot1dBasePortEntry) {
@@ -312,8 +335,8 @@ assign_dot1dBasePortEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _dot1dBasePortEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_dot1dBasePortEntry, sizeof(oid_dot1dBasePortEntry)/sizeof(guint32),
+                   attr_dot1dBasePortEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -335,8 +358,8 @@ assign_dot1dBasePortEntry(GSList *vbl)
     return dot1dBasePortEntry;
 }
 
-int
-bridge_mib_get_dot1dBasePortTable(GSnmpSession *s, bridge_mib_dot1dBasePortEntry_t ***dot1dBasePortEntry)
+void
+bridge_mib_get_dot1dBasePortTable(GSnmpSession *s, bridge_mib_dot1dBasePortEntry_t ***dot1dBasePortEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -345,24 +368,48 @@ bridge_mib_get_dot1dBasePortTable(GSnmpSession *s, bridge_mib_dot1dBasePortEntry
 
     *dot1dBasePortEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _dot1dBasePortEntry);
+    add_attributes(s, &in, base, 11, 10, attr_dot1dBasePortEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *dot1dBasePortEntry = (bridge_mib_dot1dBasePortEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(bridge_mib_dot1dBasePortEntry_t *));
+        if (! *dot1dBasePortEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*dot1dBasePortEntry)[i] = assign_dot1dBasePortEntry(row->data);
+        }
+    }
+}
+
+void
+bridge_mib_get_dot1dBasePortEntry(GSnmpSession *s, bridge_mib_dot1dBasePortEntry_t **dot1dBasePortEntry, gint32 dot1dBasePort, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_dot1dBasePortEntry, sizeof(oid_dot1dBasePortEntry));
+    len = pack_dot1dBasePortEntry(base, dot1dBasePort);
+    if (len < 0) {
+        g_warning("illegal dot1dBasePortEntry index values");
+        return;
     }
 
-    *dot1dBasePortEntry = (bridge_mib_dot1dBasePortEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(bridge_mib_dot1dBasePortEntry_t *));
-    if (! *dot1dBasePortEntry) {
-        return -4;
-    }
+    *dot1dBasePortEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*dot1dBasePortEntry)[i] = assign_dot1dBasePortEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_dot1dBasePortEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *dot1dBasePortEntry = assign_dot1dBasePortEntry(out);
+    }
 }
 
 void
@@ -408,7 +455,6 @@ assign_dot1dStp(GSList *vbl)
     bridge_mib_dot1dStp_t *dot1dStp;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 2};
 
     dot1dStp = bridge_mib_new_dot1dStp();
     if (! dot1dStp) {
@@ -421,8 +467,8 @@ assign_dot1dStp(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _dot1dStp, &idx) < 0) continue;
+        if (lookup(vb, oid_dot1dStp, sizeof(oid_dot1dStp)/sizeof(guint32),
+                   attr_dot1dStp, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -473,29 +519,25 @@ assign_dot1dStp(GSList *vbl)
     return dot1dStp;
 }
 
-int
-bridge_mib_get_dot1dStp(GSnmpSession *s, bridge_mib_dot1dStp_t **dot1dStp)
+void
+bridge_mib_get_dot1dStp(GSnmpSession *s, bridge_mib_dot1dStp_t **dot1dStp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 17, 2, 0};
 
     *dot1dStp = NULL;
 
-    add_attributes(s, &in, base, 8, _dot1dStp);
+    add_attributes(s, &in, base, 9, 8, attr_dot1dStp, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *dot1dStp = assign_dot1dStp(out);
     }
-
-    *dot1dStp = assign_dot1dStp(out);
-
-    return 0;
 }
 
-int
-bridge_mib_set_dot1dStp(GSnmpSession *s, bridge_mib_dot1dStp_t *dot1dStp)
+void
+bridge_mib_set_dot1dStp(GSnmpSession *s, bridge_mib_dot1dStp_t *dot1dStp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 17, 2, 0, 0};
@@ -531,12 +573,9 @@ bridge_mib_set_dot1dStp(GSnmpSession *s, bridge_mib_dot1dStp_t *dot1dStp)
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void
@@ -573,6 +612,15 @@ unpack_dot1dStpPortEntry(GSnmpVarBind *vb, bridge_mib_dot1dStpPortEntry_t *dot1d
     return 0;
 }
 
+static int
+pack_dot1dStpPortEntry(guint32 *base, gint32 dot1dStpPort)
+{
+    int idx = 11;
+
+    base[idx++] = dot1dStpPort;
+    return idx;
+}
+
 static bridge_mib_dot1dStpPortEntry_t *
 assign_dot1dStpPortEntry(GSList *vbl)
 {
@@ -580,7 +628,6 @@ assign_dot1dStpPortEntry(GSList *vbl)
     bridge_mib_dot1dStpPortEntry_t *dot1dStpPortEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 2, 15, 1};
 
     dot1dStpPortEntry = bridge_mib_new_dot1dStpPortEntry();
     if (! dot1dStpPortEntry) {
@@ -599,8 +646,8 @@ assign_dot1dStpPortEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _dot1dStpPortEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_dot1dStpPortEntry, sizeof(oid_dot1dStpPortEntry)/sizeof(guint32),
+                   attr_dot1dStpPortEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -636,8 +683,8 @@ assign_dot1dStpPortEntry(GSList *vbl)
     return dot1dStpPortEntry;
 }
 
-int
-bridge_mib_get_dot1dStpPortTable(GSnmpSession *s, bridge_mib_dot1dStpPortEntry_t ***dot1dStpPortEntry)
+void
+bridge_mib_get_dot1dStpPortTable(GSnmpSession *s, bridge_mib_dot1dStpPortEntry_t ***dot1dStpPortEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -646,24 +693,89 @@ bridge_mib_get_dot1dStpPortTable(GSnmpSession *s, bridge_mib_dot1dStpPortEntry_t
 
     *dot1dStpPortEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _dot1dStpPortEntry);
+    add_attributes(s, &in, base, 11, 10, attr_dot1dStpPortEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *dot1dStpPortEntry = (bridge_mib_dot1dStpPortEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(bridge_mib_dot1dStpPortEntry_t *));
+        if (! *dot1dStpPortEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*dot1dStpPortEntry)[i] = assign_dot1dStpPortEntry(row->data);
+        }
+    }
+}
+
+void
+bridge_mib_get_dot1dStpPortEntry(GSnmpSession *s, bridge_mib_dot1dStpPortEntry_t **dot1dStpPortEntry, gint32 dot1dStpPort, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_dot1dStpPortEntry, sizeof(oid_dot1dStpPortEntry));
+    len = pack_dot1dStpPortEntry(base, dot1dStpPort);
+    if (len < 0) {
+        g_warning("illegal dot1dStpPortEntry index values");
+        return;
     }
 
-    *dot1dStpPortEntry = (bridge_mib_dot1dStpPortEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(bridge_mib_dot1dStpPortEntry_t *));
-    if (! *dot1dStpPortEntry) {
-        return -4;
+    *dot1dStpPortEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_dot1dStpPortEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *dot1dStpPortEntry = assign_dot1dStpPortEntry(out);
+    }
+}
+
+void
+bridge_mib_set_dot1dStpPortEntry(GSnmpSession *s, bridge_mib_dot1dStpPortEntry_t *dot1dStpPortEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_dot1dStpPortEntry, sizeof(oid_dot1dStpPortEntry));
+    len = pack_dot1dStpPortEntry(base, dot1dStpPortEntry->dot1dStpPort);
+    if (len < 0) {
+        g_warning("illegal dot1dStpPortEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*dot1dStpPortEntry)[i] = assign_dot1dStpPortEntry(row->data);
+    if (dot1dStpPortEntry->dot1dStpPortPriority) {
+        base[10] = 2;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       dot1dStpPortEntry->dot1dStpPortPriority,
+                       0);
+    }
+    if (dot1dStpPortEntry->dot1dStpPortEnable) {
+        base[10] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       dot1dStpPortEntry->dot1dStpPortEnable,
+                       0);
+    }
+    if (dot1dStpPortEntry->dot1dStpPortPathCost) {
+        base[10] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       dot1dStpPortEntry->dot1dStpPortPathCost,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -709,7 +821,6 @@ assign_dot1dTp(GSList *vbl)
     bridge_mib_dot1dTp_t *dot1dTp;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 4};
 
     dot1dTp = bridge_mib_new_dot1dTp();
     if (! dot1dTp) {
@@ -722,8 +833,8 @@ assign_dot1dTp(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _dot1dTp, &idx) < 0) continue;
+        if (lookup(vb, oid_dot1dTp, sizeof(oid_dot1dTp)/sizeof(guint32),
+                   attr_dot1dTp, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -738,29 +849,25 @@ assign_dot1dTp(GSList *vbl)
     return dot1dTp;
 }
 
-int
-bridge_mib_get_dot1dTp(GSnmpSession *s, bridge_mib_dot1dTp_t **dot1dTp)
+void
+bridge_mib_get_dot1dTp(GSnmpSession *s, bridge_mib_dot1dTp_t **dot1dTp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 17, 4, 0};
 
     *dot1dTp = NULL;
 
-    add_attributes(s, &in, base, 8, _dot1dTp);
+    add_attributes(s, &in, base, 9, 8, attr_dot1dTp, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *dot1dTp = assign_dot1dTp(out);
     }
-
-    *dot1dTp = assign_dot1dTp(out);
-
-    return 0;
 }
 
-int
-bridge_mib_set_dot1dTp(GSnmpSession *s, bridge_mib_dot1dTp_t *dot1dTp)
+void
+bridge_mib_set_dot1dTp(GSnmpSession *s, bridge_mib_dot1dTp_t *dot1dTp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 17, 4, 0, 0};
@@ -775,12 +882,9 @@ bridge_mib_set_dot1dTp(GSnmpSession *s, bridge_mib_dot1dTp_t *dot1dTp)
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void
@@ -820,6 +924,19 @@ unpack_dot1dTpFdbEntry(GSnmpVarBind *vb, bridge_mib_dot1dTpFdbEntry_t *dot1dTpFd
     return 0;
 }
 
+static int
+pack_dot1dTpFdbEntry(guint32 *base, guchar *dot1dTpFdbAddress)
+{
+    int i, len, idx = 11;
+
+    len = 6;
+    for (i = 0; i < len; i++) {
+        base[idx++] = dot1dTpFdbAddress[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static bridge_mib_dot1dTpFdbEntry_t *
 assign_dot1dTpFdbEntry(GSList *vbl)
 {
@@ -827,7 +944,6 @@ assign_dot1dTpFdbEntry(GSList *vbl)
     bridge_mib_dot1dTpFdbEntry_t *dot1dTpFdbEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 4, 3, 1};
 
     dot1dTpFdbEntry = bridge_mib_new_dot1dTpFdbEntry();
     if (! dot1dTpFdbEntry) {
@@ -846,8 +962,8 @@ assign_dot1dTpFdbEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _dot1dTpFdbEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_dot1dTpFdbEntry, sizeof(oid_dot1dTpFdbEntry)/sizeof(guint32),
+                   attr_dot1dTpFdbEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -862,8 +978,8 @@ assign_dot1dTpFdbEntry(GSList *vbl)
     return dot1dTpFdbEntry;
 }
 
-int
-bridge_mib_get_dot1dTpFdbTable(GSnmpSession *s, bridge_mib_dot1dTpFdbEntry_t ***dot1dTpFdbEntry)
+void
+bridge_mib_get_dot1dTpFdbTable(GSnmpSession *s, bridge_mib_dot1dTpFdbEntry_t ***dot1dTpFdbEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -872,24 +988,48 @@ bridge_mib_get_dot1dTpFdbTable(GSnmpSession *s, bridge_mib_dot1dTpFdbEntry_t ***
 
     *dot1dTpFdbEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _dot1dTpFdbEntry);
+    add_attributes(s, &in, base, 11, 10, attr_dot1dTpFdbEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *dot1dTpFdbEntry = (bridge_mib_dot1dTpFdbEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(bridge_mib_dot1dTpFdbEntry_t *));
+        if (! *dot1dTpFdbEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*dot1dTpFdbEntry)[i] = assign_dot1dTpFdbEntry(row->data);
+        }
+    }
+}
+
+void
+bridge_mib_get_dot1dTpFdbEntry(GSnmpSession *s, bridge_mib_dot1dTpFdbEntry_t **dot1dTpFdbEntry, guchar *dot1dTpFdbAddress, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_dot1dTpFdbEntry, sizeof(oid_dot1dTpFdbEntry));
+    len = pack_dot1dTpFdbEntry(base, dot1dTpFdbAddress);
+    if (len < 0) {
+        g_warning("illegal dot1dTpFdbEntry index values");
+        return;
     }
 
-    *dot1dTpFdbEntry = (bridge_mib_dot1dTpFdbEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(bridge_mib_dot1dTpFdbEntry_t *));
-    if (! *dot1dTpFdbEntry) {
-        return -4;
-    }
+    *dot1dTpFdbEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*dot1dTpFdbEntry)[i] = assign_dot1dTpFdbEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_dot1dTpFdbEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *dot1dTpFdbEntry = assign_dot1dTpFdbEntry(out);
+    }
 }
 
 void
@@ -939,6 +1079,15 @@ unpack_dot1dTpPortEntry(GSnmpVarBind *vb, bridge_mib_dot1dTpPortEntry_t *dot1dTp
     return 0;
 }
 
+static int
+pack_dot1dTpPortEntry(guint32 *base, gint32 dot1dTpPort)
+{
+    int idx = 11;
+
+    base[idx++] = dot1dTpPort;
+    return idx;
+}
+
 static bridge_mib_dot1dTpPortEntry_t *
 assign_dot1dTpPortEntry(GSList *vbl)
 {
@@ -946,7 +1095,6 @@ assign_dot1dTpPortEntry(GSList *vbl)
     bridge_mib_dot1dTpPortEntry_t *dot1dTpPortEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 4, 4, 1};
 
     dot1dTpPortEntry = bridge_mib_new_dot1dTpPortEntry();
     if (! dot1dTpPortEntry) {
@@ -965,8 +1113,8 @@ assign_dot1dTpPortEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _dot1dTpPortEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_dot1dTpPortEntry, sizeof(oid_dot1dTpPortEntry)/sizeof(guint32),
+                   attr_dot1dTpPortEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -987,8 +1135,8 @@ assign_dot1dTpPortEntry(GSList *vbl)
     return dot1dTpPortEntry;
 }
 
-int
-bridge_mib_get_dot1dTpPortTable(GSnmpSession *s, bridge_mib_dot1dTpPortEntry_t ***dot1dTpPortEntry)
+void
+bridge_mib_get_dot1dTpPortTable(GSnmpSession *s, bridge_mib_dot1dTpPortEntry_t ***dot1dTpPortEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -997,24 +1145,48 @@ bridge_mib_get_dot1dTpPortTable(GSnmpSession *s, bridge_mib_dot1dTpPortEntry_t *
 
     *dot1dTpPortEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _dot1dTpPortEntry);
+    add_attributes(s, &in, base, 11, 10, attr_dot1dTpPortEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *dot1dTpPortEntry = (bridge_mib_dot1dTpPortEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(bridge_mib_dot1dTpPortEntry_t *));
+        if (! *dot1dTpPortEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*dot1dTpPortEntry)[i] = assign_dot1dTpPortEntry(row->data);
+        }
+    }
+}
+
+void
+bridge_mib_get_dot1dTpPortEntry(GSnmpSession *s, bridge_mib_dot1dTpPortEntry_t **dot1dTpPortEntry, gint32 dot1dTpPort, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_dot1dTpPortEntry, sizeof(oid_dot1dTpPortEntry));
+    len = pack_dot1dTpPortEntry(base, dot1dTpPort);
+    if (len < 0) {
+        g_warning("illegal dot1dTpPortEntry index values");
+        return;
     }
 
-    *dot1dTpPortEntry = (bridge_mib_dot1dTpPortEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(bridge_mib_dot1dTpPortEntry_t *));
-    if (! *dot1dTpPortEntry) {
-        return -4;
-    }
+    *dot1dTpPortEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*dot1dTpPortEntry)[i] = assign_dot1dTpPortEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_dot1dTpPortEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *dot1dTpPortEntry = assign_dot1dTpPortEntry(out);
+    }
 }
 
 void
@@ -1069,6 +1241,20 @@ unpack_dot1dStaticEntry(GSnmpVarBind *vb, bridge_mib_dot1dStaticEntry_t *dot1dSt
     return 0;
 }
 
+static int
+pack_dot1dStaticEntry(guint32 *base, guchar *dot1dStaticAddress, gint32 dot1dStaticReceivePort)
+{
+    int i, len, idx = 11;
+
+    len = 6;
+    for (i = 0; i < len; i++) {
+        base[idx++] = dot1dStaticAddress[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = dot1dStaticReceivePort;
+    return idx;
+}
+
 static bridge_mib_dot1dStaticEntry_t *
 assign_dot1dStaticEntry(GSList *vbl)
 {
@@ -1076,7 +1262,6 @@ assign_dot1dStaticEntry(GSList *vbl)
     bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 17, 5, 1, 1};
 
     dot1dStaticEntry = bridge_mib_new_dot1dStaticEntry();
     if (! dot1dStaticEntry) {
@@ -1095,8 +1280,8 @@ assign_dot1dStaticEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _dot1dStaticEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_dot1dStaticEntry, sizeof(oid_dot1dStaticEntry)/sizeof(guint32),
+                   attr_dot1dStaticEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -1112,8 +1297,8 @@ assign_dot1dStaticEntry(GSList *vbl)
     return dot1dStaticEntry;
 }
 
-int
-bridge_mib_get_dot1dStaticTable(GSnmpSession *s, bridge_mib_dot1dStaticEntry_t ***dot1dStaticEntry)
+void
+bridge_mib_get_dot1dStaticTable(GSnmpSession *s, bridge_mib_dot1dStaticEntry_t ***dot1dStaticEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1122,24 +1307,83 @@ bridge_mib_get_dot1dStaticTable(GSnmpSession *s, bridge_mib_dot1dStaticEntry_t *
 
     *dot1dStaticEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _dot1dStaticEntry);
+    add_attributes(s, &in, base, 11, 10, attr_dot1dStaticEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *dot1dStaticEntry = (bridge_mib_dot1dStaticEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(bridge_mib_dot1dStaticEntry_t *));
+        if (! *dot1dStaticEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*dot1dStaticEntry)[i] = assign_dot1dStaticEntry(row->data);
+        }
+    }
+}
+
+void
+bridge_mib_get_dot1dStaticEntry(GSnmpSession *s, bridge_mib_dot1dStaticEntry_t **dot1dStaticEntry, guchar *dot1dStaticAddress, gint32 dot1dStaticReceivePort, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_dot1dStaticEntry, sizeof(oid_dot1dStaticEntry));
+    len = pack_dot1dStaticEntry(base, dot1dStaticAddress, dot1dStaticReceivePort);
+    if (len < 0) {
+        g_warning("illegal dot1dStaticEntry index values");
+        return;
     }
 
-    *dot1dStaticEntry = (bridge_mib_dot1dStaticEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(bridge_mib_dot1dStaticEntry_t *));
-    if (! *dot1dStaticEntry) {
-        return -4;
+    *dot1dStaticEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_dot1dStaticEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *dot1dStaticEntry = assign_dot1dStaticEntry(out);
+    }
+}
+
+void
+bridge_mib_set_dot1dStaticEntry(GSnmpSession *s, bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_dot1dStaticEntry, sizeof(oid_dot1dStaticEntry));
+    len = pack_dot1dStaticEntry(base, dot1dStaticEntry->dot1dStaticAddress, dot1dStaticEntry->dot1dStaticReceivePort);
+    if (len < 0) {
+        g_warning("illegal dot1dStaticEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*dot1dStaticEntry)[i] = assign_dot1dStaticEntry(row->data);
+    if (dot1dStaticEntry->dot1dStaticAllowedToGoTo) {
+        base[10] = 3;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       dot1dStaticEntry->dot1dStaticAllowedToGoTo,
+                       dot1dStaticEntry->_dot1dStaticAllowedToGoToLength);
+    }
+    if (dot1dStaticEntry->dot1dStaticStatus) {
+        base[10] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       dot1dStaticEntry->dot1dStaticStatus,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void

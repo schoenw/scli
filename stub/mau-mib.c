@@ -354,33 +354,37 @@ GSnmpIdentity const mau_mib_identities[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -402,63 +406,75 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _rpMauEntry[] = {
-    { 4, G_SNMP_OBJECT_ID, "rpMauType" },
-    { 5, G_SNMP_INTEGER32, "rpMauStatus" },
-    { 6, G_SNMP_INTEGER32, "rpMauMediaAvailable" },
-    { 7, G_SNMP_COUNTER32, "rpMauMediaAvailableStateExits" },
-    { 8, G_SNMP_INTEGER32, "rpMauJabberState" },
-    { 9, G_SNMP_COUNTER32, "rpMauJabberingStateEnters" },
-    { 10, G_SNMP_COUNTER32, "rpMauFalseCarriers" },
-    { 0, 0, NULL }
+static guint32 const oid_rpMauEntry[] = {1, 3, 6, 1, 2, 1, 26, 1, 1, 1};
+
+static attribute_t attr_rpMauEntry[] = {
+    { 4, G_SNMP_OBJECT_ID, MAU_MIB_RPMAUTYPE, "rpMauType" },
+    { 5, G_SNMP_INTEGER32, MAU_MIB_RPMAUSTATUS, "rpMauStatus" },
+    { 6, G_SNMP_INTEGER32, MAU_MIB_RPMAUMEDIAAVAILABLE, "rpMauMediaAvailable" },
+    { 7, G_SNMP_COUNTER32, MAU_MIB_RPMAUMEDIAAVAILABLESTATEEXITS, "rpMauMediaAvailableStateExits" },
+    { 8, G_SNMP_INTEGER32, MAU_MIB_RPMAUJABBERSTATE, "rpMauJabberState" },
+    { 9, G_SNMP_COUNTER32, MAU_MIB_RPMAUJABBERINGSTATEENTERS, "rpMauJabberingStateEnters" },
+    { 10, G_SNMP_COUNTER32, MAU_MIB_RPMAUFALSECARRIERS, "rpMauFalseCarriers" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _rpJackEntry[] = {
-    { 2, G_SNMP_INTEGER32, "rpJackType" },
-    { 0, 0, NULL }
+static guint32 const oid_rpJackEntry[] = {1, 3, 6, 1, 2, 1, 26, 1, 2, 1};
+
+static attribute_t attr_rpJackEntry[] = {
+    { 2, G_SNMP_INTEGER32, MAU_MIB_RPJACKTYPE, "rpJackType" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ifMauEntry[] = {
-    { 3, G_SNMP_OBJECT_ID, "ifMauType" },
-    { 4, G_SNMP_INTEGER32, "ifMauStatus" },
-    { 5, G_SNMP_INTEGER32, "ifMauMediaAvailable" },
-    { 6, G_SNMP_COUNTER32, "ifMauMediaAvailableStateExits" },
-    { 7, G_SNMP_INTEGER32, "ifMauJabberState" },
-    { 8, G_SNMP_COUNTER32, "ifMauJabberingStateEnters" },
-    { 9, G_SNMP_COUNTER32, "ifMauFalseCarriers" },
-    { 10, G_SNMP_INTEGER32, "ifMauTypeList" },
-    { 11, G_SNMP_OBJECT_ID, "ifMauDefaultType" },
-    { 12, G_SNMP_INTEGER32, "ifMauAutoNegSupported" },
-    { 13, G_SNMP_OCTET_STRING, "ifMauTypeListBits" },
-    { 0, 0, NULL }
+static guint32 const oid_ifMauEntry[] = {1, 3, 6, 1, 2, 1, 26, 2, 1, 1};
+
+static attribute_t attr_ifMauEntry[] = {
+    { 3, G_SNMP_OBJECT_ID, MAU_MIB_IFMAUTYPE, "ifMauType" },
+    { 4, G_SNMP_INTEGER32, MAU_MIB_IFMAUSTATUS, "ifMauStatus" },
+    { 5, G_SNMP_INTEGER32, MAU_MIB_IFMAUMEDIAAVAILABLE, "ifMauMediaAvailable" },
+    { 6, G_SNMP_COUNTER32, MAU_MIB_IFMAUMEDIAAVAILABLESTATEEXITS, "ifMauMediaAvailableStateExits" },
+    { 7, G_SNMP_INTEGER32, MAU_MIB_IFMAUJABBERSTATE, "ifMauJabberState" },
+    { 8, G_SNMP_COUNTER32, MAU_MIB_IFMAUJABBERINGSTATEENTERS, "ifMauJabberingStateEnters" },
+    { 9, G_SNMP_COUNTER32, MAU_MIB_IFMAUFALSECARRIERS, "ifMauFalseCarriers" },
+    { 10, G_SNMP_INTEGER32, MAU_MIB_IFMAUTYPELIST, "ifMauTypeList" },
+    { 11, G_SNMP_OBJECT_ID, MAU_MIB_IFMAUDEFAULTTYPE, "ifMauDefaultType" },
+    { 12, G_SNMP_INTEGER32, MAU_MIB_IFMAUAUTONEGSUPPORTED, "ifMauAutoNegSupported" },
+    { 13, G_SNMP_OCTET_STRING, MAU_MIB_IFMAUTYPELISTBITS, "ifMauTypeListBits" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ifJackEntry[] = {
-    { 2, G_SNMP_INTEGER32, "ifJackType" },
-    { 0, 0, NULL }
+static guint32 const oid_ifJackEntry[] = {1, 3, 6, 1, 2, 1, 26, 2, 2, 1};
+
+static attribute_t attr_ifJackEntry[] = {
+    { 2, G_SNMP_INTEGER32, MAU_MIB_IFJACKTYPE, "ifJackType" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _broadMauBasicEntry[] = {
-    { 3, G_SNMP_INTEGER32, "broadMauXmtRcvSplitType" },
-    { 4, G_SNMP_INTEGER32, "broadMauXmtCarrierFreq" },
-    { 5, G_SNMP_INTEGER32, "broadMauTranslationFreq" },
-    { 0, 0, NULL }
+static guint32 const oid_broadMauBasicEntry[] = {1, 3, 6, 1, 2, 1, 26, 3, 1, 1};
+
+static attribute_t attr_broadMauBasicEntry[] = {
+    { 3, G_SNMP_INTEGER32, MAU_MIB_BROADMAUXMTRCVSPLITTYPE, "broadMauXmtRcvSplitType" },
+    { 4, G_SNMP_INTEGER32, MAU_MIB_BROADMAUXMTCARRIERFREQ, "broadMauXmtCarrierFreq" },
+    { 5, G_SNMP_INTEGER32, MAU_MIB_BROADMAUTRANSLATIONFREQ, "broadMauTranslationFreq" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ifMauAutoNegEntry[] = {
-    { 1, G_SNMP_INTEGER32, "ifMauAutoNegAdminStatus" },
-    { 2, G_SNMP_INTEGER32, "ifMauAutoNegRemoteSignaling" },
-    { 4, G_SNMP_INTEGER32, "ifMauAutoNegConfig" },
-    { 5, G_SNMP_INTEGER32, "ifMauAutoNegCapability" },
-    { 6, G_SNMP_INTEGER32, "ifMauAutoNegCapAdvertised" },
-    { 7, G_SNMP_INTEGER32, "ifMauAutoNegCapReceived" },
-    { 8, G_SNMP_INTEGER32, "ifMauAutoNegRestart" },
-    { 9, G_SNMP_OCTET_STRING, "ifMauAutoNegCapabilityBits" },
-    { 10, G_SNMP_OCTET_STRING, "ifMauAutoNegCapAdvertisedBits" },
-    { 11, G_SNMP_OCTET_STRING, "ifMauAutoNegCapReceivedBits" },
-    { 12, G_SNMP_INTEGER32, "ifMauAutoNegRemoteFaultAdvertised" },
-    { 13, G_SNMP_INTEGER32, "ifMauAutoNegRemoteFaultReceived" },
-    { 0, 0, NULL }
+static guint32 const oid_ifMauAutoNegEntry[] = {1, 3, 6, 1, 2, 1, 26, 5, 1, 1};
+
+static attribute_t attr_ifMauAutoNegEntry[] = {
+    { 1, G_SNMP_INTEGER32, MAU_MIB_IFMAUAUTONEGADMINSTATUS, "ifMauAutoNegAdminStatus" },
+    { 2, G_SNMP_INTEGER32, MAU_MIB_IFMAUAUTONEGREMOTESIGNALING, "ifMauAutoNegRemoteSignaling" },
+    { 4, G_SNMP_INTEGER32, MAU_MIB_IFMAUAUTONEGCONFIG, "ifMauAutoNegConfig" },
+    { 5, G_SNMP_INTEGER32, MAU_MIB_IFMAUAUTONEGCAPABILITY, "ifMauAutoNegCapability" },
+    { 6, G_SNMP_INTEGER32, MAU_MIB_IFMAUAUTONEGCAPADVERTISED, "ifMauAutoNegCapAdvertised" },
+    { 7, G_SNMP_INTEGER32, MAU_MIB_IFMAUAUTONEGCAPRECEIVED, "ifMauAutoNegCapReceived" },
+    { 8, G_SNMP_INTEGER32, MAU_MIB_IFMAUAUTONEGRESTART, "ifMauAutoNegRestart" },
+    { 9, G_SNMP_OCTET_STRING, MAU_MIB_IFMAUAUTONEGCAPABILITYBITS, "ifMauAutoNegCapabilityBits" },
+    { 10, G_SNMP_OCTET_STRING, MAU_MIB_IFMAUAUTONEGCAPADVERTISEDBITS, "ifMauAutoNegCapAdvertisedBits" },
+    { 11, G_SNMP_OCTET_STRING, MAU_MIB_IFMAUAUTONEGCAPRECEIVEDBITS, "ifMauAutoNegCapReceivedBits" },
+    { 12, G_SNMP_INTEGER32, MAU_MIB_IFMAUAUTONEGREMOTEFAULTADVERTISED, "ifMauAutoNegRemoteFaultAdvertised" },
+    { 13, G_SNMP_INTEGER32, MAU_MIB_IFMAUAUTONEGREMOTEFAULTRECEIVED, "ifMauAutoNegRemoteFaultReceived" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -486,6 +502,17 @@ unpack_rpMauEntry(GSnmpVarBind *vb, mau_mib_rpMauEntry_t *rpMauEntry)
     return 0;
 }
 
+static int
+pack_rpMauEntry(guint32 *base, gint32 rpMauGroupIndex, gint32 rpMauPortIndex, gint32 rpMauIndex)
+{
+    int idx = 11;
+
+    base[idx++] = rpMauGroupIndex;
+    base[idx++] = rpMauPortIndex;
+    base[idx++] = rpMauIndex;
+    return idx;
+}
+
 static mau_mib_rpMauEntry_t *
 assign_rpMauEntry(GSList *vbl)
 {
@@ -493,7 +520,6 @@ assign_rpMauEntry(GSList *vbl)
     mau_mib_rpMauEntry_t *rpMauEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 26, 1, 1, 1};
 
     rpMauEntry = mau_mib_new_rpMauEntry();
     if (! rpMauEntry) {
@@ -512,8 +538,8 @@ assign_rpMauEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _rpMauEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_rpMauEntry, sizeof(oid_rpMauEntry)/sizeof(guint32),
+                   attr_rpMauEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 4:
@@ -544,8 +570,8 @@ assign_rpMauEntry(GSList *vbl)
     return rpMauEntry;
 }
 
-int
-mau_mib_get_rpMauTable(GSnmpSession *s, mau_mib_rpMauEntry_t ***rpMauEntry)
+void
+mau_mib_get_rpMauTable(GSnmpSession *s, mau_mib_rpMauEntry_t ***rpMauEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -554,24 +580,77 @@ mau_mib_get_rpMauTable(GSnmpSession *s, mau_mib_rpMauEntry_t ***rpMauEntry)
 
     *rpMauEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _rpMauEntry);
+    add_attributes(s, &in, base, 11, 10, attr_rpMauEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *rpMauEntry = (mau_mib_rpMauEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(mau_mib_rpMauEntry_t *));
+        if (! *rpMauEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*rpMauEntry)[i] = assign_rpMauEntry(row->data);
+        }
+    }
+}
+
+void
+mau_mib_get_rpMauEntry(GSnmpSession *s, mau_mib_rpMauEntry_t **rpMauEntry, gint32 rpMauGroupIndex, gint32 rpMauPortIndex, gint32 rpMauIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_rpMauEntry, sizeof(oid_rpMauEntry));
+    len = pack_rpMauEntry(base, rpMauGroupIndex, rpMauPortIndex, rpMauIndex);
+    if (len < 0) {
+        g_warning("illegal rpMauEntry index values");
+        return;
     }
 
-    *rpMauEntry = (mau_mib_rpMauEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(mau_mib_rpMauEntry_t *));
-    if (! *rpMauEntry) {
-        return -4;
+    *rpMauEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_rpMauEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *rpMauEntry = assign_rpMauEntry(out);
+    }
+}
+
+void
+mau_mib_set_rpMauEntry(GSnmpSession *s, mau_mib_rpMauEntry_t *rpMauEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_rpMauEntry, sizeof(oid_rpMauEntry));
+    len = pack_rpMauEntry(base, rpMauEntry->rpMauGroupIndex, rpMauEntry->rpMauPortIndex, rpMauEntry->rpMauIndex);
+    if (len < 0) {
+        g_warning("illegal rpMauEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*rpMauEntry)[i] = assign_rpMauEntry(row->data);
+    if (rpMauEntry->rpMauStatus) {
+        base[10] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       rpMauEntry->rpMauStatus,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -627,6 +706,18 @@ unpack_rpJackEntry(GSnmpVarBind *vb, mau_mib_rpJackEntry_t *rpJackEntry)
     return 0;
 }
 
+static int
+pack_rpJackEntry(guint32 *base, gint32 rpMauGroupIndex, gint32 rpMauPortIndex, gint32 rpMauIndex, gint32 rpJackIndex)
+{
+    int idx = 11;
+
+    base[idx++] = rpMauGroupIndex;
+    base[idx++] = rpMauPortIndex;
+    base[idx++] = rpMauIndex;
+    base[idx++] = rpJackIndex;
+    return idx;
+}
+
 static mau_mib_rpJackEntry_t *
 assign_rpJackEntry(GSList *vbl)
 {
@@ -634,7 +725,6 @@ assign_rpJackEntry(GSList *vbl)
     mau_mib_rpJackEntry_t *rpJackEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 26, 1, 2, 1};
 
     rpJackEntry = mau_mib_new_rpJackEntry();
     if (! rpJackEntry) {
@@ -653,8 +743,8 @@ assign_rpJackEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _rpJackEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_rpJackEntry, sizeof(oid_rpJackEntry)/sizeof(guint32),
+                   attr_rpJackEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -666,8 +756,8 @@ assign_rpJackEntry(GSList *vbl)
     return rpJackEntry;
 }
 
-int
-mau_mib_get_rpJackTable(GSnmpSession *s, mau_mib_rpJackEntry_t ***rpJackEntry)
+void
+mau_mib_get_rpJackTable(GSnmpSession *s, mau_mib_rpJackEntry_t ***rpJackEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -676,24 +766,48 @@ mau_mib_get_rpJackTable(GSnmpSession *s, mau_mib_rpJackEntry_t ***rpJackEntry)
 
     *rpJackEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _rpJackEntry);
+    add_attributes(s, &in, base, 11, 10, attr_rpJackEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *rpJackEntry = (mau_mib_rpJackEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(mau_mib_rpJackEntry_t *));
+        if (! *rpJackEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*rpJackEntry)[i] = assign_rpJackEntry(row->data);
+        }
+    }
+}
+
+void
+mau_mib_get_rpJackEntry(GSnmpSession *s, mau_mib_rpJackEntry_t **rpJackEntry, gint32 rpMauGroupIndex, gint32 rpMauPortIndex, gint32 rpMauIndex, gint32 rpJackIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_rpJackEntry, sizeof(oid_rpJackEntry));
+    len = pack_rpJackEntry(base, rpMauGroupIndex, rpMauPortIndex, rpMauIndex, rpJackIndex);
+    if (len < 0) {
+        g_warning("illegal rpJackEntry index values");
+        return;
     }
 
-    *rpJackEntry = (mau_mib_rpJackEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(mau_mib_rpJackEntry_t *));
-    if (! *rpJackEntry) {
-        return -4;
-    }
+    *rpJackEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*rpJackEntry)[i] = assign_rpJackEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_rpJackEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *rpJackEntry = assign_rpJackEntry(out);
+    }
 }
 
 void
@@ -745,6 +859,16 @@ unpack_ifMauEntry(GSnmpVarBind *vb, mau_mib_ifMauEntry_t *ifMauEntry)
     return 0;
 }
 
+static int
+pack_ifMauEntry(guint32 *base, gint32 ifMauIfIndex, gint32 ifMauIndex)
+{
+    int idx = 11;
+
+    base[idx++] = ifMauIfIndex;
+    base[idx++] = ifMauIndex;
+    return idx;
+}
+
 static mau_mib_ifMauEntry_t *
 assign_ifMauEntry(GSList *vbl)
 {
@@ -752,7 +876,6 @@ assign_ifMauEntry(GSList *vbl)
     mau_mib_ifMauEntry_t *ifMauEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 26, 2, 1, 1};
 
     ifMauEntry = mau_mib_new_ifMauEntry();
     if (! ifMauEntry) {
@@ -771,8 +894,8 @@ assign_ifMauEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ifMauEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ifMauEntry, sizeof(oid_ifMauEntry)/sizeof(guint32),
+                   attr_ifMauEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -817,8 +940,8 @@ assign_ifMauEntry(GSList *vbl)
     return ifMauEntry;
 }
 
-int
-mau_mib_get_ifMauTable(GSnmpSession *s, mau_mib_ifMauEntry_t ***ifMauEntry)
+void
+mau_mib_get_ifMauTable(GSnmpSession *s, mau_mib_ifMauEntry_t ***ifMauEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -827,24 +950,83 @@ mau_mib_get_ifMauTable(GSnmpSession *s, mau_mib_ifMauEntry_t ***ifMauEntry)
 
     *ifMauEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _ifMauEntry);
+    add_attributes(s, &in, base, 11, 10, attr_ifMauEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ifMauEntry = (mau_mib_ifMauEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(mau_mib_ifMauEntry_t *));
+        if (! *ifMauEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ifMauEntry)[i] = assign_ifMauEntry(row->data);
+        }
+    }
+}
+
+void
+mau_mib_get_ifMauEntry(GSnmpSession *s, mau_mib_ifMauEntry_t **ifMauEntry, gint32 ifMauIfIndex, gint32 ifMauIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ifMauEntry, sizeof(oid_ifMauEntry));
+    len = pack_ifMauEntry(base, ifMauIfIndex, ifMauIndex);
+    if (len < 0) {
+        g_warning("illegal ifMauEntry index values");
+        return;
     }
 
-    *ifMauEntry = (mau_mib_ifMauEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(mau_mib_ifMauEntry_t *));
-    if (! *ifMauEntry) {
-        return -4;
+    *ifMauEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_ifMauEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ifMauEntry = assign_ifMauEntry(out);
+    }
+}
+
+void
+mau_mib_set_ifMauEntry(GSnmpSession *s, mau_mib_ifMauEntry_t *ifMauEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ifMauEntry, sizeof(oid_ifMauEntry));
+    len = pack_ifMauEntry(base, ifMauEntry->ifMauIfIndex, ifMauEntry->ifMauIndex);
+    if (len < 0) {
+        g_warning("illegal ifMauEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ifMauEntry)[i] = assign_ifMauEntry(row->data);
+    if (ifMauEntry->ifMauStatus) {
+        base[10] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ifMauEntry->ifMauStatus,
+                       0);
+    }
+    if (ifMauEntry->ifMauDefaultType) {
+        base[10] = 11;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OBJECT_ID,
+                       ifMauEntry->ifMauDefaultType,
+                       ifMauEntry->_ifMauDefaultTypeLength);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -898,6 +1080,17 @@ unpack_ifJackEntry(GSnmpVarBind *vb, mau_mib_ifJackEntry_t *ifJackEntry)
     return 0;
 }
 
+static int
+pack_ifJackEntry(guint32 *base, gint32 ifMauIfIndex, gint32 ifMauIndex, gint32 ifJackIndex)
+{
+    int idx = 11;
+
+    base[idx++] = ifMauIfIndex;
+    base[idx++] = ifMauIndex;
+    base[idx++] = ifJackIndex;
+    return idx;
+}
+
 static mau_mib_ifJackEntry_t *
 assign_ifJackEntry(GSList *vbl)
 {
@@ -905,7 +1098,6 @@ assign_ifJackEntry(GSList *vbl)
     mau_mib_ifJackEntry_t *ifJackEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 26, 2, 2, 1};
 
     ifJackEntry = mau_mib_new_ifJackEntry();
     if (! ifJackEntry) {
@@ -924,8 +1116,8 @@ assign_ifJackEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ifJackEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ifJackEntry, sizeof(oid_ifJackEntry)/sizeof(guint32),
+                   attr_ifJackEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -937,8 +1129,8 @@ assign_ifJackEntry(GSList *vbl)
     return ifJackEntry;
 }
 
-int
-mau_mib_get_ifJackTable(GSnmpSession *s, mau_mib_ifJackEntry_t ***ifJackEntry)
+void
+mau_mib_get_ifJackTable(GSnmpSession *s, mau_mib_ifJackEntry_t ***ifJackEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -947,24 +1139,48 @@ mau_mib_get_ifJackTable(GSnmpSession *s, mau_mib_ifJackEntry_t ***ifJackEntry)
 
     *ifJackEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _ifJackEntry);
+    add_attributes(s, &in, base, 11, 10, attr_ifJackEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ifJackEntry = (mau_mib_ifJackEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(mau_mib_ifJackEntry_t *));
+        if (! *ifJackEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ifJackEntry)[i] = assign_ifJackEntry(row->data);
+        }
+    }
+}
+
+void
+mau_mib_get_ifJackEntry(GSnmpSession *s, mau_mib_ifJackEntry_t **ifJackEntry, gint32 ifMauIfIndex, gint32 ifMauIndex, gint32 ifJackIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ifJackEntry, sizeof(oid_ifJackEntry));
+    len = pack_ifJackEntry(base, ifMauIfIndex, ifMauIndex, ifJackIndex);
+    if (len < 0) {
+        g_warning("illegal ifJackEntry index values");
+        return;
     }
 
-    *ifJackEntry = (mau_mib_ifJackEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(mau_mib_ifJackEntry_t *));
-    if (! *ifJackEntry) {
-        return -4;
-    }
+    *ifJackEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ifJackEntry)[i] = assign_ifJackEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_ifJackEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ifJackEntry = assign_ifJackEntry(out);
+    }
 }
 
 void
@@ -1016,6 +1232,16 @@ unpack_broadMauBasicEntry(GSnmpVarBind *vb, mau_mib_broadMauBasicEntry_t *broadM
     return 0;
 }
 
+static int
+pack_broadMauBasicEntry(guint32 *base, gint32 broadMauIfIndex, gint32 broadMauIndex)
+{
+    int idx = 11;
+
+    base[idx++] = broadMauIfIndex;
+    base[idx++] = broadMauIndex;
+    return idx;
+}
+
 static mau_mib_broadMauBasicEntry_t *
 assign_broadMauBasicEntry(GSList *vbl)
 {
@@ -1023,7 +1249,6 @@ assign_broadMauBasicEntry(GSList *vbl)
     mau_mib_broadMauBasicEntry_t *broadMauBasicEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 26, 3, 1, 1};
 
     broadMauBasicEntry = mau_mib_new_broadMauBasicEntry();
     if (! broadMauBasicEntry) {
@@ -1042,8 +1267,8 @@ assign_broadMauBasicEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _broadMauBasicEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_broadMauBasicEntry, sizeof(oid_broadMauBasicEntry)/sizeof(guint32),
+                   attr_broadMauBasicEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -1061,8 +1286,8 @@ assign_broadMauBasicEntry(GSList *vbl)
     return broadMauBasicEntry;
 }
 
-int
-mau_mib_get_broadMauBasicTable(GSnmpSession *s, mau_mib_broadMauBasicEntry_t ***broadMauBasicEntry)
+void
+mau_mib_get_broadMauBasicTable(GSnmpSession *s, mau_mib_broadMauBasicEntry_t ***broadMauBasicEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1071,24 +1296,48 @@ mau_mib_get_broadMauBasicTable(GSnmpSession *s, mau_mib_broadMauBasicEntry_t ***
 
     *broadMauBasicEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _broadMauBasicEntry);
+    add_attributes(s, &in, base, 11, 10, attr_broadMauBasicEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *broadMauBasicEntry = (mau_mib_broadMauBasicEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(mau_mib_broadMauBasicEntry_t *));
+        if (! *broadMauBasicEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*broadMauBasicEntry)[i] = assign_broadMauBasicEntry(row->data);
+        }
+    }
+}
+
+void
+mau_mib_get_broadMauBasicEntry(GSnmpSession *s, mau_mib_broadMauBasicEntry_t **broadMauBasicEntry, gint32 broadMauIfIndex, gint32 broadMauIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_broadMauBasicEntry, sizeof(oid_broadMauBasicEntry));
+    len = pack_broadMauBasicEntry(base, broadMauIfIndex, broadMauIndex);
+    if (len < 0) {
+        g_warning("illegal broadMauBasicEntry index values");
+        return;
     }
 
-    *broadMauBasicEntry = (mau_mib_broadMauBasicEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(mau_mib_broadMauBasicEntry_t *));
-    if (! *broadMauBasicEntry) {
-        return -4;
-    }
+    *broadMauBasicEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*broadMauBasicEntry)[i] = assign_broadMauBasicEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_broadMauBasicEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *broadMauBasicEntry = assign_broadMauBasicEntry(out);
+    }
 }
 
 void
@@ -1140,6 +1389,16 @@ unpack_ifMauAutoNegEntry(GSnmpVarBind *vb, mau_mib_ifMauAutoNegEntry_t *ifMauAut
     return 0;
 }
 
+static int
+pack_ifMauAutoNegEntry(guint32 *base, gint32 ifMauIfIndex, gint32 ifMauIndex)
+{
+    int idx = 11;
+
+    base[idx++] = ifMauIfIndex;
+    base[idx++] = ifMauIndex;
+    return idx;
+}
+
 static mau_mib_ifMauAutoNegEntry_t *
 assign_ifMauAutoNegEntry(GSList *vbl)
 {
@@ -1147,7 +1406,6 @@ assign_ifMauAutoNegEntry(GSList *vbl)
     mau_mib_ifMauAutoNegEntry_t *ifMauAutoNegEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 26, 5, 1, 1};
 
     ifMauAutoNegEntry = mau_mib_new_ifMauAutoNegEntry();
     if (! ifMauAutoNegEntry) {
@@ -1166,8 +1424,8 @@ assign_ifMauAutoNegEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ifMauAutoNegEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ifMauAutoNegEntry, sizeof(oid_ifMauAutoNegEntry)/sizeof(guint32),
+                   attr_ifMauAutoNegEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -1215,8 +1473,8 @@ assign_ifMauAutoNegEntry(GSList *vbl)
     return ifMauAutoNegEntry;
 }
 
-int
-mau_mib_get_ifMauAutoNegTable(GSnmpSession *s, mau_mib_ifMauAutoNegEntry_t ***ifMauAutoNegEntry)
+void
+mau_mib_get_ifMauAutoNegTable(GSnmpSession *s, mau_mib_ifMauAutoNegEntry_t ***ifMauAutoNegEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1225,24 +1483,101 @@ mau_mib_get_ifMauAutoNegTable(GSnmpSession *s, mau_mib_ifMauAutoNegEntry_t ***if
 
     *ifMauAutoNegEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _ifMauAutoNegEntry);
+    add_attributes(s, &in, base, 11, 10, attr_ifMauAutoNegEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ifMauAutoNegEntry = (mau_mib_ifMauAutoNegEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(mau_mib_ifMauAutoNegEntry_t *));
+        if (! *ifMauAutoNegEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ifMauAutoNegEntry)[i] = assign_ifMauAutoNegEntry(row->data);
+        }
+    }
+}
+
+void
+mau_mib_get_ifMauAutoNegEntry(GSnmpSession *s, mau_mib_ifMauAutoNegEntry_t **ifMauAutoNegEntry, gint32 ifMauIfIndex, gint32 ifMauIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ifMauAutoNegEntry, sizeof(oid_ifMauAutoNegEntry));
+    len = pack_ifMauAutoNegEntry(base, ifMauIfIndex, ifMauIndex);
+    if (len < 0) {
+        g_warning("illegal ifMauAutoNegEntry index values");
+        return;
     }
 
-    *ifMauAutoNegEntry = (mau_mib_ifMauAutoNegEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(mau_mib_ifMauAutoNegEntry_t *));
-    if (! *ifMauAutoNegEntry) {
-        return -4;
+    *ifMauAutoNegEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_ifMauAutoNegEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ifMauAutoNegEntry = assign_ifMauAutoNegEntry(out);
+    }
+}
+
+void
+mau_mib_set_ifMauAutoNegEntry(GSnmpSession *s, mau_mib_ifMauAutoNegEntry_t *ifMauAutoNegEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ifMauAutoNegEntry, sizeof(oid_ifMauAutoNegEntry));
+    len = pack_ifMauAutoNegEntry(base, ifMauAutoNegEntry->ifMauIfIndex, ifMauAutoNegEntry->ifMauIndex);
+    if (len < 0) {
+        g_warning("illegal ifMauAutoNegEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ifMauAutoNegEntry)[i] = assign_ifMauAutoNegEntry(row->data);
+    if (ifMauAutoNegEntry->ifMauAutoNegAdminStatus) {
+        base[10] = 1;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ifMauAutoNegEntry->ifMauAutoNegAdminStatus,
+                       0);
+    }
+    if (ifMauAutoNegEntry->ifMauAutoNegCapAdvertised) {
+        base[10] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ifMauAutoNegEntry->ifMauAutoNegCapAdvertised,
+                       0);
+    }
+    if (ifMauAutoNegEntry->ifMauAutoNegRestart) {
+        base[10] = 8;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ifMauAutoNegEntry->ifMauAutoNegRestart,
+                       0);
+    }
+    if (ifMauAutoNegEntry->ifMauAutoNegCapAdvertisedBits) {
+        base[10] = 10;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       ifMauAutoNegEntry->ifMauAutoNegCapAdvertisedBits,
+                       ifMauAutoNegEntry->_ifMauAutoNegCapAdvertisedBitsLength);
+    }
+    if (ifMauAutoNegEntry->ifMauAutoNegRemoteFaultAdvertised) {
+        base[10] = 12;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ifMauAutoNegEntry->ifMauAutoNegRemoteFaultAdvertised,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void

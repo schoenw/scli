@@ -19,33 +19,37 @@
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -67,11 +71,13 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _snmpMPDStats[] = {
-    { 1, G_SNMP_COUNTER32, "snmpUnknownSecurityModels" },
-    { 2, G_SNMP_COUNTER32, "snmpInvalidMsgs" },
-    { 3, G_SNMP_COUNTER32, "snmpUnknownPDUHandlers" },
-    { 0, 0, NULL }
+static guint32 const oid_snmpMPDStats[] = {1, 3, 6, 1, 6, 3, 11, 2, 1};
+
+static attribute_t attr_snmpMPDStats[] = {
+    { 1, G_SNMP_COUNTER32, SNMP_MPD_MIB_SNMPUNKNOWNSECURITYMODELS, "snmpUnknownSecurityModels" },
+    { 2, G_SNMP_COUNTER32, SNMP_MPD_MIB_SNMPINVALIDMSGS, "snmpInvalidMsgs" },
+    { 3, G_SNMP_COUNTER32, SNMP_MPD_MIB_SNMPUNKNOWNPDUHANDLERS, "snmpUnknownPDUHandlers" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -91,7 +97,6 @@ assign_snmpMPDStats(GSList *vbl)
     snmp_mpd_mib_snmpMPDStats_t *snmpMPDStats;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 6, 3, 11, 2, 1};
 
     snmpMPDStats = snmp_mpd_mib_new_snmpMPDStats();
     if (! snmpMPDStats) {
@@ -104,8 +109,8 @@ assign_snmpMPDStats(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _snmpMPDStats, &idx) < 0) continue;
+        if (lookup(vb, oid_snmpMPDStats, sizeof(oid_snmpMPDStats)/sizeof(guint32),
+                   attr_snmpMPDStats, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -123,25 +128,21 @@ assign_snmpMPDStats(GSList *vbl)
     return snmpMPDStats;
 }
 
-int
-snmp_mpd_mib_get_snmpMPDStats(GSnmpSession *s, snmp_mpd_mib_snmpMPDStats_t **snmpMPDStats)
+void
+snmp_mpd_mib_get_snmpMPDStats(GSnmpSession *s, snmp_mpd_mib_snmpMPDStats_t **snmpMPDStats, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 6, 3, 11, 2, 1, 0};
 
     *snmpMPDStats = NULL;
 
-    add_attributes(s, &in, base, 9, _snmpMPDStats);
+    add_attributes(s, &in, base, 10, 9, attr_snmpMPDStats, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *snmpMPDStats = assign_snmpMPDStats(out);
     }
-
-    *snmpMPDStats = assign_snmpMPDStats(out);
-
-    return 0;
 }
 
 void

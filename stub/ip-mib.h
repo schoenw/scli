@@ -42,6 +42,27 @@ extern GSnmpEnum const ip_mib_enums_ipNetToMediaType[];
  * C type definitions for IP-MIB::ip.
  */
 
+#define IP_MIB_IPFORWARDING	0x1 
+#define IP_MIB_IPDEFAULTTTL	0x2 
+#define IP_MIB_IPINRECEIVES	0x4 
+#define IP_MIB_IPINHDRERRORS	0x8 
+#define IP_MIB_IPINADDRERRORS	0x10 
+#define IP_MIB_IPFORWDATAGRAMS	0x20 
+#define IP_MIB_IPINUNKNOWNPROTOS	0x40 
+#define IP_MIB_IPINDISCARDS	0x80 
+#define IP_MIB_IPINDELIVERS	0x100 
+#define IP_MIB_IPOUTREQUESTS	0x200 
+#define IP_MIB_IPOUTDISCARDS	0x400 
+#define IP_MIB_IPOUTNOROUTES	0x800 
+#define IP_MIB_IPREASMTIMEOUT	0x1000 
+#define IP_MIB_IPREASMREQDS	0x2000 
+#define IP_MIB_IPREASMOKS	0x4000 
+#define IP_MIB_IPREASMFAILS	0x8000 
+#define IP_MIB_IPFRAGOKS	0x10000 
+#define IP_MIB_IPFRAGFAILS	0x20000 
+#define IP_MIB_IPFRAGCREATES	0x40000 
+#define IP_MIB_IPROUTINGDISCARDS	0x80000 
+
 typedef struct {
     gint32   *ipForwarding;
     gint32   *ipDefaultTTL;
@@ -66,13 +87,13 @@ typedef struct {
 } ip_mib_ip_t;
 
 extern ip_mib_ip_t *
-ip_mib_new_ip();
+ip_mib_new_ip(void);
 
-extern int
-ip_mib_get_ip(GSnmpSession *s, ip_mib_ip_t **ip);
+extern void
+ip_mib_get_ip(GSnmpSession *s, ip_mib_ip_t **ip, gint mask);
 
-extern int
-ip_mib_set_ip(GSnmpSession *s, ip_mib_ip_t *ip);
+extern void
+ip_mib_set_ip(GSnmpSession *s, ip_mib_ip_t *ip, gint mask);
 
 extern void
 ip_mib_free_ip(ip_mib_ip_t *ip);
@@ -80,6 +101,12 @@ ip_mib_free_ip(ip_mib_ip_t *ip);
 /*
  * C type definitions for IP-MIB::ipAddrEntry.
  */
+
+#define IP_MIB_IPADENTADDR	0x1 
+#define IP_MIB_IPADENTIFINDEX	0x2 
+#define IP_MIB_IPADENTNETMASK	0x4 
+#define IP_MIB_IPADENTBCASTADDR	0x8 
+#define IP_MIB_IPADENTREASMMAXSIZE	0x10 
 
 typedef struct {
     guchar   ipAdEntAddr[4];
@@ -89,17 +116,17 @@ typedef struct {
     gint32   *ipAdEntReasmMaxSize;
 } ip_mib_ipAddrEntry_t;
 
-extern int
-ip_mib_get_ipAddrTable(GSnmpSession *s, ip_mib_ipAddrEntry_t ***ipAddrEntry);
+extern void
+ip_mib_get_ipAddrTable(GSnmpSession *s, ip_mib_ipAddrEntry_t ***ipAddrEntry, gint mask);
 
 extern void
 ip_mib_free_ipAddrTable(ip_mib_ipAddrEntry_t **ipAddrEntry);
 
 extern ip_mib_ipAddrEntry_t *
-ip_mib_new_ipAddrEntry();
+ip_mib_new_ipAddrEntry(void);
 
-extern int
-ip_mib_get_ipAddrEntry(GSnmpSession *s, ip_mib_ipAddrEntry_t **ipAddrEntry);
+extern void
+ip_mib_get_ipAddrEntry(GSnmpSession *s, ip_mib_ipAddrEntry_t **ipAddrEntry, guchar *ipAdEntAddr, gint mask);
 
 extern void
 ip_mib_free_ipAddrEntry(ip_mib_ipAddrEntry_t *ipAddrEntry);
@@ -107,6 +134,11 @@ ip_mib_free_ipAddrEntry(ip_mib_ipAddrEntry_t *ipAddrEntry);
 /*
  * C type definitions for IP-MIB::ipNetToMediaEntry.
  */
+
+#define IP_MIB_IPNETTOMEDIAIFINDEX	0x1 
+#define IP_MIB_IPNETTOMEDIAPHYSADDRESS	0x2 
+#define IP_MIB_IPNETTOMEDIANETADDRESS	0x4 
+#define IP_MIB_IPNETTOMEDIATYPE	0x8 
 
 typedef struct {
     gint32   ipNetToMediaIfIndex;
@@ -116,20 +148,20 @@ typedef struct {
     gint32   *ipNetToMediaType;
 } ip_mib_ipNetToMediaEntry_t;
 
-extern int
-ip_mib_get_ipNetToMediaTable(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry);
+extern void
+ip_mib_get_ipNetToMediaTable(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry, gint mask);
 
 extern void
 ip_mib_free_ipNetToMediaTable(ip_mib_ipNetToMediaEntry_t **ipNetToMediaEntry);
 
 extern ip_mib_ipNetToMediaEntry_t *
-ip_mib_new_ipNetToMediaEntry();
+ip_mib_new_ipNetToMediaEntry(void);
 
-extern int
-ip_mib_get_ipNetToMediaEntry(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t **ipNetToMediaEntry);
+extern void
+ip_mib_get_ipNetToMediaEntry(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t **ipNetToMediaEntry, gint32 ipNetToMediaIfIndex, guchar *ipNetToMediaNetAddress, gint mask);
 
-extern int
-ip_mib_set_ipNetToMediaEntry(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry);
+extern void
+ip_mib_set_ipNetToMediaEntry(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry, gint mask);
 
 extern void
 ip_mib_free_ipNetToMediaEntry(ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry);
@@ -137,6 +169,33 @@ ip_mib_free_ipNetToMediaEntry(ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry);
 /*
  * C type definitions for IP-MIB::icmp.
  */
+
+#define IP_MIB_ICMPINMSGS	0x1 
+#define IP_MIB_ICMPINERRORS	0x2 
+#define IP_MIB_ICMPINDESTUNREACHS	0x4 
+#define IP_MIB_ICMPINTIMEEXCDS	0x8 
+#define IP_MIB_ICMPINPARMPROBS	0x10 
+#define IP_MIB_ICMPINSRCQUENCHS	0x20 
+#define IP_MIB_ICMPINREDIRECTS	0x40 
+#define IP_MIB_ICMPINECHOS	0x80 
+#define IP_MIB_ICMPINECHOREPS	0x100 
+#define IP_MIB_ICMPINTIMESTAMPS	0x200 
+#define IP_MIB_ICMPINTIMESTAMPREPS	0x400 
+#define IP_MIB_ICMPINADDRMASKS	0x800 
+#define IP_MIB_ICMPINADDRMASKREPS	0x1000 
+#define IP_MIB_ICMPOUTMSGS	0x2000 
+#define IP_MIB_ICMPOUTERRORS	0x4000 
+#define IP_MIB_ICMPOUTDESTUNREACHS	0x8000 
+#define IP_MIB_ICMPOUTTIMEEXCDS	0x10000 
+#define IP_MIB_ICMPOUTPARMPROBS	0x20000 
+#define IP_MIB_ICMPOUTSRCQUENCHS	0x40000 
+#define IP_MIB_ICMPOUTREDIRECTS	0x80000 
+#define IP_MIB_ICMPOUTECHOS	0x100000 
+#define IP_MIB_ICMPOUTECHOREPS	0x200000 
+#define IP_MIB_ICMPOUTTIMESTAMPS	0x400000 
+#define IP_MIB_ICMPOUTTIMESTAMPREPS	0x800000 
+#define IP_MIB_ICMPOUTADDRMASKS	0x1000000 
+#define IP_MIB_ICMPOUTADDRMASKREPS	0x2000000 
 
 typedef struct {
     guint32  *icmpInMsgs;
@@ -168,10 +227,10 @@ typedef struct {
 } ip_mib_icmp_t;
 
 extern ip_mib_icmp_t *
-ip_mib_new_icmp();
+ip_mib_new_icmp(void);
 
-extern int
-ip_mib_get_icmp(GSnmpSession *s, ip_mib_icmp_t **icmp);
+extern void
+ip_mib_get_icmp(GSnmpSession *s, ip_mib_icmp_t **icmp, gint mask);
 
 extern void
 ip_mib_free_icmp(ip_mib_icmp_t *icmp);

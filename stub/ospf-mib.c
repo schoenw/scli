@@ -283,33 +283,37 @@ GSnmpEnum const ospf_mib_enums_ospfAreaAggregateEffect[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -331,142 +335,168 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _ospfGeneralGroup[] = {
-    { 1, G_SNMP_IPADDRESS, "ospfRouterId" },
-    { 2, G_SNMP_INTEGER32, "ospfAdminStat" },
-    { 3, G_SNMP_INTEGER32, "ospfVersionNumber" },
-    { 4, G_SNMP_INTEGER32, "ospfAreaBdrRtrStatus" },
-    { 5, G_SNMP_INTEGER32, "ospfASBdrRtrStatus" },
-    { 6, G_SNMP_UNSIGNED32, "ospfExternLsaCount" },
-    { 7, G_SNMP_INTEGER32, "ospfExternLsaCksumSum" },
-    { 8, G_SNMP_INTEGER32, "ospfTOSSupport" },
-    { 9, G_SNMP_COUNTER32, "ospfOriginateNewLsas" },
-    { 10, G_SNMP_COUNTER32, "ospfRxNewLsas" },
-    { 11, G_SNMP_INTEGER32, "ospfExtLsdbLimit" },
-    { 12, G_SNMP_INTEGER32, "ospfMulticastExtensions" },
-    { 13, G_SNMP_INTEGER32, "ospfExitOverflowInterval" },
-    { 14, G_SNMP_INTEGER32, "ospfDemandExtensions" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfGeneralGroup[] = {1, 3, 6, 1, 2, 1, 14, 1};
+
+static attribute_t attr_ospfGeneralGroup[] = {
+    { 1, G_SNMP_IPADDRESS, OSPF_MIB_OSPFROUTERID, "ospfRouterId" },
+    { 2, G_SNMP_INTEGER32, OSPF_MIB_OSPFADMINSTAT, "ospfAdminStat" },
+    { 3, G_SNMP_INTEGER32, OSPF_MIB_OSPFVERSIONNUMBER, "ospfVersionNumber" },
+    { 4, G_SNMP_INTEGER32, OSPF_MIB_OSPFAREABDRRTRSTATUS, "ospfAreaBdrRtrStatus" },
+    { 5, G_SNMP_INTEGER32, OSPF_MIB_OSPFASBDRRTRSTATUS, "ospfASBdrRtrStatus" },
+    { 6, G_SNMP_UNSIGNED32, OSPF_MIB_OSPFEXTERNLSACOUNT, "ospfExternLsaCount" },
+    { 7, G_SNMP_INTEGER32, OSPF_MIB_OSPFEXTERNLSACKSUMSUM, "ospfExternLsaCksumSum" },
+    { 8, G_SNMP_INTEGER32, OSPF_MIB_OSPFTOSSUPPORT, "ospfTOSSupport" },
+    { 9, G_SNMP_COUNTER32, OSPF_MIB_OSPFORIGINATENEWLSAS, "ospfOriginateNewLsas" },
+    { 10, G_SNMP_COUNTER32, OSPF_MIB_OSPFRXNEWLSAS, "ospfRxNewLsas" },
+    { 11, G_SNMP_INTEGER32, OSPF_MIB_OSPFEXTLSDBLIMIT, "ospfExtLsdbLimit" },
+    { 12, G_SNMP_INTEGER32, OSPF_MIB_OSPFMULTICASTEXTENSIONS, "ospfMulticastExtensions" },
+    { 13, G_SNMP_INTEGER32, OSPF_MIB_OSPFEXITOVERFLOWINTERVAL, "ospfExitOverflowInterval" },
+    { 14, G_SNMP_INTEGER32, OSPF_MIB_OSPFDEMANDEXTENSIONS, "ospfDemandExtensions" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ospfAreaEntry[] = {
-    { 2, G_SNMP_INTEGER32, "ospfAuthType" },
-    { 3, G_SNMP_INTEGER32, "ospfImportAsExtern" },
-    { 4, G_SNMP_COUNTER32, "ospfSpfRuns" },
-    { 5, G_SNMP_UNSIGNED32, "ospfAreaBdrRtrCount" },
-    { 6, G_SNMP_UNSIGNED32, "ospfAsBdrRtrCount" },
-    { 7, G_SNMP_UNSIGNED32, "ospfAreaLsaCount" },
-    { 8, G_SNMP_INTEGER32, "ospfAreaLsaCksumSum" },
-    { 9, G_SNMP_INTEGER32, "ospfAreaSummary" },
-    { 10, G_SNMP_INTEGER32, "ospfAreaStatus" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfAreaEntry[] = {1, 3, 6, 1, 2, 1, 14, 2, 1};
+
+static attribute_t attr_ospfAreaEntry[] = {
+    { 2, G_SNMP_INTEGER32, OSPF_MIB_OSPFAUTHTYPE, "ospfAuthType" },
+    { 3, G_SNMP_INTEGER32, OSPF_MIB_OSPFIMPORTASEXTERN, "ospfImportAsExtern" },
+    { 4, G_SNMP_COUNTER32, OSPF_MIB_OSPFSPFRUNS, "ospfSpfRuns" },
+    { 5, G_SNMP_UNSIGNED32, OSPF_MIB_OSPFAREABDRRTRCOUNT, "ospfAreaBdrRtrCount" },
+    { 6, G_SNMP_UNSIGNED32, OSPF_MIB_OSPFASBDRRTRCOUNT, "ospfAsBdrRtrCount" },
+    { 7, G_SNMP_UNSIGNED32, OSPF_MIB_OSPFAREALSACOUNT, "ospfAreaLsaCount" },
+    { 8, G_SNMP_INTEGER32, OSPF_MIB_OSPFAREALSACKSUMSUM, "ospfAreaLsaCksumSum" },
+    { 9, G_SNMP_INTEGER32, OSPF_MIB_OSPFAREASUMMARY, "ospfAreaSummary" },
+    { 10, G_SNMP_INTEGER32, OSPF_MIB_OSPFAREASTATUS, "ospfAreaStatus" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ospfStubAreaEntry[] = {
-    { 3, G_SNMP_INTEGER32, "ospfStubMetric" },
-    { 4, G_SNMP_INTEGER32, "ospfStubStatus" },
-    { 5, G_SNMP_INTEGER32, "ospfStubMetricType" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfStubAreaEntry[] = {1, 3, 6, 1, 2, 1, 14, 3, 1};
+
+static attribute_t attr_ospfStubAreaEntry[] = {
+    { 3, G_SNMP_INTEGER32, OSPF_MIB_OSPFSTUBMETRIC, "ospfStubMetric" },
+    { 4, G_SNMP_INTEGER32, OSPF_MIB_OSPFSTUBSTATUS, "ospfStubStatus" },
+    { 5, G_SNMP_INTEGER32, OSPF_MIB_OSPFSTUBMETRICTYPE, "ospfStubMetricType" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ospfLsdbEntry[] = {
-    { 5, G_SNMP_INTEGER32, "ospfLsdbSequence" },
-    { 6, G_SNMP_INTEGER32, "ospfLsdbAge" },
-    { 7, G_SNMP_INTEGER32, "ospfLsdbChecksum" },
-    { 8, G_SNMP_OCTET_STRING, "ospfLsdbAdvertisement" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfLsdbEntry[] = {1, 3, 6, 1, 2, 1, 14, 4, 1};
+
+static attribute_t attr_ospfLsdbEntry[] = {
+    { 5, G_SNMP_INTEGER32, OSPF_MIB_OSPFLSDBSEQUENCE, "ospfLsdbSequence" },
+    { 6, G_SNMP_INTEGER32, OSPF_MIB_OSPFLSDBAGE, "ospfLsdbAge" },
+    { 7, G_SNMP_INTEGER32, OSPF_MIB_OSPFLSDBCHECKSUM, "ospfLsdbChecksum" },
+    { 8, G_SNMP_OCTET_STRING, OSPF_MIB_OSPFLSDBADVERTISEMENT, "ospfLsdbAdvertisement" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ospfAreaRangeEntry[] = {
-    { 3, G_SNMP_IPADDRESS, "ospfAreaRangeMask" },
-    { 4, G_SNMP_INTEGER32, "ospfAreaRangeStatus" },
-    { 5, G_SNMP_INTEGER32, "ospfAreaRangeEffect" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfAreaRangeEntry[] = {1, 3, 6, 1, 2, 1, 14, 5, 1};
+
+static attribute_t attr_ospfAreaRangeEntry[] = {
+    { 3, G_SNMP_IPADDRESS, OSPF_MIB_OSPFAREARANGEMASK, "ospfAreaRangeMask" },
+    { 4, G_SNMP_INTEGER32, OSPF_MIB_OSPFAREARANGESTATUS, "ospfAreaRangeStatus" },
+    { 5, G_SNMP_INTEGER32, OSPF_MIB_OSPFAREARANGEEFFECT, "ospfAreaRangeEffect" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ospfHostEntry[] = {
-    { 3, G_SNMP_INTEGER32, "ospfHostMetric" },
-    { 4, G_SNMP_INTEGER32, "ospfHostStatus" },
-    { 5, G_SNMP_IPADDRESS, "ospfHostAreaID" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfHostEntry[] = {1, 3, 6, 1, 2, 1, 14, 6, 1};
+
+static attribute_t attr_ospfHostEntry[] = {
+    { 3, G_SNMP_INTEGER32, OSPF_MIB_OSPFHOSTMETRIC, "ospfHostMetric" },
+    { 4, G_SNMP_INTEGER32, OSPF_MIB_OSPFHOSTSTATUS, "ospfHostStatus" },
+    { 5, G_SNMP_IPADDRESS, OSPF_MIB_OSPFHOSTAREAID, "ospfHostAreaID" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ospfIfEntry[] = {
-    { 3, G_SNMP_IPADDRESS, "ospfIfAreaId" },
-    { 4, G_SNMP_INTEGER32, "ospfIfType" },
-    { 5, G_SNMP_INTEGER32, "ospfIfAdminStat" },
-    { 6, G_SNMP_INTEGER32, "ospfIfRtrPriority" },
-    { 7, G_SNMP_INTEGER32, "ospfIfTransitDelay" },
-    { 8, G_SNMP_INTEGER32, "ospfIfRetransInterval" },
-    { 9, G_SNMP_INTEGER32, "ospfIfHelloInterval" },
-    { 10, G_SNMP_INTEGER32, "ospfIfRtrDeadInterval" },
-    { 11, G_SNMP_INTEGER32, "ospfIfPollInterval" },
-    { 12, G_SNMP_INTEGER32, "ospfIfState" },
-    { 13, G_SNMP_IPADDRESS, "ospfIfDesignatedRouter" },
-    { 14, G_SNMP_IPADDRESS, "ospfIfBackupDesignatedRouter" },
-    { 15, G_SNMP_COUNTER32, "ospfIfEvents" },
-    { 16, G_SNMP_OCTET_STRING, "ospfIfAuthKey" },
-    { 17, G_SNMP_INTEGER32, "ospfIfStatus" },
-    { 18, G_SNMP_INTEGER32, "ospfIfMulticastForwarding" },
-    { 19, G_SNMP_INTEGER32, "ospfIfDemand" },
-    { 20, G_SNMP_INTEGER32, "ospfIfAuthType" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfIfEntry[] = {1, 3, 6, 1, 2, 1, 14, 7, 1};
+
+static attribute_t attr_ospfIfEntry[] = {
+    { 3, G_SNMP_IPADDRESS, OSPF_MIB_OSPFIFAREAID, "ospfIfAreaId" },
+    { 4, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFTYPE, "ospfIfType" },
+    { 5, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFADMINSTAT, "ospfIfAdminStat" },
+    { 6, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFRTRPRIORITY, "ospfIfRtrPriority" },
+    { 7, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFTRANSITDELAY, "ospfIfTransitDelay" },
+    { 8, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFRETRANSINTERVAL, "ospfIfRetransInterval" },
+    { 9, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFHELLOINTERVAL, "ospfIfHelloInterval" },
+    { 10, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFRTRDEADINTERVAL, "ospfIfRtrDeadInterval" },
+    { 11, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFPOLLINTERVAL, "ospfIfPollInterval" },
+    { 12, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFSTATE, "ospfIfState" },
+    { 13, G_SNMP_IPADDRESS, OSPF_MIB_OSPFIFDESIGNATEDROUTER, "ospfIfDesignatedRouter" },
+    { 14, G_SNMP_IPADDRESS, OSPF_MIB_OSPFIFBACKUPDESIGNATEDROUTER, "ospfIfBackupDesignatedRouter" },
+    { 15, G_SNMP_COUNTER32, OSPF_MIB_OSPFIFEVENTS, "ospfIfEvents" },
+    { 16, G_SNMP_OCTET_STRING, OSPF_MIB_OSPFIFAUTHKEY, "ospfIfAuthKey" },
+    { 17, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFSTATUS, "ospfIfStatus" },
+    { 18, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFMULTICASTFORWARDING, "ospfIfMulticastForwarding" },
+    { 19, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFDEMAND, "ospfIfDemand" },
+    { 20, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFAUTHTYPE, "ospfIfAuthType" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ospfIfMetricEntry[] = {
-    { 4, G_SNMP_INTEGER32, "ospfIfMetricValue" },
-    { 5, G_SNMP_INTEGER32, "ospfIfMetricStatus" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfIfMetricEntry[] = {1, 3, 6, 1, 2, 1, 14, 8, 1};
+
+static attribute_t attr_ospfIfMetricEntry[] = {
+    { 4, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFMETRICVALUE, "ospfIfMetricValue" },
+    { 5, G_SNMP_INTEGER32, OSPF_MIB_OSPFIFMETRICSTATUS, "ospfIfMetricStatus" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ospfVirtIfEntry[] = {
-    { 3, G_SNMP_INTEGER32, "ospfVirtIfTransitDelay" },
-    { 4, G_SNMP_INTEGER32, "ospfVirtIfRetransInterval" },
-    { 5, G_SNMP_INTEGER32, "ospfVirtIfHelloInterval" },
-    { 6, G_SNMP_INTEGER32, "ospfVirtIfRtrDeadInterval" },
-    { 7, G_SNMP_INTEGER32, "ospfVirtIfState" },
-    { 8, G_SNMP_COUNTER32, "ospfVirtIfEvents" },
-    { 9, G_SNMP_OCTET_STRING, "ospfVirtIfAuthKey" },
-    { 10, G_SNMP_INTEGER32, "ospfVirtIfStatus" },
-    { 11, G_SNMP_INTEGER32, "ospfVirtIfAuthType" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfVirtIfEntry[] = {1, 3, 6, 1, 2, 1, 14, 9, 1};
+
+static attribute_t attr_ospfVirtIfEntry[] = {
+    { 3, G_SNMP_INTEGER32, OSPF_MIB_OSPFVIRTIFTRANSITDELAY, "ospfVirtIfTransitDelay" },
+    { 4, G_SNMP_INTEGER32, OSPF_MIB_OSPFVIRTIFRETRANSINTERVAL, "ospfVirtIfRetransInterval" },
+    { 5, G_SNMP_INTEGER32, OSPF_MIB_OSPFVIRTIFHELLOINTERVAL, "ospfVirtIfHelloInterval" },
+    { 6, G_SNMP_INTEGER32, OSPF_MIB_OSPFVIRTIFRTRDEADINTERVAL, "ospfVirtIfRtrDeadInterval" },
+    { 7, G_SNMP_INTEGER32, OSPF_MIB_OSPFVIRTIFSTATE, "ospfVirtIfState" },
+    { 8, G_SNMP_COUNTER32, OSPF_MIB_OSPFVIRTIFEVENTS, "ospfVirtIfEvents" },
+    { 9, G_SNMP_OCTET_STRING, OSPF_MIB_OSPFVIRTIFAUTHKEY, "ospfVirtIfAuthKey" },
+    { 10, G_SNMP_INTEGER32, OSPF_MIB_OSPFVIRTIFSTATUS, "ospfVirtIfStatus" },
+    { 11, G_SNMP_INTEGER32, OSPF_MIB_OSPFVIRTIFAUTHTYPE, "ospfVirtIfAuthType" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ospfNbrEntry[] = {
-    { 3, G_SNMP_IPADDRESS, "ospfNbrRtrId" },
-    { 4, G_SNMP_INTEGER32, "ospfNbrOptions" },
-    { 5, G_SNMP_INTEGER32, "ospfNbrPriority" },
-    { 6, G_SNMP_INTEGER32, "ospfNbrState" },
-    { 7, G_SNMP_COUNTER32, "ospfNbrEvents" },
-    { 8, G_SNMP_UNSIGNED32, "ospfNbrLsRetransQLen" },
-    { 9, G_SNMP_INTEGER32, "ospfNbmaNbrStatus" },
-    { 10, G_SNMP_INTEGER32, "ospfNbmaNbrPermanence" },
-    { 11, G_SNMP_INTEGER32, "ospfNbrHelloSuppressed" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfNbrEntry[] = {1, 3, 6, 1, 2, 1, 14, 10, 1};
+
+static attribute_t attr_ospfNbrEntry[] = {
+    { 3, G_SNMP_IPADDRESS, OSPF_MIB_OSPFNBRRTRID, "ospfNbrRtrId" },
+    { 4, G_SNMP_INTEGER32, OSPF_MIB_OSPFNBROPTIONS, "ospfNbrOptions" },
+    { 5, G_SNMP_INTEGER32, OSPF_MIB_OSPFNBRPRIORITY, "ospfNbrPriority" },
+    { 6, G_SNMP_INTEGER32, OSPF_MIB_OSPFNBRSTATE, "ospfNbrState" },
+    { 7, G_SNMP_COUNTER32, OSPF_MIB_OSPFNBREVENTS, "ospfNbrEvents" },
+    { 8, G_SNMP_UNSIGNED32, OSPF_MIB_OSPFNBRLSRETRANSQLEN, "ospfNbrLsRetransQLen" },
+    { 9, G_SNMP_INTEGER32, OSPF_MIB_OSPFNBMANBRSTATUS, "ospfNbmaNbrStatus" },
+    { 10, G_SNMP_INTEGER32, OSPF_MIB_OSPFNBMANBRPERMANENCE, "ospfNbmaNbrPermanence" },
+    { 11, G_SNMP_INTEGER32, OSPF_MIB_OSPFNBRHELLOSUPPRESSED, "ospfNbrHelloSuppressed" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ospfVirtNbrEntry[] = {
-    { 3, G_SNMP_IPADDRESS, "ospfVirtNbrIpAddr" },
-    { 4, G_SNMP_INTEGER32, "ospfVirtNbrOptions" },
-    { 5, G_SNMP_INTEGER32, "ospfVirtNbrState" },
-    { 6, G_SNMP_COUNTER32, "ospfVirtNbrEvents" },
-    { 7, G_SNMP_UNSIGNED32, "ospfVirtNbrLsRetransQLen" },
-    { 8, G_SNMP_INTEGER32, "ospfVirtNbrHelloSuppressed" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfVirtNbrEntry[] = {1, 3, 6, 1, 2, 1, 14, 11, 1};
+
+static attribute_t attr_ospfVirtNbrEntry[] = {
+    { 3, G_SNMP_IPADDRESS, OSPF_MIB_OSPFVIRTNBRIPADDR, "ospfVirtNbrIpAddr" },
+    { 4, G_SNMP_INTEGER32, OSPF_MIB_OSPFVIRTNBROPTIONS, "ospfVirtNbrOptions" },
+    { 5, G_SNMP_INTEGER32, OSPF_MIB_OSPFVIRTNBRSTATE, "ospfVirtNbrState" },
+    { 6, G_SNMP_COUNTER32, OSPF_MIB_OSPFVIRTNBREVENTS, "ospfVirtNbrEvents" },
+    { 7, G_SNMP_UNSIGNED32, OSPF_MIB_OSPFVIRTNBRLSRETRANSQLEN, "ospfVirtNbrLsRetransQLen" },
+    { 8, G_SNMP_INTEGER32, OSPF_MIB_OSPFVIRTNBRHELLOSUPPRESSED, "ospfVirtNbrHelloSuppressed" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ospfExtLsdbEntry[] = {
-    { 4, G_SNMP_INTEGER32, "ospfExtLsdbSequence" },
-    { 5, G_SNMP_INTEGER32, "ospfExtLsdbAge" },
-    { 6, G_SNMP_INTEGER32, "ospfExtLsdbChecksum" },
-    { 7, G_SNMP_OCTET_STRING, "ospfExtLsdbAdvertisement" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfExtLsdbEntry[] = {1, 3, 6, 1, 2, 1, 14, 12, 1};
+
+static attribute_t attr_ospfExtLsdbEntry[] = {
+    { 4, G_SNMP_INTEGER32, OSPF_MIB_OSPFEXTLSDBSEQUENCE, "ospfExtLsdbSequence" },
+    { 5, G_SNMP_INTEGER32, OSPF_MIB_OSPFEXTLSDBAGE, "ospfExtLsdbAge" },
+    { 6, G_SNMP_INTEGER32, OSPF_MIB_OSPFEXTLSDBCHECKSUM, "ospfExtLsdbChecksum" },
+    { 7, G_SNMP_OCTET_STRING, OSPF_MIB_OSPFEXTLSDBADVERTISEMENT, "ospfExtLsdbAdvertisement" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ospfAreaAggregateEntry[] = {
-    { 5, G_SNMP_INTEGER32, "ospfAreaAggregateStatus" },
-    { 6, G_SNMP_INTEGER32, "ospfAreaAggregateEffect" },
-    { 0, 0, NULL }
+static guint32 const oid_ospfAreaAggregateEntry[] = {1, 3, 6, 1, 2, 1, 14, 14, 1};
+
+static attribute_t attr_ospfAreaAggregateEntry[] = {
+    { 5, G_SNMP_INTEGER32, OSPF_MIB_OSPFAREAAGGREGATESTATUS, "ospfAreaAggregateStatus" },
+    { 6, G_SNMP_INTEGER32, OSPF_MIB_OSPFAREAAGGREGATEEFFECT, "ospfAreaAggregateEffect" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -486,7 +516,6 @@ assign_ospfGeneralGroup(GSList *vbl)
     ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 1};
 
     ospfGeneralGroup = ospf_mib_new_ospfGeneralGroup();
     if (! ospfGeneralGroup) {
@@ -499,8 +528,8 @@ assign_ospfGeneralGroup(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfGeneralGroup, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfGeneralGroup, sizeof(oid_ospfGeneralGroup)/sizeof(guint32),
+                   attr_ospfGeneralGroup, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -551,29 +580,25 @@ assign_ospfGeneralGroup(GSList *vbl)
     return ospfGeneralGroup;
 }
 
-int
-ospf_mib_get_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t **ospfGeneralGroup)
+void
+ospf_mib_get_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t **ospfGeneralGroup, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 14, 1, 0};
 
     *ospfGeneralGroup = NULL;
 
-    add_attributes(s, &in, base, 8, _ospfGeneralGroup);
+    add_attributes(s, &in, base, 9, 8, attr_ospfGeneralGroup, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *ospfGeneralGroup = assign_ospfGeneralGroup(out);
     }
-
-    *ospfGeneralGroup = assign_ospfGeneralGroup(out);
-
-    return 0;
 }
 
-int
-ospf_mib_set_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup)
+void
+ospf_mib_set_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 14, 1, 0, 0};
@@ -637,12 +662,9 @@ ospf_mib_set_ospfGeneralGroup(GSnmpSession *s, ospf_mib_ospfGeneralGroup_t *ospf
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void
@@ -682,6 +704,19 @@ unpack_ospfAreaEntry(GSnmpVarBind *vb, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
     return 0;
 }
 
+static int
+pack_ospfAreaEntry(guint32 *base, guchar *ospfAreaId)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfAreaId[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static ospf_mib_ospfAreaEntry_t *
 assign_ospfAreaEntry(GSList *vbl)
 {
@@ -689,7 +724,6 @@ assign_ospfAreaEntry(GSList *vbl)
     ospf_mib_ospfAreaEntry_t *ospfAreaEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 2, 1};
 
     ospfAreaEntry = ospf_mib_new_ospfAreaEntry();
     if (! ospfAreaEntry) {
@@ -708,8 +742,8 @@ assign_ospfAreaEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfAreaEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfAreaEntry, sizeof(oid_ospfAreaEntry)/sizeof(guint32),
+                   attr_ospfAreaEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -745,8 +779,8 @@ assign_ospfAreaEntry(GSList *vbl)
     return ospfAreaEntry;
 }
 
-int
-ospf_mib_get_ospfAreaTable(GSnmpSession *s, ospf_mib_ospfAreaEntry_t ***ospfAreaEntry)
+void
+ospf_mib_get_ospfAreaTable(GSnmpSession *s, ospf_mib_ospfAreaEntry_t ***ospfAreaEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -755,24 +789,95 @@ ospf_mib_get_ospfAreaTable(GSnmpSession *s, ospf_mib_ospfAreaEntry_t ***ospfArea
 
     *ospfAreaEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ospfAreaEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ospfAreaEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ospfAreaEntry = (ospf_mib_ospfAreaEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfAreaEntry_t *));
+        if (! *ospfAreaEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ospfAreaEntry)[i] = assign_ospfAreaEntry(row->data);
+        }
+    }
+}
+
+void
+ospf_mib_get_ospfAreaEntry(GSnmpSession *s, ospf_mib_ospfAreaEntry_t **ospfAreaEntry, guchar *ospfAreaId, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfAreaEntry, sizeof(oid_ospfAreaEntry));
+    len = pack_ospfAreaEntry(base, ospfAreaId);
+    if (len < 0) {
+        g_warning("illegal ospfAreaEntry index values");
+        return;
     }
 
-    *ospfAreaEntry = (ospf_mib_ospfAreaEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfAreaEntry_t *));
-    if (! *ospfAreaEntry) {
-        return -4;
+    *ospfAreaEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ospfAreaEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ospfAreaEntry = assign_ospfAreaEntry(out);
+    }
+}
+
+void
+ospf_mib_set_ospfAreaEntry(GSnmpSession *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfAreaEntry, sizeof(oid_ospfAreaEntry));
+    len = pack_ospfAreaEntry(base, ospfAreaEntry->ospfAreaId);
+    if (len < 0) {
+        g_warning("illegal ospfAreaEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ospfAreaEntry)[i] = assign_ospfAreaEntry(row->data);
+    if (ospfAreaEntry->ospfAuthType) {
+        base[9] = 2;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfAreaEntry->ospfAuthType,
+                       0);
+    }
+    if (ospfAreaEntry->ospfImportAsExtern) {
+        base[9] = 3;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfAreaEntry->ospfImportAsExtern,
+                       0);
+    }
+    if (ospfAreaEntry->ospfAreaSummary) {
+        base[9] = 9;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfAreaEntry->ospfAreaSummary,
+                       0);
+    }
+    if (ospfAreaEntry->ospfAreaStatus) {
+        base[9] = 10;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfAreaEntry->ospfAreaStatus,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -827,6 +932,20 @@ unpack_ospfStubAreaEntry(GSnmpVarBind *vb, ospf_mib_ospfStubAreaEntry_t *ospfStu
     return 0;
 }
 
+static int
+pack_ospfStubAreaEntry(guint32 *base, guchar *ospfStubAreaId, gint32 ospfStubTOS)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfStubAreaId[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = ospfStubTOS;
+    return idx;
+}
+
 static ospf_mib_ospfStubAreaEntry_t *
 assign_ospfStubAreaEntry(GSList *vbl)
 {
@@ -834,7 +953,6 @@ assign_ospfStubAreaEntry(GSList *vbl)
     ospf_mib_ospfStubAreaEntry_t *ospfStubAreaEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 3, 1};
 
     ospfStubAreaEntry = ospf_mib_new_ospfStubAreaEntry();
     if (! ospfStubAreaEntry) {
@@ -853,8 +971,8 @@ assign_ospfStubAreaEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfStubAreaEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfStubAreaEntry, sizeof(oid_ospfStubAreaEntry)/sizeof(guint32),
+                   attr_ospfStubAreaEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -872,8 +990,8 @@ assign_ospfStubAreaEntry(GSList *vbl)
     return ospfStubAreaEntry;
 }
 
-int
-ospf_mib_get_ospfStubAreaTable(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t ***ospfStubAreaEntry)
+void
+ospf_mib_get_ospfStubAreaTable(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t ***ospfStubAreaEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -882,24 +1000,89 @@ ospf_mib_get_ospfStubAreaTable(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t ***
 
     *ospfStubAreaEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ospfStubAreaEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ospfStubAreaEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ospfStubAreaEntry = (ospf_mib_ospfStubAreaEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfStubAreaEntry_t *));
+        if (! *ospfStubAreaEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ospfStubAreaEntry)[i] = assign_ospfStubAreaEntry(row->data);
+        }
+    }
+}
+
+void
+ospf_mib_get_ospfStubAreaEntry(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t **ospfStubAreaEntry, guchar *ospfStubAreaId, gint32 ospfStubTOS, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfStubAreaEntry, sizeof(oid_ospfStubAreaEntry));
+    len = pack_ospfStubAreaEntry(base, ospfStubAreaId, ospfStubTOS);
+    if (len < 0) {
+        g_warning("illegal ospfStubAreaEntry index values");
+        return;
     }
 
-    *ospfStubAreaEntry = (ospf_mib_ospfStubAreaEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfStubAreaEntry_t *));
-    if (! *ospfStubAreaEntry) {
-        return -4;
+    *ospfStubAreaEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ospfStubAreaEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ospfStubAreaEntry = assign_ospfStubAreaEntry(out);
+    }
+}
+
+void
+ospf_mib_set_ospfStubAreaEntry(GSnmpSession *s, ospf_mib_ospfStubAreaEntry_t *ospfStubAreaEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfStubAreaEntry, sizeof(oid_ospfStubAreaEntry));
+    len = pack_ospfStubAreaEntry(base, ospfStubAreaEntry->ospfStubAreaId, ospfStubAreaEntry->ospfStubTOS);
+    if (len < 0) {
+        g_warning("illegal ospfStubAreaEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ospfStubAreaEntry)[i] = assign_ospfStubAreaEntry(row->data);
+    if (ospfStubAreaEntry->ospfStubMetric) {
+        base[9] = 3;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfStubAreaEntry->ospfStubMetric,
+                       0);
+    }
+    if (ospfStubAreaEntry->ospfStubStatus) {
+        base[9] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfStubAreaEntry->ospfStubStatus,
+                       0);
+    }
+    if (ospfStubAreaEntry->ospfStubMetricType) {
+        base[9] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfStubAreaEntry->ospfStubMetricType,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -964,6 +1147,30 @@ unpack_ospfLsdbEntry(GSnmpVarBind *vb, ospf_mib_ospfLsdbEntry_t *ospfLsdbEntry)
     return 0;
 }
 
+static int
+pack_ospfLsdbEntry(guint32 *base, guchar *ospfLsdbAreaId, gint32 ospfLsdbType, guchar *ospfLsdbLsid, guchar *ospfLsdbRouterId)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfLsdbAreaId[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = ospfLsdbType;
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfLsdbLsid[i];
+        if (idx >= 128) return -1;
+    }
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfLsdbRouterId[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static ospf_mib_ospfLsdbEntry_t *
 assign_ospfLsdbEntry(GSList *vbl)
 {
@@ -971,7 +1178,6 @@ assign_ospfLsdbEntry(GSList *vbl)
     ospf_mib_ospfLsdbEntry_t *ospfLsdbEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 4, 1};
 
     ospfLsdbEntry = ospf_mib_new_ospfLsdbEntry();
     if (! ospfLsdbEntry) {
@@ -990,8 +1196,8 @@ assign_ospfLsdbEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfLsdbEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfLsdbEntry, sizeof(oid_ospfLsdbEntry)/sizeof(guint32),
+                   attr_ospfLsdbEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 5:
@@ -1013,8 +1219,8 @@ assign_ospfLsdbEntry(GSList *vbl)
     return ospfLsdbEntry;
 }
 
-int
-ospf_mib_get_ospfLsdbTable(GSnmpSession *s, ospf_mib_ospfLsdbEntry_t ***ospfLsdbEntry)
+void
+ospf_mib_get_ospfLsdbTable(GSnmpSession *s, ospf_mib_ospfLsdbEntry_t ***ospfLsdbEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1023,24 +1229,48 @@ ospf_mib_get_ospfLsdbTable(GSnmpSession *s, ospf_mib_ospfLsdbEntry_t ***ospfLsdb
 
     *ospfLsdbEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ospfLsdbEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ospfLsdbEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ospfLsdbEntry = (ospf_mib_ospfLsdbEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfLsdbEntry_t *));
+        if (! *ospfLsdbEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ospfLsdbEntry)[i] = assign_ospfLsdbEntry(row->data);
+        }
+    }
+}
+
+void
+ospf_mib_get_ospfLsdbEntry(GSnmpSession *s, ospf_mib_ospfLsdbEntry_t **ospfLsdbEntry, guchar *ospfLsdbAreaId, gint32 ospfLsdbType, guchar *ospfLsdbLsid, guchar *ospfLsdbRouterId, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfLsdbEntry, sizeof(oid_ospfLsdbEntry));
+    len = pack_ospfLsdbEntry(base, ospfLsdbAreaId, ospfLsdbType, ospfLsdbLsid, ospfLsdbRouterId);
+    if (len < 0) {
+        g_warning("illegal ospfLsdbEntry index values");
+        return;
     }
 
-    *ospfLsdbEntry = (ospf_mib_ospfLsdbEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfLsdbEntry_t *));
-    if (! *ospfLsdbEntry) {
-        return -4;
-    }
+    *ospfLsdbEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ospfLsdbEntry)[i] = assign_ospfLsdbEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 9, attr_ospfLsdbEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ospfLsdbEntry = assign_ospfLsdbEntry(out);
+    }
 }
 
 void
@@ -1098,6 +1328,24 @@ unpack_ospfAreaRangeEntry(GSnmpVarBind *vb, ospf_mib_ospfAreaRangeEntry_t *ospfA
     return 0;
 }
 
+static int
+pack_ospfAreaRangeEntry(guint32 *base, guchar *ospfAreaRangeAreaId, guchar *ospfAreaRangeNet)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfAreaRangeAreaId[i];
+        if (idx >= 128) return -1;
+    }
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfAreaRangeNet[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static ospf_mib_ospfAreaRangeEntry_t *
 assign_ospfAreaRangeEntry(GSList *vbl)
 {
@@ -1105,7 +1353,6 @@ assign_ospfAreaRangeEntry(GSList *vbl)
     ospf_mib_ospfAreaRangeEntry_t *ospfAreaRangeEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 5, 1};
 
     ospfAreaRangeEntry = ospf_mib_new_ospfAreaRangeEntry();
     if (! ospfAreaRangeEntry) {
@@ -1124,8 +1371,8 @@ assign_ospfAreaRangeEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfAreaRangeEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfAreaRangeEntry, sizeof(oid_ospfAreaRangeEntry)/sizeof(guint32),
+                   attr_ospfAreaRangeEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -1143,8 +1390,8 @@ assign_ospfAreaRangeEntry(GSList *vbl)
     return ospfAreaRangeEntry;
 }
 
-int
-ospf_mib_get_ospfAreaRangeTable(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t ***ospfAreaRangeEntry)
+void
+ospf_mib_get_ospfAreaRangeTable(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t ***ospfAreaRangeEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1153,24 +1400,89 @@ ospf_mib_get_ospfAreaRangeTable(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t *
 
     *ospfAreaRangeEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ospfAreaRangeEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ospfAreaRangeEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ospfAreaRangeEntry = (ospf_mib_ospfAreaRangeEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfAreaRangeEntry_t *));
+        if (! *ospfAreaRangeEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ospfAreaRangeEntry)[i] = assign_ospfAreaRangeEntry(row->data);
+        }
+    }
+}
+
+void
+ospf_mib_get_ospfAreaRangeEntry(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t **ospfAreaRangeEntry, guchar *ospfAreaRangeAreaId, guchar *ospfAreaRangeNet, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfAreaRangeEntry, sizeof(oid_ospfAreaRangeEntry));
+    len = pack_ospfAreaRangeEntry(base, ospfAreaRangeAreaId, ospfAreaRangeNet);
+    if (len < 0) {
+        g_warning("illegal ospfAreaRangeEntry index values");
+        return;
     }
 
-    *ospfAreaRangeEntry = (ospf_mib_ospfAreaRangeEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfAreaRangeEntry_t *));
-    if (! *ospfAreaRangeEntry) {
-        return -4;
+    *ospfAreaRangeEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ospfAreaRangeEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ospfAreaRangeEntry = assign_ospfAreaRangeEntry(out);
+    }
+}
+
+void
+ospf_mib_set_ospfAreaRangeEntry(GSnmpSession *s, ospf_mib_ospfAreaRangeEntry_t *ospfAreaRangeEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfAreaRangeEntry, sizeof(oid_ospfAreaRangeEntry));
+    len = pack_ospfAreaRangeEntry(base, ospfAreaRangeEntry->ospfAreaRangeAreaId, ospfAreaRangeEntry->ospfAreaRangeNet);
+    if (len < 0) {
+        g_warning("illegal ospfAreaRangeEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ospfAreaRangeEntry)[i] = assign_ospfAreaRangeEntry(row->data);
+    if (ospfAreaRangeEntry->ospfAreaRangeMask) {
+        base[9] = 3;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_IPADDRESS,
+                       ospfAreaRangeEntry->ospfAreaRangeMask,
+                       4);
+    }
+    if (ospfAreaRangeEntry->ospfAreaRangeStatus) {
+        base[9] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfAreaRangeEntry->ospfAreaRangeStatus,
+                       0);
+    }
+    if (ospfAreaRangeEntry->ospfAreaRangeEffect) {
+        base[9] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfAreaRangeEntry->ospfAreaRangeEffect,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1225,6 +1537,20 @@ unpack_ospfHostEntry(GSnmpVarBind *vb, ospf_mib_ospfHostEntry_t *ospfHostEntry)
     return 0;
 }
 
+static int
+pack_ospfHostEntry(guint32 *base, guchar *ospfHostIpAddress, gint32 ospfHostTOS)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfHostIpAddress[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = ospfHostTOS;
+    return idx;
+}
+
 static ospf_mib_ospfHostEntry_t *
 assign_ospfHostEntry(GSList *vbl)
 {
@@ -1232,7 +1558,6 @@ assign_ospfHostEntry(GSList *vbl)
     ospf_mib_ospfHostEntry_t *ospfHostEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 6, 1};
 
     ospfHostEntry = ospf_mib_new_ospfHostEntry();
     if (! ospfHostEntry) {
@@ -1251,8 +1576,8 @@ assign_ospfHostEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfHostEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfHostEntry, sizeof(oid_ospfHostEntry)/sizeof(guint32),
+                   attr_ospfHostEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -1270,8 +1595,8 @@ assign_ospfHostEntry(GSList *vbl)
     return ospfHostEntry;
 }
 
-int
-ospf_mib_get_ospfHostTable(GSnmpSession *s, ospf_mib_ospfHostEntry_t ***ospfHostEntry)
+void
+ospf_mib_get_ospfHostTable(GSnmpSession *s, ospf_mib_ospfHostEntry_t ***ospfHostEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1280,24 +1605,83 @@ ospf_mib_get_ospfHostTable(GSnmpSession *s, ospf_mib_ospfHostEntry_t ***ospfHost
 
     *ospfHostEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ospfHostEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ospfHostEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ospfHostEntry = (ospf_mib_ospfHostEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfHostEntry_t *));
+        if (! *ospfHostEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ospfHostEntry)[i] = assign_ospfHostEntry(row->data);
+        }
+    }
+}
+
+void
+ospf_mib_get_ospfHostEntry(GSnmpSession *s, ospf_mib_ospfHostEntry_t **ospfHostEntry, guchar *ospfHostIpAddress, gint32 ospfHostTOS, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfHostEntry, sizeof(oid_ospfHostEntry));
+    len = pack_ospfHostEntry(base, ospfHostIpAddress, ospfHostTOS);
+    if (len < 0) {
+        g_warning("illegal ospfHostEntry index values");
+        return;
     }
 
-    *ospfHostEntry = (ospf_mib_ospfHostEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfHostEntry_t *));
-    if (! *ospfHostEntry) {
-        return -4;
+    *ospfHostEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ospfHostEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ospfHostEntry = assign_ospfHostEntry(out);
+    }
+}
+
+void
+ospf_mib_set_ospfHostEntry(GSnmpSession *s, ospf_mib_ospfHostEntry_t *ospfHostEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfHostEntry, sizeof(oid_ospfHostEntry));
+    len = pack_ospfHostEntry(base, ospfHostEntry->ospfHostIpAddress, ospfHostEntry->ospfHostTOS);
+    if (len < 0) {
+        g_warning("illegal ospfHostEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ospfHostEntry)[i] = assign_ospfHostEntry(row->data);
+    if (ospfHostEntry->ospfHostMetric) {
+        base[9] = 3;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfHostEntry->ospfHostMetric,
+                       0);
+    }
+    if (ospfHostEntry->ospfHostStatus) {
+        base[9] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfHostEntry->ospfHostStatus,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1352,6 +1736,20 @@ unpack_ospfIfEntry(GSnmpVarBind *vb, ospf_mib_ospfIfEntry_t *ospfIfEntry)
     return 0;
 }
 
+static int
+pack_ospfIfEntry(guint32 *base, guchar *ospfIfIpAddress, gint32 ospfAddressLessIf)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfIfIpAddress[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = ospfAddressLessIf;
+    return idx;
+}
+
 static ospf_mib_ospfIfEntry_t *
 assign_ospfIfEntry(GSList *vbl)
 {
@@ -1359,7 +1757,6 @@ assign_ospfIfEntry(GSList *vbl)
     ospf_mib_ospfIfEntry_t *ospfIfEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 7, 1};
 
     ospfIfEntry = ospf_mib_new_ospfIfEntry();
     if (! ospfIfEntry) {
@@ -1378,8 +1775,8 @@ assign_ospfIfEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfIfEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfIfEntry, sizeof(oid_ospfIfEntry)/sizeof(guint32),
+                   attr_ospfIfEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -1443,8 +1840,8 @@ assign_ospfIfEntry(GSList *vbl)
     return ospfIfEntry;
 }
 
-int
-ospf_mib_get_ospfIfTable(GSnmpSession *s, ospf_mib_ospfIfEntry_t ***ospfIfEntry)
+void
+ospf_mib_get_ospfIfTable(GSnmpSession *s, ospf_mib_ospfIfEntry_t ***ospfIfEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1453,24 +1850,155 @@ ospf_mib_get_ospfIfTable(GSnmpSession *s, ospf_mib_ospfIfEntry_t ***ospfIfEntry)
 
     *ospfIfEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ospfIfEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ospfIfEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ospfIfEntry = (ospf_mib_ospfIfEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfIfEntry_t *));
+        if (! *ospfIfEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ospfIfEntry)[i] = assign_ospfIfEntry(row->data);
+        }
+    }
+}
+
+void
+ospf_mib_get_ospfIfEntry(GSnmpSession *s, ospf_mib_ospfIfEntry_t **ospfIfEntry, guchar *ospfIfIpAddress, gint32 ospfAddressLessIf, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfIfEntry, sizeof(oid_ospfIfEntry));
+    len = pack_ospfIfEntry(base, ospfIfIpAddress, ospfAddressLessIf);
+    if (len < 0) {
+        g_warning("illegal ospfIfEntry index values");
+        return;
     }
 
-    *ospfIfEntry = (ospf_mib_ospfIfEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfIfEntry_t *));
-    if (! *ospfIfEntry) {
-        return -4;
+    *ospfIfEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ospfIfEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ospfIfEntry = assign_ospfIfEntry(out);
+    }
+}
+
+void
+ospf_mib_set_ospfIfEntry(GSnmpSession *s, ospf_mib_ospfIfEntry_t *ospfIfEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfIfEntry, sizeof(oid_ospfIfEntry));
+    len = pack_ospfIfEntry(base, ospfIfEntry->ospfIfIpAddress, ospfIfEntry->ospfAddressLessIf);
+    if (len < 0) {
+        g_warning("illegal ospfIfEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ospfIfEntry)[i] = assign_ospfIfEntry(row->data);
+    if (ospfIfEntry->ospfIfAreaId) {
+        base[9] = 3;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_IPADDRESS,
+                       ospfIfEntry->ospfIfAreaId,
+                       4);
+    }
+    if (ospfIfEntry->ospfIfType) {
+        base[9] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfEntry->ospfIfType,
+                       0);
+    }
+    if (ospfIfEntry->ospfIfAdminStat) {
+        base[9] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfEntry->ospfIfAdminStat,
+                       0);
+    }
+    if (ospfIfEntry->ospfIfRtrPriority) {
+        base[9] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfEntry->ospfIfRtrPriority,
+                       0);
+    }
+    if (ospfIfEntry->ospfIfTransitDelay) {
+        base[9] = 7;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfEntry->ospfIfTransitDelay,
+                       0);
+    }
+    if (ospfIfEntry->ospfIfRetransInterval) {
+        base[9] = 8;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfEntry->ospfIfRetransInterval,
+                       0);
+    }
+    if (ospfIfEntry->ospfIfHelloInterval) {
+        base[9] = 9;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfEntry->ospfIfHelloInterval,
+                       0);
+    }
+    if (ospfIfEntry->ospfIfRtrDeadInterval) {
+        base[9] = 10;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfEntry->ospfIfRtrDeadInterval,
+                       0);
+    }
+    if (ospfIfEntry->ospfIfPollInterval) {
+        base[9] = 11;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfEntry->ospfIfPollInterval,
+                       0);
+    }
+    if (ospfIfEntry->ospfIfAuthKey) {
+        base[9] = 16;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       ospfIfEntry->ospfIfAuthKey,
+                       ospfIfEntry->_ospfIfAuthKeyLength);
+    }
+    if (ospfIfEntry->ospfIfStatus) {
+        base[9] = 17;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfEntry->ospfIfStatus,
+                       0);
+    }
+    if (ospfIfEntry->ospfIfMulticastForwarding) {
+        base[9] = 18;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfEntry->ospfIfMulticastForwarding,
+                       0);
+    }
+    if (ospfIfEntry->ospfIfDemand) {
+        base[9] = 19;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfEntry->ospfIfDemand,
+                       0);
+    }
+    if (ospfIfEntry->ospfIfAuthType) {
+        base[9] = 20;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfEntry->ospfIfAuthType,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1527,6 +2055,21 @@ unpack_ospfIfMetricEntry(GSnmpVarBind *vb, ospf_mib_ospfIfMetricEntry_t *ospfIfM
     return 0;
 }
 
+static int
+pack_ospfIfMetricEntry(guint32 *base, guchar *ospfIfMetricIpAddress, gint32 ospfIfMetricAddressLessIf, gint32 ospfIfMetricTOS)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfIfMetricIpAddress[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = ospfIfMetricAddressLessIf;
+    base[idx++] = ospfIfMetricTOS;
+    return idx;
+}
+
 static ospf_mib_ospfIfMetricEntry_t *
 assign_ospfIfMetricEntry(GSList *vbl)
 {
@@ -1534,7 +2077,6 @@ assign_ospfIfMetricEntry(GSList *vbl)
     ospf_mib_ospfIfMetricEntry_t *ospfIfMetricEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 8, 1};
 
     ospfIfMetricEntry = ospf_mib_new_ospfIfMetricEntry();
     if (! ospfIfMetricEntry) {
@@ -1553,8 +2095,8 @@ assign_ospfIfMetricEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfIfMetricEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfIfMetricEntry, sizeof(oid_ospfIfMetricEntry)/sizeof(guint32),
+                   attr_ospfIfMetricEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 4:
@@ -1569,8 +2111,8 @@ assign_ospfIfMetricEntry(GSList *vbl)
     return ospfIfMetricEntry;
 }
 
-int
-ospf_mib_get_ospfIfMetricTable(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t ***ospfIfMetricEntry)
+void
+ospf_mib_get_ospfIfMetricTable(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t ***ospfIfMetricEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1579,24 +2121,83 @@ ospf_mib_get_ospfIfMetricTable(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t ***
 
     *ospfIfMetricEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ospfIfMetricEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ospfIfMetricEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ospfIfMetricEntry = (ospf_mib_ospfIfMetricEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfIfMetricEntry_t *));
+        if (! *ospfIfMetricEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ospfIfMetricEntry)[i] = assign_ospfIfMetricEntry(row->data);
+        }
+    }
+}
+
+void
+ospf_mib_get_ospfIfMetricEntry(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t **ospfIfMetricEntry, guchar *ospfIfMetricIpAddress, gint32 ospfIfMetricAddressLessIf, gint32 ospfIfMetricTOS, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfIfMetricEntry, sizeof(oid_ospfIfMetricEntry));
+    len = pack_ospfIfMetricEntry(base, ospfIfMetricIpAddress, ospfIfMetricAddressLessIf, ospfIfMetricTOS);
+    if (len < 0) {
+        g_warning("illegal ospfIfMetricEntry index values");
+        return;
     }
 
-    *ospfIfMetricEntry = (ospf_mib_ospfIfMetricEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfIfMetricEntry_t *));
-    if (! *ospfIfMetricEntry) {
-        return -4;
+    *ospfIfMetricEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ospfIfMetricEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ospfIfMetricEntry = assign_ospfIfMetricEntry(out);
+    }
+}
+
+void
+ospf_mib_set_ospfIfMetricEntry(GSnmpSession *s, ospf_mib_ospfIfMetricEntry_t *ospfIfMetricEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfIfMetricEntry, sizeof(oid_ospfIfMetricEntry));
+    len = pack_ospfIfMetricEntry(base, ospfIfMetricEntry->ospfIfMetricIpAddress, ospfIfMetricEntry->ospfIfMetricAddressLessIf, ospfIfMetricEntry->ospfIfMetricTOS);
+    if (len < 0) {
+        g_warning("illegal ospfIfMetricEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ospfIfMetricEntry)[i] = assign_ospfIfMetricEntry(row->data);
+    if (ospfIfMetricEntry->ospfIfMetricValue) {
+        base[9] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfMetricEntry->ospfIfMetricValue,
+                       0);
+    }
+    if (ospfIfMetricEntry->ospfIfMetricStatus) {
+        base[9] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfIfMetricEntry->ospfIfMetricStatus,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1654,6 +2255,24 @@ unpack_ospfVirtIfEntry(GSnmpVarBind *vb, ospf_mib_ospfVirtIfEntry_t *ospfVirtIfE
     return 0;
 }
 
+static int
+pack_ospfVirtIfEntry(guint32 *base, guchar *ospfVirtIfAreaId, guchar *ospfVirtIfNeighbor)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfVirtIfAreaId[i];
+        if (idx >= 128) return -1;
+    }
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfVirtIfNeighbor[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static ospf_mib_ospfVirtIfEntry_t *
 assign_ospfVirtIfEntry(GSList *vbl)
 {
@@ -1661,7 +2280,6 @@ assign_ospfVirtIfEntry(GSList *vbl)
     ospf_mib_ospfVirtIfEntry_t *ospfVirtIfEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 9, 1};
 
     ospfVirtIfEntry = ospf_mib_new_ospfVirtIfEntry();
     if (! ospfVirtIfEntry) {
@@ -1680,8 +2298,8 @@ assign_ospfVirtIfEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfVirtIfEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfVirtIfEntry, sizeof(oid_ospfVirtIfEntry)/sizeof(guint32),
+                   attr_ospfVirtIfEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -1718,8 +2336,8 @@ assign_ospfVirtIfEntry(GSList *vbl)
     return ospfVirtIfEntry;
 }
 
-int
-ospf_mib_get_ospfVirtIfTable(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t ***ospfVirtIfEntry)
+void
+ospf_mib_get_ospfVirtIfTable(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t ***ospfVirtIfEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1728,24 +2346,113 @@ ospf_mib_get_ospfVirtIfTable(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t ***ospf
 
     *ospfVirtIfEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ospfVirtIfEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ospfVirtIfEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ospfVirtIfEntry = (ospf_mib_ospfVirtIfEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfVirtIfEntry_t *));
+        if (! *ospfVirtIfEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ospfVirtIfEntry)[i] = assign_ospfVirtIfEntry(row->data);
+        }
+    }
+}
+
+void
+ospf_mib_get_ospfVirtIfEntry(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t **ospfVirtIfEntry, guchar *ospfVirtIfAreaId, guchar *ospfVirtIfNeighbor, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfVirtIfEntry, sizeof(oid_ospfVirtIfEntry));
+    len = pack_ospfVirtIfEntry(base, ospfVirtIfAreaId, ospfVirtIfNeighbor);
+    if (len < 0) {
+        g_warning("illegal ospfVirtIfEntry index values");
+        return;
     }
 
-    *ospfVirtIfEntry = (ospf_mib_ospfVirtIfEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfVirtIfEntry_t *));
-    if (! *ospfVirtIfEntry) {
-        return -4;
+    *ospfVirtIfEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ospfVirtIfEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ospfVirtIfEntry = assign_ospfVirtIfEntry(out);
+    }
+}
+
+void
+ospf_mib_set_ospfVirtIfEntry(GSnmpSession *s, ospf_mib_ospfVirtIfEntry_t *ospfVirtIfEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfVirtIfEntry, sizeof(oid_ospfVirtIfEntry));
+    len = pack_ospfVirtIfEntry(base, ospfVirtIfEntry->ospfVirtIfAreaId, ospfVirtIfEntry->ospfVirtIfNeighbor);
+    if (len < 0) {
+        g_warning("illegal ospfVirtIfEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ospfVirtIfEntry)[i] = assign_ospfVirtIfEntry(row->data);
+    if (ospfVirtIfEntry->ospfVirtIfTransitDelay) {
+        base[9] = 3;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfVirtIfEntry->ospfVirtIfTransitDelay,
+                       0);
+    }
+    if (ospfVirtIfEntry->ospfVirtIfRetransInterval) {
+        base[9] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfVirtIfEntry->ospfVirtIfRetransInterval,
+                       0);
+    }
+    if (ospfVirtIfEntry->ospfVirtIfHelloInterval) {
+        base[9] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfVirtIfEntry->ospfVirtIfHelloInterval,
+                       0);
+    }
+    if (ospfVirtIfEntry->ospfVirtIfRtrDeadInterval) {
+        base[9] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfVirtIfEntry->ospfVirtIfRtrDeadInterval,
+                       0);
+    }
+    if (ospfVirtIfEntry->ospfVirtIfAuthKey) {
+        base[9] = 9;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       ospfVirtIfEntry->ospfVirtIfAuthKey,
+                       ospfVirtIfEntry->_ospfVirtIfAuthKeyLength);
+    }
+    if (ospfVirtIfEntry->ospfVirtIfStatus) {
+        base[9] = 10;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfVirtIfEntry->ospfVirtIfStatus,
+                       0);
+    }
+    if (ospfVirtIfEntry->ospfVirtIfAuthType) {
+        base[9] = 11;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfVirtIfEntry->ospfVirtIfAuthType,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1800,6 +2507,20 @@ unpack_ospfNbrEntry(GSnmpVarBind *vb, ospf_mib_ospfNbrEntry_t *ospfNbrEntry)
     return 0;
 }
 
+static int
+pack_ospfNbrEntry(guint32 *base, guchar *ospfNbrIpAddr, gint32 ospfNbrAddressLessIndex)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfNbrIpAddr[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = ospfNbrAddressLessIndex;
+    return idx;
+}
+
 static ospf_mib_ospfNbrEntry_t *
 assign_ospfNbrEntry(GSList *vbl)
 {
@@ -1807,7 +2528,6 @@ assign_ospfNbrEntry(GSList *vbl)
     ospf_mib_ospfNbrEntry_t *ospfNbrEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 10, 1};
 
     ospfNbrEntry = ospf_mib_new_ospfNbrEntry();
     if (! ospfNbrEntry) {
@@ -1826,8 +2546,8 @@ assign_ospfNbrEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfNbrEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfNbrEntry, sizeof(oid_ospfNbrEntry)/sizeof(guint32),
+                   attr_ospfNbrEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -1863,8 +2583,8 @@ assign_ospfNbrEntry(GSList *vbl)
     return ospfNbrEntry;
 }
 
-int
-ospf_mib_get_ospfNbrTable(GSnmpSession *s, ospf_mib_ospfNbrEntry_t ***ospfNbrEntry)
+void
+ospf_mib_get_ospfNbrTable(GSnmpSession *s, ospf_mib_ospfNbrEntry_t ***ospfNbrEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1873,24 +2593,83 @@ ospf_mib_get_ospfNbrTable(GSnmpSession *s, ospf_mib_ospfNbrEntry_t ***ospfNbrEnt
 
     *ospfNbrEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ospfNbrEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ospfNbrEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ospfNbrEntry = (ospf_mib_ospfNbrEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfNbrEntry_t *));
+        if (! *ospfNbrEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ospfNbrEntry)[i] = assign_ospfNbrEntry(row->data);
+        }
+    }
+}
+
+void
+ospf_mib_get_ospfNbrEntry(GSnmpSession *s, ospf_mib_ospfNbrEntry_t **ospfNbrEntry, guchar *ospfNbrIpAddr, gint32 ospfNbrAddressLessIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfNbrEntry, sizeof(oid_ospfNbrEntry));
+    len = pack_ospfNbrEntry(base, ospfNbrIpAddr, ospfNbrAddressLessIndex);
+    if (len < 0) {
+        g_warning("illegal ospfNbrEntry index values");
+        return;
     }
 
-    *ospfNbrEntry = (ospf_mib_ospfNbrEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfNbrEntry_t *));
-    if (! *ospfNbrEntry) {
-        return -4;
+    *ospfNbrEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ospfNbrEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ospfNbrEntry = assign_ospfNbrEntry(out);
+    }
+}
+
+void
+ospf_mib_set_ospfNbrEntry(GSnmpSession *s, ospf_mib_ospfNbrEntry_t *ospfNbrEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfNbrEntry, sizeof(oid_ospfNbrEntry));
+    len = pack_ospfNbrEntry(base, ospfNbrEntry->ospfNbrIpAddr, ospfNbrEntry->ospfNbrAddressLessIndex);
+    if (len < 0) {
+        g_warning("illegal ospfNbrEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ospfNbrEntry)[i] = assign_ospfNbrEntry(row->data);
+    if (ospfNbrEntry->ospfNbrPriority) {
+        base[9] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfNbrEntry->ospfNbrPriority,
+                       0);
+    }
+    if (ospfNbrEntry->ospfNbmaNbrStatus) {
+        base[9] = 9;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfNbrEntry->ospfNbmaNbrStatus,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1948,6 +2727,24 @@ unpack_ospfVirtNbrEntry(GSnmpVarBind *vb, ospf_mib_ospfVirtNbrEntry_t *ospfVirtN
     return 0;
 }
 
+static int
+pack_ospfVirtNbrEntry(guint32 *base, guchar *ospfVirtNbrArea, guchar *ospfVirtNbrRtrId)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfVirtNbrArea[i];
+        if (idx >= 128) return -1;
+    }
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfVirtNbrRtrId[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static ospf_mib_ospfVirtNbrEntry_t *
 assign_ospfVirtNbrEntry(GSList *vbl)
 {
@@ -1955,7 +2752,6 @@ assign_ospfVirtNbrEntry(GSList *vbl)
     ospf_mib_ospfVirtNbrEntry_t *ospfVirtNbrEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 11, 1};
 
     ospfVirtNbrEntry = ospf_mib_new_ospfVirtNbrEntry();
     if (! ospfVirtNbrEntry) {
@@ -1974,8 +2770,8 @@ assign_ospfVirtNbrEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfVirtNbrEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfVirtNbrEntry, sizeof(oid_ospfVirtNbrEntry)/sizeof(guint32),
+                   attr_ospfVirtNbrEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -2002,8 +2798,8 @@ assign_ospfVirtNbrEntry(GSList *vbl)
     return ospfVirtNbrEntry;
 }
 
-int
-ospf_mib_get_ospfVirtNbrTable(GSnmpSession *s, ospf_mib_ospfVirtNbrEntry_t ***ospfVirtNbrEntry)
+void
+ospf_mib_get_ospfVirtNbrTable(GSnmpSession *s, ospf_mib_ospfVirtNbrEntry_t ***ospfVirtNbrEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2012,24 +2808,48 @@ ospf_mib_get_ospfVirtNbrTable(GSnmpSession *s, ospf_mib_ospfVirtNbrEntry_t ***os
 
     *ospfVirtNbrEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ospfVirtNbrEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ospfVirtNbrEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ospfVirtNbrEntry = (ospf_mib_ospfVirtNbrEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfVirtNbrEntry_t *));
+        if (! *ospfVirtNbrEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ospfVirtNbrEntry)[i] = assign_ospfVirtNbrEntry(row->data);
+        }
+    }
+}
+
+void
+ospf_mib_get_ospfVirtNbrEntry(GSnmpSession *s, ospf_mib_ospfVirtNbrEntry_t **ospfVirtNbrEntry, guchar *ospfVirtNbrArea, guchar *ospfVirtNbrRtrId, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfVirtNbrEntry, sizeof(oid_ospfVirtNbrEntry));
+    len = pack_ospfVirtNbrEntry(base, ospfVirtNbrArea, ospfVirtNbrRtrId);
+    if (len < 0) {
+        g_warning("illegal ospfVirtNbrEntry index values");
+        return;
     }
 
-    *ospfVirtNbrEntry = (ospf_mib_ospfVirtNbrEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfVirtNbrEntry_t *));
-    if (! *ospfVirtNbrEntry) {
-        return -4;
-    }
+    *ospfVirtNbrEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ospfVirtNbrEntry)[i] = assign_ospfVirtNbrEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 9, attr_ospfVirtNbrEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ospfVirtNbrEntry = assign_ospfVirtNbrEntry(out);
+    }
 }
 
 void
@@ -2089,6 +2909,25 @@ unpack_ospfExtLsdbEntry(GSnmpVarBind *vb, ospf_mib_ospfExtLsdbEntry_t *ospfExtLs
     return 0;
 }
 
+static int
+pack_ospfExtLsdbEntry(guint32 *base, gint32 ospfExtLsdbType, guchar *ospfExtLsdbLsid, guchar *ospfExtLsdbRouterId)
+{
+    int i, len, idx = 10;
+
+    base[idx++] = ospfExtLsdbType;
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfExtLsdbLsid[i];
+        if (idx >= 128) return -1;
+    }
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfExtLsdbRouterId[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static ospf_mib_ospfExtLsdbEntry_t *
 assign_ospfExtLsdbEntry(GSList *vbl)
 {
@@ -2096,7 +2935,6 @@ assign_ospfExtLsdbEntry(GSList *vbl)
     ospf_mib_ospfExtLsdbEntry_t *ospfExtLsdbEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 12, 1};
 
     ospfExtLsdbEntry = ospf_mib_new_ospfExtLsdbEntry();
     if (! ospfExtLsdbEntry) {
@@ -2115,8 +2953,8 @@ assign_ospfExtLsdbEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfExtLsdbEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfExtLsdbEntry, sizeof(oid_ospfExtLsdbEntry)/sizeof(guint32),
+                   attr_ospfExtLsdbEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 4:
@@ -2137,8 +2975,8 @@ assign_ospfExtLsdbEntry(GSList *vbl)
     return ospfExtLsdbEntry;
 }
 
-int
-ospf_mib_get_ospfExtLsdbTable(GSnmpSession *s, ospf_mib_ospfExtLsdbEntry_t ***ospfExtLsdbEntry)
+void
+ospf_mib_get_ospfExtLsdbTable(GSnmpSession *s, ospf_mib_ospfExtLsdbEntry_t ***ospfExtLsdbEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2147,24 +2985,48 @@ ospf_mib_get_ospfExtLsdbTable(GSnmpSession *s, ospf_mib_ospfExtLsdbEntry_t ***os
 
     *ospfExtLsdbEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ospfExtLsdbEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ospfExtLsdbEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ospfExtLsdbEntry = (ospf_mib_ospfExtLsdbEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfExtLsdbEntry_t *));
+        if (! *ospfExtLsdbEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ospfExtLsdbEntry)[i] = assign_ospfExtLsdbEntry(row->data);
+        }
+    }
+}
+
+void
+ospf_mib_get_ospfExtLsdbEntry(GSnmpSession *s, ospf_mib_ospfExtLsdbEntry_t **ospfExtLsdbEntry, gint32 ospfExtLsdbType, guchar *ospfExtLsdbLsid, guchar *ospfExtLsdbRouterId, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfExtLsdbEntry, sizeof(oid_ospfExtLsdbEntry));
+    len = pack_ospfExtLsdbEntry(base, ospfExtLsdbType, ospfExtLsdbLsid, ospfExtLsdbRouterId);
+    if (len < 0) {
+        g_warning("illegal ospfExtLsdbEntry index values");
+        return;
     }
 
-    *ospfExtLsdbEntry = (ospf_mib_ospfExtLsdbEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfExtLsdbEntry_t *));
-    if (! *ospfExtLsdbEntry) {
-        return -4;
-    }
+    *ospfExtLsdbEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ospfExtLsdbEntry)[i] = assign_ospfExtLsdbEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 9, attr_ospfExtLsdbEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ospfExtLsdbEntry = assign_ospfExtLsdbEntry(out);
+    }
 }
 
 void
@@ -2229,6 +3091,30 @@ unpack_ospfAreaAggregateEntry(GSnmpVarBind *vb, ospf_mib_ospfAreaAggregateEntry_
     return 0;
 }
 
+static int
+pack_ospfAreaAggregateEntry(guint32 *base, guchar *ospfAreaAggregateAreaID, gint32 ospfAreaAggregateLsdbType, guchar *ospfAreaAggregateNet, guchar *ospfAreaAggregateMask)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfAreaAggregateAreaID[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = ospfAreaAggregateLsdbType;
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfAreaAggregateNet[i];
+        if (idx >= 128) return -1;
+    }
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ospfAreaAggregateMask[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static ospf_mib_ospfAreaAggregateEntry_t *
 assign_ospfAreaAggregateEntry(GSList *vbl)
 {
@@ -2236,7 +3122,6 @@ assign_ospfAreaAggregateEntry(GSList *vbl)
     ospf_mib_ospfAreaAggregateEntry_t *ospfAreaAggregateEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 14, 14, 1};
 
     ospfAreaAggregateEntry = ospf_mib_new_ospfAreaAggregateEntry();
     if (! ospfAreaAggregateEntry) {
@@ -2255,8 +3140,8 @@ assign_ospfAreaAggregateEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ospfAreaAggregateEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ospfAreaAggregateEntry, sizeof(oid_ospfAreaAggregateEntry)/sizeof(guint32),
+                   attr_ospfAreaAggregateEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 5:
@@ -2271,8 +3156,8 @@ assign_ospfAreaAggregateEntry(GSList *vbl)
     return ospfAreaAggregateEntry;
 }
 
-int
-ospf_mib_get_ospfAreaAggregateTable(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t ***ospfAreaAggregateEntry)
+void
+ospf_mib_get_ospfAreaAggregateTable(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t ***ospfAreaAggregateEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2281,24 +3166,83 @@ ospf_mib_get_ospfAreaAggregateTable(GSnmpSession *s, ospf_mib_ospfAreaAggregateE
 
     *ospfAreaAggregateEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ospfAreaAggregateEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ospfAreaAggregateEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ospfAreaAggregateEntry = (ospf_mib_ospfAreaAggregateEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfAreaAggregateEntry_t *));
+        if (! *ospfAreaAggregateEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ospfAreaAggregateEntry)[i] = assign_ospfAreaAggregateEntry(row->data);
+        }
+    }
+}
+
+void
+ospf_mib_get_ospfAreaAggregateEntry(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t **ospfAreaAggregateEntry, guchar *ospfAreaAggregateAreaID, gint32 ospfAreaAggregateLsdbType, guchar *ospfAreaAggregateNet, guchar *ospfAreaAggregateMask, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfAreaAggregateEntry, sizeof(oid_ospfAreaAggregateEntry));
+    len = pack_ospfAreaAggregateEntry(base, ospfAreaAggregateAreaID, ospfAreaAggregateLsdbType, ospfAreaAggregateNet, ospfAreaAggregateMask);
+    if (len < 0) {
+        g_warning("illegal ospfAreaAggregateEntry index values");
+        return;
     }
 
-    *ospfAreaAggregateEntry = (ospf_mib_ospfAreaAggregateEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ospf_mib_ospfAreaAggregateEntry_t *));
-    if (! *ospfAreaAggregateEntry) {
-        return -4;
+    *ospfAreaAggregateEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ospfAreaAggregateEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ospfAreaAggregateEntry = assign_ospfAreaAggregateEntry(out);
+    }
+}
+
+void
+ospf_mib_set_ospfAreaAggregateEntry(GSnmpSession *s, ospf_mib_ospfAreaAggregateEntry_t *ospfAreaAggregateEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ospfAreaAggregateEntry, sizeof(oid_ospfAreaAggregateEntry));
+    len = pack_ospfAreaAggregateEntry(base, ospfAreaAggregateEntry->ospfAreaAggregateAreaID, ospfAreaAggregateEntry->ospfAreaAggregateLsdbType, ospfAreaAggregateEntry->ospfAreaAggregateNet, ospfAreaAggregateEntry->ospfAreaAggregateMask);
+    if (len < 0) {
+        g_warning("illegal ospfAreaAggregateEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ospfAreaAggregateEntry)[i] = assign_ospfAreaAggregateEntry(row->data);
+    if (ospfAreaAggregateEntry->ospfAreaAggregateStatus) {
+        base[9] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfAreaAggregateEntry->ospfAreaAggregateStatus,
+                       0);
+    }
+    if (ospfAreaAggregateEntry->ospfAreaAggregateEffect) {
+        base[9] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ospfAreaAggregateEntry->ospfAreaAggregateEffect,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void

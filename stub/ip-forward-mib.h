@@ -85,16 +85,19 @@ extern GSnmpEnum const ip_forward_mib_enums_ipCidrRouteStatus[];
  * C type definitions for IP-FORWARD-MIB::ipForward.
  */
 
+#define IP_FORWARD_MIB_IPFORWARDNUMBER	0x1 
+#define IP_FORWARD_MIB_IPCIDRROUTENUMBER	0x2 
+
 typedef struct {
     guint32  *ipForwardNumber;
     guint32  *ipCidrRouteNumber;
 } ip_forward_mib_ipForward_t;
 
 extern ip_forward_mib_ipForward_t *
-ip_forward_mib_new_ipForward();
+ip_forward_mib_new_ipForward(void);
 
-extern int
-ip_forward_mib_get_ipForward(GSnmpSession *s, ip_forward_mib_ipForward_t **ipForward);
+extern void
+ip_forward_mib_get_ipForward(GSnmpSession *s, ip_forward_mib_ipForward_t **ipForward, gint mask);
 
 extern void
 ip_forward_mib_free_ipForward(ip_forward_mib_ipForward_t *ipForward);
@@ -102,6 +105,22 @@ ip_forward_mib_free_ipForward(ip_forward_mib_ipForward_t *ipForward);
 /*
  * C type definitions for IP-FORWARD-MIB::ipForwardEntry.
  */
+
+#define IP_FORWARD_MIB_IPFORWARDDEST	0x1 
+#define IP_FORWARD_MIB_IPFORWARDMASK	0x2 
+#define IP_FORWARD_MIB_IPFORWARDPOLICY	0x4 
+#define IP_FORWARD_MIB_IPFORWARDNEXTHOP	0x8 
+#define IP_FORWARD_MIB_IPFORWARDIFINDEX	0x10 
+#define IP_FORWARD_MIB_IPFORWARDTYPE	0x20 
+#define IP_FORWARD_MIB_IPFORWARDPROTO	0x40 
+#define IP_FORWARD_MIB_IPFORWARDAGE	0x80 
+#define IP_FORWARD_MIB_IPFORWARDINFO	0x100 
+#define IP_FORWARD_MIB_IPFORWARDNEXTHOPAS	0x200 
+#define IP_FORWARD_MIB_IPFORWARDMETRIC1	0x400 
+#define IP_FORWARD_MIB_IPFORWARDMETRIC2	0x800 
+#define IP_FORWARD_MIB_IPFORWARDMETRIC3	0x1000 
+#define IP_FORWARD_MIB_IPFORWARDMETRIC4	0x2000 
+#define IP_FORWARD_MIB_IPFORWARDMETRIC5	0x4000 
 
 typedef struct {
     guchar   ipForwardDest[4];
@@ -122,20 +141,20 @@ typedef struct {
     gint32   *ipForwardMetric5;
 } ip_forward_mib_ipForwardEntry_t;
 
-extern int
-ip_forward_mib_get_ipForwardTable(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t ***ipForwardEntry);
+extern void
+ip_forward_mib_get_ipForwardTable(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t ***ipForwardEntry, gint mask);
 
 extern void
 ip_forward_mib_free_ipForwardTable(ip_forward_mib_ipForwardEntry_t **ipForwardEntry);
 
 extern ip_forward_mib_ipForwardEntry_t *
-ip_forward_mib_new_ipForwardEntry();
+ip_forward_mib_new_ipForwardEntry(void);
 
-extern int
-ip_forward_mib_get_ipForwardEntry(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t **ipForwardEntry);
+extern void
+ip_forward_mib_get_ipForwardEntry(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t **ipForwardEntry, guchar *ipForwardDest, gint32 ipForwardProto, gint32 ipForwardPolicy, guchar *ipForwardNextHop, gint mask);
 
-extern int
-ip_forward_mib_set_ipForwardEntry(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t *ipForwardEntry);
+extern void
+ip_forward_mib_set_ipForwardEntry(GSnmpSession *s, ip_forward_mib_ipForwardEntry_t *ipForwardEntry, gint mask);
 
 extern void
 ip_forward_mib_free_ipForwardEntry(ip_forward_mib_ipForwardEntry_t *ipForwardEntry);
@@ -143,6 +162,23 @@ ip_forward_mib_free_ipForwardEntry(ip_forward_mib_ipForwardEntry_t *ipForwardEnt
 /*
  * C type definitions for IP-FORWARD-MIB::ipCidrRouteEntry.
  */
+
+#define IP_FORWARD_MIB_IPCIDRROUTEDEST	0x1 
+#define IP_FORWARD_MIB_IPCIDRROUTEMASK	0x2 
+#define IP_FORWARD_MIB_IPCIDRROUTETOS	0x4 
+#define IP_FORWARD_MIB_IPCIDRROUTENEXTHOP	0x8 
+#define IP_FORWARD_MIB_IPCIDRROUTEIFINDEX	0x10 
+#define IP_FORWARD_MIB_IPCIDRROUTETYPE	0x20 
+#define IP_FORWARD_MIB_IPCIDRROUTEPROTO	0x40 
+#define IP_FORWARD_MIB_IPCIDRROUTEAGE	0x80 
+#define IP_FORWARD_MIB_IPCIDRROUTEINFO	0x100 
+#define IP_FORWARD_MIB_IPCIDRROUTENEXTHOPAS	0x200 
+#define IP_FORWARD_MIB_IPCIDRROUTEMETRIC1	0x400 
+#define IP_FORWARD_MIB_IPCIDRROUTEMETRIC2	0x800 
+#define IP_FORWARD_MIB_IPCIDRROUTEMETRIC3	0x1000 
+#define IP_FORWARD_MIB_IPCIDRROUTEMETRIC4	0x2000 
+#define IP_FORWARD_MIB_IPCIDRROUTEMETRIC5	0x4000 
+#define IP_FORWARD_MIB_IPCIDRROUTESTATUS	0x8000 
 
 typedef struct {
     guchar   ipCidrRouteDest[4];
@@ -164,20 +200,20 @@ typedef struct {
     gint32   *ipCidrRouteStatus;
 } ip_forward_mib_ipCidrRouteEntry_t;
 
-extern int
-ip_forward_mib_get_ipCidrRouteTable(GSnmpSession *s, ip_forward_mib_ipCidrRouteEntry_t ***ipCidrRouteEntry);
+extern void
+ip_forward_mib_get_ipCidrRouteTable(GSnmpSession *s, ip_forward_mib_ipCidrRouteEntry_t ***ipCidrRouteEntry, gint mask);
 
 extern void
 ip_forward_mib_free_ipCidrRouteTable(ip_forward_mib_ipCidrRouteEntry_t **ipCidrRouteEntry);
 
 extern ip_forward_mib_ipCidrRouteEntry_t *
-ip_forward_mib_new_ipCidrRouteEntry();
+ip_forward_mib_new_ipCidrRouteEntry(void);
 
-extern int
-ip_forward_mib_get_ipCidrRouteEntry(GSnmpSession *s, ip_forward_mib_ipCidrRouteEntry_t **ipCidrRouteEntry);
+extern void
+ip_forward_mib_get_ipCidrRouteEntry(GSnmpSession *s, ip_forward_mib_ipCidrRouteEntry_t **ipCidrRouteEntry, guchar *ipCidrRouteDest, guchar *ipCidrRouteMask, gint32 ipCidrRouteTos, guchar *ipCidrRouteNextHop, gint mask);
 
-extern int
-ip_forward_mib_set_ipCidrRouteEntry(GSnmpSession *s, ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry);
+extern void
+ip_forward_mib_set_ipCidrRouteEntry(GSnmpSession *s, ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry, gint mask);
 
 extern void
 ip_forward_mib_free_ipCidrRouteEntry(ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry);

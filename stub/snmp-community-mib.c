@@ -40,33 +40,37 @@ GSnmpEnum const snmp_community_mib_enums_snmpCommunityStatus[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -88,21 +92,25 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _snmpCommunityEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "snmpCommunityName" },
-    { 3, G_SNMP_OCTET_STRING, "snmpCommunitySecurityName" },
-    { 4, G_SNMP_OCTET_STRING, "snmpCommunityContextEngineID" },
-    { 5, G_SNMP_OCTET_STRING, "snmpCommunityContextName" },
-    { 6, G_SNMP_OCTET_STRING, "snmpCommunityTransportTag" },
-    { 7, G_SNMP_INTEGER32, "snmpCommunityStorageType" },
-    { 8, G_SNMP_INTEGER32, "snmpCommunityStatus" },
-    { 0, 0, NULL }
+static guint32 const oid_snmpCommunityEntry[] = {1, 3, 6, 1, 6, 3, 18, 1, 1, 1};
+
+static attribute_t attr_snmpCommunityEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, SNMP_COMMUNITY_MIB_SNMPCOMMUNITYNAME, "snmpCommunityName" },
+    { 3, G_SNMP_OCTET_STRING, SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSECURITYNAME, "snmpCommunitySecurityName" },
+    { 4, G_SNMP_OCTET_STRING, SNMP_COMMUNITY_MIB_SNMPCOMMUNITYCONTEXTENGINEID, "snmpCommunityContextEngineID" },
+    { 5, G_SNMP_OCTET_STRING, SNMP_COMMUNITY_MIB_SNMPCOMMUNITYCONTEXTNAME, "snmpCommunityContextName" },
+    { 6, G_SNMP_OCTET_STRING, SNMP_COMMUNITY_MIB_SNMPCOMMUNITYTRANSPORTTAG, "snmpCommunityTransportTag" },
+    { 7, G_SNMP_INTEGER32, SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTORAGETYPE, "snmpCommunityStorageType" },
+    { 8, G_SNMP_INTEGER32, SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS, "snmpCommunityStatus" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _snmpTargetAddrExtEntry[] = {
-    { 1, G_SNMP_OCTET_STRING, "snmpTargetAddrTMask" },
-    { 2, G_SNMP_INTEGER32, "snmpTargetAddrMMS" },
-    { 0, 0, NULL }
+static guint32 const oid_snmpTargetAddrExtEntry[] = {1, 3, 6, 1, 6, 3, 18, 1, 2, 1};
+
+static attribute_t attr_snmpTargetAddrExtEntry[] = {
+    { 1, G_SNMP_OCTET_STRING, SNMP_COMMUNITY_MIB_SNMPTARGETADDRTMASK, "snmpTargetAddrTMask" },
+    { 2, G_SNMP_INTEGER32, SNMP_COMMUNITY_MIB_SNMPTARGETADDRMMS, "snmpTargetAddrMMS" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -130,6 +138,19 @@ unpack_snmpCommunityEntry(GSnmpVarBind *vb, snmp_community_mib_snmpCommunityEntr
     return 0;
 }
 
+static int
+pack_snmpCommunityEntry(guint32 *base, guchar *snmpCommunityIndex, gsize _snmpCommunityIndexLength)
+{
+    int i, len, idx = 11;
+
+    len = _snmpCommunityIndexLength;
+    for (i = 0; i < len; i++) {
+        base[idx++] = snmpCommunityIndex[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static snmp_community_mib_snmpCommunityEntry_t *
 assign_snmpCommunityEntry(GSList *vbl)
 {
@@ -137,7 +158,6 @@ assign_snmpCommunityEntry(GSList *vbl)
     snmp_community_mib_snmpCommunityEntry_t *snmpCommunityEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 6, 3, 18, 1, 1, 1};
 
     snmpCommunityEntry = snmp_community_mib_new_snmpCommunityEntry();
     if (! snmpCommunityEntry) {
@@ -156,8 +176,8 @@ assign_snmpCommunityEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _snmpCommunityEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_snmpCommunityEntry, sizeof(oid_snmpCommunityEntry)/sizeof(guint32),
+                   attr_snmpCommunityEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -192,8 +212,8 @@ assign_snmpCommunityEntry(GSList *vbl)
     return snmpCommunityEntry;
 }
 
-int
-snmp_community_mib_get_snmpCommunityTable(GSnmpSession *s, snmp_community_mib_snmpCommunityEntry_t ***snmpCommunityEntry)
+void
+snmp_community_mib_get_snmpCommunityTable(GSnmpSession *s, snmp_community_mib_snmpCommunityEntry_t ***snmpCommunityEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -202,24 +222,113 @@ snmp_community_mib_get_snmpCommunityTable(GSnmpSession *s, snmp_community_mib_sn
 
     *snmpCommunityEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _snmpCommunityEntry);
+    add_attributes(s, &in, base, 11, 10, attr_snmpCommunityEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *snmpCommunityEntry = (snmp_community_mib_snmpCommunityEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(snmp_community_mib_snmpCommunityEntry_t *));
+        if (! *snmpCommunityEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*snmpCommunityEntry)[i] = assign_snmpCommunityEntry(row->data);
+        }
+    }
+}
+
+void
+snmp_community_mib_get_snmpCommunityEntry(GSnmpSession *s, snmp_community_mib_snmpCommunityEntry_t **snmpCommunityEntry, guchar *snmpCommunityIndex, gsize _snmpCommunityIndexLength, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_snmpCommunityEntry, sizeof(oid_snmpCommunityEntry));
+    len = pack_snmpCommunityEntry(base, snmpCommunityIndex, _snmpCommunityIndexLength);
+    if (len < 0) {
+        g_warning("illegal snmpCommunityEntry index values");
+        return;
     }
 
-    *snmpCommunityEntry = (snmp_community_mib_snmpCommunityEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(snmp_community_mib_snmpCommunityEntry_t *));
-    if (! *snmpCommunityEntry) {
-        return -4;
+    *snmpCommunityEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_snmpCommunityEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *snmpCommunityEntry = assign_snmpCommunityEntry(out);
+    }
+}
+
+void
+snmp_community_mib_set_snmpCommunityEntry(GSnmpSession *s, snmp_community_mib_snmpCommunityEntry_t *snmpCommunityEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_snmpCommunityEntry, sizeof(oid_snmpCommunityEntry));
+    len = pack_snmpCommunityEntry(base, snmpCommunityEntry->snmpCommunityIndex, snmpCommunityEntry->_snmpCommunityIndexLength);
+    if (len < 0) {
+        g_warning("illegal snmpCommunityEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*snmpCommunityEntry)[i] = assign_snmpCommunityEntry(row->data);
+    if (snmpCommunityEntry->snmpCommunityName) {
+        base[10] = 2;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       snmpCommunityEntry->snmpCommunityName,
+                       snmpCommunityEntry->_snmpCommunityNameLength);
+    }
+    if (snmpCommunityEntry->snmpCommunitySecurityName) {
+        base[10] = 3;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       snmpCommunityEntry->snmpCommunitySecurityName,
+                       snmpCommunityEntry->_snmpCommunitySecurityNameLength);
+    }
+    if (snmpCommunityEntry->snmpCommunityContextEngineID) {
+        base[10] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       snmpCommunityEntry->snmpCommunityContextEngineID,
+                       snmpCommunityEntry->_snmpCommunityContextEngineIDLength);
+    }
+    if (snmpCommunityEntry->snmpCommunityContextName) {
+        base[10] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       snmpCommunityEntry->snmpCommunityContextName,
+                       snmpCommunityEntry->_snmpCommunityContextNameLength);
+    }
+    if (snmpCommunityEntry->snmpCommunityTransportTag) {
+        base[10] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       snmpCommunityEntry->snmpCommunityTransportTag,
+                       snmpCommunityEntry->_snmpCommunityTransportTagLength);
+    }
+    if (snmpCommunityEntry->snmpCommunityStorageType) {
+        base[10] = 7;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       snmpCommunityEntry->snmpCommunityStorageType,
+                       0);
+    }
+    if (snmpCommunityEntry->snmpCommunityStatus) {
+        base[10] = 8;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       snmpCommunityEntry->snmpCommunityStatus,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -273,6 +382,19 @@ unpack_snmpTargetAddrExtEntry(GSnmpVarBind *vb, snmp_community_mib_snmpTargetAdd
     return 0;
 }
 
+static int
+pack_snmpTargetAddrExtEntry(guint32 *base, guchar *snmpTargetAddrName, gsize _snmpTargetAddrNameLength)
+{
+    int i, len, idx = 11;
+
+    len = _snmpTargetAddrNameLength;
+    for (i = 0; i < len; i++) {
+        base[idx++] = snmpTargetAddrName[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static snmp_community_mib_snmpTargetAddrExtEntry_t *
 assign_snmpTargetAddrExtEntry(GSList *vbl)
 {
@@ -280,7 +402,6 @@ assign_snmpTargetAddrExtEntry(GSList *vbl)
     snmp_community_mib_snmpTargetAddrExtEntry_t *snmpTargetAddrExtEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 6, 3, 18, 1, 2, 1};
 
     snmpTargetAddrExtEntry = snmp_community_mib_new_snmpTargetAddrExtEntry();
     if (! snmpTargetAddrExtEntry) {
@@ -299,8 +420,8 @@ assign_snmpTargetAddrExtEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _snmpTargetAddrExtEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_snmpTargetAddrExtEntry, sizeof(oid_snmpTargetAddrExtEntry)/sizeof(guint32),
+                   attr_snmpTargetAddrExtEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -316,8 +437,8 @@ assign_snmpTargetAddrExtEntry(GSList *vbl)
     return snmpTargetAddrExtEntry;
 }
 
-int
-snmp_community_mib_get_snmpTargetAddrExtTable(GSnmpSession *s, snmp_community_mib_snmpTargetAddrExtEntry_t ***snmpTargetAddrExtEntry)
+void
+snmp_community_mib_get_snmpTargetAddrExtTable(GSnmpSession *s, snmp_community_mib_snmpTargetAddrExtEntry_t ***snmpTargetAddrExtEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -326,24 +447,83 @@ snmp_community_mib_get_snmpTargetAddrExtTable(GSnmpSession *s, snmp_community_mi
 
     *snmpTargetAddrExtEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _snmpTargetAddrExtEntry);
+    add_attributes(s, &in, base, 11, 10, attr_snmpTargetAddrExtEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *snmpTargetAddrExtEntry = (snmp_community_mib_snmpTargetAddrExtEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(snmp_community_mib_snmpTargetAddrExtEntry_t *));
+        if (! *snmpTargetAddrExtEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*snmpTargetAddrExtEntry)[i] = assign_snmpTargetAddrExtEntry(row->data);
+        }
+    }
+}
+
+void
+snmp_community_mib_get_snmpTargetAddrExtEntry(GSnmpSession *s, snmp_community_mib_snmpTargetAddrExtEntry_t **snmpTargetAddrExtEntry, guchar *snmpTargetAddrName, gsize _snmpTargetAddrNameLength, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_snmpTargetAddrExtEntry, sizeof(oid_snmpTargetAddrExtEntry));
+    len = pack_snmpTargetAddrExtEntry(base, snmpTargetAddrName, _snmpTargetAddrNameLength);
+    if (len < 0) {
+        g_warning("illegal snmpTargetAddrExtEntry index values");
+        return;
     }
 
-    *snmpTargetAddrExtEntry = (snmp_community_mib_snmpTargetAddrExtEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(snmp_community_mib_snmpTargetAddrExtEntry_t *));
-    if (! *snmpTargetAddrExtEntry) {
-        return -4;
+    *snmpTargetAddrExtEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_snmpTargetAddrExtEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *snmpTargetAddrExtEntry = assign_snmpTargetAddrExtEntry(out);
+    }
+}
+
+void
+snmp_community_mib_set_snmpTargetAddrExtEntry(GSnmpSession *s, snmp_community_mib_snmpTargetAddrExtEntry_t *snmpTargetAddrExtEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_snmpTargetAddrExtEntry, sizeof(oid_snmpTargetAddrExtEntry));
+    len = pack_snmpTargetAddrExtEntry(base, snmpTargetAddrExtEntry->snmpTargetAddrName, snmpTargetAddrExtEntry->_snmpTargetAddrNameLength);
+    if (len < 0) {
+        g_warning("illegal snmpTargetAddrExtEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*snmpTargetAddrExtEntry)[i] = assign_snmpTargetAddrExtEntry(row->data);
+    if (snmpTargetAddrExtEntry->snmpTargetAddrTMask) {
+        base[10] = 1;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       snmpTargetAddrExtEntry->snmpTargetAddrTMask,
+                       snmpTargetAddrExtEntry->_snmpTargetAddrTMaskLength);
+    }
+    if (snmpTargetAddrExtEntry->snmpTargetAddrMMS) {
+        base[10] = 2;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       snmpTargetAddrExtEntry->snmpTargetAddrMMS,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void

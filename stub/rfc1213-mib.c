@@ -154,33 +154,37 @@ GSnmpEnum const rfc1213_mib_enums_snmpEnableAuthenTraps[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -202,230 +206,262 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _system[] = {
-    { 1, G_SNMP_OCTET_STRING, "sysDescr" },
-    { 2, G_SNMP_OBJECT_ID, "sysObjectID" },
-    { 3, G_SNMP_TIMETICKS, "sysUpTime" },
-    { 4, G_SNMP_OCTET_STRING, "sysContact" },
-    { 5, G_SNMP_OCTET_STRING, "sysName" },
-    { 6, G_SNMP_OCTET_STRING, "sysLocation" },
-    { 7, G_SNMP_INTEGER32, "sysServices" },
-    { 0, 0, NULL }
+static guint32 const oid_system[] = {1, 3, 6, 1, 2, 1, 1};
+
+static attribute_t attr_system[] = {
+    { 1, G_SNMP_OCTET_STRING, RFC1213_MIB_SYSDESCR, "sysDescr" },
+    { 2, G_SNMP_OBJECT_ID, RFC1213_MIB_SYSOBJECTID, "sysObjectID" },
+    { 3, G_SNMP_TIMETICKS, RFC1213_MIB_SYSUPTIME, "sysUpTime" },
+    { 4, G_SNMP_OCTET_STRING, RFC1213_MIB_SYSCONTACT, "sysContact" },
+    { 5, G_SNMP_OCTET_STRING, RFC1213_MIB_SYSNAME, "sysName" },
+    { 6, G_SNMP_OCTET_STRING, RFC1213_MIB_SYSLOCATION, "sysLocation" },
+    { 7, G_SNMP_INTEGER32, RFC1213_MIB_SYSSERVICES, "sysServices" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _interfaces[] = {
-    { 1, G_SNMP_INTEGER32, "ifNumber" },
-    { 0, 0, NULL }
+static guint32 const oid_interfaces[] = {1, 3, 6, 1, 2, 1, 2};
+
+static attribute_t attr_interfaces[] = {
+    { 1, G_SNMP_INTEGER32, RFC1213_MIB_IFNUMBER, "ifNumber" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ifEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "ifDescr" },
-    { 3, G_SNMP_INTEGER32, "ifType" },
-    { 4, G_SNMP_INTEGER32, "ifMtu" },
-    { 5, G_SNMP_UNSIGNED32, "ifSpeed" },
-    { 6, G_SNMP_OCTET_STRING, "ifPhysAddress" },
-    { 7, G_SNMP_INTEGER32, "ifAdminStatus" },
-    { 8, G_SNMP_INTEGER32, "ifOperStatus" },
-    { 9, G_SNMP_TIMETICKS, "ifLastChange" },
-    { 10, G_SNMP_COUNTER32, "ifInOctets" },
-    { 11, G_SNMP_COUNTER32, "ifInUcastPkts" },
-    { 12, G_SNMP_COUNTER32, "ifInNUcastPkts" },
-    { 13, G_SNMP_COUNTER32, "ifInDiscards" },
-    { 14, G_SNMP_COUNTER32, "ifInErrors" },
-    { 15, G_SNMP_COUNTER32, "ifInUnknownProtos" },
-    { 16, G_SNMP_COUNTER32, "ifOutOctets" },
-    { 17, G_SNMP_COUNTER32, "ifOutUcastPkts" },
-    { 18, G_SNMP_COUNTER32, "ifOutNUcastPkts" },
-    { 19, G_SNMP_COUNTER32, "ifOutDiscards" },
-    { 20, G_SNMP_COUNTER32, "ifOutErrors" },
-    { 21, G_SNMP_UNSIGNED32, "ifOutQLen" },
-    { 22, G_SNMP_OBJECT_ID, "ifSpecific" },
-    { 0, 0, NULL }
+static guint32 const oid_ifEntry[] = {1, 3, 6, 1, 2, 1, 2, 2, 1};
+
+static attribute_t attr_ifEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, RFC1213_MIB_IFDESCR, "ifDescr" },
+    { 3, G_SNMP_INTEGER32, RFC1213_MIB_IFTYPE, "ifType" },
+    { 4, G_SNMP_INTEGER32, RFC1213_MIB_IFMTU, "ifMtu" },
+    { 5, G_SNMP_UNSIGNED32, RFC1213_MIB_IFSPEED, "ifSpeed" },
+    { 6, G_SNMP_OCTET_STRING, RFC1213_MIB_IFPHYSADDRESS, "ifPhysAddress" },
+    { 7, G_SNMP_INTEGER32, RFC1213_MIB_IFADMINSTATUS, "ifAdminStatus" },
+    { 8, G_SNMP_INTEGER32, RFC1213_MIB_IFOPERSTATUS, "ifOperStatus" },
+    { 9, G_SNMP_TIMETICKS, RFC1213_MIB_IFLASTCHANGE, "ifLastChange" },
+    { 10, G_SNMP_COUNTER32, RFC1213_MIB_IFINOCTETS, "ifInOctets" },
+    { 11, G_SNMP_COUNTER32, RFC1213_MIB_IFINUCASTPKTS, "ifInUcastPkts" },
+    { 12, G_SNMP_COUNTER32, RFC1213_MIB_IFINNUCASTPKTS, "ifInNUcastPkts" },
+    { 13, G_SNMP_COUNTER32, RFC1213_MIB_IFINDISCARDS, "ifInDiscards" },
+    { 14, G_SNMP_COUNTER32, RFC1213_MIB_IFINERRORS, "ifInErrors" },
+    { 15, G_SNMP_COUNTER32, RFC1213_MIB_IFINUNKNOWNPROTOS, "ifInUnknownProtos" },
+    { 16, G_SNMP_COUNTER32, RFC1213_MIB_IFOUTOCTETS, "ifOutOctets" },
+    { 17, G_SNMP_COUNTER32, RFC1213_MIB_IFOUTUCASTPKTS, "ifOutUcastPkts" },
+    { 18, G_SNMP_COUNTER32, RFC1213_MIB_IFOUTNUCASTPKTS, "ifOutNUcastPkts" },
+    { 19, G_SNMP_COUNTER32, RFC1213_MIB_IFOUTDISCARDS, "ifOutDiscards" },
+    { 20, G_SNMP_COUNTER32, RFC1213_MIB_IFOUTERRORS, "ifOutErrors" },
+    { 21, G_SNMP_UNSIGNED32, RFC1213_MIB_IFOUTQLEN, "ifOutQLen" },
+    { 22, G_SNMP_OBJECT_ID, RFC1213_MIB_IFSPECIFIC, "ifSpecific" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _atEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "atPhysAddress" },
-    { 0, 0, NULL }
+static guint32 const oid_atEntry[] = {1, 3, 6, 1, 2, 1, 3, 1, 1};
+
+static attribute_t attr_atEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, RFC1213_MIB_ATPHYSADDRESS, "atPhysAddress" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ip[] = {
-    { 1, G_SNMP_INTEGER32, "ipForwarding" },
-    { 2, G_SNMP_INTEGER32, "ipDefaultTTL" },
-    { 3, G_SNMP_COUNTER32, "ipInReceives" },
-    { 4, G_SNMP_COUNTER32, "ipInHdrErrors" },
-    { 5, G_SNMP_COUNTER32, "ipInAddrErrors" },
-    { 6, G_SNMP_COUNTER32, "ipForwDatagrams" },
-    { 7, G_SNMP_COUNTER32, "ipInUnknownProtos" },
-    { 8, G_SNMP_COUNTER32, "ipInDiscards" },
-    { 9, G_SNMP_COUNTER32, "ipInDelivers" },
-    { 10, G_SNMP_COUNTER32, "ipOutRequests" },
-    { 11, G_SNMP_COUNTER32, "ipOutDiscards" },
-    { 12, G_SNMP_COUNTER32, "ipOutNoRoutes" },
-    { 13, G_SNMP_INTEGER32, "ipReasmTimeout" },
-    { 14, G_SNMP_COUNTER32, "ipReasmReqds" },
-    { 15, G_SNMP_COUNTER32, "ipReasmOKs" },
-    { 16, G_SNMP_COUNTER32, "ipReasmFails" },
-    { 17, G_SNMP_COUNTER32, "ipFragOKs" },
-    { 18, G_SNMP_COUNTER32, "ipFragFails" },
-    { 19, G_SNMP_COUNTER32, "ipFragCreates" },
-    { 23, G_SNMP_COUNTER32, "ipRoutingDiscards" },
-    { 0, 0, NULL }
+static guint32 const oid_ip[] = {1, 3, 6, 1, 2, 1, 4};
+
+static attribute_t attr_ip[] = {
+    { 1, G_SNMP_INTEGER32, RFC1213_MIB_IPFORWARDING, "ipForwarding" },
+    { 2, G_SNMP_INTEGER32, RFC1213_MIB_IPDEFAULTTTL, "ipDefaultTTL" },
+    { 3, G_SNMP_COUNTER32, RFC1213_MIB_IPINRECEIVES, "ipInReceives" },
+    { 4, G_SNMP_COUNTER32, RFC1213_MIB_IPINHDRERRORS, "ipInHdrErrors" },
+    { 5, G_SNMP_COUNTER32, RFC1213_MIB_IPINADDRERRORS, "ipInAddrErrors" },
+    { 6, G_SNMP_COUNTER32, RFC1213_MIB_IPFORWDATAGRAMS, "ipForwDatagrams" },
+    { 7, G_SNMP_COUNTER32, RFC1213_MIB_IPINUNKNOWNPROTOS, "ipInUnknownProtos" },
+    { 8, G_SNMP_COUNTER32, RFC1213_MIB_IPINDISCARDS, "ipInDiscards" },
+    { 9, G_SNMP_COUNTER32, RFC1213_MIB_IPINDELIVERS, "ipInDelivers" },
+    { 10, G_SNMP_COUNTER32, RFC1213_MIB_IPOUTREQUESTS, "ipOutRequests" },
+    { 11, G_SNMP_COUNTER32, RFC1213_MIB_IPOUTDISCARDS, "ipOutDiscards" },
+    { 12, G_SNMP_COUNTER32, RFC1213_MIB_IPOUTNOROUTES, "ipOutNoRoutes" },
+    { 13, G_SNMP_INTEGER32, RFC1213_MIB_IPREASMTIMEOUT, "ipReasmTimeout" },
+    { 14, G_SNMP_COUNTER32, RFC1213_MIB_IPREASMREQDS, "ipReasmReqds" },
+    { 15, G_SNMP_COUNTER32, RFC1213_MIB_IPREASMOKS, "ipReasmOKs" },
+    { 16, G_SNMP_COUNTER32, RFC1213_MIB_IPREASMFAILS, "ipReasmFails" },
+    { 17, G_SNMP_COUNTER32, RFC1213_MIB_IPFRAGOKS, "ipFragOKs" },
+    { 18, G_SNMP_COUNTER32, RFC1213_MIB_IPFRAGFAILS, "ipFragFails" },
+    { 19, G_SNMP_COUNTER32, RFC1213_MIB_IPFRAGCREATES, "ipFragCreates" },
+    { 23, G_SNMP_COUNTER32, RFC1213_MIB_IPROUTINGDISCARDS, "ipRoutingDiscards" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ipAddrEntry[] = {
-    { 2, G_SNMP_INTEGER32, "ipAdEntIfIndex" },
-    { 3, G_SNMP_IPADDRESS, "ipAdEntNetMask" },
-    { 4, G_SNMP_INTEGER32, "ipAdEntBcastAddr" },
-    { 5, G_SNMP_INTEGER32, "ipAdEntReasmMaxSize" },
-    { 0, 0, NULL }
+static guint32 const oid_ipAddrEntry[] = {1, 3, 6, 1, 2, 1, 4, 20, 1};
+
+static attribute_t attr_ipAddrEntry[] = {
+    { 2, G_SNMP_INTEGER32, RFC1213_MIB_IPADENTIFINDEX, "ipAdEntIfIndex" },
+    { 3, G_SNMP_IPADDRESS, RFC1213_MIB_IPADENTNETMASK, "ipAdEntNetMask" },
+    { 4, G_SNMP_INTEGER32, RFC1213_MIB_IPADENTBCASTADDR, "ipAdEntBcastAddr" },
+    { 5, G_SNMP_INTEGER32, RFC1213_MIB_IPADENTREASMMAXSIZE, "ipAdEntReasmMaxSize" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ipRouteEntry[] = {
-    { 2, G_SNMP_INTEGER32, "ipRouteIfIndex" },
-    { 3, G_SNMP_INTEGER32, "ipRouteMetric1" },
-    { 4, G_SNMP_INTEGER32, "ipRouteMetric2" },
-    { 5, G_SNMP_INTEGER32, "ipRouteMetric3" },
-    { 6, G_SNMP_INTEGER32, "ipRouteMetric4" },
-    { 7, G_SNMP_IPADDRESS, "ipRouteNextHop" },
-    { 8, G_SNMP_INTEGER32, "ipRouteType" },
-    { 9, G_SNMP_INTEGER32, "ipRouteProto" },
-    { 10, G_SNMP_INTEGER32, "ipRouteAge" },
-    { 11, G_SNMP_IPADDRESS, "ipRouteMask" },
-    { 12, G_SNMP_INTEGER32, "ipRouteMetric5" },
-    { 13, G_SNMP_OBJECT_ID, "ipRouteInfo" },
-    { 0, 0, NULL }
+static guint32 const oid_ipRouteEntry[] = {1, 3, 6, 1, 2, 1, 4, 21, 1};
+
+static attribute_t attr_ipRouteEntry[] = {
+    { 2, G_SNMP_INTEGER32, RFC1213_MIB_IPROUTEIFINDEX, "ipRouteIfIndex" },
+    { 3, G_SNMP_INTEGER32, RFC1213_MIB_IPROUTEMETRIC1, "ipRouteMetric1" },
+    { 4, G_SNMP_INTEGER32, RFC1213_MIB_IPROUTEMETRIC2, "ipRouteMetric2" },
+    { 5, G_SNMP_INTEGER32, RFC1213_MIB_IPROUTEMETRIC3, "ipRouteMetric3" },
+    { 6, G_SNMP_INTEGER32, RFC1213_MIB_IPROUTEMETRIC4, "ipRouteMetric4" },
+    { 7, G_SNMP_IPADDRESS, RFC1213_MIB_IPROUTENEXTHOP, "ipRouteNextHop" },
+    { 8, G_SNMP_INTEGER32, RFC1213_MIB_IPROUTETYPE, "ipRouteType" },
+    { 9, G_SNMP_INTEGER32, RFC1213_MIB_IPROUTEPROTO, "ipRouteProto" },
+    { 10, G_SNMP_INTEGER32, RFC1213_MIB_IPROUTEAGE, "ipRouteAge" },
+    { 11, G_SNMP_IPADDRESS, RFC1213_MIB_IPROUTEMASK, "ipRouteMask" },
+    { 12, G_SNMP_INTEGER32, RFC1213_MIB_IPROUTEMETRIC5, "ipRouteMetric5" },
+    { 13, G_SNMP_OBJECT_ID, RFC1213_MIB_IPROUTEINFO, "ipRouteInfo" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ipNetToMediaEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "ipNetToMediaPhysAddress" },
-    { 4, G_SNMP_INTEGER32, "ipNetToMediaType" },
-    { 0, 0, NULL }
+static guint32 const oid_ipNetToMediaEntry[] = {1, 3, 6, 1, 2, 1, 4, 22, 1};
+
+static attribute_t attr_ipNetToMediaEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, RFC1213_MIB_IPNETTOMEDIAPHYSADDRESS, "ipNetToMediaPhysAddress" },
+    { 4, G_SNMP_INTEGER32, RFC1213_MIB_IPNETTOMEDIATYPE, "ipNetToMediaType" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _icmp[] = {
-    { 1, G_SNMP_COUNTER32, "icmpInMsgs" },
-    { 2, G_SNMP_COUNTER32, "icmpInErrors" },
-    { 3, G_SNMP_COUNTER32, "icmpInDestUnreachs" },
-    { 4, G_SNMP_COUNTER32, "icmpInTimeExcds" },
-    { 5, G_SNMP_COUNTER32, "icmpInParmProbs" },
-    { 6, G_SNMP_COUNTER32, "icmpInSrcQuenchs" },
-    { 7, G_SNMP_COUNTER32, "icmpInRedirects" },
-    { 8, G_SNMP_COUNTER32, "icmpInEchos" },
-    { 9, G_SNMP_COUNTER32, "icmpInEchoReps" },
-    { 10, G_SNMP_COUNTER32, "icmpInTimestamps" },
-    { 11, G_SNMP_COUNTER32, "icmpInTimestampReps" },
-    { 12, G_SNMP_COUNTER32, "icmpInAddrMasks" },
-    { 13, G_SNMP_COUNTER32, "icmpInAddrMaskReps" },
-    { 14, G_SNMP_COUNTER32, "icmpOutMsgs" },
-    { 15, G_SNMP_COUNTER32, "icmpOutErrors" },
-    { 16, G_SNMP_COUNTER32, "icmpOutDestUnreachs" },
-    { 17, G_SNMP_COUNTER32, "icmpOutTimeExcds" },
-    { 18, G_SNMP_COUNTER32, "icmpOutParmProbs" },
-    { 19, G_SNMP_COUNTER32, "icmpOutSrcQuenchs" },
-    { 20, G_SNMP_COUNTER32, "icmpOutRedirects" },
-    { 21, G_SNMP_COUNTER32, "icmpOutEchos" },
-    { 22, G_SNMP_COUNTER32, "icmpOutEchoReps" },
-    { 23, G_SNMP_COUNTER32, "icmpOutTimestamps" },
-    { 24, G_SNMP_COUNTER32, "icmpOutTimestampReps" },
-    { 25, G_SNMP_COUNTER32, "icmpOutAddrMasks" },
-    { 26, G_SNMP_COUNTER32, "icmpOutAddrMaskReps" },
-    { 0, 0, NULL }
+static guint32 const oid_icmp[] = {1, 3, 6, 1, 2, 1, 5};
+
+static attribute_t attr_icmp[] = {
+    { 1, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINMSGS, "icmpInMsgs" },
+    { 2, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINERRORS, "icmpInErrors" },
+    { 3, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINDESTUNREACHS, "icmpInDestUnreachs" },
+    { 4, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINTIMEEXCDS, "icmpInTimeExcds" },
+    { 5, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINPARMPROBS, "icmpInParmProbs" },
+    { 6, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINSRCQUENCHS, "icmpInSrcQuenchs" },
+    { 7, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINREDIRECTS, "icmpInRedirects" },
+    { 8, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINECHOS, "icmpInEchos" },
+    { 9, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINECHOREPS, "icmpInEchoReps" },
+    { 10, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINTIMESTAMPS, "icmpInTimestamps" },
+    { 11, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINTIMESTAMPREPS, "icmpInTimestampReps" },
+    { 12, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINADDRMASKS, "icmpInAddrMasks" },
+    { 13, G_SNMP_COUNTER32, RFC1213_MIB_ICMPINADDRMASKREPS, "icmpInAddrMaskReps" },
+    { 14, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTMSGS, "icmpOutMsgs" },
+    { 15, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTERRORS, "icmpOutErrors" },
+    { 16, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTDESTUNREACHS, "icmpOutDestUnreachs" },
+    { 17, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTTIMEEXCDS, "icmpOutTimeExcds" },
+    { 18, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTPARMPROBS, "icmpOutParmProbs" },
+    { 19, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTSRCQUENCHS, "icmpOutSrcQuenchs" },
+    { 20, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTREDIRECTS, "icmpOutRedirects" },
+    { 21, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTECHOS, "icmpOutEchos" },
+    { 22, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTECHOREPS, "icmpOutEchoReps" },
+    { 23, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTTIMESTAMPS, "icmpOutTimestamps" },
+    { 24, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTTIMESTAMPREPS, "icmpOutTimestampReps" },
+    { 25, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTADDRMASKS, "icmpOutAddrMasks" },
+    { 26, G_SNMP_COUNTER32, RFC1213_MIB_ICMPOUTADDRMASKREPS, "icmpOutAddrMaskReps" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _tcp[] = {
-    { 1, G_SNMP_INTEGER32, "tcpRtoAlgorithm" },
-    { 2, G_SNMP_INTEGER32, "tcpRtoMin" },
-    { 3, G_SNMP_INTEGER32, "tcpRtoMax" },
-    { 4, G_SNMP_INTEGER32, "tcpMaxConn" },
-    { 5, G_SNMP_COUNTER32, "tcpActiveOpens" },
-    { 6, G_SNMP_COUNTER32, "tcpPassiveOpens" },
-    { 7, G_SNMP_COUNTER32, "tcpAttemptFails" },
-    { 8, G_SNMP_COUNTER32, "tcpEstabResets" },
-    { 9, G_SNMP_UNSIGNED32, "tcpCurrEstab" },
-    { 10, G_SNMP_COUNTER32, "tcpInSegs" },
-    { 11, G_SNMP_COUNTER32, "tcpOutSegs" },
-    { 12, G_SNMP_COUNTER32, "tcpRetransSegs" },
-    { 14, G_SNMP_COUNTER32, "tcpInErrs" },
-    { 15, G_SNMP_COUNTER32, "tcpOutRsts" },
-    { 0, 0, NULL }
+static guint32 const oid_tcp[] = {1, 3, 6, 1, 2, 1, 6};
+
+static attribute_t attr_tcp[] = {
+    { 1, G_SNMP_INTEGER32, RFC1213_MIB_TCPRTOALGORITHM, "tcpRtoAlgorithm" },
+    { 2, G_SNMP_INTEGER32, RFC1213_MIB_TCPRTOMIN, "tcpRtoMin" },
+    { 3, G_SNMP_INTEGER32, RFC1213_MIB_TCPRTOMAX, "tcpRtoMax" },
+    { 4, G_SNMP_INTEGER32, RFC1213_MIB_TCPMAXCONN, "tcpMaxConn" },
+    { 5, G_SNMP_COUNTER32, RFC1213_MIB_TCPACTIVEOPENS, "tcpActiveOpens" },
+    { 6, G_SNMP_COUNTER32, RFC1213_MIB_TCPPASSIVEOPENS, "tcpPassiveOpens" },
+    { 7, G_SNMP_COUNTER32, RFC1213_MIB_TCPATTEMPTFAILS, "tcpAttemptFails" },
+    { 8, G_SNMP_COUNTER32, RFC1213_MIB_TCPESTABRESETS, "tcpEstabResets" },
+    { 9, G_SNMP_UNSIGNED32, RFC1213_MIB_TCPCURRESTAB, "tcpCurrEstab" },
+    { 10, G_SNMP_COUNTER32, RFC1213_MIB_TCPINSEGS, "tcpInSegs" },
+    { 11, G_SNMP_COUNTER32, RFC1213_MIB_TCPOUTSEGS, "tcpOutSegs" },
+    { 12, G_SNMP_COUNTER32, RFC1213_MIB_TCPRETRANSSEGS, "tcpRetransSegs" },
+    { 14, G_SNMP_COUNTER32, RFC1213_MIB_TCPINERRS, "tcpInErrs" },
+    { 15, G_SNMP_COUNTER32, RFC1213_MIB_TCPOUTRSTS, "tcpOutRsts" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _tcpConnEntry[] = {
-    { 1, G_SNMP_INTEGER32, "tcpConnState" },
-    { 0, 0, NULL }
+static guint32 const oid_tcpConnEntry[] = {1, 3, 6, 1, 2, 1, 6, 13, 1};
+
+static attribute_t attr_tcpConnEntry[] = {
+    { 1, G_SNMP_INTEGER32, RFC1213_MIB_TCPCONNSTATE, "tcpConnState" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _udp[] = {
-    { 1, G_SNMP_COUNTER32, "udpInDatagrams" },
-    { 2, G_SNMP_COUNTER32, "udpNoPorts" },
-    { 3, G_SNMP_COUNTER32, "udpInErrors" },
-    { 4, G_SNMP_COUNTER32, "udpOutDatagrams" },
-    { 0, 0, NULL }
+static guint32 const oid_udp[] = {1, 3, 6, 1, 2, 1, 7};
+
+static attribute_t attr_udp[] = {
+    { 1, G_SNMP_COUNTER32, RFC1213_MIB_UDPINDATAGRAMS, "udpInDatagrams" },
+    { 2, G_SNMP_COUNTER32, RFC1213_MIB_UDPNOPORTS, "udpNoPorts" },
+    { 3, G_SNMP_COUNTER32, RFC1213_MIB_UDPINERRORS, "udpInErrors" },
+    { 4, G_SNMP_COUNTER32, RFC1213_MIB_UDPOUTDATAGRAMS, "udpOutDatagrams" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _udpEntry[] = {
-    { 1, G_SNMP_IPADDRESS, "udpLocalAddress" },
-    { 2, G_SNMP_INTEGER32, "udpLocalPort" },
-    { 0, 0, NULL }
+static guint32 const oid_udpEntry[] = {1, 3, 6, 1, 2, 1, 7, 5, 1};
+
+static attribute_t attr_udpEntry[] = {
+    { 1, G_SNMP_IPADDRESS, RFC1213_MIB_UDPLOCALADDRESS, "udpLocalAddress" },
+    { 2, G_SNMP_INTEGER32, RFC1213_MIB_UDPLOCALPORT, "udpLocalPort" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _egp[] = {
-    { 1, G_SNMP_COUNTER32, "egpInMsgs" },
-    { 2, G_SNMP_COUNTER32, "egpInErrors" },
-    { 3, G_SNMP_COUNTER32, "egpOutMsgs" },
-    { 4, G_SNMP_COUNTER32, "egpOutErrors" },
-    { 6, G_SNMP_INTEGER32, "egpAs" },
-    { 0, 0, NULL }
+static guint32 const oid_egp[] = {1, 3, 6, 1, 2, 1, 8};
+
+static attribute_t attr_egp[] = {
+    { 1, G_SNMP_COUNTER32, RFC1213_MIB_EGPINMSGS, "egpInMsgs" },
+    { 2, G_SNMP_COUNTER32, RFC1213_MIB_EGPINERRORS, "egpInErrors" },
+    { 3, G_SNMP_COUNTER32, RFC1213_MIB_EGPOUTMSGS, "egpOutMsgs" },
+    { 4, G_SNMP_COUNTER32, RFC1213_MIB_EGPOUTERRORS, "egpOutErrors" },
+    { 6, G_SNMP_INTEGER32, RFC1213_MIB_EGPAS, "egpAs" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _egpNeighEntry[] = {
-    { 1, G_SNMP_INTEGER32, "egpNeighState" },
-    { 3, G_SNMP_INTEGER32, "egpNeighAs" },
-    { 4, G_SNMP_COUNTER32, "egpNeighInMsgs" },
-    { 5, G_SNMP_COUNTER32, "egpNeighInErrs" },
-    { 6, G_SNMP_COUNTER32, "egpNeighOutMsgs" },
-    { 7, G_SNMP_COUNTER32, "egpNeighOutErrs" },
-    { 8, G_SNMP_COUNTER32, "egpNeighInErrMsgs" },
-    { 9, G_SNMP_COUNTER32, "egpNeighOutErrMsgs" },
-    { 10, G_SNMP_COUNTER32, "egpNeighStateUps" },
-    { 11, G_SNMP_COUNTER32, "egpNeighStateDowns" },
-    { 12, G_SNMP_INTEGER32, "egpNeighIntervalHello" },
-    { 13, G_SNMP_INTEGER32, "egpNeighIntervalPoll" },
-    { 14, G_SNMP_INTEGER32, "egpNeighMode" },
-    { 15, G_SNMP_INTEGER32, "egpNeighEventTrigger" },
-    { 0, 0, NULL }
+static guint32 const oid_egpNeighEntry[] = {1, 3, 6, 1, 2, 1, 8, 5, 1};
+
+static attribute_t attr_egpNeighEntry[] = {
+    { 1, G_SNMP_INTEGER32, RFC1213_MIB_EGPNEIGHSTATE, "egpNeighState" },
+    { 3, G_SNMP_INTEGER32, RFC1213_MIB_EGPNEIGHAS, "egpNeighAs" },
+    { 4, G_SNMP_COUNTER32, RFC1213_MIB_EGPNEIGHINMSGS, "egpNeighInMsgs" },
+    { 5, G_SNMP_COUNTER32, RFC1213_MIB_EGPNEIGHINERRS, "egpNeighInErrs" },
+    { 6, G_SNMP_COUNTER32, RFC1213_MIB_EGPNEIGHOUTMSGS, "egpNeighOutMsgs" },
+    { 7, G_SNMP_COUNTER32, RFC1213_MIB_EGPNEIGHOUTERRS, "egpNeighOutErrs" },
+    { 8, G_SNMP_COUNTER32, RFC1213_MIB_EGPNEIGHINERRMSGS, "egpNeighInErrMsgs" },
+    { 9, G_SNMP_COUNTER32, RFC1213_MIB_EGPNEIGHOUTERRMSGS, "egpNeighOutErrMsgs" },
+    { 10, G_SNMP_COUNTER32, RFC1213_MIB_EGPNEIGHSTATEUPS, "egpNeighStateUps" },
+    { 11, G_SNMP_COUNTER32, RFC1213_MIB_EGPNEIGHSTATEDOWNS, "egpNeighStateDowns" },
+    { 12, G_SNMP_INTEGER32, RFC1213_MIB_EGPNEIGHINTERVALHELLO, "egpNeighIntervalHello" },
+    { 13, G_SNMP_INTEGER32, RFC1213_MIB_EGPNEIGHINTERVALPOLL, "egpNeighIntervalPoll" },
+    { 14, G_SNMP_INTEGER32, RFC1213_MIB_EGPNEIGHMODE, "egpNeighMode" },
+    { 15, G_SNMP_INTEGER32, RFC1213_MIB_EGPNEIGHEVENTTRIGGER, "egpNeighEventTrigger" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _snmp[] = {
-    { 1, G_SNMP_COUNTER32, "snmpInPkts" },
-    { 2, G_SNMP_COUNTER32, "snmpOutPkts" },
-    { 3, G_SNMP_COUNTER32, "snmpInBadVersions" },
-    { 4, G_SNMP_COUNTER32, "snmpInBadCommunityNames" },
-    { 5, G_SNMP_COUNTER32, "snmpInBadCommunityUses" },
-    { 6, G_SNMP_COUNTER32, "snmpInASNParseErrs" },
-    { 8, G_SNMP_COUNTER32, "snmpInTooBigs" },
-    { 9, G_SNMP_COUNTER32, "snmpInNoSuchNames" },
-    { 10, G_SNMP_COUNTER32, "snmpInBadValues" },
-    { 11, G_SNMP_COUNTER32, "snmpInReadOnlys" },
-    { 12, G_SNMP_COUNTER32, "snmpInGenErrs" },
-    { 13, G_SNMP_COUNTER32, "snmpInTotalReqVars" },
-    { 14, G_SNMP_COUNTER32, "snmpInTotalSetVars" },
-    { 15, G_SNMP_COUNTER32, "snmpInGetRequests" },
-    { 16, G_SNMP_COUNTER32, "snmpInGetNexts" },
-    { 17, G_SNMP_COUNTER32, "snmpInSetRequests" },
-    { 18, G_SNMP_COUNTER32, "snmpInGetResponses" },
-    { 19, G_SNMP_COUNTER32, "snmpInTraps" },
-    { 20, G_SNMP_COUNTER32, "snmpOutTooBigs" },
-    { 21, G_SNMP_COUNTER32, "snmpOutNoSuchNames" },
-    { 22, G_SNMP_COUNTER32, "snmpOutBadValues" },
-    { 24, G_SNMP_COUNTER32, "snmpOutGenErrs" },
-    { 25, G_SNMP_COUNTER32, "snmpOutGetRequests" },
-    { 26, G_SNMP_COUNTER32, "snmpOutGetNexts" },
-    { 27, G_SNMP_COUNTER32, "snmpOutSetRequests" },
-    { 28, G_SNMP_COUNTER32, "snmpOutGetResponses" },
-    { 29, G_SNMP_COUNTER32, "snmpOutTraps" },
-    { 30, G_SNMP_INTEGER32, "snmpEnableAuthenTraps" },
-    { 0, 0, NULL }
+static guint32 const oid_snmp[] = {1, 3, 6, 1, 2, 1, 11};
+
+static attribute_t attr_snmp[] = {
+    { 1, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINPKTS, "snmpInPkts" },
+    { 2, G_SNMP_COUNTER32, RFC1213_MIB_SNMPOUTPKTS, "snmpOutPkts" },
+    { 3, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINBADVERSIONS, "snmpInBadVersions" },
+    { 4, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINBADCOMMUNITYNAMES, "snmpInBadCommunityNames" },
+    { 5, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINBADCOMMUNITYUSES, "snmpInBadCommunityUses" },
+    { 6, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINASNPARSEERRS, "snmpInASNParseErrs" },
+    { 8, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINTOOBIGS, "snmpInTooBigs" },
+    { 9, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINNOSUCHNAMES, "snmpInNoSuchNames" },
+    { 10, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINBADVALUES, "snmpInBadValues" },
+    { 11, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINREADONLYS, "snmpInReadOnlys" },
+    { 12, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINGENERRS, "snmpInGenErrs" },
+    { 13, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINTOTALREQVARS, "snmpInTotalReqVars" },
+    { 14, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINTOTALSETVARS, "snmpInTotalSetVars" },
+    { 15, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINGETREQUESTS, "snmpInGetRequests" },
+    { 16, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINGETNEXTS, "snmpInGetNexts" },
+    { 17, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINSETREQUESTS, "snmpInSetRequests" },
+    { 18, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINGETRESPONSES, "snmpInGetResponses" },
+    { 19, G_SNMP_COUNTER32, RFC1213_MIB_SNMPINTRAPS, "snmpInTraps" },
+    { 20, G_SNMP_COUNTER32, RFC1213_MIB_SNMPOUTTOOBIGS, "snmpOutTooBigs" },
+    { 21, G_SNMP_COUNTER32, RFC1213_MIB_SNMPOUTNOSUCHNAMES, "snmpOutNoSuchNames" },
+    { 22, G_SNMP_COUNTER32, RFC1213_MIB_SNMPOUTBADVALUES, "snmpOutBadValues" },
+    { 24, G_SNMP_COUNTER32, RFC1213_MIB_SNMPOUTGENERRS, "snmpOutGenErrs" },
+    { 25, G_SNMP_COUNTER32, RFC1213_MIB_SNMPOUTGETREQUESTS, "snmpOutGetRequests" },
+    { 26, G_SNMP_COUNTER32, RFC1213_MIB_SNMPOUTGETNEXTS, "snmpOutGetNexts" },
+    { 27, G_SNMP_COUNTER32, RFC1213_MIB_SNMPOUTSETREQUESTS, "snmpOutSetRequests" },
+    { 28, G_SNMP_COUNTER32, RFC1213_MIB_SNMPOUTGETRESPONSES, "snmpOutGetResponses" },
+    { 29, G_SNMP_COUNTER32, RFC1213_MIB_SNMPOUTTRAPS, "snmpOutTraps" },
+    { 30, G_SNMP_INTEGER32, RFC1213_MIB_SNMPENABLEAUTHENTRAPS, "snmpEnableAuthenTraps" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -445,7 +481,6 @@ assign_system(GSList *vbl)
     rfc1213_mib_system_t *system;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 1};
 
     system = rfc1213_mib_new_system();
     if (! system) {
@@ -458,8 +493,8 @@ assign_system(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _system, &idx) < 0) continue;
+        if (lookup(vb, oid_system, sizeof(oid_system)/sizeof(guint32),
+                   attr_system, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -494,29 +529,25 @@ assign_system(GSList *vbl)
     return system;
 }
 
-int
-rfc1213_mib_get_system(GSnmpSession *s, rfc1213_mib_system_t **system)
+void
+rfc1213_mib_get_system(GSnmpSession *s, rfc1213_mib_system_t **system, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 1, 0};
 
     *system = NULL;
 
-    add_attributes(s, &in, base, 7, _system);
+    add_attributes(s, &in, base, 8, 7, attr_system, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *system = assign_system(out);
     }
-
-    *system = assign_system(out);
-
-    return 0;
 }
 
-int
-rfc1213_mib_set_system(GSnmpSession *s, rfc1213_mib_system_t *system)
+void
+rfc1213_mib_set_system(GSnmpSession *s, rfc1213_mib_system_t *system, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 1, 0, 0};
@@ -545,12 +576,9 @@ rfc1213_mib_set_system(GSnmpSession *s, rfc1213_mib_system_t *system)
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void
@@ -583,7 +611,6 @@ assign_interfaces(GSList *vbl)
     rfc1213_mib_interfaces_t *interfaces;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 2};
 
     interfaces = rfc1213_mib_new_interfaces();
     if (! interfaces) {
@@ -596,8 +623,8 @@ assign_interfaces(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _interfaces, &idx) < 0) continue;
+        if (lookup(vb, oid_interfaces, sizeof(oid_interfaces)/sizeof(guint32),
+                   attr_interfaces, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -609,25 +636,21 @@ assign_interfaces(GSList *vbl)
     return interfaces;
 }
 
-int
-rfc1213_mib_get_interfaces(GSnmpSession *s, rfc1213_mib_interfaces_t **interfaces)
+void
+rfc1213_mib_get_interfaces(GSnmpSession *s, rfc1213_mib_interfaces_t **interfaces, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 2, 0};
 
     *interfaces = NULL;
 
-    add_attributes(s, &in, base, 7, _interfaces);
+    add_attributes(s, &in, base, 8, 7, attr_interfaces, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *interfaces = assign_interfaces(out);
     }
-
-    *interfaces = assign_interfaces(out);
-
-    return 0;
 }
 
 void
@@ -664,6 +687,15 @@ unpack_ifEntry(GSnmpVarBind *vb, rfc1213_mib_ifEntry_t *ifEntry)
     return 0;
 }
 
+static int
+pack_ifEntry(guint32 *base, gint32 ifIndex)
+{
+    int idx = 10;
+
+    base[idx++] = ifIndex;
+    return idx;
+}
+
 static rfc1213_mib_ifEntry_t *
 assign_ifEntry(GSList *vbl)
 {
@@ -671,7 +703,6 @@ assign_ifEntry(GSList *vbl)
     rfc1213_mib_ifEntry_t *ifEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 2, 2, 1};
 
     ifEntry = rfc1213_mib_new_ifEntry();
     if (! ifEntry) {
@@ -690,8 +721,8 @@ assign_ifEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ifEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ifEntry, sizeof(oid_ifEntry)/sizeof(guint32),
+                   attr_ifEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -766,8 +797,8 @@ assign_ifEntry(GSList *vbl)
     return ifEntry;
 }
 
-int
-rfc1213_mib_get_ifTable(GSnmpSession *s, rfc1213_mib_ifEntry_t ***ifEntry)
+void
+rfc1213_mib_get_ifTable(GSnmpSession *s, rfc1213_mib_ifEntry_t ***ifEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -776,24 +807,77 @@ rfc1213_mib_get_ifTable(GSnmpSession *s, rfc1213_mib_ifEntry_t ***ifEntry)
 
     *ifEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ifEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ifEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ifEntry = (rfc1213_mib_ifEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_ifEntry_t *));
+        if (! *ifEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ifEntry)[i] = assign_ifEntry(row->data);
+        }
+    }
+}
+
+void
+rfc1213_mib_get_ifEntry(GSnmpSession *s, rfc1213_mib_ifEntry_t **ifEntry, gint32 ifIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ifEntry, sizeof(oid_ifEntry));
+    len = pack_ifEntry(base, ifIndex);
+    if (len < 0) {
+        g_warning("illegal ifEntry index values");
+        return;
     }
 
-    *ifEntry = (rfc1213_mib_ifEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_ifEntry_t *));
-    if (! *ifEntry) {
-        return -4;
+    *ifEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ifEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ifEntry = assign_ifEntry(out);
+    }
+}
+
+void
+rfc1213_mib_set_ifEntry(GSnmpSession *s, rfc1213_mib_ifEntry_t *ifEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ifEntry, sizeof(oid_ifEntry));
+    len = pack_ifEntry(base, ifEntry->ifIndex);
+    if (len < 0) {
+        g_warning("illegal ifEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ifEntry)[i] = assign_ifEntry(row->data);
+    if (ifEntry->ifAdminStatus) {
+        base[9] = 7;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ifEntry->ifAdminStatus,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -848,6 +932,20 @@ unpack_atEntry(GSnmpVarBind *vb, rfc1213_mib_atEntry_t *atEntry)
     return 0;
 }
 
+static int
+pack_atEntry(guint32 *base, gint32 atIfIndex, guchar *atNetAddress)
+{
+    int i, len, idx = 10;
+
+    base[idx++] = atIfIndex;
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = atNetAddress[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static rfc1213_mib_atEntry_t *
 assign_atEntry(GSList *vbl)
 {
@@ -855,7 +953,6 @@ assign_atEntry(GSList *vbl)
     rfc1213_mib_atEntry_t *atEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 3, 1, 1};
 
     atEntry = rfc1213_mib_new_atEntry();
     if (! atEntry) {
@@ -874,8 +971,8 @@ assign_atEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _atEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_atEntry, sizeof(oid_atEntry)/sizeof(guint32),
+                   attr_atEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -888,8 +985,8 @@ assign_atEntry(GSList *vbl)
     return atEntry;
 }
 
-int
-rfc1213_mib_get_atTable(GSnmpSession *s, rfc1213_mib_atEntry_t ***atEntry)
+void
+rfc1213_mib_get_atTable(GSnmpSession *s, rfc1213_mib_atEntry_t ***atEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -898,24 +995,77 @@ rfc1213_mib_get_atTable(GSnmpSession *s, rfc1213_mib_atEntry_t ***atEntry)
 
     *atEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _atEntry);
+    add_attributes(s, &in, base, 10, 9, attr_atEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *atEntry = (rfc1213_mib_atEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_atEntry_t *));
+        if (! *atEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*atEntry)[i] = assign_atEntry(row->data);
+        }
+    }
+}
+
+void
+rfc1213_mib_get_atEntry(GSnmpSession *s, rfc1213_mib_atEntry_t **atEntry, gint32 atIfIndex, guchar *atNetAddress, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atEntry, sizeof(oid_atEntry));
+    len = pack_atEntry(base, atIfIndex, atNetAddress);
+    if (len < 0) {
+        g_warning("illegal atEntry index values");
+        return;
     }
 
-    *atEntry = (rfc1213_mib_atEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_atEntry_t *));
-    if (! *atEntry) {
-        return -4;
+    *atEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_atEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *atEntry = assign_atEntry(out);
+    }
+}
+
+void
+rfc1213_mib_set_atEntry(GSnmpSession *s, rfc1213_mib_atEntry_t *atEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atEntry, sizeof(oid_atEntry));
+    len = pack_atEntry(base, atEntry->atIfIndex, atEntry->atNetAddress);
+    if (len < 0) {
+        g_warning("illegal atEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*atEntry)[i] = assign_atEntry(row->data);
+    if (atEntry->atPhysAddress) {
+        base[9] = 2;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       atEntry->atPhysAddress,
+                       atEntry->_atPhysAddressLength);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -961,7 +1111,6 @@ assign_ip(GSList *vbl)
     rfc1213_mib_ip_t *ip;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4};
 
     ip = rfc1213_mib_new_ip();
     if (! ip) {
@@ -974,8 +1123,8 @@ assign_ip(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ip, &idx) < 0) continue;
+        if (lookup(vb, oid_ip, sizeof(oid_ip)/sizeof(guint32),
+                   attr_ip, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -1044,29 +1193,25 @@ assign_ip(GSList *vbl)
     return ip;
 }
 
-int
-rfc1213_mib_get_ip(GSnmpSession *s, rfc1213_mib_ip_t **ip)
+void
+rfc1213_mib_get_ip(GSnmpSession *s, rfc1213_mib_ip_t **ip, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 4, 0};
 
     *ip = NULL;
 
-    add_attributes(s, &in, base, 7, _ip);
+    add_attributes(s, &in, base, 8, 7, attr_ip, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *ip = assign_ip(out);
     }
-
-    *ip = assign_ip(out);
-
-    return 0;
 }
 
-int
-rfc1213_mib_set_ip(GSnmpSession *s, rfc1213_mib_ip_t *ip)
+void
+rfc1213_mib_set_ip(GSnmpSession *s, rfc1213_mib_ip_t *ip, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 4, 0, 0};
@@ -1088,12 +1233,9 @@ rfc1213_mib_set_ip(GSnmpSession *s, rfc1213_mib_ip_t *ip)
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void
@@ -1133,6 +1275,19 @@ unpack_ipAddrEntry(GSnmpVarBind *vb, rfc1213_mib_ipAddrEntry_t *ipAddrEntry)
     return 0;
 }
 
+static int
+pack_ipAddrEntry(guint32 *base, guchar *ipAdEntAddr)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ipAdEntAddr[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static rfc1213_mib_ipAddrEntry_t *
 assign_ipAddrEntry(GSList *vbl)
 {
@@ -1140,7 +1295,6 @@ assign_ipAddrEntry(GSList *vbl)
     rfc1213_mib_ipAddrEntry_t *ipAddrEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4, 20, 1};
 
     ipAddrEntry = rfc1213_mib_new_ipAddrEntry();
     if (! ipAddrEntry) {
@@ -1159,8 +1313,8 @@ assign_ipAddrEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ipAddrEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ipAddrEntry, sizeof(oid_ipAddrEntry)/sizeof(guint32),
+                   attr_ipAddrEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -1181,8 +1335,8 @@ assign_ipAddrEntry(GSList *vbl)
     return ipAddrEntry;
 }
 
-int
-rfc1213_mib_get_ipAddrTable(GSnmpSession *s, rfc1213_mib_ipAddrEntry_t ***ipAddrEntry)
+void
+rfc1213_mib_get_ipAddrTable(GSnmpSession *s, rfc1213_mib_ipAddrEntry_t ***ipAddrEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1191,24 +1345,48 @@ rfc1213_mib_get_ipAddrTable(GSnmpSession *s, rfc1213_mib_ipAddrEntry_t ***ipAddr
 
     *ipAddrEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ipAddrEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ipAddrEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ipAddrEntry = (rfc1213_mib_ipAddrEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_ipAddrEntry_t *));
+        if (! *ipAddrEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ipAddrEntry)[i] = assign_ipAddrEntry(row->data);
+        }
+    }
+}
+
+void
+rfc1213_mib_get_ipAddrEntry(GSnmpSession *s, rfc1213_mib_ipAddrEntry_t **ipAddrEntry, guchar *ipAdEntAddr, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ipAddrEntry, sizeof(oid_ipAddrEntry));
+    len = pack_ipAddrEntry(base, ipAdEntAddr);
+    if (len < 0) {
+        g_warning("illegal ipAddrEntry index values");
+        return;
     }
 
-    *ipAddrEntry = (rfc1213_mib_ipAddrEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_ipAddrEntry_t *));
-    if (! *ipAddrEntry) {
-        return -4;
-    }
+    *ipAddrEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ipAddrEntry)[i] = assign_ipAddrEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 9, attr_ipAddrEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ipAddrEntry = assign_ipAddrEntry(out);
+    }
 }
 
 void
@@ -1261,6 +1439,19 @@ unpack_ipRouteEntry(GSnmpVarBind *vb, rfc1213_mib_ipRouteEntry_t *ipRouteEntry)
     return 0;
 }
 
+static int
+pack_ipRouteEntry(guint32 *base, guchar *ipRouteDest)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ipRouteDest[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static rfc1213_mib_ipRouteEntry_t *
 assign_ipRouteEntry(GSList *vbl)
 {
@@ -1268,7 +1459,6 @@ assign_ipRouteEntry(GSList *vbl)
     rfc1213_mib_ipRouteEntry_t *ipRouteEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4, 21, 1};
 
     ipRouteEntry = rfc1213_mib_new_ipRouteEntry();
     if (! ipRouteEntry) {
@@ -1287,8 +1477,8 @@ assign_ipRouteEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ipRouteEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ipRouteEntry, sizeof(oid_ipRouteEntry)/sizeof(guint32),
+                   attr_ipRouteEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -1334,8 +1524,8 @@ assign_ipRouteEntry(GSList *vbl)
     return ipRouteEntry;
 }
 
-int
-rfc1213_mib_get_ipRouteTable(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t ***ipRouteEntry)
+void
+rfc1213_mib_get_ipRouteTable(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t ***ipRouteEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1344,24 +1534,131 @@ rfc1213_mib_get_ipRouteTable(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t ***ipRo
 
     *ipRouteEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ipRouteEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ipRouteEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ipRouteEntry = (rfc1213_mib_ipRouteEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_ipRouteEntry_t *));
+        if (! *ipRouteEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ipRouteEntry)[i] = assign_ipRouteEntry(row->data);
+        }
+    }
+}
+
+void
+rfc1213_mib_get_ipRouteEntry(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t **ipRouteEntry, guchar *ipRouteDest, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ipRouteEntry, sizeof(oid_ipRouteEntry));
+    len = pack_ipRouteEntry(base, ipRouteDest);
+    if (len < 0) {
+        g_warning("illegal ipRouteEntry index values");
+        return;
     }
 
-    *ipRouteEntry = (rfc1213_mib_ipRouteEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_ipRouteEntry_t *));
-    if (! *ipRouteEntry) {
-        return -4;
+    *ipRouteEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ipRouteEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ipRouteEntry = assign_ipRouteEntry(out);
+    }
+}
+
+void
+rfc1213_mib_set_ipRouteEntry(GSnmpSession *s, rfc1213_mib_ipRouteEntry_t *ipRouteEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ipRouteEntry, sizeof(oid_ipRouteEntry));
+    len = pack_ipRouteEntry(base, ipRouteEntry->ipRouteDest);
+    if (len < 0) {
+        g_warning("illegal ipRouteEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ipRouteEntry)[i] = assign_ipRouteEntry(row->data);
+    if (ipRouteEntry->ipRouteIfIndex) {
+        base[9] = 2;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ipRouteEntry->ipRouteIfIndex,
+                       0);
+    }
+    if (ipRouteEntry->ipRouteMetric1) {
+        base[9] = 3;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ipRouteEntry->ipRouteMetric1,
+                       0);
+    }
+    if (ipRouteEntry->ipRouteMetric2) {
+        base[9] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ipRouteEntry->ipRouteMetric2,
+                       0);
+    }
+    if (ipRouteEntry->ipRouteMetric3) {
+        base[9] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ipRouteEntry->ipRouteMetric3,
+                       0);
+    }
+    if (ipRouteEntry->ipRouteMetric4) {
+        base[9] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ipRouteEntry->ipRouteMetric4,
+                       0);
+    }
+    if (ipRouteEntry->ipRouteNextHop) {
+        base[9] = 7;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_IPADDRESS,
+                       ipRouteEntry->ipRouteNextHop,
+                       4);
+    }
+    if (ipRouteEntry->ipRouteType) {
+        base[9] = 8;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ipRouteEntry->ipRouteType,
+                       0);
+    }
+    if (ipRouteEntry->ipRouteAge) {
+        base[9] = 10;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ipRouteEntry->ipRouteAge,
+                       0);
+    }
+    if (ipRouteEntry->ipRouteMask) {
+        base[9] = 11;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_IPADDRESS,
+                       ipRouteEntry->ipRouteMask,
+                       4);
+    }
+    if (ipRouteEntry->ipRouteMetric5) {
+        base[9] = 12;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ipRouteEntry->ipRouteMetric5,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1416,6 +1713,20 @@ unpack_ipNetToMediaEntry(GSnmpVarBind *vb, rfc1213_mib_ipNetToMediaEntry_t *ipNe
     return 0;
 }
 
+static int
+pack_ipNetToMediaEntry(guint32 *base, gint32 ipNetToMediaIfIndex, guchar *ipNetToMediaNetAddress)
+{
+    int i, len, idx = 10;
+
+    base[idx++] = ipNetToMediaIfIndex;
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ipNetToMediaNetAddress[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static rfc1213_mib_ipNetToMediaEntry_t *
 assign_ipNetToMediaEntry(GSList *vbl)
 {
@@ -1423,7 +1734,6 @@ assign_ipNetToMediaEntry(GSList *vbl)
     rfc1213_mib_ipNetToMediaEntry_t *ipNetToMediaEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4, 22, 1};
 
     ipNetToMediaEntry = rfc1213_mib_new_ipNetToMediaEntry();
     if (! ipNetToMediaEntry) {
@@ -1442,8 +1752,8 @@ assign_ipNetToMediaEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ipNetToMediaEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ipNetToMediaEntry, sizeof(oid_ipNetToMediaEntry)/sizeof(guint32),
+                   attr_ipNetToMediaEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -1459,8 +1769,8 @@ assign_ipNetToMediaEntry(GSList *vbl)
     return ipNetToMediaEntry;
 }
 
-int
-rfc1213_mib_get_ipNetToMediaTable(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry)
+void
+rfc1213_mib_get_ipNetToMediaTable(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1469,24 +1779,83 @@ rfc1213_mib_get_ipNetToMediaTable(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry
 
     *ipNetToMediaEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ipNetToMediaEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ipNetToMediaEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ipNetToMediaEntry = (rfc1213_mib_ipNetToMediaEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_ipNetToMediaEntry_t *));
+        if (! *ipNetToMediaEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ipNetToMediaEntry)[i] = assign_ipNetToMediaEntry(row->data);
+        }
+    }
+}
+
+void
+rfc1213_mib_get_ipNetToMediaEntry(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t **ipNetToMediaEntry, gint32 ipNetToMediaIfIndex, guchar *ipNetToMediaNetAddress, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ipNetToMediaEntry, sizeof(oid_ipNetToMediaEntry));
+    len = pack_ipNetToMediaEntry(base, ipNetToMediaIfIndex, ipNetToMediaNetAddress);
+    if (len < 0) {
+        g_warning("illegal ipNetToMediaEntry index values");
+        return;
     }
 
-    *ipNetToMediaEntry = (rfc1213_mib_ipNetToMediaEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_ipNetToMediaEntry_t *));
-    if (! *ipNetToMediaEntry) {
-        return -4;
+    *ipNetToMediaEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ipNetToMediaEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ipNetToMediaEntry = assign_ipNetToMediaEntry(out);
+    }
+}
+
+void
+rfc1213_mib_set_ipNetToMediaEntry(GSnmpSession *s, rfc1213_mib_ipNetToMediaEntry_t *ipNetToMediaEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ipNetToMediaEntry, sizeof(oid_ipNetToMediaEntry));
+    len = pack_ipNetToMediaEntry(base, ipNetToMediaEntry->ipNetToMediaIfIndex, ipNetToMediaEntry->ipNetToMediaNetAddress);
+    if (len < 0) {
+        g_warning("illegal ipNetToMediaEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ipNetToMediaEntry)[i] = assign_ipNetToMediaEntry(row->data);
+    if (ipNetToMediaEntry->ipNetToMediaPhysAddress) {
+        base[9] = 2;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       ipNetToMediaEntry->ipNetToMediaPhysAddress,
+                       ipNetToMediaEntry->_ipNetToMediaPhysAddressLength);
+    }
+    if (ipNetToMediaEntry->ipNetToMediaType) {
+        base[9] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ipNetToMediaEntry->ipNetToMediaType,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1532,7 +1901,6 @@ assign_icmp(GSList *vbl)
     rfc1213_mib_icmp_t *icmp;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 5};
 
     icmp = rfc1213_mib_new_icmp();
     if (! icmp) {
@@ -1545,8 +1913,8 @@ assign_icmp(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _icmp, &idx) < 0) continue;
+        if (lookup(vb, oid_icmp, sizeof(oid_icmp)/sizeof(guint32),
+                   attr_icmp, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -1633,25 +2001,21 @@ assign_icmp(GSList *vbl)
     return icmp;
 }
 
-int
-rfc1213_mib_get_icmp(GSnmpSession *s, rfc1213_mib_icmp_t **icmp)
+void
+rfc1213_mib_get_icmp(GSnmpSession *s, rfc1213_mib_icmp_t **icmp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 5, 0};
 
     *icmp = NULL;
 
-    add_attributes(s, &in, base, 7, _icmp);
+    add_attributes(s, &in, base, 8, 7, attr_icmp, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *icmp = assign_icmp(out);
     }
-
-    *icmp = assign_icmp(out);
-
-    return 0;
 }
 
 void
@@ -1684,7 +2048,6 @@ assign_tcp(GSList *vbl)
     rfc1213_mib_tcp_t *tcp;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 6};
 
     tcp = rfc1213_mib_new_tcp();
     if (! tcp) {
@@ -1697,8 +2060,8 @@ assign_tcp(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _tcp, &idx) < 0) continue;
+        if (lookup(vb, oid_tcp, sizeof(oid_tcp)/sizeof(guint32),
+                   attr_tcp, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -1749,25 +2112,21 @@ assign_tcp(GSList *vbl)
     return tcp;
 }
 
-int
-rfc1213_mib_get_tcp(GSnmpSession *s, rfc1213_mib_tcp_t **tcp)
+void
+rfc1213_mib_get_tcp(GSnmpSession *s, rfc1213_mib_tcp_t **tcp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 6, 0};
 
     *tcp = NULL;
 
-    add_attributes(s, &in, base, 7, _tcp);
+    add_attributes(s, &in, base, 8, 7, attr_tcp, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *tcp = assign_tcp(out);
     }
-
-    *tcp = assign_tcp(out);
-
-    return 0;
 }
 
 void
@@ -1816,6 +2175,26 @@ unpack_tcpConnEntry(GSnmpVarBind *vb, rfc1213_mib_tcpConnEntry_t *tcpConnEntry)
     return 0;
 }
 
+static int
+pack_tcpConnEntry(guint32 *base, guchar *tcpConnLocalAddress, gint32 tcpConnLocalPort, guchar *tcpConnRemAddress, gint32 tcpConnRemPort)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = tcpConnLocalAddress[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = tcpConnLocalPort;
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = tcpConnRemAddress[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = tcpConnRemPort;
+    return idx;
+}
+
 static rfc1213_mib_tcpConnEntry_t *
 assign_tcpConnEntry(GSList *vbl)
 {
@@ -1823,7 +2202,6 @@ assign_tcpConnEntry(GSList *vbl)
     rfc1213_mib_tcpConnEntry_t *tcpConnEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 6, 13, 1};
 
     tcpConnEntry = rfc1213_mib_new_tcpConnEntry();
     if (! tcpConnEntry) {
@@ -1842,8 +2220,8 @@ assign_tcpConnEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _tcpConnEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_tcpConnEntry, sizeof(oid_tcpConnEntry)/sizeof(guint32),
+                   attr_tcpConnEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -1855,8 +2233,8 @@ assign_tcpConnEntry(GSList *vbl)
     return tcpConnEntry;
 }
 
-int
-rfc1213_mib_get_tcpConnTable(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t ***tcpConnEntry)
+void
+rfc1213_mib_get_tcpConnTable(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t ***tcpConnEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1865,24 +2243,77 @@ rfc1213_mib_get_tcpConnTable(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t ***tcpC
 
     *tcpConnEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _tcpConnEntry);
+    add_attributes(s, &in, base, 10, 9, attr_tcpConnEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *tcpConnEntry = (rfc1213_mib_tcpConnEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_tcpConnEntry_t *));
+        if (! *tcpConnEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*tcpConnEntry)[i] = assign_tcpConnEntry(row->data);
+        }
+    }
+}
+
+void
+rfc1213_mib_get_tcpConnEntry(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t **tcpConnEntry, guchar *tcpConnLocalAddress, gint32 tcpConnLocalPort, guchar *tcpConnRemAddress, gint32 tcpConnRemPort, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_tcpConnEntry, sizeof(oid_tcpConnEntry));
+    len = pack_tcpConnEntry(base, tcpConnLocalAddress, tcpConnLocalPort, tcpConnRemAddress, tcpConnRemPort);
+    if (len < 0) {
+        g_warning("illegal tcpConnEntry index values");
+        return;
     }
 
-    *tcpConnEntry = (rfc1213_mib_tcpConnEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_tcpConnEntry_t *));
-    if (! *tcpConnEntry) {
-        return -4;
+    *tcpConnEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_tcpConnEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *tcpConnEntry = assign_tcpConnEntry(out);
+    }
+}
+
+void
+rfc1213_mib_set_tcpConnEntry(GSnmpSession *s, rfc1213_mib_tcpConnEntry_t *tcpConnEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_tcpConnEntry, sizeof(oid_tcpConnEntry));
+    len = pack_tcpConnEntry(base, tcpConnEntry->tcpConnLocalAddress, tcpConnEntry->tcpConnLocalPort, tcpConnEntry->tcpConnRemAddress, tcpConnEntry->tcpConnRemPort);
+    if (len < 0) {
+        g_warning("illegal tcpConnEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*tcpConnEntry)[i] = assign_tcpConnEntry(row->data);
+    if (tcpConnEntry->tcpConnState) {
+        base[9] = 1;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       tcpConnEntry->tcpConnState,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1928,7 +2359,6 @@ assign_udp(GSList *vbl)
     rfc1213_mib_udp_t *udp;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 7};
 
     udp = rfc1213_mib_new_udp();
     if (! udp) {
@@ -1941,8 +2371,8 @@ assign_udp(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _udp, &idx) < 0) continue;
+        if (lookup(vb, oid_udp, sizeof(oid_udp)/sizeof(guint32),
+                   attr_udp, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -1963,25 +2393,21 @@ assign_udp(GSList *vbl)
     return udp;
 }
 
-int
-rfc1213_mib_get_udp(GSnmpSession *s, rfc1213_mib_udp_t **udp)
+void
+rfc1213_mib_get_udp(GSnmpSession *s, rfc1213_mib_udp_t **udp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 7, 0};
 
     *udp = NULL;
 
-    add_attributes(s, &in, base, 7, _udp);
+    add_attributes(s, &in, base, 8, 7, attr_udp, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *udp = assign_udp(out);
     }
-
-    *udp = assign_udp(out);
-
-    return 0;
 }
 
 void
@@ -2023,6 +2449,20 @@ unpack_udpEntry(GSnmpVarBind *vb, rfc1213_mib_udpEntry_t *udpEntry)
     return 0;
 }
 
+static int
+pack_udpEntry(guint32 *base, guchar *udpLocalAddress, gint32 udpLocalPort)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = udpLocalAddress[i];
+        if (idx >= 128) return -1;
+    }
+    base[idx++] = udpLocalPort;
+    return idx;
+}
+
 static rfc1213_mib_udpEntry_t *
 assign_udpEntry(GSList *vbl)
 {
@@ -2030,7 +2470,6 @@ assign_udpEntry(GSList *vbl)
     rfc1213_mib_udpEntry_t *udpEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 7, 5, 1};
 
     udpEntry = rfc1213_mib_new_udpEntry();
     if (! udpEntry) {
@@ -2049,8 +2488,8 @@ assign_udpEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _udpEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_udpEntry, sizeof(oid_udpEntry)/sizeof(guint32),
+                   attr_udpEntry, &idx) < 0) continue;
 
         switch (idx) {
         };
@@ -2059,8 +2498,8 @@ assign_udpEntry(GSList *vbl)
     return udpEntry;
 }
 
-int
-rfc1213_mib_get_udpTable(GSnmpSession *s, rfc1213_mib_udpEntry_t ***udpEntry)
+void
+rfc1213_mib_get_udpTable(GSnmpSession *s, rfc1213_mib_udpEntry_t ***udpEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2069,24 +2508,48 @@ rfc1213_mib_get_udpTable(GSnmpSession *s, rfc1213_mib_udpEntry_t ***udpEntry)
 
     *udpEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _udpEntry);
+    add_attributes(s, &in, base, 10, 9, attr_udpEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *udpEntry = (rfc1213_mib_udpEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_udpEntry_t *));
+        if (! *udpEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*udpEntry)[i] = assign_udpEntry(row->data);
+        }
+    }
+}
+
+void
+rfc1213_mib_get_udpEntry(GSnmpSession *s, rfc1213_mib_udpEntry_t **udpEntry, guchar *udpLocalAddress, gint32 udpLocalPort, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_udpEntry, sizeof(oid_udpEntry));
+    len = pack_udpEntry(base, udpLocalAddress, udpLocalPort);
+    if (len < 0) {
+        g_warning("illegal udpEntry index values");
+        return;
     }
 
-    *udpEntry = (rfc1213_mib_udpEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_udpEntry_t *));
-    if (! *udpEntry) {
-        return -4;
-    }
+    *udpEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*udpEntry)[i] = assign_udpEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 9, attr_udpEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *udpEntry = assign_udpEntry(out);
+    }
 }
 
 void
@@ -2132,7 +2595,6 @@ assign_egp(GSList *vbl)
     rfc1213_mib_egp_t *egp;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 8};
 
     egp = rfc1213_mib_new_egp();
     if (! egp) {
@@ -2145,8 +2607,8 @@ assign_egp(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _egp, &idx) < 0) continue;
+        if (lookup(vb, oid_egp, sizeof(oid_egp)/sizeof(guint32),
+                   attr_egp, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -2170,25 +2632,21 @@ assign_egp(GSList *vbl)
     return egp;
 }
 
-int
-rfc1213_mib_get_egp(GSnmpSession *s, rfc1213_mib_egp_t **egp)
+void
+rfc1213_mib_get_egp(GSnmpSession *s, rfc1213_mib_egp_t **egp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 8, 0};
 
     *egp = NULL;
 
-    add_attributes(s, &in, base, 7, _egp);
+    add_attributes(s, &in, base, 8, 7, attr_egp, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *egp = assign_egp(out);
     }
-
-    *egp = assign_egp(out);
-
-    return 0;
 }
 
 void
@@ -2228,6 +2686,19 @@ unpack_egpNeighEntry(GSnmpVarBind *vb, rfc1213_mib_egpNeighEntry_t *egpNeighEntr
     return 0;
 }
 
+static int
+pack_egpNeighEntry(guint32 *base, guchar *egpNeighAddr)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = egpNeighAddr[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static rfc1213_mib_egpNeighEntry_t *
 assign_egpNeighEntry(GSList *vbl)
 {
@@ -2235,7 +2706,6 @@ assign_egpNeighEntry(GSList *vbl)
     rfc1213_mib_egpNeighEntry_t *egpNeighEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 8, 5, 1};
 
     egpNeighEntry = rfc1213_mib_new_egpNeighEntry();
     if (! egpNeighEntry) {
@@ -2254,8 +2724,8 @@ assign_egpNeighEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _egpNeighEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_egpNeighEntry, sizeof(oid_egpNeighEntry)/sizeof(guint32),
+                   attr_egpNeighEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -2306,8 +2776,8 @@ assign_egpNeighEntry(GSList *vbl)
     return egpNeighEntry;
 }
 
-int
-rfc1213_mib_get_egpNeighTable(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t ***egpNeighEntry)
+void
+rfc1213_mib_get_egpNeighTable(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t ***egpNeighEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2316,24 +2786,77 @@ rfc1213_mib_get_egpNeighTable(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t ***eg
 
     *egpNeighEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _egpNeighEntry);
+    add_attributes(s, &in, base, 10, 9, attr_egpNeighEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *egpNeighEntry = (rfc1213_mib_egpNeighEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_egpNeighEntry_t *));
+        if (! *egpNeighEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*egpNeighEntry)[i] = assign_egpNeighEntry(row->data);
+        }
+    }
+}
+
+void
+rfc1213_mib_get_egpNeighEntry(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t **egpNeighEntry, guchar *egpNeighAddr, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_egpNeighEntry, sizeof(oid_egpNeighEntry));
+    len = pack_egpNeighEntry(base, egpNeighAddr);
+    if (len < 0) {
+        g_warning("illegal egpNeighEntry index values");
+        return;
     }
 
-    *egpNeighEntry = (rfc1213_mib_egpNeighEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(rfc1213_mib_egpNeighEntry_t *));
-    if (! *egpNeighEntry) {
-        return -4;
+    *egpNeighEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_egpNeighEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *egpNeighEntry = assign_egpNeighEntry(out);
+    }
+}
+
+void
+rfc1213_mib_set_egpNeighEntry(GSnmpSession *s, rfc1213_mib_egpNeighEntry_t *egpNeighEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_egpNeighEntry, sizeof(oid_egpNeighEntry));
+    len = pack_egpNeighEntry(base, egpNeighEntry->egpNeighAddr);
+    if (len < 0) {
+        g_warning("illegal egpNeighEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*egpNeighEntry)[i] = assign_egpNeighEntry(row->data);
+    if (egpNeighEntry->egpNeighEventTrigger) {
+        base[9] = 15;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       egpNeighEntry->egpNeighEventTrigger,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -2379,7 +2902,6 @@ assign_snmp(GSList *vbl)
     rfc1213_mib_snmp_t *snmp;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 11};
 
     snmp = rfc1213_mib_new_snmp();
     if (! snmp) {
@@ -2392,8 +2914,8 @@ assign_snmp(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _snmp, &idx) < 0) continue;
+        if (lookup(vb, oid_snmp, sizeof(oid_snmp)/sizeof(guint32),
+                   attr_snmp, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -2486,29 +3008,25 @@ assign_snmp(GSList *vbl)
     return snmp;
 }
 
-int
-rfc1213_mib_get_snmp(GSnmpSession *s, rfc1213_mib_snmp_t **snmp)
+void
+rfc1213_mib_get_snmp(GSnmpSession *s, rfc1213_mib_snmp_t **snmp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 11, 0};
 
     *snmp = NULL;
 
-    add_attributes(s, &in, base, 7, _snmp);
+    add_attributes(s, &in, base, 8, 7, attr_snmp, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *snmp = assign_snmp(out);
     }
-
-    *snmp = assign_snmp(out);
-
-    return 0;
 }
 
-int
-rfc1213_mib_set_snmp(GSnmpSession *s, rfc1213_mib_snmp_t *snmp)
+void
+rfc1213_mib_set_snmp(GSnmpSession *s, rfc1213_mib_snmp_t *snmp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 11, 0, 0};
@@ -2523,12 +3041,9 @@ rfc1213_mib_set_snmp(GSnmpSession *s, rfc1213_mib_snmp_t *snmp)
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void

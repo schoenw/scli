@@ -36,33 +36,37 @@ GSnmpEnum const ip_mib_enums_ipNetToMediaType[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -84,72 +88,80 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _ip[] = {
-    { 1, G_SNMP_INTEGER32, "ipForwarding" },
-    { 2, G_SNMP_INTEGER32, "ipDefaultTTL" },
-    { 3, G_SNMP_COUNTER32, "ipInReceives" },
-    { 4, G_SNMP_COUNTER32, "ipInHdrErrors" },
-    { 5, G_SNMP_COUNTER32, "ipInAddrErrors" },
-    { 6, G_SNMP_COUNTER32, "ipForwDatagrams" },
-    { 7, G_SNMP_COUNTER32, "ipInUnknownProtos" },
-    { 8, G_SNMP_COUNTER32, "ipInDiscards" },
-    { 9, G_SNMP_COUNTER32, "ipInDelivers" },
-    { 10, G_SNMP_COUNTER32, "ipOutRequests" },
-    { 11, G_SNMP_COUNTER32, "ipOutDiscards" },
-    { 12, G_SNMP_COUNTER32, "ipOutNoRoutes" },
-    { 13, G_SNMP_INTEGER32, "ipReasmTimeout" },
-    { 14, G_SNMP_COUNTER32, "ipReasmReqds" },
-    { 15, G_SNMP_COUNTER32, "ipReasmOKs" },
-    { 16, G_SNMP_COUNTER32, "ipReasmFails" },
-    { 17, G_SNMP_COUNTER32, "ipFragOKs" },
-    { 18, G_SNMP_COUNTER32, "ipFragFails" },
-    { 19, G_SNMP_COUNTER32, "ipFragCreates" },
-    { 23, G_SNMP_COUNTER32, "ipRoutingDiscards" },
-    { 0, 0, NULL }
+static guint32 const oid_ip[] = {1, 3, 6, 1, 2, 1, 4};
+
+static attribute_t attr_ip[] = {
+    { 1, G_SNMP_INTEGER32, IP_MIB_IPFORWARDING, "ipForwarding" },
+    { 2, G_SNMP_INTEGER32, IP_MIB_IPDEFAULTTTL, "ipDefaultTTL" },
+    { 3, G_SNMP_COUNTER32, IP_MIB_IPINRECEIVES, "ipInReceives" },
+    { 4, G_SNMP_COUNTER32, IP_MIB_IPINHDRERRORS, "ipInHdrErrors" },
+    { 5, G_SNMP_COUNTER32, IP_MIB_IPINADDRERRORS, "ipInAddrErrors" },
+    { 6, G_SNMP_COUNTER32, IP_MIB_IPFORWDATAGRAMS, "ipForwDatagrams" },
+    { 7, G_SNMP_COUNTER32, IP_MIB_IPINUNKNOWNPROTOS, "ipInUnknownProtos" },
+    { 8, G_SNMP_COUNTER32, IP_MIB_IPINDISCARDS, "ipInDiscards" },
+    { 9, G_SNMP_COUNTER32, IP_MIB_IPINDELIVERS, "ipInDelivers" },
+    { 10, G_SNMP_COUNTER32, IP_MIB_IPOUTREQUESTS, "ipOutRequests" },
+    { 11, G_SNMP_COUNTER32, IP_MIB_IPOUTDISCARDS, "ipOutDiscards" },
+    { 12, G_SNMP_COUNTER32, IP_MIB_IPOUTNOROUTES, "ipOutNoRoutes" },
+    { 13, G_SNMP_INTEGER32, IP_MIB_IPREASMTIMEOUT, "ipReasmTimeout" },
+    { 14, G_SNMP_COUNTER32, IP_MIB_IPREASMREQDS, "ipReasmReqds" },
+    { 15, G_SNMP_COUNTER32, IP_MIB_IPREASMOKS, "ipReasmOKs" },
+    { 16, G_SNMP_COUNTER32, IP_MIB_IPREASMFAILS, "ipReasmFails" },
+    { 17, G_SNMP_COUNTER32, IP_MIB_IPFRAGOKS, "ipFragOKs" },
+    { 18, G_SNMP_COUNTER32, IP_MIB_IPFRAGFAILS, "ipFragFails" },
+    { 19, G_SNMP_COUNTER32, IP_MIB_IPFRAGCREATES, "ipFragCreates" },
+    { 23, G_SNMP_COUNTER32, IP_MIB_IPROUTINGDISCARDS, "ipRoutingDiscards" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ipAddrEntry[] = {
-    { 2, G_SNMP_INTEGER32, "ipAdEntIfIndex" },
-    { 3, G_SNMP_IPADDRESS, "ipAdEntNetMask" },
-    { 4, G_SNMP_INTEGER32, "ipAdEntBcastAddr" },
-    { 5, G_SNMP_INTEGER32, "ipAdEntReasmMaxSize" },
-    { 0, 0, NULL }
+static guint32 const oid_ipAddrEntry[] = {1, 3, 6, 1, 2, 1, 4, 20, 1};
+
+static attribute_t attr_ipAddrEntry[] = {
+    { 2, G_SNMP_INTEGER32, IP_MIB_IPADENTIFINDEX, "ipAdEntIfIndex" },
+    { 3, G_SNMP_IPADDRESS, IP_MIB_IPADENTNETMASK, "ipAdEntNetMask" },
+    { 4, G_SNMP_INTEGER32, IP_MIB_IPADENTBCASTADDR, "ipAdEntBcastAddr" },
+    { 5, G_SNMP_INTEGER32, IP_MIB_IPADENTREASMMAXSIZE, "ipAdEntReasmMaxSize" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _ipNetToMediaEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "ipNetToMediaPhysAddress" },
-    { 4, G_SNMP_INTEGER32, "ipNetToMediaType" },
-    { 0, 0, NULL }
+static guint32 const oid_ipNetToMediaEntry[] = {1, 3, 6, 1, 2, 1, 4, 22, 1};
+
+static attribute_t attr_ipNetToMediaEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, IP_MIB_IPNETTOMEDIAPHYSADDRESS, "ipNetToMediaPhysAddress" },
+    { 4, G_SNMP_INTEGER32, IP_MIB_IPNETTOMEDIATYPE, "ipNetToMediaType" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _icmp[] = {
-    { 1, G_SNMP_COUNTER32, "icmpInMsgs" },
-    { 2, G_SNMP_COUNTER32, "icmpInErrors" },
-    { 3, G_SNMP_COUNTER32, "icmpInDestUnreachs" },
-    { 4, G_SNMP_COUNTER32, "icmpInTimeExcds" },
-    { 5, G_SNMP_COUNTER32, "icmpInParmProbs" },
-    { 6, G_SNMP_COUNTER32, "icmpInSrcQuenchs" },
-    { 7, G_SNMP_COUNTER32, "icmpInRedirects" },
-    { 8, G_SNMP_COUNTER32, "icmpInEchos" },
-    { 9, G_SNMP_COUNTER32, "icmpInEchoReps" },
-    { 10, G_SNMP_COUNTER32, "icmpInTimestamps" },
-    { 11, G_SNMP_COUNTER32, "icmpInTimestampReps" },
-    { 12, G_SNMP_COUNTER32, "icmpInAddrMasks" },
-    { 13, G_SNMP_COUNTER32, "icmpInAddrMaskReps" },
-    { 14, G_SNMP_COUNTER32, "icmpOutMsgs" },
-    { 15, G_SNMP_COUNTER32, "icmpOutErrors" },
-    { 16, G_SNMP_COUNTER32, "icmpOutDestUnreachs" },
-    { 17, G_SNMP_COUNTER32, "icmpOutTimeExcds" },
-    { 18, G_SNMP_COUNTER32, "icmpOutParmProbs" },
-    { 19, G_SNMP_COUNTER32, "icmpOutSrcQuenchs" },
-    { 20, G_SNMP_COUNTER32, "icmpOutRedirects" },
-    { 21, G_SNMP_COUNTER32, "icmpOutEchos" },
-    { 22, G_SNMP_COUNTER32, "icmpOutEchoReps" },
-    { 23, G_SNMP_COUNTER32, "icmpOutTimestamps" },
-    { 24, G_SNMP_COUNTER32, "icmpOutTimestampReps" },
-    { 25, G_SNMP_COUNTER32, "icmpOutAddrMasks" },
-    { 26, G_SNMP_COUNTER32, "icmpOutAddrMaskReps" },
-    { 0, 0, NULL }
+static guint32 const oid_icmp[] = {1, 3, 6, 1, 2, 1, 5};
+
+static attribute_t attr_icmp[] = {
+    { 1, G_SNMP_COUNTER32, IP_MIB_ICMPINMSGS, "icmpInMsgs" },
+    { 2, G_SNMP_COUNTER32, IP_MIB_ICMPINERRORS, "icmpInErrors" },
+    { 3, G_SNMP_COUNTER32, IP_MIB_ICMPINDESTUNREACHS, "icmpInDestUnreachs" },
+    { 4, G_SNMP_COUNTER32, IP_MIB_ICMPINTIMEEXCDS, "icmpInTimeExcds" },
+    { 5, G_SNMP_COUNTER32, IP_MIB_ICMPINPARMPROBS, "icmpInParmProbs" },
+    { 6, G_SNMP_COUNTER32, IP_MIB_ICMPINSRCQUENCHS, "icmpInSrcQuenchs" },
+    { 7, G_SNMP_COUNTER32, IP_MIB_ICMPINREDIRECTS, "icmpInRedirects" },
+    { 8, G_SNMP_COUNTER32, IP_MIB_ICMPINECHOS, "icmpInEchos" },
+    { 9, G_SNMP_COUNTER32, IP_MIB_ICMPINECHOREPS, "icmpInEchoReps" },
+    { 10, G_SNMP_COUNTER32, IP_MIB_ICMPINTIMESTAMPS, "icmpInTimestamps" },
+    { 11, G_SNMP_COUNTER32, IP_MIB_ICMPINTIMESTAMPREPS, "icmpInTimestampReps" },
+    { 12, G_SNMP_COUNTER32, IP_MIB_ICMPINADDRMASKS, "icmpInAddrMasks" },
+    { 13, G_SNMP_COUNTER32, IP_MIB_ICMPINADDRMASKREPS, "icmpInAddrMaskReps" },
+    { 14, G_SNMP_COUNTER32, IP_MIB_ICMPOUTMSGS, "icmpOutMsgs" },
+    { 15, G_SNMP_COUNTER32, IP_MIB_ICMPOUTERRORS, "icmpOutErrors" },
+    { 16, G_SNMP_COUNTER32, IP_MIB_ICMPOUTDESTUNREACHS, "icmpOutDestUnreachs" },
+    { 17, G_SNMP_COUNTER32, IP_MIB_ICMPOUTTIMEEXCDS, "icmpOutTimeExcds" },
+    { 18, G_SNMP_COUNTER32, IP_MIB_ICMPOUTPARMPROBS, "icmpOutParmProbs" },
+    { 19, G_SNMP_COUNTER32, IP_MIB_ICMPOUTSRCQUENCHS, "icmpOutSrcQuenchs" },
+    { 20, G_SNMP_COUNTER32, IP_MIB_ICMPOUTREDIRECTS, "icmpOutRedirects" },
+    { 21, G_SNMP_COUNTER32, IP_MIB_ICMPOUTECHOS, "icmpOutEchos" },
+    { 22, G_SNMP_COUNTER32, IP_MIB_ICMPOUTECHOREPS, "icmpOutEchoReps" },
+    { 23, G_SNMP_COUNTER32, IP_MIB_ICMPOUTTIMESTAMPS, "icmpOutTimestamps" },
+    { 24, G_SNMP_COUNTER32, IP_MIB_ICMPOUTTIMESTAMPREPS, "icmpOutTimestampReps" },
+    { 25, G_SNMP_COUNTER32, IP_MIB_ICMPOUTADDRMASKS, "icmpOutAddrMasks" },
+    { 26, G_SNMP_COUNTER32, IP_MIB_ICMPOUTADDRMASKREPS, "icmpOutAddrMaskReps" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -169,7 +181,6 @@ assign_ip(GSList *vbl)
     ip_mib_ip_t *ip;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4};
 
     ip = ip_mib_new_ip();
     if (! ip) {
@@ -182,8 +193,8 @@ assign_ip(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ip, &idx) < 0) continue;
+        if (lookup(vb, oid_ip, sizeof(oid_ip)/sizeof(guint32),
+                   attr_ip, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -252,29 +263,25 @@ assign_ip(GSList *vbl)
     return ip;
 }
 
-int
-ip_mib_get_ip(GSnmpSession *s, ip_mib_ip_t **ip)
+void
+ip_mib_get_ip(GSnmpSession *s, ip_mib_ip_t **ip, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 4, 0};
 
     *ip = NULL;
 
-    add_attributes(s, &in, base, 7, _ip);
+    add_attributes(s, &in, base, 8, 7, attr_ip, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *ip = assign_ip(out);
     }
-
-    *ip = assign_ip(out);
-
-    return 0;
 }
 
-int
-ip_mib_set_ip(GSnmpSession *s, ip_mib_ip_t *ip)
+void
+ip_mib_set_ip(GSnmpSession *s, ip_mib_ip_t *ip, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 4, 0, 0};
@@ -296,12 +303,9 @@ ip_mib_set_ip(GSnmpSession *s, ip_mib_ip_t *ip)
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void
@@ -341,6 +345,19 @@ unpack_ipAddrEntry(GSnmpVarBind *vb, ip_mib_ipAddrEntry_t *ipAddrEntry)
     return 0;
 }
 
+static int
+pack_ipAddrEntry(guint32 *base, guchar *ipAdEntAddr)
+{
+    int i, len, idx = 10;
+
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ipAdEntAddr[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static ip_mib_ipAddrEntry_t *
 assign_ipAddrEntry(GSList *vbl)
 {
@@ -348,7 +365,6 @@ assign_ipAddrEntry(GSList *vbl)
     ip_mib_ipAddrEntry_t *ipAddrEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4, 20, 1};
 
     ipAddrEntry = ip_mib_new_ipAddrEntry();
     if (! ipAddrEntry) {
@@ -367,8 +383,8 @@ assign_ipAddrEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ipAddrEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ipAddrEntry, sizeof(oid_ipAddrEntry)/sizeof(guint32),
+                   attr_ipAddrEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -389,8 +405,8 @@ assign_ipAddrEntry(GSList *vbl)
     return ipAddrEntry;
 }
 
-int
-ip_mib_get_ipAddrTable(GSnmpSession *s, ip_mib_ipAddrEntry_t ***ipAddrEntry)
+void
+ip_mib_get_ipAddrTable(GSnmpSession *s, ip_mib_ipAddrEntry_t ***ipAddrEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -399,24 +415,48 @@ ip_mib_get_ipAddrTable(GSnmpSession *s, ip_mib_ipAddrEntry_t ***ipAddrEntry)
 
     *ipAddrEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ipAddrEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ipAddrEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ipAddrEntry = (ip_mib_ipAddrEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ip_mib_ipAddrEntry_t *));
+        if (! *ipAddrEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ipAddrEntry)[i] = assign_ipAddrEntry(row->data);
+        }
+    }
+}
+
+void
+ip_mib_get_ipAddrEntry(GSnmpSession *s, ip_mib_ipAddrEntry_t **ipAddrEntry, guchar *ipAdEntAddr, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ipAddrEntry, sizeof(oid_ipAddrEntry));
+    len = pack_ipAddrEntry(base, ipAdEntAddr);
+    if (len < 0) {
+        g_warning("illegal ipAddrEntry index values");
+        return;
     }
 
-    *ipAddrEntry = (ip_mib_ipAddrEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ip_mib_ipAddrEntry_t *));
-    if (! *ipAddrEntry) {
-        return -4;
-    }
+    *ipAddrEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ipAddrEntry)[i] = assign_ipAddrEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 9, attr_ipAddrEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ipAddrEntry = assign_ipAddrEntry(out);
+    }
 }
 
 void
@@ -471,6 +511,20 @@ unpack_ipNetToMediaEntry(GSnmpVarBind *vb, ip_mib_ipNetToMediaEntry_t *ipNetToMe
     return 0;
 }
 
+static int
+pack_ipNetToMediaEntry(guint32 *base, gint32 ipNetToMediaIfIndex, guchar *ipNetToMediaNetAddress)
+{
+    int i, len, idx = 10;
+
+    base[idx++] = ipNetToMediaIfIndex;
+    len = 4;
+    for (i = 0; i < len; i++) {
+        base[idx++] = ipNetToMediaNetAddress[i];
+        if (idx >= 128) return -1;
+    }
+    return idx;
+}
+
 static ip_mib_ipNetToMediaEntry_t *
 assign_ipNetToMediaEntry(GSList *vbl)
 {
@@ -478,7 +532,6 @@ assign_ipNetToMediaEntry(GSList *vbl)
     ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 4, 22, 1};
 
     ipNetToMediaEntry = ip_mib_new_ipNetToMediaEntry();
     if (! ipNetToMediaEntry) {
@@ -497,8 +550,8 @@ assign_ipNetToMediaEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _ipNetToMediaEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_ipNetToMediaEntry, sizeof(oid_ipNetToMediaEntry)/sizeof(guint32),
+                   attr_ipNetToMediaEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -514,8 +567,8 @@ assign_ipNetToMediaEntry(GSList *vbl)
     return ipNetToMediaEntry;
 }
 
-int
-ip_mib_get_ipNetToMediaTable(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry)
+void
+ip_mib_get_ipNetToMediaTable(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t ***ipNetToMediaEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -524,24 +577,83 @@ ip_mib_get_ipNetToMediaTable(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t ***ipNe
 
     *ipNetToMediaEntry = NULL;
 
-    add_attributes(s, &in, base, 9, _ipNetToMediaEntry);
+    add_attributes(s, &in, base, 10, 9, attr_ipNetToMediaEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *ipNetToMediaEntry = (ip_mib_ipNetToMediaEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ip_mib_ipNetToMediaEntry_t *));
+        if (! *ipNetToMediaEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*ipNetToMediaEntry)[i] = assign_ipNetToMediaEntry(row->data);
+        }
+    }
+}
+
+void
+ip_mib_get_ipNetToMediaEntry(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t **ipNetToMediaEntry, gint32 ipNetToMediaIfIndex, guchar *ipNetToMediaNetAddress, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ipNetToMediaEntry, sizeof(oid_ipNetToMediaEntry));
+    len = pack_ipNetToMediaEntry(base, ipNetToMediaIfIndex, ipNetToMediaNetAddress);
+    if (len < 0) {
+        g_warning("illegal ipNetToMediaEntry index values");
+        return;
     }
 
-    *ipNetToMediaEntry = (ip_mib_ipNetToMediaEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(ip_mib_ipNetToMediaEntry_t *));
-    if (! *ipNetToMediaEntry) {
-        return -4;
+    *ipNetToMediaEntry = NULL;
+
+    add_attributes(s, &in, base, len, 9, attr_ipNetToMediaEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *ipNetToMediaEntry = assign_ipNetToMediaEntry(out);
+    }
+}
+
+void
+ip_mib_set_ipNetToMediaEntry(GSnmpSession *s, ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_ipNetToMediaEntry, sizeof(oid_ipNetToMediaEntry));
+    len = pack_ipNetToMediaEntry(base, ipNetToMediaEntry->ipNetToMediaIfIndex, ipNetToMediaEntry->ipNetToMediaNetAddress);
+    if (len < 0) {
+        g_warning("illegal ipNetToMediaEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*ipNetToMediaEntry)[i] = assign_ipNetToMediaEntry(row->data);
+    if (ipNetToMediaEntry->ipNetToMediaPhysAddress) {
+        base[9] = 2;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       ipNetToMediaEntry->ipNetToMediaPhysAddress,
+                       ipNetToMediaEntry->_ipNetToMediaPhysAddressLength);
+    }
+    if (ipNetToMediaEntry->ipNetToMediaType) {
+        base[9] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       ipNetToMediaEntry->ipNetToMediaType,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -587,7 +699,6 @@ assign_icmp(GSList *vbl)
     ip_mib_icmp_t *icmp;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 5};
 
     icmp = ip_mib_new_icmp();
     if (! icmp) {
@@ -600,8 +711,8 @@ assign_icmp(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _icmp, &idx) < 0) continue;
+        if (lookup(vb, oid_icmp, sizeof(oid_icmp)/sizeof(guint32),
+                   attr_icmp, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -688,25 +799,21 @@ assign_icmp(GSList *vbl)
     return icmp;
 }
 
-int
-ip_mib_get_icmp(GSnmpSession *s, ip_mib_icmp_t **icmp)
+void
+ip_mib_get_icmp(GSnmpSession *s, ip_mib_icmp_t **icmp, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 5, 0};
 
     *icmp = NULL;
 
-    add_attributes(s, &in, base, 7, _icmp);
+    add_attributes(s, &in, base, 8, 7, attr_icmp, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *icmp = assign_icmp(out);
     }
-
-    *icmp = assign_icmp(out);
-
-    return 0;
 }
 
 void

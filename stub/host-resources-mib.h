@@ -151,6 +151,14 @@ extern GSnmpEnum const host_resources_mib_enums_hrSWInstalledType[];
  * C type definitions for HOST-RESOURCES-MIB::hrSystem.
  */
 
+#define HOST_RESOURCES_MIB_HRSYSTEMUPTIME	0x1 
+#define HOST_RESOURCES_MIB_HRSYSTEMDATE	0x2 
+#define HOST_RESOURCES_MIB_HRSYSTEMINITIALLOADDEVICE	0x4 
+#define HOST_RESOURCES_MIB_HRSYSTEMINITIALLOADPARAMETERS	0x8 
+#define HOST_RESOURCES_MIB_HRSYSTEMNUMUSERS	0x10 
+#define HOST_RESOURCES_MIB_HRSYSTEMPROCESSES	0x20 
+#define HOST_RESOURCES_MIB_HRSYSTEMMAXPROCESSES	0x40 
+
 typedef struct {
     guint32  *hrSystemUptime;
     guchar   *hrSystemDate;
@@ -164,13 +172,13 @@ typedef struct {
 } host_resources_mib_hrSystem_t;
 
 extern host_resources_mib_hrSystem_t *
-host_resources_mib_new_hrSystem();
+host_resources_mib_new_hrSystem(void);
 
-extern int
-host_resources_mib_get_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t **hrSystem);
+extern void
+host_resources_mib_get_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t **hrSystem, gint mask);
 
-extern int
-host_resources_mib_set_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t *hrSystem);
+extern void
+host_resources_mib_set_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t *hrSystem, gint mask);
 
 extern void
 host_resources_mib_free_hrSystem(host_resources_mib_hrSystem_t *hrSystem);
@@ -179,15 +187,17 @@ host_resources_mib_free_hrSystem(host_resources_mib_hrSystem_t *hrSystem);
  * C type definitions for HOST-RESOURCES-MIB::hrStorage.
  */
 
+#define HOST_RESOURCES_MIB_HRMEMORYSIZE	0x1 
+
 typedef struct {
     gint32   *hrMemorySize;
 } host_resources_mib_hrStorage_t;
 
 extern host_resources_mib_hrStorage_t *
-host_resources_mib_new_hrStorage();
+host_resources_mib_new_hrStorage(void);
 
-extern int
-host_resources_mib_get_hrStorage(GSnmpSession *s, host_resources_mib_hrStorage_t **hrStorage);
+extern void
+host_resources_mib_get_hrStorage(GSnmpSession *s, host_resources_mib_hrStorage_t **hrStorage, gint mask);
 
 extern void
 host_resources_mib_free_hrStorage(host_resources_mib_hrStorage_t *hrStorage);
@@ -195,6 +205,14 @@ host_resources_mib_free_hrStorage(host_resources_mib_hrStorage_t *hrStorage);
 /*
  * C type definitions for HOST-RESOURCES-MIB::hrStorageEntry.
  */
+
+#define HOST_RESOURCES_MIB_HRSTORAGEINDEX	0x1 
+#define HOST_RESOURCES_MIB_HRSTORAGETYPE	0x2 
+#define HOST_RESOURCES_MIB_HRSTORAGEDESCR	0x4 
+#define HOST_RESOURCES_MIB_HRSTORAGEALLOCATIONUNITS	0x8 
+#define HOST_RESOURCES_MIB_HRSTORAGESIZE	0x10 
+#define HOST_RESOURCES_MIB_HRSTORAGEUSED	0x20 
+#define HOST_RESOURCES_MIB_HRSTORAGEALLOCATIONFAILURES	0x40 
 
 typedef struct {
     gint32   hrStorageIndex;
@@ -208,20 +226,20 @@ typedef struct {
     guint32  *hrStorageAllocationFailures;
 } host_resources_mib_hrStorageEntry_t;
 
-extern int
-host_resources_mib_get_hrStorageTable(GSnmpSession *s, host_resources_mib_hrStorageEntry_t ***hrStorageEntry);
+extern void
+host_resources_mib_get_hrStorageTable(GSnmpSession *s, host_resources_mib_hrStorageEntry_t ***hrStorageEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrStorageTable(host_resources_mib_hrStorageEntry_t **hrStorageEntry);
 
 extern host_resources_mib_hrStorageEntry_t *
-host_resources_mib_new_hrStorageEntry();
+host_resources_mib_new_hrStorageEntry(void);
 
-extern int
-host_resources_mib_get_hrStorageEntry(GSnmpSession *s, host_resources_mib_hrStorageEntry_t **hrStorageEntry);
+extern void
+host_resources_mib_get_hrStorageEntry(GSnmpSession *s, host_resources_mib_hrStorageEntry_t **hrStorageEntry, gint32 hrStorageIndex, gint mask);
 
-extern int
-host_resources_mib_set_hrStorageEntry(GSnmpSession *s, host_resources_mib_hrStorageEntry_t *hrStorageEntry);
+extern void
+host_resources_mib_set_hrStorageEntry(GSnmpSession *s, host_resources_mib_hrStorageEntry_t *hrStorageEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrStorageEntry(host_resources_mib_hrStorageEntry_t *hrStorageEntry);
@@ -229,6 +247,13 @@ host_resources_mib_free_hrStorageEntry(host_resources_mib_hrStorageEntry_t *hrSt
 /*
  * C type definitions for HOST-RESOURCES-MIB::hrDeviceEntry.
  */
+
+#define HOST_RESOURCES_MIB_HRDEVICEINDEX	0x1 
+#define HOST_RESOURCES_MIB_HRDEVICETYPE	0x2 
+#define HOST_RESOURCES_MIB_HRDEVICEDESCR	0x4 
+#define HOST_RESOURCES_MIB_HRDEVICEID	0x8 
+#define HOST_RESOURCES_MIB_HRDEVICESTATUS	0x10 
+#define HOST_RESOURCES_MIB_HRDEVICEERRORS	0x20 
 
 typedef struct {
     gint32   hrDeviceIndex;
@@ -242,17 +267,17 @@ typedef struct {
     guint32  *hrDeviceErrors;
 } host_resources_mib_hrDeviceEntry_t;
 
-extern int
-host_resources_mib_get_hrDeviceTable(GSnmpSession *s, host_resources_mib_hrDeviceEntry_t ***hrDeviceEntry);
+extern void
+host_resources_mib_get_hrDeviceTable(GSnmpSession *s, host_resources_mib_hrDeviceEntry_t ***hrDeviceEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrDeviceTable(host_resources_mib_hrDeviceEntry_t **hrDeviceEntry);
 
 extern host_resources_mib_hrDeviceEntry_t *
-host_resources_mib_new_hrDeviceEntry();
+host_resources_mib_new_hrDeviceEntry(void);
 
-extern int
-host_resources_mib_get_hrDeviceEntry(GSnmpSession *s, host_resources_mib_hrDeviceEntry_t **hrDeviceEntry);
+extern void
+host_resources_mib_get_hrDeviceEntry(GSnmpSession *s, host_resources_mib_hrDeviceEntry_t **hrDeviceEntry, gint32 hrDeviceIndex, gint mask);
 
 extern void
 host_resources_mib_free_hrDeviceEntry(host_resources_mib_hrDeviceEntry_t *hrDeviceEntry);
@@ -261,6 +286,9 @@ host_resources_mib_free_hrDeviceEntry(host_resources_mib_hrDeviceEntry_t *hrDevi
  * C type definitions for HOST-RESOURCES-MIB::hrProcessorEntry.
  */
 
+#define HOST_RESOURCES_MIB_HRPROCESSORFRWID	0x1 
+#define HOST_RESOURCES_MIB_HRPROCESSORLOAD	0x2 
+
 typedef struct {
     gint32   hrDeviceIndex;
     guint32  *hrProcessorFrwID;
@@ -268,17 +296,17 @@ typedef struct {
     gint32   *hrProcessorLoad;
 } host_resources_mib_hrProcessorEntry_t;
 
-extern int
-host_resources_mib_get_hrProcessorTable(GSnmpSession *s, host_resources_mib_hrProcessorEntry_t ***hrProcessorEntry);
+extern void
+host_resources_mib_get_hrProcessorTable(GSnmpSession *s, host_resources_mib_hrProcessorEntry_t ***hrProcessorEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrProcessorTable(host_resources_mib_hrProcessorEntry_t **hrProcessorEntry);
 
 extern host_resources_mib_hrProcessorEntry_t *
-host_resources_mib_new_hrProcessorEntry();
+host_resources_mib_new_hrProcessorEntry(void);
 
-extern int
-host_resources_mib_get_hrProcessorEntry(GSnmpSession *s, host_resources_mib_hrProcessorEntry_t **hrProcessorEntry);
+extern void
+host_resources_mib_get_hrProcessorEntry(GSnmpSession *s, host_resources_mib_hrProcessorEntry_t **hrProcessorEntry, gint32 hrDeviceIndex, gint mask);
 
 extern void
 host_resources_mib_free_hrProcessorEntry(host_resources_mib_hrProcessorEntry_t *hrProcessorEntry);
@@ -287,22 +315,24 @@ host_resources_mib_free_hrProcessorEntry(host_resources_mib_hrProcessorEntry_t *
  * C type definitions for HOST-RESOURCES-MIB::hrNetworkEntry.
  */
 
+#define HOST_RESOURCES_MIB_HRNETWORKIFINDEX	0x1 
+
 typedef struct {
     gint32   hrDeviceIndex;
     gint32   *hrNetworkIfIndex;
 } host_resources_mib_hrNetworkEntry_t;
 
-extern int
-host_resources_mib_get_hrNetworkTable(GSnmpSession *s, host_resources_mib_hrNetworkEntry_t ***hrNetworkEntry);
+extern void
+host_resources_mib_get_hrNetworkTable(GSnmpSession *s, host_resources_mib_hrNetworkEntry_t ***hrNetworkEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrNetworkTable(host_resources_mib_hrNetworkEntry_t **hrNetworkEntry);
 
 extern host_resources_mib_hrNetworkEntry_t *
-host_resources_mib_new_hrNetworkEntry();
+host_resources_mib_new_hrNetworkEntry(void);
 
-extern int
-host_resources_mib_get_hrNetworkEntry(GSnmpSession *s, host_resources_mib_hrNetworkEntry_t **hrNetworkEntry);
+extern void
+host_resources_mib_get_hrNetworkEntry(GSnmpSession *s, host_resources_mib_hrNetworkEntry_t **hrNetworkEntry, gint32 hrDeviceIndex, gint mask);
 
 extern void
 host_resources_mib_free_hrNetworkEntry(host_resources_mib_hrNetworkEntry_t *hrNetworkEntry);
@@ -311,6 +341,9 @@ host_resources_mib_free_hrNetworkEntry(host_resources_mib_hrNetworkEntry_t *hrNe
  * C type definitions for HOST-RESOURCES-MIB::hrPrinterEntry.
  */
 
+#define HOST_RESOURCES_MIB_HRPRINTERSTATUS	0x1 
+#define HOST_RESOURCES_MIB_HRPRINTERDETECTEDERRORSTATE	0x2 
+
 typedef struct {
     gint32   hrDeviceIndex;
     gint32   *hrPrinterStatus;
@@ -318,17 +351,17 @@ typedef struct {
     gsize    _hrPrinterDetectedErrorStateLength;
 } host_resources_mib_hrPrinterEntry_t;
 
-extern int
-host_resources_mib_get_hrPrinterTable(GSnmpSession *s, host_resources_mib_hrPrinterEntry_t ***hrPrinterEntry);
+extern void
+host_resources_mib_get_hrPrinterTable(GSnmpSession *s, host_resources_mib_hrPrinterEntry_t ***hrPrinterEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrPrinterTable(host_resources_mib_hrPrinterEntry_t **hrPrinterEntry);
 
 extern host_resources_mib_hrPrinterEntry_t *
-host_resources_mib_new_hrPrinterEntry();
+host_resources_mib_new_hrPrinterEntry(void);
 
-extern int
-host_resources_mib_get_hrPrinterEntry(GSnmpSession *s, host_resources_mib_hrPrinterEntry_t **hrPrinterEntry);
+extern void
+host_resources_mib_get_hrPrinterEntry(GSnmpSession *s, host_resources_mib_hrPrinterEntry_t **hrPrinterEntry, gint32 hrDeviceIndex, gint mask);
 
 extern void
 host_resources_mib_free_hrPrinterEntry(host_resources_mib_hrPrinterEntry_t *hrPrinterEntry);
@@ -336,6 +369,11 @@ host_resources_mib_free_hrPrinterEntry(host_resources_mib_hrPrinterEntry_t *hrPr
 /*
  * C type definitions for HOST-RESOURCES-MIB::hrDiskStorageEntry.
  */
+
+#define HOST_RESOURCES_MIB_HRDISKSTORAGEACCESS	0x1 
+#define HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA	0x2 
+#define HOST_RESOURCES_MIB_HRDISKSTORAGEREMOVEBLE	0x4 
+#define HOST_RESOURCES_MIB_HRDISKSTORAGECAPACITY	0x8 
 
 typedef struct {
     gint32   hrDeviceIndex;
@@ -345,17 +383,17 @@ typedef struct {
     gint32   *hrDiskStorageCapacity;
 } host_resources_mib_hrDiskStorageEntry_t;
 
-extern int
-host_resources_mib_get_hrDiskStorageTable(GSnmpSession *s, host_resources_mib_hrDiskStorageEntry_t ***hrDiskStorageEntry);
+extern void
+host_resources_mib_get_hrDiskStorageTable(GSnmpSession *s, host_resources_mib_hrDiskStorageEntry_t ***hrDiskStorageEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrDiskStorageTable(host_resources_mib_hrDiskStorageEntry_t **hrDiskStorageEntry);
 
 extern host_resources_mib_hrDiskStorageEntry_t *
-host_resources_mib_new_hrDiskStorageEntry();
+host_resources_mib_new_hrDiskStorageEntry(void);
 
-extern int
-host_resources_mib_get_hrDiskStorageEntry(GSnmpSession *s, host_resources_mib_hrDiskStorageEntry_t **hrDiskStorageEntry);
+extern void
+host_resources_mib_get_hrDiskStorageEntry(GSnmpSession *s, host_resources_mib_hrDiskStorageEntry_t **hrDiskStorageEntry, gint32 hrDeviceIndex, gint mask);
 
 extern void
 host_resources_mib_free_hrDiskStorageEntry(host_resources_mib_hrDiskStorageEntry_t *hrDiskStorageEntry);
@@ -363,6 +401,12 @@ host_resources_mib_free_hrDiskStorageEntry(host_resources_mib_hrDiskStorageEntry
 /*
  * C type definitions for HOST-RESOURCES-MIB::hrPartitionEntry.
  */
+
+#define HOST_RESOURCES_MIB_HRPARTITIONINDEX	0x1 
+#define HOST_RESOURCES_MIB_HRPARTITIONLABEL	0x2 
+#define HOST_RESOURCES_MIB_HRPARTITIONID	0x4 
+#define HOST_RESOURCES_MIB_HRPARTITIONSIZE	0x8 
+#define HOST_RESOURCES_MIB_HRPARTITIONFSINDEX	0x10 
 
 typedef struct {
     gint32   hrDeviceIndex;
@@ -375,17 +419,17 @@ typedef struct {
     gint32   *hrPartitionFSIndex;
 } host_resources_mib_hrPartitionEntry_t;
 
-extern int
-host_resources_mib_get_hrPartitionTable(GSnmpSession *s, host_resources_mib_hrPartitionEntry_t ***hrPartitionEntry);
+extern void
+host_resources_mib_get_hrPartitionTable(GSnmpSession *s, host_resources_mib_hrPartitionEntry_t ***hrPartitionEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrPartitionTable(host_resources_mib_hrPartitionEntry_t **hrPartitionEntry);
 
 extern host_resources_mib_hrPartitionEntry_t *
-host_resources_mib_new_hrPartitionEntry();
+host_resources_mib_new_hrPartitionEntry(void);
 
-extern int
-host_resources_mib_get_hrPartitionEntry(GSnmpSession *s, host_resources_mib_hrPartitionEntry_t **hrPartitionEntry);
+extern void
+host_resources_mib_get_hrPartitionEntry(GSnmpSession *s, host_resources_mib_hrPartitionEntry_t **hrPartitionEntry, gint32 hrDeviceIndex, gint32 hrPartitionIndex, gint mask);
 
 extern void
 host_resources_mib_free_hrPartitionEntry(host_resources_mib_hrPartitionEntry_t *hrPartitionEntry);
@@ -393,6 +437,16 @@ host_resources_mib_free_hrPartitionEntry(host_resources_mib_hrPartitionEntry_t *
 /*
  * C type definitions for HOST-RESOURCES-MIB::hrFSEntry.
  */
+
+#define HOST_RESOURCES_MIB_HRFSINDEX	0x1 
+#define HOST_RESOURCES_MIB_HRFSMOUNTPOINT	0x2 
+#define HOST_RESOURCES_MIB_HRFSREMOTEMOUNTPOINT	0x4 
+#define HOST_RESOURCES_MIB_HRFSTYPE	0x8 
+#define HOST_RESOURCES_MIB_HRFSACCESS	0x10 
+#define HOST_RESOURCES_MIB_HRFSBOOTABLE	0x20 
+#define HOST_RESOURCES_MIB_HRFSSTORAGEINDEX	0x40 
+#define HOST_RESOURCES_MIB_HRFSLASTFULLBACKUPDATE	0x80 
+#define HOST_RESOURCES_MIB_HRFSLASTPARTIALBACKUPDATE	0x100 
 
 typedef struct {
     gint32   hrFSIndex;
@@ -411,20 +465,20 @@ typedef struct {
     gsize    _hrFSLastPartialBackupDateLength;
 } host_resources_mib_hrFSEntry_t;
 
-extern int
-host_resources_mib_get_hrFSTable(GSnmpSession *s, host_resources_mib_hrFSEntry_t ***hrFSEntry);
+extern void
+host_resources_mib_get_hrFSTable(GSnmpSession *s, host_resources_mib_hrFSEntry_t ***hrFSEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrFSTable(host_resources_mib_hrFSEntry_t **hrFSEntry);
 
 extern host_resources_mib_hrFSEntry_t *
-host_resources_mib_new_hrFSEntry();
+host_resources_mib_new_hrFSEntry(void);
 
-extern int
-host_resources_mib_get_hrFSEntry(GSnmpSession *s, host_resources_mib_hrFSEntry_t **hrFSEntry);
+extern void
+host_resources_mib_get_hrFSEntry(GSnmpSession *s, host_resources_mib_hrFSEntry_t **hrFSEntry, gint32 hrFSIndex, gint mask);
 
-extern int
-host_resources_mib_set_hrFSEntry(GSnmpSession *s, host_resources_mib_hrFSEntry_t *hrFSEntry);
+extern void
+host_resources_mib_set_hrFSEntry(GSnmpSession *s, host_resources_mib_hrFSEntry_t *hrFSEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrFSEntry(host_resources_mib_hrFSEntry_t *hrFSEntry);
@@ -433,15 +487,17 @@ host_resources_mib_free_hrFSEntry(host_resources_mib_hrFSEntry_t *hrFSEntry);
  * C type definitions for HOST-RESOURCES-MIB::hrSWRun.
  */
 
+#define HOST_RESOURCES_MIB_HRSWOSINDEX	0x1 
+
 typedef struct {
     gint32   *hrSWOSIndex;
 } host_resources_mib_hrSWRun_t;
 
 extern host_resources_mib_hrSWRun_t *
-host_resources_mib_new_hrSWRun();
+host_resources_mib_new_hrSWRun(void);
 
-extern int
-host_resources_mib_get_hrSWRun(GSnmpSession *s, host_resources_mib_hrSWRun_t **hrSWRun);
+extern void
+host_resources_mib_get_hrSWRun(GSnmpSession *s, host_resources_mib_hrSWRun_t **hrSWRun, gint mask);
 
 extern void
 host_resources_mib_free_hrSWRun(host_resources_mib_hrSWRun_t *hrSWRun);
@@ -449,6 +505,14 @@ host_resources_mib_free_hrSWRun(host_resources_mib_hrSWRun_t *hrSWRun);
 /*
  * C type definitions for HOST-RESOURCES-MIB::hrSWRunEntry.
  */
+
+#define HOST_RESOURCES_MIB_HRSWRUNINDEX	0x1 
+#define HOST_RESOURCES_MIB_HRSWRUNNAME	0x2 
+#define HOST_RESOURCES_MIB_HRSWRUNID	0x4 
+#define HOST_RESOURCES_MIB_HRSWRUNPATH	0x8 
+#define HOST_RESOURCES_MIB_HRSWRUNPARAMETERS	0x10 
+#define HOST_RESOURCES_MIB_HRSWRUNTYPE	0x20 
+#define HOST_RESOURCES_MIB_HRSWRUNSTATUS	0x40 
 
 typedef struct {
     gint32   hrSWRunIndex;
@@ -464,20 +528,20 @@ typedef struct {
     gint32   *hrSWRunStatus;
 } host_resources_mib_hrSWRunEntry_t;
 
-extern int
-host_resources_mib_get_hrSWRunTable(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t ***hrSWRunEntry);
+extern void
+host_resources_mib_get_hrSWRunTable(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t ***hrSWRunEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrSWRunTable(host_resources_mib_hrSWRunEntry_t **hrSWRunEntry);
 
 extern host_resources_mib_hrSWRunEntry_t *
-host_resources_mib_new_hrSWRunEntry();
+host_resources_mib_new_hrSWRunEntry(void);
 
-extern int
-host_resources_mib_get_hrSWRunEntry(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t **hrSWRunEntry);
+extern void
+host_resources_mib_get_hrSWRunEntry(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t **hrSWRunEntry, gint32 hrSWRunIndex, gint mask);
 
-extern int
-host_resources_mib_set_hrSWRunEntry(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t *hrSWRunEntry);
+extern void
+host_resources_mib_set_hrSWRunEntry(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t *hrSWRunEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrSWRunEntry(host_resources_mib_hrSWRunEntry_t *hrSWRunEntry);
@@ -486,23 +550,26 @@ host_resources_mib_free_hrSWRunEntry(host_resources_mib_hrSWRunEntry_t *hrSWRunE
  * C type definitions for HOST-RESOURCES-MIB::hrSWRunPerfEntry.
  */
 
+#define HOST_RESOURCES_MIB_HRSWRUNPERFCPU	0x1 
+#define HOST_RESOURCES_MIB_HRSWRUNPERFMEM	0x2 
+
 typedef struct {
     gint32   hrSWRunIndex;
     gint32   *hrSWRunPerfCPU;
     gint32   *hrSWRunPerfMem;
 } host_resources_mib_hrSWRunPerfEntry_t;
 
-extern int
-host_resources_mib_get_hrSWRunPerfTable(GSnmpSession *s, host_resources_mib_hrSWRunPerfEntry_t ***hrSWRunPerfEntry);
+extern void
+host_resources_mib_get_hrSWRunPerfTable(GSnmpSession *s, host_resources_mib_hrSWRunPerfEntry_t ***hrSWRunPerfEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrSWRunPerfTable(host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfEntry);
 
 extern host_resources_mib_hrSWRunPerfEntry_t *
-host_resources_mib_new_hrSWRunPerfEntry();
+host_resources_mib_new_hrSWRunPerfEntry(void);
 
-extern int
-host_resources_mib_get_hrSWRunPerfEntry(GSnmpSession *s, host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfEntry);
+extern void
+host_resources_mib_get_hrSWRunPerfEntry(GSnmpSession *s, host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfEntry, gint32 hrSWRunIndex, gint mask);
 
 extern void
 host_resources_mib_free_hrSWRunPerfEntry(host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry);
@@ -511,16 +578,19 @@ host_resources_mib_free_hrSWRunPerfEntry(host_resources_mib_hrSWRunPerfEntry_t *
  * C type definitions for HOST-RESOURCES-MIB::hrSWInstalled.
  */
 
+#define HOST_RESOURCES_MIB_HRSWINSTALLEDLASTCHANGE	0x1 
+#define HOST_RESOURCES_MIB_HRSWINSTALLEDLASTUPDATETIME	0x2 
+
 typedef struct {
     guint32  *hrSWInstalledLastChange;
     guint32  *hrSWInstalledLastUpdateTime;
 } host_resources_mib_hrSWInstalled_t;
 
 extern host_resources_mib_hrSWInstalled_t *
-host_resources_mib_new_hrSWInstalled();
+host_resources_mib_new_hrSWInstalled(void);
 
-extern int
-host_resources_mib_get_hrSWInstalled(GSnmpSession *s, host_resources_mib_hrSWInstalled_t **hrSWInstalled);
+extern void
+host_resources_mib_get_hrSWInstalled(GSnmpSession *s, host_resources_mib_hrSWInstalled_t **hrSWInstalled, gint mask);
 
 extern void
 host_resources_mib_free_hrSWInstalled(host_resources_mib_hrSWInstalled_t *hrSWInstalled);
@@ -528,6 +598,12 @@ host_resources_mib_free_hrSWInstalled(host_resources_mib_hrSWInstalled_t *hrSWIn
 /*
  * C type definitions for HOST-RESOURCES-MIB::hrSWInstalledEntry.
  */
+
+#define HOST_RESOURCES_MIB_HRSWINSTALLEDINDEX	0x1 
+#define HOST_RESOURCES_MIB_HRSWINSTALLEDNAME	0x2 
+#define HOST_RESOURCES_MIB_HRSWINSTALLEDID	0x4 
+#define HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE	0x8 
+#define HOST_RESOURCES_MIB_HRSWINSTALLEDDATE	0x10 
 
 typedef struct {
     gint32   hrSWInstalledIndex;
@@ -540,17 +616,17 @@ typedef struct {
     gsize    _hrSWInstalledDateLength;
 } host_resources_mib_hrSWInstalledEntry_t;
 
-extern int
-host_resources_mib_get_hrSWInstalledTable(GSnmpSession *s, host_resources_mib_hrSWInstalledEntry_t ***hrSWInstalledEntry);
+extern void
+host_resources_mib_get_hrSWInstalledTable(GSnmpSession *s, host_resources_mib_hrSWInstalledEntry_t ***hrSWInstalledEntry, gint mask);
 
 extern void
 host_resources_mib_free_hrSWInstalledTable(host_resources_mib_hrSWInstalledEntry_t **hrSWInstalledEntry);
 
 extern host_resources_mib_hrSWInstalledEntry_t *
-host_resources_mib_new_hrSWInstalledEntry();
+host_resources_mib_new_hrSWInstalledEntry(void);
 
-extern int
-host_resources_mib_get_hrSWInstalledEntry(GSnmpSession *s, host_resources_mib_hrSWInstalledEntry_t **hrSWInstalledEntry);
+extern void
+host_resources_mib_get_hrSWInstalledEntry(GSnmpSession *s, host_resources_mib_hrSWInstalledEntry_t **hrSWInstalledEntry, gint32 hrSWInstalledIndex, gint mask);
 
 extern void
 host_resources_mib_free_hrSWInstalledEntry(host_resources_mib_hrSWInstalledEntry_t *hrSWInstalledEntry);

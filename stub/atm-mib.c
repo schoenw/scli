@@ -259,33 +259,37 @@ GSnmpEnum const atm_mib_enums_atmVcCrossConnectRowStatus[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -307,114 +311,134 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _atmMIBObjects[] = {
-    { 8, G_SNMP_INTEGER32, "atmVpCrossConnectIndexNext" },
-    { 10, G_SNMP_INTEGER32, "atmVcCrossConnectIndexNext" },
-    { 13, G_SNMP_INTEGER32, "atmTrafficDescrParamIndexNext" },
-    { 0, 0, NULL }
+static guint32 const oid_atmMIBObjects[] = {1, 3, 6, 1, 2, 1, 37, 1};
+
+static attribute_t attr_atmMIBObjects[] = {
+    { 8, G_SNMP_INTEGER32, ATM_MIB_ATMVPCROSSCONNECTINDEXNEXT, "atmVpCrossConnectIndexNext" },
+    { 10, G_SNMP_INTEGER32, ATM_MIB_ATMVCCROSSCONNECTINDEXNEXT, "atmVcCrossConnectIndexNext" },
+    { 13, G_SNMP_INTEGER32, ATM_MIB_ATMTRAFFICDESCRPARAMINDEXNEXT, "atmTrafficDescrParamIndexNext" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _atmInterfaceConfEntry[] = {
-    { 1, G_SNMP_INTEGER32, "atmInterfaceMaxVpcs" },
-    { 2, G_SNMP_INTEGER32, "atmInterfaceMaxVccs" },
-    { 3, G_SNMP_INTEGER32, "atmInterfaceConfVpcs" },
-    { 4, G_SNMP_INTEGER32, "atmInterfaceConfVccs" },
-    { 5, G_SNMP_INTEGER32, "atmInterfaceMaxActiveVpiBits" },
-    { 6, G_SNMP_INTEGER32, "atmInterfaceMaxActiveVciBits" },
-    { 7, G_SNMP_INTEGER32, "atmInterfaceIlmiVpi" },
-    { 8, G_SNMP_INTEGER32, "atmInterfaceIlmiVci" },
-    { 9, G_SNMP_INTEGER32, "atmInterfaceAddressType" },
-    { 10, G_SNMP_OCTET_STRING, "atmInterfaceAdminAddress" },
-    { 11, G_SNMP_IPADDRESS, "atmInterfaceMyNeighborIpAddress" },
-    { 12, G_SNMP_OCTET_STRING, "atmInterfaceMyNeighborIfName" },
-    { 13, G_SNMP_INTEGER32, "atmInterfaceCurrentMaxVpiBits" },
-    { 14, G_SNMP_INTEGER32, "atmInterfaceCurrentMaxVciBits" },
-    { 15, G_SNMP_OCTET_STRING, "atmInterfaceSubscrAddress" },
-    { 0, 0, NULL }
+static guint32 const oid_atmInterfaceConfEntry[] = {1, 3, 6, 1, 2, 1, 37, 1, 2, 1};
+
+static attribute_t attr_atmInterfaceConfEntry[] = {
+    { 1, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACEMAXVPCS, "atmInterfaceMaxVpcs" },
+    { 2, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACEMAXVCCS, "atmInterfaceMaxVccs" },
+    { 3, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACECONFVPCS, "atmInterfaceConfVpcs" },
+    { 4, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACECONFVCCS, "atmInterfaceConfVccs" },
+    { 5, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACEMAXACTIVEVPIBITS, "atmInterfaceMaxActiveVpiBits" },
+    { 6, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACEMAXACTIVEVCIBITS, "atmInterfaceMaxActiveVciBits" },
+    { 7, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACEILMIVPI, "atmInterfaceIlmiVpi" },
+    { 8, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACEILMIVCI, "atmInterfaceIlmiVci" },
+    { 9, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACEADDRESSTYPE, "atmInterfaceAddressType" },
+    { 10, G_SNMP_OCTET_STRING, ATM_MIB_ATMINTERFACEADMINADDRESS, "atmInterfaceAdminAddress" },
+    { 11, G_SNMP_IPADDRESS, ATM_MIB_ATMINTERFACEMYNEIGHBORIPADDRESS, "atmInterfaceMyNeighborIpAddress" },
+    { 12, G_SNMP_OCTET_STRING, ATM_MIB_ATMINTERFACEMYNEIGHBORIFNAME, "atmInterfaceMyNeighborIfName" },
+    { 13, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACECURRENTMAXVPIBITS, "atmInterfaceCurrentMaxVpiBits" },
+    { 14, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACECURRENTMAXVCIBITS, "atmInterfaceCurrentMaxVciBits" },
+    { 15, G_SNMP_OCTET_STRING, ATM_MIB_ATMINTERFACESUBSCRADDRESS, "atmInterfaceSubscrAddress" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _atmInterfaceDs3PlcpEntry[] = {
-    { 1, G_SNMP_COUNTER32, "atmInterfaceDs3PlcpSEFSs" },
-    { 2, G_SNMP_INTEGER32, "atmInterfaceDs3PlcpAlarmState" },
-    { 3, G_SNMP_COUNTER32, "atmInterfaceDs3PlcpUASs" },
-    { 0, 0, NULL }
+static guint32 const oid_atmInterfaceDs3PlcpEntry[] = {1, 3, 6, 1, 2, 1, 37, 1, 3, 1};
+
+static attribute_t attr_atmInterfaceDs3PlcpEntry[] = {
+    { 1, G_SNMP_COUNTER32, ATM_MIB_ATMINTERFACEDS3PLCPSEFSS, "atmInterfaceDs3PlcpSEFSs" },
+    { 2, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACEDS3PLCPALARMSTATE, "atmInterfaceDs3PlcpAlarmState" },
+    { 3, G_SNMP_COUNTER32, ATM_MIB_ATMINTERFACEDS3PLCPUASS, "atmInterfaceDs3PlcpUASs" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _atmInterfaceTCEntry[] = {
-    { 1, G_SNMP_COUNTER32, "atmInterfaceOCDEvents" },
-    { 2, G_SNMP_INTEGER32, "atmInterfaceTCAlarmState" },
-    { 0, 0, NULL }
+static guint32 const oid_atmInterfaceTCEntry[] = {1, 3, 6, 1, 2, 1, 37, 1, 4, 1};
+
+static attribute_t attr_atmInterfaceTCEntry[] = {
+    { 1, G_SNMP_COUNTER32, ATM_MIB_ATMINTERFACEOCDEVENTS, "atmInterfaceOCDEvents" },
+    { 2, G_SNMP_INTEGER32, ATM_MIB_ATMINTERFACETCALARMSTATE, "atmInterfaceTCAlarmState" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _atmTrafficDescrParamEntry[] = {
-    { 2, G_SNMP_OBJECT_ID, "atmTrafficDescrType" },
-    { 3, G_SNMP_INTEGER32, "atmTrafficDescrParam1" },
-    { 4, G_SNMP_INTEGER32, "atmTrafficDescrParam2" },
-    { 5, G_SNMP_INTEGER32, "atmTrafficDescrParam3" },
-    { 6, G_SNMP_INTEGER32, "atmTrafficDescrParam4" },
-    { 7, G_SNMP_INTEGER32, "atmTrafficDescrParam5" },
-    { 8, G_SNMP_INTEGER32, "atmTrafficQoSClass" },
-    { 9, G_SNMP_INTEGER32, "atmTrafficDescrRowStatus" },
-    { 10, G_SNMP_INTEGER32, "atmServiceCategory" },
-    { 11, G_SNMP_INTEGER32, "atmTrafficFrameDiscard" },
-    { 0, 0, NULL }
+static guint32 const oid_atmTrafficDescrParamEntry[] = {1, 3, 6, 1, 2, 1, 37, 1, 5, 1};
+
+static attribute_t attr_atmTrafficDescrParamEntry[] = {
+    { 2, G_SNMP_OBJECT_ID, ATM_MIB_ATMTRAFFICDESCRTYPE, "atmTrafficDescrType" },
+    { 3, G_SNMP_INTEGER32, ATM_MIB_ATMTRAFFICDESCRPARAM1, "atmTrafficDescrParam1" },
+    { 4, G_SNMP_INTEGER32, ATM_MIB_ATMTRAFFICDESCRPARAM2, "atmTrafficDescrParam2" },
+    { 5, G_SNMP_INTEGER32, ATM_MIB_ATMTRAFFICDESCRPARAM3, "atmTrafficDescrParam3" },
+    { 6, G_SNMP_INTEGER32, ATM_MIB_ATMTRAFFICDESCRPARAM4, "atmTrafficDescrParam4" },
+    { 7, G_SNMP_INTEGER32, ATM_MIB_ATMTRAFFICDESCRPARAM5, "atmTrafficDescrParam5" },
+    { 8, G_SNMP_INTEGER32, ATM_MIB_ATMTRAFFICQOSCLASS, "atmTrafficQoSClass" },
+    { 9, G_SNMP_INTEGER32, ATM_MIB_ATMTRAFFICDESCRROWSTATUS, "atmTrafficDescrRowStatus" },
+    { 10, G_SNMP_INTEGER32, ATM_MIB_ATMSERVICECATEGORY, "atmServiceCategory" },
+    { 11, G_SNMP_INTEGER32, ATM_MIB_ATMTRAFFICFRAMEDISCARD, "atmTrafficFrameDiscard" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _atmVplEntry[] = {
-    { 2, G_SNMP_INTEGER32, "atmVplAdminStatus" },
-    { 3, G_SNMP_INTEGER32, "atmVplOperStatus" },
-    { 4, G_SNMP_TIMETICKS, "atmVplLastChange" },
-    { 5, G_SNMP_INTEGER32, "atmVplReceiveTrafficDescrIndex" },
-    { 6, G_SNMP_INTEGER32, "atmVplTransmitTrafficDescrIndex" },
-    { 7, G_SNMP_INTEGER32, "atmVplCrossConnectIdentifier" },
-    { 8, G_SNMP_INTEGER32, "atmVplRowStatus" },
-    { 9, G_SNMP_INTEGER32, "atmVplCastType" },
-    { 10, G_SNMP_INTEGER32, "atmVplConnKind" },
-    { 0, 0, NULL }
+static guint32 const oid_atmVplEntry[] = {1, 3, 6, 1, 2, 1, 37, 1, 6, 1};
+
+static attribute_t attr_atmVplEntry[] = {
+    { 2, G_SNMP_INTEGER32, ATM_MIB_ATMVPLADMINSTATUS, "atmVplAdminStatus" },
+    { 3, G_SNMP_INTEGER32, ATM_MIB_ATMVPLOPERSTATUS, "atmVplOperStatus" },
+    { 4, G_SNMP_TIMETICKS, ATM_MIB_ATMVPLLASTCHANGE, "atmVplLastChange" },
+    { 5, G_SNMP_INTEGER32, ATM_MIB_ATMVPLRECEIVETRAFFICDESCRINDEX, "atmVplReceiveTrafficDescrIndex" },
+    { 6, G_SNMP_INTEGER32, ATM_MIB_ATMVPLTRANSMITTRAFFICDESCRINDEX, "atmVplTransmitTrafficDescrIndex" },
+    { 7, G_SNMP_INTEGER32, ATM_MIB_ATMVPLCROSSCONNECTIDENTIFIER, "atmVplCrossConnectIdentifier" },
+    { 8, G_SNMP_INTEGER32, ATM_MIB_ATMVPLROWSTATUS, "atmVplRowStatus" },
+    { 9, G_SNMP_INTEGER32, ATM_MIB_ATMVPLCASTTYPE, "atmVplCastType" },
+    { 10, G_SNMP_INTEGER32, ATM_MIB_ATMVPLCONNKIND, "atmVplConnKind" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _atmVclEntry[] = {
-    { 3, G_SNMP_INTEGER32, "atmVclAdminStatus" },
-    { 4, G_SNMP_INTEGER32, "atmVclOperStatus" },
-    { 5, G_SNMP_TIMETICKS, "atmVclLastChange" },
-    { 6, G_SNMP_INTEGER32, "atmVclReceiveTrafficDescrIndex" },
-    { 7, G_SNMP_INTEGER32, "atmVclTransmitTrafficDescrIndex" },
-    { 8, G_SNMP_INTEGER32, "atmVccAalType" },
-    { 9, G_SNMP_INTEGER32, "atmVccAal5CpcsTransmitSduSize" },
-    { 10, G_SNMP_INTEGER32, "atmVccAal5CpcsReceiveSduSize" },
-    { 11, G_SNMP_INTEGER32, "atmVccAal5EncapsType" },
-    { 12, G_SNMP_INTEGER32, "atmVclCrossConnectIdentifier" },
-    { 13, G_SNMP_INTEGER32, "atmVclRowStatus" },
-    { 14, G_SNMP_INTEGER32, "atmVclCastType" },
-    { 15, G_SNMP_INTEGER32, "atmVclConnKind" },
-    { 0, 0, NULL }
+static guint32 const oid_atmVclEntry[] = {1, 3, 6, 1, 2, 1, 37, 1, 7, 1};
+
+static attribute_t attr_atmVclEntry[] = {
+    { 3, G_SNMP_INTEGER32, ATM_MIB_ATMVCLADMINSTATUS, "atmVclAdminStatus" },
+    { 4, G_SNMP_INTEGER32, ATM_MIB_ATMVCLOPERSTATUS, "atmVclOperStatus" },
+    { 5, G_SNMP_TIMETICKS, ATM_MIB_ATMVCLLASTCHANGE, "atmVclLastChange" },
+    { 6, G_SNMP_INTEGER32, ATM_MIB_ATMVCLRECEIVETRAFFICDESCRINDEX, "atmVclReceiveTrafficDescrIndex" },
+    { 7, G_SNMP_INTEGER32, ATM_MIB_ATMVCLTRANSMITTRAFFICDESCRINDEX, "atmVclTransmitTrafficDescrIndex" },
+    { 8, G_SNMP_INTEGER32, ATM_MIB_ATMVCCAALTYPE, "atmVccAalType" },
+    { 9, G_SNMP_INTEGER32, ATM_MIB_ATMVCCAAL5CPCSTRANSMITSDUSIZE, "atmVccAal5CpcsTransmitSduSize" },
+    { 10, G_SNMP_INTEGER32, ATM_MIB_ATMVCCAAL5CPCSRECEIVESDUSIZE, "atmVccAal5CpcsReceiveSduSize" },
+    { 11, G_SNMP_INTEGER32, ATM_MIB_ATMVCCAAL5ENCAPSTYPE, "atmVccAal5EncapsType" },
+    { 12, G_SNMP_INTEGER32, ATM_MIB_ATMVCLCROSSCONNECTIDENTIFIER, "atmVclCrossConnectIdentifier" },
+    { 13, G_SNMP_INTEGER32, ATM_MIB_ATMVCLROWSTATUS, "atmVclRowStatus" },
+    { 14, G_SNMP_INTEGER32, ATM_MIB_ATMVCLCASTTYPE, "atmVclCastType" },
+    { 15, G_SNMP_INTEGER32, ATM_MIB_ATMVCLCONNKIND, "atmVclConnKind" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _atmVpCrossConnectEntry[] = {
-    { 6, G_SNMP_INTEGER32, "atmVpCrossConnectAdminStatus" },
-    { 7, G_SNMP_INTEGER32, "atmVpCrossConnectL2HOperStatus" },
-    { 8, G_SNMP_INTEGER32, "atmVpCrossConnectH2LOperStatus" },
-    { 9, G_SNMP_TIMETICKS, "atmVpCrossConnectL2HLastChange" },
-    { 10, G_SNMP_TIMETICKS, "atmVpCrossConnectH2LLastChange" },
-    { 11, G_SNMP_INTEGER32, "atmVpCrossConnectRowStatus" },
-    { 0, 0, NULL }
+static guint32 const oid_atmVpCrossConnectEntry[] = {1, 3, 6, 1, 2, 1, 37, 1, 9, 1};
+
+static attribute_t attr_atmVpCrossConnectEntry[] = {
+    { 6, G_SNMP_INTEGER32, ATM_MIB_ATMVPCROSSCONNECTADMINSTATUS, "atmVpCrossConnectAdminStatus" },
+    { 7, G_SNMP_INTEGER32, ATM_MIB_ATMVPCROSSCONNECTL2HOPERSTATUS, "atmVpCrossConnectL2HOperStatus" },
+    { 8, G_SNMP_INTEGER32, ATM_MIB_ATMVPCROSSCONNECTH2LOPERSTATUS, "atmVpCrossConnectH2LOperStatus" },
+    { 9, G_SNMP_TIMETICKS, ATM_MIB_ATMVPCROSSCONNECTL2HLASTCHANGE, "atmVpCrossConnectL2HLastChange" },
+    { 10, G_SNMP_TIMETICKS, ATM_MIB_ATMVPCROSSCONNECTH2LLASTCHANGE, "atmVpCrossConnectH2LLastChange" },
+    { 11, G_SNMP_INTEGER32, ATM_MIB_ATMVPCROSSCONNECTROWSTATUS, "atmVpCrossConnectRowStatus" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _atmVcCrossConnectEntry[] = {
-    { 8, G_SNMP_INTEGER32, "atmVcCrossConnectAdminStatus" },
-    { 9, G_SNMP_INTEGER32, "atmVcCrossConnectL2HOperStatus" },
-    { 10, G_SNMP_INTEGER32, "atmVcCrossConnectH2LOperStatus" },
-    { 11, G_SNMP_TIMETICKS, "atmVcCrossConnectL2HLastChange" },
-    { 12, G_SNMP_TIMETICKS, "atmVcCrossConnectH2LLastChange" },
-    { 13, G_SNMP_INTEGER32, "atmVcCrossConnectRowStatus" },
-    { 0, 0, NULL }
+static guint32 const oid_atmVcCrossConnectEntry[] = {1, 3, 6, 1, 2, 1, 37, 1, 11, 1};
+
+static attribute_t attr_atmVcCrossConnectEntry[] = {
+    { 8, G_SNMP_INTEGER32, ATM_MIB_ATMVCCROSSCONNECTADMINSTATUS, "atmVcCrossConnectAdminStatus" },
+    { 9, G_SNMP_INTEGER32, ATM_MIB_ATMVCCROSSCONNECTL2HOPERSTATUS, "atmVcCrossConnectL2HOperStatus" },
+    { 10, G_SNMP_INTEGER32, ATM_MIB_ATMVCCROSSCONNECTH2LOPERSTATUS, "atmVcCrossConnectH2LOperStatus" },
+    { 11, G_SNMP_TIMETICKS, ATM_MIB_ATMVCCROSSCONNECTL2HLASTCHANGE, "atmVcCrossConnectL2HLastChange" },
+    { 12, G_SNMP_TIMETICKS, ATM_MIB_ATMVCCROSSCONNECTH2LLASTCHANGE, "atmVcCrossConnectH2LLastChange" },
+    { 13, G_SNMP_INTEGER32, ATM_MIB_ATMVCCROSSCONNECTROWSTATUS, "atmVcCrossConnectRowStatus" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _aal5VccEntry[] = {
-    { 3, G_SNMP_COUNTER32, "aal5VccCrcErrors" },
-    { 4, G_SNMP_COUNTER32, "aal5VccSarTimeOuts" },
-    { 5, G_SNMP_COUNTER32, "aal5VccOverSizedSDUs" },
-    { 0, 0, NULL }
+static guint32 const oid_aal5VccEntry[] = {1, 3, 6, 1, 2, 1, 37, 1, 12, 1};
+
+static attribute_t attr_aal5VccEntry[] = {
+    { 3, G_SNMP_COUNTER32, ATM_MIB_AAL5VCCCRCERRORS, "aal5VccCrcErrors" },
+    { 4, G_SNMP_COUNTER32, ATM_MIB_AAL5VCCSARTIMEOUTS, "aal5VccSarTimeOuts" },
+    { 5, G_SNMP_COUNTER32, ATM_MIB_AAL5VCCOVERSIZEDSDUS, "aal5VccOverSizedSDUs" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -434,7 +458,6 @@ assign_atmMIBObjects(GSList *vbl)
     atm_mib_atmMIBObjects_t *atmMIBObjects;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 37, 1};
 
     atmMIBObjects = atm_mib_new_atmMIBObjects();
     if (! atmMIBObjects) {
@@ -447,8 +470,8 @@ assign_atmMIBObjects(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _atmMIBObjects, &idx) < 0) continue;
+        if (lookup(vb, oid_atmMIBObjects, sizeof(oid_atmMIBObjects)/sizeof(guint32),
+                   attr_atmMIBObjects, &idx) < 0) continue;
 
         switch (idx) {
         case 8:
@@ -466,25 +489,21 @@ assign_atmMIBObjects(GSList *vbl)
     return atmMIBObjects;
 }
 
-int
-atm_mib_get_atmMIBObjects(GSnmpSession *s, atm_mib_atmMIBObjects_t **atmMIBObjects)
+void
+atm_mib_get_atmMIBObjects(GSnmpSession *s, atm_mib_atmMIBObjects_t **atmMIBObjects, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 37, 1, 0};
 
     *atmMIBObjects = NULL;
 
-    add_attributes(s, &in, base, 8, _atmMIBObjects);
+    add_attributes(s, &in, base, 9, 8, attr_atmMIBObjects, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *atmMIBObjects = assign_atmMIBObjects(out);
     }
-
-    *atmMIBObjects = assign_atmMIBObjects(out);
-
-    return 0;
 }
 
 void
@@ -521,6 +540,15 @@ unpack_atmInterfaceConfEntry(GSnmpVarBind *vb, atm_mib_atmInterfaceConfEntry_t *
     return 0;
 }
 
+static int
+pack_atmInterfaceConfEntry(guint32 *base, gint32 ifIndex)
+{
+    int idx = 11;
+
+    base[idx++] = ifIndex;
+    return idx;
+}
+
 static atm_mib_atmInterfaceConfEntry_t *
 assign_atmInterfaceConfEntry(GSList *vbl)
 {
@@ -528,7 +556,6 @@ assign_atmInterfaceConfEntry(GSList *vbl)
     atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 37, 1, 2, 1};
 
     atmInterfaceConfEntry = atm_mib_new_atmInterfaceConfEntry();
     if (! atmInterfaceConfEntry) {
@@ -547,8 +574,8 @@ assign_atmInterfaceConfEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _atmInterfaceConfEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_atmInterfaceConfEntry, sizeof(oid_atmInterfaceConfEntry)/sizeof(guint32),
+                   attr_atmInterfaceConfEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -605,8 +632,8 @@ assign_atmInterfaceConfEntry(GSList *vbl)
     return atmInterfaceConfEntry;
 }
 
-int
-atm_mib_get_atmInterfaceConfTable(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t ***atmInterfaceConfEntry)
+void
+atm_mib_get_atmInterfaceConfTable(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t ***atmInterfaceConfEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -615,24 +642,125 @@ atm_mib_get_atmInterfaceConfTable(GSnmpSession *s, atm_mib_atmInterfaceConfEntry
 
     *atmInterfaceConfEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _atmInterfaceConfEntry);
+    add_attributes(s, &in, base, 11, 10, attr_atmInterfaceConfEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *atmInterfaceConfEntry = (atm_mib_atmInterfaceConfEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmInterfaceConfEntry_t *));
+        if (! *atmInterfaceConfEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*atmInterfaceConfEntry)[i] = assign_atmInterfaceConfEntry(row->data);
+        }
+    }
+}
+
+void
+atm_mib_get_atmInterfaceConfEntry(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfEntry, gint32 ifIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmInterfaceConfEntry, sizeof(oid_atmInterfaceConfEntry));
+    len = pack_atmInterfaceConfEntry(base, ifIndex);
+    if (len < 0) {
+        g_warning("illegal atmInterfaceConfEntry index values");
+        return;
     }
 
-    *atmInterfaceConfEntry = (atm_mib_atmInterfaceConfEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmInterfaceConfEntry_t *));
-    if (! *atmInterfaceConfEntry) {
-        return -4;
+    *atmInterfaceConfEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_atmInterfaceConfEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *atmInterfaceConfEntry = assign_atmInterfaceConfEntry(out);
+    }
+}
+
+void
+atm_mib_set_atmInterfaceConfEntry(GSnmpSession *s, atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmInterfaceConfEntry, sizeof(oid_atmInterfaceConfEntry));
+    len = pack_atmInterfaceConfEntry(base, atmInterfaceConfEntry->ifIndex);
+    if (len < 0) {
+        g_warning("illegal atmInterfaceConfEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*atmInterfaceConfEntry)[i] = assign_atmInterfaceConfEntry(row->data);
+    if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
+        base[10] = 1;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmInterfaceConfEntry->atmInterfaceMaxVpcs,
+                       0);
+    }
+    if (atmInterfaceConfEntry->atmInterfaceMaxVccs) {
+        base[10] = 2;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmInterfaceConfEntry->atmInterfaceMaxVccs,
+                       0);
+    }
+    if (atmInterfaceConfEntry->atmInterfaceMaxActiveVpiBits) {
+        base[10] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmInterfaceConfEntry->atmInterfaceMaxActiveVpiBits,
+                       0);
+    }
+    if (atmInterfaceConfEntry->atmInterfaceMaxActiveVciBits) {
+        base[10] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmInterfaceConfEntry->atmInterfaceMaxActiveVciBits,
+                       0);
+    }
+    if (atmInterfaceConfEntry->atmInterfaceIlmiVpi) {
+        base[10] = 7;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmInterfaceConfEntry->atmInterfaceIlmiVpi,
+                       0);
+    }
+    if (atmInterfaceConfEntry->atmInterfaceIlmiVci) {
+        base[10] = 8;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmInterfaceConfEntry->atmInterfaceIlmiVci,
+                       0);
+    }
+    if (atmInterfaceConfEntry->atmInterfaceMyNeighborIpAddress) {
+        base[10] = 11;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_IPADDRESS,
+                       atmInterfaceConfEntry->atmInterfaceMyNeighborIpAddress,
+                       4);
+    }
+    if (atmInterfaceConfEntry->atmInterfaceMyNeighborIfName) {
+        base[10] = 12;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       atmInterfaceConfEntry->atmInterfaceMyNeighborIfName,
+                       atmInterfaceConfEntry->_atmInterfaceMyNeighborIfNameLength);
+    }
+    if (atmInterfaceConfEntry->atmInterfaceSubscrAddress) {
+        base[10] = 15;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       atmInterfaceConfEntry->atmInterfaceSubscrAddress,
+                       atmInterfaceConfEntry->_atmInterfaceSubscrAddressLength);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -682,6 +810,15 @@ unpack_atmInterfaceDs3PlcpEntry(GSnmpVarBind *vb, atm_mib_atmInterfaceDs3PlcpEnt
     return 0;
 }
 
+static int
+pack_atmInterfaceDs3PlcpEntry(guint32 *base, gint32 ifIndex)
+{
+    int idx = 11;
+
+    base[idx++] = ifIndex;
+    return idx;
+}
+
 static atm_mib_atmInterfaceDs3PlcpEntry_t *
 assign_atmInterfaceDs3PlcpEntry(GSList *vbl)
 {
@@ -689,7 +826,6 @@ assign_atmInterfaceDs3PlcpEntry(GSList *vbl)
     atm_mib_atmInterfaceDs3PlcpEntry_t *atmInterfaceDs3PlcpEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 37, 1, 3, 1};
 
     atmInterfaceDs3PlcpEntry = atm_mib_new_atmInterfaceDs3PlcpEntry();
     if (! atmInterfaceDs3PlcpEntry) {
@@ -708,8 +844,8 @@ assign_atmInterfaceDs3PlcpEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _atmInterfaceDs3PlcpEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_atmInterfaceDs3PlcpEntry, sizeof(oid_atmInterfaceDs3PlcpEntry)/sizeof(guint32),
+                   attr_atmInterfaceDs3PlcpEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -727,8 +863,8 @@ assign_atmInterfaceDs3PlcpEntry(GSList *vbl)
     return atmInterfaceDs3PlcpEntry;
 }
 
-int
-atm_mib_get_atmInterfaceDs3PlcpTable(GSnmpSession *s, atm_mib_atmInterfaceDs3PlcpEntry_t ***atmInterfaceDs3PlcpEntry)
+void
+atm_mib_get_atmInterfaceDs3PlcpTable(GSnmpSession *s, atm_mib_atmInterfaceDs3PlcpEntry_t ***atmInterfaceDs3PlcpEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -737,24 +873,48 @@ atm_mib_get_atmInterfaceDs3PlcpTable(GSnmpSession *s, atm_mib_atmInterfaceDs3Plc
 
     *atmInterfaceDs3PlcpEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _atmInterfaceDs3PlcpEntry);
+    add_attributes(s, &in, base, 11, 10, attr_atmInterfaceDs3PlcpEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *atmInterfaceDs3PlcpEntry = (atm_mib_atmInterfaceDs3PlcpEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmInterfaceDs3PlcpEntry_t *));
+        if (! *atmInterfaceDs3PlcpEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*atmInterfaceDs3PlcpEntry)[i] = assign_atmInterfaceDs3PlcpEntry(row->data);
+        }
+    }
+}
+
+void
+atm_mib_get_atmInterfaceDs3PlcpEntry(GSnmpSession *s, atm_mib_atmInterfaceDs3PlcpEntry_t **atmInterfaceDs3PlcpEntry, gint32 ifIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmInterfaceDs3PlcpEntry, sizeof(oid_atmInterfaceDs3PlcpEntry));
+    len = pack_atmInterfaceDs3PlcpEntry(base, ifIndex);
+    if (len < 0) {
+        g_warning("illegal atmInterfaceDs3PlcpEntry index values");
+        return;
     }
 
-    *atmInterfaceDs3PlcpEntry = (atm_mib_atmInterfaceDs3PlcpEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmInterfaceDs3PlcpEntry_t *));
-    if (! *atmInterfaceDs3PlcpEntry) {
-        return -4;
-    }
+    *atmInterfaceDs3PlcpEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*atmInterfaceDs3PlcpEntry)[i] = assign_atmInterfaceDs3PlcpEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_atmInterfaceDs3PlcpEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *atmInterfaceDs3PlcpEntry = assign_atmInterfaceDs3PlcpEntry(out);
+    }
 }
 
 void
@@ -804,6 +964,15 @@ unpack_atmInterfaceTCEntry(GSnmpVarBind *vb, atm_mib_atmInterfaceTCEntry_t *atmI
     return 0;
 }
 
+static int
+pack_atmInterfaceTCEntry(guint32 *base, gint32 ifIndex)
+{
+    int idx = 11;
+
+    base[idx++] = ifIndex;
+    return idx;
+}
+
 static atm_mib_atmInterfaceTCEntry_t *
 assign_atmInterfaceTCEntry(GSList *vbl)
 {
@@ -811,7 +980,6 @@ assign_atmInterfaceTCEntry(GSList *vbl)
     atm_mib_atmInterfaceTCEntry_t *atmInterfaceTCEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 37, 1, 4, 1};
 
     atmInterfaceTCEntry = atm_mib_new_atmInterfaceTCEntry();
     if (! atmInterfaceTCEntry) {
@@ -830,8 +998,8 @@ assign_atmInterfaceTCEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _atmInterfaceTCEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_atmInterfaceTCEntry, sizeof(oid_atmInterfaceTCEntry)/sizeof(guint32),
+                   attr_atmInterfaceTCEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -846,8 +1014,8 @@ assign_atmInterfaceTCEntry(GSList *vbl)
     return atmInterfaceTCEntry;
 }
 
-int
-atm_mib_get_atmInterfaceTCTable(GSnmpSession *s, atm_mib_atmInterfaceTCEntry_t ***atmInterfaceTCEntry)
+void
+atm_mib_get_atmInterfaceTCTable(GSnmpSession *s, atm_mib_atmInterfaceTCEntry_t ***atmInterfaceTCEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -856,24 +1024,48 @@ atm_mib_get_atmInterfaceTCTable(GSnmpSession *s, atm_mib_atmInterfaceTCEntry_t *
 
     *atmInterfaceTCEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _atmInterfaceTCEntry);
+    add_attributes(s, &in, base, 11, 10, attr_atmInterfaceTCEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *atmInterfaceTCEntry = (atm_mib_atmInterfaceTCEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmInterfaceTCEntry_t *));
+        if (! *atmInterfaceTCEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*atmInterfaceTCEntry)[i] = assign_atmInterfaceTCEntry(row->data);
+        }
+    }
+}
+
+void
+atm_mib_get_atmInterfaceTCEntry(GSnmpSession *s, atm_mib_atmInterfaceTCEntry_t **atmInterfaceTCEntry, gint32 ifIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmInterfaceTCEntry, sizeof(oid_atmInterfaceTCEntry));
+    len = pack_atmInterfaceTCEntry(base, ifIndex);
+    if (len < 0) {
+        g_warning("illegal atmInterfaceTCEntry index values");
+        return;
     }
 
-    *atmInterfaceTCEntry = (atm_mib_atmInterfaceTCEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmInterfaceTCEntry_t *));
-    if (! *atmInterfaceTCEntry) {
-        return -4;
-    }
+    *atmInterfaceTCEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*atmInterfaceTCEntry)[i] = assign_atmInterfaceTCEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_atmInterfaceTCEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *atmInterfaceTCEntry = assign_atmInterfaceTCEntry(out);
+    }
 }
 
 void
@@ -923,6 +1115,15 @@ unpack_atmTrafficDescrParamEntry(GSnmpVarBind *vb, atm_mib_atmTrafficDescrParamE
     return 0;
 }
 
+static int
+pack_atmTrafficDescrParamEntry(guint32 *base, gint32 atmTrafficDescrParamIndex)
+{
+    int idx = 11;
+
+    base[idx++] = atmTrafficDescrParamIndex;
+    return idx;
+}
+
 static atm_mib_atmTrafficDescrParamEntry_t *
 assign_atmTrafficDescrParamEntry(GSList *vbl)
 {
@@ -930,7 +1131,6 @@ assign_atmTrafficDescrParamEntry(GSList *vbl)
     atm_mib_atmTrafficDescrParamEntry_t *atmTrafficDescrParamEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 37, 1, 5, 1};
 
     atmTrafficDescrParamEntry = atm_mib_new_atmTrafficDescrParamEntry();
     if (! atmTrafficDescrParamEntry) {
@@ -949,8 +1149,8 @@ assign_atmTrafficDescrParamEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _atmTrafficDescrParamEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_atmTrafficDescrParamEntry, sizeof(oid_atmTrafficDescrParamEntry)/sizeof(guint32),
+                   attr_atmTrafficDescrParamEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -990,8 +1190,8 @@ assign_atmTrafficDescrParamEntry(GSList *vbl)
     return atmTrafficDescrParamEntry;
 }
 
-int
-atm_mib_get_atmTrafficDescrParamTable(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t ***atmTrafficDescrParamEntry)
+void
+atm_mib_get_atmTrafficDescrParamTable(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t ***atmTrafficDescrParamEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1000,24 +1200,131 @@ atm_mib_get_atmTrafficDescrParamTable(GSnmpSession *s, atm_mib_atmTrafficDescrPa
 
     *atmTrafficDescrParamEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _atmTrafficDescrParamEntry);
+    add_attributes(s, &in, base, 11, 10, attr_atmTrafficDescrParamEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *atmTrafficDescrParamEntry = (atm_mib_atmTrafficDescrParamEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmTrafficDescrParamEntry_t *));
+        if (! *atmTrafficDescrParamEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*atmTrafficDescrParamEntry)[i] = assign_atmTrafficDescrParamEntry(row->data);
+        }
+    }
+}
+
+void
+atm_mib_get_atmTrafficDescrParamEntry(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t **atmTrafficDescrParamEntry, gint32 atmTrafficDescrParamIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmTrafficDescrParamEntry, sizeof(oid_atmTrafficDescrParamEntry));
+    len = pack_atmTrafficDescrParamEntry(base, atmTrafficDescrParamIndex);
+    if (len < 0) {
+        g_warning("illegal atmTrafficDescrParamEntry index values");
+        return;
     }
 
-    *atmTrafficDescrParamEntry = (atm_mib_atmTrafficDescrParamEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmTrafficDescrParamEntry_t *));
-    if (! *atmTrafficDescrParamEntry) {
-        return -4;
+    *atmTrafficDescrParamEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_atmTrafficDescrParamEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *atmTrafficDescrParamEntry = assign_atmTrafficDescrParamEntry(out);
+    }
+}
+
+void
+atm_mib_set_atmTrafficDescrParamEntry(GSnmpSession *s, atm_mib_atmTrafficDescrParamEntry_t *atmTrafficDescrParamEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmTrafficDescrParamEntry, sizeof(oid_atmTrafficDescrParamEntry));
+    len = pack_atmTrafficDescrParamEntry(base, atmTrafficDescrParamEntry->atmTrafficDescrParamIndex);
+    if (len < 0) {
+        g_warning("illegal atmTrafficDescrParamEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*atmTrafficDescrParamEntry)[i] = assign_atmTrafficDescrParamEntry(row->data);
+    if (atmTrafficDescrParamEntry->atmTrafficDescrType) {
+        base[10] = 2;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OBJECT_ID,
+                       atmTrafficDescrParamEntry->atmTrafficDescrType,
+                       atmTrafficDescrParamEntry->_atmTrafficDescrTypeLength);
+    }
+    if (atmTrafficDescrParamEntry->atmTrafficDescrParam1) {
+        base[10] = 3;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmTrafficDescrParamEntry->atmTrafficDescrParam1,
+                       0);
+    }
+    if (atmTrafficDescrParamEntry->atmTrafficDescrParam2) {
+        base[10] = 4;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmTrafficDescrParamEntry->atmTrafficDescrParam2,
+                       0);
+    }
+    if (atmTrafficDescrParamEntry->atmTrafficDescrParam3) {
+        base[10] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmTrafficDescrParamEntry->atmTrafficDescrParam3,
+                       0);
+    }
+    if (atmTrafficDescrParamEntry->atmTrafficDescrParam4) {
+        base[10] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmTrafficDescrParamEntry->atmTrafficDescrParam4,
+                       0);
+    }
+    if (atmTrafficDescrParamEntry->atmTrafficDescrParam5) {
+        base[10] = 7;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmTrafficDescrParamEntry->atmTrafficDescrParam5,
+                       0);
+    }
+    if (atmTrafficDescrParamEntry->atmTrafficQoSClass) {
+        base[10] = 8;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmTrafficDescrParamEntry->atmTrafficQoSClass,
+                       0);
+    }
+    if (atmTrafficDescrParamEntry->atmTrafficDescrRowStatus) {
+        base[10] = 9;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmTrafficDescrParamEntry->atmTrafficDescrRowStatus,
+                       0);
+    }
+    if (atmTrafficDescrParamEntry->atmServiceCategory) {
+        base[10] = 10;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmTrafficDescrParamEntry->atmServiceCategory,
+                       0);
+    }
+    if (atmTrafficDescrParamEntry->atmTrafficFrameDiscard) {
+        base[10] = 11;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmTrafficDescrParamEntry->atmTrafficFrameDiscard,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1069,6 +1376,16 @@ unpack_atmVplEntry(GSnmpVarBind *vb, atm_mib_atmVplEntry_t *atmVplEntry)
     return 0;
 }
 
+static int
+pack_atmVplEntry(guint32 *base, gint32 ifIndex, gint32 atmVplVpi)
+{
+    int idx = 11;
+
+    base[idx++] = ifIndex;
+    base[idx++] = atmVplVpi;
+    return idx;
+}
+
 static atm_mib_atmVplEntry_t *
 assign_atmVplEntry(GSList *vbl)
 {
@@ -1076,7 +1393,6 @@ assign_atmVplEntry(GSList *vbl)
     atm_mib_atmVplEntry_t *atmVplEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 37, 1, 6, 1};
 
     atmVplEntry = atm_mib_new_atmVplEntry();
     if (! atmVplEntry) {
@@ -1095,8 +1411,8 @@ assign_atmVplEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _atmVplEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_atmVplEntry, sizeof(oid_atmVplEntry)/sizeof(guint32),
+                   attr_atmVplEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -1132,8 +1448,8 @@ assign_atmVplEntry(GSList *vbl)
     return atmVplEntry;
 }
 
-int
-atm_mib_get_atmVplTable(GSnmpSession *s, atm_mib_atmVplEntry_t ***atmVplEntry)
+void
+atm_mib_get_atmVplTable(GSnmpSession *s, atm_mib_atmVplEntry_t ***atmVplEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1142,24 +1458,107 @@ atm_mib_get_atmVplTable(GSnmpSession *s, atm_mib_atmVplEntry_t ***atmVplEntry)
 
     *atmVplEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _atmVplEntry);
+    add_attributes(s, &in, base, 11, 10, attr_atmVplEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *atmVplEntry = (atm_mib_atmVplEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmVplEntry_t *));
+        if (! *atmVplEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*atmVplEntry)[i] = assign_atmVplEntry(row->data);
+        }
+    }
+}
+
+void
+atm_mib_get_atmVplEntry(GSnmpSession *s, atm_mib_atmVplEntry_t **atmVplEntry, gint32 ifIndex, gint32 atmVplVpi, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmVplEntry, sizeof(oid_atmVplEntry));
+    len = pack_atmVplEntry(base, ifIndex, atmVplVpi);
+    if (len < 0) {
+        g_warning("illegal atmVplEntry index values");
+        return;
     }
 
-    *atmVplEntry = (atm_mib_atmVplEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmVplEntry_t *));
-    if (! *atmVplEntry) {
-        return -4;
+    *atmVplEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_atmVplEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *atmVplEntry = assign_atmVplEntry(out);
+    }
+}
+
+void
+atm_mib_set_atmVplEntry(GSnmpSession *s, atm_mib_atmVplEntry_t *atmVplEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmVplEntry, sizeof(oid_atmVplEntry));
+    len = pack_atmVplEntry(base, atmVplEntry->ifIndex, atmVplEntry->atmVplVpi);
+    if (len < 0) {
+        g_warning("illegal atmVplEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*atmVplEntry)[i] = assign_atmVplEntry(row->data);
+    if (atmVplEntry->atmVplAdminStatus) {
+        base[10] = 2;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVplEntry->atmVplAdminStatus,
+                       0);
+    }
+    if (atmVplEntry->atmVplReceiveTrafficDescrIndex) {
+        base[10] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVplEntry->atmVplReceiveTrafficDescrIndex,
+                       0);
+    }
+    if (atmVplEntry->atmVplTransmitTrafficDescrIndex) {
+        base[10] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVplEntry->atmVplTransmitTrafficDescrIndex,
+                       0);
+    }
+    if (atmVplEntry->atmVplRowStatus) {
+        base[10] = 8;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVplEntry->atmVplRowStatus,
+                       0);
+    }
+    if (atmVplEntry->atmVplCastType) {
+        base[10] = 9;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVplEntry->atmVplCastType,
+                       0);
+    }
+    if (atmVplEntry->atmVplConnKind) {
+        base[10] = 10;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVplEntry->atmVplConnKind,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1213,6 +1612,17 @@ unpack_atmVclEntry(GSnmpVarBind *vb, atm_mib_atmVclEntry_t *atmVclEntry)
     return 0;
 }
 
+static int
+pack_atmVclEntry(guint32 *base, gint32 ifIndex, gint32 atmVclVpi, gint32 atmVclVci)
+{
+    int idx = 11;
+
+    base[idx++] = ifIndex;
+    base[idx++] = atmVclVpi;
+    base[idx++] = atmVclVci;
+    return idx;
+}
+
 static atm_mib_atmVclEntry_t *
 assign_atmVclEntry(GSList *vbl)
 {
@@ -1220,7 +1630,6 @@ assign_atmVclEntry(GSList *vbl)
     atm_mib_atmVclEntry_t *atmVclEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 37, 1, 7, 1};
 
     atmVclEntry = atm_mib_new_atmVclEntry();
     if (! atmVclEntry) {
@@ -1239,8 +1648,8 @@ assign_atmVclEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _atmVclEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_atmVclEntry, sizeof(oid_atmVclEntry)/sizeof(guint32),
+                   attr_atmVclEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -1288,8 +1697,8 @@ assign_atmVclEntry(GSList *vbl)
     return atmVclEntry;
 }
 
-int
-atm_mib_get_atmVclTable(GSnmpSession *s, atm_mib_atmVclEntry_t ***atmVclEntry)
+void
+atm_mib_get_atmVclTable(GSnmpSession *s, atm_mib_atmVclEntry_t ***atmVclEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1298,24 +1707,131 @@ atm_mib_get_atmVclTable(GSnmpSession *s, atm_mib_atmVclEntry_t ***atmVclEntry)
 
     *atmVclEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _atmVclEntry);
+    add_attributes(s, &in, base, 11, 10, attr_atmVclEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *atmVclEntry = (atm_mib_atmVclEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmVclEntry_t *));
+        if (! *atmVclEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*atmVclEntry)[i] = assign_atmVclEntry(row->data);
+        }
+    }
+}
+
+void
+atm_mib_get_atmVclEntry(GSnmpSession *s, atm_mib_atmVclEntry_t **atmVclEntry, gint32 ifIndex, gint32 atmVclVpi, gint32 atmVclVci, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmVclEntry, sizeof(oid_atmVclEntry));
+    len = pack_atmVclEntry(base, ifIndex, atmVclVpi, atmVclVci);
+    if (len < 0) {
+        g_warning("illegal atmVclEntry index values");
+        return;
     }
 
-    *atmVclEntry = (atm_mib_atmVclEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmVclEntry_t *));
-    if (! *atmVclEntry) {
-        return -4;
+    *atmVclEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_atmVclEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *atmVclEntry = assign_atmVclEntry(out);
+    }
+}
+
+void
+atm_mib_set_atmVclEntry(GSnmpSession *s, atm_mib_atmVclEntry_t *atmVclEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmVclEntry, sizeof(oid_atmVclEntry));
+    len = pack_atmVclEntry(base, atmVclEntry->ifIndex, atmVclEntry->atmVclVpi, atmVclEntry->atmVclVci);
+    if (len < 0) {
+        g_warning("illegal atmVclEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*atmVclEntry)[i] = assign_atmVclEntry(row->data);
+    if (atmVclEntry->atmVclAdminStatus) {
+        base[10] = 3;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVclEntry->atmVclAdminStatus,
+                       0);
+    }
+    if (atmVclEntry->atmVclReceiveTrafficDescrIndex) {
+        base[10] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVclEntry->atmVclReceiveTrafficDescrIndex,
+                       0);
+    }
+    if (atmVclEntry->atmVclTransmitTrafficDescrIndex) {
+        base[10] = 7;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVclEntry->atmVclTransmitTrafficDescrIndex,
+                       0);
+    }
+    if (atmVclEntry->atmVccAalType) {
+        base[10] = 8;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVclEntry->atmVccAalType,
+                       0);
+    }
+    if (atmVclEntry->atmVccAal5CpcsTransmitSduSize) {
+        base[10] = 9;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVclEntry->atmVccAal5CpcsTransmitSduSize,
+                       0);
+    }
+    if (atmVclEntry->atmVccAal5CpcsReceiveSduSize) {
+        base[10] = 10;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVclEntry->atmVccAal5CpcsReceiveSduSize,
+                       0);
+    }
+    if (atmVclEntry->atmVccAal5EncapsType) {
+        base[10] = 11;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVclEntry->atmVccAal5EncapsType,
+                       0);
+    }
+    if (atmVclEntry->atmVclRowStatus) {
+        base[10] = 13;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVclEntry->atmVclRowStatus,
+                       0);
+    }
+    if (atmVclEntry->atmVclCastType) {
+        base[10] = 14;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVclEntry->atmVclCastType,
+                       0);
+    }
+    if (atmVclEntry->atmVclConnKind) {
+        base[10] = 15;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVclEntry->atmVclConnKind,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1373,6 +1889,19 @@ unpack_atmVpCrossConnectEntry(GSnmpVarBind *vb, atm_mib_atmVpCrossConnectEntry_t
     return 0;
 }
 
+static int
+pack_atmVpCrossConnectEntry(guint32 *base, gint32 atmVpCrossConnectIndex, gint32 atmVpCrossConnectLowIfIndex, gint32 atmVpCrossConnectLowVpi, gint32 atmVpCrossConnectHighIfIndex, gint32 atmVpCrossConnectHighVpi)
+{
+    int idx = 11;
+
+    base[idx++] = atmVpCrossConnectIndex;
+    base[idx++] = atmVpCrossConnectLowIfIndex;
+    base[idx++] = atmVpCrossConnectLowVpi;
+    base[idx++] = atmVpCrossConnectHighIfIndex;
+    base[idx++] = atmVpCrossConnectHighVpi;
+    return idx;
+}
+
 static atm_mib_atmVpCrossConnectEntry_t *
 assign_atmVpCrossConnectEntry(GSList *vbl)
 {
@@ -1380,7 +1909,6 @@ assign_atmVpCrossConnectEntry(GSList *vbl)
     atm_mib_atmVpCrossConnectEntry_t *atmVpCrossConnectEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 37, 1, 9, 1};
 
     atmVpCrossConnectEntry = atm_mib_new_atmVpCrossConnectEntry();
     if (! atmVpCrossConnectEntry) {
@@ -1399,8 +1927,8 @@ assign_atmVpCrossConnectEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _atmVpCrossConnectEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_atmVpCrossConnectEntry, sizeof(oid_atmVpCrossConnectEntry)/sizeof(guint32),
+                   attr_atmVpCrossConnectEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 6:
@@ -1427,8 +1955,8 @@ assign_atmVpCrossConnectEntry(GSList *vbl)
     return atmVpCrossConnectEntry;
 }
 
-int
-atm_mib_get_atmVpCrossConnectTable(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t ***atmVpCrossConnectEntry)
+void
+atm_mib_get_atmVpCrossConnectTable(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t ***atmVpCrossConnectEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1437,24 +1965,83 @@ atm_mib_get_atmVpCrossConnectTable(GSnmpSession *s, atm_mib_atmVpCrossConnectEnt
 
     *atmVpCrossConnectEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _atmVpCrossConnectEntry);
+    add_attributes(s, &in, base, 11, 10, attr_atmVpCrossConnectEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *atmVpCrossConnectEntry = (atm_mib_atmVpCrossConnectEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmVpCrossConnectEntry_t *));
+        if (! *atmVpCrossConnectEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*atmVpCrossConnectEntry)[i] = assign_atmVpCrossConnectEntry(row->data);
+        }
+    }
+}
+
+void
+atm_mib_get_atmVpCrossConnectEntry(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t **atmVpCrossConnectEntry, gint32 atmVpCrossConnectIndex, gint32 atmVpCrossConnectLowIfIndex, gint32 atmVpCrossConnectLowVpi, gint32 atmVpCrossConnectHighIfIndex, gint32 atmVpCrossConnectHighVpi, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmVpCrossConnectEntry, sizeof(oid_atmVpCrossConnectEntry));
+    len = pack_atmVpCrossConnectEntry(base, atmVpCrossConnectIndex, atmVpCrossConnectLowIfIndex, atmVpCrossConnectLowVpi, atmVpCrossConnectHighIfIndex, atmVpCrossConnectHighVpi);
+    if (len < 0) {
+        g_warning("illegal atmVpCrossConnectEntry index values");
+        return;
     }
 
-    *atmVpCrossConnectEntry = (atm_mib_atmVpCrossConnectEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmVpCrossConnectEntry_t *));
-    if (! *atmVpCrossConnectEntry) {
-        return -4;
+    *atmVpCrossConnectEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_atmVpCrossConnectEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *atmVpCrossConnectEntry = assign_atmVpCrossConnectEntry(out);
+    }
+}
+
+void
+atm_mib_set_atmVpCrossConnectEntry(GSnmpSession *s, atm_mib_atmVpCrossConnectEntry_t *atmVpCrossConnectEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmVpCrossConnectEntry, sizeof(oid_atmVpCrossConnectEntry));
+    len = pack_atmVpCrossConnectEntry(base, atmVpCrossConnectEntry->atmVpCrossConnectIndex, atmVpCrossConnectEntry->atmVpCrossConnectLowIfIndex, atmVpCrossConnectEntry->atmVpCrossConnectLowVpi, atmVpCrossConnectEntry->atmVpCrossConnectHighIfIndex, atmVpCrossConnectEntry->atmVpCrossConnectHighVpi);
+    if (len < 0) {
+        g_warning("illegal atmVpCrossConnectEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*atmVpCrossConnectEntry)[i] = assign_atmVpCrossConnectEntry(row->data);
+    if (atmVpCrossConnectEntry->atmVpCrossConnectAdminStatus) {
+        base[10] = 6;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVpCrossConnectEntry->atmVpCrossConnectAdminStatus,
+                       0);
+    }
+    if (atmVpCrossConnectEntry->atmVpCrossConnectRowStatus) {
+        base[10] = 11;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVpCrossConnectEntry->atmVpCrossConnectRowStatus,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1516,6 +2103,21 @@ unpack_atmVcCrossConnectEntry(GSnmpVarBind *vb, atm_mib_atmVcCrossConnectEntry_t
     return 0;
 }
 
+static int
+pack_atmVcCrossConnectEntry(guint32 *base, gint32 atmVcCrossConnectIndex, gint32 atmVcCrossConnectLowIfIndex, gint32 atmVcCrossConnectLowVpi, gint32 atmVcCrossConnectLowVci, gint32 atmVcCrossConnectHighIfIndex, gint32 atmVcCrossConnectHighVpi, gint32 atmVcCrossConnectHighVci)
+{
+    int idx = 11;
+
+    base[idx++] = atmVcCrossConnectIndex;
+    base[idx++] = atmVcCrossConnectLowIfIndex;
+    base[idx++] = atmVcCrossConnectLowVpi;
+    base[idx++] = atmVcCrossConnectLowVci;
+    base[idx++] = atmVcCrossConnectHighIfIndex;
+    base[idx++] = atmVcCrossConnectHighVpi;
+    base[idx++] = atmVcCrossConnectHighVci;
+    return idx;
+}
+
 static atm_mib_atmVcCrossConnectEntry_t *
 assign_atmVcCrossConnectEntry(GSList *vbl)
 {
@@ -1523,7 +2125,6 @@ assign_atmVcCrossConnectEntry(GSList *vbl)
     atm_mib_atmVcCrossConnectEntry_t *atmVcCrossConnectEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 37, 1, 11, 1};
 
     atmVcCrossConnectEntry = atm_mib_new_atmVcCrossConnectEntry();
     if (! atmVcCrossConnectEntry) {
@@ -1542,8 +2143,8 @@ assign_atmVcCrossConnectEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _atmVcCrossConnectEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_atmVcCrossConnectEntry, sizeof(oid_atmVcCrossConnectEntry)/sizeof(guint32),
+                   attr_atmVcCrossConnectEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 8:
@@ -1570,8 +2171,8 @@ assign_atmVcCrossConnectEntry(GSList *vbl)
     return atmVcCrossConnectEntry;
 }
 
-int
-atm_mib_get_atmVcCrossConnectTable(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t ***atmVcCrossConnectEntry)
+void
+atm_mib_get_atmVcCrossConnectTable(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t ***atmVcCrossConnectEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1580,24 +2181,83 @@ atm_mib_get_atmVcCrossConnectTable(GSnmpSession *s, atm_mib_atmVcCrossConnectEnt
 
     *atmVcCrossConnectEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _atmVcCrossConnectEntry);
+    add_attributes(s, &in, base, 11, 10, attr_atmVcCrossConnectEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *atmVcCrossConnectEntry = (atm_mib_atmVcCrossConnectEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmVcCrossConnectEntry_t *));
+        if (! *atmVcCrossConnectEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*atmVcCrossConnectEntry)[i] = assign_atmVcCrossConnectEntry(row->data);
+        }
+    }
+}
+
+void
+atm_mib_get_atmVcCrossConnectEntry(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t **atmVcCrossConnectEntry, gint32 atmVcCrossConnectIndex, gint32 atmVcCrossConnectLowIfIndex, gint32 atmVcCrossConnectLowVpi, gint32 atmVcCrossConnectLowVci, gint32 atmVcCrossConnectHighIfIndex, gint32 atmVcCrossConnectHighVpi, gint32 atmVcCrossConnectHighVci, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmVcCrossConnectEntry, sizeof(oid_atmVcCrossConnectEntry));
+    len = pack_atmVcCrossConnectEntry(base, atmVcCrossConnectIndex, atmVcCrossConnectLowIfIndex, atmVcCrossConnectLowVpi, atmVcCrossConnectLowVci, atmVcCrossConnectHighIfIndex, atmVcCrossConnectHighVpi, atmVcCrossConnectHighVci);
+    if (len < 0) {
+        g_warning("illegal atmVcCrossConnectEntry index values");
+        return;
     }
 
-    *atmVcCrossConnectEntry = (atm_mib_atmVcCrossConnectEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_atmVcCrossConnectEntry_t *));
-    if (! *atmVcCrossConnectEntry) {
-        return -4;
+    *atmVcCrossConnectEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_atmVcCrossConnectEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *atmVcCrossConnectEntry = assign_atmVcCrossConnectEntry(out);
+    }
+}
+
+void
+atm_mib_set_atmVcCrossConnectEntry(GSnmpSession *s, atm_mib_atmVcCrossConnectEntry_t *atmVcCrossConnectEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_atmVcCrossConnectEntry, sizeof(oid_atmVcCrossConnectEntry));
+    len = pack_atmVcCrossConnectEntry(base, atmVcCrossConnectEntry->atmVcCrossConnectIndex, atmVcCrossConnectEntry->atmVcCrossConnectLowIfIndex, atmVcCrossConnectEntry->atmVcCrossConnectLowVpi, atmVcCrossConnectEntry->atmVcCrossConnectLowVci, atmVcCrossConnectEntry->atmVcCrossConnectHighIfIndex, atmVcCrossConnectEntry->atmVcCrossConnectHighVpi, atmVcCrossConnectEntry->atmVcCrossConnectHighVci);
+    if (len < 0) {
+        g_warning("illegal atmVcCrossConnectEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*atmVcCrossConnectEntry)[i] = assign_atmVcCrossConnectEntry(row->data);
+    if (atmVcCrossConnectEntry->atmVcCrossConnectAdminStatus) {
+        base[10] = 8;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVcCrossConnectEntry->atmVcCrossConnectAdminStatus,
+                       0);
+    }
+    if (atmVcCrossConnectEntry->atmVcCrossConnectRowStatus) {
+        base[10] = 13;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       atmVcCrossConnectEntry->atmVcCrossConnectRowStatus,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1651,6 +2311,17 @@ unpack_aal5VccEntry(GSnmpVarBind *vb, atm_mib_aal5VccEntry_t *aal5VccEntry)
     return 0;
 }
 
+static int
+pack_aal5VccEntry(guint32 *base, gint32 ifIndex, gint32 aal5VccVpi, gint32 aal5VccVci)
+{
+    int idx = 11;
+
+    base[idx++] = ifIndex;
+    base[idx++] = aal5VccVpi;
+    base[idx++] = aal5VccVci;
+    return idx;
+}
+
 static atm_mib_aal5VccEntry_t *
 assign_aal5VccEntry(GSList *vbl)
 {
@@ -1658,7 +2329,6 @@ assign_aal5VccEntry(GSList *vbl)
     atm_mib_aal5VccEntry_t *aal5VccEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 37, 1, 12, 1};
 
     aal5VccEntry = atm_mib_new_aal5VccEntry();
     if (! aal5VccEntry) {
@@ -1677,8 +2347,8 @@ assign_aal5VccEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _aal5VccEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_aal5VccEntry, sizeof(oid_aal5VccEntry)/sizeof(guint32),
+                   attr_aal5VccEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 3:
@@ -1696,8 +2366,8 @@ assign_aal5VccEntry(GSList *vbl)
     return aal5VccEntry;
 }
 
-int
-atm_mib_get_aal5VccTable(GSnmpSession *s, atm_mib_aal5VccEntry_t ***aal5VccEntry)
+void
+atm_mib_get_aal5VccTable(GSnmpSession *s, atm_mib_aal5VccEntry_t ***aal5VccEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1706,24 +2376,48 @@ atm_mib_get_aal5VccTable(GSnmpSession *s, atm_mib_aal5VccEntry_t ***aal5VccEntry
 
     *aal5VccEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _aal5VccEntry);
+    add_attributes(s, &in, base, 11, 10, attr_aal5VccEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *aal5VccEntry = (atm_mib_aal5VccEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_aal5VccEntry_t *));
+        if (! *aal5VccEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*aal5VccEntry)[i] = assign_aal5VccEntry(row->data);
+        }
+    }
+}
+
+void
+atm_mib_get_aal5VccEntry(GSnmpSession *s, atm_mib_aal5VccEntry_t **aal5VccEntry, gint32 ifIndex, gint32 aal5VccVpi, gint32 aal5VccVci, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_aal5VccEntry, sizeof(oid_aal5VccEntry));
+    len = pack_aal5VccEntry(base, ifIndex, aal5VccVpi, aal5VccVci);
+    if (len < 0) {
+        g_warning("illegal aal5VccEntry index values");
+        return;
     }
 
-    *aal5VccEntry = (atm_mib_aal5VccEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(atm_mib_aal5VccEntry_t *));
-    if (! *aal5VccEntry) {
-        return -4;
-    }
+    *aal5VccEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*aal5VccEntry)[i] = assign_aal5VccEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_aal5VccEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *aal5VccEntry = assign_aal5VccEntry(out);
+    }
 }
 
 void

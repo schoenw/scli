@@ -51,6 +51,22 @@ extern GSnmpEnum const entity_mib_enums_entPhysicalIsFRU[];
  * C type definitions for ENTITY-MIB::entPhysicalEntry.
  */
 
+#define ENTITY_MIB_ENTPHYSICALDESCR	0x1 
+#define ENTITY_MIB_ENTPHYSICALVENDORTYPE	0x2 
+#define ENTITY_MIB_ENTPHYSICALCONTAINEDIN	0x4 
+#define ENTITY_MIB_ENTPHYSICALCLASS	0x8 
+#define ENTITY_MIB_ENTPHYSICALPARENTRELPOS	0x10 
+#define ENTITY_MIB_ENTPHYSICALNAME	0x20 
+#define ENTITY_MIB_ENTPHYSICALHARDWAREREV	0x40 
+#define ENTITY_MIB_ENTPHYSICALFIRMWAREREV	0x80 
+#define ENTITY_MIB_ENTPHYSICALSOFTWAREREV	0x100 
+#define ENTITY_MIB_ENTPHYSICALSERIALNUM	0x200 
+#define ENTITY_MIB_ENTPHYSICALMFGNAME	0x400 
+#define ENTITY_MIB_ENTPHYSICALMODELNAME	0x800 
+#define ENTITY_MIB_ENTPHYSICALALIAS	0x1000 
+#define ENTITY_MIB_ENTPHYSICALASSETID	0x2000 
+#define ENTITY_MIB_ENTPHYSICALISFRU	0x4000 
+
 typedef struct {
     gint32   entPhysicalIndex;
     guchar   *entPhysicalDescr;
@@ -81,20 +97,20 @@ typedef struct {
     gint32   *entPhysicalIsFRU;
 } entity_mib_entPhysicalEntry_t;
 
-extern int
-entity_mib_get_entPhysicalTable(GSnmpSession *s, entity_mib_entPhysicalEntry_t ***entPhysicalEntry);
+extern void
+entity_mib_get_entPhysicalTable(GSnmpSession *s, entity_mib_entPhysicalEntry_t ***entPhysicalEntry, gint mask);
 
 extern void
 entity_mib_free_entPhysicalTable(entity_mib_entPhysicalEntry_t **entPhysicalEntry);
 
 extern entity_mib_entPhysicalEntry_t *
-entity_mib_new_entPhysicalEntry();
+entity_mib_new_entPhysicalEntry(void);
 
-extern int
-entity_mib_get_entPhysicalEntry(GSnmpSession *s, entity_mib_entPhysicalEntry_t **entPhysicalEntry);
+extern void
+entity_mib_get_entPhysicalEntry(GSnmpSession *s, entity_mib_entPhysicalEntry_t **entPhysicalEntry, gint32 entPhysicalIndex, gint mask);
 
-extern int
-entity_mib_set_entPhysicalEntry(GSnmpSession *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry);
+extern void
+entity_mib_set_entPhysicalEntry(GSnmpSession *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry, gint mask);
 
 extern void
 entity_mib_free_entPhysicalEntry(entity_mib_entPhysicalEntry_t *entPhysicalEntry);
@@ -102,6 +118,14 @@ entity_mib_free_entPhysicalEntry(entity_mib_entPhysicalEntry_t *entPhysicalEntry
 /*
  * C type definitions for ENTITY-MIB::entLogicalEntry.
  */
+
+#define ENTITY_MIB_ENTLOGICALDESCR	0x1 
+#define ENTITY_MIB_ENTLOGICALTYPE	0x2 
+#define ENTITY_MIB_ENTLOGICALCOMMUNITY	0x4 
+#define ENTITY_MIB_ENTLOGICALTADDRESS	0x8 
+#define ENTITY_MIB_ENTLOGICALTDOMAIN	0x10 
+#define ENTITY_MIB_ENTLOGICALCONTEXTENGINEID	0x20 
+#define ENTITY_MIB_ENTLOGICALCONTEXTNAME	0x40 
 
 typedef struct {
     gint32   entLogicalIndex;
@@ -121,17 +145,17 @@ typedef struct {
     gsize    _entLogicalContextNameLength;
 } entity_mib_entLogicalEntry_t;
 
-extern int
-entity_mib_get_entLogicalTable(GSnmpSession *s, entity_mib_entLogicalEntry_t ***entLogicalEntry);
+extern void
+entity_mib_get_entLogicalTable(GSnmpSession *s, entity_mib_entLogicalEntry_t ***entLogicalEntry, gint mask);
 
 extern void
 entity_mib_free_entLogicalTable(entity_mib_entLogicalEntry_t **entLogicalEntry);
 
 extern entity_mib_entLogicalEntry_t *
-entity_mib_new_entLogicalEntry();
+entity_mib_new_entLogicalEntry(void);
 
-extern int
-entity_mib_get_entLogicalEntry(GSnmpSession *s, entity_mib_entLogicalEntry_t **entLogicalEntry);
+extern void
+entity_mib_get_entLogicalEntry(GSnmpSession *s, entity_mib_entLogicalEntry_t **entLogicalEntry, gint32 entLogicalIndex, gint mask);
 
 extern void
 entity_mib_free_entLogicalEntry(entity_mib_entLogicalEntry_t *entLogicalEntry);
@@ -140,22 +164,24 @@ entity_mib_free_entLogicalEntry(entity_mib_entLogicalEntry_t *entLogicalEntry);
  * C type definitions for ENTITY-MIB::entLPMappingEntry.
  */
 
+#define ENTITY_MIB_ENTLPPHYSICALINDEX	0x1 
+
 typedef struct {
     gint32   entLogicalIndex;
     gint32   entLPPhysicalIndex;
 } entity_mib_entLPMappingEntry_t;
 
-extern int
-entity_mib_get_entLPMappingTable(GSnmpSession *s, entity_mib_entLPMappingEntry_t ***entLPMappingEntry);
+extern void
+entity_mib_get_entLPMappingTable(GSnmpSession *s, entity_mib_entLPMappingEntry_t ***entLPMappingEntry, gint mask);
 
 extern void
 entity_mib_free_entLPMappingTable(entity_mib_entLPMappingEntry_t **entLPMappingEntry);
 
 extern entity_mib_entLPMappingEntry_t *
-entity_mib_new_entLPMappingEntry();
+entity_mib_new_entLPMappingEntry(void);
 
-extern int
-entity_mib_get_entLPMappingEntry(GSnmpSession *s, entity_mib_entLPMappingEntry_t **entLPMappingEntry);
+extern void
+entity_mib_get_entLPMappingEntry(GSnmpSession *s, entity_mib_entLPMappingEntry_t **entLPMappingEntry, gint32 entLogicalIndex, gint32 entLPPhysicalIndex, gint mask);
 
 extern void
 entity_mib_free_entLPMappingEntry(entity_mib_entLPMappingEntry_t *entLPMappingEntry);
@@ -164,6 +190,8 @@ entity_mib_free_entLPMappingEntry(entity_mib_entLPMappingEntry_t *entLPMappingEn
  * C type definitions for ENTITY-MIB::entAliasMappingEntry.
  */
 
+#define ENTITY_MIB_ENTALIASMAPPINGIDENTIFIER	0x1 
+
 typedef struct {
     gint32   entPhysicalIndex;
     gint32   entAliasLogicalIndexOrZero;
@@ -171,17 +199,17 @@ typedef struct {
     gsize    _entAliasMappingIdentifierLength;
 } entity_mib_entAliasMappingEntry_t;
 
-extern int
-entity_mib_get_entAliasMappingTable(GSnmpSession *s, entity_mib_entAliasMappingEntry_t ***entAliasMappingEntry);
+extern void
+entity_mib_get_entAliasMappingTable(GSnmpSession *s, entity_mib_entAliasMappingEntry_t ***entAliasMappingEntry, gint mask);
 
 extern void
 entity_mib_free_entAliasMappingTable(entity_mib_entAliasMappingEntry_t **entAliasMappingEntry);
 
 extern entity_mib_entAliasMappingEntry_t *
-entity_mib_new_entAliasMappingEntry();
+entity_mib_new_entAliasMappingEntry(void);
 
-extern int
-entity_mib_get_entAliasMappingEntry(GSnmpSession *s, entity_mib_entAliasMappingEntry_t **entAliasMappingEntry);
+extern void
+entity_mib_get_entAliasMappingEntry(GSnmpSession *s, entity_mib_entAliasMappingEntry_t **entAliasMappingEntry, gint32 entPhysicalIndex, gint32 entAliasLogicalIndexOrZero, gint mask);
 
 extern void
 entity_mib_free_entAliasMappingEntry(entity_mib_entAliasMappingEntry_t *entAliasMappingEntry);
@@ -190,22 +218,24 @@ entity_mib_free_entAliasMappingEntry(entity_mib_entAliasMappingEntry_t *entAlias
  * C type definitions for ENTITY-MIB::entPhysicalContainsEntry.
  */
 
+#define ENTITY_MIB_ENTPHYSICALCHILDINDEX	0x1 
+
 typedef struct {
     gint32   entPhysicalIndex;
     gint32   entPhysicalChildIndex;
 } entity_mib_entPhysicalContainsEntry_t;
 
-extern int
-entity_mib_get_entPhysicalContainsTable(GSnmpSession *s, entity_mib_entPhysicalContainsEntry_t ***entPhysicalContainsEntry);
+extern void
+entity_mib_get_entPhysicalContainsTable(GSnmpSession *s, entity_mib_entPhysicalContainsEntry_t ***entPhysicalContainsEntry, gint mask);
 
 extern void
 entity_mib_free_entPhysicalContainsTable(entity_mib_entPhysicalContainsEntry_t **entPhysicalContainsEntry);
 
 extern entity_mib_entPhysicalContainsEntry_t *
-entity_mib_new_entPhysicalContainsEntry();
+entity_mib_new_entPhysicalContainsEntry(void);
 
-extern int
-entity_mib_get_entPhysicalContainsEntry(GSnmpSession *s, entity_mib_entPhysicalContainsEntry_t **entPhysicalContainsEntry);
+extern void
+entity_mib_get_entPhysicalContainsEntry(GSnmpSession *s, entity_mib_entPhysicalContainsEntry_t **entPhysicalContainsEntry, gint32 entPhysicalIndex, gint32 entPhysicalChildIndex, gint mask);
 
 extern void
 entity_mib_free_entPhysicalContainsEntry(entity_mib_entPhysicalContainsEntry_t *entPhysicalContainsEntry);
@@ -214,15 +244,17 @@ entity_mib_free_entPhysicalContainsEntry(entity_mib_entPhysicalContainsEntry_t *
  * C type definitions for ENTITY-MIB::entityGeneral.
  */
 
+#define ENTITY_MIB_ENTLASTCHANGETIME	0x1 
+
 typedef struct {
     guint32  *entLastChangeTime;
 } entity_mib_entityGeneral_t;
 
 extern entity_mib_entityGeneral_t *
-entity_mib_new_entityGeneral();
+entity_mib_new_entityGeneral(void);
 
-extern int
-entity_mib_get_entityGeneral(GSnmpSession *s, entity_mib_entityGeneral_t **entityGeneral);
+extern void
+entity_mib_get_entityGeneral(GSnmpSession *s, entity_mib_entityGeneral_t **entityGeneral, gint mask);
 
 extern void
 entity_mib_free_entityGeneral(entity_mib_entityGeneral_t *entityGeneral);

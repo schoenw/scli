@@ -153,33 +153,37 @@ GSnmpEnum const host_resources_mib_enums_hrSWInstalledType[] = {
 typedef struct {
     guint32 const     subid;
     GSnmpVarBindType  type;
+    gint              tag;
     gchar            *label;
-} stls_stub_attr_t;
+} attribute_t;
 
 static void
-add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, guint idx,
-               stls_stub_attr_t *attributes)
+add_attributes(GSnmpSession *s, GSList **vbl, guint32 *base, gsize len,
+                guint idx, attribute_t *attributes, gint mask)
 {
     int i;
 
     for (i = 0; attributes[i].label; i++) {
-        if (attributes[i].type != G_SNMP_COUNTER64 || s->version > G_SNMP_V1) {
-            base[idx] = attributes[i].subid;
-            g_snmp_vbl_add_null(vbl, base, idx + 1);
+        if (! mask || (mask & attributes[i].tag)) {
+            if (attributes[i].type != G_SNMP_COUNTER64
+                || s->version > G_SNMP_V1) {
+                base[idx] = attributes[i].subid;
+                g_snmp_vbl_add_null(vbl, base, len);
+            }
         }
     }
 }
 
 static int
 lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
-	    stls_stub_attr_t *attributes, guint32 *idx)
+	    attribute_t *attributes, guint32 *idx)
 {
     int i;
 
     if (vb->type == G_SNMP_ENDOFMIBVIEW
-	|| (vb->type == G_SNMP_NOSUCHOBJECT)
-	|| (vb->type == G_SNMP_NOSUCHINSTANCE)) {
-	return -1;
+        || (vb->type == G_SNMP_NOSUCHOBJECT)
+        || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+        return -1;
     }
     
     if (memcmp(vb->id, base, base_len * sizeof(guint32)) != 0) {
@@ -201,119 +205,149 @@ lookup(GSnmpVarBind *vb, guint32 const *base, gsize const base_len,
     return -4;
 }
 
-static stls_stub_attr_t _hrSystem[] = {
-    { 1, G_SNMP_TIMETICKS, "hrSystemUptime" },
-    { 2, G_SNMP_OCTET_STRING, "hrSystemDate" },
-    { 3, G_SNMP_INTEGER32, "hrSystemInitialLoadDevice" },
-    { 4, G_SNMP_OCTET_STRING, "hrSystemInitialLoadParameters" },
-    { 5, G_SNMP_UNSIGNED32, "hrSystemNumUsers" },
-    { 6, G_SNMP_UNSIGNED32, "hrSystemProcesses" },
-    { 7, G_SNMP_INTEGER32, "hrSystemMaxProcesses" },
-    { 0, 0, NULL }
+static guint32 const oid_hrSystem[] = {1, 3, 6, 1, 2, 1, 25, 1};
+
+static attribute_t attr_hrSystem[] = {
+    { 1, G_SNMP_TIMETICKS, HOST_RESOURCES_MIB_HRSYSTEMUPTIME, "hrSystemUptime" },
+    { 2, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRSYSTEMDATE, "hrSystemDate" },
+    { 3, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRSYSTEMINITIALLOADDEVICE, "hrSystemInitialLoadDevice" },
+    { 4, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRSYSTEMINITIALLOADPARAMETERS, "hrSystemInitialLoadParameters" },
+    { 5, G_SNMP_UNSIGNED32, HOST_RESOURCES_MIB_HRSYSTEMNUMUSERS, "hrSystemNumUsers" },
+    { 6, G_SNMP_UNSIGNED32, HOST_RESOURCES_MIB_HRSYSTEMPROCESSES, "hrSystemProcesses" },
+    { 7, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRSYSTEMMAXPROCESSES, "hrSystemMaxProcesses" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrStorage[] = {
-    { 2, G_SNMP_INTEGER32, "hrMemorySize" },
-    { 0, 0, NULL }
+static guint32 const oid_hrStorage[] = {1, 3, 6, 1, 2, 1, 25, 2};
+
+static attribute_t attr_hrStorage[] = {
+    { 2, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRMEMORYSIZE, "hrMemorySize" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrStorageEntry[] = {
-    { 2, G_SNMP_OBJECT_ID, "hrStorageType" },
-    { 3, G_SNMP_OCTET_STRING, "hrStorageDescr" },
-    { 4, G_SNMP_INTEGER32, "hrStorageAllocationUnits" },
-    { 5, G_SNMP_INTEGER32, "hrStorageSize" },
-    { 6, G_SNMP_INTEGER32, "hrStorageUsed" },
-    { 7, G_SNMP_COUNTER32, "hrStorageAllocationFailures" },
-    { 0, 0, NULL }
+static guint32 const oid_hrStorageEntry[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1};
+
+static attribute_t attr_hrStorageEntry[] = {
+    { 2, G_SNMP_OBJECT_ID, HOST_RESOURCES_MIB_HRSTORAGETYPE, "hrStorageType" },
+    { 3, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRSTORAGEDESCR, "hrStorageDescr" },
+    { 4, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRSTORAGEALLOCATIONUNITS, "hrStorageAllocationUnits" },
+    { 5, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRSTORAGESIZE, "hrStorageSize" },
+    { 6, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRSTORAGEUSED, "hrStorageUsed" },
+    { 7, G_SNMP_COUNTER32, HOST_RESOURCES_MIB_HRSTORAGEALLOCATIONFAILURES, "hrStorageAllocationFailures" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrDeviceEntry[] = {
-    { 2, G_SNMP_OBJECT_ID, "hrDeviceType" },
-    { 3, G_SNMP_OCTET_STRING, "hrDeviceDescr" },
-    { 4, G_SNMP_OBJECT_ID, "hrDeviceID" },
-    { 5, G_SNMP_INTEGER32, "hrDeviceStatus" },
-    { 6, G_SNMP_COUNTER32, "hrDeviceErrors" },
-    { 0, 0, NULL }
+static guint32 const oid_hrDeviceEntry[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1};
+
+static attribute_t attr_hrDeviceEntry[] = {
+    { 2, G_SNMP_OBJECT_ID, HOST_RESOURCES_MIB_HRDEVICETYPE, "hrDeviceType" },
+    { 3, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRDEVICEDESCR, "hrDeviceDescr" },
+    { 4, G_SNMP_OBJECT_ID, HOST_RESOURCES_MIB_HRDEVICEID, "hrDeviceID" },
+    { 5, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRDEVICESTATUS, "hrDeviceStatus" },
+    { 6, G_SNMP_COUNTER32, HOST_RESOURCES_MIB_HRDEVICEERRORS, "hrDeviceErrors" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrProcessorEntry[] = {
-    { 1, G_SNMP_OBJECT_ID, "hrProcessorFrwID" },
-    { 2, G_SNMP_INTEGER32, "hrProcessorLoad" },
-    { 0, 0, NULL }
+static guint32 const oid_hrProcessorEntry[] = {1, 3, 6, 1, 2, 1, 25, 3, 3, 1};
+
+static attribute_t attr_hrProcessorEntry[] = {
+    { 1, G_SNMP_OBJECT_ID, HOST_RESOURCES_MIB_HRPROCESSORFRWID, "hrProcessorFrwID" },
+    { 2, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRPROCESSORLOAD, "hrProcessorLoad" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrNetworkEntry[] = {
-    { 1, G_SNMP_INTEGER32, "hrNetworkIfIndex" },
-    { 0, 0, NULL }
+static guint32 const oid_hrNetworkEntry[] = {1, 3, 6, 1, 2, 1, 25, 3, 4, 1};
+
+static attribute_t attr_hrNetworkEntry[] = {
+    { 1, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRNETWORKIFINDEX, "hrNetworkIfIndex" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrPrinterEntry[] = {
-    { 1, G_SNMP_INTEGER32, "hrPrinterStatus" },
-    { 2, G_SNMP_OCTET_STRING, "hrPrinterDetectedErrorState" },
-    { 0, 0, NULL }
+static guint32 const oid_hrPrinterEntry[] = {1, 3, 6, 1, 2, 1, 25, 3, 5, 1};
+
+static attribute_t attr_hrPrinterEntry[] = {
+    { 1, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRPRINTERSTATUS, "hrPrinterStatus" },
+    { 2, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRPRINTERDETECTEDERRORSTATE, "hrPrinterDetectedErrorState" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrDiskStorageEntry[] = {
-    { 1, G_SNMP_INTEGER32, "hrDiskStorageAccess" },
-    { 2, G_SNMP_INTEGER32, "hrDiskStorageMedia" },
-    { 3, G_SNMP_INTEGER32, "hrDiskStorageRemoveble" },
-    { 4, G_SNMP_INTEGER32, "hrDiskStorageCapacity" },
-    { 0, 0, NULL }
+static guint32 const oid_hrDiskStorageEntry[] = {1, 3, 6, 1, 2, 1, 25, 3, 6, 1};
+
+static attribute_t attr_hrDiskStorageEntry[] = {
+    { 1, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRDISKSTORAGEACCESS, "hrDiskStorageAccess" },
+    { 2, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA, "hrDiskStorageMedia" },
+    { 3, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRDISKSTORAGEREMOVEBLE, "hrDiskStorageRemoveble" },
+    { 4, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRDISKSTORAGECAPACITY, "hrDiskStorageCapacity" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrPartitionEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "hrPartitionLabel" },
-    { 3, G_SNMP_OCTET_STRING, "hrPartitionID" },
-    { 4, G_SNMP_INTEGER32, "hrPartitionSize" },
-    { 5, G_SNMP_INTEGER32, "hrPartitionFSIndex" },
-    { 0, 0, NULL }
+static guint32 const oid_hrPartitionEntry[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1};
+
+static attribute_t attr_hrPartitionEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRPARTITIONLABEL, "hrPartitionLabel" },
+    { 3, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRPARTITIONID, "hrPartitionID" },
+    { 4, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRPARTITIONSIZE, "hrPartitionSize" },
+    { 5, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRPARTITIONFSINDEX, "hrPartitionFSIndex" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrFSEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "hrFSMountPoint" },
-    { 3, G_SNMP_OCTET_STRING, "hrFSRemoteMountPoint" },
-    { 4, G_SNMP_OBJECT_ID, "hrFSType" },
-    { 5, G_SNMP_INTEGER32, "hrFSAccess" },
-    { 6, G_SNMP_INTEGER32, "hrFSBootable" },
-    { 7, G_SNMP_INTEGER32, "hrFSStorageIndex" },
-    { 8, G_SNMP_OCTET_STRING, "hrFSLastFullBackupDate" },
-    { 9, G_SNMP_OCTET_STRING, "hrFSLastPartialBackupDate" },
-    { 0, 0, NULL }
+static guint32 const oid_hrFSEntry[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1};
+
+static attribute_t attr_hrFSEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRFSMOUNTPOINT, "hrFSMountPoint" },
+    { 3, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRFSREMOTEMOUNTPOINT, "hrFSRemoteMountPoint" },
+    { 4, G_SNMP_OBJECT_ID, HOST_RESOURCES_MIB_HRFSTYPE, "hrFSType" },
+    { 5, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRFSACCESS, "hrFSAccess" },
+    { 6, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRFSBOOTABLE, "hrFSBootable" },
+    { 7, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRFSSTORAGEINDEX, "hrFSStorageIndex" },
+    { 8, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRFSLASTFULLBACKUPDATE, "hrFSLastFullBackupDate" },
+    { 9, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRFSLASTPARTIALBACKUPDATE, "hrFSLastPartialBackupDate" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrSWRun[] = {
-    { 1, G_SNMP_INTEGER32, "hrSWOSIndex" },
-    { 0, 0, NULL }
+static guint32 const oid_hrSWRun[] = {1, 3, 6, 1, 2, 1, 25, 4};
+
+static attribute_t attr_hrSWRun[] = {
+    { 1, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRSWOSINDEX, "hrSWOSIndex" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrSWRunEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "hrSWRunName" },
-    { 3, G_SNMP_OBJECT_ID, "hrSWRunID" },
-    { 4, G_SNMP_OCTET_STRING, "hrSWRunPath" },
-    { 5, G_SNMP_OCTET_STRING, "hrSWRunParameters" },
-    { 6, G_SNMP_INTEGER32, "hrSWRunType" },
-    { 7, G_SNMP_INTEGER32, "hrSWRunStatus" },
-    { 0, 0, NULL }
+static guint32 const oid_hrSWRunEntry[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1};
+
+static attribute_t attr_hrSWRunEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRSWRUNNAME, "hrSWRunName" },
+    { 3, G_SNMP_OBJECT_ID, HOST_RESOURCES_MIB_HRSWRUNID, "hrSWRunID" },
+    { 4, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRSWRUNPATH, "hrSWRunPath" },
+    { 5, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRSWRUNPARAMETERS, "hrSWRunParameters" },
+    { 6, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRSWRUNTYPE, "hrSWRunType" },
+    { 7, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRSWRUNSTATUS, "hrSWRunStatus" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrSWRunPerfEntry[] = {
-    { 1, G_SNMP_INTEGER32, "hrSWRunPerfCPU" },
-    { 2, G_SNMP_INTEGER32, "hrSWRunPerfMem" },
-    { 0, 0, NULL }
+static guint32 const oid_hrSWRunPerfEntry[] = {1, 3, 6, 1, 2, 1, 25, 5, 1, 1};
+
+static attribute_t attr_hrSWRunPerfEntry[] = {
+    { 1, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRSWRUNPERFCPU, "hrSWRunPerfCPU" },
+    { 2, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRSWRUNPERFMEM, "hrSWRunPerfMem" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrSWInstalled[] = {
-    { 1, G_SNMP_TIMETICKS, "hrSWInstalledLastChange" },
-    { 2, G_SNMP_TIMETICKS, "hrSWInstalledLastUpdateTime" },
-    { 0, 0, NULL }
+static guint32 const oid_hrSWInstalled[] = {1, 3, 6, 1, 2, 1, 25, 6};
+
+static attribute_t attr_hrSWInstalled[] = {
+    { 1, G_SNMP_TIMETICKS, HOST_RESOURCES_MIB_HRSWINSTALLEDLASTCHANGE, "hrSWInstalledLastChange" },
+    { 2, G_SNMP_TIMETICKS, HOST_RESOURCES_MIB_HRSWINSTALLEDLASTUPDATETIME, "hrSWInstalledLastUpdateTime" },
+    { 0, 0, 0, NULL }
 };
 
-static stls_stub_attr_t _hrSWInstalledEntry[] = {
-    { 2, G_SNMP_OCTET_STRING, "hrSWInstalledName" },
-    { 3, G_SNMP_OBJECT_ID, "hrSWInstalledID" },
-    { 4, G_SNMP_INTEGER32, "hrSWInstalledType" },
-    { 5, G_SNMP_OCTET_STRING, "hrSWInstalledDate" },
-    { 0, 0, NULL }
+static guint32 const oid_hrSWInstalledEntry[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1};
+
+static attribute_t attr_hrSWInstalledEntry[] = {
+    { 2, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRSWINSTALLEDNAME, "hrSWInstalledName" },
+    { 3, G_SNMP_OBJECT_ID, HOST_RESOURCES_MIB_HRSWINSTALLEDID, "hrSWInstalledID" },
+    { 4, G_SNMP_INTEGER32, HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE, "hrSWInstalledType" },
+    { 5, G_SNMP_OCTET_STRING, HOST_RESOURCES_MIB_HRSWINSTALLEDDATE, "hrSWInstalledDate" },
+    { 0, 0, 0, NULL }
 };
 
 
@@ -333,7 +367,6 @@ assign_hrSystem(GSList *vbl)
     host_resources_mib_hrSystem_t *hrSystem;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 1};
 
     hrSystem = host_resources_mib_new_hrSystem();
     if (! hrSystem) {
@@ -346,8 +379,8 @@ assign_hrSystem(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrSystem, &idx) < 0) continue;
+        if (lookup(vb, oid_hrSystem, sizeof(oid_hrSystem)/sizeof(guint32),
+                   attr_hrSystem, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -379,29 +412,25 @@ assign_hrSystem(GSList *vbl)
     return hrSystem;
 }
 
-int
-host_resources_mib_get_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t **hrSystem)
+void
+host_resources_mib_get_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t **hrSystem, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 1, 0};
 
     *hrSystem = NULL;
 
-    add_attributes(s, &in, base, 8, _hrSystem);
+    add_attributes(s, &in, base, 9, 8, attr_hrSystem, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *hrSystem = assign_hrSystem(out);
     }
-
-    *hrSystem = assign_hrSystem(out);
-
-    return 0;
 }
 
-int
-host_resources_mib_set_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t *hrSystem)
+void
+host_resources_mib_set_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t *hrSystem, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 1, 0, 0};
@@ -430,12 +459,9 @@ host_resources_mib_set_hrSystem(GSnmpSession *s, host_resources_mib_hrSystem_t *
 
     out = g_snmp_session_sync_set(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        g_snmp_vbl_free(out);
     }
-    g_snmp_vbl_free(out);
-
-    return 0;
 }
 
 void
@@ -468,7 +494,6 @@ assign_hrStorage(GSList *vbl)
     host_resources_mib_hrStorage_t *hrStorage;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 2};
 
     hrStorage = host_resources_mib_new_hrStorage();
     if (! hrStorage) {
@@ -481,8 +506,8 @@ assign_hrStorage(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrStorage, &idx) < 0) continue;
+        if (lookup(vb, oid_hrStorage, sizeof(oid_hrStorage)/sizeof(guint32),
+                   attr_hrStorage, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -494,25 +519,21 @@ assign_hrStorage(GSList *vbl)
     return hrStorage;
 }
 
-int
-host_resources_mib_get_hrStorage(GSnmpSession *s, host_resources_mib_hrStorage_t **hrStorage)
+void
+host_resources_mib_get_hrStorage(GSnmpSession *s, host_resources_mib_hrStorage_t **hrStorage, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 2, 0};
 
     *hrStorage = NULL;
 
-    add_attributes(s, &in, base, 8, _hrStorage);
+    add_attributes(s, &in, base, 9, 8, attr_hrStorage, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *hrStorage = assign_hrStorage(out);
     }
-
-    *hrStorage = assign_hrStorage(out);
-
-    return 0;
 }
 
 void
@@ -549,6 +570,15 @@ unpack_hrStorageEntry(GSnmpVarBind *vb, host_resources_mib_hrStorageEntry_t *hrS
     return 0;
 }
 
+static int
+pack_hrStorageEntry(guint32 *base, gint32 hrStorageIndex)
+{
+    int idx = 11;
+
+    base[idx++] = hrStorageIndex;
+    return idx;
+}
+
 static host_resources_mib_hrStorageEntry_t *
 assign_hrStorageEntry(GSList *vbl)
 {
@@ -556,7 +586,6 @@ assign_hrStorageEntry(GSList *vbl)
     host_resources_mib_hrStorageEntry_t *hrStorageEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 2, 3, 1};
 
     hrStorageEntry = host_resources_mib_new_hrStorageEntry();
     if (! hrStorageEntry) {
@@ -575,8 +604,8 @@ assign_hrStorageEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrStorageEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_hrStorageEntry, sizeof(oid_hrStorageEntry)/sizeof(guint32),
+                   attr_hrStorageEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -605,8 +634,8 @@ assign_hrStorageEntry(GSList *vbl)
     return hrStorageEntry;
 }
 
-int
-host_resources_mib_get_hrStorageTable(GSnmpSession *s, host_resources_mib_hrStorageEntry_t ***hrStorageEntry)
+void
+host_resources_mib_get_hrStorageTable(GSnmpSession *s, host_resources_mib_hrStorageEntry_t ***hrStorageEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -615,24 +644,77 @@ host_resources_mib_get_hrStorageTable(GSnmpSession *s, host_resources_mib_hrStor
 
     *hrStorageEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _hrStorageEntry);
+    add_attributes(s, &in, base, 11, 10, attr_hrStorageEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *hrStorageEntry = (host_resources_mib_hrStorageEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrStorageEntry_t *));
+        if (! *hrStorageEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*hrStorageEntry)[i] = assign_hrStorageEntry(row->data);
+        }
+    }
+}
+
+void
+host_resources_mib_get_hrStorageEntry(GSnmpSession *s, host_resources_mib_hrStorageEntry_t **hrStorageEntry, gint32 hrStorageIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrStorageEntry, sizeof(oid_hrStorageEntry));
+    len = pack_hrStorageEntry(base, hrStorageIndex);
+    if (len < 0) {
+        g_warning("illegal hrStorageEntry index values");
+        return;
     }
 
-    *hrStorageEntry = (host_resources_mib_hrStorageEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrStorageEntry_t *));
-    if (! *hrStorageEntry) {
-        return -4;
+    *hrStorageEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_hrStorageEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *hrStorageEntry = assign_hrStorageEntry(out);
+    }
+}
+
+void
+host_resources_mib_set_hrStorageEntry(GSnmpSession *s, host_resources_mib_hrStorageEntry_t *hrStorageEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrStorageEntry, sizeof(oid_hrStorageEntry));
+    len = pack_hrStorageEntry(base, hrStorageEntry->hrStorageIndex);
+    if (len < 0) {
+        g_warning("illegal hrStorageEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*hrStorageEntry)[i] = assign_hrStorageEntry(row->data);
+    if (hrStorageEntry->hrStorageSize) {
+        base[10] = 5;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       hrStorageEntry->hrStorageSize,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -682,6 +764,15 @@ unpack_hrDeviceEntry(GSnmpVarBind *vb, host_resources_mib_hrDeviceEntry_t *hrDev
     return 0;
 }
 
+static int
+pack_hrDeviceEntry(guint32 *base, gint32 hrDeviceIndex)
+{
+    int idx = 11;
+
+    base[idx++] = hrDeviceIndex;
+    return idx;
+}
+
 static host_resources_mib_hrDeviceEntry_t *
 assign_hrDeviceEntry(GSList *vbl)
 {
@@ -689,7 +780,6 @@ assign_hrDeviceEntry(GSList *vbl)
     host_resources_mib_hrDeviceEntry_t *hrDeviceEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 2, 1};
 
     hrDeviceEntry = host_resources_mib_new_hrDeviceEntry();
     if (! hrDeviceEntry) {
@@ -708,8 +798,8 @@ assign_hrDeviceEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrDeviceEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_hrDeviceEntry, sizeof(oid_hrDeviceEntry)/sizeof(guint32),
+                   attr_hrDeviceEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -736,8 +826,8 @@ assign_hrDeviceEntry(GSList *vbl)
     return hrDeviceEntry;
 }
 
-int
-host_resources_mib_get_hrDeviceTable(GSnmpSession *s, host_resources_mib_hrDeviceEntry_t ***hrDeviceEntry)
+void
+host_resources_mib_get_hrDeviceTable(GSnmpSession *s, host_resources_mib_hrDeviceEntry_t ***hrDeviceEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -746,24 +836,48 @@ host_resources_mib_get_hrDeviceTable(GSnmpSession *s, host_resources_mib_hrDevic
 
     *hrDeviceEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _hrDeviceEntry);
+    add_attributes(s, &in, base, 11, 10, attr_hrDeviceEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *hrDeviceEntry = (host_resources_mib_hrDeviceEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrDeviceEntry_t *));
+        if (! *hrDeviceEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*hrDeviceEntry)[i] = assign_hrDeviceEntry(row->data);
+        }
+    }
+}
+
+void
+host_resources_mib_get_hrDeviceEntry(GSnmpSession *s, host_resources_mib_hrDeviceEntry_t **hrDeviceEntry, gint32 hrDeviceIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrDeviceEntry, sizeof(oid_hrDeviceEntry));
+    len = pack_hrDeviceEntry(base, hrDeviceIndex);
+    if (len < 0) {
+        g_warning("illegal hrDeviceEntry index values");
+        return;
     }
 
-    *hrDeviceEntry = (host_resources_mib_hrDeviceEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrDeviceEntry_t *));
-    if (! *hrDeviceEntry) {
-        return -4;
-    }
+    *hrDeviceEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*hrDeviceEntry)[i] = assign_hrDeviceEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_hrDeviceEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *hrDeviceEntry = assign_hrDeviceEntry(out);
+    }
 }
 
 void
@@ -813,6 +927,15 @@ unpack_hrProcessorEntry(GSnmpVarBind *vb, host_resources_mib_hrProcessorEntry_t 
     return 0;
 }
 
+static int
+pack_hrProcessorEntry(guint32 *base, gint32 hrDeviceIndex)
+{
+    int idx = 11;
+
+    base[idx++] = hrDeviceIndex;
+    return idx;
+}
+
 static host_resources_mib_hrProcessorEntry_t *
 assign_hrProcessorEntry(GSList *vbl)
 {
@@ -820,7 +943,6 @@ assign_hrProcessorEntry(GSList *vbl)
     host_resources_mib_hrProcessorEntry_t *hrProcessorEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 3, 1};
 
     hrProcessorEntry = host_resources_mib_new_hrProcessorEntry();
     if (! hrProcessorEntry) {
@@ -839,8 +961,8 @@ assign_hrProcessorEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrProcessorEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_hrProcessorEntry, sizeof(oid_hrProcessorEntry)/sizeof(guint32),
+                   attr_hrProcessorEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -856,8 +978,8 @@ assign_hrProcessorEntry(GSList *vbl)
     return hrProcessorEntry;
 }
 
-int
-host_resources_mib_get_hrProcessorTable(GSnmpSession *s, host_resources_mib_hrProcessorEntry_t ***hrProcessorEntry)
+void
+host_resources_mib_get_hrProcessorTable(GSnmpSession *s, host_resources_mib_hrProcessorEntry_t ***hrProcessorEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -866,24 +988,48 @@ host_resources_mib_get_hrProcessorTable(GSnmpSession *s, host_resources_mib_hrPr
 
     *hrProcessorEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _hrProcessorEntry);
+    add_attributes(s, &in, base, 11, 10, attr_hrProcessorEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *hrProcessorEntry = (host_resources_mib_hrProcessorEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrProcessorEntry_t *));
+        if (! *hrProcessorEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*hrProcessorEntry)[i] = assign_hrProcessorEntry(row->data);
+        }
+    }
+}
+
+void
+host_resources_mib_get_hrProcessorEntry(GSnmpSession *s, host_resources_mib_hrProcessorEntry_t **hrProcessorEntry, gint32 hrDeviceIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrProcessorEntry, sizeof(oid_hrProcessorEntry));
+    len = pack_hrProcessorEntry(base, hrDeviceIndex);
+    if (len < 0) {
+        g_warning("illegal hrProcessorEntry index values");
+        return;
     }
 
-    *hrProcessorEntry = (host_resources_mib_hrProcessorEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrProcessorEntry_t *));
-    if (! *hrProcessorEntry) {
-        return -4;
-    }
+    *hrProcessorEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*hrProcessorEntry)[i] = assign_hrProcessorEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_hrProcessorEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *hrProcessorEntry = assign_hrProcessorEntry(out);
+    }
 }
 
 void
@@ -933,6 +1079,15 @@ unpack_hrNetworkEntry(GSnmpVarBind *vb, host_resources_mib_hrNetworkEntry_t *hrN
     return 0;
 }
 
+static int
+pack_hrNetworkEntry(guint32 *base, gint32 hrDeviceIndex)
+{
+    int idx = 11;
+
+    base[idx++] = hrDeviceIndex;
+    return idx;
+}
+
 static host_resources_mib_hrNetworkEntry_t *
 assign_hrNetworkEntry(GSList *vbl)
 {
@@ -940,7 +1095,6 @@ assign_hrNetworkEntry(GSList *vbl)
     host_resources_mib_hrNetworkEntry_t *hrNetworkEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 4, 1};
 
     hrNetworkEntry = host_resources_mib_new_hrNetworkEntry();
     if (! hrNetworkEntry) {
@@ -959,8 +1113,8 @@ assign_hrNetworkEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrNetworkEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_hrNetworkEntry, sizeof(oid_hrNetworkEntry)/sizeof(guint32),
+                   attr_hrNetworkEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -972,8 +1126,8 @@ assign_hrNetworkEntry(GSList *vbl)
     return hrNetworkEntry;
 }
 
-int
-host_resources_mib_get_hrNetworkTable(GSnmpSession *s, host_resources_mib_hrNetworkEntry_t ***hrNetworkEntry)
+void
+host_resources_mib_get_hrNetworkTable(GSnmpSession *s, host_resources_mib_hrNetworkEntry_t ***hrNetworkEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -982,24 +1136,48 @@ host_resources_mib_get_hrNetworkTable(GSnmpSession *s, host_resources_mib_hrNetw
 
     *hrNetworkEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _hrNetworkEntry);
+    add_attributes(s, &in, base, 11, 10, attr_hrNetworkEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *hrNetworkEntry = (host_resources_mib_hrNetworkEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrNetworkEntry_t *));
+        if (! *hrNetworkEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*hrNetworkEntry)[i] = assign_hrNetworkEntry(row->data);
+        }
+    }
+}
+
+void
+host_resources_mib_get_hrNetworkEntry(GSnmpSession *s, host_resources_mib_hrNetworkEntry_t **hrNetworkEntry, gint32 hrDeviceIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrNetworkEntry, sizeof(oid_hrNetworkEntry));
+    len = pack_hrNetworkEntry(base, hrDeviceIndex);
+    if (len < 0) {
+        g_warning("illegal hrNetworkEntry index values");
+        return;
     }
 
-    *hrNetworkEntry = (host_resources_mib_hrNetworkEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrNetworkEntry_t *));
-    if (! *hrNetworkEntry) {
-        return -4;
-    }
+    *hrNetworkEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*hrNetworkEntry)[i] = assign_hrNetworkEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_hrNetworkEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *hrNetworkEntry = assign_hrNetworkEntry(out);
+    }
 }
 
 void
@@ -1049,6 +1227,15 @@ unpack_hrPrinterEntry(GSnmpVarBind *vb, host_resources_mib_hrPrinterEntry_t *hrP
     return 0;
 }
 
+static int
+pack_hrPrinterEntry(guint32 *base, gint32 hrDeviceIndex)
+{
+    int idx = 11;
+
+    base[idx++] = hrDeviceIndex;
+    return idx;
+}
+
 static host_resources_mib_hrPrinterEntry_t *
 assign_hrPrinterEntry(GSList *vbl)
 {
@@ -1056,7 +1243,6 @@ assign_hrPrinterEntry(GSList *vbl)
     host_resources_mib_hrPrinterEntry_t *hrPrinterEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 5, 1};
 
     hrPrinterEntry = host_resources_mib_new_hrPrinterEntry();
     if (! hrPrinterEntry) {
@@ -1075,8 +1261,8 @@ assign_hrPrinterEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrPrinterEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_hrPrinterEntry, sizeof(oid_hrPrinterEntry)/sizeof(guint32),
+                   attr_hrPrinterEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -1092,8 +1278,8 @@ assign_hrPrinterEntry(GSList *vbl)
     return hrPrinterEntry;
 }
 
-int
-host_resources_mib_get_hrPrinterTable(GSnmpSession *s, host_resources_mib_hrPrinterEntry_t ***hrPrinterEntry)
+void
+host_resources_mib_get_hrPrinterTable(GSnmpSession *s, host_resources_mib_hrPrinterEntry_t ***hrPrinterEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1102,24 +1288,48 @@ host_resources_mib_get_hrPrinterTable(GSnmpSession *s, host_resources_mib_hrPrin
 
     *hrPrinterEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _hrPrinterEntry);
+    add_attributes(s, &in, base, 11, 10, attr_hrPrinterEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *hrPrinterEntry = (host_resources_mib_hrPrinterEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrPrinterEntry_t *));
+        if (! *hrPrinterEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*hrPrinterEntry)[i] = assign_hrPrinterEntry(row->data);
+        }
+    }
+}
+
+void
+host_resources_mib_get_hrPrinterEntry(GSnmpSession *s, host_resources_mib_hrPrinterEntry_t **hrPrinterEntry, gint32 hrDeviceIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrPrinterEntry, sizeof(oid_hrPrinterEntry));
+    len = pack_hrPrinterEntry(base, hrDeviceIndex);
+    if (len < 0) {
+        g_warning("illegal hrPrinterEntry index values");
+        return;
     }
 
-    *hrPrinterEntry = (host_resources_mib_hrPrinterEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrPrinterEntry_t *));
-    if (! *hrPrinterEntry) {
-        return -4;
-    }
+    *hrPrinterEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*hrPrinterEntry)[i] = assign_hrPrinterEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_hrPrinterEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *hrPrinterEntry = assign_hrPrinterEntry(out);
+    }
 }
 
 void
@@ -1169,6 +1379,15 @@ unpack_hrDiskStorageEntry(GSnmpVarBind *vb, host_resources_mib_hrDiskStorageEntr
     return 0;
 }
 
+static int
+pack_hrDiskStorageEntry(guint32 *base, gint32 hrDeviceIndex)
+{
+    int idx = 11;
+
+    base[idx++] = hrDeviceIndex;
+    return idx;
+}
+
 static host_resources_mib_hrDiskStorageEntry_t *
 assign_hrDiskStorageEntry(GSList *vbl)
 {
@@ -1176,7 +1395,6 @@ assign_hrDiskStorageEntry(GSList *vbl)
     host_resources_mib_hrDiskStorageEntry_t *hrDiskStorageEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 6, 1};
 
     hrDiskStorageEntry = host_resources_mib_new_hrDiskStorageEntry();
     if (! hrDiskStorageEntry) {
@@ -1195,8 +1413,8 @@ assign_hrDiskStorageEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrDiskStorageEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_hrDiskStorageEntry, sizeof(oid_hrDiskStorageEntry)/sizeof(guint32),
+                   attr_hrDiskStorageEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -1217,8 +1435,8 @@ assign_hrDiskStorageEntry(GSList *vbl)
     return hrDiskStorageEntry;
 }
 
-int
-host_resources_mib_get_hrDiskStorageTable(GSnmpSession *s, host_resources_mib_hrDiskStorageEntry_t ***hrDiskStorageEntry)
+void
+host_resources_mib_get_hrDiskStorageTable(GSnmpSession *s, host_resources_mib_hrDiskStorageEntry_t ***hrDiskStorageEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1227,24 +1445,48 @@ host_resources_mib_get_hrDiskStorageTable(GSnmpSession *s, host_resources_mib_hr
 
     *hrDiskStorageEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _hrDiskStorageEntry);
+    add_attributes(s, &in, base, 11, 10, attr_hrDiskStorageEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *hrDiskStorageEntry = (host_resources_mib_hrDiskStorageEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrDiskStorageEntry_t *));
+        if (! *hrDiskStorageEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*hrDiskStorageEntry)[i] = assign_hrDiskStorageEntry(row->data);
+        }
+    }
+}
+
+void
+host_resources_mib_get_hrDiskStorageEntry(GSnmpSession *s, host_resources_mib_hrDiskStorageEntry_t **hrDiskStorageEntry, gint32 hrDeviceIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrDiskStorageEntry, sizeof(oid_hrDiskStorageEntry));
+    len = pack_hrDiskStorageEntry(base, hrDeviceIndex);
+    if (len < 0) {
+        g_warning("illegal hrDiskStorageEntry index values");
+        return;
     }
 
-    *hrDiskStorageEntry = (host_resources_mib_hrDiskStorageEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrDiskStorageEntry_t *));
-    if (! *hrDiskStorageEntry) {
-        return -4;
-    }
+    *hrDiskStorageEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*hrDiskStorageEntry)[i] = assign_hrDiskStorageEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_hrDiskStorageEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *hrDiskStorageEntry = assign_hrDiskStorageEntry(out);
+    }
 }
 
 void
@@ -1296,6 +1538,16 @@ unpack_hrPartitionEntry(GSnmpVarBind *vb, host_resources_mib_hrPartitionEntry_t 
     return 0;
 }
 
+static int
+pack_hrPartitionEntry(guint32 *base, gint32 hrDeviceIndex, gint32 hrPartitionIndex)
+{
+    int idx = 11;
+
+    base[idx++] = hrDeviceIndex;
+    base[idx++] = hrPartitionIndex;
+    return idx;
+}
+
 static host_resources_mib_hrPartitionEntry_t *
 assign_hrPartitionEntry(GSList *vbl)
 {
@@ -1303,7 +1555,6 @@ assign_hrPartitionEntry(GSList *vbl)
     host_resources_mib_hrPartitionEntry_t *hrPartitionEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 7, 1};
 
     hrPartitionEntry = host_resources_mib_new_hrPartitionEntry();
     if (! hrPartitionEntry) {
@@ -1322,8 +1573,8 @@ assign_hrPartitionEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrPartitionEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_hrPartitionEntry, sizeof(oid_hrPartitionEntry)/sizeof(guint32),
+                   attr_hrPartitionEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -1346,8 +1597,8 @@ assign_hrPartitionEntry(GSList *vbl)
     return hrPartitionEntry;
 }
 
-int
-host_resources_mib_get_hrPartitionTable(GSnmpSession *s, host_resources_mib_hrPartitionEntry_t ***hrPartitionEntry)
+void
+host_resources_mib_get_hrPartitionTable(GSnmpSession *s, host_resources_mib_hrPartitionEntry_t ***hrPartitionEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1356,24 +1607,48 @@ host_resources_mib_get_hrPartitionTable(GSnmpSession *s, host_resources_mib_hrPa
 
     *hrPartitionEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _hrPartitionEntry);
+    add_attributes(s, &in, base, 11, 10, attr_hrPartitionEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *hrPartitionEntry = (host_resources_mib_hrPartitionEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrPartitionEntry_t *));
+        if (! *hrPartitionEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*hrPartitionEntry)[i] = assign_hrPartitionEntry(row->data);
+        }
+    }
+}
+
+void
+host_resources_mib_get_hrPartitionEntry(GSnmpSession *s, host_resources_mib_hrPartitionEntry_t **hrPartitionEntry, gint32 hrDeviceIndex, gint32 hrPartitionIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrPartitionEntry, sizeof(oid_hrPartitionEntry));
+    len = pack_hrPartitionEntry(base, hrDeviceIndex, hrPartitionIndex);
+    if (len < 0) {
+        g_warning("illegal hrPartitionEntry index values");
+        return;
     }
 
-    *hrPartitionEntry = (host_resources_mib_hrPartitionEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrPartitionEntry_t *));
-    if (! *hrPartitionEntry) {
-        return -4;
-    }
+    *hrPartitionEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*hrPartitionEntry)[i] = assign_hrPartitionEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_hrPartitionEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *hrPartitionEntry = assign_hrPartitionEntry(out);
+    }
 }
 
 void
@@ -1423,6 +1698,15 @@ unpack_hrFSEntry(GSnmpVarBind *vb, host_resources_mib_hrFSEntry_t *hrFSEntry)
     return 0;
 }
 
+static int
+pack_hrFSEntry(guint32 *base, gint32 hrFSIndex)
+{
+    int idx = 11;
+
+    base[idx++] = hrFSIndex;
+    return idx;
+}
+
 static host_resources_mib_hrFSEntry_t *
 assign_hrFSEntry(GSList *vbl)
 {
@@ -1430,7 +1714,6 @@ assign_hrFSEntry(GSList *vbl)
     host_resources_mib_hrFSEntry_t *hrFSEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 3, 8, 1};
 
     hrFSEntry = host_resources_mib_new_hrFSEntry();
     if (! hrFSEntry) {
@@ -1449,8 +1732,8 @@ assign_hrFSEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrFSEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_hrFSEntry, sizeof(oid_hrFSEntry)/sizeof(guint32),
+                   attr_hrFSEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -1488,8 +1771,8 @@ assign_hrFSEntry(GSList *vbl)
     return hrFSEntry;
 }
 
-int
-host_resources_mib_get_hrFSTable(GSnmpSession *s, host_resources_mib_hrFSEntry_t ***hrFSEntry)
+void
+host_resources_mib_get_hrFSTable(GSnmpSession *s, host_resources_mib_hrFSEntry_t ***hrFSEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1498,24 +1781,83 @@ host_resources_mib_get_hrFSTable(GSnmpSession *s, host_resources_mib_hrFSEntry_t
 
     *hrFSEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _hrFSEntry);
+    add_attributes(s, &in, base, 11, 10, attr_hrFSEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *hrFSEntry = (host_resources_mib_hrFSEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrFSEntry_t *));
+        if (! *hrFSEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*hrFSEntry)[i] = assign_hrFSEntry(row->data);
+        }
+    }
+}
+
+void
+host_resources_mib_get_hrFSEntry(GSnmpSession *s, host_resources_mib_hrFSEntry_t **hrFSEntry, gint32 hrFSIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrFSEntry, sizeof(oid_hrFSEntry));
+    len = pack_hrFSEntry(base, hrFSIndex);
+    if (len < 0) {
+        g_warning("illegal hrFSEntry index values");
+        return;
     }
 
-    *hrFSEntry = (host_resources_mib_hrFSEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrFSEntry_t *));
-    if (! *hrFSEntry) {
-        return -4;
+    *hrFSEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_hrFSEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *hrFSEntry = assign_hrFSEntry(out);
+    }
+}
+
+void
+host_resources_mib_set_hrFSEntry(GSnmpSession *s, host_resources_mib_hrFSEntry_t *hrFSEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrFSEntry, sizeof(oid_hrFSEntry));
+    len = pack_hrFSEntry(base, hrFSEntry->hrFSIndex);
+    if (len < 0) {
+        g_warning("illegal hrFSEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*hrFSEntry)[i] = assign_hrFSEntry(row->data);
+    if (hrFSEntry->hrFSLastFullBackupDate) {
+        base[10] = 8;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       hrFSEntry->hrFSLastFullBackupDate,
+                       hrFSEntry->_hrFSLastFullBackupDateLength);
+    }
+    if (hrFSEntry->hrFSLastPartialBackupDate) {
+        base[10] = 9;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_OCTET_STRING,
+                       hrFSEntry->hrFSLastPartialBackupDate,
+                       hrFSEntry->_hrFSLastPartialBackupDateLength);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1561,7 +1903,6 @@ assign_hrSWRun(GSList *vbl)
     host_resources_mib_hrSWRun_t *hrSWRun;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 4};
 
     hrSWRun = host_resources_mib_new_hrSWRun();
     if (! hrSWRun) {
@@ -1574,8 +1915,8 @@ assign_hrSWRun(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrSWRun, &idx) < 0) continue;
+        if (lookup(vb, oid_hrSWRun, sizeof(oid_hrSWRun)/sizeof(guint32),
+                   attr_hrSWRun, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -1587,25 +1928,21 @@ assign_hrSWRun(GSList *vbl)
     return hrSWRun;
 }
 
-int
-host_resources_mib_get_hrSWRun(GSnmpSession *s, host_resources_mib_hrSWRun_t **hrSWRun)
+void
+host_resources_mib_get_hrSWRun(GSnmpSession *s, host_resources_mib_hrSWRun_t **hrSWRun, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 4, 0};
 
     *hrSWRun = NULL;
 
-    add_attributes(s, &in, base, 8, _hrSWRun);
+    add_attributes(s, &in, base, 9, 8, attr_hrSWRun, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *hrSWRun = assign_hrSWRun(out);
     }
-
-    *hrSWRun = assign_hrSWRun(out);
-
-    return 0;
 }
 
 void
@@ -1642,6 +1979,15 @@ unpack_hrSWRunEntry(GSnmpVarBind *vb, host_resources_mib_hrSWRunEntry_t *hrSWRun
     return 0;
 }
 
+static int
+pack_hrSWRunEntry(guint32 *base, gint32 hrSWRunIndex)
+{
+    int idx = 11;
+
+    base[idx++] = hrSWRunIndex;
+    return idx;
+}
+
 static host_resources_mib_hrSWRunEntry_t *
 assign_hrSWRunEntry(GSList *vbl)
 {
@@ -1649,7 +1995,6 @@ assign_hrSWRunEntry(GSList *vbl)
     host_resources_mib_hrSWRunEntry_t *hrSWRunEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 4, 2, 1};
 
     hrSWRunEntry = host_resources_mib_new_hrSWRunEntry();
     if (! hrSWRunEntry) {
@@ -1668,8 +2013,8 @@ assign_hrSWRunEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrSWRunEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_hrSWRunEntry, sizeof(oid_hrSWRunEntry)/sizeof(guint32),
+                   attr_hrSWRunEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -1700,8 +2045,8 @@ assign_hrSWRunEntry(GSList *vbl)
     return hrSWRunEntry;
 }
 
-int
-host_resources_mib_get_hrSWRunTable(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t ***hrSWRunEntry)
+void
+host_resources_mib_get_hrSWRunTable(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t ***hrSWRunEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1710,24 +2055,77 @@ host_resources_mib_get_hrSWRunTable(GSnmpSession *s, host_resources_mib_hrSWRunE
 
     *hrSWRunEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _hrSWRunEntry);
+    add_attributes(s, &in, base, 11, 10, attr_hrSWRunEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *hrSWRunEntry = (host_resources_mib_hrSWRunEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrSWRunEntry_t *));
+        if (! *hrSWRunEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*hrSWRunEntry)[i] = assign_hrSWRunEntry(row->data);
+        }
+    }
+}
+
+void
+host_resources_mib_get_hrSWRunEntry(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t **hrSWRunEntry, gint32 hrSWRunIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrSWRunEntry, sizeof(oid_hrSWRunEntry));
+    len = pack_hrSWRunEntry(base, hrSWRunIndex);
+    if (len < 0) {
+        g_warning("illegal hrSWRunEntry index values");
+        return;
     }
 
-    *hrSWRunEntry = (host_resources_mib_hrSWRunEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrSWRunEntry_t *));
-    if (! *hrSWRunEntry) {
-        return -4;
+    *hrSWRunEntry = NULL;
+
+    add_attributes(s, &in, base, len, 10, attr_hrSWRunEntry, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *hrSWRunEntry = assign_hrSWRunEntry(out);
+    }
+}
+
+void
+host_resources_mib_set_hrSWRunEntry(GSnmpSession *s, host_resources_mib_hrSWRunEntry_t *hrSWRunEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrSWRunEntry, sizeof(oid_hrSWRunEntry));
+    len = pack_hrSWRunEntry(base, hrSWRunEntry->hrSWRunIndex);
+    if (len < 0) {
+        g_warning("illegal hrSWRunEntry index values");
+        return;
     }
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*hrSWRunEntry)[i] = assign_hrSWRunEntry(row->data);
+    if (hrSWRunEntry->hrSWRunStatus) {
+        base[10] = 7;
+        g_snmp_vbl_add(&in, base, len, G_SNMP_INTEGER32,
+                       hrSWRunEntry->hrSWRunStatus,
+                       0);
     }
 
-    return 0;
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
 }
 
 void
@@ -1777,6 +2175,15 @@ unpack_hrSWRunPerfEntry(GSnmpVarBind *vb, host_resources_mib_hrSWRunPerfEntry_t 
     return 0;
 }
 
+static int
+pack_hrSWRunPerfEntry(guint32 *base, gint32 hrSWRunIndex)
+{
+    int idx = 11;
+
+    base[idx++] = hrSWRunIndex;
+    return idx;
+}
+
 static host_resources_mib_hrSWRunPerfEntry_t *
 assign_hrSWRunPerfEntry(GSList *vbl)
 {
@@ -1784,7 +2191,6 @@ assign_hrSWRunPerfEntry(GSList *vbl)
     host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 5, 1, 1};
 
     hrSWRunPerfEntry = host_resources_mib_new_hrSWRunPerfEntry();
     if (! hrSWRunPerfEntry) {
@@ -1803,8 +2209,8 @@ assign_hrSWRunPerfEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrSWRunPerfEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_hrSWRunPerfEntry, sizeof(oid_hrSWRunPerfEntry)/sizeof(guint32),
+                   attr_hrSWRunPerfEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -1819,8 +2225,8 @@ assign_hrSWRunPerfEntry(GSList *vbl)
     return hrSWRunPerfEntry;
 }
 
-int
-host_resources_mib_get_hrSWRunPerfTable(GSnmpSession *s, host_resources_mib_hrSWRunPerfEntry_t ***hrSWRunPerfEntry)
+void
+host_resources_mib_get_hrSWRunPerfTable(GSnmpSession *s, host_resources_mib_hrSWRunPerfEntry_t ***hrSWRunPerfEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -1829,24 +2235,48 @@ host_resources_mib_get_hrSWRunPerfTable(GSnmpSession *s, host_resources_mib_hrSW
 
     *hrSWRunPerfEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _hrSWRunPerfEntry);
+    add_attributes(s, &in, base, 11, 10, attr_hrSWRunPerfEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *hrSWRunPerfEntry = (host_resources_mib_hrSWRunPerfEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrSWRunPerfEntry_t *));
+        if (! *hrSWRunPerfEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*hrSWRunPerfEntry)[i] = assign_hrSWRunPerfEntry(row->data);
+        }
+    }
+}
+
+void
+host_resources_mib_get_hrSWRunPerfEntry(GSnmpSession *s, host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfEntry, gint32 hrSWRunIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrSWRunPerfEntry, sizeof(oid_hrSWRunPerfEntry));
+    len = pack_hrSWRunPerfEntry(base, hrSWRunIndex);
+    if (len < 0) {
+        g_warning("illegal hrSWRunPerfEntry index values");
+        return;
     }
 
-    *hrSWRunPerfEntry = (host_resources_mib_hrSWRunPerfEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrSWRunPerfEntry_t *));
-    if (! *hrSWRunPerfEntry) {
-        return -4;
-    }
+    *hrSWRunPerfEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*hrSWRunPerfEntry)[i] = assign_hrSWRunPerfEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_hrSWRunPerfEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *hrSWRunPerfEntry = assign_hrSWRunPerfEntry(out);
+    }
 }
 
 void
@@ -1892,7 +2322,6 @@ assign_hrSWInstalled(GSList *vbl)
     host_resources_mib_hrSWInstalled_t *hrSWInstalled;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 6};
 
     hrSWInstalled = host_resources_mib_new_hrSWInstalled();
     if (! hrSWInstalled) {
@@ -1905,8 +2334,8 @@ assign_hrSWInstalled(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrSWInstalled, &idx) < 0) continue;
+        if (lookup(vb, oid_hrSWInstalled, sizeof(oid_hrSWInstalled)/sizeof(guint32),
+                   attr_hrSWInstalled, &idx) < 0) continue;
 
         switch (idx) {
         case 1:
@@ -1921,25 +2350,21 @@ assign_hrSWInstalled(GSList *vbl)
     return hrSWInstalled;
 }
 
-int
-host_resources_mib_get_hrSWInstalled(GSnmpSession *s, host_resources_mib_hrSWInstalled_t **hrSWInstalled)
+void
+host_resources_mib_get_hrSWInstalled(GSnmpSession *s, host_resources_mib_hrSWInstalled_t **hrSWInstalled, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 25, 6, 0};
 
     *hrSWInstalled = NULL;
 
-    add_attributes(s, &in, base, 8, _hrSWInstalled);
+    add_attributes(s, &in, base, 9, 8, attr_hrSWInstalled, mask);
 
     out = g_snmp_session_sync_getnext(s, in);
     g_snmp_vbl_free(in);
-    if (! out) {
-        return -2;
+    if (out) {
+        *hrSWInstalled = assign_hrSWInstalled(out);
     }
-
-    *hrSWInstalled = assign_hrSWInstalled(out);
-
-    return 0;
 }
 
 void
@@ -1976,6 +2401,15 @@ unpack_hrSWInstalledEntry(GSnmpVarBind *vb, host_resources_mib_hrSWInstalledEntr
     return 0;
 }
 
+static int
+pack_hrSWInstalledEntry(guint32 *base, gint32 hrSWInstalledIndex)
+{
+    int idx = 11;
+
+    base[idx++] = hrSWInstalledIndex;
+    return idx;
+}
+
 static host_resources_mib_hrSWInstalledEntry_t *
 assign_hrSWInstalledEntry(GSList *vbl)
 {
@@ -1983,7 +2417,6 @@ assign_hrSWInstalledEntry(GSList *vbl)
     host_resources_mib_hrSWInstalledEntry_t *hrSWInstalledEntry;
     guint32 idx;
     char *p;
-    static guint32 const base[] = {1, 3, 6, 1, 2, 1, 25, 6, 3, 1};
 
     hrSWInstalledEntry = host_resources_mib_new_hrSWInstalledEntry();
     if (! hrSWInstalledEntry) {
@@ -2002,8 +2435,8 @@ assign_hrSWInstalledEntry(GSList *vbl)
     for (elem = vbl; elem; elem = g_slist_next(elem)) {
         GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
 
-        if (lookup(vb, base, sizeof(base)/sizeof(guint32),
-                   _hrSWInstalledEntry, &idx) < 0) continue;
+        if (lookup(vb, oid_hrSWInstalledEntry, sizeof(oid_hrSWInstalledEntry)/sizeof(guint32),
+                   attr_hrSWInstalledEntry, &idx) < 0) continue;
 
         switch (idx) {
         case 2:
@@ -2027,8 +2460,8 @@ assign_hrSWInstalledEntry(GSList *vbl)
     return hrSWInstalledEntry;
 }
 
-int
-host_resources_mib_get_hrSWInstalledTable(GSnmpSession *s, host_resources_mib_hrSWInstalledEntry_t ***hrSWInstalledEntry)
+void
+host_resources_mib_get_hrSWInstalledTable(GSnmpSession *s, host_resources_mib_hrSWInstalledEntry_t ***hrSWInstalledEntry, gint mask)
 {
     GSList *in = NULL, *out = NULL;
     GSList *row;
@@ -2037,24 +2470,48 @@ host_resources_mib_get_hrSWInstalledTable(GSnmpSession *s, host_resources_mib_hr
 
     *hrSWInstalledEntry = NULL;
 
-    add_attributes(s, &in, base, 10, _hrSWInstalledEntry);
+    add_attributes(s, &in, base, 11, 10, attr_hrSWInstalledEntry, mask);
 
     out = gsnmp_gettable(s, in);
     /* g_snmp_vbl_free(in); */
-    if (! out) {
-        return -2;
+
+    if (out) {
+        *hrSWInstalledEntry = (host_resources_mib_hrSWInstalledEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrSWInstalledEntry_t *));
+        if (! *hrSWInstalledEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*hrSWInstalledEntry)[i] = assign_hrSWInstalledEntry(row->data);
+        }
+    }
+}
+
+void
+host_resources_mib_get_hrSWInstalledEntry(GSnmpSession *s, host_resources_mib_hrSWInstalledEntry_t **hrSWInstalledEntry, gint32 hrSWInstalledIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    int len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, oid_hrSWInstalledEntry, sizeof(oid_hrSWInstalledEntry));
+    len = pack_hrSWInstalledEntry(base, hrSWInstalledIndex);
+    if (len < 0) {
+        g_warning("illegal hrSWInstalledEntry index values");
+        return;
     }
 
-    *hrSWInstalledEntry = (host_resources_mib_hrSWInstalledEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(host_resources_mib_hrSWInstalledEntry_t *));
-    if (! *hrSWInstalledEntry) {
-        return -4;
-    }
+    *hrSWInstalledEntry = NULL;
 
-    for (row = out, i = 0; row; row = g_slist_next(row), i++) {
-        (*hrSWInstalledEntry)[i] = assign_hrSWInstalledEntry(row->data);
-    }
+    add_attributes(s, &in, base, len, 10, attr_hrSWInstalledEntry, mask);
 
-    return 0;
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        *hrSWInstalledEntry = assign_hrSWInstalledEntry(out);
+    }
 }
 
 void
