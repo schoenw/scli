@@ -30,6 +30,8 @@
 #include "if-mib.h"
 #include "ip-mib.h"
 
+#include <regex.h>
+
 
 
 static void
@@ -75,29 +77,48 @@ fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 
 
 static int
-match_interface(char *iface,
+match_interface(regex_t *regex_iface,
 		if_mib_ifEntry_t *ifEntry, if_mib_ifXEntry_t *ifXEntry)
 {
+#if 0
     long l;
     char *end;
+#endif
+    int status;
     
-    if (! iface) {
+    if (! regex_iface) {
 	return 1;
     }
 
+#if 0
     l = strtol(iface, &end, 0);
     if (end != iface) {
 	return (ifEntry->ifIndex == l);
     }
+#endif
 
     if (ifXEntry && ifXEntry->ifName) {
-	if (strncmp(iface, ifXEntry->ifName, ifXEntry->_ifNameLength) == 0) {
+	char *string = g_malloc0(ifXEntry->_ifNameLength + 1);
+	memcpy(string, ifXEntry->ifName, ifXEntry->_ifNameLength);
+	status = regexec(regex_iface, string, (size_t) 0, NULL, 0);
+	g_free(string);
+	if (status == 0) {
 	    return 1;
 	}
     }
 
+    /*
+     * Does it really make sense to filter on the description?
+     * If yes, then it should be obvious (which implies another
+     * option).
+     */
+
     if (ifEntry->ifDescr) {
-	if (strncmp(iface, ifEntry->ifDescr, ifEntry->_ifDescrLength) == 0) {
+	char *string = g_malloc0(ifEntry->_ifDescrLength + 1);
+	memcpy(string, ifEntry->ifDescr, ifEntry->_ifDescrLength);
+	status = regexec(regex_iface, string, (size_t) 0, NULL, 0);
+	g_free(string);
+	if (status == 0) {
 	    return 1;
 	}
     }
@@ -235,16 +256,20 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifXEntry_t **ifXTable = NULL;
     snmpv2_mib_system_t *system = NULL;
     ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
-    char *iface = NULL;
+    regex_t _regex_iface, *regex_iface = NULL;
     int i, c;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	iface = argv[1];
+	regex_iface = &_regex_iface;
+	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	    return SCLI_ERROR;	/* xxx report error */
+	}
     }
 
     if (if_mib_get_ifTable(interp->peer, &ifTable)) {
+	if (regex_iface) regfree(regex_iface);
 	return SCLI_ERROR;
     }
     (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
@@ -253,7 +278,7 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
 
     if (ifTable) {
 	for (i = 0, c = 0; ifTable[i]; i++) {
-	    if (match_interface(iface, ifTable[i],
+	    if (match_interface(regex_iface, ifTable[i],
 				ifXTable ? ifXTable[i] : NULL)) {
 		if (c) {
 		    g_string_append(interp->result, "\n");
@@ -270,6 +295,8 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
     if (system) snmpv2_mib_free_system(system);
     if (ipAddrTable) ip_mib_free_ipAddrTable(ipAddrTable);
+
+    if (regex_iface) regfree(regex_iface);
 
     return SCLI_OK;
 }
@@ -338,16 +365,20 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifXEntry_t **ifXTable = NULL;
     int name_width = 6;
     int type_width = 6;
-    char *iface = NULL;
+    regex_t _regex_iface, *regex_iface = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
-	iface = argv[1];
+	regex_iface = &_regex_iface;
+	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	    return SCLI_ERROR;	/* xxx report error */
+	}
     }
 
     if (if_mib_get_ifTable(interp->peer, &ifTable)) {
+	if (regex_iface) regfree(regex_iface);
 	return SCLI_ERROR;
     }
     (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
@@ -373,7 +404,7 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 			  type_width, "TYPE",
 			  name_width, "NAME");
 	for (i = 0; ifTable[i]; i++) {
-	    if (match_interface(iface, ifTable[i],
+	    if (match_interface(regex_iface, ifTable[i],
 				ifXTable ? ifXTable[i] : NULL)) {
 		show_if_info(interp->result, ifTable[i],
 			     ifXTable ? ifXTable[i] : NULL,
@@ -384,6 +415,8 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 
     if (ifTable) if_mib_free_ifTable(ifTable);
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
+
+    if (regex_iface) regfree(regex_iface);
 
     return SCLI_OK;
 }
@@ -454,14 +487,18 @@ cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
     double delta;
     static if_stats_t *stats = NULL;
     static time_t epoch = 0;
-    char *iface = NULL;
+    regex_t _regex_iface, *regex_iface = NULL;
     int i;
 
     if (argc > 1) {
-	iface = argv[1];
+	regex_iface = &_regex_iface;
+	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	    return SCLI_ERROR;	/* xxx report error */
+	}
     }
 
     if (if_mib_get_ifTable(interp->peer, &ifTable)) {
+	if (regex_iface) regfree(regex_iface);
 	return SCLI_ERROR;
     }
     (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
@@ -486,7 +523,7 @@ cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
 			"I-BPS O-BPS I-PPS O-PPS I-ERR O-ERR  DESCRIPTION");
 	for (i = 0; ifTable[i]; i++) {
 	    GString *s;
-	    if (! match_interface(iface, ifTable[i],
+	    if (! match_interface(regex_iface, ifTable[i],
 				  ifXTable ? ifXTable[i] : NULL)) {
 		continue;
 	    }
@@ -582,6 +619,8 @@ cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
     last = now;
     if (ifTable) if_mib_free_ifTable(ifTable);
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
+
+    if (regex_iface) regfree(regex_iface);
 
     return SCLI_OK;
 }
