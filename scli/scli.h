@@ -200,6 +200,12 @@ fmt_time_ticks(GString *s, guint32 timeticks);
 extern void
 fmt_date_and_time(GString *s, guchar *data, gsize len);
 
+extern char const *
+fmt_date_and_time_delta(guchar *date1, gsize len1, guchar *date2, gsize len2);
+
+extern char const *
+fmt_seconds(guint32 number);
+
 extern void
 fmt_kbytes(GString *s, guint32 kbytes);
 

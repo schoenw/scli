@@ -172,6 +172,69 @@ fmt_last_change(GString *s, guchar *data, gsize len)
 
 
 static void
+fmt_run_state(GString *s, gint32 *state)
+{
+    char *name;
+
+    static stls_table_t const run_states[] = {
+	{ 1, "I" },	/* initializing */
+	{ 2, "R" },	/* executing */
+	{ 3, "U" },	/* suspending */
+	{ 4, "S" },	/* suspended */
+	{ 5, "R" },	/* resuming */
+	{ 6, "A" },	/* aborting */
+	{ 7, "T" },	/* terminated */
+	{ 0, NULL }
+    };
+    
+    if (! state) {
+	g_string_append(s, "-");
+	return;
+    }
+    
+    name = stls_table_get_value(run_states, *state);
+    if (name) {
+	g_string_append(s, name);
+    } else {
+	g_string_append(s, "?");
+    }
+}
+
+
+static void
+fmt_exit_code(GString *s, gint32 *code)
+{
+    char *name;
+
+    static stls_table_t const exit_codes[] = {
+	{ 1, "N" },	/* noError */
+	{ 2, "H" },	/* halted */
+	{ 3, "T" },	/* lifeTimeExceeded */
+	{ 4, "O" },	/* noResourcesLeft */
+	{ 5, "L" },	/* languageError */
+	{ 6, "R" },	/* runtimeError */
+	{ 7, "A" },	/* invalidArgument */
+	{ 8, "S" },	/* securityViolation */
+	{ 9, "G" },	/* genericError */
+	{ 0, NULL }
+    };
+    
+    if (! code) {
+	g_string_append(s, "-");
+	return;
+    }
+    
+    name = stls_table_get_value(exit_codes, *code);
+    if (name) {
+	g_string_append(s, name);
+    } else {
+	g_string_append(s, "?");
+    }
+}
+
+
+
+static void
 show_extension(GString *s, smExtsnEntry_t *smExtsnEntry)
 {
     int const indent = 12;
@@ -218,8 +281,32 @@ get_script_lang_name(smScriptEntry_t *smScriptEntry,
 
 
 
+static smLaunchEntry_t*
+get_launch_entry(smRunEntry_t *smRunEntry, smLaunchEntry_t **smLaunchTable)
+{
+    int l;
+
+    if (! smLaunchTable) {
+	return NULL;
+    }
+    
+    for (l = 0; smLaunchTable[l]; l++) {
+	if (smLaunchTable[l]->_smLaunchOwnerLength == smRunEntry->_smLaunchOwnerLength
+	    && memcmp(smLaunchTable[l]->smLaunchOwner, smRunEntry->smLaunchOwner, smRunEntry->_smLaunchOwnerLength) == 0
+	    && smLaunchTable[l]->_smLaunchNameLength == smRunEntry->_smLaunchNameLength
+	    && memcmp(smLaunchTable[l]->smLaunchName, smRunEntry->smLaunchName, smRunEntry->_smLaunchNameLength) == 0
+	    ) {
+	    return smLaunchTable[l];
+	}
+    }
+
+    return NULL;
+}
+
+
+
 static void
-show_langauge(GString *s, smLangEntry_t *smLangEntry,
+show_language(GString *s, smLangEntry_t *smLangEntry,
 	      smExtsnEntry_t **smExtsnEntry)
 {
     int i;
@@ -275,7 +362,7 @@ cmd_languages(scli_interp_t *interp, int argc, char **argv)
 	    if (i) {
 		g_string_append(interp->result, "\n");
 	    }
-	    show_langauge(interp->result, smLangTable[i], smExtsnTable);
+	    show_language(interp->result, smLangTable[i], smExtsnTable);
 	}
     }
 
@@ -612,15 +699,84 @@ cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+show_run_info(GString *s, smRunEntry_t *smRunEntry,
+	      int l_owner_width, int l_name_width)
+{
+    g_string_sprintfa(s, "%-*.*s ", l_owner_width,
+		      (int) smRunEntry->_smLaunchOwnerLength,
+		      smRunEntry->smLaunchOwner);
+    g_string_sprintfa(s, "%-*.*s ", l_name_width,
+		      (int) smRunEntry->_smLaunchNameLength,
+		      smRunEntry->smLaunchName);
+    
+    g_string_sprintfa(s, "%5u  ", smRunEntry->smRunIndex);
+    
+    fmt_run_state(s, smRunEntry->smRunState);
+    fmt_exit_code(s, smRunEntry->smRunExitCode);
+
+    g_string_append(s, " ");
+    
+    if (smRunEntry->smRunLifeTime) {
+	g_string_sprintfa(s, "%7s ",
+			  fmt_seconds(*smRunEntry->smRunLifeTime/100));
+    } else {
+	g_string_sprintfa(s, "%7s ", "");
+    }
+    if (smRunEntry->smRunExpireTime) {
+	g_string_sprintfa(s, "%7s ", 
+			      fmt_seconds(*smRunEntry->smRunExpireTime/100));
+    } else {
+	g_string_sprintfa(s, "%7s ", "");
+    }
+
+#if 0
+    if (smRunEntry->smRunStartTime && smRunEntry->smRunEndTime) {
+	g_string_sprintfa(s, "%7s ",
+		  fmt_date_and_time_delta(smRunEntry->smRunStartTime,
+					  smRunEntry->_smRunStartTimeLength,
+					  smRunEntry->smRunEndTime,
+					  smRunEntry->_smRunEndTimeLength));
+    } else {
+	g_string_sprintfa(s, "%7s ", "");
+    }
+#endif
+
+    g_string_append(s, "\n");
+}
+
+
+
 static int
 cmd_run_info(scli_interp_t *interp, int argc, char **argv)
 {
     smRunEntry_t **smRunTable = NULL;
+    int l_owner_width = 8;
+    int l_name_width = 8;
+    int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (disman_script_mib_get_smRunTable(interp->peer, &smRunTable)) {
 	return SCLI_ERROR;
+    }
+
+    if (smRunTable) {
+	for (i = 0; smRunTable[i]; i++) {
+	    if (smRunTable[i]->_smLaunchOwnerLength > l_owner_width) {
+		l_owner_width = smRunTable[i]->_smLaunchOwnerLength;
+	    }
+	    if (smRunTable[i]->_smLaunchNameLength > l_name_width) {
+		l_name_width = smRunTable[i]->_smLaunchNameLength;
+	    }
+	}
+	g_string_sprintfa(interp->result,
+			  "%-*s %-*s RUNID STAT    LIFE   EXPIRE\n",
+			  l_owner_width, "L-OWNER", l_name_width, "L-NAME");
+	for (i = 0; smRunTable[i]; i++) {
+	    show_run_info(interp->result, smRunTable[i],
+			  l_owner_width, l_name_width);
+	}
     }
 
     if (smRunTable) disman_script_mib_free_smRunTable(smRunTable);
@@ -630,9 +786,138 @@ cmd_run_info(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+show_run_details(GString *s, smRunEntry_t *smRunEntry,
+		 smLaunchEntry_t *smLaunchEntry)
+{
+    char buffer[80];
+    int const width = 20;
+
+    g_snprintf(buffer, sizeof(buffer), "%u", smRunEntry->smRunIndex);
+    g_string_append(s, "Index:       ");
+    g_string_sprintfa(s, "%-7s\n", buffer);
+
+    g_string_append(s, "L-Owner:     ");
+    g_string_sprintfa(s, "%-*.*s ", width-1,
+		      (int) smRunEntry->_smLaunchOwnerLength,
+		      smRunEntry->smLaunchOwner);
+    g_string_append(s, "L-Name:   ");
+    g_string_sprintfa(s, "%.*s\n",
+		      (int) smRunEntry->_smLaunchNameLength,
+		      smRunEntry->smLaunchName);
+
+    if (smLaunchEntry) {
+	g_string_append(s, "S-Owner:     ");
+	g_string_sprintfa(s, "%-*.*s ", width-1,
+			  (int) smLaunchEntry->_smLaunchScriptOwnerLength,
+			  smLaunchEntry->smLaunchScriptOwner);
+	g_string_append(s, "S-Name:   ");
+	g_string_sprintfa(s, "%.*s\n",
+			  (int) smLaunchEntry->_smLaunchScriptNameLength,
+			  smLaunchEntry->smLaunchScriptName);
+    }
+    
+    g_string_append(s, "Status:      ");
+    fmt_enum(s, width, disman_script_mib_enums_smRunState,
+	     smRunEntry->smRunState);
+    g_string_append(s, "Start:    ");
+    if (smRunEntry->smRunStartTime) {
+	fmt_date_and_time(s, smRunEntry->smRunStartTime,
+			  smRunEntry->_smRunStartTimeLength);
+    }
+    g_string_append(s, "\n");
+
+    g_string_append(s, "Exit Code:   ");
+    fmt_enum(s, width, disman_script_mib_enums_smRunExitCode,
+	     smRunEntry->smRunExitCode);
+    g_string_append(s, "Result:   ");
+#if 0
+    if (smRunEntry->smRunResultTime) {
+	fmt_date_and_time(s, smRunEntry->smRunResultTime,
+			  smRunEntry->_smRunResultTimeLength);
+    }
+#endif
+    g_string_append(s, "\n");
+    
+    g_string_append(s, "Life Time:   ");
+    if (smRunEntry->smRunLifeTime) {
+	g_string_sprintfa(s, "%9s",
+			  fmt_seconds(*smRunEntry->smRunLifeTime/100));
+    } else {
+	g_string_sprintfa(s, "%9s", "");
+    }
+    g_string_append(s, "           Error:   ");
+#if 0
+    if (smRunEntry->smRunErrorTime) {
+	fmt_date_and_time(s, smRunEntry->smRunErrorTime,
+			  smRunEntry->_smRunErrorTimeLength);
+    }
+#endif
+    g_string_append(s, "\n");
+
+    g_string_append(s, "Expire Time: ");
+    if (smRunEntry->smRunExpireTime) {
+	g_string_sprintfa(s, "%9s",
+			  fmt_seconds(*smRunEntry->smRunExpireTime/100));
+    } else {
+	g_string_sprintfa(s, "%9s", "");
+    }
+    g_string_append(s, "           End:      ");
+    if (smRunEntry->smRunEndTime) {
+	fmt_date_and_time(s, smRunEntry->smRunEndTime,
+			  smRunEntry->_smRunEndTimeLength);
+    }
+    g_string_append(s, "\n");
+
+    if (smRunEntry->smRunArgument && smRunEntry->_smRunArgumentLength) {
+	g_string_sprintfa(s, "Argument:    %.*s\n",
+			  (int) smRunEntry->_smRunArgumentLength,
+			  smRunEntry->smRunArgument);
+    }
+
+    if (smRunEntry->smRunResult && smRunEntry->_smRunResultLength) {
+	g_string_sprintfa(s, "Result:      %.*s\n",
+			  (int) smRunEntry->_smRunResultLength,
+			  smRunEntry->smRunResult);
+    }
+
+    if (smRunEntry->smRunError && smRunEntry->_smRunErrorLength) {
+	g_string_sprintfa(s, "Error:       %.*s\n",
+			  (int) smRunEntry->_smRunErrorLength,
+			  smRunEntry->smRunError);
+    }
+}
+
+
+
 static int
 cmd_run_details(scli_interp_t *interp, int argc, char **argv)
 {
+    smLaunchEntry_t **smLaunchTable = NULL;
+    smRunEntry_t **smRunTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (disman_script_mib_get_smRunTable(interp->peer, &smRunTable)) {
+	return SCLI_ERROR;
+    }
+
+    (void) disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable);
+
+    if (smRunTable) {
+	for (i = 0; smRunTable[i]; i++) {
+	    if (i) {
+		g_string_append(interp->result, "\n");
+	    }
+	    show_run_details(interp->result, smRunTable[i],
+			     get_launch_entry(smRunTable[i], smLaunchTable));
+	}
+    }
+
+    if (smLaunchTable) disman_script_mib_free_smLaunchTable(smLaunchTable);
+    if (smRunTable) disman_script_mib_free_smRunTable(smRunTable);
+	
     return SCLI_OK;
 }
 
