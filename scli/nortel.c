@@ -763,6 +763,7 @@ static int
 create_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 {
     gint32 vlanId;
+    char *end;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -770,7 +771,8 @@ create_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    if (sscanf(argv[1], "%d", &vlanId) != 1) {
+    vlanId = strtol(argv[1], &end, 0);
+    if (*end) {
 	return SCLI_SYNTAX_NUMBER;
     }
 
