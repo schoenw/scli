@@ -420,6 +420,12 @@ fmt_tdomain(guint32 *tdomain, gsize tdomain_len);
 extern const char*
 fmt_taddress(guint32 *tdomain, gsize tdomain_len,
 	     guchar *taddress, gsize taddress_len);
+
+extern void
+fmt_row_status(GString *s, gint32 *status);
+    
+extern void
+fmt_storage_type(GString *s, gint32 *storage);
     
 /*
  * XML utilities.

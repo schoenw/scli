@@ -110,62 +110,6 @@ creatable(gint32 *storage)
 
 
 
-static void
-fmt_storage_type(GString *s, gint32 *storage)
-{
-    static GSnmpEnum const storage_types[] = {
-	{ 1, "O" },	/* other */
-	{ 2, "V" },	/* volatile */
-	{ 3, "N" },	/* nonVolatile */
-	{ 4, "P" },	/* permanent */
-	{ 5, "R" },	/* readOnly */
-	{ 0, NULL }
-    };
-    
-    const char *label;
-    
-    if (! storage) {
-	g_string_append(s, " ");
-	return;
-    }
-    
-    label = gsnmp_enum_get_label(storage_types, *storage);
-    if (label) {
-	g_string_append(s, label);
-    } else {
-	g_string_append(s, "-");
-    }
-}
-
-
-
-static void
-fmt_row_status(GString *s, gint32 *status)
-{
-    static GSnmpEnum const row_states[] = {
-	{ 1, "A" },	/* active */
-	{ 2, "S" },	/* notInService */
-	{ 3, "R" },	/* notReady */
-	{ 0, NULL }
-    };
-    
-    const char *label;
-    
-    if (! status) {
-	g_string_append(s, " ");
-	return;
-    }
-    
-    label = gsnmp_enum_get_label(row_states, *status);
-    if (label) {
-	g_string_append(s, label);
-    } else {
-	g_string_append(s, "-");
-    }
-}
-
-
-
 static int
 create_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
 {
