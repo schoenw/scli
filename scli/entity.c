@@ -447,7 +447,7 @@ scli_init_entity_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show entity info", NULL,
-	  "The show entity info command displays summary information about\n"
+	  "The `show entity info' command displays summary information about\n"
 	  "the physical entities that compose the system. The command\n"
 	  "generates a table with the following columns:\n"
 	  "\n"
@@ -460,14 +460,14 @@ scli_init_entity_mode(scli_interp_t *interp)
 	  show_entity_info },
 	
 	{ "show entity details ", NULL,
-	  "The show entity details command describes the physical entities\n"
+	  "The `show entity details' command describes the physical entities\n"
 	  "in more detail.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "entities physical", NULL,
 	  show_entity_details },
 	
 	{ "show entity containment", NULL,
-	  "The show entity containment command displays the physical entity\n"
+	  "The `show entity containment' command displays the physical entity\n"
 	  "containment hierarchy.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
@@ -505,7 +505,7 @@ scli_init_entity_mode(scli_interp_t *interp)
 	"entity",
 	"The entity scli mode is based on the ENTITY-MIB as published in\n"
 	"RFC 2737. It provides commands to browse the physical entities\n"
-	"or physical components what make up a managed system.",
+	"or physical components that make up a managed system.",
 	cmds
     };
     

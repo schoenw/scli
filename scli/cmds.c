@@ -1342,7 +1342,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	{ "show scli command info", "[<regex]",
 	  "The `show scli command info' command displays summary information\n"
 	  "about scli commands. The optional regular expression <regexp> is\n"
-	  "matched against the command names to select the scli commands.\n",
+	  "matched against the command names to select the scli commands.",
 	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  show_scli_command_info },
@@ -1350,7 +1350,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	{ "show scli command details", "[<regex]",
 	  "The `show scli command details' command displays detailed information\n"
 	  "about scli commands. The optional regular expression <regexp> is\n"
-	  "matched against the command names to select the scli commands.\n",
+	  "matched against the command names to select the scli commands.",
 	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  show_scli_command_details },
