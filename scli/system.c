@@ -146,14 +146,11 @@ xml_system_device(xmlNodePtr root,
 {
     xmlNodePtr tree, node;
     char const *type;
-    char buffer[80];
     
     g_return_if_fail(hrDeviceEntry);
 
     tree = xmlNewChild(root, NULL, "device", NULL);
-    g_snprintf(buffer, sizeof(buffer), "%d",
-	       hrDeviceEntry->hrDeviceIndex);
-    xmlSetProp(tree, "index", buffer);
+    xml_set_prop(tree, "index", "%d", hrDeviceEntry->hrDeviceIndex);
 
     if (hrDeviceEntry->hrDeviceStatus) {
 	node = xmlNewChild(tree, NULL, "status",
@@ -170,20 +167,19 @@ xml_system_device(xmlNodePtr root,
 	}
     }
 	
-#if 0
     if (hrDeviceEntry->hrDeviceDescr) {
-	g_string_sprintfa(s, "    <description>%.*s</description>\n",
-			  (int) hrDeviceEntry->_hrDeviceDescrLength,
-			  hrDeviceEntry->hrDeviceDescr);
+	node = xmlNewChild(tree, NULL, "description", NULL);
+	xml_set_content(tree, "%.*s",
+			(int) hrDeviceEntry->_hrDeviceDescrLength,
+			hrDeviceEntry->hrDeviceDescr);
     }
-#endif
 }
 
 
 
 static void
-show_system_device(GString *s,
-		   host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
+fmt_system_device(GString *s,
+		  host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
 {
     char const *status;
     char const *type;
@@ -215,7 +211,7 @@ show_system_device(GString *s,
 
 
 static int
-cmd_system_devices(scli_interp_t *interp, int argc, char **argv)
+show_system_devices(scli_interp_t *interp, int argc, char **argv)
 {
     host_resources_mib_hrDeviceEntry_t **hrDeviceTable = NULL;
     int i;
@@ -238,7 +234,7 @@ cmd_system_devices(scli_interp_t *interp, int argc, char **argv)
 	    if (scli_interp_xml(interp)) {
 		xml_system_device(interp->xml_node, hrDeviceTable[i]);
 	    } else {
-		show_system_device(interp->result, hrDeviceTable[i]);
+		fmt_system_device(interp->result, hrDeviceTable[i]);
 	    }
 	}
     }
@@ -256,12 +252,9 @@ xml_system_process(xmlNodePtr root,
 		   host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry)
 {
     xmlNodePtr tree, node;
-    char buffer[80];
 
     tree = xmlNewChild(root, NULL, "process", NULL);
-    g_snprintf(buffer, sizeof(buffer), "%d",
-	       hrSWRunEntry->hrSWRunIndex);
-    xmlSetProp(tree, "index", buffer);
+    xml_set_prop(tree, "index", "%d", hrSWRunEntry->hrSWRunIndex);
     
     if (hrSWRunEntry->hrSWRunStatus) {
 	node = xmlNewChild(tree, NULL, "status",
@@ -758,11 +751,13 @@ set_system_contact(scli_interp_t *interp, int argc, char **argv)
     system->sysContact = argv[1];
     system->_sysContactLength = strlen(system->sysContact);
     code = snmpv2_mib_set_system(interp->peer, system);
+    snmpv2_mib_free_system(system);
+
     if (interp->peer->error_status) {
 	scli_snmp_error(interp);
 	g_string_append(interp->result, "\n");
+	return SCLI_ERROR;
     }
-    snmpv2_mib_free_system(system);
 
     return SCLI_OK;
 }
@@ -785,11 +780,13 @@ set_system_name(scli_interp_t *interp, int argc, char **argv)
     system->sysName = argv[1];
     system->_sysNameLength = strlen(system->sysName);
     code = snmpv2_mib_set_system(interp->peer, system);
+    snmpv2_mib_free_system(system);
+    
     if (interp->peer->error_status) {
 	scli_snmp_error(interp);
 	g_string_append(interp->result, "\n");
+	return SCLI_ERROR;
     }
-    snmpv2_mib_free_system(system);
 
     return SCLI_OK;
 }
@@ -812,11 +809,13 @@ set_system_location(scli_interp_t *interp, int argc, char **argv)
     system->sysLocation = argv[1];
     system->_sysLocationLength = strlen(system->sysLocation);
     code = snmpv2_mib_set_system(interp->peer, system);
+    snmpv2_mib_free_system(system);
+
     if (interp->peer->error_status) {
 	scli_snmp_error(interp);
 	g_string_append(interp->result, "\n");
+	return SCLI_ERROR;
     }
-    snmpv2_mib_free_system(system);
 
     return SCLI_OK;
 }
@@ -870,7 +869,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	{ "show system devices", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "list of system devices",
-	  cmd_system_devices },
+	  show_system_devices },
 	{ "show system storage", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "storage areas attached to the system",
