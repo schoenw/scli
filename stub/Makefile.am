@@ -170,7 +170,7 @@ printer-mib.h printer-mib.c:
 	$(SMIDUMP) -f scli Printer-MIB
 
 isdn-mib.h isdn-mib.c:
-	$(SMIDUMP) -f scli ISDN-MIB
+	$(SMIDUMP) -f scli --scli-include='isdnBasicRateEntry|isdnBearerEntry' ISDN-MIB
 
 rs-232-mib.h rs-232-mib.c:
 	$(SMIDUMP) -f scli RS-232-MIB
