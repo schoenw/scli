@@ -615,3 +615,41 @@ fmt_storage_type(GString *s, gint32 *storage)
 	g_string_append(s, "-");
     }
 }
+
+
+
+void
+fmt_port_set(GString *s, guchar *bits, gsize bits_len)
+{
+    int bit, i;
+    int first = -1;
+    int n = 0;
+
+    for (i = 0; i < bits_len * 8; i++) {
+	bit = bits[i/8] & 1 << (7-(i%8));
+	if (bit) {
+	    if (first < 0) {
+		first = i;
+	    }
+	} else {
+	    if (first >= 0) {
+		if (n) {
+		    g_string_append_c(s, ',');
+		}
+		if (first == i-1) {
+		    g_string_sprintfa(s, "%d", first);
+		} else {
+		    g_string_sprintfa(s, "%d-%d", first, i-1);
+		}
+		n++;
+	    }
+	    first = -1;
+	}
+    }
+    if (first >= 0) {
+	g_string_sprintfa(s, "%s%d-%d", n ? ", " : "", first, i-1);
+    }
+}
+
+
+

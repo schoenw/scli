@@ -23,6 +23,7 @@
 #include "scli.h"
 
 #include "productmib.h"
+#include "if-mib.h"
 
 
 static void
@@ -88,6 +89,7 @@ get_vlan_name_width(productmib_a3ComVlanIfEntry_t **vlanTable)
 static void
 fmt_3com_bridge_vlan_info(GString *s,
 			  productmib_a3ComVlanIfEntry_t *vlanEntry,
+			  guchar *bits, gsize bits_len,
 			  int name_width)
 {
     g_string_sprintfa(s, "%4d  ",
@@ -104,7 +106,31 @@ fmt_3com_bridge_vlan_info(GString *s,
 	g_string_sprintfa(s, "  %*s ", name_width, "");
     }
 
+    fmt_port_set(s, bits, bits_len);
+
     g_string_append(s, "\n");
+}
+
+
+
+static void
+create_port_list(guchar *bits, gsize bits_len, int ifIndex,
+		 if_mib_ifStackEntry_t **ifStackTable,
+		 if_mib_ifEntry_t **ifTable)
+{
+    int i;
+
+    for (i = 0; ifStackTable[i]; i++) {
+	if (ifStackTable[i]->ifStackHigherLayer == ifIndex) {
+	    int l = ifStackTable[i]->ifStackLowerLayer;
+
+	    // ignore everything which is not a real physical interface
+	    
+	    if (l < bits_len * 8) {
+		bits[l/8] |= (1 <<(7-(l%8)));
+	    }
+	}
+    }
 }
 
 
@@ -113,8 +139,11 @@ static int
 show_3com_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
 {
     productmib_a3ComVlanIfEntry_t **vlanTable = NULL;
+    if_mib_ifStackEntry_t **ifStackTable = NULL;
+    if_mib_ifEntry_t **ifTable = NULL;
     regex_t _regex_vlan, *regex_vlan = NULL;
     int i, name_width;
+    guchar ports[256];
     const int mask = (PRODUCTMIB_A3COMVLANIFDESCR
 		      | PRODUCTMIB_A3COMVLANIFTYPE
 		      | PRODUCTMIB_A3COMVLANIFGLOBALIDENTIFIER
@@ -144,16 +173,32 @@ show_3com_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SNMP;
     }
 
+    if_mib_get_ifStackTable(interp->peer, &ifStackTable, 0);
+    if (interp->peer->error_status) {
+	if (regex_vlan) regfree(regex_vlan);
+	return SCLI_SNMP;
+    }
+
+    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFTYPE);
+    if (interp->peer->error_status) {
+	if (regex_vlan) regfree(regex_vlan);
+	return SCLI_SNMP;
+    }
+
     name_width = get_vlan_name_width(vlanTable);
+
+    memset(ports, 0, sizeof(ports));
 
     if (vlanTable) {
 	g_string_sprintfa(interp->header,
 			  "VLAN STATUS %-*s PORTS", name_width, "NAME");
 	for (i = 0; vlanTable[i]; i++) {
-	    if (match_vlan(regex_vlan, vlanTable[i])) {
-		fmt_3com_bridge_vlan_info(interp->result, vlanTable[i],
-					  name_width);
-	    }
+	    if (! match_vlan(regex_vlan, vlanTable[i])) continue;
+	    create_port_list(ports, sizeof(ports),
+			     vlanTable[i]->a3ComVlanIfIndex,
+			     ifStackTable, ifTable);
+	    fmt_3com_bridge_vlan_info(interp->result, vlanTable[i],
+				      ports, sizeof(ports), name_width);
 	}
     }
 

@@ -436,6 +436,9 @@ fmt_row_status(GString *s, gint32 *status);
     
 extern void
 fmt_storage_type(GString *s, gint32 *storage);
+
+extern void
+fmt_port_set(GString *s, guchar *bits, gsize bits_len);
     
 /*
  * XML utilities.
