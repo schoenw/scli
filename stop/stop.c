@@ -27,8 +27,12 @@
 #include "config.h"
 #endif
 
-#include "stools.h"
 #include "stop.h"
+
+#include "snmpv2-mib.h"
+#include "ip-mib.h"
+#include "udp-mib.h"
+#include "tcp-mib.h"
 
 #include <stdio.h>
 #include <signal.h>

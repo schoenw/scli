@@ -40,6 +40,8 @@
 #endif
 #include <time.h>
 
+#include "stools.h"
+
 /*
  * Flags that are passed to the mode driver in order to give him a
  * chance to redraw the screen or to recover from a discontinuity.

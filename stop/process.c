@@ -24,8 +24,9 @@
 #include "config.h"
 #endif
 
-#include "stools.h"
 #include "stop.h"
+
+#include "host-resources-mib.h"
 
 
 
