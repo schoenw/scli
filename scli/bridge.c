@@ -87,7 +87,9 @@ fmt_stpStatus(GString *s, gint32 *enable, gint32 *state)
 
 
 static void
-fmt_bridge_stp_info(GString *s, bridge_mib_dot1dStp_t *dot1dStp)
+fmt_bridge_stp_info(GString *s,
+		    bridge_mib_dot1dBase_t *dot1dBase,
+		    bridge_mib_dot1dStp_t *dot1dStp)
 {
     int const indent = 18;
     const char *e;
@@ -101,15 +103,28 @@ fmt_bridge_stp_info(GString *s, bridge_mib_dot1dStp_t *dot1dStp)
     }
     
     if (dot1dStp->dot1dStpPriority) {
-	g_string_sprintfa(s, "%-*s%d (%02x:%02x)\n", indent,
+	g_string_sprintfa(s, "%-*s%d (0x%04x)\n", indent,
 			      "Stp Priority:",
 			  *dot1dStp->dot1dStpPriority,
+			  *dot1dStp->dot1dStpPriority);
+    }
+
+    if (dot1dStp->dot1dStpPriority && dot1dBase->dot1dBaseBridgeAddress) {
+	g_string_sprintfa(s, "%-*s%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n", indent,
+			  "Stp Bridge ID:",
 			  (*dot1dStp->dot1dStpPriority >> 8) & 0xff,
-			  (*dot1dStp->dot1dStpPriority) & 0xff);
+			  (*dot1dStp->dot1dStpPriority) & 0xff,
+			  dot1dBase->dot1dBaseBridgeAddress[0],
+			  dot1dBase->dot1dBaseBridgeAddress[1],
+			  dot1dBase->dot1dBaseBridgeAddress[2],
+			  dot1dBase->dot1dBaseBridgeAddress[3],
+			  dot1dBase->dot1dBaseBridgeAddress[4],
+			  dot1dBase->dot1dBaseBridgeAddress[5]);
+	
     }
     
     if (dot1dStp->dot1dStpDesignatedRoot) {
-	g_string_sprintfa(s, "%-*s%s\n", indent, "Stp Root:",
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Stp Root ID:",
 			  fmt_bridgeid(dot1dStp->dot1dStpDesignatedRoot));
     }
 
@@ -124,8 +139,34 @@ fmt_bridge_stp_info(GString *s, bridge_mib_dot1dStp_t *dot1dStp)
     }
 
     if (dot1dStp->dot1dStpMaxAge) {
-	g_string_sprintfa(s, "%-*s%d seconds\n", indent, "Stp Aging Time:",
-			  *dot1dStp->dot1dStpMaxAge);
+	g_string_sprintfa(s, "%-*s%d0 milliseconds\n", indent,
+			  "Stp Aging Time:", *dot1dStp->dot1dStpMaxAge);
+    }
+
+    if (dot1dStp->dot1dStpHelloTime) {
+	g_string_sprintfa(s, "%-*s%d0 milliseconds\n", indent,
+			  "Stp Hello Time:", *dot1dStp->dot1dStpHelloTime);
+    }
+
+    if (dot1dStp->dot1dStpHoldTime) {
+	g_string_sprintfa(s, "%-*s%d0 milliseconds\n", indent,
+			  "Stp Hold  Time:", *dot1dStp->dot1dStpHoldTime);
+    }
+
+    if (dot1dStp->dot1dStpForwardDelay) {
+	g_string_sprintfa(s, "%-*s%d0 milliseconds\n", indent,
+			  "Stp Fwd Delay:", *dot1dStp->dot1dStpForwardDelay);
+    }
+
+    if (dot1dStp->dot1dStpTimeSinceTopologyChange) {
+	g_string_sprintfa(s, "%-*s", indent, "Stp Topo Change:");
+	g_string_append(s, fmt_timeticks(*(dot1dStp->dot1dStpTimeSinceTopologyChange)));
+	g_string_append_c(s, '\n');
+    }
+    
+    if (dot1dStp->dot1dStpTopChanges) {
+	g_string_sprintfa(s, "%-*s%u (estimated)\n", indent,
+			  "Stp Topo Changes:", *dot1dStp->dot1dStpTopChanges);
     }
     
 }
@@ -173,7 +214,7 @@ fmt_bridge_info(GString *s,
     }
 
     if (dot1dStp) {
-	fmt_bridge_stp_info(s, dot1dStp);
+	fmt_bridge_stp_info(s, dot1dBase, dot1dStp);
     }
 }
 
