@@ -19,9 +19,6 @@ you want to volunteer, you might find some ideas below. ;-)
 
 - Add reasonable error reporting to the stub code.
 
-- Write some more substantial documentation including a cookbook on how
-  to extend the scli.
-
 - Create some sort of a test suite (which is not that easy for highly
   interactive programs).
 
@@ -35,8 +32,6 @@ you want to volunteer, you might find some ideas below. ;-)
 
 - What about sorting interface stats by number? Might be confusing if
   things jump up and down.
-
-- Need to complete the printer mode.
 
 - Need to complete the ospf mode.
 

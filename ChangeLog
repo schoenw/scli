@@ -1,3 +1,200 @@
+2002-03-27 14:48  schoenw
+
+	* stub/: atm-mib.c, bridge-mib.c, disman-schedule-mib.c,
+	disman-script-mib.c, entity-mib.c, etherlike-mib.c,
+	host-resources-mib.c, host-resources-types.c, iana-language-mib.c,
+	if-mib.c, ip-forward-mib.c, ip-mib.c, mau-mib.c,
+	notification-log-mib.c, old-cisco-ip-mib.c, ospf-mib.c,
+	printer-mib.c, rapid-city.c, rfc1213-mib.c, snmp-community-mib.c,
+	snmp-framework-mib.c, snmp-mpd-mib.c, snmp-notification-mib.c,
+	snmp-target-mib.c, snmp-user-based-sm-mib.c,
+	snmp-view-based-acm-mib.c, snmpv2-mib.c, snmpv2-tm.c, tcp-mib.c,
+	tunnel-mib.c, ucd-snmp-mib.c, udp-mib.c: Regenerated stubs to
+	incorporate fixes in the smidump scli driver.
+
+2002-03-27 14:42  schoenw
+
+	* snmp/g_utils.c: Fixed the size/range checking code to do and OR
+	rather than an AND.  Added missing copy operations for some SNMP
+	data types.
+
+2002-03-27 14:41  schoenw
+
+	* scli/fmt.c: Display TAddress values with an unknown TDomain in
+	hex rather than just ignoring it.
+
+2002-03-27 14:40  schoenw
+
+	* scli/system.c: Display the storage type "other".
+
+2002-03-26 17:52  schoenw
+
+	* scli/: fmt.c, snmp.c: Gracefully handle unknown transport
+	domains.
+
+2002-03-26 17:26  schoenw
+
+	* stub/: atm-mib.c, atm-mib.h, bridge-mib.c, bridge-mib.h,
+	disman-schedule-mib.c, disman-schedule-mib.h, disman-script-mib.c,
+	disman-script-mib.h, entity-mib.c, entity-mib.h, etherlike-mib.c,
+	etherlike-mib.h, host-resources-mib.c, host-resources-mib.h,
+	host-resources-types.c, host-resources-types.h,
+	iana-language-mib.c, iana-language-mib.h, if-mib.c, if-mib.h,
+	ip-forward-mib.c, ip-forward-mib.h, ip-mib.c, ip-mib.h, mau-mib.c,
+	mau-mib.h, old-cisco-ip-mib.c, old-cisco-ip-mib.h, ospf-mib.c,
+	ospf-mib.h, printer-mib.c, printer-mib.h, rapid-city.c,
+	rapid-city.h, rfc1213-mib.c, rfc1213-mib.h, snmp-community-mib.c,
+	snmp-community-mib.h, snmp-framework-mib.c, snmp-framework-mib.h,
+	snmp-mpd-mib.c, snmp-mpd-mib.h, snmp-notification-mib.c,
+	snmp-notification-mib.h, snmp-target-mib.c, snmp-target-mib.h,
+	snmp-user-based-sm-mib.c, snmp-user-based-sm-mib.h,
+	snmp-view-based-acm-mib.c, snmp-view-based-acm-mib.h, snmpv2-mib.c,
+	snmpv2-mib.h, snmpv2-tm.c, snmpv2-tm.h, tcp-mib.c, tcp-mib.h,
+	tunnel-mib.c, tunnel-mib.h, ucd-snmp-mib.c, ucd-snmp-mib.h,
+	udp-mib.c, udp-mib.h: Regenerated all stubs to take advantage of
+	the new compiler backend which generates much smaller stubs.
+
+2002-03-26 17:24  schoenw
+
+	* stub/: Makefile.am, notification-log-mib.c,
+	notification-log-mib.h: Added stubs for the NOTIFICATION-LOG-MIB.
+
+2002-03-26 17:19  schoenw
+
+	* snmp/: g_utils.c, g_utils.h: Added functions that are called by
+	the stub code.
+
+2002-03-26 17:16  schoenw
+
+	* scli/cmds.c: Fixed a typo.
+
+2002-03-25 18:20  schoenw
+
+	* scli/system.c: Check whether entLastChangeTime is really
+	available.
+
+2002-03-25 16:22  schoenw
+
+	* scli/system.c: Show last add/remove event times for interfaces
+	and physical entities.
+
+2002-03-22 17:33  schoenw
+
+	* snmp/g_transport.c: Added an additional parameter for the port
+	number.
+
+2002-03-22 17:19  schoenw
+
+	* snmp/g_transport.h: Added an additional parameter for the port
+	number.
+
+2002-03-22 17:18  schoenw
+
+	* README: Updated the copyright years.
+
+2002-03-22 17:17  schoenw
+
+	* doc/: Makefile.am, scli.texinfo, texinfo.tex: Started to describe
+	how one can extend scli. Added magic to include the mode/command
+	description from the scli "show scli mode" command.
+
+2002-03-22 17:15  schoenw
+
+	* snmp/: g_dispatch.c, g_dispatch.h, g_session.c, g_session.h:
+	Changes to pass the port number around.
+
+2002-03-22 17:13  schoenw
+
+	* scli/: basic.c, cmds.c, scli.c: Added code to pass the port
+	number around.
+
+2002-03-19 21:51  schoenw
+
+	* scli/: monitor.c, system.c, vendors.c: Fixed int size problems
+	and added Lucent to the vendors we recognize.
+
+2002-03-06 17:55  schoenw
+
+	* scli/cisco.c: Added a check for non-existing variables which
+	caused core dumps on some CISCO boxes.
+
+2002-03-05 13:07  schoenw
+
+	* stub/: disman-script-mib.c, entity-mib.c, host-resources-mib.c,
+	if-mib.c, printer-mib.c, snmpv2-mib.c, ucd-snmp-mib.c: Regenerated
+	stubs to include size and range checking code.
+
+2002-02-21 09:56  schoenw
+
+	* stub/: atm-mib.c, atm-mib.h, bridge-mib.c, bridge-mib.h,
+	disman-schedule-mib.c, disman-schedule-mib.h, disman-script-mib.c,
+	disman-script-mib.h, entity-mib.c, entity-mib.h, etherlike-mib.c,
+	etherlike-mib.h, host-resources-mib.c, host-resources-mib.h,
+	host-resources-types.c, host-resources-types.h,
+	iana-language-mib.c, iana-language-mib.h, if-mib.c, if-mib.h,
+	ip-forward-mib.c, ip-forward-mib.h, ip-mib.c, ip-mib.h, mau-mib.c,
+	mau-mib.h, old-cisco-ip-mib.c, old-cisco-ip-mib.h, ospf-mib.c,
+	ospf-mib.h, printer-mib.c, printer-mib.h, rapid-city.c,
+	rapid-city.h, rfc1213-mib.c, rfc1213-mib.h, snmp-community-mib.c,
+	snmp-community-mib.h, snmp-framework-mib.c, snmp-framework-mib.h,
+	snmp-mpd-mib.c, snmp-mpd-mib.h, snmp-notification-mib.c,
+	snmp-notification-mib.h, snmp-target-mib.c, snmp-target-mib.h,
+	snmp-user-based-sm-mib.c, snmp-user-based-sm-mib.h,
+	snmp-view-based-acm-mib.c, snmp-view-based-acm-mib.h, snmpv2-mib.c,
+	snmpv2-mib.h, snmpv2-tm.c, snmpv2-tm.h, tcp-mib.c, tcp-mib.h,
+	tunnel-mib.c, tunnel-mib.h, ucd-snmp-mib.c, ucd-snmp-mib.h,
+	udp-mib.c, udp-mib.h: Regenerated all the stubs with the current
+	stub generator.
+
+2002-02-21 09:54  schoenw
+
+	* scli/: basic.c, cmds.c, monitor.c, scli.c, scli.h: Updates to
+	reflect changes in the SNMP API and minor cleanups.
+
+2002-02-21 09:52  schoenw
+
+	* snmp/: g_snmp.c, g_snmp.h, g_utils.c, g_utils.h: Added some
+	string conversion tables and normalized type defines.
+
+2002-02-20 12:14  schoenw
+
+	* scli/printer.c: Display zero-based counters for the markers.
+
+2002-02-20 11:02  schoenw
+
+	* scli/printer.c: Added code to display supply capacity and current
+	level.
+
+2002-02-19 11:46  schoenw
+
+	* scli/printer.c: Cosmetic fixes from Oliver.
+
+2002-02-19 09:54  schoenw
+
+	* scli/printer.c: Minor cleanups for more consistency.
+
+2002-02-19 08:45  schoenw
+
+	* proc/: if-mib-proc.c, if-mib-proc.h: Changed the function
+	prototype to allow machine generation.
+
+2002-02-19 08:42  schoenw
+
+	* scli/printer.c: Started work on "show printer markers" and "show
+	printer supplies".
+
+2002-02-19 08:37  schoenw
+
+	* scli/interface.c: Some minor speed improvements.
+
+2002-02-18 16:09  schoenw
+
+	* proc/Makefile.am: Added missing snmp-view-based-acm-mib-proc.h.
+
+2002-02-18 15:26  schoenw
+
+	* ChangeLog, NEWS: Updates for release 0.2.7.
+
 2002-02-18 15:19  schoenw
 
 	* configure.in: Updates for release 0.2.7.
@@ -9,25 +206,25 @@
 2002-02-18 15:06  schoenw
 
 	* stub/: snmp-framework-mib.c, snmp-framework-mib.h: Regenerated
-        stubs to improve the error handling.
+	stubs to improve the error handling.
 
 2002-02-15 15:08  schoenw
 
 	* proc/: snmp-view-based-acm-mib-proc.c,
 	snmp-view-based-acm-mib-proc.h: Updated the proc interface to be
-        more consistent with how an automatic interface would look like.
+	more consistent with how an automatic interface would look like.
 
 2002-02-15 15:07  schoenw
 
 	* stub/: snmp-notification-mib.c, snmp-notification-mib.h: Added
-        stubs for the SNMP-NOTIFICATION-MIB.
+	stubs for the SNMP-NOTIFICATION-MIB.
 
 2002-02-15 15:05  schoenw
 
 	* scli/snmp.c: Added new commands: delete snmp vacm member, show
 	snmp target addresses, show snmp target parameters, show snmp
 	notification targets. Renamed show snmp vacm groups to show snmp
-        vacm member.
+	vacm member.
 
 2002-02-15 15:03  schoenw
 
@@ -41,17 +238,17 @@
 
 	* proc/: snmp-view-based-acm-mib-proc.c,
 	snmp-view-based-acm-mib-proc.h: Added
-        snmp_view_based_acm_mib_proc_delete_member().
+	snmp_view_based_acm_mib_proc_delete_member().
 
 2002-02-13 16:02  schoenw
 
 	* stub/: Makefile.am, snmpv2-tm.c, snmpv2-tm.h: Added stubs for the
-        SNMPv2-TM module.
+	SNMPv2-TM module.
 
 2002-02-11 14:35  schoenw
 
 	* scli/entity.c: Handle physical entities wich are not contained
-        anywhere.
+	anywhere.
 
 2002-02-11 14:18  schoenw
 
@@ -60,12 +257,12 @@
 2002-02-11 14:18  schoenw
 
 	* scli/interface.c: Added code to show the physical entities which
-        contain interfaces in the "show interface details" command.
+	contain interfaces in the "show interface details" command.
 
 2002-02-07 11:35  schoenw
 
 	* scli/cmds.c: Added the show scli alarm info command to display
-        alarm information.
+	alarm information.
 
 2002-02-07 11:34  schoenw
 
@@ -80,27 +277,27 @@
 	* proc/: Makefile.am, snmp-view-based-acm-mib-proc.c,
 	snmp-view-based-acm-mib-proc.h, udp-mib-proc.c, udp-mib-proc.h:
 	Added procedure files for the UDP-MIB and the
-        SNMP-VIEW-BASED-ACM-MIB.
+	SNMP-VIEW-BASED-ACM-MIB.
 
 2002-02-07 11:13  schoenw
 
 	* snmp/: g_snmp_table.c, g_snmp_walk.c: Propagate the error
-        information back into the calling session.
+	information back into the calling session.
 
 2002-01-30 13:57  schoenw
 
 	* scli/interface.c: Implemented an experimental "alert interface
-        status" command.
+	status" command.
 
 2002-01-25 10:33  schoenw
 
 	* scli/basic.c: Experimental code to cleanup the error message
-        handling.
+	handling.
 
 2002-01-25 10:32  schoenw
 
 	* scli/: atm.c, cmds.c, interface.c, nortel.c, scli.h, system.c:
-        Regular expression matching options are now configurable.
+	Regular expression matching options are now configurable.
 
 2002-01-20 23:10  schoenw
 
@@ -113,7 +310,7 @@
 2002-01-18 10:44  schoenw
 
 	* stub/: disman-schedule-mib.c, disman-schedule-mib.h: Updated to
-        the RFC 3231 version of the MIB.
+	the RFC 3231 version of the MIB.
 
 2002-01-18 10:40  schoenw
 
@@ -126,12 +323,12 @@
 2002-01-18 10:38  schoenw
 
 	* scli/system.c: The show system processes and monitor system
-        processes now accept regexp's to select a subset of all processes.
+	processes now accept regexp's to select a subset of all processes.
 
 2002-01-10 11:12  schoenw
 
 	* scli/atm.c: Show the interface description in the "show atm
-        interface" commands.
+	interface" commands.
 
 2002-01-10 11:02  schoenw
 
@@ -152,12 +349,12 @@
 2002-01-08 12:08  schoenw
 
 	* scli/atm.c: Split the show atm interface command into two new
-        commands: show atm interface info and show atm interface details
+	commands: show atm interface info and show atm interface details
 
 2002-01-08 12:07  schoenw
 
 	* scli/netsnmp.c: New commands: show netsnmp load, set netsnmp
-        restart, show netsnmp exec, show netsnmp proc, dump netsnmp.
+	restart, show netsnmp exec, show netsnmp proc, dump netsnmp.
 
 2002-01-08 12:05  schoenw
 
@@ -170,7 +367,7 @@
 2002-01-07 16:28  schoenw
 
 	* scli/: entity.c, fmt.c: Fixed a bug where the string len check
-        was out of order. Fixed the entity details layout.
+	was out of order. Fixed the entity details layout.
 
 2002-01-05 17:15  schoenw
 
@@ -179,30 +376,30 @@
 2002-01-05 17:13  schoenw
 
 	* scli/: Makefile.am, netsnmp.c, scli.c, scli.h: Added a netsnmp
-        mode.
+	mode.
 
 2002-01-05 17:11  schoenw
 
 	* stub/: Makefile.am, snmp-view-based-acm-mib.c,
 	snmp-view-based-acm-mib.h, ucd-snmp-mib.c, ucd-snmp-mib.h: Added
-        stubs for the ucd-snmp/net-snmp private MIB.
+	stubs for the ucd-snmp/net-snmp private MIB.
 
 2001-12-19 13:23  schoenw
 
 	* ChangeLog, NEWS, config.h.in, configure.in: Updates for release
-        0.2.6.
+	0.2.6.
 
 2001-12-19 12:33  schoenw
 
 	* scli/: cmds.c, scli.h: Made scli_cmd_open() unvisible across
-        modules.
+	modules.
 
 2001-12-19 12:30  schoenw
 
 	* scli/: basic.c, cmds.c, monitor.c, scli.c, scli.h, system.c:
 	Adapted the code to recent changes in the gsnmp API. Improved the
 	handling of scli command line arguments by letting the interpreter
-        handle an open command rather than calling the command directly.
+	handle an open command rather than calling the command directly.
 
 2001-12-19 12:27  schoenw
 
@@ -211,12 +408,12 @@
 	g_transport.c, g_transport.h, g_utils.c, g_utils.h: Reworked the
 	name lookup code so that the name lookup happens when a new session
 	is created. Made it work on systems that do not have the service
-        name "snmp" defined. Added a new module that implements walks.
+	name "snmp" defined. Added a new module that implements walks.
 
 2001-12-19 12:25  schoenw
 
 	* scli/fmt.c: Added code to handle unprintable characters in
-        fmt_display_string().
+	fmt_display_string().
 
 2001-12-17 19:11  schoenw
 
@@ -225,7 +422,7 @@
 2001-12-17 19:10  schoenw
 
 	* scli/snmp.c: Reworked the whole mode. Added 'show snmp usm
-        users', 'dump snmp' and 'set snmp authentication traps' commands.
+	users', 'dump snmp' and 'set snmp authentication traps' commands.
 
 2001-12-17 19:08  schoenw
 
@@ -234,7 +431,7 @@
 2001-12-17 19:07  schoenw
 
 	* scli/: disman.c, scli.h, system.c, vendors.c: Changed the API to
-        lookup vendor information.
+	lookup vendor information.
 
 2001-12-17 19:06  schoenw
 
@@ -243,7 +440,7 @@
 2001-12-12 19:31  schoenw
 
 	* scli/: basic.c, interface.c, scli.h: Sitched to numeric error
-        codes as this is what operators want.
+	codes as this is what operators want.
 
 2001-12-12 19:30  schoenw
 
@@ -288,7 +485,7 @@
 2001-12-11 03:57  schoenw
 
 	* scli/: interface.c, tcp.c, udp.c: Added support of the dry-run
-        mode.
+	mode.
 
 2001-12-11 03:50  schoenw
 
@@ -302,12 +499,12 @@
 
 	* scli/: basic.c, interface.c, monitor.c, scli.c, scli.h:
 	Implemented a dry mode where we check the syntax of commands but do
-        not actually execute them.
+	not actually execute them.
 
 2001-12-10 19:50  schoenw
 
 	* snmp/g_snmp_table.c: Finish the table retrieval if we get a
-        noSuchName error.
+	noSuchName error.
 
 2001-12-09 22:35  schoenw
 
@@ -316,22 +513,22 @@
 2001-12-09 22:34  schoenw
 
 	* snmp/: g_snmp_table.c, g_snmp_table.h: Started to cleanup the
-        g_snmp_table module.
+	g_snmp_table module.
 
 2001-12-09 22:33  schoenw
 
 	* snmp/: g_session.c, g_session.h: Added g_snmp_session_clone() and
-        changed the deallocation of community strings to be consistent.
+	changed the deallocation of community strings to be consistent.
 
 2001-12-09 22:30  schoenw
 
 	* scli/basic.c: The SNMP library now deallocates the community
-        strings.
+	strings.
 
 2001-12-09 22:30  schoenw
 
 	* scli/: fmt.c, system.c: Generally strip leading/trailing white
-        space from display strings.
+	space from display strings.
 
 2001-12-09 22:29  schoenw
 
@@ -348,22 +545,22 @@
 2001-12-07 01:05  schoenw
 
 	* scli/: fmt.c, interface.c, ip.c: Added XML support for the "show
-        ip addresses" command.
+	ip addresses" command.
 
 2001-12-06 23:28  schoenw
 
 	* Makefile.am, PORTING: Started a PORTING file where I collect
-        porting notes submitted by users.
+	porting notes submitted by users.
 
 2001-12-06 06:48  schoenw
 
 	* scli/system.c: Strip more white spaces around strings to make UCD
-        SNMP output look nice.
+	SNMP output look nice.
 
 2001-12-06 02:28  schoenw
 
 	* scli/scli.h: Fixed a number of conversion problems. Added still
-        somewhat incomplete code to support dynamic loadable plugins.
+	somewhat incomplete code to support dynamic loadable plugins.
 
 2001-12-06 02:16  schoenw
 
@@ -374,28 +571,28 @@
 	* scli/: basic.c, bridge.c, cisco.c, cmds.c, entity.c, fmt.c,
 	interface.c, monitor.c, nortel.c, system.c: Fixed a number of
 	conversion problems. Added still somewhat incomplete code to
-        support dynamic loadable plugins.
+	support dynamic loadable plugins.
 
 2001-12-06 02:06  schoenw
 
 	* config.h.in, configure.in: Bumped version number to 0.2.5. Added
-        checks for dynamic loadable modules.
+	checks for dynamic loadable modules.
 
 2001-12-06 01:56  schoenw
 
 	* snmp/: g_session.h, g_snmp.h: Changed a few data members to
-        better reflect the actual sizes.
+	better reflect the actual sizes.
 
 2001-12-06 01:38  schoenw
 
 	* stub/: disman-schedule-mib.c, disman-schedule-mib.h,
 	disman-script-mib.c, disman-script-mib.h, if-mib.c, if-mib.h:
-        Regenerated stubs using smidump version 0.3.0.
+	Regenerated stubs using smidump version 0.3.0.
 
 2001-12-06 01:29  schoenw
 
 	* scli/bridge.c: Added code to display the port description in the
-        "show bridge stats" command.
+	"show bridge stats" command.
 
 2001-11-23 08:48  schoenw
 
@@ -412,7 +609,7 @@
 2001-11-22 09:22  schoenw
 
 	* scli/nortel.c: Reordered the output generated by the dump nortel
-        command.
+	command.
 
 2001-11-22 09:21  schoenw
 
@@ -433,12 +630,12 @@
 2001-11-21 16:58  schoenw
 
 	* scli/printer.c: Better decode the subunit status value and
-        general code cleanup.
+	general code cleanup.
 
 2001-11-15 18:29  schoenw
 
 	* scli/: basic.c, cmds.c, scli.c: Minor cleanups and better error
-        messages.
+	messages.
 
 2001-10-11 11:01  schoenw
 
@@ -446,7 +643,7 @@
 	entity.c, ether.c, interface.c, ip.c, monitor.c, nortel.c,
 	printer.c, scli.c, scli.h, snmp.c, system.c, tcp.c, udp.c:
 	Introduced SCLI_SYNTAX_NUMARGS. Reorganized the family of scli_eval
-        functions. Some code cleanup in various modes.
+	functions. Some code cleanup in various modes.
 
 2001-10-05 18:00  schoenw
 
@@ -455,7 +652,7 @@
 2001-10-05 15:54  schoenw
 
 	* scli/nortel.c: Started an implementation of the "dump nortel
-        bridge vlan" command.
+	bridge vlan" command.
 
 2001-10-05 15:52  schoenw
 
@@ -476,7 +673,7 @@
 2001-10-04 17:27  schoenw
 
 	* scli/: basic.c, scli.c: Started to implement backslash processing
-        as one expects under Unix.
+	as one expects under Unix.
 
 2001-10-02 15:24  schoenw
 
@@ -489,36 +686,36 @@
 2001-09-30 22:49  schoenw
 
 	* scli/: interface.c, nortel.c, printer.c: Moved some code into
-        reusable procedures and cleaned up some stuff.
+	reusable procedures and cleaned up some stuff.
 
 2001-09-30 22:40  schoenw
 
 	* scli/: interface.c, ip.c, system.c: Added "dump system", "dump
-        ip" and "dump interface" commands.
+	ip" and "dump interface" commands.
 
 2001-09-30 22:33  schoenw
 
 	* proc/: Makefile.am, disman-script-mib-proc.c,
 	disman-script-mib-proc.h, if-mib-proc.c, rapid-city-proc.c,
 	rapid-city-proc.h: Added some more procedures - mostly extracted
-        from the scli command code.
+	from the scli command code.
 
 2001-09-30 22:16  schoenw
 
 	* stub/: Makefile.am, atm-mib.c, atm-mib.h, bridge-mib.h,
 	disman-script-mib.c, disman-script-mib.h, if-mib.c, if-mib.h,
 	rapid-city.h, snmp-community-mib.h, tcp-mib.h: Regenerated some
-        stubs to test the new index size checking code.
+	stubs to test the new index size checking code.
 
 2001-09-30 22:08  schoenw
 
 	* snmp/: g_snmp.h, g_utils.c: Added an experimental
-        G_SNMP_ERR_PROCEDURE error code.
+	G_SNMP_ERR_PROCEDURE error code.
 
 2001-09-30 22:04  schoenw
 
 	* scli/: cmds.c, scli.1.in: Added a dump branch to the command
-        tree.
+	tree.
 
 2001-09-30 22:03  schoenw
 
@@ -531,17 +728,17 @@
 2001-09-28 20:46  schoenw
 
 	* scli/printer.c: Added missing syntax checks and cleaned up the
-        code.
+	code.
 
 2001-09-28 13:36  schoenw
 
 	* scli/nortel.c: Added the "set nortel bridge vlan default"
-        command.
+	command.
 
 2001-09-28 13:09  schoenw
 
 	* scli/nortel.c: The show nortel bridge vlan details command now
-        also shows that ports that use a vlan as their default.
+	also shows that ports that use a vlan as their default.
 
 2001-09-27 15:02  schoenw
 
@@ -550,45 +747,45 @@
 2001-09-27 13:33  schoenw
 
 	* scli/printer.c: Fixed the xml format of "show printer console
-        lights".
+	lights".
 
 2001-09-27 10:07  schoenw
 
 	* scli/printer.c: Added XML support to the show printer console and
 	show printer alerts commands. Started work on a show printer
-        interpreter command.
+	interpreter command.
 
 2001-09-27 10:02  schoenw
 
 	* scli/monitor.c: Explicitely set the return code when processing
-        'q'.
+	'q'.
 
 2001-09-27 10:01  schoenw
 
 	* scli/: basic.c, cmds.c: Added a "show scli schema" command and
-        fixed the propagation of SCLI_EXIT.
+	fixed the propagation of SCLI_EXIT.
 
 2001-09-27 10:00  schoenw
 
 	* scli/scli.1.in: Removed documentation for interactive commands
 	that are not available (although it would be nice to have them
-        implemented).
+	implemented).
 
 2001-09-27 09:59  schoenw
 
 	* scli/: system.c, interface.c: Do not rely on table augmentations
-        coming out 1:1.
+	coming out 1:1.
 
 2001-09-27 09:57  schoenw
 
 	* doc/: Makefile.am, scli.texinfo, stools.texinfo: Renamed
-        stools.texinfo to scli.texinfo.
+	stools.texinfo to scli.texinfo.
 
 2001-09-27 09:54  schoenw
 
 	* stub/: Makefile.am, rapid-city.c, rapid-city.h, rfc1213-mib.c,
 	rfc1213-mib.h: Regenerated some stubs to remove code that is not
-        currently being used by scli.
+	currently being used by scli.
 
 2001-09-26 11:59  schoenw
 
@@ -598,7 +795,7 @@
 
 	* scli/printer.c: Reworked the "show printer display|lights|alerts"
 	commands to produce better output. Added documentation for these
-        commands.
+	commands.
 
 2001-09-26 11:02  schoenw
 
@@ -615,7 +812,7 @@
 2001-09-25 15:59  schoenw
 
 	* scli/nortel.c: Finished the implementation of the "show nortel
-        bridge vlan ports" command.
+	bridge vlan ports" command.
 
 2001-09-25 14:28  schoenw
 
@@ -624,7 +821,7 @@
 2001-09-25 11:47  schoenw
 
 	* scli/nortel.c: Show the list of port members in the "show nortel
-        bridge vlan info" command.
+	bridge vlan info" command.
 
 2001-09-25 10:16  schoenw
 
@@ -633,30 +830,30 @@
 2001-09-25 10:07  schoenw
 
 	* scli/: bridge.c, system.c: More human friendly output, added a
-        show bridge stp ports command.
+	show bridge stp ports command.
 
 2001-09-25 10:02  schoenw
 
 	* Makefile.am, TODO, configure.in: Updated to reflect the addition
-        of the proc subdirectory.
+	of the proc subdirectory.
 
 2001-09-25 09:48  schoenw
 
 	* scli/: Makefile.am, atm.c, basic.c, bridge.c, cisco.c, disman.c,
 	entity.c, ether.c, interface.c, ip.c, monitor.c, nortel.c, ospf.c,
 	printer.c, scli.h, snmp.c, system.c, tcp.c, udp.c: Many updates to
-        reflect the recent changes of the stub generator.
+	reflect the recent changes of the stub generator.
 
 2001-09-25 09:47  schoenw
 
 	* proc/: Makefile.am, disman-script-mib-proc.c,
 	disman-script-mib-proc.h, if-mib-proc.c, if-mib-proc.h: Added first
-        bits of the procedures software layer.
+	bits of the procedures software layer.
 
 2001-09-25 09:46  schoenw
 
 	* snmp/: g_dispatch.c, g_session.c, g_session.h, g_sha.h, g_snmp.h,
-        g_utils.c: Minor code cleanups.
+	g_utils.c: Minor code cleanups.
 
 2001-09-25 09:44  schoenw
 
@@ -677,19 +874,19 @@
 	snmp-user-based-sm-mib.h, snmp-view-based-acm-mib.c,
 	snmp-view-based-acm-mib.h, snmpv2-mib.c, snmpv2-mib.h, tcp-mib.c,
 	tcp-mib.h, tunnel-mib.c, tunnel-mib.h, udp-mib.c, udp-mib.h:
-	Regenerated stubs to reflect recent changes in the stub generator.
-        Replaced the RAPIDCITY-VLAN-MIB module with the RAPID-CITY module.
+	Regenerated stubs to reflect recent changes in the stub generator. 
+	Replaced the RAPIDCITY-VLAN-MIB module with the RAPID-CITY module.
 
 2001-09-20 16:35  schoenw
 
 	* scli/: interface.c, ip.c, ospf.c: Replaced some more xxx_enum()
-        functions.
+	functions.
 
 2001-09-17 10:07  schoenw
 
 	* scli/: basic.c, fmt.c, interface.c, ip.c, scli.h, snmp.c,
 	system.c: Introduced new syntax error return codes. Improved the ip
-        mode implementation and its documentation.
+	mode implementation and its documentation.
 
 2001-09-13 20:04  schoenw
 
@@ -710,7 +907,7 @@
 2001-09-11 10:05  schoenw
 
 	* scli/Makefile.am: Removed dependencies so that source
-        distributions will not try to build scli.1.
+	distributions will not try to build scli.1.
 
 2001-09-10 17:09  schoenw
 
@@ -729,17 +926,17 @@
 	* scli/: atm.c, cmds.c, entity.c, interface.c, monitor.c, nortel.c,
 	system.c, tcp.c, udp.c: Updates to use the xpath for XML capable
 	commands. Implemented three more interface commands: set interface
-        [alias|promiscuous|notifications].
+	[alias|promiscuous|notifications].
 
 2001-09-10 15:40  schoenw
 
 	* scli/basic.c: Use the xpath element of the command data structure
-        to generate the root for XML formatted output.
+	to generate the root for XML formatted output.
 
 2001-09-10 15:33  schoenw
 
 	* scli/Makefile.am: Changed the manual target back to scli.1 but
-        removed the dependencies that tried to build it everytime.
+	removed the dependencies that tried to build it everytime.
 
 2001-09-07 18:39  schoenw
 
@@ -748,7 +945,7 @@
 2001-09-07 18:31  schoenw
 
 	* scli/Makefile.am: Renamed the scli.1 target so that this rule
-        does not cause problems in a distribution.
+	does not cause problems in a distribution.
 
 2001-09-07 17:52  schoenw
 
@@ -759,7 +956,7 @@
 	* scli/: atm.c, bridge.c, cisco.c, cmds.c, disman.c, entity.c,
 	ether.c, interface.c, ip.c, nortel.c, ospf.c, printer.c, scli.h,
 	snmp.c, system.c, tcp.c, udp.c: Changed the struct scli_cmd so that
-        it can contain additional data for the XML output format driver.
+	it can contain additional data for the XML output format driver.
 
 2001-09-07 17:47  schoenw
 
@@ -768,7 +965,7 @@
 2001-09-05 09:42  schoenw
 
 	* scli/system.c: Reworked some commands, added better XML support,
-        updated the documentation.
+	updated the documentation.
 
 2001-09-05 09:41  schoenw
 
@@ -777,7 +974,7 @@
 2001-09-05 09:41  schoenw
 
 	* scli/: fmt.c, scli.h: Removed fmt_kbytes() as it is not generally
-        useful.
+	useful.
 
 2001-09-03 13:41  schoenw
 
@@ -790,28 +987,28 @@
 2001-09-03 12:31  schoenw
 
 	* scli/nortel.c: Display more information in "show nortel bridge
-        vlan details". Better support for XML output.
+	vlan details". Better support for XML output.
 
 2001-08-31 10:55  schoenw
 
 	* scli/: Makefile.am, atm.c, basic.c, cmds.c, interface.c,
 	nortel.c, scli.h: Added a specific regex error code, removed
-        unneeded commands and added even more documentation.
+	unneeded commands and added even more documentation.
 
 2001-08-31 10:54  schoenw
 
 	* snmp/: g_utils.c, g_utils.h: Added a table to convert debug
-        levels to strings and vice versa.
+	levels to strings and vice versa.
 
 2001-08-30 12:12  schoenw
 
 	* stub/: disman-script-mib.c, disman-script-mib.h: Updated to the
-        RFC 3165 version.
+	RFC 3165 version.
 
 2001-08-30 12:11  schoenw
 
 	* scli/: disman.c, ether.c, interface.c, system.c, tcp.c: More
-        documentation updates.
+	documentation updates.
 
 2001-08-29 18:12  schoenw
 
@@ -820,7 +1017,7 @@
 2001-08-29 11:27  schoenw
 
 	* scli/: entity.c, ether.c, interface.c, monitor.c, nortel.c,
-        printer.c, tcp.c, udp.c: Documentation updates.
+	printer.c, tcp.c, udp.c: Documentation updates.
 
 2001-08-29 10:53  schoenw
 
@@ -829,7 +1026,7 @@
 2001-08-29 10:53  schoenw
 
 	* scli/: Makefile.am, cmds.c, scli.1, scli.1.in: Extract the mode
-        descriptions in scli.1 from the scli program itself.
+	descriptions in scli.1 from the scli program itself.
 
 2001-08-29 10:51  schoenw
 
@@ -842,18 +1039,18 @@
 2001-08-29 10:50  schoenw
 
 	* scli/interface.c: Started to add XML support for "show interface
-        details".
+	details".
 
 2001-08-28 15:31  schoenw
 
 	* scli/interface.c: Several changes to improve the online help
-        system and to generate documentation from the source code.
+	system and to generate documentation from the source code.
 
 2001-08-28 15:27  schoenw
 
 	* scli/: basic.c, cmds.c, disman.c, entity.c, nortel.c, system.c,
 	tcp.c, udp.c: Several changes to improve the online help system and
-        to generate documentation from the source code.
+	to generate documentation from the source code.
 
 2001-08-27 15:15  schoenw
 
@@ -870,23 +1067,23 @@
 2001-08-27 12:57  schoenw
 
 	* AUTHORS, Makefile.am, NEWS, README, TODO, configure.in: The
-        package stools is now called scli and stop is gone.
+	package stools is now called scli and stop is gone.
 
 2001-08-27 12:56  schoenw
 
 	* scli/: cmds.c, scli.1: More documentation updates, make core set
-        commands work in XML mode.
+	commands work in XML mode.
 
 2001-08-27 12:54  schoenw
 
 	* stub/Makefile.in: Removed Makefile.in from the CVS - autogen.sh
-        regenerates it.
+	regenerates it.
 
 2001-08-27 11:52  schoenw
 
 	* scli/: atm.c, basic.c, entity.c, nortel.c, scli.h, system.c,
 	tcp.c, udp.c, xml.c: Commands must use SCLI_CMD_FLAG_XML if they
-        are XML capable. Improved some of the XML formatters.
+	are XML capable. Improved some of the XML formatters.
 
 2001-08-27 10:37  schoenw
 
@@ -895,12 +1092,12 @@
 2001-08-27 10:12  schoenw
 
 	* scli/nortel.c: Implemented a command to assign ports to vlans.
-        Added xml output format.
+	Added xml output format.
 
 2001-08-27 10:11  schoenw
 
 	* scli/system.c: Fixed some minor errors, updated the xml
-        formatting code.
+	formatting code.
 
 2001-08-27 10:10  schoenw
 
@@ -909,7 +1106,7 @@
 2001-08-27 10:09  schoenw
 
 	* scli/: Makefile.am, atm.c, scli.h, xml.c: Added xml formatting
-        utility functions.
+	utility functions.
 
 2001-08-27 09:52  schoenw
 
@@ -919,7 +1116,7 @@
 
 	* scli/: basic.c, interface.c, nortel.c, scli.1: Accept comments
 	anywhere in a command string. Started to document the scli commands
-        in the manual page.
+	in the manual page.
 
 2001-08-24 16:01  schoenw
 
@@ -928,29 +1125,29 @@
 2001-08-24 15:59  schoenw
 
 	* snmp/g_session.c: Pass the error-index to the session which
-        invoked the request.
+	invoked the request.
 
 2001-08-23 17:32  schoenw
 
 	* scli/nortel.c: Added a command to create vlans on nortel baystack
-        bridges.
+	bridges.
 
 2001-08-23 11:18  schoenw
 
 	* scli/: basic.c, cisco.c, cmds.c, entity.c, interface.c, nortel.c,
 	scli.h, system.c: Fixed several minor errors. Implemented a "set
-        interface status" command.
+	interface status" command.
 
 2001-08-23 11:16  schoenw
 
 	* stub/: if-mib.c, if-mib.h, rapidcity-vlan-mib.c,
 	rapidcity-vlan-mib.h: Regenerated some modules in order to get
-        table write stubs.
+	table write stubs.
 
 2001-08-23 11:15  schoenw
 
 	* snmp/: g_utils.c, g_utils.h: Added more generally useful stuff to
-        the gsnmp library.
+	the gsnmp library.
 
 2001-08-22 17:42  schoenw
 
@@ -971,19 +1168,19 @@
 2001-08-22 17:33  schoenw
 
 	* scli/scli.c: Make sure scli can be compiled with older readline
-        libraries.
+	libraries.
 
 2001-08-22 17:07  schoenw
 
 	* scli/: Makefile.am, cisco.c, cmds.c, nortel.c, scli.c, scli.h:
-        Added modes for our CISCO and Nortel boxes.
+	Added modes for our CISCO and Nortel boxes.
 
 2001-08-22 17:04  schoenw
 
 	* stub/: Makefile.am, Makefile.in, old-cisco-ip-mib.c,
 	old-cisco-ip-mib.h, rapidcity-vlan-mib.c, rapidcity-vlan-mib.h:
 	Added some more stubs for things we need at the Technical
-        University of Braunschweig.
+	University of Braunschweig.
 
 2001-08-22 16:51  schoenw
 
@@ -992,13 +1189,13 @@
 2001-08-22 16:51  schoenw
 
 	* autogen.sh: Removed libtool stuff we do not really need right
-        now.
+	now.
 
 2001-08-22 15:05  schoenw
 
 	* stub/: host-resources-types.c, host-resources-types.h,
 	iana-language-mib.c, iana-language-mib.h: Regenerated stubs after
-        fixing smidump to not generate dead code.
+	fixing smidump to not generate dead code.
 
 2001-08-22 14:59  schoenw
 
@@ -1018,14 +1215,14 @@
 	snmp-view-based-acm-mib.h, snmpv2-mib.c, snmpv2-mib.h, stools.c,
 	stools.h, tcp-mib.c, tcp-mib.h, tunnel-mib.c, tunnel-mib.h,
 	udp-mib.c, udp-mib.h: Several changes to get rid of the stools.h
-        module.
+	module.
 
 2001-08-22 14:55  schoenw
 
 	* snmp/: Makefile.am, g_dispatch.c, g_md5.c, g_security.c,
 	g_session.c, g_sha.c, g_snmp.h, g_snmp_table.c, g_snmp_table.h,
 	g_transport.c, g_utils.c, g_utils.h: Added some stubs/stools.[ch]
-        functionality to the gsnmp engine.
+	functionality to the gsnmp engine.
 
 2001-08-22 14:54  schoenw
 
@@ -1036,7 +1233,7 @@
 	* scli/: Makefile.am, atm.c, basic.c, bridge.c, cmds.c, disman.c,
 	entity.c, ether.c, fmt.c, interface.c, ip.c, monitor.c, ospf.c,
 	printer.c, scli.c, scli.h, snmp.c, system.c, tcp.c, udp.c,
-        vendors.c: Several changes to get rid of the stools.h module.
+	vendors.c: Several changes to get rid of the stools.h module.
 
 2001-08-21 18:48  schoenw
 
@@ -1045,46 +1242,46 @@
 2001-08-21 18:45  schoenw
 
 	* scli/: basic.c, cmds.c, scli.1, scli.c, scli.h: The tokenizer now
-        accepts quoted strings and aliases should work now.
+	accepts quoted strings and aliases should work now.
 
 2001-08-16 17:42  schoenw
 
 	* autogen.sh: Added the autogen.sh script which should be used to
-        create the build environment from CVS.
+	create the build environment from CVS.
 
 2001-08-16 17:40  schoenw
 
 	* aclocal.m4, config.guess, config.sub: Removed files that do not
-        belong into the CVS.
+	belong into the CVS.
 
 2001-08-16 17:38  schoenw
 
 	* snmp/Makefile.in, stub/Makefile.in, Makefile.in, configure,
 	install-sh, missing, mkinstalldirs, doc/Makefile.in,
 	scli/Makefile.in: Removed files that are auto-generated. Use
-        autogen.sh instead.
+	autogen.sh instead.
 
 2001-08-16 16:17  schoenw
 
 	* scli/fmt.c: Fixed a bug that caused 1g switches to appear as 1t
-        switches.
+	switches.
 
 2001-08-16 14:25  schoenw
 
 	* scli/Makefile.am: Uncommented gscli rules since this is not yet
-        part of the CVS tree.
+	part of the CVS tree.
 
 2001-08-16 09:57  schoenw
 
 	* Makefile.in, aclocal.m4, config.h.in, configure, configure.in:
-        Added configure checks for libxml2 and gtk.
+	Added configure checks for libxml2 and gtk.
 
 2001-08-16 09:55  schoenw
 
 	* scli/: Makefile.am, Makefile.in, atm.c, basic.c, bridge.c,
 	cmds.c, disman.c, entity.c, ether.c, fmt.c, interface.c, ip.c,
 	ospf.c, printer.c, scli.h, snmp.c, system.c, tcp.c, udp.c: Use
-        libxml2 to generate XML output.
+	libxml2 to generate XML output.
 
 2001-08-16 09:50  schoenw
 
@@ -1093,19 +1290,19 @@
 2001-08-15 12:51  schoenw
 
 	* scli/basic.c: Use putenv() instead of setenv() to be more
-        portable.
+	portable.
 
 2001-08-15 12:01  schoenw
 
 	* scli/basic.c: Added more characters we do not allow in a pager
-        value.
+	value.
 
 2001-08-15 12:00  schoenw
 
 	* scli/: basic.c, cmds.c, scli.c, scli.h: Use a pipe instead of a
 	temporary file for the external pager. Validate the pager value so
 	that it does not contain magic shell characters. Added an scli
-        command to configure the pager.
+	command to configure the pager.
 
 2001-08-14 16:00  schoenw
 
@@ -1114,28 +1311,28 @@
 2001-08-14 15:52  schoenw
 
 	* scli/entity.c: Renamed "show system components" to "show system
-        entities" and wrote some XML formatting routines.
+	entities" and wrote some XML formatting routines.
 
 2001-08-14 15:51  schoenw
 
 	* scli/interface.c: Some experimental code to retrieve the physical
-        entity which implements a certain logical network interface.
+	entity which implements a certain logical network interface.
 
 2001-08-14 15:48  schoenw
 
 	* configure.in: Check for <termios.h> since it defines TIOCGWINSZ
-        under Solaris.
+	under Solaris.
 
 2001-08-14 14:45  schoenw
 
 	* scli/basic.c: Conditionally include <termios.h> which is needed
 	on Solaris machines that have resizeterm (probably ncurses) in
-        order to get a definition of TIOCGWINSZ.
+	order to get a definition of TIOCGWINSZ.
 
 2001-07-31 14:38  schoenw
 
 	* scli/: scli.c, scli.h: The --version option now better conforms
-        to GNU standards.
+	to GNU standards.
 
 2001-07-31 14:38  schoenw
 
@@ -1148,22 +1345,22 @@
 2001-07-11 12:49  schoenw
 
 	* stub/: snmpv2-mib.c, snmpv2-mib.h, stools.c: Regenerated stubs so
-        that we can use the write stub.
+	that we can use the write stub.
 
 2001-07-11 12:48  schoenw
 
 	* snmp/: g_session.c, g_snmp.c, g_snmp.h: Improved debugging
-        support, added g_snmp_vbl_add() to the API.
+	support, added g_snmp_vbl_add() to the API.
 
 2001-07-11 12:47  schoenw
 
 	* scli/: cmds.c, scli.c, system.c: Added code to configure
-        SNMPv2-MIB::system variables.
+	SNMPv2-MIB::system variables.
 
 2001-06-29 15:07  schoenw
 
 	* configure, configure.in: Bumped version number and added
-        --enable-warnings configure option.
+	--enable-warnings configure option.
 
 2001-06-29 10:26  schoenw
 
@@ -1174,19 +1371,19 @@
 	* scli/basic.c, snmp/g_dispatch.c, snmp/g_dispatch.h,
 	snmp/g_session.c, snmp/g_session.h, snmp/g_snmp.h,
 	snmp/g_snmp_table.c, snmp/g_transport.c, snmp/g_transport.h:
-        Cleaned up the SNMP transport implementation.
+	Cleaned up the SNMP transport implementation.
 
 2001-06-28 09:50  schoenw
 
 	* scli/: basic.c, cmds.c, scli.c: Updates to reflect recent gsnmp
-        API improvements.
+	API improvements.
 
 2001-06-28 09:49  schoenw
 
 	* snmp/: g_session.c, g_session.h, g_snmp.c, g_snmp.h,
 	g_snmp_table.c, g_transport.h: Fixed some more memory leaks,
 	reworked the session API, added debugging flags which allow to
-        enable/disable debugging output at runtime.
+	enable/disable debugging output at runtime.
 
 2001-06-28 09:46  schoenw
 
@@ -1198,7 +1395,7 @@
 	snmp-target-mib.c, snmp-user-based-sm-mib.c,
 	snmp-view-based-acm-mib.c, snmpv2-mib.c, stools.c, stools.h,
 	tcp-mib.c, tunnel-mib.c, udp-mib.c: Replaced some stls wrappers
-        with the original entry point into gsnmp.
+	with the original entry point into gsnmp.
 
 2001-06-27 17:12  schoenw
 
@@ -1213,7 +1410,7 @@
 	* scli/: atm.c, basic.c, bridge.c, cmds.c, disman.c, entity.c,
 	ether.c, interface.c, ip.c, monitor.c, ospf.c, printer.c, scli.h,
 	snmp.c, system.c, tcp.c, udp.c: Added code to properly handle
-        syntax errors.
+	syntax errors.
 
 2001-06-20 17:12  schoenw
 
@@ -1226,7 +1423,7 @@
 2001-06-20 17:06  schoenw
 
 	* scli/interface.c: Rewrote the interface stack display function.
-        The regex now only matches the ifDescr value.
+	The regex now only matches the ifDescr value.
 
 2001-06-20 15:03  schoenw
 
@@ -1235,12 +1432,12 @@
 2001-06-20 14:34  schoenw
 
 	* scli/scli.c: Use rl_completion_matches() instead of
-        completion_matches() where available.
+	completion_matches() where available.
 
 2001-06-20 14:34  schoenw
 
 	* configure, config.h.in, configure.in: Added a test to handle
-        readline version differences.
+	readline version differences.
 
 2001-06-20 14:28  schoenw
 
@@ -1250,7 +1447,7 @@
 
 	* scli/: bridge.c, ether.c, interface.c: Support larger interface
 	numbers. Added an initial version of the show interface stack
-        command implementation.
+	command implementation.
 
 2001-06-20 11:08  schoenw
 
@@ -1264,29 +1461,29 @@
 
 	* scli/interface.c: Some more work on interface stacks. Still more
 	work needed to display interface stacks in a nice human friendly
-        way.
+	way.
 
 2001-06-19 11:45  schoenw
 
 	* scli/: basic.c, monitor.c, scli.c, scli.h: Provided a wrapper for
 	curses [de]initialization since some curses implementations do not
 	tolerate calls to endwin() if curses has not been initialized
-        before.
+	before.
 
 2001-06-19 08:48  schoenw
 
 	* scli/: interface.c, monitor.c, scli.c, tcp.c: Ported monitor
-        summary information over from the stop implementation.
+	summary information over from the stop implementation.
 
 2001-06-18 16:26  schoenw
 
 	* scli/: disman.c, ip.c: Changes to make headers more consistent.
-        Support DISMAN run and scheduler monitors.
+	Support DISMAN run and scheduler monitors.
 
 2001-06-18 13:09  schoenw
 
 	* scli/monitor.c: The monitor.c module contains the code which
-        evaluates scli commands in monitor mode.
+	evaluates scli commands in monitor mode.
 
 2001-06-18 13:07  schoenw
 
@@ -1294,12 +1491,12 @@
 	cmds.c, ether.c, fmt.c, interface.c, printer.c, scli.1, scli.c,
 	scli.h, system.c, tcp.c, udp.c: Integrated most of the stop
 	functionality into scli. Started to use g_print and friends to
-        allow for a future GUI for scli.
+	allow for a future GUI for scli.
 
 2001-06-15 16:32  schoenw
 
 	* scli/: cmds.c, scli.c, scli.h: Made the scli core command
-        implementations static.
+	implementations static.
 
 2001-06-15 16:31  schoenw
 
@@ -1312,12 +1509,12 @@
 2001-06-14 13:24  schoenw
 
 	* scli/atm.c: Added xml support (which is easy since this mode does
-        basically nothing).
+	basically nothing).
 
 2001-06-14 13:14  schoenw
 
 	* scli/: disman.c, fmt.c, scli.h, system.c: Changed the signature
-        of some formatting functions.
+	of some formatting functions.
 
 2001-06-14 11:51  schoenw
 
@@ -1326,7 +1523,7 @@
 2001-06-14 10:02  schoenw
 
 	* scli/udp.c: Use plain addresses and port numbers rather than
-        names in XML mode.
+	names in XML mode.
 
 2001-06-14 10:00  schoenw
 
@@ -1336,32 +1533,32 @@
 
 	* scli/: basic.c, scli.1, scli.c, scli.h, tcp.c, udp.c: Added a
 	command line option to produce XML output. Modified the udp and tcp
-        modes to actually generate XML. More work needed.
+	modes to actually generate XML. More work needed.
 
 2001-06-13 17:52  schoenw
 
 	* scli/printer.c: And yet more updates. Enough for today I would
-        say.
+	say.
 
 2001-06-13 17:15  schoenw
 
 	* scli/printer.c: More code updates to handle multiple printers
-        better.
+	better.
 
 2001-06-13 14:53  schoenw
 
 	* scli/printer.c: Some more code to display console messages and
-        lights (!).
+	lights (!).
 
 2001-06-13 12:26  schoenw
 
 	* scli/printer.c: Some more features that definately need even more
-        work.
+	work.
 
 2001-06-13 10:20  schoenw
 
 	* stub/: iana-language-mib.c, iana-language-mib.h: Regenerated
-        stubs for the IANA-LANGUAGE-MIB.
+	stubs for the IANA-LANGUAGE-MIB.
 
 2001-06-13 09:47  schoenw
 
@@ -1386,12 +1583,12 @@
 	stub/snmpv2-mib.h, stub/stools.c, stub/stools.h, stub/tcp-mib.c,
 	stub/tcp-mib.h, stub/tunnel-mib.c, stub/tunnel-mib.h,
 	stub/udp-mib.c, stub/udp-mib.h, scli/basic.c, scli/scli.h: Replaced
-        host_snmp with GSnmpSession.
+	host_snmp with GSnmpSession.
 
 2001-06-13 09:17  schoenw
 
 	* configure, configure.in: Bumped the version number to 0.1.19
-        again.
+	again.
 
 2001-06-13 09:14  schoenw
 
@@ -1408,41 +1605,41 @@
 2001-06-12 17:15  schoenw
 
 	* scli/printer.c: Fixed a bug where unterminated strings were
-        passed to snprintf().
+	passed to snprintf().
 
 2001-06-12 17:05  schoenw
 
 	* NEWS, configure, configure.in: Downgraded the version number to
-        0.1.18 since this was never released.
+	0.1.18 since this was never released.
 
 2001-06-12 16:45  schoenw
 
 	* scli/: cmds.c, scli.c, scli.h: Added some experimental code to
 	create, delete and show command aliases.  Aliases are not yet used
-        by the interpreter.
+	by the interpreter.
 
 2001-06-12 14:27  schoenw
 
 	* NEWS, configure, configure.in, snmp/Makefile.in: Bumped the
-        version number and updated the NEWS file.
+	version number and updated the NEWS file.
 
 2001-06-12 14:21  schoenw
 
 	* scli/: Makefile.am, Makefile.in, printer.c, scli.c, scli.h: Added
-        the scli printer mode contributed by Oliver Wellnitz.
+	the scli printer mode contributed by Oliver Wellnitz.
 
 2001-06-12 14:18  schoenw
 
 	* stub/: Makefile.am, Makefile.in, etherlike-mib.c,
 	etherlike-mib.h, printer-mib.c, printer-mib.h: Added stubs for the
-        Printer-MIB and regenerated the EtherLike-MIB stubs.
+	Printer-MIB and regenerated the EtherLike-MIB stubs.
 
 2001-06-12 12:48  schoenw
 
 	* scli/: atm.c, basic.c, bridge.c, cmds.c, disman.c, entity.c,
 	ether.c, interface.c, ip.c, ospf.c, scli.c, snmp.c, system.c,
 	tcp.c, udp.c: Updated code to use type names which include module
-        names.
+	names.
 
 2001-06-12 12:46  schoenw
 
@@ -1453,23 +1650,23 @@
 	ip-forward-mib.c, ip-forward-mib.h, ip-mib.c, ip-mib.h, mau-mib.c,
 	mau-mib.h, snmpv2-mib.c, snmpv2-mib.h, tcp-mib.c, tcp-mib.h,
 	tunnel-mib.c, tunnel-mib.h, udp-mib.c, udp-mib.h: Regenerated stubs
-        to include module names in the typedefs.
+	to include module names in the typedefs.
 
 2001-06-12 12:06  schoenw
 
 	* scli/: basic.c, cmds.c, scli.c, scli.h, snmp.c: Split the "show
 	scli" command into multiple sub-commands. Added an exported
-        function to retrieve the rows/cols of the terminal.
+	function to retrieve the rows/cols of the terminal.
 
 2001-06-07 12:57  schoenw
 
 	* scli/interface.c: Implemented an optional argument to select
-        interfaces by index or name.
+	interfaces by index or name.
 
 2001-06-07 12:56  schoenw
 
 	* snmp/: g_snmp.c, g_snmp.h: Added utility functions to manipulate
-        varbind lists.
+	varbind lists.
 
 2001-06-07 12:53  schoenw
 
@@ -1486,17 +1683,17 @@
 2001-05-09 18:17  schoenw
 
 	* NEWS, configure, configure.in: Bumped the version number to
-        0.1.18.
+	0.1.18.
 
 2001-05-09 18:12  schoenw
 
 	* scli/: basic.c, cmds.c, ip.c, scli.c, scli.h: Added a "show scli"
-        command to display the current interpreter state.
+	command to display the current interpreter state.
 
 2001-05-09 18:09  schoenw
 
 	* scli/scli.c: Initialize the interpreter's pager attribute from
-        the environement.
+	the environement.
 
 2001-05-09 18:05  schoenw
 
@@ -1505,7 +1702,7 @@
 2001-05-03 09:43  schoenw
 
 	* scli/bridge.c: Display more interface information in the port
-        table.
+	table.
 
 2001-04-27 15:59  schoenw
 
@@ -1514,24 +1711,24 @@
 2001-04-27 15:51  schoenw
 
 	* scli/: bridge.c, ip.c: Fixed two formatting bugs just introduced
-        in the rewrite.
+	in the rewrite.
 
 2001-04-27 15:42  schoenw
 
 	* config.h.in, configure, configure.in: Added more tests for
-        headers which might define ether_ntohost().
+	headers which might define ether_ntohost().
 
 2001-04-27 15:41  schoenw
 
 	* scli/: bridge.c, fmt.c, interface.c, ip.c, ospf.c, scli.h, tcp.c,
 	udp.c: Rewrote the address formating code. The "show interface
 	details" and the "show ip mapping" commands now also report
-        ethernet names.
+	ethernet names.
 
 2001-04-27 13:45  schoenw
 
 	* config.h.in, configure, configure.in: Added some tests for
-        ethernet name lookup functions.
+	ethernet name lookup functions.
 
 2001-04-27 13:44  schoenw
 
@@ -1540,22 +1737,22 @@
 2001-04-27 13:43  schoenw
 
 	* scli/: bridge.c, fmt.c, scli.h: Added a function to format
-        ethernet addresses.
+	ethernet addresses.
 
 2001-04-17 11:47  schoenw
 
 	* snmp/g_snmp_table.c: Some fixes - I guess this really needs a
-        rewrite. Thanks Erik.
+	rewrite. Thanks Erik.
 
 2001-04-14 17:51  schoenw
 
 	* scli/: Makefile.am, Makefile.in, ospf.c, scli.c, scli.h: Added
-        the ospf scli mode implementation contributed by Oliver Wellnitz.
+	the ospf scli mode implementation contributed by Oliver Wellnitz.
 
 2001-04-14 17:48  schoenw
 
 	* stub/: Makefile.am, Makefile.in, ospf-mib.c, ospf-mib.h: Added
-        stubs for the OSPF-MIB.
+	stubs for the OSPF-MIB.
 
 2001-04-12 16:53  schoenw
 
@@ -1572,12 +1769,12 @@
 2001-04-12 16:32  schoenw
 
 	* scli/disman.c: Added support for smLaunchMaxRunning and
-        smLaunchMaxCompleted.
+	smLaunchMaxCompleted.
 
 2001-04-12 16:14  schoenw
 
 	* scli/disman.c: Improved the "show disman scheduler info" command
-        and added a new "show disman scheduler details" command.
+	and added a new "show disman scheduler details" command.
 
 2001-04-11 15:58  schoenw
 
@@ -1586,7 +1783,7 @@
 2001-04-11 15:44  schoenw
 
 	* stub/snmp-view-based-acm-mib.c: Fixed the OID instance identifier
-        unpacking code.
+	unpacking code.
 
 2001-04-11 13:15  schoenw
 
@@ -1599,7 +1796,7 @@
 	snmp-mpd-mib.h, snmp-target-mib.c, snmp-target-mib.h,
 	snmp-user-based-sm-mib.c, snmp-user-based-sm-mib.h,
 	snmp-view-based-acm-mib.c, snmp-view-based-acm-mib.h: Regenerated
-        stubs to take advantage of the new type names.
+	stubs to take advantage of the new type names.
 
 2001-04-11 13:13  schoenw
 
@@ -1612,18 +1809,18 @@
 2001-04-11 10:58  schoenw
 
 	* scli/ip.c: Implemented "show ip forwarding" based on the old RFC
-        1213 ipRouteTable.
+	1213 ipRouteTable.
 
 2001-04-10 18:12  schoenw
 
 	* scli/ip.c: Added code to display the broken RFC 1213 routing
-        table.
+	table.
 
 2001-04-10 18:11  schoenw
 
 	* stub/: Makefile.am, Makefile.in, rfc1213-mib.c, rfc1213-mib.h:
 	Added stubs for the RFC1213-MIB (since this MIB defines the routing
-        table that most devices still support these days).
+	table that most devices still support these days).
 
 2001-04-10 11:20  schoenw
 
@@ -1640,32 +1837,32 @@
 2001-04-10 10:24  schoenw
 
 	* scli/basic.c: Added hooks which indicate how fast we retrieve
-        SNMP variables.
+	SNMP variables.
 
 2001-04-10 10:23  schoenw
 
 	* scli/scli.c: Stifle the history file to contain only
-        $HISTFILESIZE entries.
+	$HISTFILESIZE entries.
 
 2001-04-10 10:13  schoenw
 
 	* snmp/: g_snmp.c, g_snmp.h: Added hooks which are called when a
-        varbind list is decoded/encoded.
+	varbind list is decoded/encoded.
 
 2001-04-09 12:58  schoenw
 
 	* scli/ip.c: The "show ip tunnel" command now shows interface names
-        (patch provided by Oliver Wellnitz <wellnitz@ibr.cs.tu-bs.de>).
+	(patch provided by Oliver Wellnitz <wellnitz@ibr.cs.tu-bs.de>).
 
 2001-04-09 11:23  schoenw
 
 	* scli/: disman.c, entity.c, interface.c, system.c: Minor code
-        cleanups.
+	cleanups.
 
 2001-04-09 11:02  schoenw
 
 	* stub/: host-resources-types.h, stools.c, stools.h: Implemented
-        stls_identity_get_label().
+	stls_identity_get_label().
 
 2001-04-06 17:47  schoenw
 
@@ -1686,7 +1883,7 @@
 	snmp-target-mib.c, snmp-user-based-sm-mib.c,
 	snmp-view-based-acm-mib.c, snmpv2-mib.c, stools.c, stools.h,
 	tcp-mib.c, tunnel-mib.c, udp-mib.c: Regenerated stubs to make the
-        resulting C code more compact.
+	resulting C code more compact.
 
 2001-04-06 15:45  schoenw
 
@@ -1695,7 +1892,7 @@
 2001-04-04 23:32  schoenw
 
 	* stub/stools.c: Use mktime() to get the gmt offset computation
-        right.
+	right.
 
 2001-03-30 15:38  schoenw
 
@@ -1708,7 +1905,7 @@
 	* scli/: Makefile.am, Makefile.in, atm.c, bridge.c, disman.c,
 	entity.c, ether.c, fmt.c, interface.c, ip.c, mau.c, scli.c, scli.h,
 	snmp.c, system.c, tcp.c, udp.c: Renamed mau.c to ether.c and
-        updated various modules to reflect internal API changes.
+	updated various modules to reflect internal API changes.
 
 2001-03-30 10:21  schoenw
 
@@ -1723,34 +1920,34 @@
 	snmp-view-based-acm-mib.c, snmp-view-based-acm-mib.h, snmpv2-mib.c,
 	snmpv2-mib.h, stools.c, stools.h, tcp-mib.c, tcp-mib.h,
 	tunnel-mib.c, tunnel-mib.h: Regenerated stubs to reflect changes in
-        the stls API.
+	the stls API.
 
 2001-03-29 17:47  schoenw
 
 	* scli/: Makefile.am, Makefile.in, mau.c, scli.c, scli.h: Added a
 	media attachement (mau) mode. This probably needs all to be merged
-        at some time into an IEEE 802.3 mode which does all of this.
+	at some time into an IEEE 802.3 mode which does all of this.
 
 2001-03-29 16:46  schoenw
 
 	* stub/: Makefile.am, Makefile.in, etherlike-mib.c,
 	etherlike-mib.h, mau-mib.c, mau-mib.h: Added stubs for the MAU-MIB
-        and the EtherLike-MIB.
+	and the EtherLike-MIB.
 
 2001-03-29 14:45  schoenw
 
 	* scli/disman.c: Import the IANA language OIDs from the
-        iana-language-mib.h stub.
+	iana-language-mib.h stub.
 
 2001-03-29 14:44  schoenw
 
 	* scli/fmt.c: Fixed again some time formatting/computation
-        problems.
+	problems.
 
 2001-03-29 14:41  schoenw
 
 	* stub/: Makefile.am, Makefile.in, iana-language-mib.c,
-        iana-language-mib.h: Added stubs for the IANA-LANGUAGE-MIB.
+	iana-language-mib.h: Added stubs for the IANA-LANGUAGE-MIB.
 
 2001-03-29 14:35  schoenw
 
@@ -1759,27 +1956,27 @@
 2001-03-29 12:33  schoenw
 
 	* scli/scli.1: Added some more documentation to bring new users up
-        to speed.
+	to speed.
 
 2001-03-29 10:51  schoenw
 
 	* config.h.in, configure, configure.in: Added a check for
-        getaddrinfo().
+	getaddrinfo().
 
 2001-03-28 12:58  schoenw
 
 	* scli/scli.1: Documented the way scli interprets the PAGER
-        environment variable.
+	environment variable.
 
 2001-03-28 12:12  schoenw
 
 	* scli/scli.c: Call scli_cmd_open() to handle arguments so that we
-        can benefit from any error handling in scli_cmd_open().
+	can benefit from any error handling in scli_cmd_open().
 
 2001-03-28 12:11  schoenw
 
 	* scli/tcp.c: Use #defines rather than numbers for enumerated
-        values.
+	values.
 
 2001-03-28 12:08  schoenw
 
@@ -1796,7 +1993,7 @@
 	snmp-view-based-acm-mib.h, snmpv2-mib.c, snmpv2-mib.h, tcp-mib.c,
 	tcp-mib.h, tunnel-mib.c, tunnel-mib.h: Regenerated stubs to include
 	#defines for enumerations and identities.  Added the
-        host-resources-types stubs.
+	host-resources-types stubs.
 
 2001-03-28 10:18  schoenw
 
@@ -1805,13 +2002,13 @@
 2001-03-28 09:39  schoenw
 
 	* snmp/g_session.c: Do not lookup the address with each and every
-        request.
+	request.
 
 2001-03-27 17:26  schoenw
 
 	* scli/basic.c: Some portability fixes. I am sure this is not the
 	right solution. Need to study the POSIX termios specification to
-        get it "right".
+	get it "right".
 
 2001-03-27 17:16  schoenw
 
@@ -1820,24 +2017,24 @@
 2001-03-27 17:14  schoenw
 
 	* scli/: disman.c, fmt.c, scli.h: Added code to display information
-        about running disman scripts.
+	about running disman scripts.
 
 2001-03-27 17:14  schoenw
 
 	* scli/basic.c: Added code to get the number of columns on the
-        terminal.
+	terminal.
 
 2001-03-27 10:55  schoenw
 
 	* scli/basic.c: Make sure we use the pager only if we are
-        interactive.
+	interactive.
 
 2001-03-27 10:48  schoenw
 
 	* scli/: atm.c, basic.c, bridge.c, disman.c, entity.c, interface.c,
 	ip.c, scli.c, scli.h, snmp.c, system.c, tcp.c, udp.c: Reworked the
 	command creation interface. Intermediate nodes are now created
-        automatically.
+	automatically.
 
 2001-03-26 15:41  schoenw
 
@@ -1854,18 +2051,18 @@
 2001-03-26 15:04  schoenw
 
 	* stub/udp-mib.c: Updated to handle tables which only have
-        auxilliary columns.
+	auxilliary columns.
 
 2001-03-26 15:02  schoenw
 
 	* scli/: Makefile.am, Makefile.in, entity.c, fmt.c, scli.c, scli.h,
 	tcp.c, udp.c: Added new "show tcp listener" and "show udp listener"
-        commands.
+	commands.
 
 2001-03-23 04:27  schoenw
 
 	* stub/bridge-mib.c: Regenerated stubs to get the RFC 1155 counters
-        right.
+	right.
 
 2001-03-23 04:09  schoenw
 
@@ -1873,12 +2070,12 @@
 	ip.c, scli.c, snmp.c, system.c, tcp.c: Cleaned up the code in the
 	help command which displays the command tree. Shortened the command
 	descriptions so that they can be used as headers in recursive
-        command evaluations.
+	command evaluations.
 
 2001-03-21 18:39  schoenw
 
 	* scli/basic.c: Added simple $PAGER support. Improved the output
-        format produced by recursive command invocations.
+	format produced by recursive command invocations.
 
 2001-03-20 16:17  schoenw
 
@@ -1887,7 +2084,7 @@
 2001-03-20 16:15  schoenw
 
 	* scli/interface.c: Added a missing check whether the IP address
-        entries are really valid.
+	entries are really valid.
 
 2001-03-19 21:45  schoenw
 
@@ -1897,17 +2094,17 @@
 	snmp-framework-mib.c, snmp-mpd-mib.c, snmp-target-mib.c,
 	snmp-user-based-sm-mib.c, snmp-view-based-acm-mib.c, snmpv2-mib.c,
 	tcp-mib.c, tunnel-mib.c, udp-mib.c: Regenerated the stubs to
-        include type checking code.
+	include type checking code.
 
 2001-03-19 17:57  schoenw
 
 	* AUTHORS, README: Updated the list of contributors and clarified
-        the pronounciation of the package name.
+	the pronounciation of the package name.
 
 2001-03-19 17:55  schoenw
 
 	* config.h.in, configure, configure.in, scli/fmt.c: Integrated a
-        freebsd patch from John Sellens <jsellens@generalconcepts.com>.
+	freebsd patch from John Sellens <jsellens@generalconcepts.com>.
 
 2001-03-16 17:01  schoenw
 
@@ -1916,7 +2113,7 @@
 2001-03-16 16:31  schoenw
 
 	* scli/interface.c: Do not try to guess interface names since this
-        can lead to confusion.
+	can lead to confusion.
 
 2001-03-16 16:30  schoenw
 
@@ -1925,7 +2122,7 @@
 2001-03-16 10:10  schoenw
 
 	* NEWS, TODO, configure, configure.in: Bumped version number to
-        0.1.15.
+	0.1.15.
 
 2001-03-16 10:04  schoenw
 
@@ -1935,7 +2132,7 @@
 	so that modes can pass command specific flags. Moved the peer
 	initialization code to the basic.c module and made the host scli
 	argument optional.  Changed the scli prompt to show the name of the
-        remote peer.
+	remote peer.
 
 2001-03-15 18:04  schoenw
 
@@ -1943,7 +2140,7 @@
 	column in the "show system storage" command. Strip trailing white
 	space in the "show system processes" command. (Perhaps we should
 	invent a generic mechanism to validate printable strings before
-        they are actuall passed to the screen).
+	they are actuall passed to the screen).
 
 2001-03-15 14:29  schoenw
 
@@ -1952,33 +2149,33 @@
 2001-03-15 14:27  schoenw
 
 	* NEWS, aclocal.m4, configure, configure.in: Preparing for the
-        0.1.14 release of stools.
+	0.1.14 release of stools.
 
 2001-03-15 14:22  schoenw
 
 	* stub/: Makefile.am, Makefile.in, atm-mib.c, atm-mib.h: Added
-        stubs for the ATM-MIB.
+	stubs for the ATM-MIB.
 
 2001-03-15 14:21  schoenw
 
 	* scli/bridge.c: Added a "show bridge info" command (which needs
-        more work for spanning tree bridges).
+	more work for spanning tree bridges).
 
 2001-03-15 14:19  schoenw
 
 	* scli/system.c: Suppress bridge summary information if the device
-        reports 0 ports.
+	reports 0 ports.
 
 2001-03-14 22:25  schoenw
 
 	* scli/: Makefile.am, Makefile.in, atm.c, bridge.c, scli.c, scli.h:
-        Started work on an ATM mode. Minor cleanups of the bridge mode.
+	Started work on an ATM mode. Minor cleanups of the bridge mode.
 
 2001-03-14 21:52  schoenw
 
 	* scli/interface.c: Fixed a bug where the code assumed that an
 	ipAddrTable is always present.	Enhanced the "show interface info"
-        command to adjust the width of the "Type" column dynamically.
+	command to adjust the width of the "Type" column dynamically.
 
 2001-03-14 18:34  schoenw
 
@@ -1987,13 +2184,13 @@
 2001-03-14 14:33  schoenw
 
 	* scli/interface.c: Updated the output format generated by the
-        "show interface info" command.
+	"show interface info" command.
 
 2001-03-14 14:32  schoenw
 
 	* scli/bridge.c: Updated the "show bridge ports" command and added
 	a new "show bridge filter" command (which I could not yet test in
-        practice).
+	practice).
 
 2001-03-14 14:31  schoenw
 
@@ -2004,22 +2201,22 @@
 	* scli/: Makefile.am, Makefile.in, bridge.c, interface.c, scli.c,
 	scli.h, system.c, vendors.c: Added the bridge mode ("show bridge
 	ports", "show bridge forwarding").  Incorporated a list of ieee
-        vendor codes to show vendors for MAC addresses.
+	vendor codes to show vendors for MAC addresses.
 
 2001-03-13 17:16  schoenw
 
 	* scli/ip.c: Prepared the "show ip tunnel" command to eventually
-        show the interface name.
+	show the interface name.
 
 2001-03-13 17:09  schoenw
 
 	* scli/: system.c, vendors.c: Display unknown vendors to encourage
-        people to update the vendor list.
+	people to update the vendor list.
 
 2001-03-13 16:44  schoenw
 
 	* scli/disman.c: Added a "show disman launch info" command and some
-        general cleanups.
+	general cleanups.
 
 2001-03-12 15:05  schoenw
 
@@ -2027,7 +2224,7 @@
 	ip.c, scli.c, scli.h, snmp.c, system.c, tcp.c, vendors.c: Include
 	only those MIB stubs that are actually needed. Renamed the "show
 	interface tunnel" command to "show ip tunnel". Added new "show
-        interface info" and "show disman script info" commands.
+	interface info" and "show disman script info" commands.
 
 2001-03-12 15:00  schoenw
 
@@ -2043,12 +2240,12 @@
 	snmp-view-based-acm-mib.h, snmpv2-mib.c, snmpv2-mib.h, stools.h,
 	tcp-mib.c, tcp-mib.h, tunnel-mib.c, tunnel-mib.h, udp-mib.c,
 	udp-mib.h: Regenerated stubs to include the MIB revision history.
-        Removed the default include of all MIB stub headers from stools.h.
+	Removed the default include of all MIB stub headers from stools.h.
 
 2001-03-09 16:12  schoenw
 
 	* scli/interface.c: Minor formatting cleanup of the "show interface
-        tunnel" command.
+	tunnel" command.
 
 2001-03-09 16:06  schoenw
 
@@ -2057,17 +2254,17 @@
 2001-03-09 16:04  schoenw
 
 	* NEWS, TODO, configure, configure.in: Preparing for the next
-        release.
+	release.
 
 2001-03-08 15:40  schoenw
 
 	* snmp/g_asn1.c: Fixed a sign decoding bug in
-        g_asn1_int32_decode().
+	g_asn1_int32_decode().
 
 2001-03-08 11:57  schoenw
 
 	* scli/: interface.c, ip.c: Oliver Wellnitz contributed a patch to
-        display tunnel information.
+	display tunnel information.
 
 2001-03-08 11:56  schoenw
 
@@ -2083,7 +2280,7 @@
 	snmp-view-based-acm-mib.h, snmpv2-mib.c, snmpv2-mib.h, stools.h,
 	tcp-mib.c, tcp-mib.h, tunnel-mib.c, tunnel-mib.h, udp-mib.c,
 	udp-mib.h: Added stubs for the TUNNEL-MIB and regenerated stubs
-        with the released smidump version 0.2.14.
+	with the released smidump version 0.2.14.
 
 2001-03-05 15:31  schoenw
 
@@ -2102,7 +2299,7 @@
 	stub/snmp-user-based-sm-mib.h, stub/snmp-view-based-acm-mib.c,
 	stub/snmp-view-based-acm-mib.h, stub/snmpv2-mib.c,
 	stub/snmpv2-mib.h, stub/tcp-mib.c, stub/tcp-mib.h, stub/udp-mib.c,
-        stub/udp-mib.h: Many updates to support an improved stub API.
+	stub/udp-mib.h: Many updates to support an improved stub API.
 
 2001-03-02 10:32  schoenw
 
@@ -2113,29 +2310,29 @@
 	snmp-mpd-mib.c, snmp-target-mib.c, snmp-user-based-sm-mib.c,
 	snmp-view-based-acm-mib.c, snmpv2-mib.c, stools.h, tcp-mib.c,
 	udp-mib.c: Added the IP-FORWARD-MIB and regenerated the stubs to
-        take advantage of some improvements in the smidump stools driver.
+	take advantage of some improvements in the smidump stools driver.
 
 2001-03-02 10:28  schoenw
 
 	* scli/: Makefile.am, Makefile.in, ip.c, scli.c, scli.h, tcp.c:
-        Added an initial IP mode for scli.
+	Added an initial IP mode for scli.
 
 2001-03-02 10:17  schoenw
 
 	* scli/: fmt.c, interface.c, scli.h: Added a fmt function to
 	convert IPv4 masks into a printable address prefix length. The
 	"show interface info" command now displays the prefix length rather
-        than the DNS name for each associated IP address.
+	than the DNS name for each associated IP address.
 
 2001-03-02 10:10  schoenw
 
 	* scli/fmt.c: Check for the unspecified case first before doing
-        host or service name lookups.
+	host or service name lookups.
 
 2001-03-02 10:10  schoenw
 
 	* scli/scli.c: Integrated a patch from Frank Strauss
-        <strauss@ibr.cs.tu-bs.de> to turn off filename completion.
+	<strauss@ibr.cs.tu-bs.de> to turn off filename completion.
 
 2001-03-01 09:44  schoenw
 
@@ -2148,17 +2345,17 @@
 2001-03-01 08:57  schoenw
 
 	* Makefile.in, NEWS, configure, configure.in: Prepare for the
-        0.1.12 snapshot.
+	0.1.12 snapshot.
 
 2001-03-01 08:55  schoenw
 
 	* scli/: fmt.c, interface.c, scli.h, tcp.c: Improved the formatting
-        of IPv4 addresses and port numbers.
+	of IPv4 addresses and port numbers.
 
 2001-03-01 08:54  schoenw
 
 	* scli/system.c: The "show system info" now shows dates in a
-        logical order.
+	logical order.
 
 2001-02-28 17:38  schoenw
 
@@ -2172,19 +2369,19 @@
 	snmp-user-based-sm-mib.h, snmp-view-based-acm-mib.c,
 	snmp-view-based-acm-mib.h, snmpv2-mib.c, snmpv2-mib.h, tcp-mib.c,
 	tcp-mib.h, udp-mib.c, udp-mib.h: Improved the instance identifier
-        unpacking to handle some more cases.
+	unpacking to handle some more cases.
 
 2001-02-28 17:37  schoenw
 
 	* scli/: disman.c, entity.c, interface.c, snmp.c, system.c:
 	Improvements of the "show disman language" and "show interface
 	info" commands. Added a new "show disman scripts" command. Updated
-        the code to use the new stubs interface.
+	the code to use the new stubs interface.
 
 2001-02-28 17:26  schoenw
 
 	* scli/: Makefile.am, Makefile.in, scli.c, scli.h, tcp.c: Added the
-        tcp mode which displays existing tcp connections.
+	tcp mode which displays existing tcp connections.
 
 2001-02-27 11:07  schoenw
 
@@ -2202,18 +2399,18 @@
 
 	* scli/entity.c: Implementation of the "show physical components"
 	and the "show physical containment" command (which replace the
-        "show system entities" command).
+	"show system entities" command).
 
 2001-02-27 11:00  schoenw
 
 	* scli/system.c: Cleanup and some initial "show system devices"
-        command code.
+	command code.
 
 2001-02-27 10:58  schoenw
 
 	* scli/interface.c: Renames "show interfaces" to "show interface
 	info" since we are going to add a "show interface stack" command
-        soon.
+	soon.
 
 2001-02-26 16:32  schoenw
 
@@ -2226,13 +2423,13 @@
 2001-02-26 16:13  schoenw
 
 	* scli/: Makefile.am, Makefile.in, scli.c, scli.h, snmp.c: Added an
-        initial snmp mode which needs much more work to be useful.
+	initial snmp mode which needs much more work to be useful.
 
 2001-02-26 16:12  schoenw
 
 	* scli/basic.c: Evaluate commands recursively on non-leaf nodes in
 	the command tree.  (Not sure yet whether this is always a feature
-        or sometimes a bug.)
+	or sometimes a bug.)
 
 2001-02-26 16:11  schoenw
 
@@ -2246,7 +2443,7 @@
 2001-02-26 16:03  schoenw
 
 	* stub/: snmp-framework-mib.c, snmp-mpd-mib.h: Forgot two files in
-        the last commit...
+	the last commit...
 
 2001-02-26 16:02  schoenw
 
@@ -2255,24 +2452,24 @@
 	snmp-target-mib.c, snmp-target-mib.h, snmp-user-based-sm-mib.c,
 	snmp-user-based-sm-mib.h, snmp-view-based-acm-mib.c,
 	snmp-view-based-acm-mib.h, stools.h: Added the standard SNMPv3
-        remote administration MIBs to eventually support them. ;-)
+	remote administration MIBs to eventually support them. ;-)
 
 2001-02-23 16:04  schoenw
 
 	* scli/system.c: Supress newlines if the sysDescr value is a zero
-        length string.
+	length string.
 
 2001-02-23 15:59  schoenw
 
 	* stub/: bridge-mib.c, disman-schedule-mib.c, disman-script-mib.c,
 	entity-mib.c, host-resources-mib.c, if-mib.c, ip-mib.c,
 	snmpv2-mib.c, tcp-mib.c, udp-mib.c: The stub code now checks the
-        complete OID in the response again.
+	complete OID in the response again.
 
 2001-02-21 17:38  schoenw
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl. (This should
-        probably be automated.)
+	probably be automated.)
 
 2001-02-21 17:34  schoenw
 
@@ -2281,7 +2478,7 @@
 2001-02-21 17:33  schoenw
 
 	* scli/entity.c: Added very experimental code to display the
-        containment hierarchy.
+	containment hierarchy.
 
 2001-02-21 17:31  schoenw
 
@@ -2290,7 +2487,7 @@
 2001-02-21 17:30  schoenw
 
 	* doc/stools.texinfo: Some grammar/wording fixed from Frank
-        Strauss.
+	Strauss.
 
 2001-02-21 17:29  schoenw
 
@@ -2300,24 +2497,24 @@
 
 	* NEWS, TODO, configure, configure.in, doc/stools.info,
 	doc/stools.texinfo: Updated for version 0.1.10 of the stools
-        package.
+	package.
 
 2001-02-20 15:37  schoenw
 
 	* stub/: bridge-mib.c, disman-schedule-mib.c, disman-script-mib.c,
 	entity-mib.c, host-resources-mib.c, if-mib.c, ip-mib.c,
 	snmpv2-mib.c, tcp-mib.c, udp-mib.c: More compact stubs generated by
-        an improved stools smidump driver.
+	an improved stools smidump driver.
 
 2001-02-20 15:32  schoenw
 
 	* scli/: Makefile.am, Makefile.in, disman.c, scli.c, scli.h: Added
-        a disman mode which needs much more work.
+	a disman mode which needs much more work.
 
 2001-02-20 15:30  schoenw
 
 	* scli/cmds.c: Fixed the help output for intermediate command nodes
-        without a description.
+	without a description.
 
 2001-02-20 15:29  schoenw
 
@@ -2326,7 +2523,7 @@
 2001-02-20 15:28  schoenw
 
 	* scli/interface.c: Minor bug fixes to produce even nicer output.
-        ;-)
+	;-)
 
 2001-02-16 15:43  schoenw
 
@@ -2340,38 +2537,38 @@
 
 	* Makefile.in, NEWS, TODO, aclocal.m4, configure, configure.in,
 	doc/Makefile.in, snmp/Makefile.in: Updates for version 0.1.9 of the
-        stools package.
+	stools package.
 
 2001-02-16 15:13  schoenw
 
 	* scli/: Makefile.am, Makefile.in, basic.c, cmds.c, entity.c,
 	fmt.c, interface.c, scli.1, scli.c, scli.h, system.c: Major code
 	refactoring. New "show system mount" command and many minor command
-        improvements.
+	improvements.
 
 2001-02-16 15:12  schoenw
 
 	* stub/: Makefile.am, Makefile.in, bridge-mib.c, bridge-mib.h,
 	disman-schedule-mib.c, disman-schedule-mib.h, disman-script-mib.c,
 	disman-script-mib.h, stools.h: Added the BRIDGE-MIB,
-        DISMAN-SCRIPT-MIB and DISMAN-SCHEDULE-MIB.
+	DISMAN-SCRIPT-MIB and DISMAN-SCHEDULE-MIB.
 
 2001-02-15 18:03  schoenw
 
 	* scli/system.c: Some more code to display a list of mounted
-        filesystems. Needs more work.
+	filesystems. Needs more work.
 
 2001-02-15 13:00  schoenw
 
 	* Makefile.in, NEWS, config.h.in, configure, configure.in,
 	doc/Makefile.in, scli/Makefile.in, snmp/Makefile.in,
 	stub/Makefile.in: Added a few more configure checks and bumped
-        version number.
+	version number.
 
 2001-02-15 12:59  schoenw
 
 	* snmp/: g_dispatch.c, g_dispatch.h, g_session.h, g_snmp.c,
-        g_transport.c: Several prototype fixes.
+	g_transport.c: Several prototype fixes.
 
 2001-02-15 12:58  schoenw
 
@@ -2393,7 +2590,7 @@
 2001-02-14 14:25  schoenw
 
 	* doc/: stools.info, stools.texinfo: Added some initial text to the
-        stools documentation.
+	stools documentation.
 
 2001-02-13 16:16  schoenw
 
@@ -2417,7 +2614,7 @@
 	stub/if-mib.c, stub/if-mib.h, stub/ip-mib.c, stub/ip-mib.h,
 	stub/snmpv2-mib.c, stub/snmpv2-mib.h, stub/stools.c, stub/stools.h,
 	stub/tcp-mib.c, stub/tcp-mib.h, stub/udp-mib.c, stub/udp-mib.h:
-        Initial revision
+	Initial revision
 
 2001-02-13 16:16  schoenw
 
@@ -2441,5 +2638,5 @@
 	stub/if-mib.c, stub/if-mib.h, stub/ip-mib.c, stub/ip-mib.h,
 	stub/snmpv2-mib.c, stub/snmpv2-mib.h, stub/stools.c, stub/stools.h,
 	stub/tcp-mib.c, stub/tcp-mib.h, stub/udp-mib.c, stub/udp-mib.h:
-        initial stools version
+	initial stools version
 
