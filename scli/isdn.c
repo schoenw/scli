@@ -30,8 +30,26 @@ static void
 fmt_isdn_bri(GString *s, isdn_mib_isdnBasicRateEntry_t *briEntry,
 	     if_mib_ifEntry_t *ifEntry)
 {
+    const char *e;
+    
     g_string_sprintfa(s, "%9u ", briEntry->ifIndex);
 
+    e = fmt_enum(isdn_mib_enums_isdnBasicRateIfType,
+		 briEntry->isdnBasicRateIfType);
+    g_string_sprintfa(s, "%-5s ", e ? e : "");
+    
+    e = fmt_enum(isdn_mib_enums_isdnBasicRateLineTopology,
+		 briEntry->isdnBasicRateLineTopology);
+    g_string_sprintfa(s, "%-17s ", e ? e : "");
+    
+    e = fmt_enum(isdn_mib_enums_isdnBasicRateIfMode,
+		 briEntry->isdnBasicRateIfMode);
+    g_string_sprintfa(s, " %-2s  ", e ? e : "");
+    
+    e = fmt_enum(isdn_mib_enums_isdnBasicRateSignalMode,
+		 briEntry->isdnBasicRateSignalMode);
+    g_string_sprintfa(s, "%-8s ", e ? e : "");
+    
     if (ifEntry && ifEntry->ifDescr) {
 	g_string_sprintfa(s, "%.*s",
 			  (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);
@@ -75,7 +93,8 @@ show_isdn_bri(scli_interp_t * interp, int argc, char **argv)
 
     if (briTable) {
 	g_string_sprintfa(interp->header,
-			  "INTERFACE TYPE TOPOLOGY MODE SIGNAL DESCRIPTION");
+			  "INTERFACE TYPE  TOPOLOGY          MODE "
+			  "SIGNAL   DESCRIPTION");
 	for (i = 0; briTable[i]; i++) {
 	    if_mib_ifEntry_t *ifEntry;
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
@@ -110,6 +129,29 @@ fmt_isdn_bearer(GString *s, isdn_mib_isdnBearerEntry_t *bearerEntry)
 		 bearerEntry->isdnBearerChannelType);
     if (e) {
 	g_string_sprintfa(s, "%-*s %s\n", indent, "Channel Type:", e);
+    }
+
+    e = fmt_enum(isdn_mib_enums_isdnBearerOperStatus,
+		 bearerEntry->isdnBearerOperStatus);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Call Status:", e);
+    }
+
+    if (bearerEntry->isdnBearerCallSetupTime) {
+	e = fmt_timeticks(*bearerEntry->isdnBearerCallSetupTime);
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Call Setup:",
+			  *bearerEntry->isdnBearerCallConnectTime ? e : "");
+    }
+
+    if (bearerEntry->isdnBearerCallConnectTime) {
+	e = fmt_timeticks(*bearerEntry->isdnBearerCallConnectTime);
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Call Connect:",
+			  *bearerEntry->isdnBearerCallConnectTime ? e : "");
+    }
+
+    if (bearerEntry->isdnBearerChargedUnits) {
+	g_string_sprintfa(s, "%-*s %u\n", indent, "Charged Units:",
+			  *bearerEntry->isdnBearerChargedUnits);
     }
 }
 
