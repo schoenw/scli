@@ -28,6 +28,10 @@
 
 #include <netdb.h>
 #include <netinet/in.h>
+#include <net/if.h>
+#ifdef HAVE_NETINET_IF_ETHER_H
+#include <netinet/if_ether.h>
+#endif
 
 
 
@@ -252,7 +256,8 @@ fmt_ipv4_address(guchar *addr, int name)
 	    return h->h_name;
 	}
     }
-    sprintf(buffer, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
+    g_snprintf(buffer, sizeof(buffer), "%d.%d.%d.%d",
+	       addr[0], addr[1], addr[2], addr[3]);
     return buffer;
 }
 
@@ -276,5 +281,26 @@ fmt_ipv4_mask(guchar *addr)
 	}
     }
     sprintf(buffer, "/%u", prefix);
+    return buffer;
+}
+
+
+char *
+fmt_ether_address(guchar *addr, int flags)
+{
+    static char buffer[256]; /* xxx */
+
+    if (flags & SCLI_FLAG_NAME_OR_ADDR || flags & SCLI_FLAG_NAME_ONLY) {
+#ifdef HAVE_ETHER_NTOHOST
+	if (ether_ntohost(buffer, addr) == 0) {
+	    return buffer;
+	}
+#endif
+	if (flags & SCLI_FLAG_NAME_ONLY) {
+	    return NULL;
+	}
+    }
+    g_snprintf(buffer, sizeof(buffer), "%02x:%02x:%02x:%02x:%02x:%02x",
+	       addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
     return buffer;
 }

@@ -220,6 +220,10 @@ fmt_kmg(guint32 number);
 extern char*
 fmt_gtp(guint32 number);
 
+#define SCLI_FLAG_ADDR_ONLY	0x00
+#define SCLI_FLAG_NAME_OR_ADDR	0x01
+#define SCLI_FLAG_NAME_ONLY	0x02
+
 extern char*
 fmt_udp_port(int port, int name);
 
@@ -232,6 +236,8 @@ fmt_ipv4_address(guchar *addr, int name);
 extern char*
 fmt_ipv4_mask(guchar *addr);
 
+extern char*
+fmt_ether_address(guchar *addr, int flags);
 
 #endif /* _SCLI_H */
 

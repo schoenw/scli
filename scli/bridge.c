@@ -159,10 +159,12 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_bridge_forwarding(GString *s, dot1dTpFdbEntry_t *dot1dTpFdbEntry)
+show_bridge_forwarding(GString *s, dot1dTpFdbEntry_t *dot1dTpFdbEntry,
+		       int name_width)
 {
     scli_vendor_t *vendor;
     guint32 prefix;
+    char *name;
     int i;
 
     if (dot1dTpFdbEntry->dot1dTpFdbPort) {
@@ -174,13 +176,13 @@ show_bridge_forwarding(GString *s, dot1dTpFdbEntry_t *dot1dTpFdbEntry)
 	     dot1dTpFdbEntry->dot1dTpFdbStatus);
     g_string_append(s, " ");
     if (dot1dTpFdbEntry->dot1dTpFdbAddress) {
+	g_string_sprintfa(s, "%s",
+		  fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress, 0));
+	name = fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress, 2);
+	g_string_sprintfa(s, " %-*s", name_width, name ? name : "");
 	prefix = dot1dTpFdbEntry->dot1dTpFdbAddress[0] * 65536
 	    + dot1dTpFdbEntry->dot1dTpFdbAddress[1] * 256
 	    + dot1dTpFdbEntry->dot1dTpFdbAddress[2];
-	for (i = 0; i < 6; i++) {
-	    g_string_sprintfa(s, "%s%02x", i ? ":" : "",
-			      dot1dTpFdbEntry->dot1dTpFdbAddress[i]);
-	}
 	vendor = scli_get_ieee_vendor(prefix);
 	if (vendor && vendor->name) {
 	    g_string_sprintfa(s, " %s", vendor->name);
@@ -196,6 +198,7 @@ cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 {
     dot1dTpFdbEntry_t **dot1dTpFdbTable = NULL;
     int i, p, max = 0;
+    int name_width = 8;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -209,14 +212,22 @@ cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 		&& *dot1dTpFdbTable[i]->dot1dTpFdbPort > max) {
 		max = *dot1dTpFdbTable[i]->dot1dTpFdbPort;
 	    }
+	    if (dot1dTpFdbTable[i]->dot1dTpFdbAddress) {
+		char *name = fmt_ether_address(dot1dTpFdbTable[i]->dot1dTpFdbAddress, 2);
+		if (name && strlen(name) > name_width) {
+		    name_width = strlen(name);
+		}
+	    }
 	};
-	g_string_append(interp->result,
-			" Port Status   Address           Vendor\n");
+	g_string_sprintfa(interp->result,
+			  " Port Status   Address           %-*s Vendor\n",
+			  name_width, "Name");
 	for (p = 0; p < max+1; p++) {
 	    for (i = 0; dot1dTpFdbTable[i]; i++) {
 		if (dot1dTpFdbTable[i]->dot1dTpFdbPort
 		    && *dot1dTpFdbTable[i]->dot1dTpFdbPort == p) {
-		    show_bridge_forwarding(interp->result, dot1dTpFdbTable[i]);
+		    show_bridge_forwarding(interp->result, dot1dTpFdbTable[i],
+					   name_width);
 		}
 	    }
 	}
