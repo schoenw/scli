@@ -24,6 +24,7 @@
 
 #include "snmpv2-tc.h"
 #include "entity-mib.h"
+#include "entity-sensor-mib.h"
 
 
 static void
@@ -129,6 +130,50 @@ show_entity_containment(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (entPhysicalTable) entity_mib_free_entPhysicalTable(entPhysicalTable);
+    
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_entity_sensors(GString *s,
+		   entity_sensor_mib_entPhySensorEntry_t *entSensorEntry)
+{
+    g_string_sprintfa(s, "sensor %d\n",
+		      entSensorEntry->entPhysicalIndex);
+}
+
+
+
+static int
+show_entity_sensors(scli_interp_t *interp, int argc, char **argv)
+{
+    entity_sensor_mib_entPhySensorEntry_t **entSensorTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    entity_sensor_mib_get_entPhySensorTable(interp->peer, &entSensorTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (entSensorTable) {
+	for (i = 0; entSensorTable[i]; i++) {
+	    fmt_entity_sensors(interp->result, entSensorTable[i]);
+	}
+    }
+
+    if (entSensorTable) entity_sensor_mib_free_entPhySensorTable(entSensorTable);
     
     return SCLI_OK;
 }
@@ -474,6 +519,13 @@ scli_init_entity_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_entity_containment },
 
+	{ "show entity sensors ", NULL,
+	  "The `show entity sensors' command describes the physical sensor\n"
+	  "entities in more detail.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_entity_sensors },
+	
 #if 0
 	{ "set entity serial", NULL,
 	  "xxx",
