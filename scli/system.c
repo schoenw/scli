@@ -499,13 +499,13 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (dot1dBase) {
-	if (dot1dBase->dot1dBaseNumPorts) {
+	if (dot1dBase->dot1dBaseNumPorts && *dot1dBase->dot1dBaseNumPorts) {
 	    g_string_sprintfa(s, "\n%-*s %d ", indent, "Bridge Ports:",
 			      *(dot1dBase->dot1dBaseNumPorts));
 	    if (dot1dBase->dot1dBaseType) {
 		fmt_enum(s, 60, bridge_mib_enums_dot1dBaseType,
 			 dot1dBase->dot1dBaseType);
-	    }
+           }
 	}
     }
 
