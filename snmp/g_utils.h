@@ -43,8 +43,9 @@ struct _GSnmpEnum {
 gchar const *
 gsnmp_enum_get_label(GSnmpEnum const *table, gint32 const id);
 
-gint32
-gsnmp_enum_get_number(GSnmpEnum const *table, gchar const *str);
+int
+gsnmp_enum_get_number(GSnmpEnum const *table, gchar const *str,
+		      gint32 *number);
 
 struct _GSnmpIdentity {
     guint32 const *oid;
@@ -64,5 +65,6 @@ gsnmp_identity_get_identity(GSnmpIdentity const *table,
  */
 
 extern GSnmpEnum const gsnmp_enum_version_table[];
+extern GSnmpEnum const gsnmp_error_status_table[];
 
 #endif

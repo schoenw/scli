@@ -24,12 +24,40 @@
 
 #include "g_snmp.h"
 
+
 GSnmpEnum const gsnmp_enum_version_table[] = {
     { G_SNMP_V1,	"SNMPv1" },
     { G_SNMP_V2C,	"SNMPv2c" },
     { G_SNMP_V3,	"SNMPv3" },
     { 0, 0 }
 };
+
+
+
+GSnmpEnum const gsnmp_error_status_table[] = {
+    { 0, "noError" },
+    { 1, "tooBig" },
+    { 2, "noSuchName"},
+    { 3, "badValue" },
+    { 4, "readOnly" },
+    { 5, "genErr" },
+    { 6, "noAccess" },
+    { 7, "wrongType" },
+    { 8, "wrongLength" },
+    { 9, "wrongEncoding" },
+    { 10, "wrongValue" },
+    { 11, "noCreation" },
+    { 12, "inconsistentValue" },
+    { 13, "resourceUnavailable" },
+    { 14, "commitFailed" },
+    { 15, "undoFailed" },
+    { 16, "authorizationError" },
+    { 17, "notWritable" },
+    { 18, "inconsistentName" },
+    { 0, 0 }
+};
+
+
 
 char const *
 gsnmp_enum_get_label(GSnmpEnum const *table, gint32 const id)
@@ -47,18 +75,19 @@ gsnmp_enum_get_label(GSnmpEnum const *table, gint32 const id)
 
 
 
-gint32
-gsnmp_enum_get_number(GSnmpEnum const *table, char const *str)
+int
+gsnmp_enum_get_number(GSnmpEnum const *table, char const *str, gint32 *number)
 {
     int i;
 
     for (i = 0; table[i].label; i++) {
 	if (strcmp(str, table[i].label) == 0) {
-	    return table[i].number;
+	    if (number) *number = table[i].number;
+	    return TRUE;
 	}
     }
 
-    return 0; /* xxx */
+    return FALSE;
 }
 
 
