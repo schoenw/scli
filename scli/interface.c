@@ -998,7 +998,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 
 	{ "show interface info", "[<regexp>]",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "The show interface info command display summary information\n"
+	  "The show interface info command displays summary information\n"
 	  "for all selected interfaces. The optional regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest. The command generates a\n"

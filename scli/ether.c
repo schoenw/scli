@@ -186,20 +186,26 @@ GSnmpIdentity const mau_type_identities[] = {
 static void
 show_ether_mau_info(GString *s, mau_mib_ifMauEntry_t *ifMauEntry)
 {
+    const char *e;
+    
     g_string_sprintfa(s, "%7u ", ifMauEntry->ifMauIfIndex);
     g_string_sprintfa(s, "%7u ", ifMauEntry->ifMauIndex);
-    
-    xxx_enum(s, 12, mau_mib_enums_ifMauStatus,
-	     ifMauEntry->ifMauStatus);
 
-    xxx_enum(s, 14, mau_mib_enums_ifMauMediaAvailable,
-	     ifMauEntry->ifMauMediaAvailable);
+    e = fmt_enum(mau_mib_enums_ifMauStatus,
+		 ifMauEntry->ifMauStatus);
+    g_string_sprintfa(s, "%12s", e ? e : "");
 
-    xxx_enum(s, 9, mau_mib_enums_ifMauJabberState,
-	     ifMauEntry->ifMauJabberState);
+    e = fmt_enum(mau_mib_enums_ifMauMediaAvailable,
+		 ifMauEntry->ifMauMediaAvailable);
+    g_string_sprintfa(s, "%14s", e ? e : "");
 
-    xxx_enum(s, 7, mau_mib_enums_ifMauAutoNegSupported,
-	     ifMauEntry->ifMauAutoNegSupported);
+    e = fmt_enum(mau_mib_enums_ifMauJabberState,
+		 ifMauEntry->ifMauJabberState);
+    g_string_sprintfa(s, "%9s", e ? e : "");
+
+    e = fmt_enum(mau_mib_enums_ifMauAutoNegSupported,
+		 ifMauEntry->ifMauAutoNegSupported);
+    g_string_sprintfa(s, "%7s", e ? e : "");
 
     if (ifMauEntry->ifMauType) {
 	g_string_sprintfa(s, " %s", 
