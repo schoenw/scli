@@ -593,6 +593,45 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+fmt_alarm_info(GString *s, scli_alarm_t *alarm)
+{	
+    struct tm *tm;
+
+    tm = localtime(&alarm->detected);
+    g_string_sprintfa(s, "%04d-%02d-%02d %02d:%02d:%02d ",
+		      tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+		      tm->tm_hour, tm->tm_min, tm->tm_sec);
+    g_string_sprintfa(s, "%s\n", alarm->desc);
+}
+
+
+
+static int
+show_scli_alarm_info(scli_interp_t *interp, int argc, char **argv)
+{
+    GSList *elem;
+    scli_alarm_t *alarm;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (interp->alarm_list) {
+	g_string_sprintfa(interp->header, "DETECTED            VERIFIED            DESCRIPTION");
+	for (elem = interp->alarm_list; elem; elem = g_slist_next(elem)) {
+	    alarm = (scli_alarm_t *) elem->data;
+	    fmt_alarm_info(interp->result, alarm);
+	}
+    }
+
+    return SCLI_OK;
+}
+
+
+
 static int
 set_scli_regex(scli_interp_t *interp, int argc, char **argv)
 {
@@ -1035,6 +1074,13 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  NULL, NULL,
 	  show_scli_schema },
+
+	{ "show scli alarm info", NULL,
+	  "The show scli alarm info command displays summary information\n"
+	  "about all known alarms.",
+	  0,
+	  NULL, NULL,
+	  show_scli_alarm_info },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
