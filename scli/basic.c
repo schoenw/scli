@@ -117,7 +117,7 @@ page(scli_interp_t *interp, GString *s)
 
     if (scli_interp_interactive(interp)) {
 	if (g_snmp_list_decode_hook) {
-	    g_print("\r                         \r");
+	    g_print("\r                                 \r");
 	}
     } else {
     nopager:

@@ -117,7 +117,7 @@ mainloop(scli_interp_t *interp)
  */
 
 static char*
-generator(char *text, int state)
+generator(char const *text, int state)
 {
     static int argc = 0;
     static char **argv = NULL;
@@ -208,12 +208,15 @@ completion(char *text, int start, int end)
     matches = completion_matches(text, generator);
 #endif
 
-    /* Don't switch to filename completion if no matches ware found. */
+    /*
+     * Do not switch to filename completion if no matches were found.
+     */
+    
     if (! matches) {
        rl_completion_entry_function = (Function *) completion;
     }
     
-    return (matches);
+    return matches;
 }
 
 /*
