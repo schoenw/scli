@@ -71,7 +71,7 @@ scli_curses_off()
 int
 scli_set_pager(scli_interp_t *interp, const char *pager)
 {
-    char *unsafe = "; '\\\"";
+    char *unsafe = "; '\\\"&|";
 
     if (pager) {
 	if (strpbrk(pager, unsafe)) {
