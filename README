@@ -1,82 +1,99 @@
-	scli - SNMP command line management tools
+SCLI -- SNMP COMMAND LINE INTERFACE
+===================================
 
-Description
+Copyright (c) 2001 Juergen Schoenwaelder, TU Braunschweig, Germany
 
-  The scli package written to address the need for small and efficient
-  command line utilities to monitor and configure network devices and
-  host systems. The scli package is based on the SNMP management
-  protocol. It utilizes a MIB compiler called smidump to generate C
-  stub code. In fact, virtually no SNMP knowledge is required in order
-  to extend the scli program with new features.
-
-  To summarize, the slogan for this little package is:
-
-    "After more than 10 years of SNMP, I felt it is time for really
-     useful command line SNMP monitoring and configuration tools. ;-)"
+$Id$
 
 
-Compiling
+DESCRIPTION
+===========
 
-  To compile scli, you need the following packages:
+The scli package written to address the need for small and efficient
+command line utilities to monitor and configure network devices and
+host systems. The scli package is based on the SNMP management
+protocol. The implementation utilizes a MIB compiler called smidump to
+generate C stub code. In fact, virtually no SNMP knowledge is required
+in order to extend the scli program with new features.
+
+To summarize, the slogan for this little package is:
+
+  "After more than 10 years of SNMP, I felt it is time for really
+   useful command line SNMP monitoring and configuration tools. ;-)"
+
+
+INSTALLATION
+============
+
+To compile scli, you need the following packages:
 
   - GNU readline version 4.X
   - glib version 1.2.X
   - ncurses version 5.X (or a native working curses implementation)
   - libxml2
 
-  The package compiles cleanly with gcc. Other C compilers have not
-  been tested and may generate errors.
+The package compiles cleanly with gcc. Other C compilers have not been
+tested and may generate various errors/warnings. Please consult the
+files INSTALL for the building the scli package and PORTING for some
+additional notes for some specific platforms.
 
 
-Reporting Bugs
+REPORTING BUGS
+==============
 
-  Please report any bugs to the scli mailing list. A bug report
-  should at a minimum contain the version number of the scli
-  package, the operating system name and version number, plus
-  everything needed to understand the problem. This includes a
-  description why you actually believe that there is a bug.
+Please report any bugs to the scli mailing list. A bug report
+should at a minimum contain the version number of the scli
+package, the operating system name and version number, plus
+everything needed to understand the problem. This includes a
+description why you actually believe that there is a bug.
 
-  If you got a core dump, please send us a readable backtrace.
-  If there was a problem with a certain SNMP agent, please let
-  us know which agent you were using and try to catch SNMP 
-  message exchanges that help to understand the problem.
-  (You may want to run a recent version of tcpdump to catch
-  the messages.)
-
-
-Mailing List
-
-  The scli mailing list is <scli@ibr.cs.tu-bs.de>. For subscribing
-  to the list, send a message containing the words ``subscribe
-  scli'' to <majordomo@ibr.cs.tu-bs.de>.
+If you got a core dump, please send us a readable backtrace.
+If there was a problem with a certain SNMP agent, please let
+us know which agent you were using and try to catch SNMP 
+message exchanges that help to understand the problem.
+(You may want to run a recent version of tcpdump to catch
+the messages.)
 
 
-Web Site
+MAILING LIST
+============
 
-  The Web site for the scli package is located at the following URL:
+The scli mailing list is <scli@ibr.cs.tu-bs.de>. For subscribing to
+the list, send a message containing the words ``subscribe scli'' to
+<majordomo@ibr.cs.tu-bs.de>.
+
+
+WEB SITE
+========
+
+The Web site for the scli package is located at the following URL:
 
   <http://www.ibr.cs.tu-bs.de/projects/scli/>
 
 
-Contacting Authors
+CONTACTING AUTHORS
+==================
 
-  See the file 'AUTHORS' that should have been included in the
-  distribution.
+See the file 'AUTHORS' that should have been included in the
+distribution.
 
 
-Copyright (C) 2001 Juergen Schoenwaelder
+COPYRIGHT
+=========
 
-  stop is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
+Copyright (c) 2001 Juergen Schoenwaelder
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+The scli package is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the
+License, or (at your option) any later version.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
