@@ -25,7 +25,9 @@ MIBS			= IF-MIB \
 			  MAU-MIB \
 			  RFC1213-MIB \
 			  OSPF-MIB \
-			  Printer-MIB 
+			  Printer-MIB \
+			  OLD-CISCO-IP-MIB \
+			  RAPIDCITY-VLAN-MIB
 
 STUBS			= if-mib.h if-mib.c \
 			  ip-mib.h ip-mib.c \
@@ -52,7 +54,9 @@ STUBS			= if-mib.h if-mib.c \
 			  mau-mib.h mau-mib.c \
 			  rfc1213-mib.h rfc1213-mib.c \
 			  ospf-mib.h ospf-mib.c \
-			  printer-mib.h printer-mib.c
+			  printer-mib.h printer-mib.c \
+			  old-cisco-ip-mib.h old-cisco-ip-mib.c \
+			  rapidcity-vlan-mib.h rapidcity-vlan-mib.c
 
 noinst_LIBRARIES	= libstub.a
 libstub_a_SOURCES	= $(STUBS)
