@@ -117,85 +117,82 @@ g_snmp_table_done_callback(host_snmp *host, gpointer data,
   return TRUE;
 }  
 
+
 static void
 g_snmp_table_time_callback(host_snmp *host, gpointer data)
 {
-  Gsnmp_table * table;
-
-  table = (Gsnmp_table *) data;
-  table->request = 0;
-  if (table->cb_error)
-    table->cb_error(table->data);
-  else
-    g_snmp_table_destroy(table);  
+    Gsnmp_table * table;
+    
+    table = (Gsnmp_table *) data;
+    table->request = 0;
+    if (table->cb_error) {
+	table->cb_error(table->data);
+    } else {
+	g_snmp_table_destroy(table);
+    }
 }
+
 
 Gsnmp_table *
-g_snmp_table_new (host_snmp *host, GSList *objs, 
-                  void (* cb_error)(), void (* cb_row)(), void (* cb_finish)(),
-                  gpointer data)
+g_snmp_table_new(host_snmp *host, GSList *objs, 
+		 void (* cb_error)(), void (* cb_row)(), void (* cb_finish)(),
+		 gpointer data)
 {
-  Gsnmp_table * table;
+    GSList *elem;
+    Gsnmp_table *table;
 
-  table       = g_malloc0(sizeof(Gsnmp_table));
-  table->host = g_malloc0(sizeof(host_snmp));
-
-  table->host->domain  = host->domain;
-  table->host->rcomm   = host->rcomm;
-  table->host->wcomm   = host->wcomm;
-  table->host->retries = host->retries;
-  table->host->name    = host->name;
-  table->host->status  = 0;
-  table->host->port    = host->port;
-  table->host->timeout = host->timeout;
-  table->host->version = host->version;
-  table->host->magic   = table;
-
-  table->host->done_callback = g_snmp_table_done_callback;
-  table->host->time_callback = g_snmp_table_time_callback;
-
-  table->objs = objs;
-  table->data = data;
-
-  table->cb_error  = cb_error;
-  table->cb_row    = cb_row;
-  table->cb_finish = cb_finish;
-
-  return table;
+    table       = g_malloc0(sizeof(Gsnmp_table));
+    table->host = g_malloc0(sizeof(host_snmp));
+    
+    table->host->domain  = host->domain;
+    table->host->rcomm   = host->rcomm;
+    table->host->wcomm   = host->wcomm;
+    table->host->retries = host->retries;
+    table->host->name    = host->name;
+    table->host->status  = 0;
+    table->host->port    = host->port;
+    table->host->timeout = host->timeout;
+    table->host->version = host->version;
+    table->host->magic   = table;
+    
+    table->host->done_callback = g_snmp_table_done_callback;
+    table->host->time_callback = g_snmp_table_time_callback;
+    
+    for (elem = objs; elem; elem = g_slist_next(elem)) {
+	GSnmpVarBind *obj, *nobj;
+	obj  = (GSnmpVarBind *) elem->data;
+	nobj = g_snmp_varbind_new(obj->id, obj->id_len, G_SNMP_NULL, NULL, 0);
+	table->objs = g_slist_append(table->objs, nobj);
+    }
+    table->data = data;
+    
+    table->cb_error  = cb_error;
+    table->cb_row    = cb_row;
+    table->cb_finish = cb_finish;
+    
+    return table;
 }
+
 
 void
 g_snmp_table_get(Gsnmp_table *table)
 {
-  GSList *objs;
-  GSList *cobj;
-  GSnmpVarBind *obj;
-  GSnmpVarBind *nobj;
-
-
-  objs = NULL; 
-  cobj = table->objs;
-  while (cobj)
-    {
-      obj = (GSnmpVarBind *) cobj->data;
-      nobj             = g_malloc0(sizeof(GSnmpVarBind));
-      nobj->type       = G_SNMP_NULL;
-      nobj->syntax_len = 0;
-      nobj->id_len     = obj->id_len;
-      nobj->id         = g_malloc(obj->id_len * sizeof(gulong));
-      memmove (nobj->id, obj->id, obj->id_len * sizeof(gulong));
-      objs             = g_slist_append(objs, nobj);
-      cobj = cobj->next;
-    }
-  table->request = g_async_getnext(table->host, objs);
+    table->request = g_async_getnext(table->host, table->objs);
 }
+
 
 void
 g_snmp_table_destroy(Gsnmp_table *table)
 {
-  if (table->request)
-    g_remove_request(table->request);
-  g_slist_free(table->objs);
-  g_free(table->host);
-  g_free(table);
+    GSList *elem;
+    
+    if (table->request) {
+	g_remove_request(table->request);
+    }
+    for (elem = table->objs; elem; elem = g_slist_next(elem)) {
+	g_snmp_varbind_free((GSnmpVarBind *) elem->data);
+    }
+    g_slist_free(table->objs);
+    g_free(table->host);
+    g_free(table);
 }
