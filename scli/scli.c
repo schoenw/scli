@@ -401,6 +401,7 @@ main(int argc, char **argv)
     scli_init_ip_mode(interp);
     scli_init_tcp_mode(interp);
     scli_init_interface_mode(interp);
+    scli_init_bridge_mode(interp);
 
     if (! norc) {
 	(void) scli_eval_init_file(interp);

@@ -420,8 +420,8 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 	}
 	if (system->sysObjectID) {
 	    scli_vendor_t *vendor;
-	    vendor = scli_get_vendor(system->sysObjectID,
-				     system->_sysObjectIDLength);
+	    vendor = scli_get_iana_vendor(system->sysObjectID,
+					  system->_sysObjectIDLength);
 	    if (vendor && vendor->name) {
 		g_string_sprintfa(s, "\n%-*s ", indent, "Vendor:");
 		if (vendor->id) {

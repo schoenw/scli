@@ -105,6 +105,20 @@ scli_register_mode(scli_interp_t *interp, scli_mode_t *mode);
 extern int
 scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd);
 
+/*
+ * Core scli commands:
+ */
+
+extern int
+scli_cmd_help(scli_interp_t *interp, int argc, char **argv);
+
+extern int
+scli_cmd_history(scli_interp_t *interp, int argc, char **argv);
+
+/*
+ * Initialization functions for the various scli modes.
+ */
+
 extern void
 scli_init_system_mode(scli_interp_t *interp);
 
@@ -126,14 +140,11 @@ scli_init_ip_mode(scli_interp_t *interp);
 extern void
 scli_init_tcp_mode(scli_interp_t *interp);
 
+extern void
+scli_init_bridge_mode(scli_interp_t *interp);
+
 extern int
 scli_cmd_exit(scli_interp_t *interp, int argc, char **argv);
-
-extern int
-scli_cmd_help(scli_interp_t *interp, int argc, char **argv);
-
-extern int
-scli_cmd_history(scli_interp_t *interp, int argc, char **argv);
 
 /* 
  * A data structure used to obtain vendor information from the
@@ -147,7 +158,10 @@ typedef struct scli_vendor {
 } scli_vendor_t;
 
 extern scli_vendor_t*
-scli_get_vendor(guint32 oid[], gsize len);
+scli_get_iana_vendor(guint32 oid[], gsize len);
+
+extern scli_vendor_t*
+scli_get_ieee_vendor(guint32 prefix);
 
 /*
  * Formatting utilities that are used frequently by scli modes.

@@ -45,11 +45,6 @@ get_if_name(ifEntry_t *ifEntry, ifXEntry_t *ifXEntry, int width)
 	       && ifEntry->_ifDescrLength < width) {
 	g_snprintf(buffer, sizeof(buffer), "%.*s",
 		   (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);
-#if 0
-    } else {
-	g_snprintf(buffer, sizeof(buffer), "if#%-*d", width - 3,
-		   ifEntry->ifIndex);
-#endif
     }
 
     return buffer;
@@ -58,16 +53,17 @@ get_if_name(ifEntry_t *ifEntry, ifXEntry_t *ifXEntry, int width)
 
 
 static void
-fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper)
+fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
+	     gint32 *conn, gint32 *prom)
 {
-    stls_table_t const admin_states[] = {
+    static stls_table_t const admin_states[] = {
 	{ 1, "u" },	/* up */
 	{ 2, "d" },	/* down */
 	{ 3, "t" },	/* testing */
 	{ 0, NULL }
     };
 
-    stls_table_t const oper_states[] = {
+    static stls_table_t const oper_states[] = {
 	{ 1, "u" },	/* up */
 	{ 2, "d" },	/* down */
 	{ 3, "t" },	/* testing */
@@ -77,11 +73,23 @@ fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper)
 	{ 7, "l" },	/* lowerLayerDown */
 	{ 0, NULL }
     };
-    
-    g_string_append(s, " ");
+
+    static stls_table_t const conn_states[] = {
+	{ 1, "c" },	/* connector present (true) */
+	{ 2, "n" },	/* no connector present (false) */
+	{ 0, NULL }
+    };
+
+    static stls_table_t const prom_states[] = {
+	{ 1, "p" },	/* promiscuous (true) */
+	{ 2, "n" },	/* no promiscuous (false) */
+	{ 0, NULL }
+    };
+
     fmt_enum(s, 1, admin_states, admin);
-    g_string_append(s, "/");
     fmt_enum(s, 1, oper_states, oper);
+    fmt_enum(s, 1, conn_states, conn);
+    fmt_enum(s, 1, prom_states, prom);
 }
     
 
@@ -228,7 +236,10 @@ show_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
     g_string_sprintfa(s, "%5u ", ifEntry->ifIndex);
     g_string_sprintfa(s, "%-*s ", name_width,
 		      get_if_name(ifEntry, ifXEntry, 12));
-    fmt_ifStatus(s, ifEntry->ifAdminStatus, ifEntry->ifOperStatus);
+    fmt_ifStatus(s,
+		 ifEntry->ifAdminStatus, ifEntry->ifOperStatus,
+		 ifXEntry ? ifXEntry->ifConnectorPresent : NULL,
+		 ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
 
     if (ifEntry->ifMtu) {
 	g_string_sprintfa(s, " %6d", *(ifEntry->ifMtu));
@@ -304,7 +315,7 @@ cmd_info(scli_interp_t *interp, int argc, char **argv)
 }
 
 
-
+#if 0
 static int
 cmd_stack(scli_interp_t *interp, int argc, char **argv)
 {
@@ -320,7 +331,7 @@ cmd_stack(scli_interp_t *interp, int argc, char **argv)
     
     return SCLI_OK;
 }
-
+#endif
 
 
 void
@@ -334,9 +345,11 @@ scli_init_interface_mode(scli_interp_t *interp)
 	{ "show interface", "info",
 	  "show network interface summary information",
 	  cmd_info },
+#if 0
 	{ "show interface", "stack",
 	  "show interface stacking information",
 	  cmd_stack },
+#endif
 	{ NULL, NULL, NULL, NULL }
     };
     
