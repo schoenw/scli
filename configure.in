@@ -36,7 +36,7 @@ AC_CHECK_LIB(readline, readline, ,
 dnl Checks for header files.
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h sys/ioctl.h sys/time.h ncurses.h)
+AC_CHECK_HEADERS(unistd.h sys/ioctl.h sys/time.h ncurses.h netinet/if_ether.h)
 dnl AC_EGREP_HEADER(TIOCGWINSZ,sys/ioctl.h,AC_DEFINE(HAVE_TIOCGWINSZ))
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -56,7 +56,7 @@ if test $ac_cv_func_connect = no; then
   AC_CHECK_LIB(socket, connect)
 fi
 
-AC_CHECK_FUNCS(resizeterm getaddrinfo)
+AC_CHECK_FUNCS(resizeterm getaddrinfo ether_ntohost)
 
 dnl Check for configure options
 

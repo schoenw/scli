@@ -1768,7 +1768,7 @@ EOF
 
 fi
 
-for ac_hdr in unistd.h sys/ioctl.h sys/time.h ncurses.h
+for ac_hdr in unistd.h sys/ioctl.h sys/time.h ncurses.h netinet/if_ether.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
@@ -2112,7 +2112,7 @@ fi
 
 fi
 
-for ac_func in resizeterm getaddrinfo
+for ac_func in resizeterm getaddrinfo ether_ntohost
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
 echo "configure:2119: checking for $ac_func" >&5
