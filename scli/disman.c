@@ -1567,7 +1567,9 @@ create_disman_script(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (strlen(argv[1]) > 32 || strlen(argv[2]) > 32) {
+    if (strlen(argv[1]) > 32
+	|| strlen(argv[2]) < 1
+	|| strlen(argv[2]) > 32) {
 	return SCLI_SYNTAX_VALUE;
     }
 
@@ -1582,16 +1584,48 @@ create_disman_script(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+create_disman_run(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 4) {
+	return SCLI_SYNTAX;
+    }
+
+    if (strlen(argv[1]) > 32
+	|| strlen(argv[2]) < 1
+	|| strlen(argv[2]) > 32) {
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    disman_script_mib_proc_create_run(interp->peer,
+				      argv[1], argv[2], argv[3]);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_disman_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 
-	{ "create disman script", "<owner> <name> [<description>]",
+	{ "create disman script", "<owner> <name> <description>",
 	  "...",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  create_disman_script },	  
+
+	{ "create disman run", "<owner> <name> <args>",
+	  "...",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  create_disman_run },	  
 
 	{ "show disman languages", NULL,
 	  "languages supported by the distributed manager",
