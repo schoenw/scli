@@ -234,54 +234,10 @@ main(int argc, char **argv)
     scli_interp_t *interp;
     char *file = NULL;
     char *cmd = NULL;
-    int c, i;
+    int c;
     
     int norc = 0, port = 161, delay = 5000, retries = 3, timeout = 500000;
     int xml = 0;
-
-    static scli_cmd_t cmds[] = {
-        { "create scli alias",
-	  0,
-	  "create an scli command alias",
-	  scli_cmd_alias },
-	{ "close",
-	  0,
-	  "close the association to a remote SNMP agent",
-	  scli_cmd_close },
-	{ "exit",
-	  0,
-	  "exit the scli command line program",
-	  scli_cmd_exit },
-	{ "help",
-	  0,
-	  "help about the current mode and commands",
-	  scli_cmd_help },
-	{ "history",
-	  0,
-	  "display the command history list with line numbers",
-	  scli_cmd_history },
-	{ "open",
-	  0,
-	  "open an association to a remote SNMP agent",
-	  scli_cmd_open },
-	{ "show scli aliases",
-	  0,
-	  "show information about scli aliases",
-	  scli_cmd_show_aliases },
-	{ "show scli association",
-	  0,
-	  "show information about the current scli association",
-	  scli_cmd_show_peer },
-	{ "show scli term",
-	  0,
-	  "show information about the terminal parameters",
-	  scli_cmd_show_term },
-	{ "delete scli alias",
-	  0,
-	  "delete an scli command alias",
-	  scli_cmd_unalias },
-	{ NULL, 0, NULL, NULL }
-    };
 
     static struct option const long_options[] =
     {
@@ -372,10 +328,6 @@ main(int argc, char **argv)
 
     interp = scli_interp_create();
 
-    for (i = 0; cmds[i].path; i++) {
-	scli_create_command(interp, cmds + i);
-    }
-
     if (file == NULL && cmd == NULL && isatty(0)) {
 	interp->flags |= SCLI_INTERP_FLAG_INTERACTIVE;
     }
@@ -400,6 +352,7 @@ main(int argc, char **argv)
 	fputs(interp->result->str, stdout);
     }
 
+    scli_init_scli_mode(interp);
     scli_init_system_mode(interp);
     scli_init_entity_mode(interp);
     scli_init_disman_mode(interp);

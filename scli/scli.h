@@ -133,42 +133,18 @@ extern void
 scli_get_screen(int *rows, int *cols);
 
 /*
- * Core scli commands:
+ * Core scli commands:	XXX this should not be visible across modules XXX
  */
-
-extern int
-scli_cmd_help(scli_interp_t *interp, int argc, char **argv);
-
-extern int
-scli_cmd_history(scli_interp_t *interp, int argc, char **argv);
-
-extern int
-scli_cmd_exit(scli_interp_t *interp, int argc, char **argv);
 
 extern int
 scli_cmd_open(scli_interp_t *interp, int argc, char **argv);
 
-extern int
-scli_cmd_close(scli_interp_t *interp, int argc, char **argv);
-
-extern int
-scli_cmd_alias(scli_interp_t *interp, int argc, char **argv);
-
-extern int
-scli_cmd_unalias(scli_interp_t *interp, int argc, char **argv);
-
-extern int
-scli_cmd_show_aliases(scli_interp_t *interp, int argc, char **argv);
-
-extern int
-scli_cmd_show_peer(scli_interp_t *interp, int argc, char **argv);
-
-extern int
-scli_cmd_show_term(scli_interp_t *interp, int argc, char **argv);
-
 /*
  * Initialization functions for the various scli modes.
  */
+
+extern void
+scli_init_scli_mode(scli_interp_t *interp);
 
 extern void
 scli_init_system_mode(scli_interp_t *interp);

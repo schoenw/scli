@@ -40,8 +40,8 @@ alias_compare(gconstpointer a, gconstpointer b)
 
 
 
-int
-scli_cmd_exit(scli_interp_t *interp, int argc, char **argv)
+static int
+cmd_scli_exit(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
         
@@ -84,36 +84,47 @@ print_cmd_tree(GString *s, GNode *node, char *prefix)
 
 
 
-int
-scli_cmd_help(scli_interp_t *interp, int argc, char **argv)
+static int
+cmd_scli_modes(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_mode_t *mode;
     GString *s;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
-        
-    s = interp->result;
-    g_string_sprintfa(s, "scli version %s %s\n\n", VERSION, scli_copyright);
-    g_string_append(s, "Supported modes:\n");
-    for (elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
-	mode = (scli_mode_t *) elem->data;
-	g_string_sprintfa(s, "%-15s %s\n", mode->name, mode->desc);
-    }
-    g_string_append(s, "\nList of scli commands:\n");
-    if (interp->cmd_root) {
-	print_cmd_tree(s, interp->cmd_root, "");
-	g_string_append(s, "\n");
-    }
 
-    interp->result = s;
+    if (! scli_interp_xml(interp)) {
+	s = interp->result;
+	g_string_sprintfa(s, "%-15s %s\n", "Mode", "Description");
+	for (elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
+	    mode = (scli_mode_t *) elem->data;
+	    g_string_sprintfa(s, "%-15s %s\n", mode->name, mode->desc);
+	}
+	interp->result = s;
+    }
     return SCLI_OK;
 }
 
 
 
-int
-scli_cmd_history(scli_interp_t *interp, int argc, char **argv)
+static int
+cmd_scli_help(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (! scli_interp_xml(interp)) {
+	if (interp->cmd_root) {
+	    print_cmd_tree(interp->result, interp->cmd_root, "");
+	    g_string_append(interp->result, "\n");
+	}
+    }
+    return SCLI_OK;
+}
+
+
+
+static int
+cmd_scli_history(scli_interp_t *interp, int argc, char **argv)
 {
     HIST_ENTRY **the_list;
     int i;
@@ -151,8 +162,8 @@ scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
 
 
 
-int
-scli_cmd_close(scli_interp_t *interp, int argc, char **argv)
+static int
+cmd_scli_close(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -163,8 +174,8 @@ scli_cmd_close(scli_interp_t *interp, int argc, char **argv)
 
 
 
-int
-scli_cmd_alias(scli_interp_t *interp, int argc, char **argv)
+static int
+cmd_scli_alias(scli_interp_t *interp, int argc, char **argv)
 {
     scli_alias_t *alias = NULL;
     
@@ -185,8 +196,8 @@ scli_cmd_alias(scli_interp_t *interp, int argc, char **argv)
 
 
 
-int
-scli_cmd_unalias(scli_interp_t *interp, int argc, char **argv)
+static int
+cmd_scli_unalias(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_alias_t *alias = NULL;
@@ -215,8 +226,8 @@ scli_cmd_unalias(scli_interp_t *interp, int argc, char **argv)
 
 
 
-int
-scli_cmd_show_aliases(scli_interp_t *interp, int argc, char **argv)
+static int
+cmd_scli_aliases(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_alias_t *alias;
@@ -252,8 +263,8 @@ scli_cmd_show_aliases(scli_interp_t *interp, int argc, char **argv)
 
 
 
-int
-scli_cmd_show_peer(scli_interp_t *interp, int argc, char **argv)
+static int
+cmd_scli_peer(scli_interp_t *interp, int argc, char **argv)
 {
     int const indent = 18;
 
@@ -279,8 +290,8 @@ scli_cmd_show_peer(scli_interp_t *interp, int argc, char **argv)
 
 
 
-int
-scli_cmd_show_term(scli_interp_t *interp, int argc, char **argv)
+static int
+cmd_scli_term(scli_interp_t *interp, int argc, char **argv)
 {
     int const indent = 18;
     int rows, cols;
@@ -301,4 +312,66 @@ scli_cmd_show_term(scli_interp_t *interp, int argc, char **argv)
     }
 
     return SCLI_OK;
+}
+
+
+
+void
+scli_init_scli_mode(scli_interp_t *interp)
+{
+    static scli_cmd_t cmds[] = {
+        { "create scli alias",
+	  0,
+	  "create an scli command alias",
+	  cmd_scli_alias },
+	{ "close",
+	  0,
+	  "close the association to a remote SNMP agent",
+	  cmd_scli_close },
+	{ "exit",
+	  0,
+	  "exit the scli command line program",
+	  cmd_scli_exit },
+	{ "help",
+	  0,
+	  "help about the current mode and commands",
+	  cmd_scli_help },
+	{ "history",
+	  0,
+	  "display the command history list with line numbers",
+	  cmd_scli_history },
+	{ "open",
+	  0,
+	  "open an association to a remote SNMP agent",
+	  scli_cmd_open },
+	{ "show scli aliases",
+	  0,
+	  "show information about scli aliases",
+	  cmd_scli_aliases },
+	{ "show scli association",
+	  0,
+	  "show information about the current scli association",
+	  cmd_scli_peer },
+	{ "show scli term",
+	  0,
+	  "show information about the terminal parameters",
+	  cmd_scli_term },
+	{ "show scli modes",
+	  0,
+	  "show information about the available modes",
+	  cmd_scli_modes },
+	{ "delete scli alias",
+	  0,
+	  "delete an scli command alias",
+	  cmd_scli_unalias },
+	{ NULL, 0, NULL, NULL }
+    };
+    
+    static scli_mode_t scli_mode = {
+	"scli",
+	"scli mode to display and configure scli parameters",
+	cmds
+    };
+
+    scli_register_mode(interp, &scli_mode);
 }
