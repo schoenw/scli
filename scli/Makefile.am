@@ -13,13 +13,15 @@ scli_SOURCES	= scli.c scli.h scli.1 vendors.c \
 		  cisco.c nortel.c netsnmp.c 3com.c
 scli_LDADD	= -L../proc -lproc -L../stub -lstub -L../snmp -lgsnmp $(GLIB_LIBS) $(XML_LIBS)
 #gscli_SOURCES	= gscli.c scli.h scli.1 vendors.c \
-#		  getopt.h getopt.c getopt1.c basic.c monitor.c cmds.c fmt.c \
+#		  getopt.h getopt.c getopt1.c basic.c monitor.c cmds.c \
+#		  fmt.c xml.c \
 #		  system.c entity.c interface.c disman.c snmp.c \
 #		  ip.c udp.c tcp.c \
 #		  bridge.c atm.c ether.c \
 #		  ospf.c printer.c \
+#		  isdn.c rs232.c \
 #		  cisco.c nortel.c netsnmp.c 3com.c
-#gscli_LDADD	= -L../stub -lstub -L../snmp -lgsnmp $(GTK_LIBS) $(GLIB_LIBS) $(XML_LIBS)
+#gscli_LDADD	= -L../proc -lproc -L../stub -lstub -L../snmp -lgsnmp $(GTK_LIBS) $(GLIB_LIBS) $(XML_LIBS)
 man_MANS	= scli.1
 
 scli.1:
