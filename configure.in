@@ -7,8 +7,6 @@ AM_INIT_AUTOMAKE(scli, 0.2.12)
 dnl create a config.h file (Automake will add -DHAVE_CONFIG_H)
 AM_CONFIG_HEADER(config.h)
 
-AC_SUBST(VERSION)
-
 ISODATE=`date +%Y-%m-%d`
 AC_SUBST(ISODATE)
 
@@ -21,7 +19,7 @@ AC_PROG_RANLIB
 AC_CHECK_PROG(SMIDUMP, smidump, smidump)
 AC_SUBST(SMIDUMP)
 
-AC_DEFINE_UNQUOTED(SCLI_PLUGIN_PATH, "${exec_prefix}/lib/scli")
+AC_DEFINE_UNQUOTED(SCLI_PLUGIN_PATH, "${pkglibdir}")
 
 AC_MSG_CHECKING([whether to enable -Wall])
 AC_ARG_ENABLE(warnings,
@@ -34,15 +32,15 @@ AC_ARG_ENABLE(warnings,
 
 dnl Checks for libraries.
 
-AM_PATH_GLIB(1.2.0,,AC_MSG_ERROR(scli needs GLIB),gmodule)dnl
-dnl AM_PATH_GTK(1.2.0,,AC_MSG_ERROR(scli needs GTK))dnl
-AM_PATH_XML2(2.0.0,,AC_MSG_ERROR(scli needs libxml2))dnl
-AC_CHECK_LIB(ncurses, initscr, , 
-  AC_CHECK_LIB(curses, initscr, ,
+AM_PATH_GLIB(1.2.0, [], AC_MSG_ERROR(scli needs GLIB), gmodule)
+dnl AM_PATH_GTK(1.2.0, [], AC_MSG_ERROR(scli needs GTK))
+AM_PATH_XML2(2.0.0, [], AC_MSG_ERROR(scli needs libxml2))
+AC_CHECK_LIB(ncurses, initscr, [],
+  AC_CHECK_LIB(curses, initscr, [],
     AC_MSG_ERROR([scli requires curses functions; install curses first])
   )
 )
-AC_CHECK_LIB(readline, readline, ,
+AC_CHECK_LIB(readline, readline, [],
   AC_MSG_ERROR([scli requires readline functions; install libreadline first])
 )
 
@@ -61,10 +59,7 @@ dnl Checks for library functions.
 
 AC_CHECK_FUNC(gethostbyname, [], AC_CHECK_LIB(nsl, gethostbyname))
 
-AC_CHECK_FUNC(connect)
-if test $ac_cv_func_connect = no; then
-  AC_CHECK_LIB(socket, connect)
-fi
+AC_CHECK_FUNC(connect, [], AC_CHECK_LIB(socket, connect))
 
 AC_CHECK_FUNCS(resizeterm getaddrinfo ether_ntohost)
 AC_CHECK_FUNCS(rl_completion_matches)
