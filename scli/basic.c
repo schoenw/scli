@@ -175,6 +175,46 @@ scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd)
 }
 
 
+static int
+eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
+{
+    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
+    int code = SCLI_OK;
+   
+    if (cmd->func) {
+	g_string_truncate(interp->result, 0);
+	code = (cmd->func) (interp, argc, argv);
+	if (interp->result) {
+	    fputs(interp->result->str, stdout);
+	}
+    }
+
+    return code;
+}
+
+
+
+static int
+eval_all_cmd_node(scli_interp_t *interp, GNode *node)
+{
+    for (node = g_node_first_child(node);
+	 node; node = g_node_next_sibling(node)) {
+	if (G_NODE_IS_LEAF(node)) {
+	    scli_cmd_t *cmd = node->data;
+	    if (cmd) {
+		printf("scli > %s %s\n", cmd->path, cmd->name);
+		eval_cmd_node(interp, node, 0, NULL);
+	    }
+	} else {
+	    eval_all_cmd_node(interp, node);
+	}
+    }
+
+    return SCLI_OK;
+}
+
+
+    
 
 int
 scli_eval(scli_interp_t *interp, char *cmd)
@@ -208,18 +248,14 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	if (! node) {
 	    break;
 	}
-	if (i < argc-1 && g_node_first_child(node)) {
+	if (i < argc-1 && ! G_NODE_IS_LEAF(node)) {
 	    node = g_node_first_child(node);
-	} else {
-	    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
+	} else if (G_NODE_IS_LEAF(node)) {
+	    code = eval_cmd_node(interp, node, argc - i, argv + i);
 	    done = 1;
-	    if (cmd->func) {
-		g_string_truncate(interp->result, 0);
-		code = (cmd->func) (interp, argc-i, argv+i);
-		if (interp->result) {
-		    fputs(interp->result->str, stdout);
-		}
-	    }
+	} else if (! G_NODE_IS_LEAF(node)) {
+	    done = 1;
+	    code = eval_all_cmd_node(interp, node);
 	}
     }
 
