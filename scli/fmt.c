@@ -81,7 +81,7 @@ fmt_timeticks(guint32 timeticks)
 {
     static char buffer[80];
     time_t now, gmt;
-    struct tm *tm;
+    struct tm *tm, now_tm;
     int gmt_offset;
     
     now = time(NULL);
@@ -99,13 +99,14 @@ fmt_timeticks(guint32 timeticks)
     gmt = mktime(tm);
 
     tm = localtime(&now);
+    now_tm = *tm;	/* make a copy since mktime() below can modify tm */
     tm->tm_isdst = 0;
     gmt_offset = mktime(tm) - gmt;
 
     g_snprintf(buffer, sizeof(buffer),
 	       "%04d-%02d-%02d %02d:%02d:%02d %c%02d:%02d",
-	       tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-	       tm->tm_hour, tm->tm_min, tm->tm_sec,
+	       now_tm.tm_year + 1900, now_tm.tm_mon + 1, now_tm.tm_mday,
+	       now_tm.tm_hour, now_tm.tm_min, now_tm.tm_sec,
 	       gmt_offset >= 0 ? '+' : '-',
 	       (int) ABS(gmt_offset) / 3600,
 	       (int) (ABS(gmt_offset) / 60) % 60);
