@@ -878,6 +878,86 @@ set_nortel_bridge_vlan_ports(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+set_vlan_default(scli_interp_t *interp,
+		 rapid_city_rcVlanEntry_t *vlanEntry,
+		 guchar *ports)
+{
+    rapid_city_rcVlanPortEntry_t *xx;
+    int port, bit;
+    
+    xx = rapid_city_new_rcVlanPortEntry();
+    if (! xx) {
+	return SCLI_ERROR;
+    }
+
+    for (port = 0; port < 32 * 8; port++) {
+	bit = ports[port/8] & 1 << (7-(port%8));
+	if (bit) {
+	    xx->rcVlanPortIndex = port;
+	    xx->rcVlanPortDefaultVlanId = &vlanEntry->rcVlanId;
+	    rapid_city_set_rcVlanPortEntry(interp->peer, xx,
+					   RAPID_CITY_RCVLANPORTDEFAULTVLANID);
+	    if (interp->peer->error_status) {
+		vlan_snmp_error(interp, vlanEntry);
+		return SCLI_ERROR;
+	    }
+	}
+    }
+
+    rapid_city_free_rcVlanPortEntry(xx);
+
+    return SCLI_OK;
+}
+
+
+
+static int
+set_nortel_bridge_vlan_default(scli_interp_t *interp, int argc, char **argv)
+{
+    rapid_city_rcVlanEntry_t **vlanTable = NULL;
+    guchar ports[32];
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 3) {
+	return SCLI_SYNTAX;
+    }
+
+    if (scan_port_set(ports, sizeof(ports), argv[2]) != SCLI_OK) {
+	return SCLI_SYNTAX;
+    }
+
+    rapid_city_get_rcVlanTable(interp->peer, &vlanTable, RAPID_CITY_RCVLANNAME);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (vlanTable) {
+	int len = strlen(argv[1]);
+	for (i = 0; vlanTable[i]; i++) {
+	    if (vlanTable[i]->rcVlanName
+		&& vlanTable[i]->_rcVlanNameLength == len
+		&& memcmp(vlanTable[i]->rcVlanName, argv[1], len) == 0) {
+		break;
+	    }
+	}
+	if (! vlanTable[i]) {
+	    g_string_sprintfa(interp->result, "no vlan with this name");
+	    rapid_city_free_rcVlanTable(vlanTable);
+	    return SCLI_ERROR;
+	}
+	set_vlan_default(interp, vlanTable[i], ports);
+    }
+
+    if (vlanTable) rapid_city_free_rcVlanTable(vlanTable);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_nortel_mode(scli_interp_t *interp)
 {
@@ -907,6 +987,16 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  set_nortel_bridge_vlan_ports },
+
+	{ "set nortel bridge vlan default", "<string> <ports>",
+	  "The set nortel bridge vlan default command allows to assign\n"
+	  "ports to a default vlan. The <string> argument is matched\n"
+	  "against the vlan names to select the vlan. The <ports> argument\n"
+	  "contains a comma separated list of port numbers or port number\n"
+	  "ranges, e.g. 1,5,7-8.",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  set_nortel_bridge_vlan_default },
 
 	{ "show nortel bridge vlan info", "[<regexp>]",
 	  "The show nortel bridge vlan info command shows summary\n"
