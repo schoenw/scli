@@ -507,12 +507,17 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
     g_string_truncate(interp->result, 0);
     g_string_truncate(interp->header, 0);
     if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER && ! interp->peer) {
-	g_printerr("no association to a remote SNMP agent\n");
+	g_printerr("error: no association to a remote SNMP agent\n");
 	return SCLI_ERROR;
     }
 
     if (scli_interp_xml(interp) && ! (cmd->flags & SCLI_CMD_FLAG_XML)) {
-	return SCLI_OK;
+	if (! scli_interp_recursive(interp)) {
+	    g_printerr("error: command does not support xml\n");
+	    return SCLI_ERROR;
+	} else {
+	    return SCLI_OK;
+	}
     }
 
     if (cmd->flags & SCLI_CMD_FLAG_MONITOR) {
