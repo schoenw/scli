@@ -1175,7 +1175,8 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	}
     }
 
-    if (entityGeneral && system && system->sysUpTime) {
+    if (entityGeneral && entityGeneral->entLastChangeTime
+	&& system && system->sysUpTime) {
 	guint32 dsecs = *(system->sysUpTime)
 	    - *(entityGeneral->entLastChangeTime);
 	g_string_sprintfa(s, "%-*s%s\n", indent, "Entity Swap:",
