@@ -238,7 +238,7 @@ create_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     productmib_proc_create_vlan(interp->peer, vlanId, argv[2],
 				PRODUCTMIB_A3COMVLANIFTYPE_VLANLAYER2);
     if (interp->peer->error_status) {
-	return SCLI_ERROR;
+	return SCLI_SNMP;
     }
 
     return SCLI_OK;
