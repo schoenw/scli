@@ -30,7 +30,7 @@
 #define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTORAGETYPE_PERMANENT	4
 #define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTORAGETYPE_READONLY	5
 
-extern stls_table_t const snmp_community_mib_enums_snmpCommunityStorageType[];
+extern stls_enum_t const snmp_community_mib_enums_snmpCommunityStorageType[];
 
 #define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_ACTIVE	1
 #define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_NOTINSERVICE	2
@@ -39,7 +39,7 @@ extern stls_table_t const snmp_community_mib_enums_snmpCommunityStorageType[];
 #define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_CREATEANDWAIT	5
 #define SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_DESTROY	6
 
-extern stls_table_t const snmp_community_mib_enums_snmpCommunityStatus[];
+extern stls_enum_t const snmp_community_mib_enums_snmpCommunityStatus[];
 
 
 /*

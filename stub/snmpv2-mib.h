@@ -27,7 +27,7 @@
 #define SNMPV2_MIB_SNMPENABLEAUTHENTRAPS_ENABLED	1
 #define SNMPV2_MIB_SNMPENABLEAUTHENTRAPS_DISABLED	2
 
-extern stls_table_t const snmpv2_mib_enums_snmpEnableAuthenTraps[];
+extern stls_enum_t const snmpv2_mib_enums_snmpEnableAuthenTraps[];
 
 
 /*

@@ -39,12 +39,12 @@
 #define ENTITY_MIB_ENTPHYSICALCLASS_PORT	10
 #define ENTITY_MIB_ENTPHYSICALCLASS_STACK	11
 
-extern stls_table_t const entity_mib_enums_entPhysicalClass[];
+extern stls_enum_t const entity_mib_enums_entPhysicalClass[];
 
 #define ENTITY_MIB_ENTPHYSICALISFRU_TRUE	1
 #define ENTITY_MIB_ENTPHYSICALISFRU_FALSE	2
 
-extern stls_table_t const entity_mib_enums_entPhysicalIsFRU[];
+extern stls_enum_t const entity_mib_enums_entPhysicalIsFRU[];
 
 
 /*

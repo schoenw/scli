@@ -15,27 +15,27 @@
 
 #include "disman-schedule-mib.h"
 
-stls_table_t const disman_schedule_mib_enums_schedType[] = {
+stls_enum_t const disman_schedule_mib_enums_schedType[] = {
     { DISMAN_SCHEDULE_MIB_SCHEDTYPE_PERIODIC,	"periodic" },
     { DISMAN_SCHEDULE_MIB_SCHEDTYPE_CALENDAR,	"calendar" },
     { DISMAN_SCHEDULE_MIB_SCHEDTYPE_ONESHOT,	"oneshot" },
     { 0, NULL }
 };
 
-stls_table_t const disman_schedule_mib_enums_schedAdminStatus[] = {
+stls_enum_t const disman_schedule_mib_enums_schedAdminStatus[] = {
     { DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_ENABLED,	"enabled" },
     { DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_DISABLED,	"disabled" },
     { 0, NULL }
 };
 
-stls_table_t const disman_schedule_mib_enums_schedOperStatus[] = {
+stls_enum_t const disman_schedule_mib_enums_schedOperStatus[] = {
     { DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_ENABLED,	"enabled" },
     { DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_DISABLED,	"disabled" },
     { DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_FINISHED,	"finished" },
     { 0, NULL }
 };
 
-stls_table_t const disman_schedule_mib_enums_schedLastFailure[] = {
+stls_enum_t const disman_schedule_mib_enums_schedLastFailure[] = {
     { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_NORESPONSE,	"noResponse" },
     { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_NOERROR,	"noError" },
     { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_TOOBIG,	"tooBig" },
@@ -59,7 +59,7 @@ stls_table_t const disman_schedule_mib_enums_schedLastFailure[] = {
     { 0, NULL }
 };
 
-stls_table_t const disman_schedule_mib_enums_schedStorageType[] = {
+stls_enum_t const disman_schedule_mib_enums_schedStorageType[] = {
     { DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE_OTHER,	"other" },
     { DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE_VOLATILE,	"volatile" },
     { DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
@@ -68,7 +68,7 @@ stls_table_t const disman_schedule_mib_enums_schedStorageType[] = {
     { 0, NULL }
 };
 
-stls_table_t const disman_schedule_mib_enums_schedRowStatus[] = {
+stls_enum_t const disman_schedule_mib_enums_schedRowStatus[] = {
     { DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_ACTIVE,	"active" },
     { DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_NOTINSERVICE,	"notInService" },
     { DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_NOTREADY,	"notReady" },

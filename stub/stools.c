@@ -68,14 +68,14 @@ cb_row(GHashTable *table, int index_len, gpointer *data)
 
 
 
-char *
-stls_table_get_value(stls_table_t const *table, gint32 const id)
+char const *
+stls_enum_get_label(stls_enum_t const *table, gint32 const id)
 {
     int i;
 
-    for (i = 0; table[i].str; i++) {
-	if (id == table[i].id) {
-	    return table[i].str;
+    for (i = 0; table[i].label; i++) {
+	if (id == table[i].number) {
+	    return table[i].label;
 	}
     }
 
@@ -83,13 +83,13 @@ stls_table_get_value(stls_table_t const *table, gint32 const id)
 }
 
 gint32
-stls_table_get_id(stls_table_t const *table, char const *str)
+stls_enum_get_number(stls_enum_t const *table, char const *str)
 {
     int i;
 
-    for (i = 0; table[i].str; i++) {
-	if (strcmp(str, table[i].str) == 0) {
-	    return table[i].id;
+    for (i = 0; table[i].label; i++) {
+	if (strcmp(str, table[i].label) == 0) {
+	    return table[i].number;
 	}
     }
 

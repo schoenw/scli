@@ -26,18 +26,18 @@
 #define DISMAN_SCHEDULE_MIB_SCHEDTYPE_CALENDAR	2
 #define DISMAN_SCHEDULE_MIB_SCHEDTYPE_ONESHOT	3
 
-extern stls_table_t const disman_schedule_mib_enums_schedType[];
+extern stls_enum_t const disman_schedule_mib_enums_schedType[];
 
 #define DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_ENABLED	1
 #define DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_DISABLED	2
 
-extern stls_table_t const disman_schedule_mib_enums_schedAdminStatus[];
+extern stls_enum_t const disman_schedule_mib_enums_schedAdminStatus[];
 
 #define DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_ENABLED	1
 #define DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_DISABLED	2
 #define DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_FINISHED	3
 
-extern stls_table_t const disman_schedule_mib_enums_schedOperStatus[];
+extern stls_enum_t const disman_schedule_mib_enums_schedOperStatus[];
 
 #define DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_NORESPONSE	-1
 #define DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_NOERROR	0
@@ -60,7 +60,7 @@ extern stls_table_t const disman_schedule_mib_enums_schedOperStatus[];
 #define DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_NOTWRITABLE	17
 #define DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_INCONSISTENTNAME	18
 
-extern stls_table_t const disman_schedule_mib_enums_schedLastFailure[];
+extern stls_enum_t const disman_schedule_mib_enums_schedLastFailure[];
 
 #define DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE_OTHER	1
 #define DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE_VOLATILE	2
@@ -68,7 +68,7 @@ extern stls_table_t const disman_schedule_mib_enums_schedLastFailure[];
 #define DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE_PERMANENT	4
 #define DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE_READONLY	5
 
-extern stls_table_t const disman_schedule_mib_enums_schedStorageType[];
+extern stls_enum_t const disman_schedule_mib_enums_schedStorageType[];
 
 #define DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_ACTIVE	1
 #define DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_NOTINSERVICE	2
@@ -77,7 +77,7 @@ extern stls_table_t const disman_schedule_mib_enums_schedStorageType[];
 #define DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_CREATEANDWAIT	5
 #define DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_DESTROY	6
 
-extern stls_table_t const disman_schedule_mib_enums_schedRowStatus[];
+extern stls_enum_t const disman_schedule_mib_enums_schedRowStatus[];
 
 
 /*

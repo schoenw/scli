@@ -29,7 +29,7 @@
 #define TCP_MIB_TCPRTOALGORITHM_RSRE	3
 #define TCP_MIB_TCPRTOALGORITHM_VANJ	4
 
-extern stls_table_t const tcp_mib_enums_tcpRtoAlgorithm[];
+extern stls_enum_t const tcp_mib_enums_tcpRtoAlgorithm[];
 
 #define TCP_MIB_TCPCONNSTATE_CLOSED	1
 #define TCP_MIB_TCPCONNSTATE_LISTEN	2
@@ -44,7 +44,7 @@ extern stls_table_t const tcp_mib_enums_tcpRtoAlgorithm[];
 #define TCP_MIB_TCPCONNSTATE_TIMEWAIT	11
 #define TCP_MIB_TCPCONNSTATE_DELETETCB	12
 
-extern stls_table_t const tcp_mib_enums_tcpConnState[];
+extern stls_enum_t const tcp_mib_enums_tcpConnState[];
 
 
 /*

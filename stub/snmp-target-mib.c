@@ -19,7 +19,7 @@
 
 #include "snmp-target-mib.h"
 
-stls_table_t const snmp_target_mib_enums_snmpTargetAddrStorageType[] = {
+stls_enum_t const snmp_target_mib_enums_snmpTargetAddrStorageType[] = {
     { SNMP_TARGET_MIB_SNMPTARGETADDRSTORAGETYPE_OTHER,	"other" },
     { SNMP_TARGET_MIB_SNMPTARGETADDRSTORAGETYPE_VOLATILE,	"volatile" },
     { SNMP_TARGET_MIB_SNMPTARGETADDRSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
@@ -28,7 +28,7 @@ stls_table_t const snmp_target_mib_enums_snmpTargetAddrStorageType[] = {
     { 0, NULL }
 };
 
-stls_table_t const snmp_target_mib_enums_snmpTargetAddrRowStatus[] = {
+stls_enum_t const snmp_target_mib_enums_snmpTargetAddrRowStatus[] = {
     { SNMP_TARGET_MIB_SNMPTARGETADDRROWSTATUS_ACTIVE,	"active" },
     { SNMP_TARGET_MIB_SNMPTARGETADDRROWSTATUS_NOTINSERVICE,	"notInService" },
     { SNMP_TARGET_MIB_SNMPTARGETADDRROWSTATUS_NOTREADY,	"notReady" },
@@ -38,14 +38,14 @@ stls_table_t const snmp_target_mib_enums_snmpTargetAddrRowStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const snmp_target_mib_enums_snmpTargetParamsSecurityLevel[] = {
+stls_enum_t const snmp_target_mib_enums_snmpTargetParamsSecurityLevel[] = {
     { SNMP_TARGET_MIB_SNMPTARGETPARAMSSECURITYLEVEL_NOAUTHNOPRIV,	"noAuthNoPriv" },
     { SNMP_TARGET_MIB_SNMPTARGETPARAMSSECURITYLEVEL_AUTHNOPRIV,	"authNoPriv" },
     { SNMP_TARGET_MIB_SNMPTARGETPARAMSSECURITYLEVEL_AUTHPRIV,	"authPriv" },
     { 0, NULL }
 };
 
-stls_table_t const snmp_target_mib_enums_snmpTargetParamsStorageType[] = {
+stls_enum_t const snmp_target_mib_enums_snmpTargetParamsStorageType[] = {
     { SNMP_TARGET_MIB_SNMPTARGETPARAMSSTORAGETYPE_OTHER,	"other" },
     { SNMP_TARGET_MIB_SNMPTARGETPARAMSSTORAGETYPE_VOLATILE,	"volatile" },
     { SNMP_TARGET_MIB_SNMPTARGETPARAMSSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
@@ -54,7 +54,7 @@ stls_table_t const snmp_target_mib_enums_snmpTargetParamsStorageType[] = {
     { 0, NULL }
 };
 
-stls_table_t const snmp_target_mib_enums_snmpTargetParamsRowStatus[] = {
+stls_enum_t const snmp_target_mib_enums_snmpTargetParamsRowStatus[] = {
     { SNMP_TARGET_MIB_SNMPTARGETPARAMSROWSTATUS_ACTIVE,	"active" },
     { SNMP_TARGET_MIB_SNMPTARGETPARAMSROWSTATUS_NOTINSERVICE,	"notInService" },
     { SNMP_TARGET_MIB_SNMPTARGETPARAMSROWSTATUS_NOTREADY,	"notReady" },

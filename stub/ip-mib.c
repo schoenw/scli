@@ -18,13 +18,13 @@
 
 #include "ip-mib.h"
 
-stls_table_t const ip_mib_enums_ipForwarding[] = {
+stls_enum_t const ip_mib_enums_ipForwarding[] = {
     { IP_MIB_IPFORWARDING_FORWARDING,	"forwarding" },
     { IP_MIB_IPFORWARDING_NOTFORWARDING,	"notForwarding" },
     { 0, NULL }
 };
 
-stls_table_t const ip_mib_enums_ipNetToMediaType[] = {
+stls_enum_t const ip_mib_enums_ipNetToMediaType[] = {
     { IP_MIB_IPNETTOMEDIATYPE_OTHER,	"other" },
     { IP_MIB_IPNETTOMEDIATYPE_INVALID,	"invalid" },
     { IP_MIB_IPNETTOMEDIATYPE_DYNAMIC,	"dynamic" },

@@ -17,7 +17,7 @@
 
 #include "snmp-community-mib.h"
 
-stls_table_t const snmp_community_mib_enums_snmpCommunityStorageType[] = {
+stls_enum_t const snmp_community_mib_enums_snmpCommunityStorageType[] = {
     { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTORAGETYPE_OTHER,	"other" },
     { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTORAGETYPE_VOLATILE,	"volatile" },
     { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
@@ -26,7 +26,7 @@ stls_table_t const snmp_community_mib_enums_snmpCommunityStorageType[] = {
     { 0, NULL }
 };
 
-stls_table_t const snmp_community_mib_enums_snmpCommunityStatus[] = {
+stls_enum_t const snmp_community_mib_enums_snmpCommunityStatus[] = {
     { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_ACTIVE,	"active" },
     { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_NOTINSERVICE,	"notInService" },
     { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_NOTREADY,	"notReady" },

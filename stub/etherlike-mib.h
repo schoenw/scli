@@ -52,21 +52,21 @@
 #define ETHERLIKE_MIB_DOT3STATSDUPLEXSTATUS_HALFDUPLEX	2
 #define ETHERLIKE_MIB_DOT3STATSDUPLEXSTATUS_FULLDUPLEX	3
 
-extern stls_table_t const etherlike_mib_enums_dot3StatsDuplexStatus[];
+extern stls_enum_t const etherlike_mib_enums_dot3StatsDuplexStatus[];
 
 #define ETHERLIKE_MIB_DOT3PAUSEADMINMODE_DISABLED	1
 #define ETHERLIKE_MIB_DOT3PAUSEADMINMODE_ENABLEDXMIT	2
 #define ETHERLIKE_MIB_DOT3PAUSEADMINMODE_ENABLEDRCV	3
 #define ETHERLIKE_MIB_DOT3PAUSEADMINMODE_ENABLEDXMITANDRCV	4
 
-extern stls_table_t const etherlike_mib_enums_dot3PauseAdminMode[];
+extern stls_enum_t const etherlike_mib_enums_dot3PauseAdminMode[];
 
 #define ETHERLIKE_MIB_DOT3PAUSEOPERMODE_DISABLED	1
 #define ETHERLIKE_MIB_DOT3PAUSEOPERMODE_ENABLEDXMIT	2
 #define ETHERLIKE_MIB_DOT3PAUSEOPERMODE_ENABLEDRCV	3
 #define ETHERLIKE_MIB_DOT3PAUSEOPERMODE_ENABLEDXMITANDRCV	4
 
-extern stls_table_t const etherlike_mib_enums_dot3PauseOperMode[];
+extern stls_enum_t const etherlike_mib_enums_dot3PauseOperMode[];
 
 
 /*

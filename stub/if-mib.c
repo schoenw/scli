@@ -24,7 +24,7 @@
 
 #include "if-mib.h"
 
-stls_table_t const if_mib_enums_ifType[] = {
+stls_enum_t const if_mib_enums_ifType[] = {
     { IF_MIB_IFTYPE_OTHER,	"other" },
     { IF_MIB_IFTYPE_REGULAR1822,	"regular1822" },
     { IF_MIB_IFTYPE_HDH1822,	"hdh1822" },
@@ -217,14 +217,14 @@ stls_table_t const if_mib_enums_ifType[] = {
     { 0, NULL }
 };
 
-stls_table_t const if_mib_enums_ifAdminStatus[] = {
+stls_enum_t const if_mib_enums_ifAdminStatus[] = {
     { IF_MIB_IFADMINSTATUS_UP,	"up" },
     { IF_MIB_IFADMINSTATUS_DOWN,	"down" },
     { IF_MIB_IFADMINSTATUS_TESTING,	"testing" },
     { 0, NULL }
 };
 
-stls_table_t const if_mib_enums_ifOperStatus[] = {
+stls_enum_t const if_mib_enums_ifOperStatus[] = {
     { IF_MIB_IFOPERSTATUS_UP,	"up" },
     { IF_MIB_IFOPERSTATUS_DOWN,	"down" },
     { IF_MIB_IFOPERSTATUS_TESTING,	"testing" },
@@ -235,25 +235,25 @@ stls_table_t const if_mib_enums_ifOperStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const if_mib_enums_ifLinkUpDownTrapEnable[] = {
+stls_enum_t const if_mib_enums_ifLinkUpDownTrapEnable[] = {
     { IF_MIB_IFLINKUPDOWNTRAPENABLE_ENABLED,	"enabled" },
     { IF_MIB_IFLINKUPDOWNTRAPENABLE_DISABLED,	"disabled" },
     { 0, NULL }
 };
 
-stls_table_t const if_mib_enums_ifPromiscuousMode[] = {
+stls_enum_t const if_mib_enums_ifPromiscuousMode[] = {
     { IF_MIB_IFPROMISCUOUSMODE_TRUE,	"true" },
     { IF_MIB_IFPROMISCUOUSMODE_FALSE,	"false" },
     { 0, NULL }
 };
 
-stls_table_t const if_mib_enums_ifConnectorPresent[] = {
+stls_enum_t const if_mib_enums_ifConnectorPresent[] = {
     { IF_MIB_IFCONNECTORPRESENT_TRUE,	"true" },
     { IF_MIB_IFCONNECTORPRESENT_FALSE,	"false" },
     { 0, NULL }
 };
 
-stls_table_t const if_mib_enums_ifStackStatus[] = {
+stls_enum_t const if_mib_enums_ifStackStatus[] = {
     { IF_MIB_IFSTACKSTATUS_ACTIVE,	"active" },
     { IF_MIB_IFSTACKSTATUS_NOTINSERVICE,	"notInService" },
     { IF_MIB_IFSTACKSTATUS_NOTREADY,	"notReady" },
@@ -263,13 +263,13 @@ stls_table_t const if_mib_enums_ifStackStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const if_mib_enums_ifTestStatus[] = {
+stls_enum_t const if_mib_enums_ifTestStatus[] = {
     { IF_MIB_IFTESTSTATUS_NOTINUSE,	"notInUse" },
     { IF_MIB_IFTESTSTATUS_INUSE,	"inUse" },
     { 0, NULL }
 };
 
-stls_table_t const if_mib_enums_ifTestResult[] = {
+stls_enum_t const if_mib_enums_ifTestResult[] = {
     { IF_MIB_IFTESTRESULT_NONE,	"none" },
     { IF_MIB_IFTESTRESULT_SUCCESS,	"success" },
     { IF_MIB_IFTESTRESULT_INPROGRESS,	"inProgress" },
@@ -280,7 +280,7 @@ stls_table_t const if_mib_enums_ifTestResult[] = {
     { 0, NULL }
 };
 
-stls_table_t const if_mib_enums_ifRcvAddressStatus[] = {
+stls_enum_t const if_mib_enums_ifRcvAddressStatus[] = {
     { IF_MIB_IFRCVADDRESSSTATUS_ACTIVE,	"active" },
     { IF_MIB_IFRCVADDRESSSTATUS_NOTINSERVICE,	"notInService" },
     { IF_MIB_IFRCVADDRESSSTATUS_NOTREADY,	"notReady" },
@@ -290,7 +290,7 @@ stls_table_t const if_mib_enums_ifRcvAddressStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const if_mib_enums_ifRcvAddressType[] = {
+stls_enum_t const if_mib_enums_ifRcvAddressType[] = {
     { IF_MIB_IFRCVADDRESSTYPE_OTHER,	"other" },
     { IF_MIB_IFRCVADDRESSTYPE_VOLATILE,	"volatile" },
     { IF_MIB_IFRCVADDRESSTYPE_NONVOLATILE,	"nonVolatile" },

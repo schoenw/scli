@@ -71,7 +71,7 @@
 
 #include "host-resources-mib.h"
 
-stls_table_t const host_resources_mib_enums_hrDeviceStatus[] = {
+stls_enum_t const host_resources_mib_enums_hrDeviceStatus[] = {
     { HOST_RESOURCES_MIB_HRDEVICESTATUS_UNKNOWN,	"unknown" },
     { HOST_RESOURCES_MIB_HRDEVICESTATUS_RUNNING,	"running" },
     { HOST_RESOURCES_MIB_HRDEVICESTATUS_WARNING,	"warning" },
@@ -80,7 +80,7 @@ stls_table_t const host_resources_mib_enums_hrDeviceStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const host_resources_mib_enums_hrPrinterStatus[] = {
+stls_enum_t const host_resources_mib_enums_hrPrinterStatus[] = {
     { HOST_RESOURCES_MIB_HRPRINTERSTATUS_OTHER,	"other" },
     { HOST_RESOURCES_MIB_HRPRINTERSTATUS_UNKNOWN,	"unknown" },
     { HOST_RESOURCES_MIB_HRPRINTERSTATUS_IDLE,	"idle" },
@@ -89,13 +89,13 @@ stls_table_t const host_resources_mib_enums_hrPrinterStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const host_resources_mib_enums_hrDiskStorageAccess[] = {
+stls_enum_t const host_resources_mib_enums_hrDiskStorageAccess[] = {
     { HOST_RESOURCES_MIB_HRDISKSTORAGEACCESS_READWRITE,	"readWrite" },
     { HOST_RESOURCES_MIB_HRDISKSTORAGEACCESS_READONLY,	"readOnly" },
     { 0, NULL }
 };
 
-stls_table_t const host_resources_mib_enums_hrDiskStorageMedia[] = {
+stls_enum_t const host_resources_mib_enums_hrDiskStorageMedia[] = {
     { HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_OTHER,	"other" },
     { HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_UNKNOWN,	"unknown" },
     { HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_HARDDISK,	"hardDisk" },
@@ -107,25 +107,25 @@ stls_table_t const host_resources_mib_enums_hrDiskStorageMedia[] = {
     { 0, NULL }
 };
 
-stls_table_t const host_resources_mib_enums_hrDiskStorageRemoveble[] = {
+stls_enum_t const host_resources_mib_enums_hrDiskStorageRemoveble[] = {
     { HOST_RESOURCES_MIB_HRDISKSTORAGEREMOVEBLE_TRUE,	"true" },
     { HOST_RESOURCES_MIB_HRDISKSTORAGEREMOVEBLE_FALSE,	"false" },
     { 0, NULL }
 };
 
-stls_table_t const host_resources_mib_enums_hrFSAccess[] = {
+stls_enum_t const host_resources_mib_enums_hrFSAccess[] = {
     { HOST_RESOURCES_MIB_HRFSACCESS_READWRITE,	"readWrite" },
     { HOST_RESOURCES_MIB_HRFSACCESS_READONLY,	"readOnly" },
     { 0, NULL }
 };
 
-stls_table_t const host_resources_mib_enums_hrFSBootable[] = {
+stls_enum_t const host_resources_mib_enums_hrFSBootable[] = {
     { HOST_RESOURCES_MIB_HRFSBOOTABLE_TRUE,	"true" },
     { HOST_RESOURCES_MIB_HRFSBOOTABLE_FALSE,	"false" },
     { 0, NULL }
 };
 
-stls_table_t const host_resources_mib_enums_hrSWRunType[] = {
+stls_enum_t const host_resources_mib_enums_hrSWRunType[] = {
     { HOST_RESOURCES_MIB_HRSWRUNTYPE_UNKNOWN,	"unknown" },
     { HOST_RESOURCES_MIB_HRSWRUNTYPE_OPERATINGSYSTEM,	"operatingSystem" },
     { HOST_RESOURCES_MIB_HRSWRUNTYPE_DEVICEDRIVER,	"deviceDriver" },
@@ -133,7 +133,7 @@ stls_table_t const host_resources_mib_enums_hrSWRunType[] = {
     { 0, NULL }
 };
 
-stls_table_t const host_resources_mib_enums_hrSWRunStatus[] = {
+stls_enum_t const host_resources_mib_enums_hrSWRunStatus[] = {
     { HOST_RESOURCES_MIB_HRSWRUNSTATUS_RUNNING,	"running" },
     { HOST_RESOURCES_MIB_HRSWRUNSTATUS_RUNNABLE,	"runnable" },
     { HOST_RESOURCES_MIB_HRSWRUNSTATUS_NOTRUNNABLE,	"notRunnable" },
@@ -141,7 +141,7 @@ stls_table_t const host_resources_mib_enums_hrSWRunStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const host_resources_mib_enums_hrSWInstalledType[] = {
+stls_enum_t const host_resources_mib_enums_hrSWInstalledType[] = {
     { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_UNKNOWN,	"unknown" },
     { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_OPERATINGSYSTEM,	"operatingSystem" },
     { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_DEVICEDRIVER,	"deviceDriver" },

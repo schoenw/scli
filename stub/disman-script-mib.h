@@ -25,7 +25,7 @@
 #define DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_DISABLED	2
 #define DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_EDITING	3
 
-extern stls_table_t const disman_script_mib_enums_smScriptAdminStatus[];
+extern stls_enum_t const disman_script_mib_enums_smScriptAdminStatus[];
 
 #define DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_ENABLED	1
 #define DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_DISABLED	2
@@ -42,7 +42,7 @@ extern stls_table_t const disman_script_mib_enums_smScriptAdminStatus[];
 #define DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_PROTOCOLFAILURE	13
 #define DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_GENERICERROR	14
 
-extern stls_table_t const disman_script_mib_enums_smScriptOperStatus[];
+extern stls_enum_t const disman_script_mib_enums_smScriptOperStatus[];
 
 #define DISMAN_SCRIPT_MIB_SMSCRIPTSTORAGETYPE_OTHER	1
 #define DISMAN_SCRIPT_MIB_SMSCRIPTSTORAGETYPE_VOLATILE	2
@@ -50,7 +50,7 @@ extern stls_table_t const disman_script_mib_enums_smScriptOperStatus[];
 #define DISMAN_SCRIPT_MIB_SMSCRIPTSTORAGETYPE_PERMANENT	4
 #define DISMAN_SCRIPT_MIB_SMSCRIPTSTORAGETYPE_READONLY	5
 
-extern stls_table_t const disman_script_mib_enums_smScriptStorageType[];
+extern stls_enum_t const disman_script_mib_enums_smScriptStorageType[];
 
 #define DISMAN_SCRIPT_MIB_SMSCRIPTROWSTATUS_ACTIVE	1
 #define DISMAN_SCRIPT_MIB_SMSCRIPTROWSTATUS_NOTINSERVICE	2
@@ -59,7 +59,7 @@ extern stls_table_t const disman_script_mib_enums_smScriptStorageType[];
 #define DISMAN_SCRIPT_MIB_SMSCRIPTROWSTATUS_CREATEANDWAIT	5
 #define DISMAN_SCRIPT_MIB_SMSCRIPTROWSTATUS_DESTROY	6
 
-extern stls_table_t const disman_script_mib_enums_smScriptRowStatus[];
+extern stls_enum_t const disman_script_mib_enums_smScriptRowStatus[];
 
 #define DISMAN_SCRIPT_MIB_SMCODEROWSTATUS_ACTIVE	1
 #define DISMAN_SCRIPT_MIB_SMCODEROWSTATUS_NOTINSERVICE	2
@@ -68,24 +68,24 @@ extern stls_table_t const disman_script_mib_enums_smScriptRowStatus[];
 #define DISMAN_SCRIPT_MIB_SMCODEROWSTATUS_CREATEANDWAIT	5
 #define DISMAN_SCRIPT_MIB_SMCODEROWSTATUS_DESTROY	6
 
-extern stls_table_t const disman_script_mib_enums_smCodeRowStatus[];
+extern stls_enum_t const disman_script_mib_enums_smCodeRowStatus[];
 
 #define DISMAN_SCRIPT_MIB_SMLAUNCHCONTROL_ABORT	1
 #define DISMAN_SCRIPT_MIB_SMLAUNCHCONTROL_SUSPEND	2
 #define DISMAN_SCRIPT_MIB_SMLAUNCHCONTROL_RESUME	3
 #define DISMAN_SCRIPT_MIB_SMLAUNCHCONTROL_NOP	4
 
-extern stls_table_t const disman_script_mib_enums_smLaunchControl[];
+extern stls_enum_t const disman_script_mib_enums_smLaunchControl[];
 
 #define DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_ENABLED	1
 #define DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_DISABLED	2
 
-extern stls_table_t const disman_script_mib_enums_smLaunchAdminStatus[];
+extern stls_enum_t const disman_script_mib_enums_smLaunchAdminStatus[];
 
 #define DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_ENABLED	1
 #define DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_DISABLED	2
 
-extern stls_table_t const disman_script_mib_enums_smLaunchOperStatus[];
+extern stls_enum_t const disman_script_mib_enums_smLaunchOperStatus[];
 
 #define DISMAN_SCRIPT_MIB_SMLAUNCHSTORAGETYPE_OTHER	1
 #define DISMAN_SCRIPT_MIB_SMLAUNCHSTORAGETYPE_VOLATILE	2
@@ -93,7 +93,7 @@ extern stls_table_t const disman_script_mib_enums_smLaunchOperStatus[];
 #define DISMAN_SCRIPT_MIB_SMLAUNCHSTORAGETYPE_PERMANENT	4
 #define DISMAN_SCRIPT_MIB_SMLAUNCHSTORAGETYPE_READONLY	5
 
-extern stls_table_t const disman_script_mib_enums_smLaunchStorageType[];
+extern stls_enum_t const disman_script_mib_enums_smLaunchStorageType[];
 
 #define DISMAN_SCRIPT_MIB_SMLAUNCHROWSTATUS_ACTIVE	1
 #define DISMAN_SCRIPT_MIB_SMLAUNCHROWSTATUS_NOTINSERVICE	2
@@ -102,7 +102,7 @@ extern stls_table_t const disman_script_mib_enums_smLaunchStorageType[];
 #define DISMAN_SCRIPT_MIB_SMLAUNCHROWSTATUS_CREATEANDWAIT	5
 #define DISMAN_SCRIPT_MIB_SMLAUNCHROWSTATUS_DESTROY	6
 
-extern stls_table_t const disman_script_mib_enums_smLaunchRowStatus[];
+extern stls_enum_t const disman_script_mib_enums_smLaunchRowStatus[];
 
 #define DISMAN_SCRIPT_MIB_SMRUNEXITCODE_NOERROR	1
 #define DISMAN_SCRIPT_MIB_SMRUNEXITCODE_HALTED	2
@@ -114,14 +114,14 @@ extern stls_table_t const disman_script_mib_enums_smLaunchRowStatus[];
 #define DISMAN_SCRIPT_MIB_SMRUNEXITCODE_SECURITYVIOLATION	8
 #define DISMAN_SCRIPT_MIB_SMRUNEXITCODE_GENERICERROR	9
 
-extern stls_table_t const disman_script_mib_enums_smRunExitCode[];
+extern stls_enum_t const disman_script_mib_enums_smRunExitCode[];
 
 #define DISMAN_SCRIPT_MIB_SMRUNCONTROL_ABORT	1
 #define DISMAN_SCRIPT_MIB_SMRUNCONTROL_SUSPEND	2
 #define DISMAN_SCRIPT_MIB_SMRUNCONTROL_RESUME	3
 #define DISMAN_SCRIPT_MIB_SMRUNCONTROL_NOP	4
 
-extern stls_table_t const disman_script_mib_enums_smRunControl[];
+extern stls_enum_t const disman_script_mib_enums_smRunControl[];
 
 #define DISMAN_SCRIPT_MIB_SMRUNSTATE_INITIALIZING	1
 #define DISMAN_SCRIPT_MIB_SMRUNSTATE_EXECUTING	2
@@ -131,7 +131,7 @@ extern stls_table_t const disman_script_mib_enums_smRunControl[];
 #define DISMAN_SCRIPT_MIB_SMRUNSTATE_ABORTING	6
 #define DISMAN_SCRIPT_MIB_SMRUNSTATE_TERMINATED	7
 
-extern stls_table_t const disman_script_mib_enums_smRunState[];
+extern stls_enum_t const disman_script_mib_enums_smRunState[];
 
 
 /*

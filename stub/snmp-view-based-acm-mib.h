@@ -31,7 +31,7 @@
 #define SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTORAGETYPE_PERMANENT	4
 #define SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTORAGETYPE_READONLY	5
 
-extern stls_table_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStorageType[];
+extern stls_enum_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStorageType[];
 
 #define SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_ACTIVE	1
 #define SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_NOTINSERVICE	2
@@ -40,18 +40,18 @@ extern stls_table_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStora
 #define SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_CREATEANDWAIT	5
 #define SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_DESTROY	6
 
-extern stls_table_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStatus[];
+extern stls_enum_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStatus[];
 
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_NOAUTHNOPRIV	1
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_AUTHNOPRIV	2
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_AUTHPRIV	3
 
-extern stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessSecurityLevel[];
+extern stls_enum_t const snmp_view_based_acm_mib_enums_vacmAccessSecurityLevel[];
 
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSCONTEXTMATCH_EXACT	1
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSCONTEXTMATCH_PREFIX	2
 
-extern stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessContextMatch[];
+extern stls_enum_t const snmp_view_based_acm_mib_enums_vacmAccessContextMatch[];
 
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE_OTHER	1
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE_VOLATILE	2
@@ -59,7 +59,7 @@ extern stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessContextMatch[]
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE_PERMANENT	4
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE_READONLY	5
 
-extern stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessStorageType[];
+extern stls_enum_t const snmp_view_based_acm_mib_enums_vacmAccessStorageType[];
 
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_ACTIVE	1
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_NOTINSERVICE	2
@@ -68,12 +68,12 @@ extern stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessStorageType[];
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_CREATEANDWAIT	5
 #define SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_DESTROY	6
 
-extern stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessStatus[];
+extern stls_enum_t const snmp_view_based_acm_mib_enums_vacmAccessStatus[];
 
 #define SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE_INCLUDED	1
 #define SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE_EXCLUDED	2
 
-extern stls_table_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyType[];
+extern stls_enum_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyType[];
 
 #define SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE_OTHER	1
 #define SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE_VOLATILE	2
@@ -81,7 +81,7 @@ extern stls_table_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyType[]
 #define SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE_PERMANENT	4
 #define SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE_READONLY	5
 
-extern stls_table_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStorageType[];
+extern stls_enum_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStorageType[];
 
 #define SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_ACTIVE	1
 #define SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_NOTINSERVICE	2
@@ -90,7 +90,7 @@ extern stls_table_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStorag
 #define SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_CREATEANDWAIT	5
 #define SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_DESTROY	6
 
-extern stls_table_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStatus[];
+extern stls_enum_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStatus[];
 
 
 /*

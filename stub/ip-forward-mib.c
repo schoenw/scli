@@ -13,7 +13,7 @@
 
 #include "ip-forward-mib.h"
 
-stls_table_t const ip_forward_mib_enums_ipForwardType[] = {
+stls_enum_t const ip_forward_mib_enums_ipForwardType[] = {
     { IP_FORWARD_MIB_IPFORWARDTYPE_OTHER,	"other" },
     { IP_FORWARD_MIB_IPFORWARDTYPE_INVALID,	"invalid" },
     { IP_FORWARD_MIB_IPFORWARDTYPE_LOCAL,	"local" },
@@ -21,7 +21,7 @@ stls_table_t const ip_forward_mib_enums_ipForwardType[] = {
     { 0, NULL }
 };
 
-stls_table_t const ip_forward_mib_enums_ipForwardProto[] = {
+stls_enum_t const ip_forward_mib_enums_ipForwardProto[] = {
     { IP_FORWARD_MIB_IPFORWARDPROTO_OTHER,	"other" },
     { IP_FORWARD_MIB_IPFORWARDPROTO_LOCAL,	"local" },
     { IP_FORWARD_MIB_IPFORWARDPROTO_NETMGMT,	"netmgmt" },
@@ -40,7 +40,7 @@ stls_table_t const ip_forward_mib_enums_ipForwardProto[] = {
     { 0, NULL }
 };
 
-stls_table_t const ip_forward_mib_enums_ipCidrRouteType[] = {
+stls_enum_t const ip_forward_mib_enums_ipCidrRouteType[] = {
     { IP_FORWARD_MIB_IPCIDRROUTETYPE_OTHER,	"other" },
     { IP_FORWARD_MIB_IPCIDRROUTETYPE_REJECT,	"reject" },
     { IP_FORWARD_MIB_IPCIDRROUTETYPE_LOCAL,	"local" },
@@ -48,7 +48,7 @@ stls_table_t const ip_forward_mib_enums_ipCidrRouteType[] = {
     { 0, NULL }
 };
 
-stls_table_t const ip_forward_mib_enums_ipCidrRouteProto[] = {
+stls_enum_t const ip_forward_mib_enums_ipCidrRouteProto[] = {
     { IP_FORWARD_MIB_IPCIDRROUTEPROTO_OTHER,	"other" },
     { IP_FORWARD_MIB_IPCIDRROUTEPROTO_LOCAL,	"local" },
     { IP_FORWARD_MIB_IPCIDRROUTEPROTO_NETMGMT,	"netmgmt" },
@@ -68,7 +68,7 @@ stls_table_t const ip_forward_mib_enums_ipCidrRouteProto[] = {
     { 0, NULL }
 };
 
-stls_table_t const ip_forward_mib_enums_ipCidrRouteStatus[] = {
+stls_enum_t const ip_forward_mib_enums_ipCidrRouteStatus[] = {
     { IP_FORWARD_MIB_IPCIDRROUTESTATUS_ACTIVE,	"active" },
     { IP_FORWARD_MIB_IPCIDRROUTESTATUS_NOTINSERVICE,	"notInService" },
     { IP_FORWARD_MIB_IPCIDRROUTESTATUS_NOTREADY,	"notReady" },

@@ -84,7 +84,7 @@
 #define HOST_RESOURCES_MIB_HRDEVICESTATUS_TESTING	4
 #define HOST_RESOURCES_MIB_HRDEVICESTATUS_DOWN	5
 
-extern stls_table_t const host_resources_mib_enums_hrDeviceStatus[];
+extern stls_enum_t const host_resources_mib_enums_hrDeviceStatus[];
 
 #define HOST_RESOURCES_MIB_HRPRINTERSTATUS_OTHER	1
 #define HOST_RESOURCES_MIB_HRPRINTERSTATUS_UNKNOWN	2
@@ -92,12 +92,12 @@ extern stls_table_t const host_resources_mib_enums_hrDeviceStatus[];
 #define HOST_RESOURCES_MIB_HRPRINTERSTATUS_PRINTING	4
 #define HOST_RESOURCES_MIB_HRPRINTERSTATUS_WARMUP	5
 
-extern stls_table_t const host_resources_mib_enums_hrPrinterStatus[];
+extern stls_enum_t const host_resources_mib_enums_hrPrinterStatus[];
 
 #define HOST_RESOURCES_MIB_HRDISKSTORAGEACCESS_READWRITE	1
 #define HOST_RESOURCES_MIB_HRDISKSTORAGEACCESS_READONLY	2
 
-extern stls_table_t const host_resources_mib_enums_hrDiskStorageAccess[];
+extern stls_enum_t const host_resources_mib_enums_hrDiskStorageAccess[];
 
 #define HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_OTHER	1
 #define HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_UNKNOWN	2
@@ -108,43 +108,43 @@ extern stls_table_t const host_resources_mib_enums_hrDiskStorageAccess[];
 #define HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_OPTICALDISKRW	7
 #define HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_RAMDISK	8
 
-extern stls_table_t const host_resources_mib_enums_hrDiskStorageMedia[];
+extern stls_enum_t const host_resources_mib_enums_hrDiskStorageMedia[];
 
 #define HOST_RESOURCES_MIB_HRDISKSTORAGEREMOVEBLE_TRUE	1
 #define HOST_RESOURCES_MIB_HRDISKSTORAGEREMOVEBLE_FALSE	2
 
-extern stls_table_t const host_resources_mib_enums_hrDiskStorageRemoveble[];
+extern stls_enum_t const host_resources_mib_enums_hrDiskStorageRemoveble[];
 
 #define HOST_RESOURCES_MIB_HRFSACCESS_READWRITE	1
 #define HOST_RESOURCES_MIB_HRFSACCESS_READONLY	2
 
-extern stls_table_t const host_resources_mib_enums_hrFSAccess[];
+extern stls_enum_t const host_resources_mib_enums_hrFSAccess[];
 
 #define HOST_RESOURCES_MIB_HRFSBOOTABLE_TRUE	1
 #define HOST_RESOURCES_MIB_HRFSBOOTABLE_FALSE	2
 
-extern stls_table_t const host_resources_mib_enums_hrFSBootable[];
+extern stls_enum_t const host_resources_mib_enums_hrFSBootable[];
 
 #define HOST_RESOURCES_MIB_HRSWRUNTYPE_UNKNOWN	1
 #define HOST_RESOURCES_MIB_HRSWRUNTYPE_OPERATINGSYSTEM	2
 #define HOST_RESOURCES_MIB_HRSWRUNTYPE_DEVICEDRIVER	3
 #define HOST_RESOURCES_MIB_HRSWRUNTYPE_APPLICATION	4
 
-extern stls_table_t const host_resources_mib_enums_hrSWRunType[];
+extern stls_enum_t const host_resources_mib_enums_hrSWRunType[];
 
 #define HOST_RESOURCES_MIB_HRSWRUNSTATUS_RUNNING	1
 #define HOST_RESOURCES_MIB_HRSWRUNSTATUS_RUNNABLE	2
 #define HOST_RESOURCES_MIB_HRSWRUNSTATUS_NOTRUNNABLE	3
 #define HOST_RESOURCES_MIB_HRSWRUNSTATUS_INVALID	4
 
-extern stls_table_t const host_resources_mib_enums_hrSWRunStatus[];
+extern stls_enum_t const host_resources_mib_enums_hrSWRunStatus[];
 
 #define HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_UNKNOWN	1
 #define HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_OPERATINGSYSTEM	2
 #define HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_DEVICEDRIVER	3
 #define HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_APPLICATION	4
 
-extern stls_table_t const host_resources_mib_enums_hrSWInstalledType[];
+extern stls_enum_t const host_resources_mib_enums_hrSWInstalledType[];
 
 
 /*

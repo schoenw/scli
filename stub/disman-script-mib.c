@@ -14,14 +14,14 @@
 
 #include "disman-script-mib.h"
 
-stls_table_t const disman_script_mib_enums_smScriptAdminStatus[] = {
+stls_enum_t const disman_script_mib_enums_smScriptAdminStatus[] = {
     { DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_ENABLED,	"enabled" },
     { DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_DISABLED,	"disabled" },
     { DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_EDITING,	"editing" },
     { 0, NULL }
 };
 
-stls_table_t const disman_script_mib_enums_smScriptOperStatus[] = {
+stls_enum_t const disman_script_mib_enums_smScriptOperStatus[] = {
     { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_ENABLED,	"enabled" },
     { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_DISABLED,	"disabled" },
     { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_EDITING,	"editing" },
@@ -39,7 +39,7 @@ stls_table_t const disman_script_mib_enums_smScriptOperStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const disman_script_mib_enums_smScriptStorageType[] = {
+stls_enum_t const disman_script_mib_enums_smScriptStorageType[] = {
     { DISMAN_SCRIPT_MIB_SMSCRIPTSTORAGETYPE_OTHER,	"other" },
     { DISMAN_SCRIPT_MIB_SMSCRIPTSTORAGETYPE_VOLATILE,	"volatile" },
     { DISMAN_SCRIPT_MIB_SMSCRIPTSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
@@ -48,7 +48,7 @@ stls_table_t const disman_script_mib_enums_smScriptStorageType[] = {
     { 0, NULL }
 };
 
-stls_table_t const disman_script_mib_enums_smScriptRowStatus[] = {
+stls_enum_t const disman_script_mib_enums_smScriptRowStatus[] = {
     { DISMAN_SCRIPT_MIB_SMSCRIPTROWSTATUS_ACTIVE,	"active" },
     { DISMAN_SCRIPT_MIB_SMSCRIPTROWSTATUS_NOTINSERVICE,	"notInService" },
     { DISMAN_SCRIPT_MIB_SMSCRIPTROWSTATUS_NOTREADY,	"notReady" },
@@ -58,7 +58,7 @@ stls_table_t const disman_script_mib_enums_smScriptRowStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const disman_script_mib_enums_smCodeRowStatus[] = {
+stls_enum_t const disman_script_mib_enums_smCodeRowStatus[] = {
     { DISMAN_SCRIPT_MIB_SMCODEROWSTATUS_ACTIVE,	"active" },
     { DISMAN_SCRIPT_MIB_SMCODEROWSTATUS_NOTINSERVICE,	"notInService" },
     { DISMAN_SCRIPT_MIB_SMCODEROWSTATUS_NOTREADY,	"notReady" },
@@ -68,7 +68,7 @@ stls_table_t const disman_script_mib_enums_smCodeRowStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const disman_script_mib_enums_smLaunchControl[] = {
+stls_enum_t const disman_script_mib_enums_smLaunchControl[] = {
     { DISMAN_SCRIPT_MIB_SMLAUNCHCONTROL_ABORT,	"abort" },
     { DISMAN_SCRIPT_MIB_SMLAUNCHCONTROL_SUSPEND,	"suspend" },
     { DISMAN_SCRIPT_MIB_SMLAUNCHCONTROL_RESUME,	"resume" },
@@ -76,19 +76,19 @@ stls_table_t const disman_script_mib_enums_smLaunchControl[] = {
     { 0, NULL }
 };
 
-stls_table_t const disman_script_mib_enums_smLaunchAdminStatus[] = {
+stls_enum_t const disman_script_mib_enums_smLaunchAdminStatus[] = {
     { DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_ENABLED,	"enabled" },
     { DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_DISABLED,	"disabled" },
     { 0, NULL }
 };
 
-stls_table_t const disman_script_mib_enums_smLaunchOperStatus[] = {
+stls_enum_t const disman_script_mib_enums_smLaunchOperStatus[] = {
     { DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_ENABLED,	"enabled" },
     { DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_DISABLED,	"disabled" },
     { 0, NULL }
 };
 
-stls_table_t const disman_script_mib_enums_smLaunchStorageType[] = {
+stls_enum_t const disman_script_mib_enums_smLaunchStorageType[] = {
     { DISMAN_SCRIPT_MIB_SMLAUNCHSTORAGETYPE_OTHER,	"other" },
     { DISMAN_SCRIPT_MIB_SMLAUNCHSTORAGETYPE_VOLATILE,	"volatile" },
     { DISMAN_SCRIPT_MIB_SMLAUNCHSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
@@ -97,7 +97,7 @@ stls_table_t const disman_script_mib_enums_smLaunchStorageType[] = {
     { 0, NULL }
 };
 
-stls_table_t const disman_script_mib_enums_smLaunchRowStatus[] = {
+stls_enum_t const disman_script_mib_enums_smLaunchRowStatus[] = {
     { DISMAN_SCRIPT_MIB_SMLAUNCHROWSTATUS_ACTIVE,	"active" },
     { DISMAN_SCRIPT_MIB_SMLAUNCHROWSTATUS_NOTINSERVICE,	"notInService" },
     { DISMAN_SCRIPT_MIB_SMLAUNCHROWSTATUS_NOTREADY,	"notReady" },
@@ -107,7 +107,7 @@ stls_table_t const disman_script_mib_enums_smLaunchRowStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const disman_script_mib_enums_smRunExitCode[] = {
+stls_enum_t const disman_script_mib_enums_smRunExitCode[] = {
     { DISMAN_SCRIPT_MIB_SMRUNEXITCODE_NOERROR,	"noError" },
     { DISMAN_SCRIPT_MIB_SMRUNEXITCODE_HALTED,	"halted" },
     { DISMAN_SCRIPT_MIB_SMRUNEXITCODE_LIFETIMEEXCEEDED,	"lifeTimeExceeded" },
@@ -120,7 +120,7 @@ stls_table_t const disman_script_mib_enums_smRunExitCode[] = {
     { 0, NULL }
 };
 
-stls_table_t const disman_script_mib_enums_smRunControl[] = {
+stls_enum_t const disman_script_mib_enums_smRunControl[] = {
     { DISMAN_SCRIPT_MIB_SMRUNCONTROL_ABORT,	"abort" },
     { DISMAN_SCRIPT_MIB_SMRUNCONTROL_SUSPEND,	"suspend" },
     { DISMAN_SCRIPT_MIB_SMRUNCONTROL_RESUME,	"resume" },
@@ -128,7 +128,7 @@ stls_table_t const disman_script_mib_enums_smRunControl[] = {
     { 0, NULL }
 };
 
-stls_table_t const disman_script_mib_enums_smRunState[] = {
+stls_enum_t const disman_script_mib_enums_smRunState[] = {
     { DISMAN_SCRIPT_MIB_SMRUNSTATE_INITIALIZING,	"initializing" },
     { DISMAN_SCRIPT_MIB_SMRUNSTATE_EXECUTING,	"executing" },
     { DISMAN_SCRIPT_MIB_SMRUNSTATE_SUSPENDING,	"suspending" },

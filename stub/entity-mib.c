@@ -20,7 +20,7 @@
 
 #include "entity-mib.h"
 
-stls_table_t const entity_mib_enums_entPhysicalClass[] = {
+stls_enum_t const entity_mib_enums_entPhysicalClass[] = {
     { ENTITY_MIB_ENTPHYSICALCLASS_OTHER,	"other" },
     { ENTITY_MIB_ENTPHYSICALCLASS_UNKNOWN,	"unknown" },
     { ENTITY_MIB_ENTPHYSICALCLASS_CHASSIS,	"chassis" },
@@ -35,7 +35,7 @@ stls_table_t const entity_mib_enums_entPhysicalClass[] = {
     { 0, NULL }
 };
 
-stls_table_t const entity_mib_enums_entPhysicalIsFRU[] = {
+stls_enum_t const entity_mib_enums_entPhysicalIsFRU[] = {
     { ENTITY_MIB_ENTPHYSICALISFRU_TRUE,	"true" },
     { ENTITY_MIB_ENTPHYSICALISFRU_FALSE,	"false" },
     { 0, NULL }

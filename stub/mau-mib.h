@@ -52,7 +52,7 @@
 #define MAU_MIB_RPMAUSTATUS_SHUTDOWN	5
 #define MAU_MIB_RPMAUSTATUS_RESET	6
 
-extern stls_table_t const mau_mib_enums_rpMauStatus[];
+extern stls_enum_t const mau_mib_enums_rpMauStatus[];
 
 #define MAU_MIB_RPMAUMEDIAAVAILABLE_OTHER	1
 #define MAU_MIB_RPMAUMEDIAAVAILABLE_UNKNOWN	2
@@ -66,14 +66,14 @@ extern stls_table_t const mau_mib_enums_rpMauStatus[];
 #define MAU_MIB_RPMAUMEDIAAVAILABLE_OFFLINE	10
 #define MAU_MIB_RPMAUMEDIAAVAILABLE_AUTONEGERROR	11
 
-extern stls_table_t const mau_mib_enums_rpMauMediaAvailable[];
+extern stls_enum_t const mau_mib_enums_rpMauMediaAvailable[];
 
 #define MAU_MIB_RPMAUJABBERSTATE_OTHER	1
 #define MAU_MIB_RPMAUJABBERSTATE_UNKNOWN	2
 #define MAU_MIB_RPMAUJABBERSTATE_NOJABBER	3
 #define MAU_MIB_RPMAUJABBERSTATE_JABBERING	4
 
-extern stls_table_t const mau_mib_enums_rpMauJabberState[];
+extern stls_enum_t const mau_mib_enums_rpMauJabberState[];
 
 #define MAU_MIB_RPJACKTYPE_OTHER	1
 #define MAU_MIB_RPJACKTYPE_RJ45	2
@@ -89,7 +89,7 @@ extern stls_table_t const mau_mib_enums_rpMauJabberState[];
 #define MAU_MIB_RPJACKTYPE_MTRJ	12
 #define MAU_MIB_RPJACKTYPE_HSSDC	13
 
-extern stls_table_t const mau_mib_enums_rpJackType[];
+extern stls_enum_t const mau_mib_enums_rpJackType[];
 
 #define MAU_MIB_IFMAUSTATUS_OTHER	1
 #define MAU_MIB_IFMAUSTATUS_UNKNOWN	2
@@ -98,7 +98,7 @@ extern stls_table_t const mau_mib_enums_rpJackType[];
 #define MAU_MIB_IFMAUSTATUS_SHUTDOWN	5
 #define MAU_MIB_IFMAUSTATUS_RESET	6
 
-extern stls_table_t const mau_mib_enums_ifMauStatus[];
+extern stls_enum_t const mau_mib_enums_ifMauStatus[];
 
 #define MAU_MIB_IFMAUMEDIAAVAILABLE_OTHER	1
 #define MAU_MIB_IFMAUMEDIAAVAILABLE_UNKNOWN	2
@@ -112,19 +112,19 @@ extern stls_table_t const mau_mib_enums_ifMauStatus[];
 #define MAU_MIB_IFMAUMEDIAAVAILABLE_OFFLINE	10
 #define MAU_MIB_IFMAUMEDIAAVAILABLE_AUTONEGERROR	11
 
-extern stls_table_t const mau_mib_enums_ifMauMediaAvailable[];
+extern stls_enum_t const mau_mib_enums_ifMauMediaAvailable[];
 
 #define MAU_MIB_IFMAUJABBERSTATE_OTHER	1
 #define MAU_MIB_IFMAUJABBERSTATE_UNKNOWN	2
 #define MAU_MIB_IFMAUJABBERSTATE_NOJABBER	3
 #define MAU_MIB_IFMAUJABBERSTATE_JABBERING	4
 
-extern stls_table_t const mau_mib_enums_ifMauJabberState[];
+extern stls_enum_t const mau_mib_enums_ifMauJabberState[];
 
 #define MAU_MIB_IFMAUAUTONEGSUPPORTED_TRUE	1
 #define MAU_MIB_IFMAUAUTONEGSUPPORTED_FALSE	2
 
-extern stls_table_t const mau_mib_enums_ifMauAutoNegSupported[];
+extern stls_enum_t const mau_mib_enums_ifMauAutoNegSupported[];
 
 #define MAU_MIB_IFJACKTYPE_OTHER	1
 #define MAU_MIB_IFJACKTYPE_RJ45	2
@@ -140,23 +140,23 @@ extern stls_table_t const mau_mib_enums_ifMauAutoNegSupported[];
 #define MAU_MIB_IFJACKTYPE_MTRJ	12
 #define MAU_MIB_IFJACKTYPE_HSSDC	13
 
-extern stls_table_t const mau_mib_enums_ifJackType[];
+extern stls_enum_t const mau_mib_enums_ifJackType[];
 
 #define MAU_MIB_BROADMAUXMTRCVSPLITTYPE_OTHER	1
 #define MAU_MIB_BROADMAUXMTRCVSPLITTYPE_SINGLE	2
 #define MAU_MIB_BROADMAUXMTRCVSPLITTYPE_DUAL	3
 
-extern stls_table_t const mau_mib_enums_broadMauXmtRcvSplitType[];
+extern stls_enum_t const mau_mib_enums_broadMauXmtRcvSplitType[];
 
 #define MAU_MIB_IFMAUAUTONEGADMINSTATUS_ENABLED	1
 #define MAU_MIB_IFMAUAUTONEGADMINSTATUS_DISABLED	2
 
-extern stls_table_t const mau_mib_enums_ifMauAutoNegAdminStatus[];
+extern stls_enum_t const mau_mib_enums_ifMauAutoNegAdminStatus[];
 
 #define MAU_MIB_IFMAUAUTONEGREMOTESIGNALING_DETECTED	1
 #define MAU_MIB_IFMAUAUTONEGREMOTESIGNALING_NOTDETECTED	2
 
-extern stls_table_t const mau_mib_enums_ifMauAutoNegRemoteSignaling[];
+extern stls_enum_t const mau_mib_enums_ifMauAutoNegRemoteSignaling[];
 
 #define MAU_MIB_IFMAUAUTONEGCONFIG_OTHER	1
 #define MAU_MIB_IFMAUAUTONEGCONFIG_CONFIGURING	2
@@ -164,26 +164,26 @@ extern stls_table_t const mau_mib_enums_ifMauAutoNegRemoteSignaling[];
 #define MAU_MIB_IFMAUAUTONEGCONFIG_DISABLED	4
 #define MAU_MIB_IFMAUAUTONEGCONFIG_PARALLELDETECTFAIL	5
 
-extern stls_table_t const mau_mib_enums_ifMauAutoNegConfig[];
+extern stls_enum_t const mau_mib_enums_ifMauAutoNegConfig[];
 
 #define MAU_MIB_IFMAUAUTONEGRESTART_RESTART	1
 #define MAU_MIB_IFMAUAUTONEGRESTART_NORESTART	2
 
-extern stls_table_t const mau_mib_enums_ifMauAutoNegRestart[];
+extern stls_enum_t const mau_mib_enums_ifMauAutoNegRestart[];
 
 #define MAU_MIB_IFMAUAUTONEGREMOTEFAULTADVERTISED_NOERROR	1
 #define MAU_MIB_IFMAUAUTONEGREMOTEFAULTADVERTISED_OFFLINE	2
 #define MAU_MIB_IFMAUAUTONEGREMOTEFAULTADVERTISED_LINKFAILURE	3
 #define MAU_MIB_IFMAUAUTONEGREMOTEFAULTADVERTISED_AUTONEGERROR	4
 
-extern stls_table_t const mau_mib_enums_ifMauAutoNegRemoteFaultAdvertised[];
+extern stls_enum_t const mau_mib_enums_ifMauAutoNegRemoteFaultAdvertised[];
 
 #define MAU_MIB_IFMAUAUTONEGREMOTEFAULTRECEIVED_NOERROR	1
 #define MAU_MIB_IFMAUAUTONEGREMOTEFAULTRECEIVED_OFFLINE	2
 #define MAU_MIB_IFMAUAUTONEGREMOTEFAULTRECEIVED_LINKFAILURE	3
 #define MAU_MIB_IFMAUAUTONEGREMOTEFAULTRECEIVED_AUTONEGERROR	4
 
-extern stls_table_t const mau_mib_enums_ifMauAutoNegRemoteFaultReceived[];
+extern stls_enum_t const mau_mib_enums_ifMauAutoNegRemoteFaultReceived[];
 
 
 /*

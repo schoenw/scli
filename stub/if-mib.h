@@ -221,13 +221,13 @@
 #define IF_MIB_IFTYPE_RADIOMAC	188
 #define IF_MIB_IFTYPE_ATMRADIO	189
 
-extern stls_table_t const if_mib_enums_ifType[];
+extern stls_enum_t const if_mib_enums_ifType[];
 
 #define IF_MIB_IFADMINSTATUS_UP	1
 #define IF_MIB_IFADMINSTATUS_DOWN	2
 #define IF_MIB_IFADMINSTATUS_TESTING	3
 
-extern stls_table_t const if_mib_enums_ifAdminStatus[];
+extern stls_enum_t const if_mib_enums_ifAdminStatus[];
 
 #define IF_MIB_IFOPERSTATUS_UP	1
 #define IF_MIB_IFOPERSTATUS_DOWN	2
@@ -237,22 +237,22 @@ extern stls_table_t const if_mib_enums_ifAdminStatus[];
 #define IF_MIB_IFOPERSTATUS_NOTPRESENT	6
 #define IF_MIB_IFOPERSTATUS_LOWERLAYERDOWN	7
 
-extern stls_table_t const if_mib_enums_ifOperStatus[];
+extern stls_enum_t const if_mib_enums_ifOperStatus[];
 
 #define IF_MIB_IFLINKUPDOWNTRAPENABLE_ENABLED	1
 #define IF_MIB_IFLINKUPDOWNTRAPENABLE_DISABLED	2
 
-extern stls_table_t const if_mib_enums_ifLinkUpDownTrapEnable[];
+extern stls_enum_t const if_mib_enums_ifLinkUpDownTrapEnable[];
 
 #define IF_MIB_IFPROMISCUOUSMODE_TRUE	1
 #define IF_MIB_IFPROMISCUOUSMODE_FALSE	2
 
-extern stls_table_t const if_mib_enums_ifPromiscuousMode[];
+extern stls_enum_t const if_mib_enums_ifPromiscuousMode[];
 
 #define IF_MIB_IFCONNECTORPRESENT_TRUE	1
 #define IF_MIB_IFCONNECTORPRESENT_FALSE	2
 
-extern stls_table_t const if_mib_enums_ifConnectorPresent[];
+extern stls_enum_t const if_mib_enums_ifConnectorPresent[];
 
 #define IF_MIB_IFSTACKSTATUS_ACTIVE	1
 #define IF_MIB_IFSTACKSTATUS_NOTINSERVICE	2
@@ -261,12 +261,12 @@ extern stls_table_t const if_mib_enums_ifConnectorPresent[];
 #define IF_MIB_IFSTACKSTATUS_CREATEANDWAIT	5
 #define IF_MIB_IFSTACKSTATUS_DESTROY	6
 
-extern stls_table_t const if_mib_enums_ifStackStatus[];
+extern stls_enum_t const if_mib_enums_ifStackStatus[];
 
 #define IF_MIB_IFTESTSTATUS_NOTINUSE	1
 #define IF_MIB_IFTESTSTATUS_INUSE	2
 
-extern stls_table_t const if_mib_enums_ifTestStatus[];
+extern stls_enum_t const if_mib_enums_ifTestStatus[];
 
 #define IF_MIB_IFTESTRESULT_NONE	1
 #define IF_MIB_IFTESTRESULT_SUCCESS	2
@@ -276,7 +276,7 @@ extern stls_table_t const if_mib_enums_ifTestStatus[];
 #define IF_MIB_IFTESTRESULT_ABORTED	6
 #define IF_MIB_IFTESTRESULT_FAILED	7
 
-extern stls_table_t const if_mib_enums_ifTestResult[];
+extern stls_enum_t const if_mib_enums_ifTestResult[];
 
 #define IF_MIB_IFRCVADDRESSSTATUS_ACTIVE	1
 #define IF_MIB_IFRCVADDRESSSTATUS_NOTINSERVICE	2
@@ -285,13 +285,13 @@ extern stls_table_t const if_mib_enums_ifTestResult[];
 #define IF_MIB_IFRCVADDRESSSTATUS_CREATEANDWAIT	5
 #define IF_MIB_IFRCVADDRESSSTATUS_DESTROY	6
 
-extern stls_table_t const if_mib_enums_ifRcvAddressStatus[];
+extern stls_enum_t const if_mib_enums_ifRcvAddressStatus[];
 
 #define IF_MIB_IFRCVADDRESSTYPE_OTHER	1
 #define IF_MIB_IFRCVADDRESSTYPE_VOLATILE	2
 #define IF_MIB_IFRCVADDRESSTYPE_NONVOLATILE	3
 
-extern stls_table_t const if_mib_enums_ifRcvAddressType[];
+extern stls_enum_t const if_mib_enums_ifRcvAddressType[];
 
 
 /*

@@ -9,7 +9,7 @@
 
 #include "bridge-mib.h"
 
-stls_table_t const bridge_mib_enums_dot1dBaseType[] = {
+stls_enum_t const bridge_mib_enums_dot1dBaseType[] = {
     { BRIDGE_MIB_DOT1DBASETYPE_UNKNOWN,	"unknown" },
     { BRIDGE_MIB_DOT1DBASETYPE_TRANSPARENT_ONLY,	"transparent-only" },
     { BRIDGE_MIB_DOT1DBASETYPE_SOURCEROUTE_ONLY,	"sourceroute-only" },
@@ -17,14 +17,14 @@ stls_table_t const bridge_mib_enums_dot1dBaseType[] = {
     { 0, NULL }
 };
 
-stls_table_t const bridge_mib_enums_dot1dStpProtocolSpecification[] = {
+stls_enum_t const bridge_mib_enums_dot1dStpProtocolSpecification[] = {
     { BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_UNKNOWN,	"unknown" },
     { BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_DECLB100,	"decLb100" },
     { BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_IEEE8021D,	"ieee8021d" },
     { 0, NULL }
 };
 
-stls_table_t const bridge_mib_enums_dot1dStpPortState[] = {
+stls_enum_t const bridge_mib_enums_dot1dStpPortState[] = {
     { BRIDGE_MIB_DOT1DSTPPORTSTATE_DISABLED,	"disabled" },
     { BRIDGE_MIB_DOT1DSTPPORTSTATE_BLOCKING,	"blocking" },
     { BRIDGE_MIB_DOT1DSTPPORTSTATE_LISTENING,	"listening" },
@@ -34,13 +34,13 @@ stls_table_t const bridge_mib_enums_dot1dStpPortState[] = {
     { 0, NULL }
 };
 
-stls_table_t const bridge_mib_enums_dot1dStpPortEnable[] = {
+stls_enum_t const bridge_mib_enums_dot1dStpPortEnable[] = {
     { BRIDGE_MIB_DOT1DSTPPORTENABLE_ENABLED,	"enabled" },
     { BRIDGE_MIB_DOT1DSTPPORTENABLE_DISABLED,	"disabled" },
     { 0, NULL }
 };
 
-stls_table_t const bridge_mib_enums_dot1dTpFdbStatus[] = {
+stls_enum_t const bridge_mib_enums_dot1dTpFdbStatus[] = {
     { BRIDGE_MIB_DOT1DTPFDBSTATUS_OTHER,	"other" },
     { BRIDGE_MIB_DOT1DTPFDBSTATUS_INVALID,	"invalid" },
     { BRIDGE_MIB_DOT1DTPFDBSTATUS_LEARNED,	"learned" },
@@ -49,7 +49,7 @@ stls_table_t const bridge_mib_enums_dot1dTpFdbStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const bridge_mib_enums_dot1dStaticStatus[] = {
+stls_enum_t const bridge_mib_enums_dot1dStaticStatus[] = {
     { BRIDGE_MIB_DOT1DSTATICSTATUS_OTHER,	"other" },
     { BRIDGE_MIB_DOT1DSTATICSTATUS_INVALID,	"invalid" },
     { BRIDGE_MIB_DOT1DSTATICSTATUS_PERMANENT,	"permanent" },

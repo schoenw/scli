@@ -25,7 +25,7 @@
 #define IP_FORWARD_MIB_IPFORWARDTYPE_LOCAL	3
 #define IP_FORWARD_MIB_IPFORWARDTYPE_REMOTE	4
 
-extern stls_table_t const ip_forward_mib_enums_ipForwardType[];
+extern stls_enum_t const ip_forward_mib_enums_ipForwardType[];
 
 #define IP_FORWARD_MIB_IPFORWARDPROTO_OTHER	1
 #define IP_FORWARD_MIB_IPFORWARDPROTO_LOCAL	2
@@ -43,14 +43,14 @@ extern stls_table_t const ip_forward_mib_enums_ipForwardType[];
 #define IP_FORWARD_MIB_IPFORWARDPROTO_BGP	14
 #define IP_FORWARD_MIB_IPFORWARDPROTO_IDPR	15
 
-extern stls_table_t const ip_forward_mib_enums_ipForwardProto[];
+extern stls_enum_t const ip_forward_mib_enums_ipForwardProto[];
 
 #define IP_FORWARD_MIB_IPCIDRROUTETYPE_OTHER	1
 #define IP_FORWARD_MIB_IPCIDRROUTETYPE_REJECT	2
 #define IP_FORWARD_MIB_IPCIDRROUTETYPE_LOCAL	3
 #define IP_FORWARD_MIB_IPCIDRROUTETYPE_REMOTE	4
 
-extern stls_table_t const ip_forward_mib_enums_ipCidrRouteType[];
+extern stls_enum_t const ip_forward_mib_enums_ipCidrRouteType[];
 
 #define IP_FORWARD_MIB_IPCIDRROUTEPROTO_OTHER	1
 #define IP_FORWARD_MIB_IPCIDRROUTEPROTO_LOCAL	2
@@ -69,7 +69,7 @@ extern stls_table_t const ip_forward_mib_enums_ipCidrRouteType[];
 #define IP_FORWARD_MIB_IPCIDRROUTEPROTO_IDPR	15
 #define IP_FORWARD_MIB_IPCIDRROUTEPROTO_CISCOEIGRP	16
 
-extern stls_table_t const ip_forward_mib_enums_ipCidrRouteProto[];
+extern stls_enum_t const ip_forward_mib_enums_ipCidrRouteProto[];
 
 #define IP_FORWARD_MIB_IPCIDRROUTESTATUS_ACTIVE	1
 #define IP_FORWARD_MIB_IPCIDRROUTESTATUS_NOTINSERVICE	2
@@ -78,7 +78,7 @@ extern stls_table_t const ip_forward_mib_enums_ipCidrRouteProto[];
 #define IP_FORWARD_MIB_IPCIDRROUTESTATUS_CREATEANDWAIT	5
 #define IP_FORWARD_MIB_IPCIDRROUTESTATUS_DESTROY	6
 
-extern stls_table_t const ip_forward_mib_enums_ipCidrRouteStatus[];
+extern stls_enum_t const ip_forward_mib_enums_ipCidrRouteStatus[];
 
 
 /*

@@ -41,14 +41,14 @@
 
 #include "etherlike-mib.h"
 
-stls_table_t const etherlike_mib_enums_dot3StatsDuplexStatus[] = {
+stls_enum_t const etherlike_mib_enums_dot3StatsDuplexStatus[] = {
     { ETHERLIKE_MIB_DOT3STATSDUPLEXSTATUS_UNKNOWN,	"unknown" },
     { ETHERLIKE_MIB_DOT3STATSDUPLEXSTATUS_HALFDUPLEX,	"halfDuplex" },
     { ETHERLIKE_MIB_DOT3STATSDUPLEXSTATUS_FULLDUPLEX,	"fullDuplex" },
     { 0, NULL }
 };
 
-stls_table_t const etherlike_mib_enums_dot3PauseAdminMode[] = {
+stls_enum_t const etherlike_mib_enums_dot3PauseAdminMode[] = {
     { ETHERLIKE_MIB_DOT3PAUSEADMINMODE_DISABLED,	"disabled" },
     { ETHERLIKE_MIB_DOT3PAUSEADMINMODE_ENABLEDXMIT,	"enabledXmit" },
     { ETHERLIKE_MIB_DOT3PAUSEADMINMODE_ENABLEDRCV,	"enabledRcv" },
@@ -56,7 +56,7 @@ stls_table_t const etherlike_mib_enums_dot3PauseAdminMode[] = {
     { 0, NULL }
 };
 
-stls_table_t const etherlike_mib_enums_dot3PauseOperMode[] = {
+stls_enum_t const etherlike_mib_enums_dot3PauseOperMode[] = {
     { ETHERLIKE_MIB_DOT3PAUSEOPERMODE_DISABLED,	"disabled" },
     { ETHERLIKE_MIB_DOT3PAUSEOPERMODE_ENABLEDXMIT,	"enabledXmit" },
     { ETHERLIKE_MIB_DOT3PAUSEOPERMODE_ENABLEDRCV,	"enabledRcv" },

@@ -18,7 +18,7 @@
 
 #include "snmp-view-based-acm-mib.h"
 
-stls_table_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStorageType[] = {
+stls_enum_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStorageType[] = {
     { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTORAGETYPE_OTHER,	"other" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTORAGETYPE_VOLATILE,	"volatile" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
@@ -27,7 +27,7 @@ stls_table_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStorageType[
     { 0, NULL }
 };
 
-stls_table_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStatus[] = {
+stls_enum_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStatus[] = {
     { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_ACTIVE,	"active" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_NOTINSERVICE,	"notInService" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_NOTREADY,	"notReady" },
@@ -37,20 +37,20 @@ stls_table_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessSecurityLevel[] = {
+stls_enum_t const snmp_view_based_acm_mib_enums_vacmAccessSecurityLevel[] = {
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_NOAUTHNOPRIV,	"noAuthNoPriv" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_AUTHNOPRIV,	"authNoPriv" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_AUTHPRIV,	"authPriv" },
     { 0, NULL }
 };
 
-stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessContextMatch[] = {
+stls_enum_t const snmp_view_based_acm_mib_enums_vacmAccessContextMatch[] = {
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSCONTEXTMATCH_EXACT,	"exact" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSCONTEXTMATCH_PREFIX,	"prefix" },
     { 0, NULL }
 };
 
-stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessStorageType[] = {
+stls_enum_t const snmp_view_based_acm_mib_enums_vacmAccessStorageType[] = {
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE_OTHER,	"other" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE_VOLATILE,	"volatile" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
@@ -59,7 +59,7 @@ stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessStorageType[] = {
     { 0, NULL }
 };
 
-stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessStatus[] = {
+stls_enum_t const snmp_view_based_acm_mib_enums_vacmAccessStatus[] = {
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_ACTIVE,	"active" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_NOTINSERVICE,	"notInService" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_NOTREADY,	"notReady" },
@@ -69,13 +69,13 @@ stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyType[] = {
+stls_enum_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyType[] = {
     { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE_INCLUDED,	"included" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE_EXCLUDED,	"excluded" },
     { 0, NULL }
 };
 
-stls_table_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStorageType[] = {
+stls_enum_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStorageType[] = {
     { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE_OTHER,	"other" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE_VOLATILE,	"volatile" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
@@ -84,7 +84,7 @@ stls_table_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStorageType[]
     { 0, NULL }
 };
 
-stls_table_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStatus[] = {
+stls_enum_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStatus[] = {
     { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_ACTIVE,	"active" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_NOTINSERVICE,	"notInService" },
     { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_NOTREADY,	"notReady" },

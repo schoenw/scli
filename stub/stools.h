@@ -41,13 +41,28 @@
  */
 
 typedef struct {
-    gint32 id;
-    gchar  *str;
-} stls_table_t;
+    gint32 const number;
+    gchar  const *label;
+} stls_enum_t;
 
-gchar * stls_table_get_value(stls_table_t const *table, gint32 const id);
-gint32 stls_table_get_id(stls_table_t const *table, gchar const *str);
+gchar const *
+stls_enum_get_label(stls_enum_t const *table, gint32 const id);
 
+gint32
+stls_enum_get_number(stls_enum_t const *table, gchar const *str);
+
+typedef struct {
+    guint32 const *oid;
+    gsize const oidlen;
+    gchar const *label;
+} stls_identity_t;
+
+gchar const *
+stls_identity_get_label(stls_identity_t const *table,
+			guint32 const oid, gsize oidlen);
+guint32 *
+stls_identity_get_identity(stls_identity_t const *table,
+			   gchar const *str, gsize *oidlen);
 
 /*
  * SNMP toolkit independent functions to create and free varbind lists.

@@ -46,7 +46,7 @@
 
 #include "atm-mib.h"
 
-stls_table_t const atm_mib_enums_atmInterfaceAddressType[] = {
+stls_enum_t const atm_mib_enums_atmInterfaceAddressType[] = {
     { ATM_MIB_ATMINTERFACEADDRESSTYPE_PRIVATE,	"private" },
     { ATM_MIB_ATMINTERFACEADDRESSTYPE_NSAPE164,	"nsapE164" },
     { ATM_MIB_ATMINTERFACEADDRESSTYPE_NATIVEE164,	"nativeE164" },
@@ -54,20 +54,20 @@ stls_table_t const atm_mib_enums_atmInterfaceAddressType[] = {
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmInterfaceDs3PlcpAlarmState[] = {
+stls_enum_t const atm_mib_enums_atmInterfaceDs3PlcpAlarmState[] = {
     { ATM_MIB_ATMINTERFACEDS3PLCPALARMSTATE_NOALARM,	"noAlarm" },
     { ATM_MIB_ATMINTERFACEDS3PLCPALARMSTATE_RECEIVEDFARENDALARM,	"receivedFarEndAlarm" },
     { ATM_MIB_ATMINTERFACEDS3PLCPALARMSTATE_INCOMINGLOF,	"incomingLOF" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmInterfaceTCAlarmState[] = {
+stls_enum_t const atm_mib_enums_atmInterfaceTCAlarmState[] = {
     { ATM_MIB_ATMINTERFACETCALARMSTATE_NOALARM,	"noAlarm" },
     { ATM_MIB_ATMINTERFACETCALARMSTATE_LCDFAILURE,	"lcdFailure" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmTrafficDescrRowStatus[] = {
+stls_enum_t const atm_mib_enums_atmTrafficDescrRowStatus[] = {
     { ATM_MIB_ATMTRAFFICDESCRROWSTATUS_ACTIVE,	"active" },
     { ATM_MIB_ATMTRAFFICDESCRROWSTATUS_NOTINSERVICE,	"notInService" },
     { ATM_MIB_ATMTRAFFICDESCRROWSTATUS_NOTREADY,	"notReady" },
@@ -77,7 +77,7 @@ stls_table_t const atm_mib_enums_atmTrafficDescrRowStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmServiceCategory[] = {
+stls_enum_t const atm_mib_enums_atmServiceCategory[] = {
     { ATM_MIB_ATMSERVICECATEGORY_OTHER,	"other" },
     { ATM_MIB_ATMSERVICECATEGORY_CBR,	"cbr" },
     { ATM_MIB_ATMSERVICECATEGORY_RTVBR,	"rtVbr" },
@@ -87,26 +87,26 @@ stls_table_t const atm_mib_enums_atmServiceCategory[] = {
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmTrafficFrameDiscard[] = {
+stls_enum_t const atm_mib_enums_atmTrafficFrameDiscard[] = {
     { ATM_MIB_ATMTRAFFICFRAMEDISCARD_TRUE,	"true" },
     { ATM_MIB_ATMTRAFFICFRAMEDISCARD_FALSE,	"false" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVplAdminStatus[] = {
+stls_enum_t const atm_mib_enums_atmVplAdminStatus[] = {
     { ATM_MIB_ATMVPLADMINSTATUS_UP,	"up" },
     { ATM_MIB_ATMVPLADMINSTATUS_DOWN,	"down" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVplOperStatus[] = {
+stls_enum_t const atm_mib_enums_atmVplOperStatus[] = {
     { ATM_MIB_ATMVPLOPERSTATUS_UP,	"up" },
     { ATM_MIB_ATMVPLOPERSTATUS_DOWN,	"down" },
     { ATM_MIB_ATMVPLOPERSTATUS_UNKNOWN,	"unknown" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVplRowStatus[] = {
+stls_enum_t const atm_mib_enums_atmVplRowStatus[] = {
     { ATM_MIB_ATMVPLROWSTATUS_ACTIVE,	"active" },
     { ATM_MIB_ATMVPLROWSTATUS_NOTINSERVICE,	"notInService" },
     { ATM_MIB_ATMVPLROWSTATUS_NOTREADY,	"notReady" },
@@ -116,14 +116,14 @@ stls_table_t const atm_mib_enums_atmVplRowStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVplCastType[] = {
+stls_enum_t const atm_mib_enums_atmVplCastType[] = {
     { ATM_MIB_ATMVPLCASTTYPE_P2P,	"p2p" },
     { ATM_MIB_ATMVPLCASTTYPE_P2MPROOT,	"p2mpRoot" },
     { ATM_MIB_ATMVPLCASTTYPE_P2MPLEAF,	"p2mpLeaf" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVplConnKind[] = {
+stls_enum_t const atm_mib_enums_atmVplConnKind[] = {
     { ATM_MIB_ATMVPLCONNKIND_PVC,	"pvc" },
     { ATM_MIB_ATMVPLCONNKIND_SVCINCOMING,	"svcIncoming" },
     { ATM_MIB_ATMVPLCONNKIND_SVCOUTGOING,	"svcOutgoing" },
@@ -132,20 +132,20 @@ stls_table_t const atm_mib_enums_atmVplConnKind[] = {
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVclAdminStatus[] = {
+stls_enum_t const atm_mib_enums_atmVclAdminStatus[] = {
     { ATM_MIB_ATMVCLADMINSTATUS_UP,	"up" },
     { ATM_MIB_ATMVCLADMINSTATUS_DOWN,	"down" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVclOperStatus[] = {
+stls_enum_t const atm_mib_enums_atmVclOperStatus[] = {
     { ATM_MIB_ATMVCLOPERSTATUS_UP,	"up" },
     { ATM_MIB_ATMVCLOPERSTATUS_DOWN,	"down" },
     { ATM_MIB_ATMVCLOPERSTATUS_UNKNOWN,	"unknown" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVccAalType[] = {
+stls_enum_t const atm_mib_enums_atmVccAalType[] = {
     { ATM_MIB_ATMVCCAALTYPE_AAL1,	"aal1" },
     { ATM_MIB_ATMVCCAALTYPE_AAL34,	"aal34" },
     { ATM_MIB_ATMVCCAALTYPE_AAL5,	"aal5" },
@@ -155,7 +155,7 @@ stls_table_t const atm_mib_enums_atmVccAalType[] = {
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVccAal5EncapsType[] = {
+stls_enum_t const atm_mib_enums_atmVccAal5EncapsType[] = {
     { ATM_MIB_ATMVCCAAL5ENCAPSTYPE_VCMULTIPLEXROUTEDPROTOCOL,	"vcMultiplexRoutedProtocol" },
     { ATM_MIB_ATMVCCAAL5ENCAPSTYPE_VCMULTIPLEXBRIDGEDPROTOCOL8023,	"vcMultiplexBridgedProtocol8023" },
     { ATM_MIB_ATMVCCAAL5ENCAPSTYPE_VCMULTIPLEXBRIDGEDPROTOCOL8025,	"vcMultiplexBridgedProtocol8025" },
@@ -169,7 +169,7 @@ stls_table_t const atm_mib_enums_atmVccAal5EncapsType[] = {
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVclRowStatus[] = {
+stls_enum_t const atm_mib_enums_atmVclRowStatus[] = {
     { ATM_MIB_ATMVCLROWSTATUS_ACTIVE,	"active" },
     { ATM_MIB_ATMVCLROWSTATUS_NOTINSERVICE,	"notInService" },
     { ATM_MIB_ATMVCLROWSTATUS_NOTREADY,	"notReady" },
@@ -179,14 +179,14 @@ stls_table_t const atm_mib_enums_atmVclRowStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVclCastType[] = {
+stls_enum_t const atm_mib_enums_atmVclCastType[] = {
     { ATM_MIB_ATMVCLCASTTYPE_P2P,	"p2p" },
     { ATM_MIB_ATMVCLCASTTYPE_P2MPROOT,	"p2mpRoot" },
     { ATM_MIB_ATMVCLCASTTYPE_P2MPLEAF,	"p2mpLeaf" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVclConnKind[] = {
+stls_enum_t const atm_mib_enums_atmVclConnKind[] = {
     { ATM_MIB_ATMVCLCONNKIND_PVC,	"pvc" },
     { ATM_MIB_ATMVCLCONNKIND_SVCINCOMING,	"svcIncoming" },
     { ATM_MIB_ATMVCLCONNKIND_SVCOUTGOING,	"svcOutgoing" },
@@ -195,27 +195,27 @@ stls_table_t const atm_mib_enums_atmVclConnKind[] = {
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVpCrossConnectAdminStatus[] = {
+stls_enum_t const atm_mib_enums_atmVpCrossConnectAdminStatus[] = {
     { ATM_MIB_ATMVPCROSSCONNECTADMINSTATUS_UP,	"up" },
     { ATM_MIB_ATMVPCROSSCONNECTADMINSTATUS_DOWN,	"down" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVpCrossConnectL2HOperStatus[] = {
+stls_enum_t const atm_mib_enums_atmVpCrossConnectL2HOperStatus[] = {
     { ATM_MIB_ATMVPCROSSCONNECTL2HOPERSTATUS_UP,	"up" },
     { ATM_MIB_ATMVPCROSSCONNECTL2HOPERSTATUS_DOWN,	"down" },
     { ATM_MIB_ATMVPCROSSCONNECTL2HOPERSTATUS_UNKNOWN,	"unknown" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVpCrossConnectH2LOperStatus[] = {
+stls_enum_t const atm_mib_enums_atmVpCrossConnectH2LOperStatus[] = {
     { ATM_MIB_ATMVPCROSSCONNECTH2LOPERSTATUS_UP,	"up" },
     { ATM_MIB_ATMVPCROSSCONNECTH2LOPERSTATUS_DOWN,	"down" },
     { ATM_MIB_ATMVPCROSSCONNECTH2LOPERSTATUS_UNKNOWN,	"unknown" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVpCrossConnectRowStatus[] = {
+stls_enum_t const atm_mib_enums_atmVpCrossConnectRowStatus[] = {
     { ATM_MIB_ATMVPCROSSCONNECTROWSTATUS_ACTIVE,	"active" },
     { ATM_MIB_ATMVPCROSSCONNECTROWSTATUS_NOTINSERVICE,	"notInService" },
     { ATM_MIB_ATMVPCROSSCONNECTROWSTATUS_NOTREADY,	"notReady" },
@@ -225,27 +225,27 @@ stls_table_t const atm_mib_enums_atmVpCrossConnectRowStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVcCrossConnectAdminStatus[] = {
+stls_enum_t const atm_mib_enums_atmVcCrossConnectAdminStatus[] = {
     { ATM_MIB_ATMVCCROSSCONNECTADMINSTATUS_UP,	"up" },
     { ATM_MIB_ATMVCCROSSCONNECTADMINSTATUS_DOWN,	"down" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVcCrossConnectL2HOperStatus[] = {
+stls_enum_t const atm_mib_enums_atmVcCrossConnectL2HOperStatus[] = {
     { ATM_MIB_ATMVCCROSSCONNECTL2HOPERSTATUS_UP,	"up" },
     { ATM_MIB_ATMVCCROSSCONNECTL2HOPERSTATUS_DOWN,	"down" },
     { ATM_MIB_ATMVCCROSSCONNECTL2HOPERSTATUS_UNKNOWN,	"unknown" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVcCrossConnectH2LOperStatus[] = {
+stls_enum_t const atm_mib_enums_atmVcCrossConnectH2LOperStatus[] = {
     { ATM_MIB_ATMVCCROSSCONNECTH2LOPERSTATUS_UP,	"up" },
     { ATM_MIB_ATMVCCROSSCONNECTH2LOPERSTATUS_DOWN,	"down" },
     { ATM_MIB_ATMVCCROSSCONNECTH2LOPERSTATUS_UNKNOWN,	"unknown" },
     { 0, NULL }
 };
 
-stls_table_t const atm_mib_enums_atmVcCrossConnectRowStatus[] = {
+stls_enum_t const atm_mib_enums_atmVcCrossConnectRowStatus[] = {
     { ATM_MIB_ATMVCCROSSCONNECTROWSTATUS_ACTIVE,	"active" },
     { ATM_MIB_ATMVCCROSSCONNECTROWSTATUS_NOTINSERVICE,	"notInService" },
     { ATM_MIB_ATMVCCROSSCONNECTROWSTATUS_NOTREADY,	"notReady" },

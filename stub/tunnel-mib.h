@@ -31,13 +31,13 @@
 #define TUNNEL_MIB_TUNNELIFENCAPSMETHOD_UDP	8
 #define TUNNEL_MIB_TUNNELIFENCAPSMETHOD_ATMP	9
 
-extern stls_table_t const tunnel_mib_enums_tunnelIfEncapsMethod[];
+extern stls_enum_t const tunnel_mib_enums_tunnelIfEncapsMethod[];
 
 #define TUNNEL_MIB_TUNNELIFSECURITY_NONE	1
 #define TUNNEL_MIB_TUNNELIFSECURITY_IPSEC	2
 #define TUNNEL_MIB_TUNNELIFSECURITY_OTHER	3
 
-extern stls_table_t const tunnel_mib_enums_tunnelIfSecurity[];
+extern stls_enum_t const tunnel_mib_enums_tunnelIfSecurity[];
 
 #define TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_OTHER	1
 #define TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_DIRECT	2
@@ -49,7 +49,7 @@ extern stls_table_t const tunnel_mib_enums_tunnelIfSecurity[];
 #define TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_UDP	8
 #define TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_ATMP	9
 
-extern stls_table_t const tunnel_mib_enums_tunnelConfigEncapsMethod[];
+extern stls_enum_t const tunnel_mib_enums_tunnelConfigEncapsMethod[];
 
 #define TUNNEL_MIB_TUNNELCONFIGSTATUS_ACTIVE	1
 #define TUNNEL_MIB_TUNNELCONFIGSTATUS_NOTINSERVICE	2
@@ -58,7 +58,7 @@ extern stls_table_t const tunnel_mib_enums_tunnelConfigEncapsMethod[];
 #define TUNNEL_MIB_TUNNELCONFIGSTATUS_CREATEANDWAIT	5
 #define TUNNEL_MIB_TUNNELCONFIGSTATUS_DESTROY	6
 
-extern stls_table_t const tunnel_mib_enums_tunnelConfigStatus[];
+extern stls_enum_t const tunnel_mib_enums_tunnelConfigStatus[];
 
 
 /*

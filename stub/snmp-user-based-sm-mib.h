@@ -31,7 +31,7 @@
 #define SNMP_USER_BASED_SM_MIB_USMUSERSTORAGETYPE_PERMANENT	4
 #define SNMP_USER_BASED_SM_MIB_USMUSERSTORAGETYPE_READONLY	5
 
-extern stls_table_t const snmp_user_based_sm_mib_enums_usmUserStorageType[];
+extern stls_enum_t const snmp_user_based_sm_mib_enums_usmUserStorageType[];
 
 #define SNMP_USER_BASED_SM_MIB_USMUSERSTATUS_ACTIVE	1
 #define SNMP_USER_BASED_SM_MIB_USMUSERSTATUS_NOTINSERVICE	2
@@ -40,7 +40,7 @@ extern stls_table_t const snmp_user_based_sm_mib_enums_usmUserStorageType[];
 #define SNMP_USER_BASED_SM_MIB_USMUSERSTATUS_CREATEANDWAIT	5
 #define SNMP_USER_BASED_SM_MIB_USMUSERSTATUS_DESTROY	6
 
-extern stls_table_t const snmp_user_based_sm_mib_enums_usmUserStatus[];
+extern stls_enum_t const snmp_user_based_sm_mib_enums_usmUserStatus[];
 
 
 /*

@@ -17,7 +17,7 @@
 
 #include "tcp-mib.h"
 
-stls_table_t const tcp_mib_enums_tcpRtoAlgorithm[] = {
+stls_enum_t const tcp_mib_enums_tcpRtoAlgorithm[] = {
     { TCP_MIB_TCPRTOALGORITHM_OTHER,	"other" },
     { TCP_MIB_TCPRTOALGORITHM_CONSTANT,	"constant" },
     { TCP_MIB_TCPRTOALGORITHM_RSRE,	"rsre" },
@@ -25,7 +25,7 @@ stls_table_t const tcp_mib_enums_tcpRtoAlgorithm[] = {
     { 0, NULL }
 };
 
-stls_table_t const tcp_mib_enums_tcpConnState[] = {
+stls_enum_t const tcp_mib_enums_tcpConnState[] = {
     { TCP_MIB_TCPCONNSTATE_CLOSED,	"closed" },
     { TCP_MIB_TCPCONNSTATE_LISTEN,	"listen" },
     { TCP_MIB_TCPCONNSTATE_SYNSENT,	"synSent" },

@@ -21,13 +21,13 @@
 #define BRIDGE_MIB_DOT1DBASETYPE_SOURCEROUTE_ONLY	3
 #define BRIDGE_MIB_DOT1DBASETYPE_SRT	4
 
-extern stls_table_t const bridge_mib_enums_dot1dBaseType[];
+extern stls_enum_t const bridge_mib_enums_dot1dBaseType[];
 
 #define BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_UNKNOWN	1
 #define BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_DECLB100	2
 #define BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_IEEE8021D	3
 
-extern stls_table_t const bridge_mib_enums_dot1dStpProtocolSpecification[];
+extern stls_enum_t const bridge_mib_enums_dot1dStpProtocolSpecification[];
 
 #define BRIDGE_MIB_DOT1DSTPPORTSTATE_DISABLED	1
 #define BRIDGE_MIB_DOT1DSTPPORTSTATE_BLOCKING	2
@@ -36,12 +36,12 @@ extern stls_table_t const bridge_mib_enums_dot1dStpProtocolSpecification[];
 #define BRIDGE_MIB_DOT1DSTPPORTSTATE_FORWARDING	5
 #define BRIDGE_MIB_DOT1DSTPPORTSTATE_BROKEN	6
 
-extern stls_table_t const bridge_mib_enums_dot1dStpPortState[];
+extern stls_enum_t const bridge_mib_enums_dot1dStpPortState[];
 
 #define BRIDGE_MIB_DOT1DSTPPORTENABLE_ENABLED	1
 #define BRIDGE_MIB_DOT1DSTPPORTENABLE_DISABLED	2
 
-extern stls_table_t const bridge_mib_enums_dot1dStpPortEnable[];
+extern stls_enum_t const bridge_mib_enums_dot1dStpPortEnable[];
 
 #define BRIDGE_MIB_DOT1DTPFDBSTATUS_OTHER	1
 #define BRIDGE_MIB_DOT1DTPFDBSTATUS_INVALID	2
@@ -49,7 +49,7 @@ extern stls_table_t const bridge_mib_enums_dot1dStpPortEnable[];
 #define BRIDGE_MIB_DOT1DTPFDBSTATUS_SELF	4
 #define BRIDGE_MIB_DOT1DTPFDBSTATUS_MGMT	5
 
-extern stls_table_t const bridge_mib_enums_dot1dTpFdbStatus[];
+extern stls_enum_t const bridge_mib_enums_dot1dTpFdbStatus[];
 
 #define BRIDGE_MIB_DOT1DSTATICSTATUS_OTHER	1
 #define BRIDGE_MIB_DOT1DSTATICSTATUS_INVALID	2
@@ -57,7 +57,7 @@ extern stls_table_t const bridge_mib_enums_dot1dTpFdbStatus[];
 #define BRIDGE_MIB_DOT1DSTATICSTATUS_DELETEONRESET	4
 #define BRIDGE_MIB_DOT1DSTATICSTATUS_DELETEONTIMEOUT	5
 
-extern stls_table_t const bridge_mib_enums_dot1dStaticStatus[];
+extern stls_enum_t const bridge_mib_enums_dot1dStaticStatus[];
 
 
 /*

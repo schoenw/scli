@@ -38,7 +38,7 @@
 
 #include "mau-mib.h"
 
-stls_table_t const mau_mib_enums_rpMauStatus[] = {
+stls_enum_t const mau_mib_enums_rpMauStatus[] = {
     { MAU_MIB_RPMAUSTATUS_OTHER,	"other" },
     { MAU_MIB_RPMAUSTATUS_UNKNOWN,	"unknown" },
     { MAU_MIB_RPMAUSTATUS_OPERATIONAL,	"operational" },
@@ -48,7 +48,7 @@ stls_table_t const mau_mib_enums_rpMauStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_rpMauMediaAvailable[] = {
+stls_enum_t const mau_mib_enums_rpMauMediaAvailable[] = {
     { MAU_MIB_RPMAUMEDIAAVAILABLE_OTHER,	"other" },
     { MAU_MIB_RPMAUMEDIAAVAILABLE_UNKNOWN,	"unknown" },
     { MAU_MIB_RPMAUMEDIAAVAILABLE_AVAILABLE,	"available" },
@@ -63,7 +63,7 @@ stls_table_t const mau_mib_enums_rpMauMediaAvailable[] = {
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_rpMauJabberState[] = {
+stls_enum_t const mau_mib_enums_rpMauJabberState[] = {
     { MAU_MIB_RPMAUJABBERSTATE_OTHER,	"other" },
     { MAU_MIB_RPMAUJABBERSTATE_UNKNOWN,	"unknown" },
     { MAU_MIB_RPMAUJABBERSTATE_NOJABBER,	"noJabber" },
@@ -71,7 +71,7 @@ stls_table_t const mau_mib_enums_rpMauJabberState[] = {
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_rpJackType[] = {
+stls_enum_t const mau_mib_enums_rpJackType[] = {
     { MAU_MIB_RPJACKTYPE_OTHER,	"other" },
     { MAU_MIB_RPJACKTYPE_RJ45,	"rj45" },
     { MAU_MIB_RPJACKTYPE_RJ45S,	"rj45S" },
@@ -88,7 +88,7 @@ stls_table_t const mau_mib_enums_rpJackType[] = {
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_ifMauStatus[] = {
+stls_enum_t const mau_mib_enums_ifMauStatus[] = {
     { MAU_MIB_IFMAUSTATUS_OTHER,	"other" },
     { MAU_MIB_IFMAUSTATUS_UNKNOWN,	"unknown" },
     { MAU_MIB_IFMAUSTATUS_OPERATIONAL,	"operational" },
@@ -98,7 +98,7 @@ stls_table_t const mau_mib_enums_ifMauStatus[] = {
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_ifMauMediaAvailable[] = {
+stls_enum_t const mau_mib_enums_ifMauMediaAvailable[] = {
     { MAU_MIB_IFMAUMEDIAAVAILABLE_OTHER,	"other" },
     { MAU_MIB_IFMAUMEDIAAVAILABLE_UNKNOWN,	"unknown" },
     { MAU_MIB_IFMAUMEDIAAVAILABLE_AVAILABLE,	"available" },
@@ -113,7 +113,7 @@ stls_table_t const mau_mib_enums_ifMauMediaAvailable[] = {
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_ifMauJabberState[] = {
+stls_enum_t const mau_mib_enums_ifMauJabberState[] = {
     { MAU_MIB_IFMAUJABBERSTATE_OTHER,	"other" },
     { MAU_MIB_IFMAUJABBERSTATE_UNKNOWN,	"unknown" },
     { MAU_MIB_IFMAUJABBERSTATE_NOJABBER,	"noJabber" },
@@ -121,13 +121,13 @@ stls_table_t const mau_mib_enums_ifMauJabberState[] = {
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_ifMauAutoNegSupported[] = {
+stls_enum_t const mau_mib_enums_ifMauAutoNegSupported[] = {
     { MAU_MIB_IFMAUAUTONEGSUPPORTED_TRUE,	"true" },
     { MAU_MIB_IFMAUAUTONEGSUPPORTED_FALSE,	"false" },
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_ifJackType[] = {
+stls_enum_t const mau_mib_enums_ifJackType[] = {
     { MAU_MIB_IFJACKTYPE_OTHER,	"other" },
     { MAU_MIB_IFJACKTYPE_RJ45,	"rj45" },
     { MAU_MIB_IFJACKTYPE_RJ45S,	"rj45S" },
@@ -144,26 +144,26 @@ stls_table_t const mau_mib_enums_ifJackType[] = {
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_broadMauXmtRcvSplitType[] = {
+stls_enum_t const mau_mib_enums_broadMauXmtRcvSplitType[] = {
     { MAU_MIB_BROADMAUXMTRCVSPLITTYPE_OTHER,	"other" },
     { MAU_MIB_BROADMAUXMTRCVSPLITTYPE_SINGLE,	"single" },
     { MAU_MIB_BROADMAUXMTRCVSPLITTYPE_DUAL,	"dual" },
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_ifMauAutoNegAdminStatus[] = {
+stls_enum_t const mau_mib_enums_ifMauAutoNegAdminStatus[] = {
     { MAU_MIB_IFMAUAUTONEGADMINSTATUS_ENABLED,	"enabled" },
     { MAU_MIB_IFMAUAUTONEGADMINSTATUS_DISABLED,	"disabled" },
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_ifMauAutoNegRemoteSignaling[] = {
+stls_enum_t const mau_mib_enums_ifMauAutoNegRemoteSignaling[] = {
     { MAU_MIB_IFMAUAUTONEGREMOTESIGNALING_DETECTED,	"detected" },
     { MAU_MIB_IFMAUAUTONEGREMOTESIGNALING_NOTDETECTED,	"notdetected" },
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_ifMauAutoNegConfig[] = {
+stls_enum_t const mau_mib_enums_ifMauAutoNegConfig[] = {
     { MAU_MIB_IFMAUAUTONEGCONFIG_OTHER,	"other" },
     { MAU_MIB_IFMAUAUTONEGCONFIG_CONFIGURING,	"configuring" },
     { MAU_MIB_IFMAUAUTONEGCONFIG_COMPLETE,	"complete" },
@@ -172,13 +172,13 @@ stls_table_t const mau_mib_enums_ifMauAutoNegConfig[] = {
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_ifMauAutoNegRestart[] = {
+stls_enum_t const mau_mib_enums_ifMauAutoNegRestart[] = {
     { MAU_MIB_IFMAUAUTONEGRESTART_RESTART,	"restart" },
     { MAU_MIB_IFMAUAUTONEGRESTART_NORESTART,	"norestart" },
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_ifMauAutoNegRemoteFaultAdvertised[] = {
+stls_enum_t const mau_mib_enums_ifMauAutoNegRemoteFaultAdvertised[] = {
     { MAU_MIB_IFMAUAUTONEGREMOTEFAULTADVERTISED_NOERROR,	"noError" },
     { MAU_MIB_IFMAUAUTONEGREMOTEFAULTADVERTISED_OFFLINE,	"offline" },
     { MAU_MIB_IFMAUAUTONEGREMOTEFAULTADVERTISED_LINKFAILURE,	"linkFailure" },
@@ -186,7 +186,7 @@ stls_table_t const mau_mib_enums_ifMauAutoNegRemoteFaultAdvertised[] = {
     { 0, NULL }
 };
 
-stls_table_t const mau_mib_enums_ifMauAutoNegRemoteFaultReceived[] = {
+stls_enum_t const mau_mib_enums_ifMauAutoNegRemoteFaultReceived[] = {
     { MAU_MIB_IFMAUAUTONEGREMOTEFAULTRECEIVED_NOERROR,	"noError" },
     { MAU_MIB_IFMAUAUTONEGREMOTEFAULTRECEIVED_OFFLINE,	"offline" },
     { MAU_MIB_IFMAUAUTONEGREMOTEFAULTRECEIVED_LINKFAILURE,	"linkFailure" },
