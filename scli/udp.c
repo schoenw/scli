@@ -71,6 +71,10 @@ show_udp_listener(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     udp_mib_get_udpTable(interp->peer, &udpTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -115,7 +119,7 @@ scli_init_udp_mode(scli_interp_t *interp)
 	{ "show udp listener", NULL,
 	  "The show udp listener command displays the listening UDP\n"
 	  "endpoints.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "udp", NULL,
 	  show_udp_listener },
 	

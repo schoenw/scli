@@ -77,6 +77,10 @@ show_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -196,6 +200,10 @@ show_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -261,7 +269,7 @@ scli_init_tcp_mode(scli_interp_t *interp)
 	{ "show tcp listener", NULL,
 	  "The show tcp listener command displays the listening TCP\n"
 	  "endpoints.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "tcp", NULL,
 	  show_tcp_listener },
 
@@ -269,7 +277,7 @@ scli_init_tcp_mode(scli_interp_t *interp)
 	  "The show tcp connections command displays the connected TCP\n"
 	  "endpoints including the current state of the connection as seen\n"
 	  "by the remote SNMP agent.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "tcp", NULL,
 	  show_tcp_connections },
 
@@ -277,7 +285,7 @@ scli_init_tcp_mode(scli_interp_t *interp)
 	  "The monitor tcp connections command displays the connected TCP\n"
 	  "endpoints including the current state of the connection as seen\n"
 	  "by the remote SNMP agent. The information is updated periodically.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_tcp_connections },
 

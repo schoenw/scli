@@ -552,6 +552,11 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 	}
     }
 
+    if (scli_interp_dry(interp)) {
+	if (regex_iface) regfree(regex_iface);
+	return SCLI_OK;
+    }
+
     if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_PARAMS);
     if (interp->peer->error_status) {
 	if (regex_iface) regfree(regex_iface);
@@ -683,6 +688,11 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
 	}
     }
 
+    if (scli_interp_dry(interp)) {
+	if (regex_iface) regfree(regex_iface);
+	return SCLI_OK;
+    }
+
     if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_PARAMS);
     if (interp->peer->error_status) {
 	if (regex_iface) regfree(regex_iface);
@@ -794,6 +804,11 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
 	}
     }
 
+    if (scli_interp_dry(interp)) {
+	if (regex_iface) regfree(regex_iface);
+	return SCLI_OK;
+    }
+
     if_mib_get_ifStackTable(interp->peer, &ifStackTable, 0);
     if (interp->peer->error_status) {
 	if (regex_iface) regfree(regex_iface);
@@ -866,6 +881,11 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_iface) regfree(regex_iface);
+	return SCLI_OK;
     }
 
     if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_STATS);
@@ -1004,6 +1024,11 @@ foreach_interface(scli_interp_t *interp, char *regex,
 	return SCLI_SYNTAX_REGEXP;
     }
 
+    if (scli_interp_dry(interp)) {
+	regfree(regex_iface);
+	return SCLI_OK;
+    }
+    
     if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR);
     if (interp->peer->error_status) {
 	regfree(regex_iface);
@@ -1044,7 +1069,7 @@ static int
 set_interface_status(scli_interp_t *interp, int argc, char **argv)
 {
     gint32 value;
-    int status = SCLI_OK;
+    int status;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -1056,9 +1081,7 @@ set_interface_status(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_VALUE;
     }
 
-    if (! (interp->flags & SCLI_INTERP_FLAG_DRY)) {
-	status = foreach_interface(interp, argv[1], set_status, &value);
-    }
+    status = foreach_interface(interp, argv[1], set_status, &value);
     return status;
 }
 
@@ -1182,6 +1205,10 @@ dump_interface(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_PARAMS);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -1256,7 +1283,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "applications to better identify interfaces. The regular\n"
 	  "expression <regexp> is matched against the interface\n"
 	  "descriptions to select the interfaces.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_interface_alias },
 
@@ -1266,7 +1293,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "The regular expression <regexp> is matched against the interface\n"
 	  "descriptions to select the interfaces. The <value> parameter\n"
 	  "must be one of the strings \"enabled\" or \"disabled\".",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_interface_notifications },
 
@@ -1276,7 +1303,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "regular expression <regexp> is matched against the interface\n"
 	  "descriptions to select the interfaces. The <bool> parameter\n"
 	  "must be one of the strings \"true\" or \"false\".",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_interface_promiscuous },
 
@@ -1303,7 +1330,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "connector is present (C=connector, N=none) and the fourth\n"
 	  "character indicates whether the interface is in promiscuous\n"
 	  "mode (P=promiscuous, N=normal).",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_interface_info },
 	
@@ -1312,7 +1339,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "interfaces in more detail. The optional regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "interfaces", NULL,
 	  show_interface_details },
 	
@@ -1340,7 +1367,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "  I-ERR       input errors per second\n"
 	  "  O-ERR       output errors per second\n"
 	  "  DESCRIPTION description of the network interface",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_interface_stats },
 	
@@ -1348,14 +1375,14 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "The monitor interface stats command shows the same\n"
 	  "information as the show interface stats command. The\n"
 	  "information is updated periodically.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_interface_stats },
 	
 	{ "dump interface", NULL,
 	  "The dump interface command generates a sequence of scli commands\n"
 	  "which can be used to restore the interface configuration.\n",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  dump_interface },
 
