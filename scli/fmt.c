@@ -76,8 +76,8 @@ static GNetSnmpIdentity const tdomain_identities[] = {
 
 
 
-char const *
-fmt_timeticks(guint32 timeticks)
+static char const *
+format_timeticks(guint32 timeticks, int xml)
 {
     static char buffer[80];
     time_t now, gmt;
@@ -103,6 +103,15 @@ fmt_timeticks(guint32 timeticks)
     tm->tm_isdst = 0;
     gmt_offset = mktime(tm) - gmt;
 
+    if (xml) {
+	g_snprintf(buffer, sizeof(buffer),
+		   "%04d-%02d-%02dT%02d:%02d:%02d%c%02d:%02d",
+		   now_tm.tm_year + 1900, now_tm.tm_mon + 1, now_tm.tm_mday,
+		   now_tm.tm_hour, now_tm.tm_min, now_tm.tm_sec,
+		   gmt_offset >= 0 ? '+' : '-',
+		   (int) ABS(gmt_offset) / 3600,
+		   (int) (ABS(gmt_offset) / 60) % 60);
+    } else {
     g_snprintf(buffer, sizeof(buffer),
 	       "%04d-%02d-%02d %02d:%02d:%02d %c%02d:%02d",
 	       now_tm.tm_year + 1900, now_tm.tm_mon + 1, now_tm.tm_mday,
@@ -110,8 +119,25 @@ fmt_timeticks(guint32 timeticks)
 	       gmt_offset >= 0 ? '+' : '-',
 	       (int) ABS(gmt_offset) / 3600,
 	       (int) (ABS(gmt_offset) / 60) % 60);
+    }
     
     return buffer;
+}
+
+
+
+char const *
+xml_timeticks(guint32 timeticks)
+{
+    return format_timeticks(timeticks, 1);
+}
+
+
+
+char const *
+fmt_timeticks(guint32 timeticks)
+{
+    return format_timeticks(timeticks, 0);
 }
 
 
@@ -138,8 +164,8 @@ date_to_time(guchar *date, gsize len)
 
 
 
-char const *
-fmt_date_and_time(guchar *data, gsize len)
+static char const *
+format_date_and_time(guchar *data, gsize len, int xml)
 {
     static char buffer[80];
     int i;
@@ -169,18 +195,49 @@ fmt_date_and_time(guchar *data, gsize len)
      */
     
     if (len == 8) {
+	if (xml) {
+	    g_snprintf(buffer, sizeof(buffer),
+		       "%04u-%02u-%02uT%02u:%02u:%02u",
+		       (data[0] << 8) + data[1], data[2], data[3],
+		       data[4], data[5], data[6]);
+	} else {
 	g_snprintf(buffer, sizeof(buffer),
 		   "%04u-%02u-%02u %02u:%02u:%02u",
 		   (data[0] << 8) + data[1], data[2], data[3],
 		   data[4], data[5], data[6]);
+	}
     } else if (len == 11) {
+	if (xml) {
+	    g_snprintf(buffer, sizeof(buffer),
+		       "%04u-%02u-%02uT%02u:%02u:%02u%c%02u:%02u",
+		       (data[0] << 8) + data[1], data[2], data[3],
+		       data[4], data[5], data[6],
+		       data[8], data[9], data[10]);
+	} else {
 	g_snprintf(buffer, sizeof(buffer),
 		   "%04u-%02u-%02u %02u:%02u:%02u %c%02u:%02u",
 		   (data[0] << 8) + data[1], data[2], data[3],
 		   data[4], data[5], data[6],
 		   data[8], data[9], data[10]);
     }
+    }
     return buffer;
+}
+
+
+
+char const *
+xml_date_and_time(guchar *data, gsize len)
+{
+    return format_date_and_time(data, len, 1);
+}
+
+
+
+char const *
+fmt_date_and_time(guchar *data, gsize len)
+{
+    return format_date_and_time(data, len, 0);
 }
 
 
@@ -470,6 +527,34 @@ fmt_indent_string(GString *s, int indent, char *label, int len, char *string)
     }
     g_string_append_c(s, '\n');
 }
+
+
+
+const char *
+xml_display_string(int len, char *string)
+{
+    static char *e = NULL;
+    
+    if (e) {
+	g_free(e);
+	e = NULL;
+    }
+
+    /* Remove leading and trailing white-space characters first. */
+
+    while (len && isspace((int) string[0])) {
+	string++, len--;
+    }
+    while (len && isspace((int) string[len-1])) {
+	len--;
+    }
+
+    e = g_malloc0(len+1);
+    snprintf(e, len+1, "%s\0", string);
+    
+    return e;
+}
+
 
 
 void

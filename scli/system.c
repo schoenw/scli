@@ -521,9 +521,9 @@ xml_system_process(xmlNodePtr root,
     }
 
     if (hrSWRunPerfEntry && hrSWRunPerfEntry->hrSWRunPerfMem) {
-	node = xml_new_child(tree, NULL, "memory", "%u",
-			     *hrSWRunPerfEntry->hrSWRunPerfMem);
-	xml_set_prop(node, "unit", "kilobyte");
+	node = xml_new_child(tree, NULL, "memory", "%llu",
+			     (guint64)1024 * *hrSWRunPerfEntry->hrSWRunPerfMem);
+	xml_set_prop(node, "unit", "bytes");
     }
     if (hrSWRunPerfEntry && hrSWRunPerfEntry->hrSWRunPerfCPU) {
 	node = xml_new_child(tree, NULL, "cpu", "%u",
@@ -932,11 +932,11 @@ xml_system_storage(xmlNodePtr root,
 	storage_used *= *(hrStorageEntry->hrStorageAllocationUnits);
 	storage_used /= scale;
 
-	node = xml_new_child(tree, NULL, "size", "%llu", storage_size);
-	xml_set_prop(node, "unit", "kilobyte");
+	node = xml_new_child(tree, NULL, "size", "%llu", (guint64)1024 * storage_size);
+	xml_set_prop(node, "unit", "bytes");
 
-	node = xml_new_child(tree, NULL, "used", "%llu", storage_used);
-	xml_set_prop(node, "unit", "kilobyte");
+	node = xml_new_child(tree, NULL, "used", "%llu", (guint64)1024 * storage_used);
+	xml_set_prop(node, "unit", "bytes");
     }
 }
 
@@ -1061,16 +1061,16 @@ static void
 xml_system_info(xmlNodePtr root, scli_interp_t *interp,
 		snmpv2_mib_system_t *system)
 {
+    GURI *uri;
+
     if (system) {
 	(void) xml_new_child(root, NULL, "name", "%.*s",
 			     (int) system->_sysNameLength,
 			     system->sysName);
-	if (interp->peer->taddress) {
-	    gchar *name =
-		gnet_inetaddr_get_canonical_name(interp->peer->taddress);
-	    gint port = gnet_inetaddr_get_port(interp->peer->taddress);
-	    (void) xml_new_child(root, NULL, "taddress", "%s:%d",
-				 name ? name : "?", port);
+	uri = gnet_snmp_get_uri(interp->peer);
+	if (uri) {
+	    gchar *name = gnet_uri_get_string(uri);
+	    (void) xml_new_child(root, NULL, "uri", "%s", name);
 	    g_free(name);
 	}
 	
@@ -1092,7 +1092,7 @@ xml_system_info(xmlNodePtr root, scli_interp_t *interp,
 		(void) xml_new_child(root, NULL, "vendor", "%s", vendor->name);
 	    }
 	    if (vendor && vendor->url) {
-		(void) xml_new_child(root, NULL, "url", "%s", vendor->url);
+		(void) xml_new_child(root, NULL, "vendor-url", "%s", vendor->url);
 	    }
 	}
 
@@ -1202,6 +1202,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     GString *s;
     int i;
     int const indent = 18;
+    xmlNodePtr node;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1239,7 +1240,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	    if (scli_interp_xml(interp)) {
 		(void) xml_new_child(interp->xml_node, NULL,
 				     "current-time", "%s",
-			     fmt_date_and_time(hrSystem->hrSystemDate,
+			     xml_date_and_time(hrSystem->hrSystemDate,
 					       hrSystem->_hrSystemDateLength));
 	    } else {
 		g_string_sprintfa(s, "%-*s", indent, "Current Time:");
@@ -1255,7 +1256,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	    if (scli_interp_xml(interp)) {
 		(void) xml_new_child(interp->xml_node, NULL,
 				     "agent-boot-time", "%s",
-				     fmt_timeticks(*(system->sysUpTime)));
+				     xml_timeticks(*(system->sysUpTime)));
 	    } else {
 		g_string_sprintfa(s, "%-*s", indent, "Agent Boot Time:");
 		g_string_append(s, fmt_timeticks(*(system->sysUpTime)));
@@ -1266,49 +1267,96 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     
     if (hrSystem) {
 	if (hrSystem->hrSystemUptime) {
+	    if (scli_interp_xml(interp)) {
+		(void) xml_new_child(interp->xml_node, NULL,
+				     "system-boot-time", "%s",
+				     xml_timeticks(*(hrSystem->hrSystemUptime)));
+	    } else {
 	    g_string_sprintfa(s, "%-*s", indent, "System Boot Time:");
 	    g_string_append(s, fmt_timeticks(*(hrSystem->hrSystemUptime)));
 	    g_string_append_c(s, '\n');
+	}
 	}
 	if (hrSystem->hrSystemInitialLoadDevice) {
 	    host_resources_mib_hrDeviceEntry_t *dev;
 	    host_resources_mib_get_hrDeviceEntry(interp->peer, &dev,
 						 *hrSystem->hrSystemInitialLoadDevice, 0);
 	    if (dev && dev->hrDeviceDescr) {
+		if (scli_interp_xml(interp)) {
+		    (void) xml_new_child(interp->xml_node, NULL,
+					 "system-boot-dev", "%.*s",
+					 (int) dev->_hrDeviceDescrLength,
+					 dev->hrDeviceDescr);
+		} else {
 		fmt_display_string(s, indent, "System Boot Dev:",
 				   (int) dev->_hrDeviceDescrLength,
 				   dev->hrDeviceDescr);
 	    }
+	    }
 	    host_resources_mib_free_hrDeviceEntry(dev);
 	}
 	if (hrSystem->hrSystemInitialLoadParameters) {
+	    if (scli_interp_xml(interp)) {
+		(void) xml_new_child(interp->xml_node, NULL,
+				     "system-boot-args", "%s",
+				     xml_display_string((int) hrSystem->_hrSystemInitialLoadParametersLength,
+							hrSystem->hrSystemInitialLoadParameters));
+	    } else {
 	    fmt_display_string(s, indent, "System Boot Args:",
 			       (int) hrSystem->_hrSystemInitialLoadParametersLength,
 			       hrSystem->hrSystemInitialLoadParameters);
 	}
+	}
 	if (hrSystem->hrSystemNumUsers) {
+	    if (scli_interp_xml(interp)) {
+		(void) xml_new_child(interp->xml_node, NULL,
+				     "users", "%u",
+				     *(hrSystem->hrSystemNumUsers));
+	    } else {
 	    g_string_sprintfa(s, "%-*s%u", indent, "Users:", 
 			      *(hrSystem->hrSystemNumUsers));
 	    g_string_append_c(s, '\n');
 	}
+	}
 	if (hrSystem->hrSystemProcesses) {
+	    if (scli_interp_xml(interp)) {
+		(void) xml_new_child(interp->xml_node, NULL,
+				     "processes", "%u",
+				     *(hrSystem->hrSystemProcesses));
+	    } else {
 	    g_string_sprintfa(s, "%-*s%u", indent, "Processes:",
 			      *(hrSystem->hrSystemProcesses));
+	    }
 	    if (hrSystem->hrSystemMaxProcesses
 		&& *(hrSystem->hrSystemMaxProcesses)) {
+		if (scli_interp_xml(interp)) {
+		    (void) xml_new_child(interp->xml_node, NULL,
+					 "max-processes", "%u",
+					 *(hrSystem->hrSystemMaxProcesses));
+		} else {
 		g_string_sprintfa(s, " (%u maximum)",
 				  *(hrSystem->hrSystemMaxProcesses));
 	    }
+	    }
+	    if (!scli_interp_xml(interp)) {
 	    g_string_append_c(s, '\n');
 	}
+    }
     }
 
     if (hrStorage) {
 	if (hrStorage->hrMemorySize) {
+	    if (scli_interp_xml(interp)) {
+		node = xml_new_child(interp->xml_node, NULL,
+				     "memory", "%llu",
+				     (guint64)1024 * *(hrStorage->hrMemorySize));
+		xml_set_prop(node, "unit", "bytes");
+	    } else {
 	    g_string_sprintfa(s, "%-*s", indent, "Memory:");
 	    fmt_kbytes(s, (guint32) *(hrStorage->hrMemorySize));
 	    g_string_append_c(s, '\n');
 	}
+    }
     }
 
     if (interfaces) {
@@ -1342,25 +1390,47 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 
     if (dot1dBase) {
 	if (dot1dBase->dot1dBaseNumPorts && *dot1dBase->dot1dBaseNumPorts) {
+	    if (scli_interp_xml(interp)) {
+		(void) xml_new_child(interp->xml_node, NULL,
+				     "bridge-ports", "%d",
+				     *(dot1dBase->dot1dBaseNumPorts));
+	    } else {
 	    g_string_sprintfa(s, "%-*s%d\n", indent, "Bridge Ports:",
 			      *(dot1dBase->dot1dBaseNumPorts));
 	}
+	}
 	if (dot1dBase->dot1dBaseType) {
-	    e = fmt_enum(dot1dBaseType, dot1dBase->dot1dBaseType);
+	    e = fmt_enum(bridge_mib_enums_dot1dBaseType, dot1dBase->dot1dBaseType);
 	    if (e) {
-		g_string_sprintfa(s, "%-*s%s\n", indent, "Bridge Type:", e);
+		if (scli_interp_xml(interp)) {
+		    (void) xml_new_child(interp->xml_node, NULL,
+					 "bridge-type", "%s", e);
+		} else {
+		    g_string_sprintfa(s, "%-*s%s\n", indent,
+				      "Bridge Type:", e);
+		}
 	    }
 	}
     }
 
     if (rs232 && rs232->rs232Number && rs232->rs232Number > 0) {
+	if (scli_interp_xml(interp)) {
+	    (void) xml_new_child(interp->xml_node, NULL,
+				 "rs232-ports", "%d", *(rs232->rs232Number));
+	} else {
 	g_string_sprintfa(s, "%-*s%d\n", indent, "RS 232 Ports:",
 			  *(rs232->rs232Number));
+    }
     }
 
     if (smLangTable) {
 	for (i = 0; smLangTable[i]; i++) ;
+	if (scli_interp_xml(interp)) {
+	    (void) xml_new_child(interp->xml_node, NULL,
+				 "script-languages", "%d", i);
+	} else {
 	g_string_sprintfa(s, "%-*s%u\n", indent, "Script Languages:", i);
+    }
     }
 
     if (system)

@@ -263,6 +263,7 @@ xml_ip_address(xmlNodePtr root, ip_mib_ipAddrEntry_t *ipAddrEntry)
     tree = xmlNewChild(root, NULL, "address", NULL);
     xmlSetProp(tree, "address",
 	       fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_ADDR));
+    xmlSetProp(tree, "type", "ipv4");
 
     if (ipAddrEntry->ipAdEntNetMask) {
 	xmlSetProp(tree, "prefix", fmt_ipv4_mask(ipAddrEntry->ipAdEntNetMask));

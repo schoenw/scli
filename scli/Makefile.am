@@ -1,4 +1,4 @@
-INCLUDES	= -I$(top_srcdir)/stub -I$(top_srcdir)/proc $(GSNMP_CFLAGS) $(GNET_CFLAGS) $(GTK_CFLAGS) $(XML_CFLAGS)
+INCLUDES	= -I$(top_srcdir)/stub -I$(top_srcdir)/proc $(GSNMP_CFLAGS) $(GNET_CFLAGS) $(GTK_CFLAGS) $(XML_CFLAGS) $(XML_CPPFLAGS)
 
 bin_PROGRAMS	= scli # gscli
 

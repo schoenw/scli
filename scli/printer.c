@@ -3158,7 +3158,7 @@ xml_printer_alert(xmlNodePtr root, printer_mib_prtAlertEntry_t *alertEntry)
 
     if (alertEntry->prtAlertTime) {
 	xml_new_child(tree, NULL, "date",
-		      fmt_timeticks(*alertEntry->prtAlertTime));
+		      xml_timeticks(*alertEntry->prtAlertTime));
     }
 
     e = fmt_enum(iana_printer_mib_enums_PrtAlertCodeTC,

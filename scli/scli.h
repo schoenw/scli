@@ -396,7 +396,13 @@ scli_get_ieee_vendor(guint32 prefix);
  */
 
 extern const char *
+xml_timeticks(guint32 timeticks);
+
+extern const char *
 fmt_timeticks(guint32 timeticks);
+
+extern char const *
+xml_date_and_time(guchar *data, gsize len);
 
 extern char const *
 fmt_date_and_time(guchar *data, gsize len);
@@ -447,6 +453,9 @@ fmt_counter_dt(GString *s, guint32 *new_counter, guint32 *old_counter,
 	       struct timeval *last, double delta);
 extern void
 fmt_indent_string(GString *s, int indent, char *label, int len, char *string);
+
+extern const char*
+xml_display_string(int len, char *string);
 
 extern void
 fmt_display_string(GString *s, int indent, char *label, int len, char *string);

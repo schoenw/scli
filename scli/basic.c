@@ -841,7 +841,7 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 		xml_set_prop(top, "peer", name ? name : "?");
 		g_free(name);
 	    }
-	    xml_set_prop(top, "date", "%s", fmt_timeticks(0));
+	    xml_set_prop(top, "date", "%s", xml_timeticks(0));
 	}
 	if (! (scli_interp_recursive(interp))) {
 	    if (interp->xml_doc->children

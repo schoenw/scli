@@ -91,6 +91,93 @@ fmt_stpStatus(GString *s, gint32 *enable, gint32 *state)
 
 
 static void
+xml_bridge_stp_info(xmlNodePtr root,
+		    bridge_mib_dot1dBase_t *dot1dBase,
+		    bridge_mib_dot1dStp_t *dot1dStp)
+{
+    const char *e;
+    xmlNodePtr node;
+
+    if (dot1dStp->dot1dStpProtocolSpecification) {
+	e = fmt_enum(bridge_mib_enums_dot1dStpProtocolSpecification,
+		     dot1dStp->dot1dStpProtocolSpecification);
+	if (e) {
+	    (void) xml_new_child(root, NULL, "stp-type", "%s", e);
+	}
+    }
+    
+    if (dot1dStp->dot1dStpPriority) {
+	(void) xml_new_child(root, NULL, "stp-priority", "%d",
+			     *dot1dStp->dot1dStpPriority);
+    }
+
+    if (dot1dStp->dot1dStpPriority && dot1dBase->dot1dBaseBridgeAddress) {
+	(void) xml_new_child(root, NULL, "stp-bridge-id",
+			     "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
+			     (*dot1dStp->dot1dStpPriority >> 8) & 0xff,
+			     (*dot1dStp->dot1dStpPriority) & 0xff,
+			     dot1dBase->dot1dBaseBridgeAddress[0],
+			     dot1dBase->dot1dBaseBridgeAddress[1],
+			     dot1dBase->dot1dBaseBridgeAddress[2],
+			     dot1dBase->dot1dBaseBridgeAddress[3],
+			     dot1dBase->dot1dBaseBridgeAddress[4],
+			     dot1dBase->dot1dBaseBridgeAddress[5]);
+    }
+    
+    if (dot1dStp->dot1dStpDesignatedRoot) {
+	(void) xml_new_child(root, NULL, "stp-root-id", "%s",
+			     fmt_bridgeid(dot1dStp->dot1dStpDesignatedRoot));
+    }
+
+    if (dot1dStp->dot1dStpRootCost) {
+	(void) xml_new_child(root, NULL, "stp-root-cost", "%d",
+			     *dot1dStp->dot1dStpRootCost);
+    }
+
+    if (dot1dStp->dot1dStpRootPort) {
+	(void) xml_new_child(root, NULL, "stp-root-port", "%d",
+			     *dot1dStp->dot1dStpRootPort);
+    }
+
+    if (dot1dStp->dot1dStpMaxAge) {
+	node = xml_new_child(root, NULL, "stp-aging-time", "%d",
+			     *dot1dStp->dot1dStpMaxAge * 10);
+	xml_set_prop(node, "unit", "milliseconds");
+    }
+
+    if (dot1dStp->dot1dStpHelloTime) {
+	node = xml_new_child(root, NULL, "stp-hello-time", "%d",
+			     *dot1dStp->dot1dStpHelloTime * 10);
+	xml_set_prop(node, "unit", "milliseconds");
+    }
+
+    if (dot1dStp->dot1dStpHoldTime) {
+	node = xml_new_child(root, NULL, "stp-hold-time", "%d",
+			     *dot1dStp->dot1dStpHoldTime * 10);
+	xml_set_prop(node, "unit", "milliseconds");
+    }
+
+    if (dot1dStp->dot1dStpForwardDelay) {
+	node = xml_new_child(root, NULL, "stp-forward-delay", "%d",
+			     *dot1dStp->dot1dStpForwardDelay * 10);
+	xml_set_prop(node, "unit", "milliseconds");
+    }
+
+    if (dot1dStp->dot1dStpTimeSinceTopologyChange) {
+	node = xml_new_child(root, NULL, "stp-topology-change", "%s",
+			     xml_timeticks(*(dot1dStp->dot1dStpTimeSinceTopologyChange)));
+    }
+    
+    if (dot1dStp->dot1dStpTopChanges) {
+	node = xml_new_child(root, NULL, "stp-topology-changes", "%u",
+			     *dot1dStp->dot1dStpTopChanges);
+    }
+    
+}
+
+
+
+static void
 fmt_bridge_stp_info(GString *s,
 		    bridge_mib_dot1dBase_t *dot1dBase,
 		    bridge_mib_dot1dStp_t *dot1dStp)
@@ -124,7 +211,6 @@ fmt_bridge_stp_info(GString *s,
 			  dot1dBase->dot1dBaseBridgeAddress[3],
 			  dot1dBase->dot1dBaseBridgeAddress[4],
 			  dot1dBase->dot1dBaseBridgeAddress[5]);
-	
     }
     
     if (dot1dStp->dot1dStpDesignatedRoot) {
@@ -173,6 +259,46 @@ fmt_bridge_stp_info(GString *s,
 			  "Stp Topo Changes:", *dot1dStp->dot1dStpTopChanges);
     }
     
+}
+
+
+
+static void
+xml_bridge_info(xmlNodePtr root,
+		bridge_mib_dot1dBase_t *dot1dBase,
+		bridge_mib_dot1dTp_t *dot1dTp,
+		bridge_mib_dot1dStp_t *dot1dStp)
+{
+    const char *e;
+    xmlNodePtr node;
+
+    if (dot1dBase->dot1dBaseBridgeAddress) {
+	(void) xml_new_child(root, NULL, "address", "%s",
+			     fmt_ether_address(dot1dBase->dot1dBaseBridgeAddress,
+					       SCLI_FMT_ADDR));
+    }
+    if (dot1dBase->dot1dBaseNumPorts) {
+	(void) xml_new_child(root, NULL, "ports", "%d",
+			     *(dot1dBase->dot1dBaseNumPorts));
+    }
+    if (dot1dBase->dot1dBaseType) {
+	e = fmt_enum(bridge_mib_enums_dot1dBaseType, dot1dBase->dot1dBaseType);
+	if (e) {
+	    (void) xml_new_child(root, NULL, "type", "%s", e);
+	}
+	if (dot1dBase->dot1dBaseType
+	    && (*dot1dBase->dot1dBaseType == BRIDGE_MIB_DOT1DBASETYPE_TRANSPARENT_ONLY
+		|| *dot1dBase->dot1dBaseType == BRIDGE_MIB_DOT1DBASETYPE_SRT)) {
+	    if (dot1dTp && dot1dTp->dot1dTpAgingTime) {
+		node = xml_new_child(root, NULL, "tp-aging-time", "%d",
+				     *dot1dTp->dot1dTpAgingTime);
+		xml_set_prop(node, "unit", "seconds");
+	    }
+	}
+    }
+    if (dot1dStp) {
+	xml_bridge_stp_info(root, dot1dBase, dot1dStp);
+    }
 }
 
 
@@ -251,7 +377,12 @@ show_bridge_info(scli_interp_t *interp, int argc, char **argv)
 	&& *dot1dBase->dot1dBaseNumPorts) {
 	bridge_mib_get_dot1dTp(interp->peer, &dot1dTp, 0);
 	bridge_mib_get_dot1dStp(interp->peer, &dot1dStp, 0);
+
+	if (scli_interp_xml(interp)) {
+	    xml_bridge_info(interp->xml_node, dot1dBase, dot1dTp, dot1dStp);
+	} else {
 	fmt_bridge_info(interp->result, dot1dBase, dot1dTp, dot1dStp);
+    }
     }
 
     if (dot1dBase)
@@ -262,6 +393,59 @@ show_bridge_info(scli_interp_t *interp, int argc, char **argv)
 	bridge_mib_free_dot1dStp(dot1dStp);
     
     return SCLI_OK;
+}
+
+
+
+static void
+xml_bridge_port(xmlNodePtr root,
+		bridge_mib_dot1dBasePortEntry_t *dot1dBasePortEntry,
+		if_mib_ifEntry_t *ifEntry,
+		if_mib_ifXEntry_t *ifXEntry,
+		int type_width, int name_width)
+{
+    xmlNodePtr tree, node;
+    const char *s;
+
+    tree = xmlNewChild(root, NULL, "port", NULL);
+    xml_set_prop(tree, "index", "%u", 
+		 dot1dBasePortEntry->dot1dBasePort);
+
+    if (dot1dBasePortEntry->dot1dBasePortIfIndex) {
+	(void) xml_new_child(tree, NULL, "interface", "%u",
+			   *dot1dBasePortEntry->dot1dBasePortIfIndex);
+    }
+#if 0 // In case of XML output, we should avoid duplicated information 
+    if (ifEntry) {
+	const char *type;
+	type = fmt_enum(ianaiftype_mib_enums_IANAifType, ifEntry->ifType);
+	(void) xmlNewChild(tree, NULL, "type", "%s", type);
+
+	if (ifEntry->ifSpeed) {
+	    if (*(ifEntry->ifSpeed) == 0xffffffff
+		&& ifXEntry && ifXEntry->ifHighSpeed) {
+		node = xml_new_child(tree, NULL, "speed", "%s",
+				     fmt_gtp(*(ifXEntry->ifHighSpeed)));
+	    } else {
+		node = xml_new_child(tree, NULL, "speed", "%s",
+				     fmt_kmg(*(ifEntry->ifSpeed)));
+	    }
+	}
+	xml_set_prop(node, "unit", "bps");
+
+	if (ifXEntry && ifXEntry->ifName) {
+	    (void) xml_new_child(tree, NULL, "name", "%.*s",
+				 (int) ifXEntry->_ifNameLength,
+				 ifXEntry->ifName);
+	}
+
+	if (ifEntry->ifDescr) {
+	    (void) xml_new_child(tree, NULL, "description", "%.*s",
+				 (int) ifEntry->_ifDescrLength,
+				 ifEntry->ifDescr);
+	}
+    }
+#endif
 }
 
 
@@ -361,10 +545,12 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 		}
 	    }
 	}
+	if (!scli_interp_xml(interp)) {
 	g_string_sprintfa(interp->header,
 			  " PORT INTERFACE %-*s SPEED %-*s DESCRIPTION",
 			  type_width, "TYPE",
 			  name_width, "NAME");
+	}
 	for (i = 0; dot1dBasePortTable[i]; i++) {
 	    if (ifTable && dot1dBasePortTable[i]->dot1dBasePortIfIndex) {
 		for (j = 0; ifTable[j]; j++) {
@@ -374,11 +560,18 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 		    }
 		}
 	    }
+	    if (scli_interp_xml(interp)) {
+		xml_bridge_port(interp->xml_node, dot1dBasePortTable[i],
+				(ifTable && ifTable[j]) ? ifTable[j] : NULL,
+				(ifXTable && ifXTable[j]) ? ifXTable[j] : NULL,
+				type_width, name_width);
+	    } else {
 	    fmt_bridge_port(interp->result, dot1dBasePortTable[i],
 			    (ifTable && ifTable[j]) ? ifTable[j] : NULL,
 			    (ifXTable && ifXTable[j]) ? ifXTable[j] : NULL,
 			    type_width, name_width);
 	}
+    }
     }
 
     if (dot1dBasePortTable)
@@ -387,6 +580,61 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
 
     return SCLI_OK;
+}
+
+
+
+static void
+xml_bridge_stp_port(xmlNodePtr root,
+		    bridge_mib_dot1dStpPortEntry_t *dot1dStpPortEntry)
+{
+    xmlNodePtr tree, node;
+    const char *s;
+    const char *e;
+
+    tree = xmlNewChild(root, NULL, "port", NULL);
+    xml_set_prop(tree, "index", "%u", dot1dStpPortEntry->dot1dStpPort);
+
+    if (dot1dStpPortEntry->dot1dStpPortPriority) {
+	(void) xml_new_child(tree, NULL, "priority", "%u",
+			     *dot1dStpPortEntry->dot1dStpPortPriority);
+    }
+
+    e = fmt_enum(bridge_mib_enums_dot1dStpPortEnable,
+		 dot1dStpPortEntry->dot1dStpPortEnable);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "enable", "%s", e);
+    }
+    e = fmt_enum(bridge_mib_enums_dot1dStpPortState,
+		 dot1dStpPortEntry->dot1dStpPortState);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "state", "%s", e);
+    }
+
+    if (dot1dStpPortEntry->dot1dStpPortPathCost) {
+	(void) xml_new_child(tree, NULL, "path-cost", "%u",
+			     *dot1dStpPortEntry->dot1dStpPortPathCost);
+    }
+
+    if (dot1dStpPortEntry->dot1dStpPortDesignatedRoot) {
+	(void) xml_new_child(tree, NULL, "designated-root", "%s",
+			     fmt_bridgeid(dot1dStpPortEntry->dot1dStpPortDesignatedRoot));
+    }
+
+    if (dot1dStpPortEntry->dot1dStpPortDesignatedCost) {
+	(void) xml_new_child(tree, NULL, "designated-cost", "%u",
+			     *dot1dStpPortEntry->dot1dStpPortDesignatedCost);
+    }
+    
+    if (dot1dStpPortEntry->dot1dStpPortDesignatedBridge) {
+	(void) xml_new_child(tree, NULL, "designated-bridge", "%s",
+			     fmt_bridgeid(dot1dStpPortEntry->dot1dStpPortDesignatedBridge));
+    }
+
+    if (dot1dStpPortEntry->dot1dStpPortDesignatedPort) {
+	(void) xml_new_child(tree, NULL, "designated-port", "%u",
+			     *dot1dStpPortEntry->dot1dStpPortDesignatedPort);
+    }
 }
 
 
@@ -405,9 +653,9 @@ fmt_bridge_stp_port(GString *s,
 		  dot1dStpPortEntry->dot1dStpPortState);
 
     if (dot1dStpPortEntry->dot1dStpPortPathCost) {
-	g_string_sprintfa(s, "%6u  ", *dot1dStpPortEntry->dot1dStpPortPathCost);
+	g_string_sprintfa(s, " %6u", *dot1dStpPortEntry->dot1dStpPortPathCost);
     } else {
-	g_string_sprintfa(s, "%6s  ", "");
+	g_string_sprintfa(s, " %6s", "");
     }
 
     if (dot1dStpPortEntry->dot1dStpPortDesignatedRoot) {
@@ -416,7 +664,7 @@ fmt_bridge_stp_port(GString *s,
     }
 
     if (dot1dStpPortEntry->dot1dStpPortDesignatedCost) {
-	g_string_sprintfa(s, "%5u ", *dot1dStpPortEntry->dot1dStpPortDesignatedCost);
+	g_string_sprintfa(s, "%5u", *dot1dStpPortEntry->dot1dStpPortDesignatedCost);
     }
     
     if (dot1dStpPortEntry->dot1dStpPortDesignatedBridge) {
@@ -425,7 +673,7 @@ fmt_bridge_stp_port(GString *s,
     }
 
     if (dot1dStpPortEntry->dot1dStpPortDesignatedPort) {
-	g_string_sprintfa(s, "%5u ", *dot1dStpPortEntry->dot1dStpPortDesignatedPort);
+	g_string_sprintfa(s, "%5u", *dot1dStpPortEntry->dot1dStpPortDesignatedPort);
     }
 
     g_string_append(s, "\n");
@@ -455,17 +703,71 @@ show_bridge_stp_ports(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (dot1dStpPortTable) {
+	if (!scli_interp_xml(interp)) {
 	g_string_sprintfa(interp->header,
 			  " PORT  PRIO STATE P-COST D-ROOT D-COST D-BRIDGE D-PORT");
+	}
 	for (i = 0; dot1dStpPortTable[i]; i++) {
+	    if (scli_interp_xml(interp)) {
+		xml_bridge_stp_port(interp->xml_node, dot1dStpPortTable[i]);
+	    } else {
 	    fmt_bridge_stp_port(interp->result, dot1dStpPortTable[i]);
 	}
+    }
     }
 
     if (dot1dStpPortTable)
 	bridge_mib_free_dot1dStpPortTable(dot1dStpPortTable);
 
     return SCLI_OK;
+}
+
+
+
+static void
+xml_bridge_forwarding(xmlNodePtr root,
+		      bridge_mib_dot1dTpFdbEntry_t *dot1dTpFdbEntry,
+		      ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry)
+{
+    xmlNodePtr tree, node;
+    const char *s;
+    const scli_vendor_t *vendor;
+    guint32 prefix;
+    char *name;
+    const char *status;
+
+    tree = xmlNewChild(root, NULL, "forward", NULL);
+    xml_set_prop(tree, "port", "%u", *dot1dTpFdbEntry->dot1dTpFdbPort);
+
+    status = fmt_enum(bridge_mib_enums_dot1dTpFdbStatus,
+	     dot1dTpFdbEntry->dot1dTpFdbStatus);
+    (void) xml_new_child(tree, NULL, "status", "%s", status);
+
+    if (dot1dTpFdbEntry->dot1dTpFdbAddress) {
+	xml_set_prop(tree, "address", "%s",
+		     fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress,
+				       SCLI_FMT_ADDR));
+	name = fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress,
+				 SCLI_FMT_NAME);
+	if (name) {
+	    (void) xml_new_child(tree, NULL, "name", "%s", name);
+	}
+#if 1
+	if (ipNetToMediaEntry) {
+	    node = xml_new_child(tree, NULL, "address", "%s",
+		 fmt_ipv4_address(ipNetToMediaEntry->ipNetToMediaNetAddress,
+				  SCLI_FMT_ADDR));
+	    xml_set_prop(node, "type", "ipv4");
+	}
+#endif
+	prefix = dot1dTpFdbEntry->dot1dTpFdbAddress[0] * 65536
+	    + dot1dTpFdbEntry->dot1dTpFdbAddress[1] * 256
+	    + dot1dTpFdbEntry->dot1dTpFdbAddress[2];
+	vendor = scli_get_ieee_vendor(prefix);
+	if (vendor && vendor->name) {
+	    (void) xml_new_child(tree, NULL, "vendor", "%s", vendor->name);
+	}
+    }
 }
 
 
@@ -562,9 +864,11 @@ show_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 		}
 	    }
 	};
+	if (!scli_interp_xml(interp)) {
 	g_string_sprintfa(interp->header,
 			  " PORT STATUS   ADDRESS           %-*s IP ADDRESS      VENDOR",
 			  name_width, "NAME");
+	}
 	for (p = 0; p < max+1; p++) {
 	    for (i = 0; dot1dTpFdbTable[i]; i++) {
 		if (dot1dTpFdbTable[i]->dot1dTpFdbPort
@@ -585,12 +889,18 @@ show_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 			}
 		    }
 		    
+		    if (scli_interp_xml(interp)) {
+			xml_bridge_forwarding(interp->xml_node,
+					      dot1dTpFdbTable[i],
+					      (ipNetToMediaTable && ipNetToMediaTable[k]) ? ipNetToMediaTable[k] : NULL);
+		    } else {
 		    fmt_bridge_forwarding(interp->result, dot1dTpFdbTable[i],
 					  (ipNetToMediaTable && ipNetToMediaTable[k]) ? ipNetToMediaTable[k] : NULL,
 					  name_width);
 		}
 	    }
 	}
+    }
     }
 
 #if 1
@@ -808,15 +1118,15 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  "The show bridge info command displays summary information about\n"
 	  "a bridge, such as the number of ports and the supported bridging\n"
 	  "functions and associated parameters.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "bridge info", NULL,
 	  show_bridge_info },
 
 	{ "show bridge ports", NULL,
 	  "The show bridge ports command displays information about the\n"
 	  "bridge ports.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "bridge ports", NULL,
 	  show_bridge_ports },
 
 	{ "show bridge stp ports", NULL,
@@ -838,8 +1148,8 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  "(D). The second character indicates the current status\n"
 	  "(D=disabled, B=blocking, I=listening, L=learning, F=forwarding,\n"
 	  "X=broken).",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "bridge stp ports", NULL,
 	  show_bridge_stp_ports },
 
 	{ "show bridge forwarding", NULL,
@@ -852,8 +1162,8 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  "  ADDRESS address associated with the port\n"
 	  "  NAME    name of the address (where known)\n"
 	  "  VENDOR  vendor info derived from the address",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "bridge forwarding", NULL,
 	  show_bridge_forwarding },
 
 	{ "show bridge filter", NULL,

@@ -151,7 +151,7 @@ fmt_phys_address(GString *s, guchar *address, guint16 address_len)
      int i;
 
      for (i = 0; i < address_len; i++) {
-	  g_string_sprintfa(s, "%s%02X", (i == 0) ? "" : ":", address[i]);
+	  g_string_sprintfa(s, "%s%02x", (i == 0) ? "" : ":", address[i]);
      }
 }
 
@@ -351,7 +351,7 @@ fmt_interface_details(GString *s,
 		 ifXEntry ? ifXEntry->ifLinkUpDownTrapEnable : NULL);
     g_string_sprintfa(s, "Traps:       %-*s", width, e ? e : "");
     if (ifEntry->ifMtu) {
-	g_string_sprintfa(s, " MTU:     %d byte\n", *(ifEntry->ifMtu));
+	g_string_sprintfa(s, " MTU:     %d bytes\n", *(ifEntry->ifMtu));
     } else {
 	g_string_append(s, " MTU:\n");
     }
@@ -475,7 +475,7 @@ xml_interface_details(xmlNodePtr root,
 	char *a, *b;
 	a = g_malloc((size_t) (ifEntry->_ifPhysAddressLength * 3));
 	for (j = 0, b = a; j < ifEntry->_ifPhysAddressLength; j++) {
-	    sprintf(b, "%s%02X", (j == 0) ? "" : ":",
+	    sprintf(b, "%s%02x", (j == 0) ? "" : ":",
 		    ifEntry->ifPhysAddress[j]);
 	    b += strlen(b);
 	}
@@ -485,17 +485,17 @@ xml_interface_details(xmlNodePtr root,
 
     if (ifEntry->ifMtu) {
 	node = xml_new_child(tree, NULL, "mtu", "%d", *ifEntry->ifMtu);
-	xml_set_prop(node, "unit", "byte");	
+	xml_set_prop(node, "unit", "bytes");	
     }
 
     if (ifEntry->ifSpeed) {
 	if (*(ifEntry->ifSpeed) == 0xffffffff
 	    && ifXEntry && ifXEntry->ifHighSpeed) {
-	    node = xml_new_child(tree, NULL, "speed", "%s",
-				 fmt_gtp(*(ifXEntry->ifHighSpeed)));
+	    node = xml_new_child(tree, NULL, "speed", "%u000000",
+				 *(ifXEntry->ifHighSpeed));
 	} else {
-	    node = xml_new_child(tree, NULL, "speed", "%s",
-				 fmt_kmg(*(ifEntry->ifSpeed)));
+	    node = xml_new_child(tree, NULL, "speed", "%u",
+				 *(ifEntry->ifSpeed));
 	}
 	xml_set_prop(node, "unit", "bps");
     }
@@ -520,7 +520,7 @@ xml_interface_details(xmlNodePtr root,
 
     if (ifEntry->ifLastChange && system && system->sysUpTime) {
 	guint32 dsecs = *(system->sysUpTime) - *(ifEntry->ifLastChange);
-	(void) xml_new_child(tree, NULL, "change", "%s", fmt_timeticks(dsecs));
+	(void) xml_new_child(tree, NULL, "change", "%s", xml_timeticks(dsecs));
     }
 
 #if 0

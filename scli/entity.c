@@ -523,7 +523,7 @@ scli_init_entity_mode(scli_interp_t *interp)
 	  "The `show entity sensors' command describes the physical sensor\n"
 	  "entities in more detail.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
-	  NULL, NULL,
+	  "entities sensors", NULL,
 	  show_entity_sensors },
 	
 #if 0
