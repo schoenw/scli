@@ -379,40 +379,27 @@ fmt_printer_general(GString *s,
 	g_string_append(s, "\n");
     }
     
-    g_string_sprintfa(s, "%-*s ", indent, "Defaults:");
-    if (prtGeneralEntry->prtInputDefaultIndex) {
-	switch (*prtGeneralEntry->prtInputDefaultIndex) {
-	case -1:
-	    g_string_append(s, "No default input\n");
-	    break;
-	default:
-	    g_string_sprintfa(s, "input #%u\n",
-			      *prtGeneralEntry->prtInputDefaultIndex);
-	}
-    } 
-    
-    if (prtGeneralEntry->prtOutputDefaultIndex) {
-	g_string_sprintfa(s, "%-*s ", indent, "");
-	switch (*prtGeneralEntry->prtOutputDefaultIndex) {
-	case -1:
-	    g_string_append(s, "no default output\n");
-	    break;
-	default:
-	    g_string_sprintfa(s, "output #%u\n",
-			      *prtGeneralEntry->prtOutputDefaultIndex);
-	}
+    if (prtGeneralEntry->prtInputDefaultIndex
+	&& *prtGeneralEntry->prtInputDefaultIndex > 0) {
+	g_string_sprintfa(s, "%-*s input #%d\n", indent, "Default Input:",
+			  *prtGeneralEntry->prtInputDefaultIndex);
+    }
+
+    if (prtGeneralEntry->prtOutputDefaultIndex
+	&& *prtGeneralEntry->prtOutputDefaultIndex > 0) {
+	g_string_sprintfa(s, "%-*s output #%d\n", indent, "Default Output:",
+			  *prtGeneralEntry->prtOutputDefaultIndex);
     }
     
     if (prtGeneralEntry->prtMarkerDefaultIndex) {
-	g_string_sprintfa(s, "%-*s marker #%u\n", indent, "",
+	g_string_sprintfa(s, "%-*s marker #%u\n", indent, "Default Marker:",
 			  *prtGeneralEntry->prtMarkerDefaultIndex);
     }
     
     if (prtGeneralEntry->prtMediaPathDefaultIndex) {
-	g_string_sprintfa(s, "%-*s media path #%u", indent, "",
+	g_string_sprintfa(s, "%-*s media path #%u\n", indent, "Default Path:",
 			  *prtGeneralEntry->prtMediaPathDefaultIndex);
     }
-    g_string_append(s, "\n");
     
     if (prtGeneralEntry->prtAlertAllEvents) {
 	g_string_sprintfa(s, "%-*s %u\n", indent, "Total Alerts:",
@@ -1100,7 +1087,7 @@ fmt_printer_supplies(GString *s, printer_mib_prtMarkerSuppliesEntry_t *prtSuppli
     g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
 		      prtSuppliesEntry->hrDeviceIndex);
 
-    g_string_sprintfa(s, "%-*s %u\n", indent, "Marker:",
+    g_string_sprintfa(s, "%-*s %u\n", indent, "Supply:",
 		      prtSuppliesEntry->prtMarkerSuppliesIndex);
 
     if (prtSuppliesEntry->prtMarkerSuppliesDescription &&
