@@ -157,6 +157,8 @@ scli_interp_reset(scli_interp_t *interp);
 	(interp->flags & SCLI_INTERP_FLAG_XML)
 #define scli_interp_monitor(interp) \
 	(interp->flags & SCLI_INTERP_FLAG_MONITOR)
+#define scli_interp_dry(interp) \
+	(interp->flags & SCLI_INTERP_FLAG_DRY)
 
 extern int
 scli_split(char *string, int *argc, char ***argv);

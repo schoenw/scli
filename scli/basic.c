@@ -620,7 +620,7 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 
     g_string_truncate(interp->result, 0);
     g_string_truncate(interp->header, 0);
-    if (! (interp->flags & SCLI_INTERP_FLAG_DRY)
+    if (! scli_interp_dry(interp)
 	&& cmd->flags & SCLI_CMD_FLAG_NEED_PEER && ! interp->peer) {
 	g_printerr("error: no association to a remote SNMP agent\n");
 	return SCLI_ERROR;
@@ -648,8 +648,8 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 	code = scli_loop(interp, cmd, argc, argv);
 	interp->flags &= ~SCLI_INTERP_FLAG_LOOP;
     } else {
-	if (! (interp->flags & SCLI_INTERP_FLAG_DRY)
-	    || ((interp->flags & SCLI_INTERP_FLAG_DRY) && (cmd->flags & SCLI_CMD_FLAG_DRY))) {
+	if (! scli_interp_dry(interp)
+	    || (scli_interp_dry(interp) && (cmd->flags & SCLI_CMD_FLAG_DRY))) {
 	    code = (cmd->func) (interp, argc, argv);
 	} else {
 	    code = SCLI_OK;
