@@ -300,33 +300,6 @@ fmt_exit_code(GString *s, gint32 *code)
 
 
 
-static void
-show_extension(GString *s, smExtsnEntry_t *smExtsnEntry)
-{
-    int const indent = 12;
-    if (smExtsnEntry->smExtsnDescr) {
-	g_string_sprintfa(s, "%-*s ", indent, "  Extension:");
-	g_string_sprintfa(s, " %.*s\n",
-			  (int) smExtsnEntry->_smExtsnDescrLength,
-			  smExtsnEntry->smExtsnDescr);
-	
-    }
-    if (smExtsnEntry->smExtsnVersion) {
-	g_string_sprintfa(s, "%-*s ", indent, "  Version:");
-	g_string_sprintfa(s, " %.*s\n",
-			  (int) smExtsnEntry->_smExtsnVersionLength,
-			  smExtsnEntry->smExtsnVersion);
-    }
-    if (smExtsnEntry->smExtsnRevision && smExtsnEntry->_smExtsnRevisionLength) {
-	g_string_sprintfa(s, "%-*s ", indent, "  Revision:");
-	g_string_sprintfa(s, " %.*s\n",
-			  (int) smExtsnEntry->_smExtsnRevisionLength,
-			  smExtsnEntry->smExtsnRevision);
-    }
-}
-
-
-
 static char const *
 get_script_lang_name(smScriptEntry_t *smScriptEntry,
 		     smLangEntry_t **smLangTable)
@@ -372,11 +345,58 @@ get_launch_entry(smRunEntry_t *smRunEntry, smLaunchEntry_t **smLaunchTable)
 
 
 static void
-show_language(GString *s, smLangEntry_t *smLangEntry,
-	      smExtsnEntry_t **smExtsnEntry)
+show_extension(GString *s, smExtsnEntry_t *smExtsnEntry, int c)
 {
-    int i;
     int const indent = 12;
+    
+    if (smExtsnEntry->smExtsnDescr) {
+	g_string_sprintfa(s, "%c%-*s ", c, indent, "- Extension:");
+	g_string_sprintfa(s, " %.*s\n",
+			  (int) smExtsnEntry->_smExtsnDescrLength,
+			  smExtsnEntry->smExtsnDescr);
+    }
+    if (c == '`') c = ' ';
+    if (smExtsnEntry->smExtsnVersion) {
+	g_string_sprintfa(s, "%c%-*s ", c, indent, "  Version:");
+	g_string_sprintfa(s, " %.*s\n",
+			  (int) smExtsnEntry->_smExtsnVersionLength,
+			  smExtsnEntry->smExtsnVersion);
+    }
+    if (c == '`') c = ' ';
+    if (smExtsnEntry->smExtsnVendor) {
+	scli_vendor_t *vendor;
+	vendor = scli_get_iana_vendor(smExtsnEntry->smExtsnVendor,
+				      smExtsnEntry->_smExtsnVendorLength);
+	if (vendor && vendor->name) {
+	    g_string_sprintfa(s, "%c%-*s  ", c, indent, "  Vendor:");
+	    if (vendor->id) {
+		g_string_append(s, vendor->name);
+		if (vendor->url) {
+		    g_string_sprintfa(s, " <%s>", vendor->url);
+		}
+	    } else {
+		g_string_sprintfa(s, "unknown (%s)", vendor->name);
+	    }
+	    g_string_append(s, "\n");
+	}
+    }
+    if (c == '`') c = ' ';
+    if (smExtsnEntry->smExtsnRevision && smExtsnEntry->_smExtsnRevisionLength) {
+	g_string_sprintfa(s, "%c%-*s ", c, indent, "  Revision:");
+	g_string_sprintfa(s, " %.*s\n",
+			  (int) smExtsnEntry->_smExtsnRevisionLength,
+			  smExtsnEntry->smExtsnRevision);
+    }
+}
+
+
+
+static void
+show_language(GString *s, smLangEntry_t *smLangEntry,
+	      smExtsnEntry_t **smExtsnTable)
+{
+    int i, j;
+    int const indent = 13;
 
     if (smLangEntry->smLangDescr) {
 	g_string_sprintfa(s, "%-*s ", indent, "Descr:");
@@ -390,6 +410,23 @@ show_language(GString *s, smLangEntry_t *smLangEntry,
 			  (int) smLangEntry->_smLangVersionLength,
 			  smLangEntry->smLangVersion);
     }
+    if (smLangEntry->smLangVendor) {
+	scli_vendor_t *vendor;
+	vendor = scli_get_iana_vendor(smLangEntry->smLangVendor,
+				      smLangEntry->_smLangVendorLength);
+	if (vendor && vendor->name) {
+	    g_string_sprintfa(s, "%-*s  ", indent, "Vendor:");
+	    if (vendor->id) {
+		g_string_append(s, vendor->name);
+		if (vendor->url) {
+		    g_string_sprintfa(s, " <%s>", vendor->url);
+		}
+	    } else {
+		g_string_sprintfa(s, "unknown (%s)", vendor->name);
+	    }
+	    g_string_append(s, "\n");
+	}
+    }
     if (smLangEntry->smLangRevision && smLangEntry->_smLangRevisionLength) {
 	g_string_sprintfa(s, "%-*s ", indent, "Revision:");
 	g_string_sprintfa(s, " %.*s\n",
@@ -397,12 +434,17 @@ show_language(GString *s, smLangEntry_t *smLangEntry,
 			  smLangEntry->smLangRevision);
     }
 
-    if (smExtsnEntry) {
-	for (i = 0; smExtsnEntry[i]; i++) {
-	    if (smExtsnEntry[i]->smLangIndex != smLangEntry->smLangIndex) {
+    if (smExtsnTable) {
+	for (i = 0; smExtsnTable[i]; i++) {
+	    if (smExtsnTable[i]->smLangIndex != smLangEntry->smLangIndex) {
 		continue;
 	    }
-	    show_extension(s, smExtsnEntry[i]);
+	    for (j = i+1; smExtsnTable[j]; j++) {
+		if (smExtsnTable[j]->smLangIndex == smLangEntry->smLangIndex) {
+		    break;
+		}
+	    }
+	    show_extension(s, smExtsnTable[i], smExtsnTable[j] ? '|' : '`');
 	}
     }
 }
