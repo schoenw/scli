@@ -22,6 +22,7 @@
 
 #include "scli.h"
 
+#include <ctype.h>
 #include <regex.h>
 #include <readline/history.h>
 
@@ -644,12 +645,147 @@ set_scli_format(scli_interp_t *interp, int argc, char **argv)
     } else {
 	g_string_sprintfa(interp->result,
 			  "unknown format `%s'", argv[1]);
-	return SCLI_ERROR;	
+	return SCLI_SYNTAX_VALUE;	
     }
 
     return SCLI_OK;
 }
 
+
+#if 0
+static int
+cmd_scli_probe(scli_interp_t *interp, int argc, char **argv)
+{
+    GSList *in = NULL, *out = NULL;
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 1, 1, 0};
+    GSnmpSession *s = NULL;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    s = g_snmp_session_clone(interp->peer);
+    g_snmp_vbl_add_null(&in, base, sizeof(base)/sizeof(guint32));
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+	g_snmp_vbl_free(out);
+    }
+    g_snmp_session_destroy(s);
+
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_walk(GString *s, GSnmpVarBind *vb)
+{
+    int i, printable;
+    
+    for (i = 0; i < vb->id_len; i++) {
+	g_string_sprintfa(s, "%s%d",
+			  i ? "." : "", vb->id[i]);
+    }
+    g_string_append(s, " = ");
+    switch (vb->type) {
+    case G_SNMP_INTEGER32:
+	g_string_sprintfa(s, "%d", vb->syntax.i32[0]);
+	break;
+    case G_SNMP_UNSIGNED32:
+    case G_SNMP_COUNTER32:
+    case G_SNMP_TIMETICKS:
+	g_string_sprintfa(s, "%u", vb->syntax.ui32[0]);
+	break;
+    case G_SNMP_COUNTER64:
+	g_string_sprintfa(s, "%llu", vb->syntax.ui64[0]);
+	break;
+    case G_SNMP_IPADDRESS:
+	if (vb->syntax_len == 4) {
+	    g_string_sprintfa(s, "%d.%d.%d.%d",
+			      vb->syntax.uc[0],
+			      vb->syntax.uc[1],
+			      vb->syntax.uc[2],
+			      vb->syntax.uc[3]);
+	}
+	break;
+    case G_SNMP_OCTET_STRING:
+    case G_SNMP_OPAQUE:
+	for (i = 0; i < vb->syntax_len; i++) {
+	    g_string_sprintfa(s, "%s%02x", i ? ":" : "", vb->syntax.uc[i]);
+	}
+	for (i = 0, printable = 1; i < vb->syntax_len; i++) {
+	    printable = printable && isprint((int) vb->syntax.uc[i]);
+	}
+	if (printable && vb->syntax_len) {
+	    g_string_append(s, " \"");
+	    for (i = 0; i < vb->syntax_len; i++) {
+		g_string_append_c(s, vb->syntax.uc[i]);
+	    }
+	    g_string_append(s, "\"");
+	}
+	break;
+    case G_SNMP_OBJECT_ID:
+	for (i = 0; i < vb->syntax_len/sizeof(guint32); i++) {
+	    g_string_sprintfa(s, "%s%d",
+			      i ? "." : "", vb->syntax.ui32[i]);
+	}
+	break;
+    default:
+	break;
+    }
+    g_string_append_c(s, '\n');
+}
+
+
+
+static int
+cmd_scli_walk(scli_interp_t *interp, int argc, char **argv)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[SNMP_SIZE_OBJECTID];
+    GSnmpSession *s = NULL;
+    GSList *elem;
+    int i, len;
+    char *p;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc < 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    for (i = 1; i < argc; i++) {
+	for (len = 0, p = argv[i]; p && *p && len < SNMP_SIZE_OBJECTID; len++) {
+	    base[len] = strtoul(p, &p, 0);
+	    if (p && *p) {
+		if (*p == '.') {
+		    p++;
+		} else {
+		    g_snmp_vbl_free(in);
+		    return SCLI_SYNTAX_VALUE;
+		}
+	    }
+	}
+	if ((p && *p) || len < 2 || base[0] > 2 || base[1] > 40) {
+	    g_snmp_vbl_free(in);
+	    return SCLI_SYNTAX_VALUE;
+	}
+	g_snmp_vbl_add_null(&in, base, len);
+    }
+
+    s = g_snmp_session_clone(interp->peer);
+    out = g_snmp_session_sync_walk(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+	for (elem = out; elem; elem = g_slist_next(elem)) {
+	    fmt_walk(interp->result, (GSnmpVarBind *) elem->data);
+	}
+	g_snmp_vbl_free(out);
+    }
+    g_snmp_session_destroy(s);
+            
+    return SCLI_OK;
+}
+#endif
 
 
 void
@@ -681,7 +817,21 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  NULL, NULL,
 	  cmd_scli_close },
+#if 0
+	{ "probe", NULL,
+	  "xxx",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  cmd_scli_probe },
 
+	{ "walk", "<oid> [<oid> ...]",
+	  "The walk command is a low-level debugging utility which simply\n"
+	  "performs a MIB walks. Note that scli does not have general MIB\n"
+	  "knowledge and hence the output requires some post-processing.",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  cmd_scli_walk },
+#endif
 	{ "create scli plugin", "<module>",
 	  "The create scli plugin command dynamically loads an scli mode\n"
 	  "into a running scli process. This can be used to dynamically\n"

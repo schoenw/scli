@@ -406,7 +406,7 @@ fmt_bridge_forwarding(GString *s,
 		      bridge_mib_dot1dTpFdbEntry_t *dot1dTpFdbEntry,
 		      int name_width)
 {
-    scli_vendor_t *vendor;
+    const scli_vendor_t *vendor;
     guint32 prefix;
     char *name;
     const char *status;
