@@ -161,14 +161,16 @@ show_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
     } else {
 	g_string_append(s, " Change:\n");
     }
-	    
-    for (j = 0; ipAddrTable[j]; j++) {
-	if (ipAddrTable[j]->ipAdEntIfIndex
-	    && (ifEntry->ifIndex == *(ipAddrTable[j]->ipAdEntIfIndex))) {
-	    g_string_sprintfa(s, "IP Address:  %-*s", width,
-		      fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr, 0));
-	    g_string_sprintfa(s, " Prefix:  %s\n",
-		      fmt_ipv4_mask(ipAddrTable[j]->ipAdEntNetMask));
+
+    if (ipAddrTable) {
+	for (j = 0; ipAddrTable[j]; j++) {
+	    if (ipAddrTable[j]->ipAdEntIfIndex
+		&& (ifEntry->ifIndex == *(ipAddrTable[j]->ipAdEntIfIndex))) {
+		g_string_sprintfa(s, "IP Address:  %-*s", width,
+			  fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr, 0));
+		g_string_sprintfa(s, " Prefix:  %s\n",
+			  fmt_ipv4_mask(ipAddrTable[j]->ipAdEntNetMask));
+	    }
 	}
     }
     
@@ -229,7 +231,7 @@ cmd_details(scli_interp_t *interp, int argc, char **argv)
 
 static void
 show_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
-	  int name_width)
+	  int type_width, int name_width)
 {
     int j;
 
@@ -241,7 +243,7 @@ show_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 		 ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
 
     g_string_append(s, "  ");
-    fmt_enum(s, 20, if_mib_enums_ifType, ifEntry->ifType);
+    fmt_enum(s, type_width, if_mib_enums_ifType, ifEntry->ifType);
     g_string_append(s, " ");
 
     if (ifEntry->ifSpeed) {
@@ -276,8 +278,10 @@ cmd_info(scli_interp_t *interp, int argc, char **argv)
 {
     ifEntry_t **ifTable = NULL;
     ifXEntry_t **ifXTable = NULL;
+    int name_width = 8;
+    int type_width = 8;
+    char *x;
     int i;
-    int name_width = 12;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -288,18 +292,26 @@ cmd_info(scli_interp_t *interp, int argc, char **argv)
 
     if (ifTable) {
 	for (i = 0; ifTable[i]; i++) {
-	    char *x = get_if_name(ifTable[i], ifXTable ? ifXTable[i] : NULL, 12);
+	    x = get_if_name(ifTable[i], ifXTable ? ifXTable[i] : NULL, 12);
 	    if (x && strlen(x) > name_width) {
 		name_width = strlen(x);
 	    }
+	    if (ifTable[i]->ifType) {
+		x = stls_table_get_value(if_mib_enums_ifType,
+					 *ifTable[i]->ifType);
+		if (x && strlen(x) > type_width) {
+		    type_width = strlen(x);
+		}
+	    }
 	}
 	g_string_sprintfa(interp->result,
-	  "Index Status Type                  Speed %-*s Description\n",
+	  "Index Status %-*s  Speed %-*s Description\n",
+			  type_width, "Type",
 			  name_width, "Name");
 	for (i = 0; ifTable[i]; i++) {
 	    show_info(interp->result, ifTable[i],
 		      ifXTable ? ifXTable[i] : NULL,
-		      name_width);
+		      type_width, name_width);
 	}
     }
 
