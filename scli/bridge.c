@@ -97,7 +97,8 @@ cmd_bridge_info(scli_interp_t *interp, int argc, char **argv)
 
 static void
 show_bridge_port(GString *s, dot1dBasePortEntry_t *dot1dBasePortEntry,
-	  ifEntry_t *ifEntry, ifXEntry_t *ifXEntry)
+		 ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
+		 int type_width, int name_width)
 {
     g_string_sprintfa(s, "%5u ", dot1dBasePortEntry->dot1dBasePort);
     if (dot1dBasePortEntry->dot1dBasePortIfIndex) {
@@ -107,7 +108,33 @@ show_bridge_port(GString *s, dot1dBasePortEntry_t *dot1dBasePortEntry,
 	g_string_sprintfa(s, "%7s   ", "");
     }
     if (ifEntry) {
-	fmt_enum(s, 20, if_mib_enums_ifType, ifEntry->ifType);
+	fmt_enum(s, type_width, if_mib_enums_ifType, ifEntry->ifType);
+	if (ifEntry->ifSpeed) {
+	    if (*(ifEntry->ifSpeed) == 0xffffffff
+		&& ifXEntry && ifXEntry->ifHighSpeed) {
+		g_string_sprintfa(s, "  %4s ",
+				  fmt_gtp(*(ifXEntry->ifHighSpeed)));
+	    } else {
+		g_string_sprintfa(s, "  %4s ",
+				  fmt_kmg(*(ifEntry->ifSpeed)));
+	    }
+	} else {
+	    g_string_append(s, "       ");
+	}
+	
+	if (ifXEntry && ifXEntry->ifName) {
+	    g_string_sprintfa(s, "%-*.*s ", name_width,
+			      (int) ifXEntry->_ifNameLength,
+			      ifXEntry->ifName);
+	} else {
+	    g_string_sprintfa(s, "%*s ", name_width, "");
+	}
+	
+	if (ifEntry->ifDescr) {
+	    g_string_sprintfa(s, "%.*s",
+			      (int) ifEntry->_ifDescrLength,
+			      ifEntry->ifDescr);
+	}
     }
     g_string_append(s, "\n");
 }
@@ -120,6 +147,8 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
     dot1dBasePortEntry_t **dot1dBasePortTable = NULL;
     ifEntry_t **ifTable = NULL;
     ifXEntry_t **ifXTable = NULL;
+    int type_width = 6;
+    int name_width = 6;
     int i, j = -1;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -132,7 +161,25 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
     (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
     
     if (dot1dBasePortTable) {
-	g_string_append(interp->result, " Port Interface Type\n");
+	for (i = 0; ifTable[i]; i++) {
+	    if (ifXTable && ifXTable[i]) {
+		if (ifXTable[i]->_ifNameLength > name_width) {
+		    name_width = ifXTable[i]->_ifNameLength;
+		}
+	    }
+	    if (ifTable[i]->ifType) {
+		char const *label;
+		label = stls_enum_get_label(if_mib_enums_ifType,
+					*ifTable[i]->ifType);
+		if (label && strlen(label) > type_width) {
+		    type_width = strlen(label);
+		}
+	    }
+	}
+	g_string_sprintfa(interp->result,
+			  " Port Interface %-*s Speed %-*s Description\n",
+			  type_width, "Type",
+			  name_width, "Name");
 	for (i = 0; dot1dBasePortTable[i]; i++) {
 	    if (ifTable && dot1dBasePortTable[i]->dot1dBasePortIfIndex) {
 		for (j = 0; ifTable[j]; j++) {
@@ -144,7 +191,8 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 	    }
 	    show_bridge_port(interp->result, dot1dBasePortTable[i],
 			     (ifTable && ifTable[j]) ? ifTable[j] : NULL,
-			     (ifXTable && ifXTable[j]) ? ifXTable[j] : NULL);
+			     (ifXTable && ifXTable[j]) ? ifXTable[j] : NULL,
+			     type_width, name_width);
 	}
     }
 
