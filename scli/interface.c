@@ -75,8 +75,8 @@ fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 
 
 static void
-show_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
-	     system_t *system, ipAddrEntry_t **ipAddrTable)
+show_if_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
+		system_t *system, ipAddrEntry_t **ipAddrTable)
 {
     int j;
     int const width = 20;
@@ -151,10 +151,13 @@ show_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 	for (j = 0; ipAddrTable[j]; j++) {
 	    if (ipAddrTable[j]->ipAdEntIfIndex
 		&& (ifEntry->ifIndex == *(ipAddrTable[j]->ipAdEntIfIndex))) {
-		g_string_sprintfa(s, "IP Address:  %-*s", width,
-			  fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr, 0));
-		g_string_sprintfa(s, " Prefix:  %s\n",
-			  fmt_ipv4_mask(ipAddrTable[j]->ipAdEntNetMask));
+		if (ipAddrTable[j]->ipAdEntAddr
+		    && ipAddrTable[j]->ipAdEntNetMask) {
+		    g_string_sprintfa(s, "IP Address:  %-*s", width,
+		      fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr, 0));
+		    g_string_sprintfa(s, " Prefix:  %s\n",
+		      fmt_ipv4_mask(ipAddrTable[j]->ipAdEntNetMask));
+		}
 	    }
 	}
     }
@@ -176,7 +179,7 @@ show_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 
 
 static int
-cmd_details(scli_interp_t *interp, int argc, char **argv)
+cmd_if_details(scli_interp_t *interp, int argc, char **argv)
 {
     ifEntry_t **ifTable = NULL;
     ifXEntry_t **ifXTable = NULL;
@@ -198,9 +201,9 @@ cmd_details(scli_interp_t *interp, int argc, char **argv)
 	    if (i) {
 		g_string_append(interp->result, "\n");
 	    }
-	    show_details(interp->result, ifTable[i],
-			 ifXTable ? ifXTable[i] : NULL,
-			 system, ipAddrTable);
+	    show_if_details(interp->result, ifTable[i],
+			    ifXTable ? ifXTable[i] : NULL,
+			    system, ipAddrTable);
 	}
     }
 
@@ -215,8 +218,8 @@ cmd_details(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
-	  int type_width, int name_width)
+show_if_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
+	     int type_width, int name_width)
 {
     g_string_sprintfa(s, "%6u     ", ifEntry->ifIndex);
 
@@ -262,7 +265,7 @@ show_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 
 
 static int
-cmd_info(scli_interp_t *interp, int argc, char **argv)
+cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 {
     ifEntry_t **ifTable = NULL;
     ifXEntry_t **ifXTable = NULL;
@@ -298,9 +301,9 @@ cmd_info(scli_interp_t *interp, int argc, char **argv)
 			  type_width, "Type",
 			  name_width, "Name");
 	for (i = 0; ifTable[i]; i++) {
-	    show_info(interp->result, ifTable[i],
-		      ifXTable ? ifXTable[i] : NULL,
-		      type_width, name_width);
+	    show_if_info(interp->result, ifTable[i],
+			 ifXTable ? ifXTable[i] : NULL,
+			 type_width, name_width);
 	}
     }
 
@@ -313,7 +316,7 @@ cmd_info(scli_interp_t *interp, int argc, char **argv)
 
 #if 0
 static int
-cmd_stack(scli_interp_t *interp, int argc, char **argv)
+cmd_if_stack(scli_interp_t *interp, int argc, char **argv)
 {
     /*
      *      ,-- if2 
@@ -337,14 +340,14 @@ scli_init_interface_mode(scli_interp_t *interp)
 	{ "show", "interface", 0, NULL, NULL },
 	{ "show interface", "details", SCLI_CMD_FLAG_NEED_PEER,
 	  "show detailed information about the network interfaces",
-	  cmd_details },
+	  cmd_if_details },
 	{ "show interface", "info", SCLI_CMD_FLAG_NEED_PEER,
 	  "show network interface summary information",
-	  cmd_info },
+	  cmd_if_info },
 #if 0
 	{ "show interface", "stack", SCLI_CMD_FLAG_NEED_PEER,
 	  "show interface stacking information",
-	  cmd_stack },
+	  cmd_if_stack },
 #endif
 	{ NULL, NULL, 0, NULL, NULL }
     };
