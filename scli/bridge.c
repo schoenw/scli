@@ -163,6 +163,10 @@ show_bridge_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     bridge_mib_get_dot1dBase(interp->peer, &dot1dBase, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -252,6 +256,10 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     bridge_mib_get_dot1dBasePortTable(interp->peer, &dot1dBasePortTable, 0);
@@ -368,6 +376,10 @@ show_bridge_stp_ports(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     bridge_mib_get_dot1dStpPortTable(interp->peer, &dot1dStpPortTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -439,6 +451,10 @@ show_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     bridge_mib_get_dot1dTpFdbTable(interp->peer, &dot1dTpFdbTable, 0);
@@ -529,6 +545,10 @@ show_bridge_filter(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     bridge_mib_get_dot1dStaticTable(interp->peer, &dot1dStaticTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -603,6 +623,10 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     bridge_mib_get_dot1dTpPortTable(interp->peer, &portTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -675,21 +699,21 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  "The show bridge info command displays summary information about\n"
 	  "a bridge, such as the number of ports and the supported bridging\n"
 	  "functions and associated parameters.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_bridge_info },
 
 	{ "show bridge ports", NULL,
 	  "The show bridge ports command displays information about the\n"
 	  "bridge ports.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_bridge_ports },
 
 	{ "show bridge stp ports", NULL,
 	  "The show bridge stp ports command displays information about the\n"
 	  "bridge ports which participate in the spanning tree protocol.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_bridge_stp_ports },
 
@@ -703,13 +727,13 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  "  ADDRESS address associated with the port\n"
 	  "  NAME    name of the address (where known)\n"
 	  "  VENDOR  vendor info derived from the address",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_bridge_forwarding },
 
 	{ "show bridge filter", NULL,
 	  "The show bridge filte command shows filtering information.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_bridge_filter },
 
@@ -723,7 +747,7 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  "  O-FPS       output frames per second\n"
 	  "  D-FPS       discarded frames per second\n"
 	  "  DESCRIPTION description of the port",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_bridge_stats },
 
@@ -731,7 +755,7 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  "The monitor bridge stats command shows the same\n"
 	  "information as the show bridge stats command. The"
 	  "information is updated periodically.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_bridge_stats },
 

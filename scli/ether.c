@@ -184,7 +184,7 @@ GSnmpIdentity const mau_type_identities[] = {
 
 
 static void
-show_ether_mau_info(GString *s, mau_mib_ifMauEntry_t *ifMauEntry)
+fmt_ether_mau_info(GString *s, mau_mib_ifMauEntry_t *ifMauEntry)
 {
     const char *e;
     
@@ -236,7 +236,7 @@ show_ether_mau_info(GString *s, mau_mib_ifMauEntry_t *ifMauEntry)
 
 
 static int
-cmd_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
+show_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
 {
     mau_mib_ifMauEntry_t **ifMauTable = NULL;
     mau_mib_ifJackEntry_t **ifJackTable = NULL;
@@ -246,6 +246,10 @@ cmd_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     mau_mib_get_ifMauTable(interp->peer, &ifMauTable, 0);
@@ -258,7 +262,7 @@ cmd_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
 	g_string_sprintfa(interp->header,
 		  "INTERFACE   MAU STATUS      MEDIA         JABBER   AUTONEG TYPE");
 	for (i = 0; ifMauTable[i]; i++) {
-	    show_ether_mau_info(interp->result, ifMauTable[i]);
+	    fmt_ether_mau_info(interp->result, ifMauTable[i]);
 	}
     }
 
@@ -288,7 +292,7 @@ typedef struct {
 
 
 static int
-cmd_ether_stats(scli_interp_t *interp, int argc, char **argv)
+show_ether_stats(scli_interp_t *interp, int argc, char **argv)
 {
     etherlike_mib_dot3StatsEntry_t **dot3StatsTable = NULL;
     static struct timeval last, now;
@@ -299,6 +303,10 @@ cmd_ether_stats(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     etherlike_mib_get_dot3StatsTable(interp->peer, &dot3StatsTable, 0);
@@ -395,9 +403,9 @@ scli_init_ether_mode(scli_interp_t *interp)
 	  "  JABBER    jabber state of the medium attachment unit\n"
 	  "  AUTONEG   autonegation capabilities\n"
 	  "  TYPE      type of the medium attachment unit",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_ether_mau_info },
+	  show_ether_mau_info },
 
 	{ "show ethernet stats", NULL,
 	  "The show ethernet stats command displays ethernet specific\n"
@@ -416,17 +424,17 @@ scli_init_ether_mode(scli_interp_t *interp)
           "  LCOL      late collisions per second\n"
           "  XMIT      MAC transmit errors per second\n"
           "  CARR      carrier sense errors per second",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_ether_stats },
+	  show_ether_stats },
 
 	{ "monitor ethernet stats", NULL,
 	  "The monitor ethernet stats command shows the same information\n"
 	  "as the show ethernet stats command. The information is updated\n"
 	  "periodically.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_ether_stats },
+	  show_ether_stats },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
