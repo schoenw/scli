@@ -572,9 +572,9 @@ show_extension(GString *s,
 
 
 static void
-show_language(GString *s,
-	      disman_script_mib_smLangEntry_t *smLangEntry,
-	      disman_script_mib_smExtsnEntry_t **smExtsnTable)
+fmt_language(GString *s,
+	     disman_script_mib_smLangEntry_t *smLangEntry,
+	     disman_script_mib_smExtsnEntry_t **smExtsnTable)
 {
     int i, j;
     int const indent = 13;
@@ -633,7 +633,7 @@ show_language(GString *s,
 
 
 static int
-cmd_languages(scli_interp_t *interp, int argc, char **argv)
+show_languages(scli_interp_t *interp, int argc, char **argv)
 {
     disman_script_mib_smLangEntry_t **smLangTable = NULL;
     disman_script_mib_smExtsnEntry_t **smExtsnTable = NULL;
@@ -643,6 +643,10 @@ cmd_languages(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0);
@@ -656,7 +660,7 @@ cmd_languages(scli_interp_t *interp, int argc, char **argv)
 	    if (i) {
 		g_string_append(interp->result, "\n");
 	    }
-	    show_language(interp->result, smLangTable[i], smExtsnTable);
+	    fmt_language(interp->result, smLangTable[i], smExtsnTable);
 	}
     }
 
@@ -669,9 +673,9 @@ cmd_languages(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_script_details(GString *s,
-		    disman_script_mib_smScriptEntry_t *smScriptEntry,
-		    char const *language)
+fmt_script_details(GString *s,
+		   disman_script_mib_smScriptEntry_t *smScriptEntry,
+		   char const *language)
 {
     int const width = 20;
     
@@ -737,7 +741,7 @@ show_script_details(GString *s,
 
 
 static int
-cmd_script_details(scli_interp_t *interp, int argc, char **argv)
+show_script_details(scli_interp_t *interp, int argc, char **argv)
 {
     disman_script_mib_smLangEntry_t **smLangTable = NULL;
     disman_script_mib_smScriptEntry_t **smScriptTable = NULL;
@@ -747,6 +751,10 @@ cmd_script_details(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0);
@@ -761,9 +769,9 @@ cmd_script_details(scli_interp_t *interp, int argc, char **argv)
 		if (i) {
 		    g_string_append(interp->result, "\n");
 		}
-		show_script_details(interp->result, smScriptTable[i],
-				    get_script_lang_name(smScriptTable[i],
-							 smLangTable));
+		fmt_script_details(interp->result, smScriptTable[i],
+				   get_script_lang_name(smScriptTable[i],
+							smLangTable));
 	    }
 	}
     }
@@ -777,10 +785,10 @@ cmd_script_details(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_script_info(GString *s,
-		 disman_script_mib_smScriptEntry_t *smScriptEntry, 
-		 char const *language, int launches,
-		 int owner_width, int lang_width)
+fmt_script_info(GString *s,
+		disman_script_mib_smScriptEntry_t *smScriptEntry, 
+		char const *language, int launches,
+		int owner_width, int lang_width)
 {
     fmt_script_admin_status(s, smScriptEntry->smScriptAdminStatus);
     fmt_script_oper_status(s, smScriptEntry->smScriptOperStatus);
@@ -841,7 +849,7 @@ count_launches(disman_script_mib_smScriptEntry_t *smScriptEntry,
 
 
 static int
-cmd_script_info(scli_interp_t *interp, int argc, char **argv)
+show_script_info(scli_interp_t *interp, int argc, char **argv)
 {
     disman_script_mib_smLangEntry_t **smLangTable = NULL;
     disman_script_mib_smScriptEntry_t **smScriptTable = NULL;
@@ -853,6 +861,10 @@ cmd_script_info(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0);
@@ -873,12 +885,12 @@ cmd_script_info(scli_interp_t *interp, int argc, char **argv)
 			      "STATE  L %-*s %-*s LAST CHANGE  NAME",
 			      owner_width, "OWNER", lang_width, "LANGUAGE");
 	    for (i = 0; smScriptTable[i]; i++) {
-		show_script_info(interp->result, smScriptTable[i],
-				 get_script_lang_name(smScriptTable[i],
-						      smLangTable),
-				 count_launches(smScriptTable[i],
-						smLaunchTable),
-				 owner_width, lang_width);
+		fmt_script_info(interp->result, smScriptTable[i],
+				get_script_lang_name(smScriptTable[i],
+						     smLangTable),
+				count_launches(smScriptTable[i],
+					       smLaunchTable),
+				owner_width, lang_width);
 	    }
 	}
     }
@@ -925,9 +937,9 @@ count_runs(disman_script_mib_smLaunchEntry_t *smLaunchEntry,
 
 
 static void
-show_launch_info(GString *s,
-		 disman_script_mib_smLaunchEntry_t *smLaunchEntry,
-		 int runs, int owner_width)
+fmt_launch_info(GString *s,
+		disman_script_mib_smLaunchEntry_t *smLaunchEntry,
+		int runs, int owner_width)
 {
     fmt_launch_admin_status(s, smLaunchEntry->smLaunchAdminStatus);
     fmt_launch_oper_status(s, smLaunchEntry->smLaunchOperStatus);
@@ -968,7 +980,7 @@ show_launch_info(GString *s,
 
 
 static int
-cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
+show_launch_info(scli_interp_t *interp, int argc, char **argv)
 {
     disman_script_mib_smScriptEntry_t **smScriptTable = NULL;
     disman_script_mib_smLaunchEntry_t **smLaunchTable = NULL;
@@ -980,6 +992,10 @@ cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
@@ -999,7 +1015,7 @@ cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
 			  "STATE  R %-*s LAST CHANGE  NAME",
 			  owner_width, "OWNER");
 	for (i = 0; smLaunchTable[i]; i++) {
-	    show_launch_info(interp->result, smLaunchTable[i],
+	    fmt_launch_info(interp->result, smLaunchTable[i],
 			     count_runs(smLaunchTable[i], smRunTable),
 			     owner_width);
 	}
@@ -1015,8 +1031,8 @@ cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_launch_details(GString *s,
-		    disman_script_mib_smLaunchEntry_t *smLaunchEntry)
+fmt_launch_details(GString *s,
+		   disman_script_mib_smLaunchEntry_t *smLaunchEntry)
 {
     int const width = 20;
 
@@ -1129,7 +1145,7 @@ show_launch_details(GString *s,
 
 
 static int
-cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
+show_launch_details(scli_interp_t *interp, int argc, char **argv)
 {
     disman_script_mib_smLaunchEntry_t **smLaunchTable = NULL;
     int i;
@@ -1138,6 +1154,10 @@ cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
@@ -1150,7 +1170,7 @@ cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
 	    if (i) {
 		g_string_append(interp->result, "\n");
 	    }
-	    show_launch_details(interp->result, smLaunchTable[i]);
+	    fmt_launch_details(interp->result, smLaunchTable[i]);
 	}
     }
 
@@ -1162,9 +1182,9 @@ cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_run_info(GString *s,
-	      disman_script_mib_smRunEntry_t *smRunEntry,
-	      int l_owner_width, int l_name_width)
+fmt_run_info(GString *s,
+	     disman_script_mib_smRunEntry_t *smRunEntry,
+	     int l_owner_width, int l_name_width)
 {
     g_string_sprintfa(s, "%-*.*s ", l_owner_width,
 		      (int) smRunEntry->_smLaunchOwnerLength,
@@ -1203,7 +1223,7 @@ show_run_info(GString *s,
 
 
 static int
-cmd_run_info(scli_interp_t *interp, int argc, char **argv)
+show_run_info(scli_interp_t *interp, int argc, char **argv)
 {
     disman_script_mib_smRunEntry_t **smRunTable = NULL;
     int l_owner_width = 8;
@@ -1214,6 +1234,10 @@ cmd_run_info(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     disman_script_mib_get_smRunTable(interp->peer, &smRunTable, 0);
@@ -1234,8 +1258,8 @@ cmd_run_info(scli_interp_t *interp, int argc, char **argv)
 			  "%-*s %-*s RUNID STAT      LIFE     EXPIRE",
 			  l_owner_width, "L-OWNER", l_name_width, "L-NAME");
 	for (i = 0; smRunTable[i]; i++) {
-	    show_run_info(interp->result, smRunTable[i],
-			  l_owner_width, l_name_width);
+	    fmt_run_info(interp->result, smRunTable[i],
+			 l_owner_width, l_name_width);
 	}
     }
 
@@ -1247,9 +1271,9 @@ cmd_run_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_run_details(GString *s,
-		 disman_script_mib_smRunEntry_t *smRunEntry,
-		 disman_script_mib_smLaunchEntry_t *smLaunchEntry)
+fmt_run_details(GString *s,
+		disman_script_mib_smRunEntry_t *smRunEntry,
+		disman_script_mib_smLaunchEntry_t *smLaunchEntry)
 {
     char buffer[80];
     int const width = 20;
@@ -1352,7 +1376,7 @@ show_run_details(GString *s,
 
 
 static int
-cmd_run_details(scli_interp_t *interp, int argc, char **argv)
+show_run_details(scli_interp_t *interp, int argc, char **argv)
 {
     disman_script_mib_smLaunchEntry_t **smLaunchTable = NULL;
     disman_script_mib_smRunEntry_t **smRunTable = NULL;
@@ -1362,6 +1386,10 @@ cmd_run_details(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     disman_script_mib_get_smRunTable(interp->peer, &smRunTable, 0);
@@ -1375,8 +1403,8 @@ cmd_run_details(scli_interp_t *interp, int argc, char **argv)
 	    if (i) {
 		g_string_append(interp->result, "\n");
 	    }
-	    show_run_details(interp->result, smRunTable[i],
-			     get_launch_entry(smRunTable[i], smLaunchTable));
+	    fmt_run_details(interp->result, smRunTable[i],
+			    get_launch_entry(smRunTable[i], smLaunchTable));
 	}
     }
 
@@ -1389,9 +1417,9 @@ cmd_run_details(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_scheduler_info(GString *s,
-		    disman_schedule_mib_schedEntry_t *schedEntry,
-		    int name_width, int owner_width)
+fmt_scheduler_info(GString *s,
+		   disman_schedule_mib_schedEntry_t *schedEntry,
+		   int name_width, int owner_width)
 {
     fmt_schedule_admin_status(s, schedEntry->schedAdminStatus);
     fmt_schedule_oper_status(s, schedEntry->schedOperStatus);
@@ -1415,7 +1443,7 @@ show_scheduler_info(GString *s,
 
 
 static int
-cmd_scheduler_info(scli_interp_t *interp, int argc, char **argv)
+show_scheduler_info(scli_interp_t *interp, int argc, char **argv)
 {
     disman_schedule_mib_schedEntry_t **schedTable = NULL;
     int name_width = 5, owner_width = 5;
@@ -1425,6 +1453,10 @@ cmd_scheduler_info(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     disman_schedule_mib_get_schedTable(interp->peer, &schedTable, 0);
@@ -1445,8 +1477,8 @@ cmd_scheduler_info(scli_interp_t *interp, int argc, char **argv)
 			  "STATE %-*s %-*s TYPE     EXPRESSION",
 			  owner_width, "OWNER", name_width, "NAME");
 	for (i = 0; schedTable[i]; i++) {
-	    show_scheduler_info(interp->result, schedTable[i],
-				name_width, owner_width);
+	    fmt_scheduler_info(interp->result, schedTable[i],
+			       name_width, owner_width);
 	}
     }
 
@@ -1458,8 +1490,8 @@ cmd_scheduler_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_scheduler_details(GString *s,
-		       disman_schedule_mib_schedEntry_t *schedEntry)
+fmt_scheduler_details(GString *s,
+		      disman_schedule_mib_schedEntry_t *schedEntry)
 {
     int const width = 20;
     int i;
@@ -1535,7 +1567,7 @@ show_scheduler_details(GString *s,
 
     
 static int
-cmd_scheduler_details(scli_interp_t *interp, int argc, char **argv)
+show_scheduler_details(scli_interp_t *interp, int argc, char **argv)
 {
     disman_schedule_mib_schedEntry_t **schedTable = NULL;
     int i;
@@ -1544,6 +1576,10 @@ cmd_scheduler_details(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     disman_schedule_mib_get_schedTable(interp->peer, &schedTable, 0);
@@ -1556,7 +1592,7 @@ cmd_scheduler_details(scli_interp_t *interp, int argc, char **argv)
 	    if (i) {
 		g_string_append(interp->result, "\n");
 	    }
-	    show_scheduler_details(interp->result, schedTable[i]);
+	    fmt_scheduler_details(interp->result, schedTable[i]);
 	}
     }
 
@@ -1638,63 +1674,63 @@ scli_init_disman_mode(scli_interp_t *interp)
 
 	{ "show disman languages", NULL,
 	  "languages supported by the distributed manager",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_languages },
+	  show_languages },
 
 	{ "show disman script info", NULL,
 	  "script summary information",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_script_info },
+	  show_script_info },
 
 	{ "show disman script details", NULL,
 	  "scripts installed at the distributed manager",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_script_details },
+	  show_script_details },
 
 	{ "show disman launch info", NULL,
 	  "launch summary information",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_launch_info },
+	  show_launch_info },
 
 	{ "show disman launch details", NULL,
 	  "launch buttons installed on the distributed manager",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_launch_details },
+	  show_launch_details },
 
 	{ "show disman run info", NULL,
 	  "summary information about running scripts",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_run_info },
+	  show_run_info },
 
 	{ "show disman run details", NULL,
 	  "running scripts on the distributed manager",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_run_details },
+	  show_run_details },
 
 	{ "show disman scheduler info", NULL,
 	  "scheduler information",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_scheduler_info },
+	  show_scheduler_info },
 
 	{ "show disman scheduler details", NULL,
 	  "schedules on the distributed manager",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_scheduler_details },
+	  show_scheduler_details },
 
 	{ "monitor disman run", NULL,
 	  "monitor running scripts",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_run_info },
+	  show_run_info },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
