@@ -83,7 +83,7 @@ This flag causes scli to supress some informational messages.
 .TP
 .B \-r count, \-\-retries=count
 The number of SNMP retransmissions before we give up. The default
-number of retries is 5.
+number of retries is 3.
 .TP
 .B \-s, \-\-dry-run
 Parse scli commands but do not actually execute them. This allows to
@@ -133,6 +133,10 @@ things.
 Delete object instances from the remote SNMP agent. This command
 has many sub-commands which are used to delete very different
 things.
+.TP
+.B run
+Execute a specific action. This command has many sub-commands which
+are used run very different actions.
 .TP
 .B set
 Modify object instances on the remote SNMP agent by assigning new
