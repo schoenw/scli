@@ -85,6 +85,50 @@ fmt_x_kbytes(GString *s, guint32 bytes)
 
 
 
+static void
+show_device(GString *s, hrDeviceEntry_t *hrDeviceEntry)
+{
+    g_return_if_fail(hrDeviceEntry);
+
+    if (hrDeviceEntry->hrDeviceIndex) {
+	g_string_sprintfa(s, "%5d: ", *(hrDeviceEntry->hrDeviceIndex));
+    } else {
+	g_string_append(s, "     : ");
+    }
+    
+    if (hrDeviceEntry->hrDeviceDescr) {
+	g_string_sprintfa(s, "%.*s\n",
+			  (int) hrDeviceEntry->_hrDeviceDescrLength,
+			  hrDeviceEntry->hrDeviceDescr);
+    }
+}
+
+
+
+static int
+cmd_devices(scli_interp_t *interp, int argc, char **argv)
+{
+    hrDeviceEntry_t **hrDeviceEntry = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (host_resources_mib_get_hrDeviceEntry(interp->peer, &hrDeviceEntry)) {
+	return SCLI_ERROR;
+    }
+    
+    if (hrDeviceEntry) {
+	for (i = 0; hrDeviceEntry[i]; i++) {
+	    show_device(interp->result, hrDeviceEntry[i]);
+	}
+	host_resources_mib_free_hrDeviceEntry(hrDeviceEntry);
+    }
+
+    return SCLI_OK;
+}
+
+
+
 static int
 cmd_processes(scli_interp_t *interp, int argc, char **argv)
 {
@@ -153,11 +197,42 @@ cmd_processes(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+show_mount(GString *s, hrFSEntry_t *hrFSEntry, int loc_len, int rem_len)
+{
+    g_return_if_fail(hrFSEntry);
+
+    if (hrFSEntry->hrFSMountPoint) {
+	g_string_sprintfa(s, "%-*.*s", loc_len,
+			  (int) hrFSEntry->_hrFSMountPointLength,
+			  hrFSEntry->hrFSMountPoint);
+    } else {
+	g_string_sprintfa(s, "%*s", loc_len, "");
+    }
+    if (hrFSEntry->hrFSRemoteMountPoint) {
+	g_string_sprintfa(s, "%-*.*s", rem_len,
+			  (int) hrFSEntry->_hrFSRemoteMountPointLength,
+			  hrFSEntry->hrFSRemoteMountPoint);
+    } else {
+	g_string_sprintfa(s, "%*s", rem_len, "");
+    }
+    if (hrFSEntry->hrFSAccess) {
+	fmt_enum(s, 0, host_resources_mib_enums_hrFSAccess,
+		 hrFSEntry->hrFSAccess);
+    }
+    if (hrFSEntry->hrFSBootable
+	&& *(hrFSEntry->hrFSBootable) == 1) {
+	g_string_append(s, ", bootable");
+    }
+    g_string_append(s, "\n");
+}
+
+
+
 static int
 cmd_mounts(scli_interp_t *interp, int argc, char **argv)
 {
     hrFSEntry_t **hrFSEntry = NULL;
-    GString *s;
     int i, loc_len = 20, rem_len = 20;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -166,7 +241,6 @@ cmd_mounts(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_ERROR;
     }
 
-    s = interp->result;
     if (hrFSEntry) {
 	for (i = 0; hrFSEntry[i]; i++) {
 	    if (hrFSEntry[i]->hrFSMountPoint) {
@@ -179,41 +253,15 @@ cmd_mounts(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 	loc_len++, rem_len++;
-	g_string_sprintfa(s, "%-*s%-*sAccess\n",
+	g_string_sprintfa(interp->result, "%-*s%-*sAccess\n",
 			  loc_len, "Mount Point",
 			  rem_len, "Remote Mount Point");
 	for (i = 0; hrFSEntry[i]; i++) {
-	    if (hrFSEntry[i]->hrFSMountPoint) {
-		g_string_sprintfa(s, "%-*.*s", loc_len,
-			  (int) hrFSEntry[i]->_hrFSMountPointLength,
-				hrFSEntry[i]->hrFSMountPoint);
-	    } else {
-		g_string_sprintfa(s, "%*s", loc_len, "");
-	    }
-	    if (hrFSEntry[i]->hrFSRemoteMountPoint) {
-		g_string_sprintfa(s, "%-*.*s", rem_len,
-			  (int) hrFSEntry[i]->_hrFSRemoteMountPointLength,
-				hrFSEntry[i]->hrFSRemoteMountPoint);
-	    } else {
-		g_string_sprintfa(s, "%*s", rem_len, "");
-	    }
-
-	    if (hrFSEntry[i]->hrFSAccess) {
-		fmt_enum(s, 0, host_resources_mib_enums_hrFSAccess,
-			 hrFSEntry[i]->hrFSAccess);
-	    }
-	    
-	    if (hrFSEntry[i]->hrFSBootable
-		&& *(hrFSEntry[i]->hrFSBootable) == 1) {
-		g_string_append(s, ", bootable");
-	    }
-
-	    g_string_append(s, "\n");
+	    show_mount(interp->result, hrFSEntry[i], loc_len, rem_len);
 	}
 	host_resources_mib_free_hrFSEntry(hrFSEntry);
     }
 
-    interp->result = s;
     return SCLI_OK;
 }
 
@@ -410,6 +458,11 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
 	    g_string_sprintfa(s, "\n%-*s %u", indent, "Processes:",
 			      *(hrSystem->hrSystemProcesses));
 	}
+	if (hrSystem->hrSystemMaxProcesses
+	    && *(hrSystem->hrSystemMaxProcesses)) {
+	    g_string_sprintfa(s, " (%u maximum)",
+			      *(hrSystem->hrSystemMaxProcesses));
+	}
 	host_resources_mib_free_hrSystem(hrSystem);
     }
 
@@ -464,13 +517,20 @@ scli_init_system_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 	{ "show", "system", NULL, NULL },
 	{ "show system", "info",
-	  "show generic system information", cmd_system },
+	  "show system summary information",
+	  cmd_system },
+	{ "show system", "devices",
+	  "show list of system devices",
+	  cmd_devices },
 	{ "show system", "storage",
-	  "show storage areas attached to the system", cmd_storage },
+	  "show storage areas attached to the system",
+	  cmd_storage },
 	{ "show system", "mounts",
-	  "show file systems mounted on the system", cmd_mounts },
+	  "show file systems mounted on the system",
+	  cmd_mounts },
 	{ "show system", "processes",
-	  "show processes running on the system", cmd_processes },
+	  "show processes running on the system",
+	  cmd_processes },
 	{ NULL, NULL, NULL, NULL }
     };
     
