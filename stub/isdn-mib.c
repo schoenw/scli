@@ -3,7 +3,7 @@
  * version 0.3.1 for the scli package.
  *
  * Options:
- *   --scli-include='isdnBasicRateEntry|isdnBearerEntry'
+ *   --scli-include='isdnBasicRateEntry|isdnBearerEntry|isdnEndpointEntry'
  *
  * Derived from ISDN-MIB:
  *   The MIB module to describe the
@@ -82,10 +82,222 @@ GSnmpEnum const isdn_mib_enums_isdnBearerMultirate[] = {
     { 0, NULL }
 };
 
+GSnmpEnum const isdn_mib_enums_isdnEndpointIfType[] = {
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_OTHER,                         "other" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_REGULAR1822,                   "regular1822" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_HDH1822,                       "hdh1822" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DDNX25,                        "ddnX25" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_RFC877X25,                     "rfc877x25" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ETHERNETCSMACD,                "ethernetCsmacd" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ISO88023CSMACD,                "iso88023Csmacd" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ISO88024TOKENBUS,              "iso88024TokenBus" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ISO88025TOKENRING,             "iso88025TokenRing" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ISO88026MAN,                   "iso88026Man" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_STARLAN,                       "starLan" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PROTEON10MBIT,                 "proteon10Mbit" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PROTEON80MBIT,                 "proteon80Mbit" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_HYPERCHANNEL,                  "hyperchannel" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_FDDI,                          "fddi" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_LAPB,                          "lapb" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SDLC,                          "sdlc" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DS1,                           "ds1" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_E1,                            "e1" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_BASICISDN,                     "basicISDN" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PRIMARYISDN,                   "primaryISDN" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PROPPOINTTOPOINTSERIAL,        "propPointToPointSerial" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PPP,                           "ppp" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SOFTWARELOOPBACK,              "softwareLoopback" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_EON,                           "eon" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ETHERNET3MBIT,                 "ethernet3Mbit" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_NSIP,                          "nsip" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SLIP,                          "slip" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ULTRA,                         "ultra" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DS3,                           "ds3" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SIP,                           "sip" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_FRAMERELAY,                    "frameRelay" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_RS232,                         "rs232" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PARA,                          "para" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ARCNET,                        "arcnet" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ARCNETPLUS,                    "arcnetPlus" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ATM,                           "atm" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_MIOX25,                        "miox25" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SONET,                         "sonet" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_X25PLE,                        "x25ple" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ISO88022LLC,                   "iso88022llc" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_LOCALTALK,                     "localTalk" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SMDSDXI,                       "smdsDxi" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_FRAMERELAYSERVICE,             "frameRelayService" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_V35,                           "v35" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_HSSI,                          "hssi" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_HIPPI,                         "hippi" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_MODEM,                         "modem" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_AAL5,                          "aal5" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SONETPATH,                     "sonetPath" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SONETVT,                       "sonetVT" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SMDSICIP,                      "smdsIcip" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PROPVIRTUAL,                   "propVirtual" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PROPMULTIPLEXOR,               "propMultiplexor" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IEEE80212,                     "ieee80212" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_FIBRECHANNEL,                  "fibreChannel" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_HIPPIINTERFACE,                "hippiInterface" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_FRAMERELAYINTERCONNECT,        "frameRelayInterconnect" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_AFLANE8023,                    "aflane8023" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_AFLANE8025,                    "aflane8025" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_CCTEMUL,                       "cctEmul" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_FASTETHER,                     "fastEther" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ISDN,                          "isdn" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_V11,                           "v11" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_V36,                           "v36" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_G703AT64K,                     "g703at64k" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_G703AT2MB,                     "g703at2mb" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_QLLC,                          "qllc" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_FASTETHERFX,                   "fastEtherFX" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_CHANNEL,                       "channel" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IEEE80211,                     "ieee80211" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IBM370PARCHAN,                 "ibm370parChan" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ESCON,                         "escon" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DLSW,                          "dlsw" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ISDNS,                         "isdns" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ISDNU,                         "isdnu" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_LAPD,                          "lapd" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IPSWITCH,                      "ipSwitch" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_RSRB,                          "rsrb" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ATMLOGICAL,                    "atmLogical" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DS0,                           "ds0" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DS0BUNDLE,                     "ds0Bundle" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_BSC,                           "bsc" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ASYNC,                         "async" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_CNR,                           "cnr" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ISO88025DTR,                   "iso88025Dtr" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_EPLRS,                         "eplrs" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ARAP,                          "arap" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PROPCNLS,                      "propCnls" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_HOSTPAD,                       "hostPad" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_TERMPAD,                       "termPad" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_FRAMERELAYMPI,                 "frameRelayMPI" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_X213,                          "x213" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ADSL,                          "adsl" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_RADSL,                         "radsl" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SDSL,                          "sdsl" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_VDSL,                          "vdsl" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ISO88025CRFPINT,               "iso88025CRFPInt" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_MYRINET,                       "myrinet" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_VOICEEM,                       "voiceEM" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_VOICEFXO,                      "voiceFXO" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_VOICEFXS,                      "voiceFXS" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_VOICEENCAP,                    "voiceEncap" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_VOICEOVERIP,                   "voiceOverIp" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ATMDXI,                        "atmDxi" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ATMFUNI,                       "atmFuni" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ATMIMA,                        "atmIma" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PPPMULTILINKBUNDLE,            "pppMultilinkBundle" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IPOVERCDLC,                    "ipOverCdlc" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IPOVERCLAW,                    "ipOverClaw" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_STACKTOSTACK,                  "stackToStack" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_VIRTUALIPADDRESS,              "virtualIpAddress" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_MPC,                           "mpc" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IPOVERATM,                     "ipOverAtm" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ISO88025FIBER,                 "iso88025Fiber" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_TDLC,                          "tdlc" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_GIGABITETHERNET,               "gigabitEthernet" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_HDLC,                          "hdlc" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_LAPF,                          "lapf" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_V37,                           "v37" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_X25MLP,                        "x25mlp" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_X25HUNTGROUP,                  "x25huntGroup" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_TRASNPHDLC,                    "trasnpHdlc" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_INTERLEAVE,                    "interleave" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_FAST,                          "fast" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IP,                            "ip" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DOCSCABLEMACLAYER,             "docsCableMaclayer" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DOCSCABLEDOWNSTREAM,           "docsCableDownstream" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DOCSCABLEUPSTREAM,             "docsCableUpstream" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_A12MPPSWITCH,                  "a12MppSwitch" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_TUNNEL,                        "tunnel" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_COFFEE,                        "coffee" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_CES,                           "ces" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ATMSUBINTERFACE,               "atmSubInterface" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_L2VLAN,                        "l2vlan" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_L3IPVLAN,                      "l3ipvlan" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_L3IPXVLAN,                     "l3ipxvlan" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DIGITALPOWERLINE,              "digitalPowerline" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_MEDIAMAILOVERIP,               "mediaMailOverIp" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DTM,                           "dtm" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DCN,                           "dcn" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IPFORWARD,                     "ipForward" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_MSDSL,                         "msdsl" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IEEE1394,                      "ieee1394" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IF_GSN,                        "if-gsn" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DVBRCCMACLAYER,                "dvbRccMacLayer" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DVBRCCDOWNSTREAM,              "dvbRccDownstream" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DVBRCCUPSTREAM,                "dvbRccUpstream" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ATMVIRTUAL,                    "atmVirtual" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_MPLSTUNNEL,                    "mplsTunnel" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SRP,                           "srp" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_VOICEOVERATM,                  "voiceOverAtm" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_VOICEOVERFRAMERELAY,           "voiceOverFrameRelay" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IDSL,                          "idsl" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_COMPOSITELINK,                 "compositeLink" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SS7SIGLINK,                    "ss7SigLink" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PROPWIRELESSP2P,               "propWirelessP2P" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_FRFORWARD,                     "frForward" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_RFC1483,                       "rfc1483" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_USB,                           "usb" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_IEEE8023ADLAG,                 "ieee8023adLag" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_BGPPOLICYACCOUNTING,           "bgppolicyaccounting" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_FRF16MFRBUNDLE,                "frf16MfrBundle" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_H323GATEKEEPER,                "h323Gatekeeper" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_H323PROXY,                     "h323Proxy" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_MPLS,                          "mpls" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_MFSIGLINK,                     "mfSigLink" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_HDSL2,                         "hdsl2" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SHDSL,                         "shdsl" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DS1FDL,                        "ds1FDL" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_POS,                           "pos" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DVBASILN,                      "dvbAsiln" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DVBASIOUT,                     "dvbAsiOut" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PLC,                           "plc" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_NFAS,                          "nfas" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_TR008,                         "tr008" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_GR303RDT,                      "gr303RDT" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_GR303IDT,                      "gr303IDT" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ISUP,                          "isup" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PROPDOCSWIRELESSMACLAYER,      "propDocsWirelessMaclayer" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PROPDOCSWIRELESSDOWNSTREAM,    "propDocsWirelessDownstream" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PROPDOCSWIRELESSUPSTREAM,      "propDocsWirelessUpstream" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_HIPERLAN2,                     "hiperlan2" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_PROPBWAP2MP,                   "propBWAp2Mp" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_SONETOVERHEADCHANNEL,          "sonetOverheadChannel" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_DIGITALWRAPPEROVERHEADCHANNEL, "digitalWrapperOverheadChannel" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_AAL2,                          "aal2" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_RADIOMAC,                      "radioMAC" },
+    { ISDN_MIB_ISDNENDPOINTIFTYPE_ATMRADIO,                      "atmRadio" },
+    { 0, NULL }
+};
+
+GSnmpEnum const isdn_mib_enums_isdnEndpointTeiType[] = {
+    { ISDN_MIB_ISDNENDPOINTTEITYPE_DYNAMIC, "dynamic" },
+    { ISDN_MIB_ISDNENDPOINTTEITYPE_STATIC,  "static" },
+    { 0, NULL }
+};
+
+GSnmpEnum const isdn_mib_enums_isdnEndpointStatus[] = {
+    { ISDN_MIB_ISDNENDPOINTSTATUS_ACTIVE,        "active" },
+    { ISDN_MIB_ISDNENDPOINTSTATUS_NOTINSERVICE,  "notInService" },
+    { ISDN_MIB_ISDNENDPOINTSTATUS_NOTREADY,      "notReady" },
+    { ISDN_MIB_ISDNENDPOINTSTATUS_CREATEANDGO,   "createAndGo" },
+    { ISDN_MIB_ISDNENDPOINTSTATUS_CREATEANDWAIT, "createAndWait" },
+    { ISDN_MIB_ISDNENDPOINTSTATUS_DESTROY,       "destroy" },
+    { 0, NULL }
+};
+
 
 static guint32 isdnBearerChannelNumber_constraints[] = {1L, 30L, 0, 0};
 static guint16 isdnBearerPeerAddress_constraints[] = {0, 255, 0, 0};
 static guint16 isdnBearerPeerSubAddress_constraints[] = {0, 255, 0, 0};
+static guint32 isdnEndpointIfIndex_constraints[] = {1L, 2147483647L, 0, 0};
+static guint32 isdnEndpointTeiValue_constraints[] = {0L, 255L, 0, 0};
+static guint16 isdnEndpointSpid_constraints[] = {0, 255, 0, 0};
 
 
 static guint32 const isdnBasicRateEntry_oid[] = {1, 3, 6, 1, 2, 1, 10, 20, 1, 1, 1, 1};
@@ -187,6 +399,48 @@ static GSnmpAttribute isdnBearerEntry_attr[] = {
       G_STRUCT_OFFSET(isdn_mib_isdnBearerEntry_t, isdnBearerChargedUnits),
       0,
       0 },
+    { 0, 0, 0, NULL }
+};
+
+static guint32 const isdnEndpointEntry_oid[] = {1, 3, 6, 1, 2, 1, 10, 20, 1, 4, 2, 1};
+
+static GSnmpAttribute isdnEndpointEntry_attr[] = {
+    { 2, G_SNMP_INTEGER32,
+      ISDN_MIB_ISDNENDPOINTIFINDEX, "isdnEndpointIfIndex",
+       isdnEndpointIfIndex_constraints,
+      G_STRUCT_OFFSET(isdn_mib_isdnEndpointEntry_t, isdnEndpointIfIndex),
+      0,
+      0 },
+    { 3, G_SNMP_INTEGER32,
+      ISDN_MIB_ISDNENDPOINTIFTYPE, "isdnEndpointIfType",
+       NULL,
+      G_STRUCT_OFFSET(isdn_mib_isdnEndpointEntry_t, isdnEndpointIfType),
+      0,
+      GSNMP_ATTR_FLAG_WRITABLE },
+    { 4, G_SNMP_INTEGER32,
+      ISDN_MIB_ISDNENDPOINTTEITYPE, "isdnEndpointTeiType",
+       NULL,
+      G_STRUCT_OFFSET(isdn_mib_isdnEndpointEntry_t, isdnEndpointTeiType),
+      0,
+      GSNMP_ATTR_FLAG_WRITABLE },
+    { 5, G_SNMP_INTEGER32,
+      ISDN_MIB_ISDNENDPOINTTEIVALUE, "isdnEndpointTeiValue",
+       isdnEndpointTeiValue_constraints,
+      G_STRUCT_OFFSET(isdn_mib_isdnEndpointEntry_t, isdnEndpointTeiValue),
+      0,
+      GSNMP_ATTR_FLAG_WRITABLE },
+    { 6, G_SNMP_OCTETSTRING,
+      ISDN_MIB_ISDNENDPOINTSPID, "isdnEndpointSpid",
+       isdnEndpointSpid_constraints,
+      G_STRUCT_OFFSET(isdn_mib_isdnEndpointEntry_t, isdnEndpointSpid),
+      G_STRUCT_OFFSET(isdn_mib_isdnEndpointEntry_t, _isdnEndpointSpidLength),
+      GSNMP_ATTR_FLAG_WRITABLE },
+    { 7, G_SNMP_INTEGER32,
+      ISDN_MIB_ISDNENDPOINTSTATUS, "isdnEndpointStatus",
+       NULL,
+      G_STRUCT_OFFSET(isdn_mib_isdnEndpointEntry_t, isdnEndpointStatus),
+      0,
+      GSNMP_ATTR_FLAG_WRITABLE },
     { 0, 0, 0, NULL }
 };
 
@@ -581,6 +835,247 @@ isdn_mib_set_isdnBearerChannelType(GSnmpSession *s, gint32 ifIndex, gint32 isdnB
     isdnBearerEntry->isdnBearerChannelType = &isdnBearerChannelType;
     isdn_mib_set_isdnBearerEntry(s, isdnBearerEntry, ISDN_MIB_ISDNBEARERCHANNELTYPE);
     isdn_mib_free_isdnBearerEntry(isdnBearerEntry);
+}
+
+isdn_mib_isdnEndpointEntry_t *
+isdn_mib_new_isdnEndpointEntry()
+{
+    isdn_mib_isdnEndpointEntry_t *isdnEndpointEntry;
+
+    isdnEndpointEntry = (isdn_mib_isdnEndpointEntry_t *) g_malloc0(sizeof(isdn_mib_isdnEndpointEntry_t) + sizeof(gpointer));
+    return isdnEndpointEntry;
+}
+
+static inline int
+unpack_isdnEndpointEntry(GSnmpVarBind *vb, isdn_mib_isdnEndpointEntry_t *isdnEndpointEntry)
+{
+    guint8 idx = 13;
+
+    if (vb->id_len < idx) return -1;
+    isdnEndpointEntry->isdnEndpointIndex = vb->id[idx++];
+    if (vb->id_len > idx) return -1;
+    return 0;
+}
+
+static inline gint8
+pack_isdnEndpointEntry(guint32 *base, gint32 isdnEndpointIndex)
+{
+    guint8 idx = 13;
+
+    base[idx++] = isdnEndpointIndex;
+    return idx;
+}
+
+static inline isdn_mib_isdnEndpointEntry_t *
+assign_isdnEndpointEntry(GSList *vbl)
+{
+    isdn_mib_isdnEndpointEntry_t *isdnEndpointEntry;
+    char *p;
+
+    isdnEndpointEntry = isdn_mib_new_isdnEndpointEntry();
+    if (! isdnEndpointEntry) {
+        return NULL;
+    }
+
+    p = (char *) isdnEndpointEntry + sizeof(isdn_mib_isdnEndpointEntry_t);
+    * (GSList **) p = vbl;
+
+    if (unpack_isdnEndpointEntry((GSnmpVarBind *) vbl->data, isdnEndpointEntry) < 0) {
+        g_warning("%s: invalid instance identifier", "isdnEndpointEntry");
+        g_free(isdnEndpointEntry);
+        return NULL;
+    }
+
+    gsnmp_attr_assign(vbl, isdnEndpointEntry_oid, sizeof(isdnEndpointEntry_oid)/sizeof(guint32),
+                      isdnEndpointEntry_attr, isdnEndpointEntry);
+
+    return isdnEndpointEntry;
+}
+
+void
+isdn_mib_get_isdnEndpointTable(GSnmpSession *s, isdn_mib_isdnEndpointEntry_t ***isdnEndpointEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    GSList *row;
+    int i;
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 10, 20, 1, 4, 2, 1, 0};
+
+    *isdnEndpointEntry = NULL;
+
+    gsnmp_attr_get(s, &in, base, 13, 12, isdnEndpointEntry_attr, mask);
+
+    out = gsnmp_gettable(s, in);
+    /* g_snmp_vbl_free(in); */
+
+    if (out) {
+        *isdnEndpointEntry = (isdn_mib_isdnEndpointEntry_t **) g_malloc0((g_slist_length(out) + 1) * sizeof(isdn_mib_isdnEndpointEntry_t *));
+        if (! *isdnEndpointEntry) {
+            s->error_status = G_SNMP_ERR_INTERNAL;
+            g_snmp_vbl_free(out);
+            return;
+        }
+        for (row = out, i = 0; row; row = g_slist_next(row), i++) {
+            (*isdnEndpointEntry)[i] = assign_isdnEndpointEntry(row->data);
+        }
+    }
+}
+
+void
+isdn_mib_get_isdnEndpointEntry(GSnmpSession *s, isdn_mib_isdnEndpointEntry_t **isdnEndpointEntry, gint32 isdnEndpointIndex, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    gint8 len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, isdnEndpointEntry_oid, sizeof(isdnEndpointEntry_oid));
+    len = pack_isdnEndpointEntry(base, isdnEndpointIndex);
+    if (len < 0) {
+        g_warning("%s: invalid index values", "isdnEndpointEntry");
+        s->error_status = G_SNMP_ERR_INTERNAL;
+        return;
+    }
+
+    *isdnEndpointEntry = NULL;
+
+    gsnmp_attr_get(s, &in, base, len, 12, isdnEndpointEntry_attr, mask);
+
+    out = g_snmp_session_sync_get(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        if (s->error_status != G_SNMP_ERR_NOERROR) {
+            g_snmp_vbl_free(out);
+            return;
+        }
+        *isdnEndpointEntry = assign_isdnEndpointEntry(out);
+    }
+}
+
+void
+isdn_mib_set_isdnEndpointEntry(GSnmpSession *s, isdn_mib_isdnEndpointEntry_t *isdnEndpointEntry, gint mask)
+{
+    GSList *in = NULL, *out = NULL;
+    guint32 base[128];
+    gint8 len;
+
+    memset(base, 0, sizeof(base));
+    memcpy(base, isdnEndpointEntry_oid, sizeof(isdnEndpointEntry_oid));
+    len = pack_isdnEndpointEntry(base, isdnEndpointEntry->isdnEndpointIndex);
+    if (len < 0) {
+        g_warning("%s: invalid index values", "isdnEndpointEntry");
+        s->error_status = G_SNMP_ERR_INTERNAL;
+        return;
+    }
+
+    gsnmp_attr_set(s, &in, base, len, 12, isdnEndpointEntry_attr, mask, isdnEndpointEntry);
+
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (out) {
+        g_snmp_vbl_free(out);
+    }
+}
+
+void
+isdn_mib_free_isdnEndpointEntry(isdn_mib_isdnEndpointEntry_t *isdnEndpointEntry)
+{
+    GSList *vbl;
+    char *p;
+
+    if (isdnEndpointEntry) {
+        p = (char *) isdnEndpointEntry + sizeof(isdn_mib_isdnEndpointEntry_t);
+        vbl = * (GSList **) p;
+        g_snmp_vbl_free(vbl);
+        g_free(isdnEndpointEntry);
+    }
+}
+
+void
+isdn_mib_free_isdnEndpointTable(isdn_mib_isdnEndpointEntry_t **isdnEndpointEntry)
+{
+    int i;
+
+    if (isdnEndpointEntry) {
+        for (i = 0; isdnEndpointEntry[i]; i++) {
+            isdn_mib_free_isdnEndpointEntry(isdnEndpointEntry[i]);
+        }
+        g_free(isdnEndpointEntry);
+    }
+}
+
+void
+isdn_mib_set_isdnEndpointIfType(GSnmpSession *s, gint32 isdnEndpointIndex, gint32 isdnEndpointIfType)
+{
+    isdn_mib_isdnEndpointEntry_t *isdnEndpointEntry;
+
+    isdn_mib_get_isdnEndpointEntry(s, &isdnEndpointEntry, isdnEndpointIndex, ISDN_MIB_ISDNENDPOINTIFTYPE);
+    if (s->error_status || !isdnEndpointEntry) return;
+    isdnEndpointEntry->isdnEndpointIfType = &isdnEndpointIfType;
+    isdn_mib_set_isdnEndpointEntry(s, isdnEndpointEntry, ISDN_MIB_ISDNENDPOINTIFTYPE);
+    isdn_mib_free_isdnEndpointEntry(isdnEndpointEntry);
+}
+
+void
+isdn_mib_set_isdnEndpointTeiType(GSnmpSession *s, gint32 isdnEndpointIndex, gint32 isdnEndpointTeiType)
+{
+    isdn_mib_isdnEndpointEntry_t *isdnEndpointEntry;
+
+    isdn_mib_get_isdnEndpointEntry(s, &isdnEndpointEntry, isdnEndpointIndex, ISDN_MIB_ISDNENDPOINTTEITYPE);
+    if (s->error_status || !isdnEndpointEntry) return;
+    isdnEndpointEntry->isdnEndpointTeiType = &isdnEndpointTeiType;
+    isdn_mib_set_isdnEndpointEntry(s, isdnEndpointEntry, ISDN_MIB_ISDNENDPOINTTEITYPE);
+    isdn_mib_free_isdnEndpointEntry(isdnEndpointEntry);
+}
+
+void
+isdn_mib_set_isdnEndpointTeiValue(GSnmpSession *s, gint32 isdnEndpointIndex, gint32 isdnEndpointTeiValue)
+{
+    isdn_mib_isdnEndpointEntry_t *isdnEndpointEntry;
+
+    isdn_mib_get_isdnEndpointEntry(s, &isdnEndpointEntry, isdnEndpointIndex, ISDN_MIB_ISDNENDPOINTTEIVALUE);
+    if (s->error_status || !isdnEndpointEntry) return;
+    isdnEndpointEntry->isdnEndpointTeiValue = &isdnEndpointTeiValue;
+    isdn_mib_set_isdnEndpointEntry(s, isdnEndpointEntry, ISDN_MIB_ISDNENDPOINTTEIVALUE);
+    isdn_mib_free_isdnEndpointEntry(isdnEndpointEntry);
+}
+
+void
+isdn_mib_set_isdnEndpointSpid(GSnmpSession *s, gint32 isdnEndpointIndex, guchar *isdnEndpointSpid, guint16 _isdnEndpointSpidLength)
+{
+    isdn_mib_isdnEndpointEntry_t *isdnEndpointEntry;
+
+    isdn_mib_get_isdnEndpointEntry(s, &isdnEndpointEntry, isdnEndpointIndex, ISDN_MIB_ISDNENDPOINTSPID);
+    if (s->error_status || !isdnEndpointEntry) return;
+    isdnEndpointEntry->isdnEndpointSpid = isdnEndpointSpid;
+    isdnEndpointEntry->_isdnEndpointSpidLength = _isdnEndpointSpidLength;
+    isdn_mib_set_isdnEndpointEntry(s, isdnEndpointEntry, ISDN_MIB_ISDNENDPOINTSPID);
+    isdn_mib_free_isdnEndpointEntry(isdnEndpointEntry);
+}
+
+void
+isdn_mib_create_isdnEndpointEntry(GSnmpSession *s, gint32 isdnEndpointIndex)
+{
+    isdn_mib_isdnEndpointEntry_t *isdnEndpointEntry;
+    gint32 create = ISDN_MIB_ISDNENDPOINTSTATUS_CREATEANDGO;
+
+    isdnEndpointEntry = isdn_mib_new_isdnEndpointEntry();
+    isdnEndpointEntry->isdnEndpointIndex = isdnEndpointIndex;
+    isdnEndpointEntry->isdnEndpointStatus = &create;
+    isdn_mib_set_isdnEndpointEntry(s, isdnEndpointEntry, ISDN_MIB_ISDNENDPOINTSTATUS);
+    isdn_mib_free_isdnEndpointEntry(isdnEndpointEntry);
+}
+
+void
+isdn_mib_delete_isdnEndpointEntry(GSnmpSession *s, gint32 isdnEndpointIndex)
+{
+    isdn_mib_isdnEndpointEntry_t *isdnEndpointEntry;
+    gint32 destroy = ISDN_MIB_ISDNENDPOINTSTATUS_DESTROY;
+
+    isdn_mib_get_isdnEndpointEntry(s, &isdnEndpointEntry, isdnEndpointIndex, ISDN_MIB_ISDNENDPOINTSTATUS);
+    if (s->error_status || !isdnEndpointEntry) return;
+    isdnEndpointEntry->isdnEndpointStatus = &destroy;
+    isdn_mib_set_isdnEndpointEntry(s, isdnEndpointEntry, ISDN_MIB_ISDNENDPOINTSTATUS);
+    isdn_mib_free_isdnEndpointEntry(isdnEndpointEntry);
 }
 
 
