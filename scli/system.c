@@ -897,9 +897,9 @@ xml_system_info(xmlNodePtr root, scli_interp_t *interp,
 	}
 
 	if (system->sysObjectID) {
-	    scli_vendor_t *vendor;
-	    vendor = scli_get_iana_vendor(system->sysObjectID,
-					  system->_sysObjectIDLength);
+	    scli_vendor_t const *vendor;
+	    vendor = scli_get_vendor_oid(system->sysObjectID,
+					 system->_sysObjectIDLength);
 	    if (vendor && vendor->name) {
 		(void) xml_new_child(root, NULL, "vendor", "%s", vendor->name);
 	    }
@@ -961,9 +961,9 @@ fmt_system_info(GString *s, scli_interp_t *interp,
 			       system->sysLocation);
 	}
 	if (system->sysObjectID) {
-	    scli_vendor_t *vendor;
-	    vendor = scli_get_iana_vendor(system->sysObjectID,
-					  system->_sysObjectIDLength);
+	    scli_vendor_t const *vendor;
+	    vendor = scli_get_vendor_oid(system->sysObjectID,
+					 system->_sysObjectIDLength);
 	    if (vendor && vendor->name) {
 		g_string_sprintfa(s, "%-*s", indent, "Vendor:");
 		if (vendor->id) {

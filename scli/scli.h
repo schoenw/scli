@@ -295,10 +295,13 @@ typedef struct scli_vendor {
     char     *url;
 } scli_vendor_t;
 
-extern scli_vendor_t*
-scli_get_iana_vendor(guint32 oid[], gsize len);
+extern const scli_vendor_t*
+scli_get_vendor(guint32 enterp);
 
-extern scli_vendor_t*
+extern const scli_vendor_t*
+scli_get_vendor_oid(guint32 oid[], gsize len);
+
+extern const scli_vendor_t*
 scli_get_ieee_vendor(guint32 prefix);
 
 /*

@@ -544,9 +544,9 @@ show_extension(GString *s,
     }
     if (c == '`') c = ' ';
     if (smExtsnEntry->smExtsnVendor) {
-	scli_vendor_t *vendor;
-	vendor = scli_get_iana_vendor(smExtsnEntry->smExtsnVendor,
-				      smExtsnEntry->_smExtsnVendorLength);
+	scli_vendor_t const *vendor;
+	vendor = scli_get_vendor_oid(smExtsnEntry->smExtsnVendor,
+				     smExtsnEntry->_smExtsnVendorLength);
 	if (vendor && vendor->name) {
 	    g_string_sprintfa(s, "%c%-*s  ", c, indent, "  Vendor:");
 	    if (vendor->id) {
@@ -592,9 +592,9 @@ fmt_language(GString *s,
 			  smLangEntry->smLangVersion);
     }
     if (smLangEntry->smLangVendor) {
-	scli_vendor_t *vendor;
-	vendor = scli_get_iana_vendor(smLangEntry->smLangVendor,
-				      smLangEntry->_smLangVendorLength);
+	scli_vendor_t const *vendor;
+	vendor = scli_get_vendor_oid(smLangEntry->smLangVendor,
+				     smLangEntry->_smLangVendorLength);
 	if (vendor && vendor->name) {
 	    g_string_sprintfa(s, "%-*s  ", indent, "Vendor:");
 	    if (vendor->id) {

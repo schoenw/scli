@@ -39,8 +39,22 @@ static scli_vendor_t iana_vendor_table[] = {
 };
 
 
-scli_vendor_t*
-scli_get_iana_vendor(guint32 oid[], gsize len)
+const scli_vendor_t*
+scli_get_vendor(guint32 id)
+{
+    int i;
+    
+    for (i = 0; iana_vendor_table[i].id; i++) {
+	if (iana_vendor_table[i].id == id) {
+	    return &(iana_vendor_table[i]);
+	}
+    }
+    return NULL;
+}
+
+
+const scli_vendor_t*
+scli_get_vendor_oid(guint32 oid[], gsize len)
 {
     static guint32 const enterprises[] = { 1, 3, 6, 1, 4, 1 };
     static char buffer[80];
@@ -983,7 +997,7 @@ static scli_vendor_t ieee802_vendor_table[] = {
 };
 
 
-scli_vendor_t*
+const scli_vendor_t*
 scli_get_ieee_vendor(guint32 prefix)
 {
     int i;
