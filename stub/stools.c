@@ -153,10 +153,9 @@ char const *
 stls_fmt_timeticks(guint32 timeticks)
 {
     static char buffer[80];
-    time_t now;
+    time_t now, gmt;
     struct tm *tm;
-    long gmt_offset;
-    struct tm local, utc;
+    int gmt_offset;
     
     now = time(NULL);
     now -= timeticks/100;
@@ -169,14 +168,12 @@ stls_fmt_timeticks(guint32 timeticks)
      */
 
     tm = gmtime(&now);
-    utc = *tm;
-    
-    tm = localtime(&now);
-    local = *tm;
+    tm->tm_isdst = 0;
+    gmt = mktime(tm);
 
-    gmt_offset  = (local.tm_hour - utc.tm_hour) * 3600;
-    gmt_offset += (local.tm_min  - utc.tm_min) * 60;
-    gmt_offset += (local.tm_sec  - utc.tm_sec);
+    tm = localtime(&now);
+    tm->tm_isdst = 0;
+    gmt_offset = mktime(tm) - gmt;
 
     g_snprintf(buffer, sizeof(buffer),
 	       "%04d-%02d-%02d %02d:%02d:%02d %c%02d:%02d",
