@@ -29,14 +29,14 @@ static char const rcsid[] =
 
 #include "g_snmp.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <string.h>                   /* Quite the memmove warning */
 
 extern int     errno;
 
-static GSList  *rq_list     = NULL;   /* track the active requests */
-static gint     id          = 1;      /* SNMP request id */
+static GSList  *request_queue = NULL;   /* queue of active requests */
 
 /*
  * lookup address of node and set port number or default.
@@ -55,6 +55,143 @@ g_setup_address (GSnmpSession *session)
   return TRUE;
 }
 
+/*
+ * Allocate a new session data structure.
+ */
+
+GSnmpSession*
+g_snmp_session_new()
+{
+    GSnmpSession *session;
+
+    session = g_malloc0(sizeof(GSnmpSession));
+    session->domain = AF_INET;
+    session->name = "localhost";
+    session->port = 161;
+    session->retries = 3;
+    session->timeout = 1;
+    session->version = G_SNMP_V2C;
+
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_printerr("session %p: new\n", session);
+    }
+    return session;
+}
+
+/*
+ * Destroy a session data structure.
+ */
+
+void
+g_snmp_session_destroy(GSnmpSession *session)
+{
+    /* XXX delete all requests that refer to this session first */
+
+    if (session->name) g_free(session->name);
+    if (session->rcomm) g_free(session->rcomm);
+    if (session->address) g_free(session->address);
+    g_free(session);
+
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_printerr("session %p: destroyed\n", session);
+    }
+}
+
+/*
+ * Allocate a new request data structure.
+ */
+
+snmp_request*
+g_snmp_request_new()
+{
+    snmp_request *request;
+
+    request = g_malloc0(sizeof(snmp_request));
+    request->auth = g_string_new(NULL);
+    
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
+	g_printerr("request %p: new\n", request);
+    }
+
+    return request;
+}
+
+/*
+ * Destroy a request data structure.
+ */
+
+void
+g_snmp_request_destroy(snmp_request *request)
+{
+    g_return_if_fail(request);
+    
+    if (request->auth) {
+	g_string_free(request->auth, 1);
+    }
+    g_free(request);
+
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
+	g_printerr("request %p: destroyed\n", request);
+    }
+}
+
+/*
+ * Add a request to the global queue of outstanding requests.
+ * XXX This is not thread-safe.
+ */
+
+void
+g_snmp_request_queue(snmp_request *request)
+{
+    g_return_if_fail(request);
+    
+    request_queue = g_slist_append(request_queue, request);
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
+	g_printerr("request %p: queued\n", request);
+    }
+}
+
+/*
+ * Remove a request from the global queue of outstanding requests.
+ * XXX This is not thread-safe.
+ */
+
+void
+g_snmp_request_dequeue(snmp_request *request)
+{
+    g_return_if_fail(request);
+
+    request_queue = g_slist_remove(request_queue, request);
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
+	g_printerr("request %p: dequeued\n", request);
+    }
+}
+
+/*
+ * Find the request with a given request id in the global queue of
+ * outstanding requests.
+ * XXX This is not thread-safe.
+ */
+
+snmp_request*
+g_snmp_request_find(gint32 id)
+{
+    GSList *elem;
+
+    for (elem = request_queue; elem; elem = g_slist_next(elem)) {
+	snmp_request *request = (snmp_request *) elem->data;
+	if (request->pdu.request.id == id) {
+	    if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
+		g_printerr("request %p: found\n", request);
+	    }
+	    return request;
+	}
+    }
+
+    return NULL;
+}
+
+
 /* 
  * query/set one mib from a snmp host
  *
@@ -65,23 +202,25 @@ g_setup_address (GSnmpSession *session)
 
 /* Asynchronous SNMP functions */
 
-gpointer
-g_async_send (GSnmpSession *session, GSnmpPduType type,
-	      GSList *objs, guint arg1, guint arg2)
+static gpointer
+g_async_send(GSnmpSession *session, GSnmpPduType type,
+	     GSList *objs, guint32 arg1, guint32 arg2)
 {
-  snmp_request * request;
-  time_t         now;
-  int            model = 0, pduv = 0;
+  snmp_request *request;
+  time_t        now;
+  int           model = 0, pduv = 0;
+  static gint32	id = -1;
+
+  if (id < 0) {
+      id = random();
+  }
 
   now = time(NULL);
 
 #ifdef SNMP_DEBUG
   printf("g_async_send for %s\n", host->name);
 #endif
-  request = g_malloc(sizeof(snmp_request));
-#ifdef SNMP_DEBUG
-  printf("New request: %p\n", request);
-#endif
+  request = g_snmp_request_new();
 
   if (session->done_callback)
     request->callback = session->done_callback;
@@ -96,7 +235,7 @@ g_async_send (GSnmpSession *session, GSnmpPduType type,
   if (!session->address) {
       if (!g_setup_address(session))
       {
-	  g_free(request);
+	  g_snmp_request_destroy(request);
 	  return NULL;
       }
   }
@@ -108,11 +247,11 @@ g_async_send (GSnmpSession *session, GSnmpPduType type,
 
   if (type == G_SNMP_PDU_SET)
     {
-      request->auth=g_string_new(session->wcomm);
+      request->auth=g_string_append(request->auth, session->wcomm);
     }
   else
     {
-      request->auth=g_string_new(session->rcomm);
+      request->auth=g_string_append(request->auth, session->rcomm);
     }
 
   request->pdu.type	            = type;
@@ -140,7 +279,9 @@ g_async_send (GSnmpSession *session, GSnmpPduType type,
         pduv  = PDUV2;
         break;
       default:
-        printf("Unknown version!!!\n");
+	g_printerr("Unknown protocol version!!!");
+	g_snmp_request_destroy(request);
+	return NULL;
     }
 #ifdef SNMP_DEBUG 
   printf("sending Pdu for %s, version %d\n", session->name, request->version);
@@ -148,33 +289,46 @@ g_async_send (GSnmpSession *session, GSnmpPduType type,
   sendPdu(request->domain, request->address, model, SMODEL_ANY, 
           request->auth, SLEVEL_NANP, NULL, NULL, pduv, &request->pdu, TRUE);
 
-  rq_list = g_slist_append(rq_list, request);
+  g_snmp_request_queue(request);
 
   return request;
 }
 
 gpointer
-g_async_get (GSnmpSession *session, GSList *pdu)
+g_snmp_session_async_set(GSnmpSession *session, GSList *pdu)
 {
-  return g_async_send(session, G_SNMP_PDU_GET, pdu, 0, 0);
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_printerr("session %p: g_async_set pdu %p\n", session, pdu);
+    }
+    return g_async_send(session, G_SNMP_PDU_SET, pdu, 0, 0);
 }
 
 gpointer
-g_async_getnext (GSnmpSession *session, GSList *pdu)
+g_snmp_session_async_get(GSnmpSession *session, GSList *pdu)
 {
-  return g_async_send(session, G_SNMP_PDU_NEXT, pdu, 0, 0);
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_printerr("session %p: g_async_get pdu %p\n", session, pdu);
+    }
+    return g_async_send(session, G_SNMP_PDU_GET, pdu, 0, 0);
 }
 
 gpointer
-g_async_bulk (GSnmpSession *session, GSList *pdu, guint nonrep, guint maxiter)
+g_snmp_session_async_getnext(GSnmpSession *session, GSList *pdu)
 {
-  return g_async_send(session, G_SNMP_PDU_BULK, pdu, nonrep, maxiter);
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_printerr("session %p: g_async_getnext pdu %p\n", session, pdu);
+    }
+    return g_async_send(session, G_SNMP_PDU_NEXT, pdu, 0, 0);
 }
 
 gpointer
-g_async_set (GSnmpSession *session, GSList *pdu)
+g_snmp_session_async_bulk(GSnmpSession *session, GSList *pdu,
+			  guint32 nonrep, guint32 maxrep)
 {
-  return g_async_send(session, G_SNMP_PDU_SET, pdu, 0, 0);
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_printerr("session %p: g_async_getbulk pdu %p\n", session, pdu);
+    }
+    return g_async_send(session, G_SNMP_PDU_BULK, pdu, nonrep, maxrep);
 }
 
 /* Synchronous SNMP functions */
@@ -212,9 +366,9 @@ cb_done (GSnmpSession *session, void *magic, GSnmpPdu *spdu, GSList *objs)
   return FALSE;
 }
 
-GSList *
-g_sync_send (GSnmpSession *session, GSnmpPduType type,
-	     GSList *objs, guint arg1, guint arg2)
+static GSList *
+g_sync_send(GSnmpSession *session, GSnmpPduType type,
+	    GSList *objs, guint32 arg1, guint32 arg2)
 {
   struct syncmagic * magic;
   GSList *result;
@@ -252,29 +406,43 @@ g_sync_send (GSnmpSession *session, GSnmpPduType type,
 }
 
 GSList *
-g_sync_get (GSnmpSession *session, GSList *pdu)
+g_snmp_session_sync_set(GSnmpSession *session, GSList *pdu)
 {
-  return g_sync_send(session, G_SNMP_PDU_GET, pdu, 0, 0);
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_printerr("session %p: g_sync_set pdu %p\n", session, pdu);
+    }
+    return g_sync_send(session, G_SNMP_PDU_SET, pdu, 0, 0);
 }
 
 GSList *
-g_sync_getnext (GSnmpSession *session, GSList *pdu)
+g_snmp_session_sync_get(GSnmpSession *session, GSList *pdu)
 {
-  return g_sync_send(session, G_SNMP_PDU_NEXT, pdu, 0, 0);
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_printerr("session %p: g_sync_get pdu %p\n", session, pdu);
+    }
+    return g_sync_send(session, G_SNMP_PDU_GET, pdu, 0, 0);
 }
 
 GSList *
-g_sync_bulk (GSnmpSession *session, GSList *pdu, guint nonrep, guint maxiter)
+g_snmp_session_sync_getnext(GSnmpSession *session, GSList *pdu)
 {
-  return g_sync_send(session, G_SNMP_PDU_BULK, pdu, nonrep, maxiter);
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_printerr("session %p: g_sync_getnext pdu %p\n", session, pdu);
+    }
+    return g_sync_send(session, G_SNMP_PDU_NEXT, pdu, 0, 0);
 }
 
 GSList *
-g_sync_set (GSnmpSession *session, GSList *pdu)
+g_snmp_session_sync_bulk(GSnmpSession *session, GSList *pdu,
+			 guint32 nonrep, guint32 maxrep)
 {
-  return g_sync_send(session, G_SNMP_PDU_SET, pdu, 0, 0);
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_printerr("session %p: g_sync_getbulk pdu %p\n", session, pdu);
+    }
+    return g_sync_send(session, G_SNMP_PDU_BULK, pdu, nonrep, maxrep);
 }
 
+#if 0
 gboolean
 g_pdu_add_oid(GSList **pdu, guint32 *myoid, guint mylength,
 	      GSnmpVarBindType type, gpointer value)
@@ -288,7 +456,9 @@ g_pdu_add_oid(GSList **pdu, guint32 *myoid, guint mylength,
   *pdu = g_slist_append(*pdu, obj);
   return TRUE;
 }
+#endif
 
+#if 0
 /* This should be nuked once the new parser and mib module are available.
    For now, either use this or the print function in struct tree          */
 
@@ -352,41 +522,7 @@ g_snmp_printf(char *buf, int buflen, GSnmpVarBind *obj)
         break;
     }
 }
-
-/*
- * The request queue functions
- */
-
-snmp_request *
-g_find_request (guint reqid)
-{
-  GSList       * list;
-  snmp_request * retval;
-
-  list = rq_list;
-  while(list)
-    {
-      retval = (snmp_request *) list->data;
-      if(retval->pdu.request.id == reqid)
-	  return retval;
-      list = list->next;
-    }
-  return NULL;
-}
-
-gboolean
-g_remove_request (snmp_request *request)
-{
-#ifdef SNMP_DEBUG
-  printf("Removing request: %p\n", request);
 #endif
-  rq_list = g_slist_remove(rq_list, request);
-  if (request->auth) {
-      g_string_free(request->auth, 1);
-  }
-  g_free(request);
-  return TRUE;
-}
 
 /*
  * The low level callbacks
@@ -406,7 +542,7 @@ g_snmp_timeout_cb (gpointer data)
 
 again:
   now = time(NULL);
-  mylist = rq_list;
+  mylist = request_queue;
 
   while(mylist)
     {
@@ -443,7 +579,7 @@ again:
             }
           else
             {
-              rq_list = g_slist_remove(rq_list, request);
+		g_snmp_request_dequeue(request);
               if (request->timeout)
                 {
 #ifdef SNMP_DEBUG
@@ -451,10 +587,7 @@ again:
 #endif
                    request->timeout(request->session, request->magic);
                 }
-	      if (request->auth) {
-		  g_string_free(request->auth, 1);
-	      }
-              g_free(request);
+	      g_snmp_request_destroy(request);
               goto again;
             }
         }
@@ -463,41 +596,53 @@ again:
 }
 
 void
-g_session_response_pdu (guint messageProcessingModel,
-  guint securityModel, GString *securityName, guint securityLevel, 
-  GString *contextEngineID, GString *contextName, guint pduVersion,
-  GSnmpPdu *PDU)
+g_session_response_pdu(guint messageProcessingModel,
+		       guint securityModel,
+		       GString *securityName,
+		       guint securityLevel, 
+		       GString *contextEngineID,
+		       GString *contextName,
+		       guint pduVersion,
+		       GSnmpPdu *PDU)
 {
-  GSList             *objs;
-  snmp_request       *request;
+    GSList       *vbl;
+    snmp_request *request;
 
-  if (PDU->type == G_SNMP_PDU_TRAP1)
-    objs = PDU->trap.variables;
-  else
-    objs = PDU->request.variables;
-  if ((request = g_find_request(PDU->request.id)))
-    {
-      if (memcmp(securityName->str, request->auth->str, securityName->len))
-        {
-          g_slist_free(objs);
-          return;
-        }
-      rq_list = g_slist_remove(rq_list, request);
-      request->session->status = PDU->request.error_status;
-      if (request->callback)
-        {
-#ifdef SNMP_DEBUG
-          printf("Calling done callback for request: %p\n", request);
-#endif
-          if (request->callback(request->session, request->magic, PDU, objs))
-            g_slist_free(objs);
-        }
-      else  
-        g_slist_free(objs);
-      g_free(request);
+    if (PDU->type == G_SNMP_PDU_TRAP1) {
+	vbl = PDU->trap.variables;
+    } else {
+	vbl = PDU->request.variables;
     }
-  else
-    g_slist_free(objs);
+
+    request = g_snmp_request_find(PDU->request.id);
+    if (! request) {
+	g_snmp_vbl_free(vbl);
+	return;
+    }
+    
+    /* XXX this needs to be generalized I think */
+    
+    if (memcmp(securityName->str, request->auth->str, securityName->len)) {
+	g_snmp_vbl_free(vbl);
+	return;
+    }
+
+    g_snmp_request_dequeue(request);
+    request->session->status = PDU->request.error_status;
+    /* XXX what about the error index? */
+    if (! request->callback) {
+	g_snmp_vbl_free(vbl);
+	g_snmp_request_destroy(request);
+	return;
+    }
+
+    if (request->callback(request->session, request->magic, PDU, vbl)) {
+	if (g_snmp_debug_flags & G_SNMP_DEBUG_REQUESTS) {
+	    g_printerr("request %p: callback invoked\n");
+	}
+	/* g_snmp_vbl_free(vbl); */
+    }
+    g_snmp_request_destroy(request);
 }
 
 /* EOF */

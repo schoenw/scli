@@ -21,8 +21,6 @@
 #ifndef __G_SESSION_H__
 #define __G_SESSION_H__
 
-#define MAX_DGRAM_SIZE 32768
-
 /*
  * In an effort to reduce the redundant code the callbacks from the
  * snmp lib callbacks are routed through one routine, that in turn will
@@ -31,16 +29,14 @@
  * interface. The queue routine will copy the return values from the 
  * snmp query to the per host structure and then invoke the callback.
  * the call back should return 1 and the queue entry will be purged.
- * This will also invaildate values returned.
+ * This will also invalidate values returned.
  */
 
 /*
- * Basic snmp info on a per host basis
+ * Basic snmp info on a per session basis.
  */
 
-typedef struct	_GSnmpSession	GSnmpSession;
-
-struct _GSnmpSession {
+typedef struct _GSnmpSession {
   struct sockaddr *address;
   guint         domain;
   gchar        *rcomm;
@@ -54,7 +50,32 @@ struct _GSnmpSession {
   gboolean      (*done_callback) (); /* what to call when complete */
   void          (*time_callback) (); /* what to call on a timeout */
   gpointer      magic;         /* can be used to pass additional data to cb */
-};
+} GSnmpSession;
+
+GSnmpSession*	g_snmp_session_new();
+void		g_snmp_session_destroy(GSnmpSession *s);
+
+gpointer g_snmp_session_async_set    (GSnmpSession *session,
+				      GSList *vbl);
+gpointer g_snmp_session_async_get    (GSnmpSession *session,
+				      GSList *vbl);
+gpointer g_snmp_session_async_getnext(GSnmpSession *session,
+				      GSList *vbl);
+gpointer g_snmp_session_async_getbulk(GSnmpSession *session,
+				      GSList *vbl,
+				      guint32 nonrep,
+				      guint32 maxrep);
+
+GSList* g_snmp_session_sync_set      (GSnmpSession *session,
+				      GSList *vbl);
+GSList* g_snmp_session_sync_get      (GSnmpSession *session,
+				      GSList *vbl);
+GSList* g_snmp_session_sync_getnext  (GSnmpSession *session,
+				      GSList *vbl);
+GSList* g_snmp_session_sync_getbulk  (GSnmpSession *session,
+				      GSList *vbl,
+				      guint32 nonrep,
+				      guint32 maxrep);
 
 typedef struct _snmp_request {
   gboolean            (*callback) ();
@@ -72,64 +93,24 @@ typedef struct _snmp_request {
 } snmp_request;
 
 
-gpointer g_async_send        (GSnmpSession *session, 
-                              GSnmpPduType type,
-                              GSList *objs, 
-                              guint arg1, 
-                              guint arg2);
+snmp_request*	g_snmp_request_new();
+void		g_snmp_request_destroy(snmp_request *request);
 
-gpointer g_async_getnext     (GSnmpSession *session, 
-                              GSList *pdu);
+void		g_snmp_request_queue(snmp_request *request);
+void		g_snmp_request_dequeue(snmp_request *request);
+snmp_request*	g_snmp_request_find(gint32 request_id);
 
-gpointer g_async_get         (GSnmpSession *session, 
-                              GSList *pdu);
-
-gpointer g_async_set         (GSnmpSession *session, 
-                              GSList *pdu);
-
-gpointer g_async_bulk        (GSnmpSession *session, 
-                              GSList *pdu,
-                              guint nonrep, 
-                              guint maxiter);
-
-GSList * g_sync_getnext      (GSnmpSession *session, 
-                              GSList *pdu);
-
-GSList * g_sync_get          (GSnmpSession *session, 
-                              GSList *pdu);
-
-GSList * g_sync_set          (GSnmpSession *session, 
-                              GSList *pdu);
-
-GSList * g_sync_bulk         (GSnmpSession *session, 
-                              GSList *pdu,
-                              guint nonrep, 
-                              guint maxiter);
-
-/* xxx fix this - should go away or at least get another argument
-   and be renamed to something more sensible */
-
-gboolean g_pdu_add_oid       (GSList **pdu, 
-                              guint32 *myoid, 
-                              guint mylength, 
-                              GSnmpVarBindType type,
-                              gpointer value);
+/*
+ * Session API
+ */
 
 int g_snmp_timeout_cb        (gpointer    data);
 void g_snmp_input_cb         (gpointer    data);
-
-/*
- * The request queue
- */
-snmp_request * g_find_request (guint reqid);
-gboolean g_remove_request     (snmp_request *request);
 
 void g_session_response_pdu (guint messageProcessingModel,
   guint securityModel, GString *securityName, guint securityLevel, 
   GString *contextEngineID, GString *contextName, guint pduVersion,
   GSnmpPdu *PDU);
-
-void g_snmp_printf(char *buf, int buflen, GSnmpVarBind *obj);
 
 #endif
 

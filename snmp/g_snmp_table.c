@@ -114,7 +114,8 @@ g_snmp_table_done_callback(GSnmpSession *session, gpointer data,
     }
   if (table->cb_row)
     table->cb_row(otable, index_len, table->data);
-  table->request = g_async_getnext(table->session, nobjs);
+  g_hash_table_destroy(otable);
+  table->request = g_snmp_session_async_getnext(table->session, nobjs);
   return TRUE;
 }  
 
@@ -178,7 +179,7 @@ g_snmp_table_new(GSnmpSession *session, GSList *objs,
 void
 g_snmp_table_get(Gsnmp_table *table)
 {
-    table->request = g_async_getnext(table->session, table->objs);
+    table->request = g_snmp_session_async_getnext(table->session, table->objs);
 }
 
 
@@ -188,7 +189,8 @@ g_snmp_table_destroy(Gsnmp_table *table)
     GSList *elem;
     
     if (table->request) {
-	g_remove_request(table->request);
+	g_snmp_request_dequeue(table->request);
+	g_snmp_request_destroy(table->request);
     }
     for (elem = table->objs; elem; elem = g_slist_next(elem)) {
 	g_snmp_varbind_free((GSnmpVarBind *) elem->data);

@@ -184,6 +184,18 @@ union _GSnmpPdu			/* xxx are three structures really needed */
 
 extern const char *SnmpTrap[];		/* xxx fix this - really needed ? */
 
+/* Variables that control SNMP library debugging features. */
+
+typedef enum
+{
+  G_SNMP_DEBUG_REQUESTS	= 1 << 0,
+  G_SNMP_DEBUG_SESSION	= 1 << 1,
+  G_SNMP_DEBUG_ALL	= G_SNMP_DEBUG_REQUESTS | G_SNMP_DEBUG_SESSION,
+  G_SNMP_DEBUG_MASK	= 0x03
+} GSnmpDebugFlags;
+
+extern GSnmpDebugFlags g_snmp_debug_flags;
+
 /* SNMP encoding and decoding */
  
 gboolean g_snmp_pdu_v1_encode ( ASN1_SCK *asn1, GSnmpPdu *pdu);

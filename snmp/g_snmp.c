@@ -36,7 +36,7 @@
 
 #include <stdio.h>
 
-char *g_snmp_msg = NULL;
+GSnmpDebugFlags g_snmp_debug_flags = 0;
 
 void (*g_snmp_list_decode_hook)(GSList *list) = NULL;
 void (*g_snmp_list_encode_hook)(GSList *list) = NULL;

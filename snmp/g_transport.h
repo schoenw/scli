@@ -19,10 +19,13 @@
  *
  * Defines and variables for snmp support
  */
+
 #ifndef __G_TRANSPORT_H__
 #define __G_TRANSPORT_H__
 
 #include "g_snmp.h"
+
+#define MAX_DGRAM_SIZE 32768
 
 struct g_transport
   {
