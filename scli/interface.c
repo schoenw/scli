@@ -1,7 +1,7 @@
 /* 
  * interface.c -- scli interface mode implementation
  *
- * Copyright (C) 2001 Juergen Schoenwaelder
+ * Copyright (C) 2001-2002 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,9 @@
 
 #include <ctype.h>
 
+#define ENTITY_MIB_ENTPHYSICAL_MASK \
+	( ENTITY_MIB_ENTPHYSICALDESCR | ENTITY_MIB_ENTPHYSICALCLASS \
+	  | ENTITY_MIB_ENTPHYSICALCONTAINEDIN )
 
 #define IF_MIB_IFENTRY_CONFIG \
 	( IF_MIB_IFDESCR | IF_MIB_IFADMINSTATUS )
@@ -613,7 +616,8 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 	entity_mib_get_entAliasMappingTable(interp->peer,
 					    &entAliasMappingTable, 0);
 	if (!interp->peer->error_status && entAliasMappingTable) {
-	    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
+	    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable,
+					    ENTITY_MIB_ENTPHYSICAL_MASK);
 	}
 	for (i = 0, c = 0; ifTable[i]; i++) {
 	    if (match_interface(regex_iface, ifTable[i])) {
@@ -759,6 +763,13 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
 		ifXEntry = get_ifXEntry(ifXTable, ifTable[i]->ifIndex);
 		fmt_interface_info(interp->result, ifTable[i],
 				   ifXEntry, type_width, name_width);
+#if 0
+		if (ifTable[i]->ifAdminStatus
+		    && ifTable[i]->ifOperStatus
+		    && *ifTable[i]->ifAdminStatus != *ifTable[i]->ifOperStatus) {
+		    scli_alarm_create(interp, "interface status mismatch");
+		}
+#endif
 	    }
 	}
     }
@@ -1138,7 +1149,7 @@ set_alias(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
 	  gpointer user_data)
 {
     if_mib_proc_set_interface_alias(interp->peer, ifEntry->ifIndex,
-				    (char *) user_data);
+				    (char *) user_data, strlen((char *) user_data));
     if (interp->peer->error_status) {
 	interface_snmp_error(interp, ifEntry);
     }
@@ -1498,7 +1509,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	{ "alert interface status", "<regexp> [<regexp>]",
 	  "The alarm interface status command generates alerts for\n"
 	  "interfaces that are in given status.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_LOOP,
 	  NULL, NULL,
 	  alert_interface_status },
 	
