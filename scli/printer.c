@@ -259,6 +259,31 @@ xml_media_dimensions(xmlNodePtr tree, gchar *label,
 
 
 
+static xmlNodePtr
+get_printer_node(xmlNodePtr tree, gint32 printer)
+{
+    xmlNodePtr node;
+    char buffer[20];
+
+    g_snprintf(buffer, sizeof(buffer), "%d", printer);
+
+    for (node = tree->children; node; node = node->next) {
+	if (xmlStrcmp(node->name, (const xmlChar *) "printer") == 0) {
+	    xmlChar *prop = xmlGetProp(node, (const xmlChar *) "number");
+	    if (xmlStrcmp(prop, (const xmlChar *) buffer) == 0) {
+		break;
+	    }
+	}
+    }
+    if (! node) {
+	node = xmlNewChild(tree, NULL, "printer", NULL);
+	xml_set_prop(node, "number", "%s", buffer);
+    }
+    return node;
+}
+
+
+
 static host_resources_mib_hrDeviceEntry_t*
 get_device_entry(host_resources_mib_hrPrinterEntry_t *hrPrinterEntry,
 		 host_resources_mib_hrDeviceEntry_t **hrDeviceTable)
@@ -1021,7 +1046,9 @@ show_printer_inputs(scli_interp_t *interp, int argc, char **argv)
     if (prtInputTable) {
 	for (i = 0; prtInputTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
-		xml_printer_inputs(interp->xml_node, prtInputTable[i]);
+		xmlNodePtr node = get_printer_node(interp->xml_node,
+					 prtInputTable[i]->hrDeviceIndex);
+		xml_printer_inputs(node, prtInputTable[i]);
 	    } else {
 		if (i > 0) {
 		    g_string_append(interp->result, "\n");
@@ -1689,7 +1716,9 @@ show_printer_console_display(scli_interp_t * interp, int argc, char **argv)
 	}
 	for (i = 0; displayTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
-		xml_printer_console_display(interp->xml_node,
+		xmlNodePtr node = get_printer_node(interp->xml_node,
+					 displayTable[i]->hrDeviceIndex);
+		xml_printer_console_display(node,
 					    displayTable[i]);
 	    } else {
 		fmt_printer_console_display(interp->result,
@@ -1819,7 +1848,9 @@ show_printer_console_lights(scli_interp_t *interp, int argc, char **argv)
 	}
 	for (i = 0; lightTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
-		xml_printer_console_light(interp->xml_node, lightTable[i]);
+		xmlNodePtr node = get_printer_node(interp->xml_node,
+					 lightTable[i]->hrDeviceIndex);
+		xml_printer_console_light(node, lightTable[i]);
 	    } else {
 		fmt_printer_console_light(interp->result, lightTable[i],
 					  light_width);
@@ -1972,7 +2003,9 @@ show_printer_alert(scli_interp_t * interp, int argc, char **argv)
     if (alertTable) {
 	for (i = 0; alertTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
-		xml_printer_alert(interp->xml_node, alertTable[i]);
+		xmlNodePtr node = get_printer_node(interp->xml_node,
+					 alertTable[i]->hrDeviceIndex);
+		xml_printer_alert(node, alertTable[i]);
 	    } else {
 		if (i > 0) {
 		    g_string_append(interp->result, "\n");
@@ -2057,7 +2090,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "input sub-units of a printer which provide media for input to\n"
 	  "the printing process.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
-	  "printer inputs",
+	  "devices",
 	  NULL,
 	  show_printer_inputs },
 
@@ -2109,7 +2142,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "  LINE    display line number\n"
 	  "  TEXT    contents of the display line",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
-	  "printer console display",
+	  "devices",
 	  NULL,
 	  show_printer_console_display },
 
@@ -2124,7 +2157,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "  STATUS      current status (on, off, blink)\n"
 	  "  COLOR       current color of the light",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
-	  "printer console lights",
+	  "devices",
 	  "<xsd:simpleType name=\"PrinterLightColor\">\n"
 	  "  <xsd:restriction base=\"xsd:string\">\n"
 	  "    <xsd:enumeration value=\"other\"/>\n"
@@ -2165,7 +2198,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "the alert description, the alert time, the alert location and\n"
 	  "the personel required to handle the alert.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
-	  "printer",
+	  "devices",
 	  "<xsd:simpleType name=\"PrinterAlertSeverity\">\n"
 	  "  <xsd:restriction base=\"xsd:string\">\n"
 	  "    <xsd:enumeration value=\"other\"/>\n"
