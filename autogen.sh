@@ -5,7 +5,7 @@
 # $Id$
 
 DIE=true
-PROJECT="stools"
+PROJECT="scli"
 
 
 VER=`autoconf --version | grep '^autoconf' | sed 's/.*)//'`
