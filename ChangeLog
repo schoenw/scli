@@ -1,3 +1,62 @@
+2001-02-26 16:20  schoenw
+
+	* README, configure, configure.in: Prepare for release 0.1.11.
+
+2001-02-26 16:13  schoenw
+
+	* scli/: Makefile.am, Makefile.in, scli.c, scli.h, snmp.c: Added an
+        initial snmp mode which needs much more work to be useful.
+
+2001-02-26 16:12  schoenw
+
+	* scli/basic.c: Evaluate commands recursively on non-leaf nodes in
+	the command tree.  (Not sure yet whether this is always a feature
+        or sometimes a bug.)
+
+2001-02-26 16:11  schoenw
+
+	* scli/system.c: Renamed "show system" to "show system info". Set
+	the minimum column width to 20 in the "show system mounts" command.
+
+2001-02-26 16:09  schoenw
+
+	* scli/interface.c: Renamed "show interface" to "show interfaces".
+
+2001-02-26 16:08  schoenw
+
+	* stop/interface.c: Updates to display byte and packet counters.
+
+2001-02-26 16:03  schoenw
+
+	* stub/: snmp-framework-mib.c, snmp-mpd-mib.h: Forgot two files in
+        the last commit...
+
+2001-02-26 16:02  schoenw
+
+	* stub/: Makefile.am, Makefile.in, snmp-community-mib.c,
+	snmp-community-mib.h, snmp-framework-mib.h, snmp-mpd-mib.c,
+	snmp-target-mib.c, snmp-target-mib.h, snmp-user-based-sm-mib.c,
+	snmp-user-based-sm-mib.h, snmp-view-based-acm-mib.c,
+	snmp-view-based-acm-mib.h, stools.h: Added the standard SNMPv3
+        remote administration MIBs to eventually support them. ;-)
+
+2001-02-23 16:04  schoenw
+
+	* scli/system.c: Supress newlines if the sysDescr value is a zero
+        length string.
+
+2001-02-23 15:59  schoenw
+
+	* stub/: bridge-mib.c, disman-schedule-mib.c, disman-script-mib.c,
+	entity-mib.c, host-resources-mib.c, if-mib.c, ip-mib.c,
+	snmpv2-mib.c, tcp-mib.c, udp-mib.c: The stub code now checks the
+        complete OID in the response again.
+
+2001-02-21 17:38  schoenw
+
+	* ChangeLog: Generated the ChangeLog via cvs2cl. (This should
+        probably be automated.)
+
 2001-02-21 17:34  schoenw
 
 	* TODO: Updated the ever growing TODO list.
