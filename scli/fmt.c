@@ -175,23 +175,6 @@ fmt_seconds(guint32 seconds)
 
 
 
-char const *
-fmt_kbytes(guint32 kbytes)
-{
-    static char buffer[80];
-    
-    if (kbytes > 9999999) {
-	g_snprintf(buffer, sizeof(buffer), "%u GByte", kbytes / 1024 / 1024);
-    } else if (kbytes > 9999) {
-	g_snprintf(buffer, sizeof(buffer), "%u MByte", kbytes / 1024);
-    } else {
-	g_snprintf(buffer, sizeof(buffer), "%u KByte", kbytes);
-    }
-    return buffer;
-}
-
-
-
 void
 xxx_enum(GString *s, int width, GSnmpEnum const *table, gint32 *number)
 {

@@ -282,9 +282,6 @@ extern char const *
 fmt_seconds(guint32 seconds);
 
 extern char const *
-fmt_kbytes(guint32 kbytes);
-
-extern char const *
 fmt_enum(GSnmpEnum const *table, gint32 *number);
 
 extern void
