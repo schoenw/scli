@@ -2,7 +2,7 @@
  * scli.h -- emulate a command line interface via SNMP
  *
  *       After more than 10 years of SNMP, I felt it is time for the
- *       first really useful command line SNMP configuration tool. ;-)
+ *       first really useful command line SNMP management tool. ;-)
  *
  * Copyright (C) 2001 Juergen Schoenwaelder
  *

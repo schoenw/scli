@@ -2,7 +2,7 @@
  * scli.c -- emulate a command line interface via SNMP
  *
  *       After more than 10 years of SNMP, I felt it is time for the
- *       first really useful command line SNMP configuration tool. ;-)
+ *       first really useful command line SNMP management tool. ;-)
  *
  * Copyright (C) 2001 Juergen Schoenwaelder
  *
@@ -294,8 +294,12 @@ main(int argc, char **argv)
                             (int *) 0)) != EOF) {
         switch (c) {
         case 'V':
-            g_print("scli %s\n", VERSION);
-            exit(0);
+	    g_print("scli version %s\n", VERSION);
+	    g_print("Copyright %s\n", scli_copyright);
+	    g_print("scli comes with ABSOLUTELY NO WARRANTY.\n"
+		    "You may redistribute copies of scli under\n"
+		    "the terms of the GNU General Public License.\n");
+	    exit(0);
 	case 'c':
 	    cmd = optarg;
 	    break;
