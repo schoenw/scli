@@ -550,8 +550,43 @@ typedef struct {
     guint32 inFrames;
     guint32 outFrames;
     guint32 inDiscards;
+    char    *descr;
 } bridge_stats_t;
 
+
+static char*
+get_port_description(scli_interp_t *interp, gint32 dot1dTpPort)
+{
+    bridge_mib_dot1dBasePortEntry_t **dot1dBasePortTable = NULL;
+    if_mib_ifEntry_t **ifTable = NULL;
+    int i, j;
+
+    bridge_mib_get_dot1dBasePortTable(interp->peer, &dot1dBasePortTable,
+				      BRIDGE_MIB_DOT1DBASEPORT
+				      | BRIDGE_MIB_DOT1DBASEPORTIFINDEX);
+    if (interp->peer->error_status) {
+	return NULL;
+    }
+
+    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFINDEX | IF_MIB_IFDESCR);
+    if (interp->peer->error_status) {
+	return NULL;
+    }
+
+    for (i = 0; dot1dBasePortTable[i]; i++) {
+	if (dot1dBasePortTable[i]->dot1dBasePort == dot1dTpPort
+	    && dot1dBasePortTable[i]->dot1dBasePortIfIndex) {
+	    for (j = 0; ifTable[j]; j++) {
+		if (ifTable[j]->ifIndex
+		    == *dot1dBasePortTable[i]->dot1dBasePortIfIndex) {
+		    return g_strdup_printf("%.*s", ifTable[j]->_ifDescrLength, ifTable[j]->ifDescr);
+		}
+	    }
+	}
+    }
+    
+    return NULL;
+}
 
 
 static int
@@ -561,6 +596,7 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
     static struct timeval last, now;
     double delta;
     static bridge_stats_t *stats = NULL;
+    static int stats_size = 0;
     static time_t epoch = 0;
     int i;
     
@@ -574,14 +610,25 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (epoch < interp->epoch) {
-	if (stats) g_free(stats);
+	if (stats) {
+	    for (i = 0; i < stats_size; i++) {
+		if (stats[i].descr) g_free(stats[i].descr);
+	    }
+	    g_free(stats);
+	}
 	stats = NULL;
+	stats_size = 0;
 	last.tv_sec = last.tv_usec = 0;
     }
 
     if (! stats && portTable) {
 	for (i = 0; portTable[i]; i++) ;
+	stats_size = i;
 	stats = (bridge_stats_t *) g_malloc0(i * sizeof(bridge_stats_t));
+	for (i = 0; portTable[i]; i++) {
+	    stats[i].descr = get_port_description(interp,
+						  portTable[i]->dot1dTpPort);
+	}
     }
 
     epoch = time(NULL);
@@ -607,7 +654,8 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
 			   &(stats[i].inDiscards),
 			   &last, delta);
 
-	    g_string_append(interp->result, "\n");
+	    g_string_sprintfa(interp->result, " %s\n",
+			      stats[i].descr ? stats[i].descr : "");
 	}
     }
 
