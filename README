@@ -23,6 +23,7 @@ Compiling
   - GNU readline version 4.X
   - glib version 1.2.X
   - ncurses version 5.X (or a native working curses implementation)
+  - libxml2
 
   The package compiles cleanly with gcc. Other C compilers have not
   been tested and may generate errors.
