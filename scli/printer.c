@@ -24,39 +24,42 @@
 
 #include "host-resources-mib.h"
 #include "host-resources-types.h"
+#include "iana-charset-mib.h"
+#include "iana-printer-mib.h"
 #include "printer-mib.h"
+#include "snmpv2-mib.h"
 
 
-static GSnmpEnum const prtAlertGroup[] = {
-    { PRINTER_MIB_PRTALERTGROUP_OTHER,	"other" },
-    { PRINTER_MIB_PRTALERTGROUP_HOSTRESOURCESMIBSTORAGETABLE,	"storage" },
-    { PRINTER_MIB_PRTALERTGROUP_HOSTRESOURCESMIBDEVICETABLE,	"device" },
-    { PRINTER_MIB_PRTALERTGROUP_GENERALPRINTER,	"general" },
-    { PRINTER_MIB_PRTALERTGROUP_COVER,	"cover" },
-    { PRINTER_MIB_PRTALERTGROUP_LOCALIZATION,	"localization" },
-    { PRINTER_MIB_PRTALERTGROUP_INPUT,	"input" },
-    { PRINTER_MIB_PRTALERTGROUP_OUTPUT,	"output" },
-    { PRINTER_MIB_PRTALERTGROUP_MARKER,	"marker" },
-    { PRINTER_MIB_PRTALERTGROUP_MARKERSUPPLIES,	"marker supply" },
-    { PRINTER_MIB_PRTALERTGROUP_MARKERCOLORANT,	"marker colorant" },
-    { PRINTER_MIB_PRTALERTGROUP_MEDIAPATH,	"media path" },
-    { PRINTER_MIB_PRTALERTGROUP_CHANNEL,	"channel" },
-    { PRINTER_MIB_PRTALERTGROUP_INTERPRETER,	"interpreter" },
-    { PRINTER_MIB_PRTALERTGROUP_CONSOLEDISPLAYBUFFER,	"console display buffer" },
-    { PRINTER_MIB_PRTALERTGROUP_CONSOLELIGHTS,	"console light" },
-    { PRINTER_MIB_PRTALERTGROUP_ALERT,	"alert" },
-    { PRINTER_MIB_PRTALERTGROUP_FINDEVICE,	"finishing device" },
-    { PRINTER_MIB_PRTALERTGROUP_FINSUPPLY,	"finishing supply" },
-    { PRINTER_MIB_PRTALERTGROUP_FINSUPPLYMEDIAINPUT,	"finishing supply media input" },
-    { PRINTER_MIB_PRTALERTGROUP_FINATTRIBUTETABLE,	"finishing attribute table" },
+static GNetSnmpEnum const prtAlertGroup[] = {
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_OTHER,	"other" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_HOSTRESOURCESMIBSTORAGETABLE,	"storage" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_HOSTRESOURCESMIBDEVICETABLE,	"device" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_GENERALPRINTER,	"general" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_COVER,	"cover" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_LOCALIZATION,	"localization" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_INPUT,	"input" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_OUTPUT,	"output" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_MARKER,	"marker" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_MARKERSUPPLIES,	"marker supply" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_MARKERCOLORANT,	"marker colorant" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_MEDIAPATH,	"media path" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_CHANNEL,	"channel" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_INTERPRETER,	"interpreter" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_CONSOLEDISPLAYBUFFER,	"console display buffer" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_CONSOLELIGHTS,	"console light" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_ALERT,	"alert" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_FINDEVICE,	"finisher device" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_FINSUPPLY,	"finisher supply" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_FINSUPPLYMEDIAINPUT,	"finisher supply media input" },
+    { IANA_PRINTER_MIB_PRTALERTGROUPTC_FINATTRIBUTE,	"finisher attribute" },
     { 0, NULL }
 };
 
 
 
-static GSnmpEnum const markerResolutionUnit[] = {
-    { PRINTER_MIB_PRTMARKERADDRESSABILITYUNIT_TENTHOUSANDTHSOFINCHES, "dpi" },
-    { PRINTER_MIB_PRTMARKERADDRESSABILITYUNIT_MICROMETERS,            "dpcm" },
+static GNetSnmpEnum const markerResolutionUnit[] = {
+    { PRINTER_MIB_PRTMARKERADDRESSABILITYUNITTC_TENTHOUSANDTHSOFINCHES, "dpi" },
+    { PRINTER_MIB_PRTMARKERADDRESSABILITYUNITTC_MICROMETERS,            "dpcm" },
     { 0, NULL }
 };
 
@@ -197,25 +200,23 @@ lookup_media_name(gint32 dir, gint32 xdir, gint32 unit)
 
 
 
-static char const *
-fmt_bits(const char **labels, guchar *bits, gsize bits_len)
+static void
+fmt_bits(GString *s, const char **labels, guchar *bits, gsize bits_len)
 {
     int i, bit;
     int cnt = 0;
     
     if (! bits) {
-	return NULL;
+	return;
     }
     
     for (i = 0; labels[i]; i++) {
 	bit = (i/8 < bits_len) ? bits[i/8] & 1 <<(7-(i%8)) : 0;
+	if (bit) {
+	    g_string_sprintfa(s, "%s%s", cnt ? " " : "", labels[i]);
+	}
 	if (bit) cnt++;
     }
-    if (cnt == i) {
-	return NULL;
-    }
-
-    return labels[i];
 }
     
 
@@ -295,11 +296,11 @@ fmt_subunit(GString *s, int indent, gint32 *status)
 	return;
     }
 
-    g_string_sprintfa(s, "%-*s %s\n", indent, "Availability:",
+    g_string_sprintfa(s, "%-*s%s\n", indent, "Availability:",
 		      fmt_subunit_availability(status));
-    g_string_sprintfa(s, "%-*s %s\n", indent, "Alerts:",
+    g_string_sprintfa(s, "%-*s%s\n", indent, "Alerts:",
 		      fmt_subunit_alerts(status));
-    g_string_sprintfa(s, "%-*s %s\n", indent, "Status:",
+    g_string_sprintfa(s, "%-*s%s\n", indent, "Status:",
 		      fmt_subunit_status(status));
 }
 
@@ -348,7 +349,7 @@ fmt_dimensions(gint32 *dim)
 static void
 fmt_media_dimensions(GString *s, gint indent, gchar *label,
 		     gint32 *dir, gint32 *xdir,
-		     gint32 *unit, const GSnmpEnum *enums)
+		     gint32 *unit, const GNetSnmpEnum *enums)
 {
     const char *e;
     const char *name;
@@ -359,11 +360,11 @@ fmt_media_dimensions(GString *s, gint indent, gchar *label,
 
     name = lookup_media_name(*dir, *xdir, *unit);
     if (name) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, label, name);
+	g_string_sprintfa(s, "%-*s%s\n", indent, label, name);
     } else {
 	e = fmt_enum(enums, unit);
 	
-	g_string_sprintfa(s, "%-*s %s", indent, label,
+	g_string_sprintfa(s, "%-*s%s", indent, label,
 			  fmt_dimensions(dir));
 	g_string_sprintfa(s, " x %s ",
 			  fmt_dimensions(xdir));
@@ -376,7 +377,7 @@ fmt_media_dimensions(GString *s, gint indent, gchar *label,
 static void
 xml_media_dimensions(xmlNodePtr root, gchar *label,
 		     gint32 *dir, gint32 *xdir,
-		     gint32 *unit, const GSnmpEnum *enums)
+		     gint32 *unit, const GNetSnmpEnum *enums)
 {
     const char *e;
     const char *name;
@@ -521,21 +522,21 @@ fmt_printer_info(GString *s,
     int const indent = 18;
     const char *e;
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Device:",
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Device:",
 		      hrPrinterEntry->hrDeviceIndex);
 
     if (hrDeviceEntry && hrDeviceEntry->hrDeviceDescr) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:", 
-			  (int) hrDeviceEntry->_hrDeviceDescrLength,
-			  hrDeviceEntry->hrDeviceDescr);
+	fmt_display_string(s, indent, "Description:",
+			   (int) hrDeviceEntry->_hrDeviceDescrLength,
+			   hrDeviceEntry->hrDeviceDescr);
     }
 
     if (hrDeviceEntry) {
 	e = fmt_identity(host_resources_types_identities,
 			 hrDeviceEntry->hrDeviceType,
-			 hrDeviceEntry->_hrDeviceDescrLength);
+			 hrDeviceEntry->_hrDeviceTypeLength);
 	if (e) {
-	    g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", e);
+	    g_string_sprintfa(s, "%-*s%s\n", indent, "Type:", e);
 	}
     }
 	
@@ -543,24 +544,22 @@ fmt_printer_info(GString *s,
 	e = fmt_enum(host_resources_mib_enums_hrDeviceStatus,
 		     hrDeviceEntry->hrDeviceStatus);
 	if (e) {
-	    g_string_sprintfa(s, "%-*s %s\n", indent, "Device Status:", e);
+	    g_string_sprintfa(s, "%-*s%s\n", indent, "Device Status:", e);
 	}
     }
 
     e = fmt_enum(host_resources_mib_enums_hrPrinterStatus,
 		 hrPrinterEntry->hrPrinterStatus);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Printer Status:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Printer Status:", e);
     }
 
     if (hrPrinterEntry->hrPrinterDetectedErrorState) {
-	/* XXX fmt_bits() just does non-sense here */
-	e = fmt_bits(error_states,
-		     hrPrinterEntry->hrPrinterDetectedErrorState,
-		     hrPrinterEntry->_hrPrinterDetectedErrorStateLength);
-	if (e) {
-	    g_string_sprintfa(s, "%-*s %s\n", indent, "Error State:", e);
-	}
+	g_string_sprintfa(s, "%-*s", indent, "Error State:");
+	fmt_bits(s, error_states,
+		 hrPrinterEntry->hrPrinterDetectedErrorState,
+		 hrPrinterEntry->_hrPrinterDetectedErrorStateLength);
+	g_string_sprintfa(s, "\n");
     }
 }
 
@@ -572,6 +571,7 @@ xml_printer_info(xmlNodePtr tree,
 		 host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
 {
     const char *e;
+    GString *s;
 
     if (hrDeviceEntry) {
 	(void) xml_new_child(tree, NULL, "description", "%.*s",
@@ -602,21 +602,22 @@ xml_printer_info(xmlNodePtr tree,
 	(void) xml_new_child(tree, NULL, "printer-status", "%s", e);
     }
 
-    /* XXX fmt_bits() just does non-sense here */
-    e = fmt_bits(error_states,
-		 hrPrinterEntry->hrPrinterDetectedErrorState,
-		 hrPrinterEntry->_hrPrinterDetectedErrorStateLength);
-    if (e) {
-	(void) xml_new_child(tree, NULL, "error-states", "%s", e);
-    }
+    s = g_string_new(NULL);
+    fmt_bits(s, error_states,
+	     hrPrinterEntry->hrPrinterDetectedErrorState,
+	     hrPrinterEntry->_hrPrinterDetectedErrorStateLength);
+    (void) xml_new_child(tree, NULL, "error-states", "%s", s->str);
+    g_string_free(s, 1);
 }
 
 
 
 static void
 fmt_printer_general(GString *s,
-		     printer_mib_prtGeneralEntry_t *prtGeneralEntry,
-		     printer_mib_prtLocalizationEntry_t **prtLocalTable)
+		    printer_mib_prtGeneralEntry_t *prtGeneralEntry,
+		    printer_mib_prtInputEntry_t *prtInputEntry,
+		    printer_mib_prtOutputEntry_t *prtOutputEntry,
+		    printer_mib_prtLocalizationEntry_t **prtLocalTable)
 {
     int const indent = 18;
     const char *e;
@@ -627,28 +628,28 @@ fmt_printer_general(GString *s,
     /* MISSING: prtGeneralReset */
     
     if (prtGeneralEntry->prtGeneralPrinterName) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent,
+	g_string_sprintfa(s, "%-*s%.*s\n", indent,
 			  "Printer Name:",
 		    (int) prtGeneralEntry->_prtGeneralPrinterNameLength,
 			  prtGeneralEntry->prtGeneralPrinterName);
     }
 
     if (prtGeneralEntry->prtGeneralSerialNumber) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent,
+	g_string_sprintfa(s, "%-*s%.*s\n", indent,
 			  "Serial Number:",
 		    (int) prtGeneralEntry->_prtGeneralSerialNumberLength,
 			  prtGeneralEntry->prtGeneralSerialNumber);
     }
     
     if (prtGeneralEntry->prtGeneralCurrentOperator) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent,
+	g_string_sprintfa(s, "%-*s%.*s\n", indent,
 			  "Current Operator:",
 		    (int) prtGeneralEntry->_prtGeneralCurrentOperatorLength,
 			  prtGeneralEntry->prtGeneralCurrentOperator);
     }
     
     if (prtGeneralEntry->prtGeneralServicePerson) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent,
+	g_string_sprintfa(s, "%-*s%.*s\n", indent,
 			  "Service Person",
 		    (int) prtGeneralEntry->_prtGeneralServicePersonLength,
 			  prtGeneralEntry->prtGeneralServicePerson);
@@ -656,7 +657,7 @@ fmt_printer_general(GString *s,
     
     if (prtGeneralEntry->prtConsoleNumberOfDisplayLines &&
 	prtGeneralEntry->prtConsoleNumberOfDisplayChars) {
-	g_string_sprintfa(s, "%-*s %u line(s) a %u chars\n", indent,
+	g_string_sprintfa(s, "%-*s%u line(s) a %u chars\n", indent,
 			  "Console Display:",
 			  *prtGeneralEntry->prtConsoleNumberOfDisplayLines,
 			  *prtGeneralEntry->prtConsoleNumberOfDisplayChars);
@@ -667,55 +668,71 @@ fmt_printer_general(GString *s,
 	prtLocalEntry = get_console_local_entry(prtGeneralEntry,
 						prtLocalTable);
 	if (prtLocalEntry) {
-	    g_string_sprintfa(s, "%-*s %.*s/%.*s\n", indent,
+	    g_string_sprintfa(s, "%-*s%.*s/%.*s\n", indent,
 			      "Console Language:",
-		        (int) prtLocalEntry->_prtLocalizationLanguageLength,
+			      PRINTER_MIB_PRTLOCALIZATIONLANGUAGELENGTH,
 			      prtLocalEntry->prtLocalizationLanguage,
-		        (int) prtLocalEntry->_prtLocalizationCountryLength,
+			      PRINTER_MIB_PRTLOCALIZATIONCOUNTRYLENGTH,
 			      prtLocalEntry->prtLocalizationCountry);
 	}
     }
     
-    e = fmt_enum(printer_mib_enums_prtConsoleDisable,
+    e = fmt_enum(iana_printer_mib_enums_PrtConsoleDisableTC,
 		 prtGeneralEntry->prtConsoleDisable);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Console Access:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Console Access:", e);
     }
     
     if (prtGeneralEntry->prtInputDefaultIndex
 	&& *prtGeneralEntry->prtInputDefaultIndex > 0) {
-	g_string_sprintfa(s, "%-*s input #%d\n", indent, "Default Input:",
-			  *prtGeneralEntry->prtInputDefaultIndex);
+	if (prtInputEntry && prtInputEntry->prtInputName) {
+	    g_string_sprintfa(s, "%-*s%.*s\n", indent,
+			      "Default Input:",
+			      prtInputEntry->_prtInputNameLength,
+			      prtInputEntry->prtInputName);
+	} else {
+	    g_string_sprintfa(s, "%-*sinput #%d\n", indent,
+			      "Default Input:",
+			      *prtGeneralEntry->prtInputDefaultIndex);
+	}
     }
 
     if (prtGeneralEntry->prtOutputDefaultIndex
 	&& *prtGeneralEntry->prtOutputDefaultIndex > 0) {
-	g_string_sprintfa(s, "%-*s output #%d\n", indent, "Default Output:",
-			  *prtGeneralEntry->prtOutputDefaultIndex);
+	if (prtOutputEntry && prtOutputEntry->prtOutputName) {
+	    g_string_sprintfa(s, "%-*s%.*s\n", indent,
+			      "Default Output:",
+			      prtOutputEntry->_prtOutputNameLength,
+			      prtOutputEntry->prtOutputName);
+	} else {
+	    g_string_sprintfa(s, "%-*soutput #%d\n", indent,
+			      "Default Output:",
+			      *prtGeneralEntry->prtOutputDefaultIndex);
+	}
     }
     
     if (prtGeneralEntry->prtMarkerDefaultIndex) {
-	g_string_sprintfa(s, "%-*s marker #%u\n", indent, "Default Marker:",
+	g_string_sprintfa(s, "%-*smarker #%u\n", indent, "Default Marker:",
 			  *prtGeneralEntry->prtMarkerDefaultIndex);
     }
     
     if (prtGeneralEntry->prtMediaPathDefaultIndex) {
-	g_string_sprintfa(s, "%-*s media path #%u\n", indent, "Default Path:",
+	g_string_sprintfa(s, "%-*smedia path #%u\n", indent, "Default Path:",
 			  *prtGeneralEntry->prtMediaPathDefaultIndex);
     }
     
     if (prtGeneralEntry->prtAlertAllEvents) {
-	g_string_sprintfa(s, "%-*s %u\n", indent, "Total Alerts:",
+	g_string_sprintfa(s, "%-*s%u\n", indent, "Total Alerts:",
 			  *prtGeneralEntry->prtAlertAllEvents);
     }
     
     if (prtGeneralEntry->prtAlertCriticalEvents) {
-	g_string_sprintfa(s, "%-*s %u\n", indent, "Critical Alerts:",
+	g_string_sprintfa(s, "%-*s%u\n", indent, "Critical Alerts:",
 			  *prtGeneralEntry->prtAlertCriticalEvents);
     }
     
     if (prtGeneralEntry->prtGeneralConfigChanges) {
-	g_string_sprintfa(s, "%-*s %u\n", indent, "Config Changes:",
+	g_string_sprintfa(s, "%-*s%u\n", indent, "Config Changes:",
 			  *prtGeneralEntry->prtGeneralConfigChanges);
     }
 }
@@ -769,10 +786,30 @@ show_printer_info(scli_interp_t *interp, int argc, char **argv)
 				 get_device_entry(hrPrinterTable[i],
 						  hrDeviceTable));
 		if (prtGeneralTable) {
-		    fmt_printer_general(interp->result,
-					get_general_entry(hrPrinterTable[i],
-							  prtGeneralTable),
-				    prtLocalTable);
+		    printer_mib_prtInputEntry_t *input = NULL;
+		    printer_mib_prtOutputEntry_t *output = NULL;
+		    printer_mib_prtGeneralEntry_t *gent;
+		    gent = get_general_entry(hrPrinterTable[i],
+					     prtGeneralTable);
+		    if (gent) {
+			if (gent->prtInputDefaultIndex) {
+			    printer_mib_get_prtInputEntry(interp->peer, &input,
+					  gent->hrDeviceIndex,
+					  *(gent->prtInputDefaultIndex),
+					  PRINTER_MIB_PRTINPUTNAME);
+			}
+			if (gent->prtOutputDefaultIndex) {
+			    printer_mib_get_prtOutputEntry(interp->peer,
+					  &output,
+					  gent->hrDeviceIndex,
+					  *(gent->prtOutputDefaultIndex),
+					  PRINTER_MIB_PRTOUTPUTNAME);
+			}
+			fmt_printer_general(interp->result, gent,
+					    input, output, prtLocalTable);
+			if (input) printer_mib_free_prtInputEntry(input);
+			if (output) printer_mib_free_prtOutputEntry(output);
+		    }
 		}
 		last = hrPrinterTable[i]->hrDeviceIndex;
 	    }
@@ -799,23 +836,23 @@ fmt_printer_cover(GString *s, printer_mib_prtCoverEntry_t *prtCoverEntry)
     int const indent = 18;
     const char *e;
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Printer:",
 		      prtCoverEntry->hrDeviceIndex);
 
-    g_string_sprintfa(s, "%-*s %u\n", indent, "Cover:",
+    g_string_sprintfa(s, "%-*s%u\n", indent, "Cover:",
 		      prtCoverEntry->prtCoverIndex);
 
     if (prtCoverEntry->prtCoverDescription &&
 	prtCoverEntry->_prtCoverDescriptionLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Description:",
 			  (int) prtCoverEntry->_prtCoverDescriptionLength,
 			  prtCoverEntry->prtCoverDescription);
     }
 
-    e = fmt_enum(printer_mib_enums_prtCoverStatus,
+    e = fmt_enum(iana_printer_mib_enums_PrtCoverStatusTC,
 		 prtCoverEntry->prtCoverStatus);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Status:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Status:", e);
     }
 }
 
@@ -838,7 +875,7 @@ xml_printer_cover(xmlNodePtr root,
 			  prtCoverEntry->prtCoverDescription);
     }
 
-    e = fmt_enum(printer_mib_enums_prtCoverStatus,
+    e = fmt_enum(iana_printer_mib_enums_PrtCoverStatusTC,
 		 prtCoverEntry->prtCoverStatus);
     if (e) {
 	(void) xml_new_child(tree, NULL, "status", "%s", e);
@@ -876,6 +913,9 @@ show_printer_covers(scli_interp_t *interp, int argc, char **argv)
 						   "covers");
 		xml_printer_cover(node, prtCoverTable[i]);
 	    } else {
+		if (i > 0) {
+		    g_string_append(interp->result, "\n");
+		}
 		fmt_printer_cover(interp->result, prtCoverTable[i]);
 	    }
 	}
@@ -895,31 +935,31 @@ fmt_printer_path(GString *s, printer_mib_prtMediaPathEntry_t *prtPathEntry)
     int const indent = 18;
     const char *e;
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Printer:",
 		      prtPathEntry->hrDeviceIndex);
 
-    g_string_sprintfa(s, "%-*s %u\n", indent, "Path:",
+    g_string_sprintfa(s, "%-*s%u\n", indent, "Path:",
 		      prtPathEntry->prtMediaPathIndex);
 
     if (prtPathEntry->prtMediaPathDescription &&
 	prtPathEntry->_prtMediaPathDescriptionLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Description:",
 			  (int) prtPathEntry->_prtMediaPathDescriptionLength,
 			  prtPathEntry->prtMediaPathDescription);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMediaPathType,
+    e = fmt_enum(iana_printer_mib_enums_PrtMediaPathTypeTC,
 		 prtPathEntry->prtMediaPathType);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Type:", e);
     }
 
     fmt_subunit(s, indent, prtPathEntry->prtMediaPathStatus);
 
-    e = fmt_enum(printer_mib_enums_prtMediaPathMaxSpeedPrintUnit,
+    e = fmt_enum(printer_mib_enums_PrtMediaPathMaxSpeedPrintUnitTC,
 		 prtPathEntry->prtMediaPathMaxSpeedPrintUnit);
     if (e && prtPathEntry->prtMediaPathMaxSpeed) {
-	g_string_sprintfa(s, "%-*s %d %s\n", indent, "Max. Speed:",
+	g_string_sprintfa(s, "%-*s%d %s\n", indent, "Max. Speed:",
 			  *prtPathEntry->prtMediaPathMaxSpeed, e);
     }
 
@@ -927,13 +967,13 @@ fmt_printer_path(GString *s, printer_mib_prtMediaPathEntry_t *prtPathEntry)
 			 prtPathEntry->prtMediaPathMinMediaFeedDir,
 			 prtPathEntry->prtMediaPathMinMediaXFeedDir,
 			 prtPathEntry->prtMediaPathMediaSizeUnit,
-			 printer_mib_enums_prtMediaPathMediaSizeUnit);
+			 printer_mib_enums_PrtMediaUnitTC);
 
     fmt_media_dimensions(s, indent, "Max. Dimension:",
 			 prtPathEntry->prtMediaPathMaxMediaFeedDir,
 			 prtPathEntry->prtMediaPathMaxMediaXFeedDir,
 			 prtPathEntry->prtMediaPathMediaSizeUnit,
-			 printer_mib_enums_prtMediaPathMediaSizeUnit);
+			 printer_mib_enums_PrtMediaUnitTC);
 }
 
 
@@ -955,7 +995,7 @@ xml_printer_path(xmlNodePtr root,
 			  prtPathEntry->prtMediaPathDescription);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMediaPathType,
+    e = fmt_enum(iana_printer_mib_enums_PrtMediaPathTypeTC,
 		 prtPathEntry->prtMediaPathType);
     if (e) {
 	(void) xml_new_child(tree, NULL, "type", "%s", e);
@@ -966,7 +1006,7 @@ xml_printer_path(xmlNodePtr root,
     if (prtPathEntry->prtMediaPathMaxSpeed) {
 	node = xml_new_child(tree, NULL, "max-speed", "%d",
 			     *prtPathEntry->prtMediaPathMaxSpeed);
-	e = fmt_enum(printer_mib_enums_prtMediaPathMaxSpeedPrintUnit,
+	e = fmt_enum(printer_mib_enums_PrtMediaPathMaxSpeedPrintUnitTC,
 		     prtPathEntry->prtMediaPathMaxSpeedPrintUnit);
 	if (e) xml_set_prop(node, "unit", "%s", e);
     }
@@ -975,13 +1015,13 @@ xml_printer_path(xmlNodePtr root,
 			 prtPathEntry->prtMediaPathMinMediaFeedDir,
 			 prtPathEntry->prtMediaPathMinMediaXFeedDir,
 			 prtPathEntry->prtMediaPathMediaSizeUnit,
-			 printer_mib_enums_prtMediaPathMediaSizeUnit);
+			 printer_mib_enums_PrtMediaUnitTC);
 
     xml_media_dimensions(tree, "max-dimensions",
 			 prtPathEntry->prtMediaPathMaxMediaFeedDir,
 			 prtPathEntry->prtMediaPathMaxMediaXFeedDir,
 			 prtPathEntry->prtMediaPathMediaSizeUnit,
-			 printer_mib_enums_prtMediaPathMediaSizeUnit);
+			 printer_mib_enums_PrtMediaUnitTC);
 }
 
 
@@ -1037,49 +1077,50 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
     int const indent = 18;
     const char *e;
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Printer:",
 		      prtInputEntry->hrDeviceIndex);
 
-    g_string_sprintfa(s, "%-*s %u\n", indent, "Input:",
+    g_string_sprintfa(s, "%-*s%u\n", indent, "Input:",
 		      prtInputEntry->prtInputIndex);
     
     if (prtInputEntry->prtInputName &&
 	prtInputEntry->_prtInputNameLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Name:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Name:",
 			  (int) prtInputEntry->_prtInputNameLength,
 			  prtInputEntry->prtInputName);
     }
 
     if (prtInputEntry->prtInputDescription &&
 	prtInputEntry->_prtInputDescriptionLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Description:",
 			  (int) prtInputEntry->_prtInputDescriptionLength,
 			  prtInputEntry->prtInputDescription);
     }
 
     if (prtInputEntry->prtInputVendorName &&
 	prtInputEntry->_prtInputVendorNameLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Vendor",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Vendor",
 			  (int) prtInputEntry->_prtInputVendorNameLength,
 			  prtInputEntry->prtInputVendorName);
     }
     
-    e = fmt_enum(printer_mib_enums_prtInputType, prtInputEntry->prtInputType);
+    e = fmt_enum(iana_printer_mib_enums_PrtInputTypeTC,
+		 prtInputEntry->prtInputType);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Type:", e);
     }
     
     if (prtInputEntry->prtInputModel &&
 	prtInputEntry->_prtInputModelLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Model:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Model:",
 			  (int) prtInputEntry->_prtInputModelLength,
 			  prtInputEntry->prtInputModel);
     }
 
-    e = fmt_enum(printer_mib_enums_prtInputCapacityUnit,
+    e = fmt_enum(printer_mib_enums_PrtCapacityUnitTC,
 		 prtInputEntry->prtInputCapacityUnit);
     if (prtInputEntry->prtInputMaxCapacity) {
-	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
+	g_string_sprintfa(s, "%-*s", indent, "Capacity:");
 	switch (*prtInputEntry->prtInputMaxCapacity) {
 	case -1:
 	    g_string_append(s, "unlimited");
@@ -1095,7 +1136,7 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
     }
 
     if (prtInputEntry->prtInputCurrentLevel) {
-	g_string_sprintfa(s, "%-*s ", indent, "Level:");
+	g_string_sprintfa(s, "%-*s", indent, "Level:");
 	switch (*prtInputEntry->prtInputCurrentLevel) {
 	case -1:
 	    g_string_append(s, "unlimited");
@@ -1113,7 +1154,7 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
     }
 
     if (prtInputEntry->prtInputNextIndex) {
-	g_string_append(s, "Next Input: ");
+	g_string_sprintfa(s, "%-*s", indent, "Next Input:");
 	switch (*prtInputEntry->prtInputNextIndex) {
 	case 0:
 	    g_string_append(s, "none");
@@ -1138,47 +1179,47 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
     
     if (prtInputEntry->prtInputSerialNumber &&
 	prtInputEntry->_prtInputSerialNumberLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Serial Number:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Serial Number:",
 			  (int) prtInputEntry->_prtInputSerialNumberLength,
 			  prtInputEntry->prtInputSerialNumber);
     }
     
     if (prtInputEntry->prtInputVersion &&
 	prtInputEntry->_prtInputVersionLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Input Version:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Input Version:",
 			  (int) prtInputEntry->_prtInputVersionLength,
 			  prtInputEntry->prtInputVersion);
     }
 
-    e = fmt_enum(printer_mib_enums_prtInputSecurity,
+    e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtInputEntry->prtInputSecurity);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Security:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Security:", e);
     }
 
     if (prtInputEntry->prtInputMediaName &&
 	prtInputEntry->_prtInputMediaNameLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Media Name:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Media Name:",
 			  (int) prtInputEntry->_prtInputMediaNameLength,
 			  prtInputEntry->prtInputMediaName);
     }
     
     if (prtInputEntry->prtInputMediaType &&
 	prtInputEntry->_prtInputMediaTypeLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Media Type:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Media Type:",
 			  (int) prtInputEntry->_prtInputMediaTypeLength,
 			  prtInputEntry->prtInputMediaType);
     }
     
     if (prtInputEntry->prtInputMediaWeight) {
-	g_string_sprintfa(s, "%-*s ", indent, "Media Weight:");
-	switch (*prtInputEntry->prtInputMaxCapacity) {
+	g_string_sprintfa(s, "%-*s", indent, "Media Weight:");
+	switch (*prtInputEntry->prtInputMediaWeight) {
 	case -2:
 	    g_string_append(s, "unknown");
 	    break;
 	default:
 	    g_string_sprintfa(s,
-			      "%u g/m^2",
+			      "%d g/m^2",
 			      *prtInputEntry->prtInputMediaWeight);
 	}
 	g_string_append(s, "\n");
@@ -1186,13 +1227,13 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
     
     if (prtInputEntry->prtInputMediaColor &&
 	prtInputEntry->_prtInputMediaColorLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Media Color:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Media Color:",
 			  (int) prtInputEntry->_prtInputMediaColorLength,
 			  prtInputEntry->prtInputMediaColor);
     }
     
     if (prtInputEntry->prtInputMediaFormParts) {
-	g_string_sprintfa(s, "%-*s ", indent, "Media Parts:");
+	g_string_sprintfa(s, "%-*s", indent, "Media Parts:");
 	switch (*prtInputEntry->prtInputMediaFormParts) {
 	case -1:
 	    g_string_append(s, "other");
@@ -1211,16 +1252,16 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 			 prtInputEntry->prtInputMediaDimFeedDirDeclared,
 			 prtInputEntry->prtInputMediaDimXFeedDirDeclared,
 			 prtInputEntry->prtInputDimUnit,
-			 printer_mib_enums_prtInputDimUnit);
+			 printer_mib_enums_PrtMediaUnitTC);
 
     fmt_media_dimensions(s, indent, "Chosen Dimensions:",
 			 prtInputEntry->prtInputMediaDimFeedDirChosen,
 			 prtInputEntry->prtInputMediaDimXFeedDirChosen,
 			 prtInputEntry->prtInputDimUnit,
-			 printer_mib_enums_prtInputDimUnit);
+			 printer_mib_enums_PrtMediaUnitTC);
     
     if (prtInputEntry->prtInputMediaLoadTimeout) {
-	g_string_sprintfa(s, "%-*s ", indent, "Media Load Timeout:");
+	g_string_sprintfa(s, "%-*s", indent, "Media Load Timeout:");
 	switch (*prtInputEntry->prtInputMediaLoadTimeout) {
 	case -1:
 	    g_string_append(s, "wait forever");
@@ -1268,7 +1309,8 @@ xml_printer_inputs(xmlNodePtr root,
 			     prtInputEntry->prtInputVendorName);
     }
     
-    e = fmt_enum(printer_mib_enums_prtInputType, prtInputEntry->prtInputType);
+    e = fmt_enum(iana_printer_mib_enums_PrtInputTypeTC,
+		 prtInputEntry->prtInputType);
     if (e) {
 	(void) xml_new_child(tree, NULL, "type", "%s", e);
     }
@@ -1279,7 +1321,7 @@ xml_printer_inputs(xmlNodePtr root,
 			     prtInputEntry->prtInputModel);
     }
 
-    e = fmt_enum(printer_mib_enums_prtInputCapacityUnit,
+    e = fmt_enum(printer_mib_enums_PrtCapacityUnitTC,
 		 prtInputEntry->prtInputCapacityUnit);
     if (prtInputEntry->prtInputMaxCapacity) {
 	switch (*prtInputEntry->prtInputMaxCapacity) {
@@ -1328,7 +1370,7 @@ xml_printer_inputs(xmlNodePtr root,
 			     prtInputEntry->prtInputVersion);
     }
 
-    e = fmt_enum(printer_mib_enums_prtInputSecurity,
+    e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtInputEntry->prtInputSecurity);
     if (e) {
 	(void) xml_new_child(tree, NULL, "security", "%s", e);
@@ -1351,13 +1393,13 @@ xml_printer_inputs(xmlNodePtr root,
     }
 
     if (prtInputEntry->prtInputMediaWeight) {
-	switch (*prtInputEntry->prtInputMaxCapacity) {
+	switch (*prtInputEntry->prtInputMediaWeight) {
 	case -2:
 	    (void) xml_new_child(tree, NULL, "weight", "%s", "unknown");
 	    break;
 	default:
 	    node = xml_new_child(tree, NULL, "weight",
-				 "%u", *prtInputEntry->prtInputMediaWeight);
+				 "%d", *prtInputEntry->prtInputMediaWeight);
 	    xml_set_prop(node, "unit", "%s", "g/m^2");
 	}
     }
@@ -1382,20 +1424,20 @@ xml_printer_inputs(xmlNodePtr root,
 	}
      }
 
-    e = fmt_enum(printer_mib_enums_prtInputDimUnit,
+    e = fmt_enum(printer_mib_enums_PrtMediaUnitTC,
 		 prtInputEntry->prtInputDimUnit);
 
     xml_media_dimensions(tree, "dimensions",
 			 prtInputEntry->prtInputMediaDimFeedDirDeclared,
 			 prtInputEntry->prtInputMediaDimXFeedDirDeclared,
 			 prtInputEntry->prtInputDimUnit,
-			 printer_mib_enums_prtInputDimUnit);
+			 printer_mib_enums_PrtMediaUnitTC);
 
     xml_media_dimensions(tree, "chosen",
 			 prtInputEntry->prtInputMediaDimFeedDirChosen,
 			 prtInputEntry->prtInputMediaDimXFeedDirChosen,
 			 prtInputEntry->prtInputDimUnit,
-			 printer_mib_enums_prtInputDimUnit);
+			 printer_mib_enums_PrtMediaUnitTC);
     
     if (prtInputEntry->prtInputMediaLoadTimeout) {
 	switch (*prtInputEntry->prtInputMediaLoadTimeout) {
@@ -1467,51 +1509,51 @@ fmt_printer_outputs(GString *s, printer_mib_prtOutputEntry_t *prtOutputEntry)
     int const indent = 18;
     const char *e;
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Printer:",
 		      prtOutputEntry->hrDeviceIndex);
 
-    g_string_sprintfa(s, "%-*s %u\n", indent, "Output:",
+    g_string_sprintfa(s, "%-*s%u\n", indent, "Output:",
 		      prtOutputEntry->prtOutputIndex);
     
     if (prtOutputEntry->prtOutputName &&
 	prtOutputEntry->_prtOutputNameLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Name:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Name:",
 			  (int) prtOutputEntry->_prtOutputNameLength,
 			  prtOutputEntry->prtOutputName);
     }
 
     if (prtOutputEntry->prtOutputDescription &&
 	prtOutputEntry->_prtOutputDescriptionLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Description:",
 			  (int) prtOutputEntry->_prtOutputDescriptionLength,
 			  prtOutputEntry->prtOutputDescription);
     }
 
     if (prtOutputEntry->prtOutputVendorName &&
 	prtOutputEntry->_prtOutputVendorNameLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Vendor",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Vendor",
 			  (int) prtOutputEntry->_prtOutputVendorNameLength,
 			  prtOutputEntry->prtOutputVendorName);
     }
     
-    e = fmt_enum(printer_mib_enums_prtOutputType,
+    e = fmt_enum(iana_printer_mib_enums_PrtOutputTypeTC,
 		 prtOutputEntry->prtOutputType);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Type:", e);
     }
     
     if (prtOutputEntry->prtOutputModel &&
 	prtOutputEntry->_prtOutputModelLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Model:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Model:",
 			  (int) prtOutputEntry->_prtOutputModelLength,
 			  prtOutputEntry->prtOutputModel);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputCapacityUnit,
+    e = fmt_enum(printer_mib_enums_PrtCapacityUnitTC,
 		 prtOutputEntry->prtOutputCapacityUnit);
     
     if (prtOutputEntry->prtOutputMaxCapacity) {
-	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
+	g_string_sprintfa(s, "%-*s", indent, "Capacity:");
 	switch (*prtOutputEntry->prtOutputMaxCapacity) {
 	case -1:
 	    g_string_append(s, "unlimited");
@@ -1527,7 +1569,7 @@ fmt_printer_outputs(GString *s, printer_mib_prtOutputEntry_t *prtOutputEntry)
     }
 
     if (prtOutputEntry->prtOutputRemainingCapacity) {
-	g_string_sprintfa(s, "%-*s ", indent, "Remaining:");
+	g_string_sprintfa(s, "%-*s", indent, "Remaining:");
 	switch (*prtOutputEntry->prtOutputRemainingCapacity) {
 	case -1:
 	    g_string_append(s, "unlimited");
@@ -1548,70 +1590,70 @@ fmt_printer_outputs(GString *s, printer_mib_prtOutputEntry_t *prtOutputEntry)
     
     if (prtOutputEntry->prtOutputSerialNumber &&
 	prtOutputEntry->_prtOutputSerialNumberLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Serial Number:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Serial Number:",
 			  (int) prtOutputEntry->_prtOutputSerialNumberLength,
 			  prtOutputEntry->prtOutputSerialNumber);
     }
     
     if (prtOutputEntry->prtOutputVersion &&
 	prtOutputEntry->_prtOutputVersionLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Output Version:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Output Version:",
 			  (int) prtOutputEntry->_prtOutputVersionLength,
 			  prtOutputEntry->prtOutputVersion);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputSecurity,
+    e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputSecurity);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Security:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Security:", e);
     }
 
     fmt_media_dimensions(s, indent, "Min. Dimensions:",
 			 prtOutputEntry->prtOutputMinDimFeedDir,
 			 prtOutputEntry->prtOutputMinDimXFeedDir,
 			 prtOutputEntry->prtOutputDimUnit,
-			 printer_mib_enums_prtOutputDimUnit);
+			 printer_mib_enums_PrtMediaUnitTC);
 
     fmt_media_dimensions(s, indent, "Max. Dimensions:",
 			 prtOutputEntry->prtOutputMaxDimFeedDir,
 			 prtOutputEntry->prtOutputMaxDimXFeedDir,
 			 prtOutputEntry->prtOutputDimUnit,
-			 printer_mib_enums_prtOutputDimUnit);
+			 printer_mib_enums_PrtMediaUnitTC);
 
-    e = fmt_enum(printer_mib_enums_prtOutputStackingOrder,
+    e = fmt_enum(printer_mib_enums_PrtOutputStackingOrderTC,
 		 prtOutputEntry->prtOutputStackingOrder);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Stacking Order:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Stacking Order:", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputPageDeliveryOrientation,
+    e = fmt_enum(printer_mib_enums_PrtOutputPageDeliveryOrientationTC,
 		 prtOutputEntry->prtOutputPageDeliveryOrientation);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Orientation:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Orientation:", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputBursting,
+    e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputBursting);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Bursting:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Bursting:", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputDecollating,
+    e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputDecollating);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Decollating:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Decollating:", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputPageCollated,
+    e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputPageCollated);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Collation:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Collation:", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputOffsetStacking,
+    e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputOffsetStacking);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Offset Stacking:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Offset Stacking:", e);
     }
 }
 
@@ -1646,7 +1688,7 @@ xml_printer_outputs(xmlNodePtr root,
 			     prtOutputEntry->prtOutputVendorName);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputType,
+    e = fmt_enum(iana_printer_mib_enums_PrtOutputTypeTC,
 		 prtOutputEntry->prtOutputType);
     if (e) {
 	(void) xml_new_child(tree, NULL, "type", "%s", e);
@@ -1658,7 +1700,7 @@ xml_printer_outputs(xmlNodePtr root,
 			     prtOutputEntry->prtOutputModel);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputCapacityUnit,
+    e = fmt_enum(printer_mib_enums_PrtCapacityUnitTC,
 		 prtOutputEntry->prtOutputCapacityUnit);
 
     if (prtOutputEntry->prtOutputMaxCapacity) {
@@ -1708,7 +1750,7 @@ xml_printer_outputs(xmlNodePtr root,
 			     prtOutputEntry->prtOutputVersion);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputSecurity,
+    e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputSecurity);
     if (e) {
 	(void) xml_new_child(tree, NULL, "security", "%s", e);
@@ -1720,45 +1762,45 @@ xml_printer_outputs(xmlNodePtr root,
 			 prtOutputEntry->prtOutputMinDimFeedDir,
 			 prtOutputEntry->prtOutputMinDimXFeedDir,
 			 prtOutputEntry->prtOutputDimUnit,
-			 printer_mib_enums_prtOutputDimUnit);
+			 printer_mib_enums_PrtMediaUnitTC);
 
     xml_media_dimensions(tree, "max-dimensions",
 			 prtOutputEntry->prtOutputMaxDimFeedDir,
 			 prtOutputEntry->prtOutputMaxDimXFeedDir,
 			 prtOutputEntry->prtOutputDimUnit,
-			 printer_mib_enums_prtOutputDimUnit);
+			 printer_mib_enums_PrtMediaUnitTC);
 
-    e = fmt_enum(printer_mib_enums_prtOutputStackingOrder,
+    e = fmt_enum(printer_mib_enums_PrtOutputStackingOrderTC,
 		 prtOutputEntry->prtOutputStackingOrder);
     if (e) {
 	(void) xml_new_child(tree, NULL, "stacking-order", "%s", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputPageDeliveryOrientation,
+    e = fmt_enum(printer_mib_enums_PrtOutputPageDeliveryOrientationTC,
 		 prtOutputEntry->prtOutputPageDeliveryOrientation);
     if (e) {
 	(void) xml_new_child(tree, NULL, "orientation", "%s", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputBursting,
+    e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputBursting);
     if (e) {
 	(void) xml_new_child(tree, NULL, "bursting", "%s", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputDecollating,
+    e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputDecollating);
     if (e) {
 	(void) xml_new_child(tree, NULL, "decollating", "%s", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputPageCollated,
+    e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputPageCollated);
     if (e) {
 	(void) xml_new_child(tree, NULL, "collation", "%s", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtOutputOffsetStacking,
+    e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputOffsetStacking);
     if (e) {
 	(void) xml_new_child(tree, NULL, "offset-stacking", "%s", e);
@@ -1817,41 +1859,41 @@ fmt_printer_marker(GString *s, printer_mib_prtMarkerEntry_t *prtMarkerEntry)
     int const indent = 18;
     const char *e;
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Printer:",
 		      prtMarkerEntry->hrDeviceIndex);
 
-    g_string_sprintfa(s, "%-*s %u\n", indent, "Marker:",
+    g_string_sprintfa(s, "%-*s%u\n", indent, "Marker:",
 		      prtMarkerEntry->prtMarkerIndex);
 
-    e = fmt_enum(printer_mib_enums_prtMarkerCounterUnit,
+    e = fmt_enum(printer_mib_enums_PrtMarkerCounterUnitTC,
 		 prtMarkerEntry->prtMarkerCounterUnit);
 
     if (prtMarkerEntry->prtMarkerLifeCount) {
-	g_string_sprintfa(s, "%-*s %u %s\n", indent, "Life Count:",
+	g_string_sprintfa(s, "%-*s%u %s\n", indent, "Life Count:",
 			  *prtMarkerEntry->prtMarkerLifeCount,
 			  e ? e : "");
     }
 
     if (prtMarkerEntry->prtMarkerPowerOnCount) {
-	g_string_sprintfa(s, "%-*s %u %s\n", indent, "Power On Count:",
+	g_string_sprintfa(s, "%-*s%u %s\n", indent, "Power On Count:",
 			  *prtMarkerEntry->prtMarkerPowerOnCount,
 			  e ? e : "");
     }
 
     if (prtMarkerEntry->prtMarkerProcessColorants) {
-	g_string_sprintfa(s, "%-*s %u\n", indent, "Process Colors:",
+	g_string_sprintfa(s, "%-*s%u\n", indent, "Process Colors:",
 			  *prtMarkerEntry->prtMarkerProcessColorants);
     }
 
     if (prtMarkerEntry->prtMarkerSpotColorants) {
-	g_string_sprintfa(s, "%-*s %u\n", indent, "Spot Colors:",
+	g_string_sprintfa(s, "%-*s%u\n", indent, "Spot Colors:",
 			  *prtMarkerEntry->prtMarkerSpotColorants);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMarkerMarkTech,
+    e = fmt_enum(iana_printer_mib_enums_PrtMarkerMarkTechTC,
 		 prtMarkerEntry->prtMarkerMarkTech);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Technology:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Technology:", e);
     }
 
     e = fmt_enum(markerResolutionUnit,
@@ -1859,7 +1901,7 @@ fmt_printer_marker(GString *s, printer_mib_prtMarkerEntry_t *prtMarkerEntry)
     if (prtMarkerEntry->prtMarkerAddressabilityFeedDir
 	&& prtMarkerEntry->prtMarkerAddressabilityXFeedDir) {
 
-	g_string_sprintfa(s, "%-*s %s ", indent, "Resolution:",
+	g_string_sprintfa(s, "%-*s%s ", indent, "Resolution:",
 	  fmt_dimensions(prtMarkerEntry->prtMarkerAddressabilityFeedDir));
 
 	g_string_sprintfa(s, "x %s %s\n",
@@ -1867,23 +1909,23 @@ fmt_printer_marker(GString *s, printer_mib_prtMarkerEntry_t *prtMarkerEntry)
 			  e ? e : "");
     }
 
-    e = fmt_enum(printer_mib_enums_prtMarkerAddressabilityUnit,
+    e = fmt_enum(printer_mib_enums_PrtMarkerAddressabilityUnitTC,
 		 prtMarkerEntry->prtMarkerAddressabilityUnit);
     if (prtMarkerEntry->prtMarkerNorthMargin
 	&& prtMarkerEntry->prtMarkerSouthMargin
 	&& prtMarkerEntry->prtMarkerWestMargin
 	&& prtMarkerEntry->prtMarkerEastMargin) {
 
-	g_string_sprintfa(s, "%-*s %s %s\n", indent, "Margin North:",
+	g_string_sprintfa(s, "%-*s%s %s\n", indent, "Margin North:",
 			  fmt_dimensions(prtMarkerEntry->prtMarkerNorthMargin),
 			  e ? e : "");
-	g_string_sprintfa(s, "%-*s %s %s\n", indent, "Margin South:",
+	g_string_sprintfa(s, "%-*s%s %s\n", indent, "Margin South:",
 			  fmt_dimensions(prtMarkerEntry->prtMarkerSouthMargin),
 			  e ? e : "");
-	g_string_sprintfa(s, "%-*s %s %s\n", indent, "Margin West:",
+	g_string_sprintfa(s, "%-*s%s %s\n", indent, "Margin West:",
 			  fmt_dimensions(prtMarkerEntry->prtMarkerWestMargin),
 			  e ? e : "");
-	g_string_sprintfa(s, "%-*s %s %s\n", indent, "Margin East:",
+	g_string_sprintfa(s, "%-*s%s %s\n", indent, "Margin East:",
 			  fmt_dimensions(prtMarkerEntry->prtMarkerEastMargin),
 			  e ? e : "");
     }
@@ -1903,7 +1945,7 @@ xml_printer_marker(xmlNodePtr root,
     tree = xmlNewChild(root, NULL, "marker", NULL);
     xml_set_prop(tree, "number", "%d",
 		      prtMarkerEntry->prtMarkerIndex);
-    e = fmt_enum(printer_mib_enums_prtMarkerCounterUnit,
+    e = fmt_enum(printer_mib_enums_PrtMarkerCounterUnitTC,
 		 prtMarkerEntry->prtMarkerCounterUnit);
 
     if (prtMarkerEntry->prtMarkerLifeCount) {
@@ -1928,7 +1970,7 @@ xml_printer_marker(xmlNodePtr root,
 			  *prtMarkerEntry->prtMarkerSpotColorants);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMarkerMarkTech,
+    e = fmt_enum(iana_printer_mib_enums_PrtMarkerMarkTechTC,
 		 prtMarkerEntry->prtMarkerMarkTech);
     if (e) {
 	(void) xml_new_child(tree, NULL, "technology", "%s", e);
@@ -1950,7 +1992,7 @@ xml_printer_marker(xmlNodePtr root,
 	if (e) xml_set_prop(node, "unit", "%s", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMarkerAddressabilityUnit,
+    e = fmt_enum(printer_mib_enums_PrtMarkerAddressabilityUnitTC,
 		 prtMarkerEntry->prtMarkerAddressabilityUnit);
     if (prtMarkerEntry->prtMarkerNorthMargin
 	&& prtMarkerEntry->prtMarkerSouthMargin
@@ -2030,32 +2072,32 @@ fmt_printer_colorant(GString *s,
     int const indent = 18;
     const char *e;
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Printer:",
 		      prtColorantEntry->hrDeviceIndex);
 
-    g_string_sprintfa(s, "%-*s %u\n", indent, "Colorant:",
+    g_string_sprintfa(s, "%-*s%u\n", indent, "Colorant:",
 		      prtColorantEntry->prtMarkerColorantIndex);
 
     if (prtColorantEntry->prtMarkerColorantMarkerIndex) {
-	g_string_sprintfa(s, "%-*s %d\n", indent, "Marker:",
+	g_string_sprintfa(s, "%-*s%d\n", indent, "Marker:",
 			  *prtColorantEntry->prtMarkerColorantMarkerIndex);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMarkerColorantRole,
+    e = fmt_enum(printer_mib_enums_PrtMarkerColorantRoleTC,
 		 prtColorantEntry->prtMarkerColorantRole);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Role:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Role:", e);
     }
 
     if (prtColorantEntry->prtMarkerColorantValue
 	&& prtColorantEntry->_prtMarkerColorantValueLength) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Color:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Color:",
 		  (int) prtColorantEntry->_prtMarkerColorantValueLength,
 		  prtColorantEntry->prtMarkerColorantValue);
     }
 
     if (prtColorantEntry->prtMarkerColorantTonality) {
-	g_string_sprintfa(s, "%-*s %d\n", indent, "Tonality:",
+	g_string_sprintfa(s, "%-*s%d\n", indent, "Tonality:",
 			  *prtColorantEntry->prtMarkerColorantTonality);
     }
 }
@@ -2078,7 +2120,7 @@ xml_printer_colorant(xmlNodePtr root,
 			     *prtColorantEntry->prtMarkerColorantMarkerIndex);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMarkerColorantRole,
+    e = fmt_enum(printer_mib_enums_PrtMarkerColorantRoleTC,
 		 prtColorantEntry->prtMarkerColorantRole);
     if (e) {
 	(void) xml_new_child(tree, NULL, "role", "%s", e);
@@ -2149,48 +2191,48 @@ fmt_printer_supplies(GString *s, printer_mib_prtMarkerSuppliesEntry_t *prtSuppli
     int const indent = 18;
     const char *e;
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Printer:",
 		      prtSuppliesEntry->hrDeviceIndex);
 
-    g_string_sprintfa(s, "%-*s %u\n", indent, "Supply:",
+    g_string_sprintfa(s, "%-*s%u\n", indent, "Supply:",
 		      prtSuppliesEntry->prtMarkerSuppliesIndex);
 
     if (prtSuppliesEntry->prtMarkerSuppliesMarkerIndex
 	&& *prtSuppliesEntry->prtMarkerSuppliesMarkerIndex) {
-	g_string_sprintfa(s, "%-*s marker #%u\n", indent, "Marker:",
+	g_string_sprintfa(s, "%-*smarker #%u\n", indent, "Marker:",
 			  *prtSuppliesEntry->prtMarkerSuppliesMarkerIndex);
     }
 
     if (prtSuppliesEntry->prtMarkerSuppliesColorantIndex
 	&& *prtSuppliesEntry->prtMarkerSuppliesColorantIndex) {
-	g_string_sprintfa(s, "%-*s colorant #%u\n", indent, "Colorant:",
+	g_string_sprintfa(s, "%-*scolorant #%u\n", indent, "Colorant:",
 			  *prtSuppliesEntry->prtMarkerSuppliesColorantIndex);
     }
 
     if (prtSuppliesEntry->prtMarkerSuppliesDescription &&
 	prtSuppliesEntry->_prtMarkerSuppliesDescriptionLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
+	g_string_sprintfa(s, "%-*s%.*s\n", indent, "Description:",
 			  (int) prtSuppliesEntry->_prtMarkerSuppliesDescriptionLength,
 			  prtSuppliesEntry->prtMarkerSuppliesDescription);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMarkerSuppliesType,
+    e = fmt_enum(iana_printer_mib_enums_PrtMarkerSuppliesTypeTC,
 		 prtSuppliesEntry->prtMarkerSuppliesType);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Type:", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMarkerSuppliesClass,
+    e = fmt_enum(printer_mib_enums_PrtMarkerSuppliesClassTC,
 		 prtSuppliesEntry->prtMarkerSuppliesClass);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Class:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Class:", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMarkerSuppliesSupplyUnit,
+    e = fmt_enum(printer_mib_enums_PrtMarkerSuppliesSupplyUnitTC,
 		 prtSuppliesEntry->prtMarkerSuppliesSupplyUnit);
 
     if (prtSuppliesEntry->prtMarkerSuppliesMaxCapacity) {
-	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
+	g_string_sprintfa(s, "%-*s", indent, "Capacity:");
 	switch (*prtSuppliesEntry->prtMarkerSuppliesMaxCapacity) {
 	case -1:
 	    g_string_append(s, "unlimited");
@@ -2205,7 +2247,7 @@ fmt_printer_supplies(GString *s, printer_mib_prtMarkerSuppliesEntry_t *prtSuppli
     }
 
     if (prtSuppliesEntry->prtMarkerSuppliesLevel) {
-	g_string_sprintfa(s, "%-*s ", indent, "Level:");
+	g_string_sprintfa(s, "%-*s", indent, "Level:");
 	switch (*prtSuppliesEntry->prtMarkerSuppliesLevel) {
 	case -1:
 	    g_string_append(s, "unlimited");
@@ -2254,19 +2296,19 @@ xml_printer_supplies(xmlNodePtr root,
 			     prtSuppliesEntry->prtMarkerSuppliesDescription);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMarkerSuppliesType,
+    e = fmt_enum(iana_printer_mib_enums_PrtMarkerSuppliesTypeTC,
 		 prtSuppliesEntry->prtMarkerSuppliesType);
     if (e) {
 	(void) xml_new_child(tree, NULL, "type", "%s", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMarkerSuppliesClass,
+    e = fmt_enum(printer_mib_enums_PrtMarkerSuppliesClassTC,
 		 prtSuppliesEntry->prtMarkerSuppliesClass);
     if (e) {
 	(void) xml_new_child(tree, NULL, "class", "%s", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtMarkerSuppliesSupplyUnit,
+    e = fmt_enum(printer_mib_enums_PrtMarkerSuppliesSupplyUnitTC,
 		 prtSuppliesEntry->prtMarkerSuppliesSupplyUnit);
 
     if (prtSuppliesEntry->prtMarkerSuppliesMaxCapacity) {
@@ -2358,38 +2400,38 @@ fmt_printer_interpreter(GString *s,
     int const indent = 18;
     const char *e;
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Printer:",
 		      interpEntry->hrDeviceIndex);
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Interpreter:",
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Interpreter:",
 		      interpEntry->prtInterpreterIndex);
 
-    e = fmt_enum(printer_mib_enums_prtInterpreterLangFamily,
+    e = fmt_enum(iana_printer_mib_enums_PrtInterpreterLangFamilyTC,
 		 interpEntry->prtInterpreterLangFamily);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Language:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Language:", e);
     }
 
-    fmt_display_string(s, indent+1, "Language Level:",
+    fmt_display_string(s, indent, "Language Level:",
 		       (int) interpEntry->_prtInterpreterLangLevelLength,
 		       interpEntry->prtInterpreterLangLevel);
 
-    fmt_display_string(s, indent+1, "Language Version:",
+    fmt_display_string(s, indent, "Language Version:",
 		       (int) interpEntry->_prtInterpreterLangVersionLength,
 		       interpEntry->prtInterpreterLangVersion);
 
-    fmt_display_string(s, indent+1, "Description:",
+    fmt_display_string(s, indent, "Description:",
 		       (int) interpEntry->_prtInterpreterDescriptionLength,
 		       interpEntry->prtInterpreterDescription);
 
-    fmt_display_string(s, indent+1, "Version:",
+    fmt_display_string(s, indent, "Version:",
 		       (int) interpEntry->_prtInterpreterVersionLength,
 		       interpEntry->prtInterpreterVersion);
 
-    e = fmt_enum(printer_mib_enums_prtInterpreterDefaultOrientation,
+    e = fmt_enum(printer_mib_enums_PrtPrintOrientationTC,
 		 interpEntry->prtInterpreterDefaultOrientation);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Orientation:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Orientation:", e);
     }
 
 #if 0
@@ -2401,22 +2443,22 @@ fmt_printer_interpreter(GString *s,
 			 printer_mib_enums_prtMediaPathMediaSizeUnit);
 #endif
 
-    e = fmt_enum(printer_mib_enums_prtInterpreterDefaultCharSetIn,
+    e = fmt_enum(iana_charset_mib_enums_IANACharset,
 		 interpEntry->prtInterpreterDefaultCharSetIn);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Charset In:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Charset In:", e);
     }
     
-    e = fmt_enum(printer_mib_enums_prtInterpreterDefaultCharSetOut,
+    e = fmt_enum(iana_charset_mib_enums_IANACharset,
 		 interpEntry->prtInterpreterDefaultCharSetOut);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Charset Out:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Charset Out:", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtInterpreterTwoWay,
+    e = fmt_enum(printer_mib_enums_PrtInterpreterTwoWayTC,
 		 interpEntry->prtInterpreterTwoWay);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "TwoWay:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "TwoWay:", e);
     }
 }
 
@@ -2435,7 +2477,7 @@ xml_printer_interpreter(xmlNodePtr root,
 
     lang = xmlNewChild(tree, NULL, "language", NULL);
 
-    e = fmt_enum(printer_mib_enums_prtInterpreterLangFamily,
+    e = fmt_enum(iana_printer_mib_enums_PrtInterpreterLangFamilyTC,
 		 interpEntry->prtInterpreterLangFamily);
     if (e) {
 	(void) xml_new_child(lang, NULL, "name", "%s", e);
@@ -2465,7 +2507,7 @@ xml_printer_interpreter(xmlNodePtr root,
 			     interpEntry->prtInterpreterVersion);
     }
 
-    e = fmt_enum(printer_mib_enums_prtInterpreterDefaultOrientation,
+    e = fmt_enum(printer_mib_enums_PrtPrintOrientationTC,
 		 interpEntry->prtInterpreterDefaultOrientation);
     if (e) {
 	(void) xml_new_child(tree, NULL, "orientation", "%s", e);
@@ -2487,19 +2529,19 @@ xml_printer_interpreter(xmlNodePtr root,
     }
 #endif
     
-    e = fmt_enum(printer_mib_enums_prtInterpreterDefaultCharSetIn,
+    e = fmt_enum(iana_charset_mib_enums_IANACharset,
 		 interpEntry->prtInterpreterDefaultCharSetIn);
     if (e) {
 	(void) xml_new_child(tree, NULL, "charset-in", "%s", e);
     }
     
-    e = fmt_enum(printer_mib_enums_prtInterpreterDefaultCharSetOut,
+    e = fmt_enum(iana_charset_mib_enums_IANACharset,
 		 interpEntry->prtInterpreterDefaultCharSetOut);
     if (e) {
 	(void) xml_new_child(tree, NULL, "charset-out", "%s", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtInterpreterTwoWay,
+    e = fmt_enum(printer_mib_enums_PrtInterpreterTwoWayTC,
 		 interpEntry->prtInterpreterTwoWay);
     if (e) {
 	(void) xml_new_child(tree, NULL, "two-way", "%s", e);
@@ -2583,30 +2625,30 @@ fmt_printer_channel(GString *s,
     int const indent = 18;
     const char *e;
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Printer:",
 		      channelEntry->hrDeviceIndex);
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Channel:",
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Channel:",
 		      channelEntry->prtChannelIndex);
 
-    e = fmt_enum(printer_mib_enums_prtChannelType,
+    e = fmt_enum(iana_printer_mib_enums_PrtChannelTypeTC,
 		 channelEntry->prtChannelType);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Type:", e);
     }
 
-    fmt_display_string(s, indent+1, "Version:",
+    fmt_display_string(s, indent, "Version:",
 		       (int) channelEntry->_prtChannelProtocolVersionLength,
 		       channelEntry->prtChannelProtocolVersion);
 
-    e = fmt_enum(printer_mib_enums_prtChannelState,
+    e = fmt_enum(printer_mib_enums_PrtChannelStateTC,
 		 channelEntry->prtChannelState);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "State:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "State:", e);
     }
 
     if (channelEntry->prtChannelIfIndex) {
-	g_string_sprintfa(s, "%-*s %d\n", indent, "Interface:",
+	g_string_sprintfa(s, "%-*s%d\n", indent, "Interface:",
 			 *channelEntry->prtChannelIfIndex);
     }
     
@@ -2614,12 +2656,12 @@ fmt_printer_channel(GString *s,
 	interpEntry = find_interp(interpTable, channelEntry->hrDeviceIndex,
 			  *channelEntry->prtChannelCurrentJobCntlLangIndex);
 	e = (interpEntry) ?
-	    fmt_enum(printer_mib_enums_prtInterpreterLangFamily,
+	    fmt_enum(iana_printer_mib_enums_PrtInterpreterLangFamilyTC,
 		     interpEntry->prtInterpreterLangFamily) : NULL;
 	if (e) {
-	    g_string_sprintfa(s, "%-*s %s\n", indent, "Ctrl Language:", e);
+	    g_string_sprintfa(s, "%-*s%s\n", indent, "Ctrl Language:", e);
 	} else {
-	    g_string_sprintfa(s, "%-*s %d\n", indent, "Ctrl Language:",
+	    g_string_sprintfa(s, "%-*s%d\n", indent, "Ctrl Language:",
 			      *channelEntry->prtChannelCurrentJobCntlLangIndex);
 	}
     }
@@ -2628,19 +2670,19 @@ fmt_printer_channel(GString *s,
 	interpEntry = find_interp(interpTable, channelEntry->hrDeviceIndex,
 			  *channelEntry->prtChannelDefaultPageDescLangIndex);
 	e = (interpEntry) ?
-	    fmt_enum(printer_mib_enums_prtInterpreterLangFamily,
+	    fmt_enum(iana_printer_mib_enums_PrtInterpreterLangFamilyTC,
 		     interpEntry->prtInterpreterLangFamily) : NULL;
 	if (e) {
-	    g_string_sprintfa(s, "%-*s %s\n", indent, "Page Language:", e);
+	    g_string_sprintfa(s, "%-*s%s\n", indent, "Page Language:", e);
 	} else {
-	    g_string_sprintfa(s, "%-*s %d\n", indent, "Page Language:",
+	    g_string_sprintfa(s, "%-*s%d\n", indent, "Page Language:",
 			      *channelEntry->prtChannelDefaultPageDescLangIndex);
 	}
     }
     
     fmt_subunit(s, indent, channelEntry->prtChannelStatus);
 
-    fmt_display_string(s, indent+1, "Information:",
+    fmt_display_string(s, indent, "Information:",
 		       (int) channelEntry->_prtChannelInformationLength,
 		       channelEntry->prtChannelInformation);
 }
@@ -2660,7 +2702,7 @@ xml_printer_channel(xmlNodePtr root,
     xml_set_prop(tree, "number", "%d",
 		 channelEntry->prtChannelIndex);
 
-    e = fmt_enum(printer_mib_enums_prtChannelType,
+    e = fmt_enum(iana_printer_mib_enums_PrtChannelTypeTC,
 		 channelEntry->prtChannelType);
     if (e) {
 	(void) xml_new_child(tree, NULL, "type", "%s", e);
@@ -2672,7 +2714,7 @@ xml_printer_channel(xmlNodePtr root,
 		     channelEntry->prtChannelProtocolVersion);
     }
 
-    e = fmt_enum(printer_mib_enums_prtChannelState,
+    e = fmt_enum(printer_mib_enums_PrtChannelStateTC,
 		 channelEntry->prtChannelState);
     if (e) {
 	(void) xml_new_child(tree, NULL, "state", "%s", e);
@@ -2687,7 +2729,7 @@ xml_printer_channel(xmlNodePtr root,
 	interpEntry = find_interp(interpTable, channelEntry->hrDeviceIndex,
 			  *channelEntry->prtChannelCurrentJobCntlLangIndex);
 	e = (interpEntry) ?
-	    fmt_enum(printer_mib_enums_prtInterpreterLangFamily,
+	    fmt_enum(iana_printer_mib_enums_PrtInterpreterLangFamilyTC,
 		     interpEntry->prtInterpreterLangFamily) : NULL;
 	if (e) {
 	    (void) xml_new_child(tree, NULL, "crtl-language", "%s", e);
@@ -2701,7 +2743,7 @@ xml_printer_channel(xmlNodePtr root,
 	interpEntry = find_interp(interpTable, channelEntry->hrDeviceIndex,
 			  *channelEntry->prtChannelDefaultPageDescLangIndex);
 	e = (interpEntry) ?
-	    fmt_enum(printer_mib_enums_prtInterpreterLangFamily,
+	    fmt_enum(iana_printer_mib_enums_PrtInterpreterLangFamilyTC,
 		     interpEntry->prtInterpreterLangFamily) : NULL;
 	if (e) {
 	    (void) xml_new_child(tree, NULL, "page-language", "%s", e);
@@ -2781,10 +2823,11 @@ fmt_printer_display(GString *s,
     g_string_sprintfa(s, "%4d   ", displayEntry->prtConsoleDisplayBufferIndex);
 	
     if (displayEntry->prtConsoleDisplayBufferText) {
-	g_string_sprintfa(s, "%.*s\n",
+	g_string_sprintfa(s, "%.*s",
 		    (int) displayEntry->_prtConsoleDisplayBufferTextLength,
 		          displayEntry->prtConsoleDisplayBufferText);
     }
+    g_string_sprintfa(s, "\n");
 }
 
 
@@ -2884,7 +2927,7 @@ fmt_printer_light(GString *s,
     }
     g_string_sprintfa(s, " %-*s ", 5, state);
 
-    e = fmt_enum(printer_mib_enums_prtConsoleColor,
+    e = fmt_enum(iana_printer_mib_enums_PrtConsoleColorTC,
 		 prtConsoleLightEntry->prtConsoleColor);
     g_string_sprintfa(s, "%s\n", e ? e : "");
 }
@@ -2908,7 +2951,7 @@ xml_printer_light(xmlNodePtr root,
 			     lightEntry->prtConsoleDescription);
     }
 
-    e = fmt_enum(printer_mib_enums_prtConsoleColor,
+    e = fmt_enum(iana_printer_mib_enums_PrtConsoleColorTC,
 		 lightEntry->prtConsoleColor);
     if (e) {
 	xml_new_child(tree, NULL, "color", e);
@@ -2989,36 +3032,43 @@ fmt_printer_alert(GString *s, printer_mib_prtAlertEntry_t *alertEntry)
     int const indent = 18;
     const char *e;
 
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
-		      alertEntry->hrDeviceIndex);
-
-    g_string_sprintfa(s, "%-*s %d\n", indent, "Alert:",
+    g_string_sprintfa(s, "%6d %6d", alertEntry->hrDeviceIndex,
 		      alertEntry->prtAlertIndex);
 
+    /* xxx this is broken since this is actually a time stamp */
+
     if (alertEntry->prtAlertTime) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Date:",
-			  fmt_timeticks(*alertEntry->prtAlertTime));
+	g_string_sprintfa(s, " %s [%d]",
+			  fmt_timeticks(*alertEntry->prtAlertTime),
+			  *alertEntry->prtAlertTime);
     }
 
-    e = fmt_enum(printer_mib_enums_prtAlertCode,
+#if 0    
+    e = fmt_enum(iana_printer_mib_enums_PrtAlertCodeTC,
 		 alertEntry->prtAlertCode);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Code:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Code:", e);
     }
+#endif
 
-    e = fmt_enum(printer_mib_enums_prtAlertSeverityLevel,
+    e = fmt_enum(printer_mib_enums_PrtAlertSeverityLevelTC,
 		 alertEntry->prtAlertSeverityLevel);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Severity:", e);
+	g_string_sprintfa(s, " %s", e);
     }
 
-    fmt_display_string(s, indent+1, "Description:",
+    g_string_sprintfa(s, " %.*s",
+		      (int) alertEntry->_prtAlertDescriptionLength,
+		      alertEntry->prtAlertDescription);
+
+#if 0
+    fmt_display_string(s, indent, "Description:",
 		       (int) alertEntry->_prtAlertDescriptionLength,
 		       alertEntry->prtAlertDescription);
 
     e = fmt_enum(prtAlertGroup, alertEntry->prtAlertGroup);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s", indent, "Location:", e);
+	g_string_sprintfa(s, "%-*s%s", indent, "Location:", e);
 	if (alertEntry->prtAlertGroupIndex
 	    && *alertEntry->prtAlertGroupIndex > 0) {
 	    g_string_sprintfa(s, " #%u", *alertEntry->prtAlertGroupIndex);
@@ -3030,10 +3080,68 @@ fmt_printer_alert(GString *s, printer_mib_prtAlertEntry_t *alertEntry)
 	g_string_append(s, "\n");
     }
 
-    e = fmt_enum(printer_mib_enums_prtAlertTrainingLevel,
+    e = fmt_enum(iana_printer_mib_enums_PrtAlertTrainingLevelTC,
 		 alertEntry->prtAlertTrainingLevel);
     if (e) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Personnel:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Personnel:", e);
+    }
+#endif
+
+}
+
+
+
+static void
+fmt_printer_alert_orig(GString *s, printer_mib_prtAlertEntry_t *alertEntry)
+{
+    int const indent = 18;
+    const char *e;
+
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Printer:",
+		      alertEntry->hrDeviceIndex);
+
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Alert:",
+		      alertEntry->prtAlertIndex);
+
+    if (alertEntry->prtAlertTime) {
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Date:",
+			  fmt_timeticks(*alertEntry->prtAlertTime));
+    }
+
+    e = fmt_enum(iana_printer_mib_enums_PrtAlertCodeTC,
+		 alertEntry->prtAlertCode);
+    if (e) {
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Code:", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_PrtAlertSeverityLevelTC,
+		 alertEntry->prtAlertSeverityLevel);
+    if (e) {
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Severity:", e);
+    }
+
+    fmt_display_string(s, indent, "Description:",
+		       (int) alertEntry->_prtAlertDescriptionLength,
+		       alertEntry->prtAlertDescription);
+
+    e = fmt_enum(prtAlertGroup, alertEntry->prtAlertGroup);
+    if (e) {
+	g_string_sprintfa(s, "%-*s%s", indent, "Location:", e);
+	if (alertEntry->prtAlertGroupIndex
+	    && *alertEntry->prtAlertGroupIndex > 0) {
+	    g_string_sprintfa(s, " #%u", *alertEntry->prtAlertGroupIndex);
+	}
+	if (alertEntry->prtAlertLocation
+	    && *alertEntry->prtAlertLocation > 0) {
+	    g_string_sprintfa(s, " (at location %u)", *alertEntry->prtAlertLocation);
+	}
+	g_string_append(s, "\n");
+    }
+
+    e = fmt_enum(iana_printer_mib_enums_PrtAlertTrainingLevelTC,
+		 alertEntry->prtAlertTrainingLevel);
+    if (e) {
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Personnel:", e);
     }
 }
 
@@ -3053,13 +3161,13 @@ xml_printer_alert(xmlNodePtr root, printer_mib_prtAlertEntry_t *alertEntry)
 		      fmt_timeticks(*alertEntry->prtAlertTime));
     }
 
-    e = fmt_enum(printer_mib_enums_prtAlertCode,
+    e = fmt_enum(iana_printer_mib_enums_PrtAlertCodeTC,
 		 alertEntry->prtAlertCode);
     if (e) {
 	xml_new_child(tree, NULL, "code", e);
     }
 
-    e = fmt_enum(printer_mib_enums_prtAlertSeverityLevel,
+    e = fmt_enum(printer_mib_enums_PrtAlertSeverityLevelTC,
 		 alertEntry->prtAlertSeverityLevel);
     if (e) {
 	xml_new_child(tree, NULL, "severity", e);
@@ -3086,7 +3194,7 @@ xml_printer_alert(xmlNodePtr root, printer_mib_prtAlertEntry_t *alertEntry)
 	g_string_free(s, 1);
     }
 
-    e = fmt_enum(printer_mib_enums_prtAlertTrainingLevel,
+    e = fmt_enum(iana_printer_mib_enums_PrtAlertTrainingLevelTC,
 		 alertEntry->prtAlertTrainingLevel);
     if (e) {
 	xml_new_child(tree, NULL, "personnel", "%s", e);
@@ -3165,6 +3273,30 @@ set_printer_operator(scli_interp_t *interp, int argc, char **argv)
 
     printer_mib_set_prtGeneralCurrentOperator(interp->peer, 42, /* xxx */
 					      operator, operator_len);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+exec_printer_reboot(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    printer_mib_set_prtGeneralReset(interp->peer, 1, /* xxx */
+			    IANA_PRINTER_MIB_PRTGENERALRESETTC_RESETTONVRAM);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
@@ -3316,8 +3448,8 @@ scli_init_printer_mode(scli_interp_t *interp)
 	  "<xsd:complexType name=\"light\">\n"
 	  "  <xsd:sequence>\n"
 	  "    <xsd:element name=\"description\" type=\"xsd:string\" minOccurs=\"0\"/>\n"
-	  "    <xsd:element name=\"color\" type=\"xsd:PrinterLightColor\" minOccurs=\"0\"/>\n"
-	  "    <xsd:element name=\"status\" type=\"xsd:PrinterLightStatus\" minOccurs=\"0\"/>\n"
+	  "    <xsd:element name=\"color\" type=\"PrinterLightColor\" minOccurs=\"0\"/>\n"
+	  "    <xsd:element name=\"status\" type=\"PrinterLightStatus\" minOccurs=\"0\"/>\n"
 	  "  </xsd:sequence>\n"
 	  "  <xsd:attribute name=\"printer\" type=\"xsd:int\"/>\n"
 	  "  <xsd:attribute name=\"number\" type=\"xsd:int\"/>\n"
@@ -3356,10 +3488,10 @@ scli_init_printer_mode(scli_interp_t *interp)
 	  "  <xsd:sequence>\n"
 	  "    <xsd:element name=\"date\" type=\"xsd:string\" minOccurs=\"0\"/>\n"
 	  "    <xsd:element name=\"code\" type=\"xsd:string\" minOccurs=\"0\"/>\n"
-	  "    <xsd:element name=\"severity\" type=\"xsd:PrinterAlertSeverity\" minOccurs=\"0\"/>\n"
+	  "    <xsd:element name=\"severity\" type=\"PrinterAlertSeverity\" minOccurs=\"0\"/>\n"
 	  "    <xsd:element name=\"description\" type=\"xsd:string\" minOccurs=\"0\"/>\n"
 	  "    <xsd:element name=\"location\" type=\"xsd:string\" minOccurs=\"0\"/>\n"
-	  "    <xsd:element name=\"personnel\" type=\"xsd:PrinterAlertPersonnel\" minOccurs=\"0\"/>\n"
+	  "    <xsd:element name=\"personnel\" type=\"PrinterAlertPersonnel\" minOccurs=\"0\"/>\n"
 	  "  </xsd:sequence>\n"
 	  "  <xsd:attribute name=\"printer\" type=\"xsd:int\"/>\n"
 	  "  <xsd:attribute name=\"number\" type=\"xsd:int\"/>\n"
@@ -3389,6 +3521,12 @@ scli_init_printer_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_alert },
+
+	{ "run printer reboot", NULL,
+	  "The `run printer reboot' command resets the printed.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  exec_printer_reboot },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
