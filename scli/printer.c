@@ -2179,7 +2179,7 @@ xml_printer_channel(xmlNodePtr root,
     xml_subunit(tree, channelEntry->prtChannelStatus);
 
     if (channelEntry->prtChannelInformation) {
-	(void) xml_new_child(tree, NULL, "version", "%.*s",
+	(void) xml_new_child(tree, NULL, "information", "%.*s",
 			     (int) channelEntry->_prtChannelInformationLength,
 			     channelEntry->prtChannelInformation);
     }
