@@ -462,6 +462,7 @@ main(int argc, char **argv)
     scli_init_printer_mode(interp);
     scli_init_cisco_mode(interp);
     scli_init_nortel_mode(interp);
+    scli_init_netsnmp_mode(interp);
 
     if (argc > 1) {
 	char *margv[] = { "open", NULL, NULL, NULL };

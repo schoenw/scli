@@ -82,6 +82,8 @@ extern char const scli_copyright[];	/* copyright message (surprise) */
 #define SCLI_OK			200	/* normal return code */
 #define SCLI_EXIT		201	/* return and exit the command loop */
 #define SCLI_ERROR		300	/* generic error return code */
+#define SCLI_ERROR_NOPEER	301	/* no association to SNMP peer */
+#define SCLI_ERROR_NOXML	302	/* command does not support XML */
 #define SCLI_SYNTAX		400	/* generic syntax error */
 #define SCLI_SYNTAX_NUMARGS	401	/* syntax error in number of args */
 #define SCLI_SYNTAX_REGEXP	402	/* syntax error in regexp */
@@ -280,6 +282,9 @@ scli_init_cisco_mode(scli_interp_t *interp);
 
 extern void
 scli_init_nortel_mode(scli_interp_t *interp);
+
+extern void
+scli_init_netsnmp_mode(scli_interp_t *interp);
 
 /* 
  * A data structure used to obtain vendor information from the
