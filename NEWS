@@ -1,3 +1,11 @@
+Changes in stools 0.1.18:
+
+- scli supports a new ospf mode
+- scli now shows names for ethernet addresses in "show bridge forwarding"
+- scli now shows names for ethernet addresses in "show interface details"
+- scli now shows names for ethernet addresses in "show ip mapping"
+- scli supports a new "show scli" command
+
 Changes in stools 0.1.17:
 
 - scli supports a new "show disman scheduler info" command
