@@ -829,9 +829,9 @@ cmd_script_info(scli_interp_t *interp, int argc, char **argv)
 		owner_width = smScriptTable[i]->_smScriptOwnerLength;
 	    }
 	}
-	g_string_sprintfa(interp->result,
-			  "State  L %-*s %-*s Last Change  Name\n",
-			  owner_width, "Owner", lang_width, "Language");
+	g_string_sprintfa(interp->header,
+			  "STATE  L %-*s %-*s LAST CHANGE  NAME",
+			  owner_width, "OWNER", lang_width, "LANGUAGE");
 	for (i = 0; smScriptTable[i]; i++) {
 	    show_script_info(interp->result, smScriptTable[i],
 		     get_script_lang_name(smScriptTable[i], smLangTable),
@@ -948,9 +948,9 @@ cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
 		owner_width = smLaunchTable[i]->_smLaunchOwnerLength;
 	    }
 	}
-	g_string_sprintfa(interp->result,
-			  "State  R %-*s Last Change  Name\n",
-			  owner_width, "Owner");
+	g_string_sprintfa(interp->header,
+			  "STATE  R %-*s LAST CHANGE  NAME",
+			  owner_width, "OWNER");
 	for (i = 0; smLaunchTable[i]; i++) {
 	    show_launch_info(interp->result, smLaunchTable[i],
 			     count_runs(smLaunchTable[i], smRunTable),
@@ -1173,8 +1173,8 @@ cmd_run_info(scli_interp_t *interp, int argc, char **argv)
 		l_name_width = smRunTable[i]->_smLaunchNameLength;
 	    }
 	}
-	g_string_sprintfa(interp->result,
-			  "%-*s %-*s RUNID STAT      LIFE     EXPIRE\n",
+	g_string_sprintfa(interp->header,
+			  "%-*s %-*s RUNID STAT      LIFE     EXPIRE",
 			  l_owner_width, "L-OWNER", l_name_width, "L-NAME");
 	for (i = 0; smRunTable[i]; i++) {
 	    show_run_info(interp->result, smRunTable[i],
@@ -1375,9 +1375,9 @@ cmd_scheduler_info(scli_interp_t *interp, int argc, char **argv)
 		name_width = schedTable[i]->_schedNameLength;
 	    }
 	}
-	g_string_sprintfa(interp->result,
-			  "State %-*s %-*s Type     Expression\n",
-			  owner_width, "Owner", name_width, "Name");
+	g_string_sprintfa(interp->header,
+			  "STATE %-*s %-*s TYPE     EXPRESSION",
+			  owner_width, "OWNER", name_width, "NAME");
 	for (i = 0; schedTable[i]; i++) {
 	    show_scheduler_info(interp->result, schedTable[i],
 				name_width, owner_width);
@@ -1536,6 +1536,14 @@ scli_init_disman_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "schedules on the distributed manager",
 	  cmd_scheduler_details },
+	{ "monitor disman run",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  "running scripts",
+	  cmd_run_info },
+	{ "monitor disman scheduler",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  "scheduler information",
+	  cmd_scheduler_info },
 	{ NULL, 0, NULL, NULL }
     };
     

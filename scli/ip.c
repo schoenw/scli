@@ -146,8 +146,8 @@ cmd_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
     (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
 
     if (ipCidrRouteTable || ipRouteTable) {
-	g_string_sprintfa(interp->result, "%-20s%-16s%-10s%-10s%s\n",
-		  "Destination", "Next Hop", "Type", "Proto", "Interface");
+	g_string_sprintfa(interp->header, "%-20s%-16s%-10s%-10s%s",
+		  "DESTINATION", "NEXT HOP", "TYPE", "PROTO", "INTERFACE");
 	if (ipCidrRouteTable) {
 	    for (i = 0; ipCidrRouteTable[i]; i++) {
 		show_ip_forward(interp->result, ipCidrRouteTable[i]);
@@ -230,8 +230,8 @@ cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (ipAddrTable) {
-	g_string_sprintfa(interp->result,
-			  "Interface IP Address     Prefix  Name\n");
+	g_string_sprintfa(interp->header,
+			  "INTERFACE IP-ADDRESS     PREFIX  NAME");
 	for (i = 0; ipAddrTable[i]; i++) {
 	    show_ip_address(interp->result, ipAddrTable[i]);
 	}
@@ -354,11 +354,11 @@ cmd_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
     (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
     
     if (tunnelIfTable) {
-
-	g_string_append(interp->result,
-	"Local Address    Remote Address   Type    Sec.  TTL TOS Interface\n");
+	g_string_append(interp->header,
+	"LOCAL ADDRESS    REMOTE ADDRESS   TYPE    SEC.  TTL TOS INTERFACE");
 	for (i = 0; tunnelIfTable[i]; i++) {
-	    show_ip_tunnel(interp->result, tunnelIfTable[i], ifXTable, ifTable);
+	    show_ip_tunnel(interp->result, tunnelIfTable[i],
+			   ifXTable, ifTable);
 	}
     }
 
@@ -432,8 +432,8 @@ cmd_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
     (void) if_mib_get_ifTable(interp->peer, &ifTable);
 
     if (ipNetToMediaTable) {
-	g_string_append(interp->result,
-	"Interface Type     IP Address       Physical Address\n");
+	g_string_append(interp->header,
+		"INTERFACE TYPE     IP-ADDRESS       LOWER LAYER ADDRESS");
 	for (i = 0; ipNetToMediaTable[i]; i++) {
 	    if (ifTable) {
 		for (j = 0; ifTable[j]; j++) {
