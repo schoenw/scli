@@ -310,7 +310,25 @@ next_token(char *string, char *out)
 	    }
 	    break;
 	case '\\':
-	    if (p[1]) {
+	    switch (p[1]) {
+	    case 0:
+		break;
+	    case 'f':
+		p += 2; *d++ = '\f';
+		break;
+	    case 'n':
+		p += 2; *d++ = '\n';
+		break;
+	    case 'r':
+		p += 2; *d++ = '\r';
+		break;
+	    case 't':
+		p += 2; *d++ = '\t';
+		break;
+	    case 'v':
+		p += 2; *d++ = '\v';
+		break;
+	    default:
 		p++;			/* skip backslash and */
 		*d++ = *p++;		/* copy next character */
 	    }
@@ -348,7 +366,7 @@ next_token(char *string, char *out)
  done:
     while (*p && isspace((int) *p)) p++;	/* skip white space */
     *d = 0;
-    return *p ? p : NULL;
+    return p;
 }
 
 
@@ -360,7 +378,6 @@ next_token(char *string, char *out)
  * copies of all the list elements. It is the caller's responsibility
  * to free up all of this storage.
  *
- * XXX This code should handle backslash substitutions.
  * XXX This code should allow ; as command separator.
  */
 
@@ -390,6 +407,12 @@ scli_split(char *string, int *argc, char ***argv)
     
     while (p && *p) {
 	p = next_token(p, d);
+	if (! p) {
+	    g_free(*argv);
+	    *argv = NULL;
+	    *argc = 0;
+	    return SCLI_ERROR;
+	}
 	(*argv)[(*argc)++] = d;
 	d += strlen(d) + 1;
     }
@@ -515,7 +538,9 @@ get_xml_tree(scli_interp_t *interp, char *xpath)
 
     g_return_val_if_fail(interp && xpath, NULL);
     
-    (void) scli_split(xpath, &argc, &argv);
+    if (scli_split(xpath, &argc, &argv) != SCLI_OK) {
+	return NULL;
+    }
     
     tree = xmlDocGetRootElement(interp->xml_doc);
     for (i = 0; i < argc; i++) {
@@ -704,10 +729,15 @@ scli_eval(scli_interp_t *interp, char *cmd)
 
     if (scli_interp_interactive(interp)
 	&& (expanded_cmd = expand_alias(interp, cmd))) {
-	(void) scli_split(expanded_cmd, &argc, &argv);
+	code = scli_split(expanded_cmd, &argc, &argv);
 	g_free(expanded_cmd);
     } else {
-	(void) scli_split(cmd, &argc, &argv);
+	code = scli_split(cmd, &argc, &argv);
+    }
+
+    if (code != SCLI_OK) {
+	g_printerr("syntax error: failed to tokenize input\n");
+	return SCLI_ERROR;
     }
 
     if (argc == 0) {
@@ -790,16 +820,30 @@ scli_eval_file_stream(scli_interp_t *interp, FILE *stream)
 {
     char buffer[1024];
     int code = SCLI_OK;
+    int len;
+    GString *s;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
     g_return_val_if_fail(stream, SCLI_ERROR);
 
+    s = g_string_new(NULL);
     while (code != SCLI_EXIT
 	   && code != SCLI_ERROR
 	   && fgets(buffer, sizeof(buffer), stream) != NULL) {
-	/* xxx allow for backslash line completion */
-	code = scli_eval(interp, buffer);
+	len = strlen(buffer);
+	if (len > 1
+	    && buffer[len-1] == '\n'
+	    && buffer[len-2] == '\\'
+	    && (len == 2 || buffer[len-3] != '\\')) {
+	    buffer[len-2] = 0;
+	    g_string_append(s, buffer);
+	} else {
+	    g_string_append(s, buffer);
+	    code = scli_eval(interp, s->str);
+	    g_string_truncate(s, 0);
+	}
     }
+    g_string_free(s, 1);
     
     return code;
 }

@@ -74,10 +74,12 @@ static void
 mainloop(scli_interp_t *interp)
 {
     char *input, *expansion, *prompt;
-    int result, code = SCLI_OK;
+    int result, len, code = SCLI_OK;
+    GString *s;
 
     g_return_if_fail(interp);
 
+    s = g_string_new(NULL);
     while (code != SCLI_EXIT) {
 	current_interp = interp;
 	prompt = scli_prompt(interp);
@@ -100,11 +102,21 @@ mainloop(scli_interp_t *interp)
 	    continue;
 	}
 	free(input); input = expansion;
-	/* xxx allow for backslash line completion */
-	add_history(input);
-	code = scli_eval(interp, input);
+	len = strlen(input);
+	if (len > 0
+	    && input[len-1] == '\\'
+	    && (len == 1 || input[len-2] != '\\')) {
+	    input[len-1] = 0;
+	    g_string_append(s, input);
+	} else {
+	    g_string_append(s, input);
+	    add_history(s->str);
+	    code = scli_eval(interp, s->str);
+	    g_string_truncate(s, 0);
+	}
 	free(input);
     }
+    g_string_free(s, 1);
 }
 
 /*
