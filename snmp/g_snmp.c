@@ -34,6 +34,13 @@
 
 #include "g_snmp.h"
 
+#include <stdio.h>
+
+char *g_snmp_msg = NULL;
+
+void (*g_snmp_list_decode_hook)(GSList *list) = NULL;
+void (*g_snmp_list_encode_hook)(GSList *list) = NULL;
+
 /*prototypes*/
 static gboolean g_snmp_syntax2tag_cls(guint *tag, guint *cls, gint syntax);
 static gboolean g_snmp_tag_cls2syntax(guint tag, guint cls, gushort *syntax);
@@ -507,6 +514,10 @@ g_snmp_list_encode ( ASN1_SCK *asn1, GSList *list)
 	return FALSE;
     if (!g_asn1_header_encode (asn1, eoc, ASN1_UNI, ASN1_CON, ASN1_SEQ))
         return FALSE;
+
+    if (g_snmp_list_encode_hook) {
+	g_snmp_list_encode_hook(list);
+    }
     return TRUE;
 }
 
@@ -557,6 +568,9 @@ g_snmp_list_decode (ASN1_SCK *asn1, GSList **list)
 	g_slist_free(*list);
 	*list = NULL;
         return FALSE;
+    }
+    if (g_snmp_list_decode_hook) {
+	g_snmp_list_decode_hook(*list);
     }
     return TRUE;
 }

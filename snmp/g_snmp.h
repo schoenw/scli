@@ -195,6 +195,11 @@ gboolean g_snmp_pdu_v3_encode ( ASN1_SCK *asn1, GSnmpPdu *pdu,
 gboolean g_snmp_pdu_v3_decode ( ASN1_SCK *asn1, GSnmpPdu *pdu,
          char **cenid, int *cenidlen, char **cname, int *cnamelen);
 
+/* SNMP hooks for debugging, profiling, statistics, ... */
+
+void (*g_snmp_list_decode_hook)(GSList *list);
+void (*g_snmp_list_encode_hook)(GSList *list);
+
 /* SNMP varbind management */
 
 GSnmpVarBind* g_snmp_varbind_new  ( guint32 const *oid, gsize oid_len,
