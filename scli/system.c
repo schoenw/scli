@@ -1281,22 +1281,22 @@ scli_init_system_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 
-	{ "set system contact", "<contact>",
+	{ "set system contact", "<string>",
 	  "The set system contact command configures the system's contact\n"
-	  "information. The <contact> string should include information\n"
+	  "information. The <string> argument should include information\n"
 	  "on how to contact a person who is responsible for this system.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  set_system_contact },
 
-	{ "set system name", "<name>",
+	{ "set system name", "<string>",
 	  "The set system name command configures the systems's name. By\n"
 	  "convention, this is the system's fully-qualified domain name.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  set_system_name },
 
-	{ "set system location", "<location>",
+	{ "set system location", "<string>",
 	  "The set system location command configures the system's physical\n"
 	  "location.",
 	  SCLI_CMD_FLAG_NEED_PEER,

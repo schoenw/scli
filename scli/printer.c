@@ -1206,7 +1206,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 
 	{ "show printer console lights", NULL,
 	  "The show printer console lights command shows the current\n"
-	  "status of the printers lights. The command generates a table\n"
+	  "status of the printer's lights. The command generates a table\n"
 	  "with the following columns:\n"
 	  "\n"
 	  "  PRINTER     logical printer number\n"
