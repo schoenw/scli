@@ -287,6 +287,7 @@ usage()
 	"  -r, --retries     number of retries (default 3)\n"
 	"  -s, --dry-run     parse commands but do not execute them\n"
 	"  -t, --timeout     timeout between retries in milliseconds (default 500)\n"
+	"  -v, --snmp        version of the SNMP protocol (1, 2c, 3)\n"
 	"  -x, --xml         produce machine readable XML output\n"
 	);
 }
@@ -306,6 +307,7 @@ main(int argc, char **argv)
     
     int norc = 0, port = 161, delay = 5000, retries = 3, timeout = 500000;
     int xml = 0, dry = 0;
+    int snmp = -1;
 
     static struct option const long_options[] =
     {
@@ -319,11 +321,12 @@ main(int argc, char **argv)
         { "port",    required_argument, 0, 'p' },
 	{ "retries", required_argument, 0, 'r' },
 	{ "timeout", required_argument, 0, 't' },
+	{ "snmp",    required_argument, 0, 'v' },
 	{ "xml",     no_argument,	0, 'x' },
         { NULL, 0, NULL, 0}
     };
 
-    while ((c = getopt_long(argc, argv, "Vc:d:f:hnp:r:st:x", long_options,
+    while ((c = getopt_long(argc, argv, "Vc:d:f:hnp:r:st:v:x", long_options,
                             (int *) 0)) != EOF) {
         switch (c) {
         case 'V':
@@ -360,6 +363,9 @@ main(int argc, char **argv)
 		retries = atoi(optarg);
 	    }
 	    break;
+	case 's':
+	    dry = 1;
+	    break;
 	case 't':
 	    if (atoi(optarg) < 50) {
 		timeout = 50 * 1000;
@@ -367,11 +373,20 @@ main(int argc, char **argv)
 		timeout = atoi(optarg) * 1000;
 	    }
 	    break;
+	case 'v':
+	    if (strcmp(optarg, "1") == 0) {
+		snmp = G_SNMP_V1;
+	    } else if (strcmp(optarg, "2c") == 0) {
+		snmp = G_SNMP_V2C;
+	    } else if (strcmp(optarg, "3") == 0) {
+		snmp = G_SNMP_V3;
+	    } else {
+		g_printerr("scli: unknown protocol version \"%s\"\n",
+			   optarg);
+	    }
+	    break;
 	case 'x':
 	    xml = 1;
-	    break;
-	case 's':
-	    dry = 1;
 	    break;
         default:
             usage();
@@ -428,6 +443,7 @@ main(int argc, char **argv)
 
     interp->delay = delay;
     interp->port = port;
+    interp->snmp = snmp;
 
     if (xml) {
 	interp->flags |= SCLI_INTERP_FLAG_XML;

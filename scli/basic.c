@@ -1057,34 +1057,43 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
     /*
      * Lets see how we can talk to this guy. We first try to speek
      * SNMPv2c (since this protocol does much better error handling)
-     * and we fall back to SNMPv1 only if this is necessary.
+     * and we fall back to SNMPv1 only if this is necessary. However,
+     * if the user specified a specific version, we trust him and
+     * do no probe at all.
      */
 
     g_snmp_list_decode_hook = NULL;
 
-    if (scli_interp_interactive(interp)) {
-	g_print("%3d Trying SNMPv2c ... ", SCLI_MSG);
-    }
-    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
-    if (interp->peer->error_status == 0) {
-	if (scli_interp_interactive(interp)) {
-	    g_print("good!\n");
-	}
+    if (interp->snmp == G_SNMP_V1
+	|| interp->snmp == G_SNMP_V2C
+	|| interp->snmp == G_SNMP_V3) {
+	interp->peer->version = interp->snmp;
     } else {
 	if (scli_interp_interactive(interp)) {
-	    g_print("timeout.\n%d Trying SNMPv1  ... ", SCLI_MSG);
+	    g_print("%3d Trying SNMPv2c ... ", SCLI_MSG);
 	}
-	interp->peer->version = G_SNMP_V1;
+	interp->peer->version = G_SNMP_V2C;
 	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
 	if (interp->peer->error_status == 0) {
 	    if (scli_interp_interactive(interp)) {
-		g_print("ok.\n");
+		g_print("good!\n");
 	    }
 	} else {
 	    if (scli_interp_interactive(interp)) {
-		g_print("timeout.\n");
+		g_print("timeout.\n%d Trying SNMPv1  ... ", SCLI_MSG);
 	    }
-	    scli_close(interp);
+	    interp->peer->version = G_SNMP_V1;
+	    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
+	    if (interp->peer->error_status == 0) {
+		if (scli_interp_interactive(interp)) {
+		    g_print("ok.\n");
+		}
+	    } else {
+		if (scli_interp_interactive(interp)) {
+		    g_print("timeout.\n");
+		}
+		scli_close(interp);
+	    }
 	}
     }
     if (system) {

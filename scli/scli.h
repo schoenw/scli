@@ -189,6 +189,7 @@ struct scli_interp {
     GSnmpSession *peer;		/* snmp peer we are talking to */
     gint delay;			/* delay between updates in milliseconds */
     int port;			/* default port number, defaults to 161 */
+    int snmp;			/* version of the preferred SNMP protocol */
     time_t epoch;		/* epoch (used to invalidate cached data) */
     int xid;			/* transaction identifier for each transaction */
     int regex_flags;		/* regular expression flags (see regcomp(3)) */
