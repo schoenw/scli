@@ -392,7 +392,7 @@ static int
 show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 {
     tcp_mib_tcpConnEntry_t **tcpConnTable = NULL;
-    int i, t;
+    int i, j, t;
 
     const gint32 tcp_states[] = { TCP_MIB_TCPCONNSTATE_LISTEN,
 				  TCP_MIB_TCPCONNSTATE_SYNSENT,
@@ -433,7 +433,6 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 	    const char *name;
 	    guint16 port;
 	    GSList *list = NULL;
-	    GSList *listen = NULL;
 	    tcp_state_t *t;
 		
 	    for (i = 0; tcpConnTable[i]; i++) {
@@ -443,23 +442,33 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 		}
 		c++;
 		port = tcpConnTable[i]->tcpConnLocalPort;
-#if 1
-		name = fmt_tcp_port(port, SCLI_FMT_NAME);
-#else
-		if (s == TCP_MIB_TCPCONNSTATE_LISTEN) {
+
+		/*
+		 * Check if the port is one of the ports we are listening
+		 * to. If yes, we assume that it is useful to identify a
+		 * certain protocol.
+		 */
+
+		for (j = 0; tcpConnTable[j]; j++) {
+		    if (tcpConnTable[j]->tcpConnState
+			&& (*tcpConnTable[j]->tcpConnState
+			    == TCP_MIB_TCPCONNSTATE_LISTEN)
+			&& tcpConnTable[j]->tcpConnLocalPort == port) {
+			break;
+		    }
+		}
+		if (tcpConnTable[j]) {
 		    name = fmt_tcp_port(port, SCLI_FMT_NAME_OR_ADDR);
-		    (void) tcp_state_lookup(&listen, name, port);
 		} else {
 		    name = fmt_tcp_port(port, SCLI_FMT_NAME);
 		}
-#endif
 		if (! name && s != TCP_MIB_TCPCONNSTATE_LISTEN) {
 		    port = tcpConnTable[i]->tcpConnRemPort;
 		    name = fmt_tcp_port(port, SCLI_FMT_NAME);
 		}
 		if (! name) {
 #if 1
-		    name = "?";
+		    name = "<other>";
 #else
 		    gchar *x, *y;
 		    port = tcpConnTable[i]->tcpConnLocalPort;
@@ -484,8 +493,6 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 	    }
 	    g_slist_foreach(list, tcp_state_free, NULL);
 	    g_slist_free(list);
-	    g_slist_foreach(listen, tcp_state_free, NULL);
-	    g_slist_free(listen);
 	}
     }
 
