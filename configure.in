@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(stop/stop.c)
 dnl Every other copy of the package version number gets its value from here
-AM_INIT_AUTOMAKE(stools, 0.1.19)
+AM_INIT_AUTOMAKE(stools, 0.1.20)
 
 dnl create a config.h file (Automake will add -DHAVE_CONFIG_H)
 AM_CONFIG_HEADER(config.h)
@@ -20,6 +20,15 @@ AC_PROG_CC
 AC_PROG_RANLIB
 AC_CHECK_PROG(SMIDUMP, smidump, smidump)
 AC_SUBST(SMIDUMP)
+
+AC_MSG_CHECKING([whether to enable -Wall])
+AC_ARG_ENABLE(warnings,
+[  --enable-warnings       Enable -Wall if using gcc.],
+[ if test -n "$GCC"; then 
+    AC_MSG_RESULT(adding -Wall to CFLAGS.)
+    CFLAGS="$CFLAGS -Wall"
+  fi],AC_MSG_RESULT(no))
+
 
 dnl Checks for libraries.
 
