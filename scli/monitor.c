@@ -207,7 +207,7 @@ show_system(GSnmpSession *peer, int flags)
     snmpv2_mib_get_system(peer, &system, mask);
     if (peer->error_status) {
 	const char *error;
-	error = gsnmp_enum_get_label(gsnmp_error_status_table,
+	error = gsnmp_enum_get_label(gsnmp_enum_error_table,
 				     peer->error_status);
         move(0, 10);
         clrtoeol();
@@ -785,6 +785,11 @@ scli_loop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
     loop = g_main_new(TRUE);
     
     g_timeout_add(1000, loop_iteration, &loop_data);
+
+    /*
+    (void) initscr();
+    (void) cbreak();
+    */
 
     channel = g_io_channel_unix_new(fileno(stdin));
     g_io_add_watch(channel, (G_IO_IN | G_IO_PRI), loop_input, loop);

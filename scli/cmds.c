@@ -291,9 +291,9 @@ scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc == 2) {
-	code = scli_open_community(interp, argv[1], 161, NULL);
+	code = scli_open_community(interp, argv[1], interp->port, NULL);
     } else if (argc == 3) {
-	code = scli_open_community(interp, argv[1], 161, argv[2]);
+	code = scli_open_community(interp, argv[1], interp->port, argv[2]);
     } else {
 	code = SCLI_SYNTAX_NUMARGS;
     }

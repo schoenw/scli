@@ -187,6 +187,7 @@ struct scli_interp {
     char *pager;		/* external pager we are using */
     GSnmpSession *peer;		/* snmp peer we are talking to */
     gint delay;			/* delay between updates in milliseconds */
+    int port;			/* default port number, defaults to 161 */
     time_t epoch;		/* epoch used to invalidate cached data */
     int regex_flags;		/* regular expression flags (see regcomp(3)) */
 };

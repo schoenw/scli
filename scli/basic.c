@@ -117,7 +117,7 @@ scli_snmp_error(scli_interp_t *interp)
 {
     if (interp->peer) {
 	const char *error;
-	error = gsnmp_enum_get_label(gsnmp_error_status_table,
+	error = gsnmp_enum_get_label(gsnmp_enum_error_table,
 				     interp->peer->error_status);
 	g_string_sprintfa(interp->result,
 			  "%s", error ? error : "internalError");
@@ -232,6 +232,7 @@ scli_interp_create()
     interp->header = g_string_new(NULL);
     interp->epoch = time(NULL);
     interp->regex_flags = REG_EXTENDED|REG_NOSUB;
+    interp->port = 161;
 
     return interp;
 }
@@ -662,7 +663,7 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
     case SCLI_SNMP:
 	if (interp->peer) {
 	    const char *error;
-	    error = gsnmp_enum_get_label(gsnmp_error_status_table,
+	    error = gsnmp_enum_get_label(gsnmp_enum_error_table,
 					 interp->peer->error_status);
 	    reason = g_strdup_printf("%s", error ? error : "internalError");
 #if 0

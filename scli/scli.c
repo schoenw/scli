@@ -427,6 +427,7 @@ main(int argc, char **argv)
     }
 
     interp->delay = delay;
+    interp->port = port;
 
     if (xml) {
 	interp->flags |= SCLI_INTERP_FLAG_XML;
