@@ -397,6 +397,7 @@ main(int argc, char **argv)
     scli_init_entity_mode(interp);
     scli_init_disman_mode(interp);
     scli_init_snmp_mode(interp);
+    scli_init_ip_mode(interp);
     scli_init_tcp_mode(interp);
     scli_init_interface_mode(interp);
 

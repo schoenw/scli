@@ -119,6 +119,9 @@ extern void
 scli_init_snmp_mode(scli_interp_t *interp);
 
 extern void
+scli_init_ip_mode(scli_interp_t *interp);
+
+extern void
 scli_init_tcp_mode(scli_interp_t *interp);
 
 extern int
