@@ -117,7 +117,7 @@ print_cmd_tree(GString *s, GNode *node, char *prefix)
 
 
 static int
-show_interp_modes(scli_interp_t *interp, int argc, char **argv)
+show_scli_modes(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_mode_t *mode;
@@ -280,7 +280,7 @@ cmd_scli_unalias(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-show_interp_aliases(scli_interp_t *interp, int argc, char **argv)
+show_scli_aliases(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_alias_t *alias;
@@ -311,15 +311,14 @@ show_interp_aliases(scli_interp_t *interp, int argc, char **argv)
 		    value_width = strlen(alias->value);
 		}
 	    }
-	    g_string_sprintfa(interp->header, "%-*s %-*s USAGE",
+	    g_string_sprintfa(interp->header, "%-*s %-*s",
 			      name_width, "ALIAS NAME",
 			  value_width, "ALIAS VALUE");
 	    for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
 		alias = (scli_alias_t *) elem->data;
-		g_string_sprintfa(interp->result, "%-*s %-*s %4d\n",
+		g_string_sprintfa(interp->result, "%-*s %-*s\n",
 				  name_width, alias->name,
-				  value_width, alias->value,
-				  alias->count);
+				  value_width, alias->value);
 	    }
 	}
     }
@@ -330,7 +329,7 @@ show_interp_aliases(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-show_interp_info(scli_interp_t *interp, int argc, char **argv)
+show_scli_info(scli_interp_t *interp, int argc, char **argv)
 {
     int const indent = 18;
     int rows, cols;
@@ -401,7 +400,7 @@ show_interp_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-conf_interp_debugging(scli_interp_t *interp, int argc, char **argv)
+conf_scli_debugging(scli_interp_t *interp, int argc, char **argv)
 {
     GSnmpDebugFlags flags = 0;
     SnmpDebugFlagToStringEntry *dft;
@@ -430,7 +429,7 @@ conf_interp_debugging(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-conf_interp_pager(scli_interp_t *interp, int argc, char **argv)
+conf_scli_pager(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -451,7 +450,7 @@ conf_interp_pager(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-conf_interp_format(scli_interp_t *interp, int argc, char **argv)
+conf_scli_format(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -502,34 +501,34 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  "open an association to a remote SNMP agent",
 	  scli_cmd_open },
-	{ "show interp aliases", NULL,
+	{ "show scli aliases", NULL,
 	  0,
 	  "show information about the interpreter aliases",
-	  show_interp_aliases },
-	{ "show interp info", NULL,
+	  show_scli_aliases },
+	{ "show scli info", NULL,
 	  0,
 	  "show status information about the interpreter",
-	  show_interp_info },
-	{ "show interp modes", NULL,
+	  show_scli_info },
+	{ "show scli modes", NULL,
 	  0,
 	  "show information about the available interpreter modes",
-	  show_interp_modes },
+	  show_scli_modes },
 	{ "delete scli alias", "<name>",
 	  0,
 	  "delete an scli command alias",
 	  cmd_scli_unalias },
-	{ "config interp debugging", "<layer> ...",
+	{ "config scli debugging", "<layer> ...",
 	  0,
 	  "configure interpreter debugging options",
-	  conf_interp_debugging },
-	{ "config interp pager", "<pager>",
+	  conf_scli_debugging },
+	{ "config scli pager", "<pager>",
 	  0,
 	  "configure pager used by the interpreter",
-	  conf_interp_pager },
-	{ "config interp format", "<pager>",
+	  conf_scli_pager },
+	{ "config scli format", "<pager>",
 	  0,
 	  "configure output format produced by the interpreter",
-	  conf_interp_format },
+	  conf_scli_format },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     

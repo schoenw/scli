@@ -97,7 +97,6 @@ struct scli_mode {
 struct scli_alias {
     char *name;			/* name of the command alias */
     char *value;		/* value of the command alias */
-    guint32 count;		/* usage counter for the alias */
 };
 
 

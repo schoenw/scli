@@ -235,6 +235,7 @@ scli_interp_reset(scli_interp_t *interp)
     interp->xml_doc = xmlNewDoc("1.0");
     interp->xml_doc->children = xmlNewDocNode(interp->xml_doc, NULL, "scli", NULL);
     interp->xml_node = interp->xml_doc->children;
+    xmlSetProp(interp->xml_node, "version", VERSION);
 }
 
 
@@ -256,6 +257,72 @@ scli_register_mode(scli_interp_t *interp, scli_mode_t *mode)
 
 
 
+static char *
+next_token(char *string, char *out)
+{
+    char *p = string, *d = out;
+    int dquote = 0;
+    int squote = 0;
+
+    while (*p && isspace(*p)) p++;	/* skip white space */
+    while (*p) {
+	switch (*p) {
+	case '\"':
+	    if (dquote) {
+		if (p[1] && !isspace(p[1])) {
+		    p++;
+		    return NULL;
+		} else {
+		    goto done;
+		}
+	    } else {
+		dquote = 1;
+		p++;
+	    }
+	    break;
+	case '\'':
+	    if (squote) {
+		if (p[1] && !isspace(p[1])) {
+		    p++;
+		    return NULL;
+		} else {
+		    goto done;
+		}
+	    } else {
+		squote = 1;
+		p++;
+	    }
+	    break;
+	    /* what about backslashes ? */
+	case ' ':
+	case '\f':
+	case '\n':
+	case '\r':
+	case '\t':
+	case '\v':
+	    if (dquote || squote) {
+		*d++ = *p++;		/* just copy */
+	    } else {
+		goto done;
+	    }
+	    break;
+	default:
+	    *d++ = *p++;		/* just copy */
+	    break;
+	}
+    }
+
+    if (dquote || squote) {
+	return NULL;
+    }
+
+ done:
+    *d = 0;
+    return *p ? p : NULL;
+}
+
+
+
 /*
  * Split a string into an argc/argv pair which can be passed to
  * command procedures. The memory pointed to by argv is dynamically
@@ -263,7 +330,6 @@ scli_register_mode(scli_interp_t *interp, scli_mode_t *mode)
  * copies of all the list elements. It is the caller's responsibility
  * to free up all of this storage.
  *
- * XXX This code should handle "quoted strings".
  * XXX This code should handle backslash substitutions.
  * XXX This code should handle ; as command separators.
  */
@@ -281,8 +347,26 @@ scli_split(char *string, int *argc, char ***argv)
     }
     size++;			/* leave space for final NULL pointer. */
 
-    *argv = (char **) g_malloc(((size * sizeof(char *)) + (p - string) + 1));
+    *argv = (char **) g_malloc0(((size * sizeof(char *)) + (p - string) + 1));
+
+    *argc = 0;
+    p = string;
+    d = ((char *) *argv) + size*sizeof(char *);
+
+    while (*p && isspace((int) *p)) p++;
+    if (*p == '#') {
+	return SCLI_OK;
+    }
     
+    do {
+	p = next_token(p, d);
+	if (*d) {
+	    (*argv)[(*argc)++] = d;
+	    d += strlen(d) + 1;
+	}
+    } while (p);
+
+#if 0
     for (*argc = 0, p = string, d = ((char *) *argv) + size*sizeof(char *);
 	 *p != 0; ) {
 	(*argv)[*argc] = NULL;
@@ -300,11 +384,47 @@ scli_split(char *string, int *argc, char ***argv)
 	    while (*p && isspace((int) *p)) p++;
 	}
     }
+#endif
     
     return SCLI_OK;
 }
 
 
+
+static char *
+expand_alias(scli_interp_t *interp, char *cmd)
+{
+    char *rest, *token;
+    char *expanded_cmd = NULL;
+    GSList *elem;
+    
+    /*
+     * We should perhaps allow the expansion of other aliases during alias
+     * expansion and only complain about alias expansion loops...
+     */
+
+    token = g_strdup(cmd);
+    rest = next_token(cmd, token);
+    if (token) {
+	for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
+	    scli_alias_t *alias = (scli_alias_t *) elem->data;
+	    if (strcmp(alias->name, token) == 0) {
+		expanded_cmd = g_malloc(strlen(cmd) + strlen(alias->value) + 2);
+		strcpy(expanded_cmd, alias->value);
+		strcat(expanded_cmd, " ");
+		if (rest) {
+		    strcat(expanded_cmd, rest);
+		}
+		g_printerr("** %s -> %s\n", cmd, expanded_cmd);
+		return expanded_cmd;
+	    }
+	}
+    }
+    g_free(token);
+    return NULL;
+}
+
+    
 
 int
 scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd)
@@ -488,12 +608,13 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
     return SCLI_OK;
 }
 
-    
+
 
 int
 scli_eval(scli_interp_t *interp, char *cmd)
 {
     char **argv;
+    char *expanded_cmd = NULL;
     int i, done = 0, argc, code = SCLI_OK;
     GNode *node = NULL;
     
@@ -504,7 +625,14 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	return SCLI_OK;
     }
 
-    (void) scli_split(cmd, &argc, &argv);
+    if (scli_interp_interactive(interp)
+	&& (expanded_cmd = expand_alias(interp, cmd))) {
+	(void) scli_split(expanded_cmd, &argc, &argv);
+	g_free(expanded_cmd);
+    } else {
+	(void) scli_split(cmd, &argc, &argv);
+    }
+
     if (argc == 0) {
 	if (argv) g_free(argv);
 	return SCLI_OK;

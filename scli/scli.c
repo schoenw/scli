@@ -123,6 +123,7 @@ generator(char const *text, int state)
     static char **argv = NULL;
     static size_t len;
     static GNode *last_node = NULL;
+    static GSList *last_elem = NULL;
 
     scli_interp_t *interp = current_interp;	/* a hack, for sure */
     GNode *node;
@@ -164,6 +165,7 @@ generator(char const *text, int state)
 	    }
 	    last_node = g_node_first_child(last_node);
 	}
+	last_elem = (argc < 2) ? interp->alias_list : NULL;
     }
 
     /*
@@ -175,6 +177,17 @@ generator(char const *text, int state)
 	if (strncmp(cmd->name, text, len) == 0) {
 	    last_node = g_node_next_sibling(node);
 	    return (g_strdup(cmd->name));
+	}
+    }
+
+    if (! node && last_elem) {
+	GSList *elem;
+	for (elem = last_elem; elem; elem = g_slist_next(elem)) {
+	    scli_alias_t *alias = (scli_alias_t *) elem->data;
+	    if (strncmp(alias->name, text, len) == 0) {
+		last_elem = g_slist_next(elem);
+		return (g_strdup(alias->name));
+	    }
 	}
     }
 
@@ -378,6 +391,7 @@ main(int argc, char **argv)
     signal(SIGHUP, onsignal);
     signal(SIGQUIT, onsignal);
     signal(SIGWINCH, onwinch);
+    signal(SIGPIPE, SIG_IGN);
 
     /*
      * Initialize the interpreter. Register the toplevel commands.
