@@ -126,11 +126,11 @@ typedef struct  _GSnmpVarBind		GSnmpVarBind;
 
 union _GSnmpVarBindSyntax
 {
-    guchar   uc[0];	/*  8 bit unsigned */
-    gint32   i32[0];	/* 32 bit signed   */
-    guint32  ui32[0];	/* 32 bit unsigned */
-    gint64   i64[0];	/* 64 bit signed   */
-    guint64  ui64[0];	/* 64 bit unsigned */
+    guchar   uc[1];	/*  8 bit unsigned */
+    gint32   i32[1];	/* 32 bit signed   */
+    guint32  ui32[1];	/* 32 bit unsigned */
+    gint64   i64[1];	/* 64 bit signed   */
+    guint64  ui64[1];	/* 64 bit unsigned */
 };
 
 struct _GSnmpVarBind

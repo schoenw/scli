@@ -195,20 +195,17 @@ g_snmp_varbind_new(guint32 const *oid, gsize oid_len, GSnmpVarBindType type,
 	obj = g_malloc(sizeof(GSnmpVarBind));
         break;
       case G_SNMP_INTEGER32:
-        len = sizeof(gint32);
-        obj = g_malloc(sizeof(GSnmpVarBind) + len);
+        obj = g_malloc(sizeof(GSnmpVarBind));
         obj->syntax.i32[0] = *((gint32 *) value);
         break;
       case G_SNMP_COUNTER32:
       case G_SNMP_UNSIGNED32:
       case G_SNMP_TIMETICKS:
-        len = sizeof(guint32);
-        obj = g_malloc(sizeof(GSnmpVarBind) + len);
+        obj = g_malloc(sizeof(GSnmpVarBind));
         obj->syntax.ui32[0] = *((guint32 *) value);
         break;
       case G_SNMP_COUNTER64:
-        len = sizeof(guint64);
-	obj = g_malloc(sizeof(GSnmpVarBind) + len);
+	obj = g_malloc(sizeof(GSnmpVarBind));
 	obj->syntax.ui64[0] = *((guint64 *) value);
 	break;
       case G_SNMP_OCTET_STRING:
@@ -616,7 +613,7 @@ g_snmp_request_decode ( ASN1_SCK *asn1, GSnmpRequest *request)
         return FALSE;
     if (cls != ASN1_UNI || con != ASN1_PRI || tag != ASN1_INT)
         return FALSE;
-    if (!g_asn1_uint32_decode (asn1, end, &request->id))
+    if (!g_asn1_uint32_decode (asn1, end, (guint32 *) &request->id))
         return FALSE;
     if (!g_asn1_header_decode (asn1, &end, &cls, &con, &tag))
         return FALSE;
@@ -850,11 +847,11 @@ g_snmp_pdu_v3_encode ( ASN1_SCK *asn1, GSnmpPdu *pdu, char *cenid,
 
     if (!g_asn1_header_encode (asn1, eoc, ASN1_CTX, ASN1_CON, pdu->type))
         return FALSE;
-    if (!g_asn1_octets_encode (asn1, &end, cname, cnamelen))
+    if (!g_asn1_octets_encode (asn1, &end, (guchar *) cname, cnamelen))
         return FALSE;
     if (!g_asn1_header_encode (asn1, end, ASN1_UNI, ASN1_PRI, ASN1_OTS))
         return FALSE;
-    if (!g_asn1_octets_encode (asn1, &end, cenid, cenidlen))
+    if (!g_asn1_octets_encode (asn1, &end, (guchar *) cenid, cenidlen))
         return FALSE;
     if (!g_asn1_header_encode (asn1, end, ASN1_UNI, ASN1_PRI, ASN1_OTS))
         return FALSE;

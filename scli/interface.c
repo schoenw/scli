@@ -27,6 +27,10 @@
 #include "stools.h"
 #include "scli.h"
 
+#include <string.h>
+
+extern time_t timezone;
+
 
 static char*
 fmt_time_ticks(guint32 timeticks)
@@ -267,7 +271,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 	{ "show", "interface",
-	  "display interface information", cmd_show },
+	  "show interface information", cmd_show },
 	{ NULL, NULL, NULL, NULL }
     };
     

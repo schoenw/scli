@@ -96,7 +96,7 @@ ipv4_resolve_address (guchar *hostname, struct sockaddr **address)
   *address = NULL;
   adr = (struct sockaddr_in *) g_malloc(sizeof(struct sockaddr_in)); 
   adr->sin_family = AF_INET;
-  hp = gethostbyname(hostname);
+  hp = gethostbyname((char *) hostname);
   if (!hp)
     {
       g_free(adr);

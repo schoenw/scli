@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4a from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -46,10 +46,9 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_STRIP_FLAG =
 transform = @program_transform_name@
 
 NORMAL_INSTALL = :
@@ -191,62 +190,13 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
+	    cp -pr $$/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-entity-mib.o: entity-mib.c entity-mib.h stools.h ../config.h \
-	../snmp/g_snmp.h ../snmp/g_asn1.h ../snmp/g_message.h \
-	../snmp/g_security.h ../snmp/g_sha.h ../snmp/g_md5.h \
-	../snmp/g_session.h ../snmp/g_transport.h ../snmp/g_dispatch.h \
-	../snmp/g_snmp_table.h if-mib.h ip-mib.h tcp-mib.h udp-mib.h \
-	snmpv2-mib.h host-resources-mib.h
-host-resources-mib.o: host-resources-mib.c host-resources-mib.h stools.h \
-	../config.h ../snmp/g_snmp.h ../snmp/g_asn1.h \
-	../snmp/g_message.h ../snmp/g_security.h ../snmp/g_sha.h \
-	../snmp/g_md5.h ../snmp/g_session.h ../snmp/g_transport.h \
-	../snmp/g_dispatch.h ../snmp/g_snmp_table.h if-mib.h ip-mib.h \
-	tcp-mib.h udp-mib.h snmpv2-mib.h entity-mib.h
-if-mib.o: if-mib.c if-mib.h stools.h ../config.h ../snmp/g_snmp.h \
-	../snmp/g_asn1.h ../snmp/g_message.h ../snmp/g_security.h \
-	../snmp/g_sha.h ../snmp/g_md5.h ../snmp/g_session.h \
-	../snmp/g_transport.h ../snmp/g_dispatch.h \
-	../snmp/g_snmp_table.h ip-mib.h tcp-mib.h udp-mib.h \
-	snmpv2-mib.h host-resources-mib.h entity-mib.h
-ip-mib.o: ip-mib.c ip-mib.h stools.h ../config.h ../snmp/g_snmp.h \
-	../snmp/g_asn1.h ../snmp/g_message.h ../snmp/g_security.h \
-	../snmp/g_sha.h ../snmp/g_md5.h ../snmp/g_session.h \
-	../snmp/g_transport.h ../snmp/g_dispatch.h \
-	../snmp/g_snmp_table.h if-mib.h tcp-mib.h udp-mib.h \
-	snmpv2-mib.h host-resources-mib.h entity-mib.h
-snmpv2-mib.o: snmpv2-mib.c snmpv2-mib.h stools.h ../config.h \
-	../snmp/g_snmp.h ../snmp/g_asn1.h ../snmp/g_message.h \
-	../snmp/g_security.h ../snmp/g_sha.h ../snmp/g_md5.h \
-	../snmp/g_session.h ../snmp/g_transport.h ../snmp/g_dispatch.h \
-	../snmp/g_snmp_table.h if-mib.h ip-mib.h tcp-mib.h udp-mib.h \
-	host-resources-mib.h entity-mib.h
-stools.o: stools.c stools.h ../config.h ../snmp/g_snmp.h \
-	../snmp/g_asn1.h ../snmp/g_message.h ../snmp/g_security.h \
-	../snmp/g_sha.h ../snmp/g_md5.h ../snmp/g_session.h \
-	../snmp/g_transport.h ../snmp/g_dispatch.h \
-	../snmp/g_snmp_table.h if-mib.h ip-mib.h tcp-mib.h udp-mib.h \
-	snmpv2-mib.h host-resources-mib.h entity-mib.h
-tcp-mib.o: tcp-mib.c tcp-mib.h stools.h ../config.h ../snmp/g_snmp.h \
-	../snmp/g_asn1.h ../snmp/g_message.h ../snmp/g_security.h \
-	../snmp/g_sha.h ../snmp/g_md5.h ../snmp/g_session.h \
-	../snmp/g_transport.h ../snmp/g_dispatch.h \
-	../snmp/g_snmp_table.h if-mib.h ip-mib.h udp-mib.h snmpv2-mib.h \
-	host-resources-mib.h entity-mib.h
-udp-mib.o: udp-mib.c udp-mib.h stools.h ../config.h ../snmp/g_snmp.h \
-	../snmp/g_asn1.h ../snmp/g_message.h ../snmp/g_security.h \
-	../snmp/g_sha.h ../snmp/g_md5.h ../snmp/g_session.h \
-	../snmp/g_transport.h ../snmp/g_dispatch.h \
-	../snmp/g_snmp_table.h if-mib.h ip-mib.h tcp-mib.h snmpv2-mib.h \
-	host-resources-mib.h entity-mib.h
-
 info-am:
 info: info-am
 dvi-am:
@@ -269,7 +219,7 @@ uninstall: uninstall-am
 all-am: Makefile $(LIBRARIES)
 all-redirect: all-am
 install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
 
 

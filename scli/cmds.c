@@ -50,21 +50,24 @@ print_cmd(GNode *node, gpointer data)
 {
     scli_cmd_t *cmd = (scli_cmd_t *) node->data;
     int i, depth;
-    
+    GString *s;
+
     if (cmd) {
+	s = g_string_new(NULL);
 	depth = g_node_depth(node);
 	for (i = 2; i < depth; i++) {
 	    if (i == 2) {
-		printf("  ");
+		s = g_string_append(s, "  ");
 	    } else {
-		printf("| ");
+		s = g_string_append(s, "| ");
 	    }
 	}
-	if (depth == 2) {
-	    printf("%s\t%s\n", cmd->name, cmd->desc);
-	} else {
-	    printf("+-%s\t%s\n", cmd->name, cmd->desc);
+	if (depth > 2) {
+	    s = g_string_append(s, "+-");
 	}
+	s = g_string_append(s, cmd->name);
+	printf("%-20s %s\n", s->str, cmd->desc);
+	g_string_free(s, 1);
     }
     return FALSE;
 }

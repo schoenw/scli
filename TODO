@@ -64,3 +64,4 @@
 
  19. implement a coexistance layer to hide snmpv1/snmpv2 pdu differences
 
++20. fix the usage of "gint32 i32[0]" which violates ANSI C

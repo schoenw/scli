@@ -27,6 +27,8 @@
 #include "stools.h"
 #include "stop.h"
 
+extern time_t timezone;
+
 
 typedef struct {
     int inOctets;

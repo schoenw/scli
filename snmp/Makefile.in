@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4a from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -46,10 +46,9 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_STRIP_FLAG =
 transform = @program_transform_name@
 
 NORMAL_INSTALL = :
@@ -186,38 +185,13 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
+	    cp -pr $$/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-g_asn1.o: g_asn1.c g_snmp.h g_asn1.h g_message.h g_security.h g_sha.h \
-	g_md5.h g_session.h g_transport.h g_dispatch.h g_snmp_table.h
-g_dispatch.o: g_dispatch.c ../config.h g_snmp.h g_asn1.h g_message.h \
-	g_security.h g_sha.h g_md5.h g_session.h g_transport.h \
-	g_dispatch.h g_snmp_table.h
-g_md5.o: g_md5.c ../config.h g_md5.h
-g_message.o: g_message.c g_snmp.h g_asn1.h g_message.h g_security.h \
-	g_sha.h g_md5.h g_session.h g_transport.h g_dispatch.h \
-	g_snmp_table.h
-g_security.o: g_security.c ../config.h g_snmp.h g_asn1.h g_message.h \
-	g_security.h g_sha.h g_md5.h g_session.h g_transport.h \
-	g_dispatch.h g_snmp_table.h
-g_session.o: g_session.c g_snmp.h g_asn1.h g_message.h g_security.h \
-	g_sha.h g_md5.h g_session.h g_transport.h g_dispatch.h \
-	g_snmp_table.h
-g_sha.o: g_sha.c g_sha.h
-g_snmp.o: g_snmp.c g_snmp.h g_asn1.h g_message.h g_security.h g_sha.h \
-	g_md5.h g_session.h g_transport.h g_dispatch.h g_snmp_table.h
-g_snmp_table.o: g_snmp_table.c ../config.h g_snmp.h g_asn1.h g_message.h \
-	g_security.h g_sha.h g_md5.h g_session.h g_transport.h \
-	g_dispatch.h g_snmp_table.h
-g_transport.o: g_transport.c ../config.h g_snmp.h g_asn1.h g_message.h \
-	g_security.h g_sha.h g_md5.h g_session.h g_transport.h \
-	g_dispatch.h g_snmp_table.h
-
 info-am:
 info: info-am
 dvi-am:
@@ -240,7 +214,7 @@ uninstall: uninstall-am
 all-am: Makefile $(LIBRARIES)
 all-redirect: all-am
 install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
 
 

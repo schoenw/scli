@@ -164,7 +164,7 @@ ptr    = buffer;
 
   if (!g_snmp_pdu_v1_encode (&asn1, PDU))
     return FALSE;
-  if (!g_asn1_octets_encode (&asn1, &end, securityName->str, securityName->len))
+  if (!g_asn1_octets_encode (&asn1, &end, (guchar *) securityName->str, securityName->len))
     return FALSE;
   if (!g_asn1_header_encode (&asn1, end, ASN1_UNI, ASN1_PRI, ASN1_OTS))
     return FALSE;
@@ -254,13 +254,13 @@ snmpv1_prepare_data_elements(guint transportDomain,
   if (cls != ASN1_UNI || con != ASN1_PRI || tag != ASN1_OTS)
     return FALSE;
   if (!g_asn1_octets_decode (&asn1, end, (guchar **)&((*securityName)->str), 
-                             &((*securityName)->len)))
+                             (guint *) &((*securityName)->len)))
     return FALSE;
   if (!g_snmp_pdu_v1_decode (&asn1, PDU))
     return FALSE;
   if (!g_asn1_eoc_decode (&asn1, eoc))
     return FALSE;
-  g_asn1_close (&asn1, wholeMsg, &wholeMsgLength);
+  g_asn1_close (&asn1, wholeMsg, (guint *) &wholeMsgLength);
 
   if (PDU->type == G_SNMP_PDU_RESPONSE) 
     *sendPduHandle = -1;
@@ -348,7 +348,7 @@ ptr    = buffer;
 
   if (!g_snmp_pdu_v2_encode (&asn1, PDU))
     return FALSE;
-  if (!g_asn1_octets_encode (&asn1, &end, securityName->str, securityName->len))
+  if (!g_asn1_octets_encode (&asn1, &end, (guchar *) securityName->str, securityName->len))
     return FALSE;
   if (!g_asn1_header_encode (&asn1, end, ASN1_UNI, ASN1_PRI, ASN1_OTS))
     return FALSE;
@@ -435,13 +435,13 @@ snmpv2c_prepare_data_elements(guint transportDomain,
   if (cls != ASN1_UNI || con != ASN1_PRI || tag != ASN1_OTS)
     return FALSE;
   if (!g_asn1_octets_decode (&asn1, end, (guchar **)&((*securityName)->str), 
-                             &((*securityName)->len)))
+                             (guint *) &((*securityName)->len)))
     return FALSE;
   if (!g_snmp_pdu_v2_decode (&asn1, PDU))
     return FALSE;
   if (!g_asn1_eoc_decode (&asn1, eoc))
     return FALSE;
-  g_asn1_close (&asn1, wholeMsg, &wholeMsgLength);
+  g_asn1_close (&asn1, wholeMsg, (guint *) &wholeMsgLength);
 
   if (PDU->type == G_SNMP_PDU_RESPONSE) 
     *sendPduHandle = -1;
@@ -526,7 +526,7 @@ snmpv3_prepare_outgoing_message(guint transportDomain,
      contextName?contextName->len:0))
     return FALSE;
 
-  if (!g_asn1_octets_encode (&asn1, &end, securityName->str, securityName->len))
+  if (!g_asn1_octets_encode (&asn1, &end, (guchar *) securityName->str, securityName->len))
     return FALSE;
   if (!g_asn1_header_encode (&asn1, end, ASN1_UNI, ASN1_PRI, ASN1_OTS))
     return FALSE;
@@ -631,13 +631,13 @@ snmpv3_prepare_data_elements(guint transportDomain,
   if (cls != ASN1_UNI || con != ASN1_PRI || tag != ASN1_OTS)
     return FALSE;
   if (!g_asn1_octets_decode (&asn1, end, (guchar **)&((*securityName)->str), 
-                             &((*securityName)->len)))
+                             (guint *) &((*securityName)->len)))
     return FALSE;
   if (!g_snmp_pdu_v2_decode (&asn1, PDU))
     return FALSE;
   if (!g_asn1_eoc_decode (&asn1, eoc))
     return FALSE;
-  g_asn1_close (&asn1, wholeMsg, &wholeMsgLength);
+  g_asn1_close (&asn1, wholeMsg, (guint *) &wholeMsgLength);
 
   if (PDU->type == G_SNMP_PDU_RESPONSE) 
     *sendPduHandle = -1;

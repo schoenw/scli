@@ -93,7 +93,7 @@ onwinch(int n)
 
 
 static void
-fix_string(char *s, int *len)
+fix_string(guchar *s, gsize *len)
 {
     int i;
 
@@ -292,7 +292,7 @@ show_system(host_snmp *peer, int flags)
     if (do_contact_summary
         && system->sysLocation && system->_sysLocationLength) {
         fix_string(system->sysLocation, &(system->_sysLocationLength));
-        mvprintw(sys_loc_line, 10, "%.*s\n",
+        mvprintw(sys_loc_line, 10, "%.*s",
 		 MIN(system->_sysLocationLength, COLS-11),
                  system->sysLocation);
 	clrtoeol();

@@ -93,10 +93,10 @@ fmt_kbytes(guint32 bytes)
 
 
 static void
-print_string(char *label, gchar *string, gsize len)
+print_string(char *label, guchar *string, gsize len)
 {
     if (len < 0) {
-	len = strlen(string);
+	len = strlen((char *) string);
     }
     if (string && len) {
 	if (label) {
@@ -150,7 +150,7 @@ show_system_summary(scli_interp_t *interp)
 		    system->sysLocation, system->_sysLocationLength);
 	if (system->sysUpTime) {
 	    print_string("Agent:",
-			fmt_time_ticks(*(system->sysUpTime)), -1);
+			(guchar *) fmt_time_ticks(*(system->sysUpTime)), -1);
 	}
 	if (system->sysObjectID) {
 	    scli_vendor_t *vendor;
@@ -185,13 +185,13 @@ show_system_summary(scli_interp_t *interp)
     if (host_resources_mib_get_hrSystem(interp->peer, &hrSystem) == 0 && hrSystem) {
 	if (hrSystem->hrSystemUptime) {
 	    print_string("Uptime:",
-			fmt_time_ticks(*(hrSystem->hrSystemUptime)), -1);
+			(guchar *) fmt_time_ticks(*(hrSystem->hrSystemUptime)), -1);
 	}
 	if (hrSystem->hrSystemDate && hrSystem->_hrSystemDateLength) {
 	    char *date = fmt_date_and_time(hrSystem->hrSystemDate,
 					   hrSystem->_hrSystemDateLength);
 	    if (date) {
-		print_string("Date:", date, -1);
+		print_string("Date:", (guchar *) date, -1);
 	    }
 	}
 	if (hrSystem->hrSystemNumUsers) {
@@ -207,7 +207,7 @@ show_system_summary(scli_interp_t *interp)
 
     if (host_resources_mib_get_hrStorage(interp->peer, &hrStorage) == 0 && hrStorage) {
 	if (hrStorage->hrMemorySize) {
-	    print_string("Memory:", fmt_kbytes(*(hrStorage->hrMemorySize)), -1);
+	    print_string("Memory:", (guchar *) fmt_kbytes(*(hrStorage->hrMemorySize)), -1);
 	}
 	host_resources_mib_free_hrStorage(hrStorage);
     }
@@ -251,9 +251,9 @@ scli_init_system_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 	{ "show", "system",
-	  "display system information", cmd_show },
+	  "show generic system information", cmd_show },
 	{ "show system", "entities",
-	  "display system entities", cmd_entities },
+	  "show the entities that make up the system", cmd_entities },
 	{ NULL, NULL, NULL, NULL }
     };
     

@@ -2,17 +2,66 @@
 
 Description
 
-  The stools package was written in order to have small and efficient
-  command line utility to monitor and configure network devices and
-  host systems. The stools package is based on the SNMP management
-  protocol and it utilizes a MIB compiler called smidump to generate C
-  stub code. In fact, virtually no SNMP knowledge is required in order
-  to extend the stools programs with new features.
+  The stools package was written since we felt a need for small and
+  efficient command line utilities to monitor and configure network
+  devices and host systems. The stools package is based on the SNMP
+  management protocol. It utilizes a MIB compiler called smidump to
+  generate C stub code. In fact, virtually no SNMP knowledge is
+  required in order to extend the stools programs with new features.
 
-  In other words, the slogan for this little package is:
+  To summarize, the slogan for this little package is:
 
     "After more than 10 years of SNMP, I felt it is time for really
      useful command line SNMP monitoring and configuration tools. ;-)"
+
+
+Compiling
+
+  To compile the package, you need to have the following packages
+  available:
+
+  - GNU readline version 4.X
+  - glib version 1.2.X
+  - ncurses version 5.X (or a native working curses implementation)
+
+  The package compiles cleanly with gcc. Other C compilers have not
+  been tested and may generate errors.
+
+
+Reporting Bugs
+
+  Please report any bugs to the stools mailing list. A bug report
+  should at a minimum contain the version number of the stools
+  package, the operating system name and version number, plus
+  everything needed to understand the problem. This includes a
+  description why you actually believe that there is a bug.
+
+  If you got a core dump, please send us a readable backtrace.
+  If there was a problem with a certain SNMP agent, please let
+  us know which agent you were using and try to catch SNMP 
+  message exchanges that help to understand the problem.
+  (You may want to run a recent version of tcpdump to catch
+  the messages.)
+
+
+Mailing List
+
+  The stools mailing list is <stools@ibr.cs.tu-bs.de>. For subscribing
+  to the list, send a message containing the words ``subscribe
+  stools'' to <majordomo@ibr.cs.tu-bs.de>.
+
+
+Web Site
+
+  The Web site for the stools package is located at the following URL:
+
+  <http://www.ibr.cs.tu-bs.de/projects/stools/>
+
+
+Contacting Authors
+
+  See the file 'AUTHORS' that should have been included in the
+  distribution.
 
 
 Copyright (C) 2001 Juergen Schoenwaelder
@@ -31,6 +80,3 @@ Copyright (C) 2001 Juergen Schoenwaelder
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-Comments are welcome.
-
-	- Juergen Schoenwaelder <schoenw@ibr.cs.tu-bs.de>
