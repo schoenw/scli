@@ -67,10 +67,11 @@ extern char const scli_copyright[];	/* copyright message (surprise) */
  * The return codes used by the scli commands functions.
  */
 
-#define SCLI_OK		0	/* normal return code */
-#define SCLI_ERROR	1	/* generic error return code */
-#define SCLI_EXIT	2	/* return and exit the command loop */
-#define SCLI_SYNTAX	3	/* syntax error return code */
+#define SCLI_OK			0	/* normal return code */
+#define SCLI_ERROR		1	/* generic error return code */
+#define SCLI_EXIT		2	/* return and exit the command loop */
+#define SCLI_SYNTAX		3	/* generic syntax error return code */
+#define SCLI_SYNTAX_REGEXP	4	/* syntax error in regexp */
 
 
 typedef struct scli_interp	scli_interp_t;

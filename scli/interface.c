@@ -484,7 +484,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_SYNTAX;
+	    return SCLI_SYNTAX_REGEXP;
 	}
     }
 
@@ -613,7 +613,7 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_SYNTAX;
+	    return SCLI_SYNTAX_REGEXP;
 	}
     }
 
@@ -721,7 +721,7 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_SYNTAX;
+	    return SCLI_SYNTAX_REGEXP;
 	}
     }
 
@@ -794,7 +794,7 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_iface = &_regex_iface;
 	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_SYNTAX;
+	    return SCLI_SYNTAX_REGEXP;
 	}
     }
 
@@ -952,7 +952,7 @@ set_interface_status(scli_interp_t *interp, int argc, char **argv)
 
     regex_iface = &_regex_iface;
     if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_REGEXP;
     }
 
     if (! gsnmp_enum_get_number(if_mib_enums_ifAdminStatus, argv[2], &value)) {

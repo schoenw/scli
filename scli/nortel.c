@@ -321,7 +321,7 @@ show_nortel_baystack_vlan_details(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_vlan = &_regex_vlan;
 	if (regcomp(regex_vlan, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_SYNTAX;
+	    return SCLI_SYNTAX_REGEXP;
 	}
     }
 
@@ -410,7 +410,7 @@ show_nortel_baystack_vlan_info(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_vlan = &_regex_vlan;
 	if (regcomp(regex_vlan, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_SYNTAX;
+	    return SCLI_SYNTAX_REGEXP;
 	}
     }
 
@@ -485,7 +485,7 @@ delete_nortel_baystack_vlan(scli_interp_t *interp, int argc, char **argv)
 
     regex_vlan = &_regex_vlan;
     if (regcomp(regex_vlan, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_REGEXP;
     }
 
     if (rapidcity_vlan_mib_get_rcVlanTable(interp->peer, &vlanTable)) {
@@ -601,7 +601,7 @@ set_nortel_baystack_vlan_ports(scli_interp_t *interp, int argc, char **argv)
 
     regex_vlan = &_regex_vlan;
     if (regcomp(regex_vlan, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	return SCLI_SYNTAX;
+	return SCLI_SYNTAX_REGEXP;
     }
 
     if (scan_ports(ports, sizeof(ports), argv[2]) != SCLI_OK) {

@@ -26,19 +26,6 @@
 #include <readline/history.h>
 
 
-typedef struct {
-    GSnmpDebugFlags flag;
-    gchar	    *name;
-} SnmpDebugFlagToStringEntry;
-
-static SnmpDebugFlagToStringEntry debug_flag_table[] = {
-    { G_SNMP_DEBUG_REQUESTS, "request" },
-    { G_SNMP_DEBUG_SESSION, "session" },
-    { G_SNMP_DEBUG_TRANSPORT, "transport" },
-    { 0, 0 }
-};
-
-
 
 static gint
 alias_compare(gconstpointer a, gconstpointer b)
@@ -102,7 +89,7 @@ fmt_cmd_tree(GString *s, GNode *node, char *prefix)
 
 
 static int
-show_scli_command_tree(scli_interp_t *interp, int argc, char **argv)
+show_scli_commands(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -119,122 +106,7 @@ show_scli_command_tree(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-show_scli_command_details(scli_interp_t *interp, int argc, char **argv)
-{
-    GSList *elem;
-    scli_mode_t *mode;
-    int i, j, c;
-    regex_t _regex_cmd, *regex_cmd = NULL;
-    char *cmd;
-
-    if (argc > 2) {
-	return SCLI_SYNTAX;
-    }
-
-    if (argc == 2) {
-	regex_cmd = &_regex_cmd;
-	if (regcomp(regex_cmd, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_SYNTAX;
-	}
-    }
-    
-    for (c = 0, elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
-	mode = (scli_mode_t *) elem->data;
-	for (i = 0; mode->cmds[i].path; i++) {
-	    cmd = g_strdup_printf("%s %s",
-			  mode->cmds[i].path,
-			  mode->cmds[i].options ? mode->cmds[i].options : "");
-	    if (regex_cmd) {
-		if (regexec(regex_cmd, cmd, (size_t) 0, NULL, 0) != 0) {
-		    g_free(cmd);
-		    continue;
-		}
-	    }
-	    if (c) {
-		g_string_append(interp->result, "\n");
-	    }
-	    g_string_sprintfa(interp->result, "Command:     %s\n", cmd);
-	    g_string_append(interp->result, "Description: ");
-	    for (j = 0; mode->cmds[i].desc[j]; j++) {
-		g_string_append_c(interp->result, mode->cmds[i].desc[j]);
-		if (mode->cmds[i].desc[j] == '\n') {
-		    g_string_append(interp->result, "             ");
-		}
-	    }
-	    g_string_append_c(interp->result, '\n');
-	    g_string_sprintfa(interp->result, "Formats:     scli%s\n",
-		      (mode->cmds[i].flags & SCLI_CMD_FLAG_XML) ? ",xml" : "");
-	    g_string_sprintfa(interp->result, "Mode:        %s\n",
-			      mode->name);
-	    g_free(cmd);
-	    c++;
-	}
-    }
-
-    if (regex_cmd) regfree(regex_cmd); 
-    
-    return SCLI_OK;
-}
-
-
-
-static int
-show_scli_command_info(scli_interp_t *interp, int argc, char **argv)
-{
-    GSList *elem;
-    scli_mode_t *mode;
-    int mode_width = 6;
-    int i;
-    regex_t _regex_cmd, *regex_cmd = NULL;
-    char *cmd;
-
-    if (argc > 2) {
-	return SCLI_SYNTAX;
-    }
-
-    if (argc == 2) {
-	regex_cmd = &_regex_cmd;
-	if (regcomp(regex_cmd, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_SYNTAX;
-	}
-    }
-    
-    for (elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
-	mode = (scli_mode_t *) elem->data;
-	if (strlen(mode->name) > mode_width) {
-	    mode_width = strlen(mode->name);
-	}
-    }
-
-    g_string_sprintfa(interp->header, "%-*s COMMAND", mode_width, "MODE");
-    
-    for (elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
-	mode = (scli_mode_t *) elem->data;
-	for (i = 0; mode->cmds[i].path; i++) {
-	    cmd = g_strdup_printf("%s %s",
-			  mode->cmds[i].path,
-			  mode->cmds[i].options ? mode->cmds[i].options : "");
-	    if (regex_cmd) {
-		if (regexec(regex_cmd, cmd, (size_t) 0, NULL, 0) != 0) {
-		    g_free(cmd);
-		    continue;
-		}
-	    }
-	    g_string_sprintfa(interp->result, "%-*s %s\n", mode_width,
-			      mode->name, cmd);
-	    g_free(cmd);
-	}
-    }
-
-    if (regex_cmd) regfree(regex_cmd); 
-    
-    return SCLI_OK;
-}
-
-
-
-static int
-show_scli_mode_details(scli_interp_t *interp, int argc, char **argv)
+show_scli_modes(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_mode_t *mode;
@@ -251,7 +123,7 @@ show_scli_mode_details(scli_interp_t *interp, int argc, char **argv)
     if (argc == 2) {
 	regex_mode = &_regex_mode;
 	if (regcomp(regex_mode, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
-	    return SCLI_SYNTAX;
+	    return SCLI_SYNTAX_REGEXP;
 	}
     }
     
@@ -288,30 +160,6 @@ show_scli_mode_details(scli_interp_t *interp, int argc, char **argv)
 }
 
 
-#if 0
-static int
-show_scli_modes(scli_interp_t *interp, int argc, char **argv)
-{
-    GSList *elem;
-    scli_mode_t *mode;
-
-    g_return_val_if_fail(interp, SCLI_ERROR);
-
-    if (argc > 1) {
-	return SCLI_SYNTAX;
-    }
-
-    g_string_sprintfa(interp->header, "%-15s %s", "MODE", "DESCRIPTION");
-    for (elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
-	mode = (scli_mode_t *) elem->data;
-	g_string_sprintfa(interp->result, "%-15s %s\n",
-			  mode->name, mode->desc);
-    }
-    return SCLI_OK;
-}
-#endif
-
-
 static int
 help(scli_interp_t *interp, int argc, char **argv)
 {
@@ -322,9 +170,9 @@ help(scli_interp_t *interp, int argc, char **argv)
     }
 
     g_string_sprintfa(interp->result,
-      "scli is a command interpreter which can be used to browse,\n"
-      "monitor and configure SNMP enabled devices. scli commands are\n"
-      "organized in a hierarchy. The top-level commands are:\n"
+      "Scli is a command interpreter which can be used to browse,\n"
+      "monitor and configure SNMP enabled devices. All scli commands\n"
+      "are organized in a hierarchy. The top-level commands are:\n"
       "\n"
       " - open         Establish an association to a remote SNMP agent.\n"
       " - close        Close the association to a remote SNMP agent.\n"
@@ -337,8 +185,8 @@ help(scli_interp_t *interp, int argc, char **argv)
       " - show         Show information provided by the remote SNMP agent.\n"
       " - monitor      Monitor information provided by the remote SNMP agent.\n"
       "\n"
-      "Use the \"show scli command tree\" command to look at the complete\n"
-      "scli command tree and \"show scli command details\" command to obtain\n"
+      "Use the \"show scli commands\" command to browse the complete\n"
+      "scli command tree and \"show scli modes\" command to obtain\n"
       "a detailed description of the various scli commands.\n");
     
     return SCLI_OK;
@@ -408,18 +256,29 @@ cmd_scli_close(scli_interp_t *interp, int argc, char **argv)
 static int
 create_scli_alias(scli_interp_t *interp, int argc, char **argv)
 {
+    GSList *elem;
     scli_alias_t *alias = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
     
-    if (argc == 3) {
+    if (argc != 3) {
+	return SCLI_SYNTAX;
+    }
+
+    for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
+	alias = (scli_alias_t *) elem->data;
+	if (strcmp(alias->name, argv[1]) == 0) break;
+    }
+
+    if (elem) {
+	g_free(alias->value);
+	alias->value = g_strdup_printf(argv[2]);
+    } else {
 	alias = (scli_alias_t *) g_malloc0(sizeof(scli_alias_t));
 	alias->name = g_strdup(argv[1]);
 	alias->value = g_strdup(argv[2]);
 	interp->alias_list = g_slist_insert_sorted(interp->alias_list,
 						   alias, alias_compare);
-    } else {
-	return SCLI_SYNTAX;
     }
     
     return SCLI_OK;
@@ -432,6 +291,7 @@ delete_scli_alias(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_alias_t *alias = NULL;
+    regex_t _regex_name, *regex_name = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -439,10 +299,15 @@ delete_scli_alias(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
     
+    regex_name = &_regex_name;
+    if (regcomp(regex_name, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	return SCLI_SYNTAX_REGEXP;
+    }
+    
  again:
     for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
 	alias = (scli_alias_t *) elem->data;
-	if (strcmp(alias->name, argv[1]) == 0) {
+	if (regexec(regex_name, alias->name, (size_t) 0, NULL, 0) == 0) {
 	    interp->alias_list = g_slist_remove(interp->alias_list,
 						elem->data);
 	    g_free(alias->name);
@@ -451,6 +316,8 @@ delete_scli_alias(scli_interp_t *interp, int argc, char **argv)
 	    goto again;
 	}
     }
+
+    if (regex_name) regfree(regex_name);
     
     return SCLI_OK;
 }
@@ -458,7 +325,7 @@ delete_scli_alias(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-show_scli_command_aliases(scli_interp_t *interp, int argc, char **argv)
+show_scli_aliases(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_alias_t *alias;
@@ -502,7 +369,7 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 {
     int const indent = 18;
     int rows, cols;
-    SnmpDebugFlagToStringEntry *dft;
+    GSnmpEnum const *dft;
     char const *label;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -527,9 +394,9 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 		      interp->delay / 1000);
 
     g_string_sprintfa(interp->result, "%-*s ", indent, "Debugging:");
-    for (dft = debug_flag_table; dft && dft->name; dft++) {
-	if (g_snmp_debug_flags & dft->flag) {
-	    g_string_sprintfa(interp->result, "%s ", dft->name);
+    for (dft = gsnmp_enum_debug_table; dft && dft->label; dft++) {
+	if (g_snmp_debug_flags & dft->number) {
+	    g_string_sprintfa(interp->result, "%s ", dft->label);
 	}
     }
     g_string_append(interp->result, "\n");
@@ -573,26 +440,34 @@ static int
 set_scli_debugging(scli_interp_t *interp, int argc, char **argv)
 {
     GSnmpDebugFlags flags = 0;
-    SnmpDebugFlagToStringEntry *dft;
-    int i;
+    GSnmpEnum const *dft;
+    regex_t _regex_flags, *regex_flags = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
-    
-    for (i = 1; i < argc; i++) {
-	for (dft = debug_flag_table; dft && dft->name; dft++) {
-	    if (strcmp(argv[i], dft->name) == 0) {
-		flags |= dft->flag;
-		break;
-	    }
-	}
-	if (! dft || ! dft->name) {
-	    g_string_sprintfa(interp->result,
-			      "unknown debugging option \"%s\"", argv[i]);
-	    return SCLI_ERROR;
-	}
+
+    if (argc > 2) {
+	return SCLI_SYNTAX;
     }
 
+    if (argc == 1) {
+	g_snmp_debug_flags = 0;
+	return SCLI_OK;
+    }
+    
+    regex_flags = &_regex_flags;
+    if (regcomp(regex_flags, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	return SCLI_SYNTAX_REGEXP;
+    }
+    
+    for (dft = gsnmp_enum_debug_table; dft && dft->label; dft++) {
+	if (regexec(regex_flags, dft->label, (size_t) 0, NULL, 0) == 0) {
+	    flags |= dft->number;
+	}
+    }
     g_snmp_debug_flags = flags;
+
+    if (regex_flags) regfree(regex_flags);
+
     return SCLI_OK;
 }
 
@@ -647,82 +522,130 @@ void
 scli_init_scli_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "open", "<hostname> [<community>]",
+
+	{ "open", "<nodename> [<community>]",
 	  0,
-	  "open an association to a remote SNMP agent",
+	  "The open command establishes an association to a remote SNMP\n"
+	  "agent. The <nodename> argument is the DNS name or the IP\n"
+	  "address of the remote node. Scli will try to talks to this\n"
+	  "node's SNMP agent on the default port number (usually 161)\n"
+	  "using the default transport mapping (usually SNMP over UDP).\n"
+	  "The optional <community> argument is the community string\n"
+	  "needed to communicate with the remote SNMP agent. The default\n"
+	  "community string is \"public\". Opening an association while\n"
+	  "an association is already established is not considered an\n"
+	  "error. The existing established association will be closed\n"
+	  "automatically before an attempt to create a new association\n"
+	  "is started.",
 	  scli_cmd_open },
+
 	{ "close", NULL,
 	  0,
-	  "close the association to a remote SNMP agent",
+	  "The close command closes an established association to a remote\n"
+	  "SNMP agent. Invoking the close command when no association is\n"
+	  "established is not considered an error and will do just nothing.",
 	  cmd_scli_close },
+
 	{ "exit", NULL,
 	  0,
-	  "exit the scli command line program",
+	  "The exit command terminates the scli interpreter. An end of file\n"
+	  "in the standard input stream will also terminate the the scli\n"
+	  "interpreter.",
 	  cmd_scli_exit },
+
 	{ "help", NULL,
 	  0,
-	  "display some help information",
+	  "The help command displays some help information including a list\n"
+	  "of all top-level scli commands.",
 	  help },
+
 	{ "history", NULL,
 	  0,
-	  "display the command history list with line numbers",
+	  "The history command displays the scli command history list with\n"
+	  "line numbers.",
 	  history },
+
         { "create scli alias", "<name> <value>",
 	  0,
-	  "create an alias for an scli command",
+	  "The create scli alias command creates the alias <name> for the\n"
+	  "scli command (fragment) <value>. If the alias <name> already\n"
+	  "exists, then the new <value> will be assigned to the existing\n"
+	  "alias.",
 	  create_scli_alias },
-	{ "delete scli alias", "<name>",
+	
+	{ "delete scli alias", "<regexp>",
 	  0,
-	  "delete an scli command alias",
+	  "The delete scli alias command removes previously defined\n"
+	  "aliases from the scli interpreter. The regular expression\n"
+	  "<regexp> is matched against all alias names in order to\n"
+	  "select the aliases that are deleted.",
 	  delete_scli_alias },
-	{ "set scli debugging", "[<layer> ...]",
+	
+	{ "set scli debugging", "[<regexp>]",
 	  0,
-	  "set interpreter debugging options",
+	  "The set scli debugging command sets the debugging level of\n"
+	  "the SNMP engine. The optional regular expression <regexp> is\n"
+	  "matched against the debugging levels. A successful match turns\n"
+	  "a debugging level on while an unsuccessful match turns a\n"
+	  "debugging level off. Invoking the command without the <regexp>\n"
+	  "argument will turn all debugging levels off. The currently\n"
+	  "defined debugging levels are \"session\" for the SNMP session\n"
+	  "layer, \"request\" for the SNMP request handling layer, and\n"
+	  "\"transport\" for the SNMP transport layer.",
 	  set_scli_debugging },
+	
 	{ "set scli pager", "<pager>",
 	  0,
-	  "set pager used by the interpreter",
+	  "The set scli pager command defines the shell command which is\n"
+	  "used as a pager if the output produced by an scli command does\n"
+	  "not fit on a single screen. The output is passed to the <pager>\n"
+	  "shell command via its standard input stream.",
 	  set_scli_pager },
-	{ "set scli format", "<pager>",
+	
+	{ "set scli format", "<fmt>",
 	  SCLI_CMD_FLAG_XML,
-	  "set output format of the interpreter",
+	  "The set scli format command defines the output format used by\n"
+	  "subsequent scli commands. The currently supported formats are\n"
+	  "\"scli\" and \"xml\". The \"scli\" format is the default output\n"
+	  "format and described in this documentation. The \"xml\" output\n"
+	  "format is experimental and therefore not described here.",
 	  set_scli_format },
+	
 	{ "show scli info", NULL,
 	  0,
-	  "show status information about the scli interpreter",
+	  "The show scli info command displays the current status of the\n"
+	  "scli interpreter.",
 	  show_scli_info },
-#if 0
-	{ "show scli modes", NULL,
+
+	{ "show scli commands", NULL,
 	  0,
-	  "show information about the scli modes",
+	  "The show scli commands command displays the scli command tree.\n"
+	  "The full command syntax is displayed for each leaf node.",
+	  show_scli_commands },
+
+	{ "show scli aliases", NULL,
+	  0,
+	  "The show scli aliases command lists all scli command aliases.\n"
+	  "The first column in the generated table lists the aliase names\n"
+	  "while the second column shows the alias values.",
+	  show_scli_aliases },
+
+	{ "show scli modes", "[<regex>]",
+	  0,
+	  "The show scli modes command shows information about the scli\n"
+	  "modes. An scli mode is a logical grouping of related commands\n"
+	  "(e.g., all commands that deal with printers). The optional\n"
+	  "regular expression <regex> can be use to select a subset of\n"
+	  "the available scli modes.",
 	  show_scli_modes },
-#endif
-	{ "show scli command info", "[<regex>]",
-	  0,
-	  "show summary information about the scli commands",
-	  show_scli_command_info },
-	{ "show scli command details", "[<regex>]",
-	  0,
-	  "show information about the scli commands",
-	  show_scli_command_details },
-	{ "show scli command tree", NULL,
-	  0,
-	  "show the scli command tree",
-	  show_scli_command_tree },
-	{ "show scli command aliases", NULL,
-	  0,
-	  "show information about the scli command aliases",
-	  show_scli_command_aliases },
-	{ "show scli mode details", "[<regex>]",
-	  0,
-	  "show information about the scli modes",
-	  show_scli_mode_details },
+
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t scli_mode = {
 	"scli",
-	"scli mode to display and configure scli parameters",
+	"The scli mode provides commands that can be used to display and\n"
+	"manipulate the internal state of the scli interpreter.",
 	cmds
     };
 

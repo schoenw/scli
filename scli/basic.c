@@ -529,6 +529,9 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
     }
 
     switch (code) {
+    case SCLI_SYNTAX_REGEXP:
+	g_printerr("error: invalid regular expression\n");
+	break;
     case SCLI_SYNTAX:
 	g_printerr("usage: %s %s\n", cmd->path,
 		   cmd->options ? cmd->options : "");

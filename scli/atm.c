@@ -132,7 +132,9 @@ scli_init_atm_mode(scli_interp_t *interp)
     
     static scli_mode_t atm_mode = {
 	"atm",
-	"scli mode to display and configure ATM parameters",
+	"The atm scli is based on the ATM-MIB as published in RFC 2515.\n"
+	"This mode is intended to display and configure ATM parameters.\n"
+	"However, much more work is needed to make it useful.",
 	cmds
     };
     
