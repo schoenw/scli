@@ -149,10 +149,10 @@ show_storage(GString *s, hrStorageEntry_t *hrStorageEntry)
 	storage_used *= *(hrStorageEntry->hrStorageAllocationUnits);
 	storage_used /= scale;
 
-        g_string_sprintfa(s, "%10llu %10llu %10llu %3u%%",
+        g_string_sprintfa(s, "%10llu %10llu %10llu %3u",
 	       storage_size, storage_used, storage_size - storage_used,
 	       (guint32) (storage_size
-			  ? storage_used / storage_size * 100 : 0));
+			  ? storage_used * 100 / storage_size : 0));
 
 	if (type) {
 	    g_string_sprintfa(s, " (%s)", type);
@@ -178,7 +178,7 @@ cmd_storage(scli_interp_t *interp, int argc, char **argv)
 
     if (hrStorageEntry) {
 	g_string_append(interp->result, "Storage Area          "
-	       "Size [K]   Used [K]   Free [K] Use%%\n");
+	       "Size [K]   Used [K]   Free [K] Use%\n");
 	for (i = 0; hrStorageEntry[i]; i++) {
 	    show_storage(interp->result, hrStorageEntry[i]);
 	}
