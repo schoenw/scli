@@ -11,7 +11,7 @@
 - Change the configure setup so that stop is linked against curses and
   scli against readline only.
 
-- Enhance the stub generator to properly decode INDEX elements.
+- Enhance the stub generator to properly decode all INDEX elements.
 
 - Add a mechanism (perhaps based on fd_sets) to tell the stubs to retrieve
   only a subset of the members of a data structure. This would be more
@@ -23,11 +23,13 @@
 - Create some sort of a test suite (which is not that easy for highly
   interactive programs).
 
-- Finish the entity display mode.
-
 - Complete the disman scli mode and add a disman stop mode.
 
 - Add a mechanism to switch between agents without restarting scli/stop.
+
+- Display processor load in the stop process mode summary line.
+
+- Finish the implementation of the "show system devices" scli command.
 
 ==== GXSNMP specific things ====
 

@@ -1,3 +1,13 @@
+Changes in stools 0.1.11:
+
+- recursive command evaluation on non-leaf nodes of the command tree
+- stop now displays packet statistics in addition to byte statistics
+- scli supports a new "show physical components" command
+- scli supports a new "show physical containment" command
+- renamed scli command "show system" to "show system info"
+- renamed scli command "show interface" to "show interface info"
+- minor bug fixes
+
 Changes in stools 0.1.10:
 
 - optimized the size of the generated stub code plus simple index decoding
