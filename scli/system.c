@@ -145,7 +145,8 @@ fmt_x_kbytes(GString *s, guint32 bytes)
 
 
 static void
-show_system_device(GString *s, hrDeviceEntry_t *hrDeviceEntry)
+show_system_device(GString *s,
+		   host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
 {
     char const *type;
     
@@ -182,7 +183,7 @@ show_system_device(GString *s, hrDeviceEntry_t *hrDeviceEntry)
 static int
 cmd_system_devices(scli_interp_t *interp, int argc, char **argv)
 {
-    hrDeviceEntry_t **hrDeviceTable = NULL;
+    host_resources_mib_hrDeviceEntry_t **hrDeviceTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -206,8 +207,9 @@ cmd_system_devices(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_system_process(GString *s, hrSWRunEntry_t *hrSWRunEntry,
-		    hrSWRunPerfEntry_t *hrSWRunPerfEntry)
+show_system_process(GString *s,
+		    host_resources_mib_hrSWRunEntry_t *hrSWRunEntry,
+		    host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry)
 {
     g_string_sprintfa(s, "%5d ", hrSWRunEntry->hrSWRunIndex);
     fmt_run_state_and_type(s,
@@ -250,8 +252,8 @@ show_system_process(GString *s, hrSWRunEntry_t *hrSWRunEntry,
 static int
 cmd_system_processes(scli_interp_t *interp, int argc, char **argv)
 {
-    hrSWRunEntry_t **hrSWRunTable = NULL;
-    hrSWRunPerfEntry_t **hrSWRunPerfTable = NULL;
+    host_resources_mib_hrSWRunEntry_t **hrSWRunTable = NULL;
+    host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -281,7 +283,8 @@ cmd_system_processes(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_system_mount(GString *s, hrFSEntry_t *hrFSEntry, int loc_len, int rem_len)
+show_system_mount(GString *s, host_resources_mib_hrFSEntry_t *hrFSEntry,
+		  int loc_len, int rem_len)
 {
     g_return_if_fail(hrFSEntry);
 
@@ -315,7 +318,7 @@ show_system_mount(GString *s, hrFSEntry_t *hrFSEntry, int loc_len, int rem_len)
 static int
 cmd_system_mounts(scli_interp_t *interp, int argc, char **argv)
 {
-    hrFSEntry_t **hrFSTable = NULL;
+    host_resources_mib_hrFSEntry_t **hrFSTable = NULL;
     int i, loc_len = 20, rem_len = 20;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -352,7 +355,8 @@ cmd_system_mounts(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_system_storage(GString *s, hrStorageEntry_t *hrStorageEntry,
+show_system_storage(GString *s,
+		    host_resources_mib_hrStorageEntry_t *hrStorageEntry,
 		    int descr_width)
 {
     gchar const *type = NULL;
@@ -408,7 +412,7 @@ show_system_storage(GString *s, hrStorageEntry_t *hrStorageEntry,
 static int
 cmd_system_storage(scli_interp_t *interp, int argc, char **argv)
 {
-    hrStorageEntry_t **hrStorageTable = NULL;
+    host_resources_mib_hrStorageEntry_t **hrStorageTable = NULL;
     int descr_width = 14;
     int i;
 
@@ -445,12 +449,12 @@ cmd_system_storage(scli_interp_t *interp, int argc, char **argv)
 static int
 cmd_system_info(scli_interp_t *interp, int argc, char **argv)
 {
-    system_t *system = NULL;
-    hrSystem_t *hrSystem = NULL;
-    hrStorage_t *hrStorage = NULL;
-    interfaces_t *interfaces = NULL;
-    dot1dBase_t *dot1dBase = NULL;
-    smLangEntry_t **smLangTable = NULL;
+    snmpv2_mib_system_t *system = NULL;
+    host_resources_mib_hrSystem_t *hrSystem = NULL;
+    host_resources_mib_hrStorage_t *hrStorage = NULL;
+    if_mib_interfaces_t *interfaces = NULL;
+    bridge_mib_dot1dBase_t *dot1dBase = NULL;
+    disman_script_mib_smLangEntry_t **smLangTable = NULL;
     GString *s;
     int i;
     int const indent = 18;

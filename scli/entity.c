@@ -31,7 +31,8 @@
 
 static void
 show_containment(GString *s, char *prefix,
-		 entPhysicalEntry_t **entPhysicalEntry, gint32 parent)
+		 entity_mib_entPhysicalEntry_t **entPhysicalEntry,
+		 gint32 parent)
 {
     int i, j, len;
 
@@ -87,7 +88,7 @@ show_containment(GString *s, char *prefix,
 static int
 cmd_containment(scli_interp_t *interp, int argc, char **argv)
 {
-    entPhysicalEntry_t **entPhysicalTable = NULL;
+    entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -107,7 +108,7 @@ cmd_containment(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_component(GString *s, entPhysicalEntry_t *entPhysicalEntry)
+show_component(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 {
     if (entPhysicalEntry->entPhysicalDescr) {
 	g_string_sprintfa(s, "%.*s\n",
@@ -198,7 +199,7 @@ show_component(GString *s, entPhysicalEntry_t *entPhysicalEntry)
 static int
 cmd_components(scli_interp_t *interp, int argc, char **argv)
 {
-    entPhysicalEntry_t **entPhysicalTable = NULL;
+    entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);

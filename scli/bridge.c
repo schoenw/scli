@@ -31,8 +31,10 @@
 
 
 static void
-show_bridge_info(GString *s, dot1dBase_t *dot1dBase, dot1dTp_t *dot1dTp,
-		 dot1dStp_t *dot1dStp)
+show_bridge_info(GString *s,
+		 bridge_mib_dot1dBase_t *dot1dBase,
+		 bridge_mib_dot1dTp_t *dot1dTp,
+		 bridge_mib_dot1dStp_t *dot1dStp)
 {
     int const indent = 18;
 
@@ -65,9 +67,9 @@ show_bridge_info(GString *s, dot1dBase_t *dot1dBase, dot1dTp_t *dot1dTp,
 static int
 cmd_bridge_info(scli_interp_t *interp, int argc, char **argv)
 {
-    dot1dBase_t *dot1dBase = NULL;
-    dot1dTp_t *dot1dTp = NULL;
-    dot1dStp_t *dot1dStp = NULL;
+    bridge_mib_dot1dBase_t *dot1dBase = NULL;
+    bridge_mib_dot1dTp_t *dot1dTp = NULL;
+    bridge_mib_dot1dStp_t *dot1dStp = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -96,8 +98,10 @@ cmd_bridge_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_bridge_port(GString *s, dot1dBasePortEntry_t *dot1dBasePortEntry,
-		 ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
+show_bridge_port(GString *s,
+		 bridge_mib_dot1dBasePortEntry_t *dot1dBasePortEntry,
+		 if_mib_ifEntry_t *ifEntry,
+		 if_mib_ifXEntry_t *ifXEntry,
 		 int type_width, int name_width)
 {
     g_string_sprintfa(s, "%5u ", dot1dBasePortEntry->dot1dBasePort);
@@ -144,9 +148,9 @@ show_bridge_port(GString *s, dot1dBasePortEntry_t *dot1dBasePortEntry,
 static int
 cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 {
-    dot1dBasePortEntry_t **dot1dBasePortTable = NULL;
-    ifEntry_t **ifTable = NULL;
-    ifXEntry_t **ifXTable = NULL;
+    bridge_mib_dot1dBasePortEntry_t **dot1dBasePortTable = NULL;
+    if_mib_ifEntry_t **ifTable = NULL;
+    if_mib_ifXEntry_t **ifXTable = NULL;
     int type_width = 6;
     int name_width = 6;
     int i, j = -1;
@@ -207,7 +211,8 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_bridge_forwarding(GString *s, dot1dTpFdbEntry_t *dot1dTpFdbEntry,
+show_bridge_forwarding(GString *s,
+		       bridge_mib_dot1dTpFdbEntry_t *dot1dTpFdbEntry,
 		       int name_width)
 {
     scli_vendor_t *vendor;
@@ -245,7 +250,7 @@ show_bridge_forwarding(GString *s, dot1dTpFdbEntry_t *dot1dTpFdbEntry,
 static int
 cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 {
-    dot1dTpFdbEntry_t **dot1dTpFdbTable = NULL;
+    bridge_mib_dot1dTpFdbEntry_t **dot1dTpFdbTable = NULL;
     char *name;
     int i, p, max = 0;
     int name_width = 8;
@@ -292,7 +297,7 @@ cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_bridge_filter(GString *s, dot1dStaticEntry_t *dot1dStaticEntry)
+show_bridge_filter(GString *s, bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry)
 {
     if (dot1dStaticEntry->dot1dStaticReceivePort) {
 	g_string_sprintfa(s, "%5d ",
@@ -325,7 +330,7 @@ show_bridge_filter(GString *s, dot1dStaticEntry_t *dot1dStaticEntry)
 static int
 cmd_bridge_filter(scli_interp_t *interp, int argc, char **argv)
 {
-    dot1dStaticEntry_t **dot1dStaticTable = NULL;
+    bridge_mib_dot1dStaticEntry_t **dot1dStaticTable = NULL;
     int i;
     
     g_return_val_if_fail(interp, SCLI_ERROR);

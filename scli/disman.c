@@ -400,7 +400,7 @@ fmt_item(GString *s, const char **labels, guchar *bits, gsize bits_len)
 
 
 static char*
-fmt_expression(schedEntry_t *schedEntry)
+fmt_expression(disman_schedule_mib_schedEntry_t *schedEntry)
 {
     static GString *s = NULL;
     int w = 0, o = 0, d = 0, h = 0, m = 0;
@@ -453,8 +453,8 @@ fmt_expression(schedEntry_t *schedEntry)
 
 
 static char const *
-get_script_lang_name(smScriptEntry_t *smScriptEntry,
-		     smLangEntry_t **smLangTable)
+get_script_lang_name(disman_script_mib_smScriptEntry_t *smScriptEntry,
+		     disman_script_mib_smLangEntry_t **smLangTable)
 {
     int i;
 
@@ -474,8 +474,9 @@ get_script_lang_name(smScriptEntry_t *smScriptEntry,
 
 
 
-static smLaunchEntry_t*
-get_launch_entry(smRunEntry_t *smRunEntry, smLaunchEntry_t **smLaunchTable)
+static disman_script_mib_smLaunchEntry_t*
+get_launch_entry(disman_script_mib_smRunEntry_t *smRunEntry,
+		 disman_script_mib_smLaunchEntry_t **smLaunchTable)
 {
     int l;
 
@@ -499,7 +500,8 @@ get_launch_entry(smRunEntry_t *smRunEntry, smLaunchEntry_t **smLaunchTable)
 
 
 static void
-show_extension(GString *s, smExtsnEntry_t *smExtsnEntry, int c)
+show_extension(GString *s, disman_script_mib_smExtsnEntry_t *smExtsnEntry,
+	       int c)
 {
     int const indent = 12;
     
@@ -546,8 +548,9 @@ show_extension(GString *s, smExtsnEntry_t *smExtsnEntry, int c)
 
 
 static void
-show_language(GString *s, smLangEntry_t *smLangEntry,
-	      smExtsnEntry_t **smExtsnTable)
+show_language(GString *s,
+	      disman_script_mib_smLangEntry_t *smLangEntry,
+	      disman_script_mib_smExtsnEntry_t **smExtsnTable)
 {
     int i, j;
     int const indent = 13;
@@ -608,8 +611,8 @@ show_language(GString *s, smLangEntry_t *smLangEntry,
 static int
 cmd_languages(scli_interp_t *interp, int argc, char **argv)
 {
-    smLangEntry_t **smLangTable = NULL;
-    smExtsnEntry_t **smExtsnTable = NULL;
+    disman_script_mib_smLangEntry_t **smLangTable = NULL;
+    disman_script_mib_smExtsnEntry_t **smExtsnTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -637,7 +640,8 @@ cmd_languages(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_script_details(GString *s, smScriptEntry_t *smScriptEntry,
+show_script_details(GString *s,
+		    disman_script_mib_smScriptEntry_t *smScriptEntry,
 		    char const *language)
 {
     int const width = 20;
@@ -706,8 +710,8 @@ show_script_details(GString *s, smScriptEntry_t *smScriptEntry,
 static int
 cmd_script_details(scli_interp_t *interp, int argc, char **argv)
 {
-    smLangEntry_t **smLangTable = NULL;
-    smScriptEntry_t **smScriptTable = NULL;
+    disman_script_mib_smLangEntry_t **smLangTable = NULL;
+    disman_script_mib_smScriptEntry_t **smScriptTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -737,7 +741,8 @@ cmd_script_details(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_script_info(GString *s, smScriptEntry_t *smScriptEntry, 
+show_script_info(GString *s,
+		 disman_script_mib_smScriptEntry_t *smScriptEntry, 
 		 char const *language, int launches,
 		 int owner_width, int lang_width)
 {
@@ -766,7 +771,8 @@ show_script_info(GString *s, smScriptEntry_t *smScriptEntry,
 
 
 static int
-count_launches(smScriptEntry_t *smScriptEntry, smLaunchEntry_t **smLaunchTable)
+count_launches(disman_script_mib_smScriptEntry_t *smScriptEntry,
+	       disman_script_mib_smLaunchEntry_t **smLaunchTable)
 {
     int i;
     int launches = 0;
@@ -801,9 +807,9 @@ count_launches(smScriptEntry_t *smScriptEntry, smLaunchEntry_t **smLaunchTable)
 static int
 cmd_script_info(scli_interp_t *interp, int argc, char **argv)
 {
-    smLangEntry_t **smLangTable = NULL;
-    smScriptEntry_t **smScriptTable = NULL;
-    smLaunchEntry_t **smLaunchTable = NULL;
+    disman_script_mib_smLangEntry_t **smLangTable = NULL;
+    disman_script_mib_smScriptEntry_t **smScriptTable = NULL;
+    disman_script_mib_smLaunchEntry_t **smLaunchTable = NULL;
     int i;
     int owner_width = 8, lang_width = 8;
 
@@ -843,7 +849,8 @@ cmd_script_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-count_runs(smLaunchEntry_t *smLaunchEntry, smRunEntry_t **smRunTable)
+count_runs(disman_script_mib_smLaunchEntry_t *smLaunchEntry,
+	   disman_script_mib_smRunEntry_t **smRunTable)
 {
     int i;
     int runs = 0;
@@ -874,7 +881,8 @@ count_runs(smLaunchEntry_t *smLaunchEntry, smRunEntry_t **smRunTable)
 
 
 static void
-show_launch_info(GString *s, smLaunchEntry_t *smLaunchEntry,
+show_launch_info(GString *s,
+		 disman_script_mib_smLaunchEntry_t *smLaunchEntry,
 		 int runs, int owner_width)
 {
     fmt_launch_admin_status(s, smLaunchEntry->smLaunchAdminStatus);
@@ -918,9 +926,9 @@ show_launch_info(GString *s, smLaunchEntry_t *smLaunchEntry,
 static int
 cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
 {
-    smScriptEntry_t **smScriptTable = NULL;
-    smLaunchEntry_t **smLaunchTable = NULL;
-    smRunEntry_t **smRunTable = NULL;
+    disman_script_mib_smScriptEntry_t **smScriptTable = NULL;
+    disman_script_mib_smLaunchEntry_t **smLaunchTable = NULL;
+    disman_script_mib_smRunEntry_t **smRunTable = NULL;
     int i;
     int owner_width = 8;
 
@@ -959,7 +967,8 @@ cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_launch_details(GString *s, smLaunchEntry_t *smLaunchEntry)
+show_launch_details(GString *s,
+		    disman_script_mib_smLaunchEntry_t *smLaunchEntry)
 {
     int const width = 20;
 
@@ -1074,7 +1083,7 @@ show_launch_details(GString *s, smLaunchEntry_t *smLaunchEntry)
 static int
 cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
 {
-    smLaunchEntry_t **smLaunchTable = NULL;
+    disman_script_mib_smLaunchEntry_t **smLaunchTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -1100,7 +1109,8 @@ cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_run_info(GString *s, smRunEntry_t *smRunEntry,
+show_run_info(GString *s,
+	      disman_script_mib_smRunEntry_t *smRunEntry,
 	      int l_owner_width, int l_name_width)
 {
     g_string_sprintfa(s, "%-*.*s ", l_owner_width,
@@ -1142,7 +1152,7 @@ show_run_info(GString *s, smRunEntry_t *smRunEntry,
 static int
 cmd_run_info(scli_interp_t *interp, int argc, char **argv)
 {
-    smRunEntry_t **smRunTable = NULL;
+    disman_script_mib_smRunEntry_t **smRunTable = NULL;
     int l_owner_width = 8;
     int l_name_width = 8;
     int i;
@@ -1179,8 +1189,9 @@ cmd_run_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_run_details(GString *s, smRunEntry_t *smRunEntry,
-		 smLaunchEntry_t *smLaunchEntry)
+show_run_details(GString *s,
+		 disman_script_mib_smRunEntry_t *smRunEntry,
+		 disman_script_mib_smLaunchEntry_t *smLaunchEntry)
 {
     char buffer[80];
     int const width = 20;
@@ -1285,8 +1296,8 @@ show_run_details(GString *s, smRunEntry_t *smRunEntry,
 static int
 cmd_run_details(scli_interp_t *interp, int argc, char **argv)
 {
-    smLaunchEntry_t **smLaunchTable = NULL;
-    smRunEntry_t **smRunTable = NULL;
+    disman_script_mib_smLaunchEntry_t **smLaunchTable = NULL;
+    disman_script_mib_smRunEntry_t **smRunTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -1316,7 +1327,8 @@ cmd_run_details(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_scheduler_info(GString *s, schedEntry_t *schedEntry,
+show_scheduler_info(GString *s,
+		    disman_schedule_mib_schedEntry_t *schedEntry,
 		    int name_width, int owner_width)
 {
     fmt_schedule_admin_status(s, schedEntry->schedAdminStatus);
@@ -1343,7 +1355,7 @@ show_scheduler_info(GString *s, schedEntry_t *schedEntry,
 static int
 cmd_scheduler_info(scli_interp_t *interp, int argc, char **argv)
 {
-    schedEntry_t **schedTable = NULL;
+    disman_schedule_mib_schedEntry_t **schedTable = NULL;
     int name_width = 5, owner_width = 5;
     int i;
 
@@ -1379,7 +1391,8 @@ cmd_scheduler_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_scheduler_details(GString *s, schedEntry_t *schedEntry)
+show_scheduler_details(GString *s,
+		       disman_schedule_mib_schedEntry_t *schedEntry)
 {
     int const width = 20;
     int i;
@@ -1457,7 +1470,7 @@ show_scheduler_details(GString *s, schedEntry_t *schedEntry)
 static int
 cmd_scheduler_details(scli_interp_t *interp, int argc, char **argv)
 {
-    schedEntry_t **schedTable = NULL;
+    disman_schedule_mib_schedEntry_t **schedTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);

@@ -75,7 +75,8 @@ fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 
 
 static int
-match_interface(char *iface, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry)
+match_interface(char *iface,
+		if_mib_ifEntry_t *ifEntry, if_mib_ifXEntry_t *ifXEntry)
 {
     long l;
     char *end;
@@ -107,8 +108,11 @@ match_interface(char *iface, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry)
 
 
 static void
-show_if_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
-		system_t *system, ipAddrEntry_t **ipAddrTable)
+show_if_details(GString *s,
+		if_mib_ifEntry_t *ifEntry,
+		if_mib_ifXEntry_t *ifXEntry,
+		snmpv2_mib_system_t *system,
+		ip_mib_ipAddrEntry_t **ipAddrTable)
 {
     int j;
     char *name;
@@ -227,10 +231,10 @@ show_if_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 static int
 cmd_if_details(scli_interp_t *interp, int argc, char **argv)
 {
-    ifEntry_t **ifTable = NULL;
-    ifXEntry_t **ifXTable = NULL;
-    system_t *system = NULL;
-    ipAddrEntry_t **ipAddrTable = NULL;
+    if_mib_ifEntry_t **ifTable = NULL;
+    if_mib_ifXEntry_t **ifXTable = NULL;
+    snmpv2_mib_system_t *system = NULL;
+    ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
     char *iface = NULL;
     int i, c;
 
@@ -273,7 +277,9 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_if_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
+show_if_info(GString *s,
+	     if_mib_ifEntry_t *ifEntry,
+	     if_mib_ifXEntry_t *ifXEntry,
 	     int type_width, int name_width)
 {
     g_string_sprintfa(s, "%6u     ", ifEntry->ifIndex);
@@ -322,8 +328,8 @@ show_if_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 static int
 cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 {
-    ifEntry_t **ifTable = NULL;
-    ifXEntry_t **ifXTable = NULL;
+    if_mib_ifEntry_t **ifTable = NULL;
+    if_mib_ifXEntry_t **ifXTable = NULL;
     int name_width = 6;
     int type_width = 6;
     char *iface = NULL;

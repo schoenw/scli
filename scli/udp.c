@@ -31,7 +31,7 @@
 
 
 static void
-show_udp_listener(GString *s, udpEntry_t *udpEntry, int width)
+show_udp_listener(GString *s, udp_mib_udpEntry_t *udpEntry, int width)
 {
     int pos;
     
@@ -50,7 +50,7 @@ show_udp_listener(GString *s, udpEntry_t *udpEntry, int width)
 static int
 cmd_udp_listener(scli_interp_t *interp, int argc, char **argv)
 {
-    udpEntry_t **udpTable = NULL;
+    udp_mib_udpEntry_t **udpTable = NULL;
     int width = 20;
     char *addr, *port;
     int i, len;

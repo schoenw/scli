@@ -277,9 +277,11 @@ cmd_ospf_area(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_ospf_interfaces(GString *s, ospf_mib_ospfIfEntry_t *ospfIfEntry,
-		     ifEntry_t **ifTable, ifXEntry_t **ifXTable,
-		     ipAddrEntry_t **ipAddrTable)
+show_ospf_interfaces(GString *s,
+		     ospf_mib_ospfIfEntry_t *ospfIfEntry,
+		     if_mib_ifEntry_t **ifTable,
+		     if_mib_ifXEntry_t **ifXTable,
+		     ip_mib_ipAddrEntry_t **ipAddrTable)
 {
     int j;
     
@@ -355,9 +357,9 @@ static int
 cmd_ospf_interfaces(scli_interp_t *interp, int argc, char **argv)
 {
    ospf_mib_ospfIfEntry_t **ospfIfTable = NULL;
-   ifEntry_t **ifTable = NULL;
-   ifXEntry_t **ifXTable = NULL;
-   ipAddrEntry_t **ipAddrTable = NULL;
+   if_mib_ifEntry_t **ifTable = NULL;
+   if_mib_ifXEntry_t **ifXTable = NULL;
+   ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
    int i;
 
    g_return_val_if_fail(interp, SCLI_ERROR);

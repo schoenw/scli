@@ -188,7 +188,7 @@ stls_identity_t const mau_type_identities[] = {
 
 
 static void
-show_ether_mau_info(GString *s, ifMauEntry_t *ifMauEntry)
+show_ether_mau_info(GString *s, mau_mib_ifMauEntry_t *ifMauEntry)
 {
     g_string_sprintfa(s, "%7u ", ifMauEntry->ifMauIfIndex);
     g_string_sprintfa(s, "%7u ", ifMauEntry->ifMauIndex);
@@ -236,8 +236,8 @@ show_ether_mau_info(GString *s, ifMauEntry_t *ifMauEntry)
 static int
 cmd_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
 {
-    ifMauEntry_t **ifMauTable = NULL;
-    ifJackEntry_t **ifJackTable = NULL;
+    mau_mib_ifMauEntry_t **ifMauTable = NULL;
+    mau_mib_ifJackEntry_t **ifJackTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);

@@ -31,8 +31,10 @@
 
 
 static void
-show_atm_interface(GString *s, atmInterfaceConfEntry_t *atmInterfaceConfEntry,
-		   ifEntry_t *ifEntry, ifXEntry_t *ifXEntry)
+show_atm_interface(GString *s,
+		   atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry,
+		   if_mib_ifEntry_t *ifEntry,
+		   if_mib_ifXEntry_t *ifXEntry)
 {
     if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
 	g_string_sprintfa(s, "%5d   ",
@@ -52,9 +54,9 @@ show_atm_interface(GString *s, atmInterfaceConfEntry_t *atmInterfaceConfEntry,
 static int
 cmd_atm_interface(scli_interp_t *interp, int argc, char **argv)
 {
-    atmInterfaceConfEntry_t **atmInterfaceConfTable = NULL;
-    ifEntry_t **ifTable = NULL;
-    ifXEntry_t **ifXTable = NULL;
+    atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfTable = NULL;
+    if_mib_ifEntry_t **ifTable = NULL;
+    if_mib_ifXEntry_t **ifXTable = NULL;
     int i;
     
     g_return_val_if_fail(interp, SCLI_ERROR);

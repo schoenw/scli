@@ -134,9 +134,9 @@ show_disman_summary(host_snmp *peer)
 static void
 show_runs(WINDOW *win, host_snmp *peer, int flags)
 {
-    smLaunchEntry_t **smLaunchTable = NULL;
-    smRunEntry_t **smRunTable = NULL;
-    schedObjects_t *schedObjects = NULL;
+    disman_script_mib_smLaunchEntry_t **smLaunchTable = NULL;
+    disman_script_mib_smRunEntry_t **smRunTable = NULL;
+    disman_schedule_mib_schedObjects_t *schedObjects = NULL;
     int i;
 
     if (flags & STOP_FLAG_RESTART) {

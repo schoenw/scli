@@ -35,7 +35,8 @@
 
 
 static void
-show_ip_forward(GString *s, ipCidrRouteEntry_t *ipCidrRouteEntry)
+show_ip_forward(GString *s,
+		ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry)
 {
 #if 0    
     int pos;
@@ -61,8 +62,10 @@ show_ip_forward(GString *s, ipCidrRouteEntry_t *ipCidrRouteEntry)
 
 
 static void
-show_ip_route(GString *s, rfc1213_mib_ipRouteEntry_t *ipRouteEntry,
-	      ifXEntry_t **ifXTable, ifEntry_t **ifTable)
+show_ip_route(GString *s,
+	      rfc1213_mib_ipRouteEntry_t *ipRouteEntry,
+	      if_mib_ifXEntry_t **ifXTable,
+	      if_mib_ifEntry_t **ifTable)
 {
     const char *label;
     int i, pos;
@@ -125,10 +128,10 @@ show_ip_route(GString *s, rfc1213_mib_ipRouteEntry_t *ipRouteEntry,
 static int
 cmd_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 {
-    ipCidrRouteEntry_t **ipCidrRouteTable = NULL;
+    ip_forward_mib_ipCidrRouteEntry_t **ipCidrRouteTable = NULL;
     rfc1213_mib_ipRouteEntry_t **ipRouteTable = NULL;
-    ifEntry_t **ifTable = NULL;
-    ifXEntry_t **ifXTable = NULL;
+    if_mib_ifEntry_t **ifTable = NULL;
+    if_mib_ifXEntry_t **ifXTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -173,7 +176,7 @@ cmd_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_ip_address(GString *s, ipAddrEntry_t *ipAddrEntry)
+show_ip_address(GString *s, ip_mib_ipAddrEntry_t *ipAddrEntry)
 {
     unsigned prefix = 0;
     char *name;
@@ -217,7 +220,7 @@ show_ip_address(GString *s, ipAddrEntry_t *ipAddrEntry)
 static int
 cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 {
-    ipAddrEntry_t **ipAddrTable = NULL;
+    ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -240,8 +243,10 @@ cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_ip_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry,
-	       ifXEntry_t **ifXTable, ifEntry_t **ifTable)
+show_ip_tunnel(GString *s,
+	       tunnel_mib_tunnelIfEntry_t *tunnelIfEntry,
+	       if_mib_ifXEntry_t **ifXTable,
+	       if_mib_ifEntry_t **ifTable)
 {
     int i;
 
@@ -334,9 +339,9 @@ show_ip_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry,
 static int
 cmd_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 {
-    tunnelIfEntry_t **tunnelIfTable = NULL;
-    ifEntry_t **ifTable = NULL;
-    ifXEntry_t **ifXTable = NULL;
+    tunnel_mib_tunnelIfEntry_t **tunnelIfTable = NULL;
+    if_mib_ifEntry_t **ifTable = NULL;
+    if_mib_ifXEntry_t **ifXTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -367,8 +372,9 @@ cmd_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_ip_arp(GString *s, ipNetToMediaEntry_t *ipNetToMediaEntry,
-	    ifEntry_t *ifEntry)
+show_ip_arp(GString *s,
+	    ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry,
+	    if_mib_ifEntry_t *ifEntry)
 {
     char *name;
     int i;
@@ -413,8 +419,8 @@ show_ip_arp(GString *s, ipNetToMediaEntry_t *ipNetToMediaEntry,
 static int
 cmd_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
 {
-    ipNetToMediaEntry_t **ipNetToMediaTable = NULL;
-    ifEntry_t **ifTable = NULL, *ifEntry = NULL;
+    ip_mib_ipNetToMediaEntry_t **ipNetToMediaTable = NULL;
+    if_mib_ifEntry_t **ifTable = NULL, *ifEntry = NULL;
     int i, j;
 
     g_return_val_if_fail(interp, SCLI_ERROR);

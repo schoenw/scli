@@ -243,7 +243,7 @@ show_interior(host_snmp *peer)
 static int
 show_system(host_snmp *peer, int flags)
 {
-    system_t *system = NULL;
+    snmpv2_mib_system_t *system = NULL;
     static struct timeval last, now;
     static guint32 sysUpTime = 0;
     char timestr[10];
@@ -329,7 +329,7 @@ show_system(host_snmp *peer, int flags)
 static void
 show_ip(host_snmp *peer, int flags)
 {
-    ip_t *ip = NULL;
+    ip_mib_ip_t *ip = NULL;
     static guint32 ipInReceives = 0;
     static guint32 ipForwDatagrams = 0;
     static guint32 ipReasmOKs = 0;
@@ -420,7 +420,7 @@ show_ip(host_snmp *peer, int flags)
 static void
 show_udp(host_snmp *peer, int flags)
 {
-    udp_t *udp = NULL;
+    udp_mib_udp_t *udp = NULL;
     static guint32 udpInDatagrams = 0;
     static guint32 udpOutDatagrams = 0;
     static struct timeval last, now;
@@ -464,7 +464,7 @@ show_udp(host_snmp *peer, int flags)
 static void
 show_tcp(host_snmp *peer, int flags)
 {
-    tcp_t *tcp = NULL;
+    tcp_mib_tcp_t *tcp = NULL;
     static guint32 tcpInSegs = 0;
     static guint32 tcpOutSegs = 0;
     static guint32 tcpActiveOpens = 0;
@@ -747,7 +747,7 @@ int
 main(int argc, char **argv)
 {
     host_snmp _peer, *peer = &_peer;
-    system_t *system = NULL;
+    snmpv2_mib_system_t *system = NULL;
     int c, port = 161, delay = 5000, retries = 5, timeout = 200000;
     char *mode_name = NULL;
 

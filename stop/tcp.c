@@ -90,7 +90,7 @@ show_tcp_summary(host_snmp *peer)
 
 
 static void
-show_tcp_connection(GString *s, tcpConnEntry_t *tcpConnEntry)
+show_tcp_connection(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry)
 {
     int pos;
 
@@ -122,7 +122,7 @@ show_tcp_connection(GString *s, tcpConnEntry_t *tcpConnEntry)
 static void
 show_tcp_connections(WINDOW *win, host_snmp *peer, int flags)
 {
-    tcpConnEntry_t **tcpConnTable = NULL;
+    tcp_mib_tcpConnEntry_t **tcpConnTable = NULL;
     GString *s;
     int i, k, p;
     static gint32 const state_order[] = {

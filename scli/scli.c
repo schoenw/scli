@@ -260,11 +260,11 @@ main(int argc, char **argv)
 	  scli_cmd_open },
 	{ "show scli association",
 	  0,
-	  "scli information about the current scli association",
+	  "show information about the current scli association",
 	  scli_cmd_show_peer },
 	{ "show scli term",
 	  0,
-	  "scli information about the terminal parameters",
+	  "show information about the terminal parameters",
 	  scli_cmd_show_term },
 	{ NULL, 0, NULL, NULL }
     };

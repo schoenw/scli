@@ -131,7 +131,7 @@ cmd_snmp_engine(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_snmp_resource(GString *s, sysOREntry_t *sysOREntry)
+show_snmp_resource(GString *s, snmpv2_mib_sysOREntry_t *sysOREntry)
 {
     g_string_sprintfa(s, "%3d: %.*s\n",
 		      sysOREntry->sysORIndex,
@@ -144,7 +144,7 @@ show_snmp_resource(GString *s, sysOREntry_t *sysOREntry)
 static int
 cmd_snmp_resources(scli_interp_t *interp, int argc, char **argv)
 {
-    sysOREntry_t **sysORTable;
+    snmpv2_mib_sysOREntry_t **sysORTable;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);

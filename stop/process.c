@@ -101,8 +101,8 @@ hr_sort (const void *arg1, const void *arg2)
 static void
 show_process_summary(host_snmp *peer)
 {
-    hrSystem_t *hrSystem = NULL;
-    hrStorage_t *hrStorage = NULL;
+    host_resources_mib_hrSystem_t *hrSystem = NULL;
+    host_resources_mib_hrStorage_t *hrStorage = NULL;
     GString *s;
     
     g_return_if_fail(peer);
@@ -146,8 +146,8 @@ show_process_summary(host_snmp *peer)
 static void
 show_processes(WINDOW *win, host_snmp *peer, int flags)
 {
-    hrSWRunEntry_t **hrSWRunTable = NULL;
-    hrSWRunPerfEntry_t **hrSWRunPerfTable = NULL;
+    host_resources_mib_hrSWRunEntry_t **hrSWRunTable = NULL;
+    host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfTable = NULL;
     int j, i;
     int n_idx;
     hr_sort_t *s_arr;

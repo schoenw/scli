@@ -501,7 +501,7 @@ int
 scli_open_community(scli_interp_t *interp, char *host, int port,
 		    char *community)
 {
-    system_t *system = NULL;
+    snmpv2_mib_system_t *system = NULL;
 
     if (interp->peer) {
 	scli_close(interp);

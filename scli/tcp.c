@@ -30,7 +30,7 @@
 
 
 static void
-show_tcp_listener(GString *s, tcpConnEntry_t *tcpConnEntry, int width)
+show_tcp_listener(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry, int width)
 {
     int pos;
     
@@ -53,7 +53,7 @@ show_tcp_listener(GString *s, tcpConnEntry_t *tcpConnEntry, int width)
 static int
 cmd_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 {
-    tcpConnEntry_t **tcpConnTable = NULL;
+    tcp_mib_tcpConnEntry_t **tcpConnTable = NULL;
     int width = 20;
     char *addr, *port;
     int i, len, cnt;
@@ -102,7 +102,7 @@ cmd_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_tcp_connection(GString *s, tcpConnEntry_t *tcpConnEntry,
+show_tcp_connection(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry,
 		    int local_width, int remote_width)
 {
     int pos;
@@ -133,7 +133,7 @@ show_tcp_connection(GString *s, tcpConnEntry_t *tcpConnEntry,
 static int
 cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 {
-    tcpConnEntry_t **tcpConnTable = NULL;
+    tcp_mib_tcpConnEntry_t **tcpConnTable = NULL;
     int local_width = 20;
     int remote_width = 20;
     char *addr, *port;

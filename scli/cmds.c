@@ -194,9 +194,9 @@ scli_cmd_show_term(scli_interp_t *interp, int argc, char **argv)
 		      "Rows:", rows);
     g_string_sprintfa(interp->result, "%-*s %d\n", indent,
 		      "Columns:", cols);
-    
+
     if (interp->pager) {
-	g_string_sprintfa(interp->result, "%-*s %s \n", indent,
+	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
 			  "Pager:", interp->pager);
     }
 
