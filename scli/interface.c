@@ -239,7 +239,7 @@ fmt_interface_details(GString *s,
     
     g_string_append(s, "Traps:       ");
     xxx_enum(s, width, if_mib_enums_ifLinkUpDownTrapEnable,
-	     (ifXEntry && ifXEntry) ? ifXEntry->ifLinkUpDownTrapEnable : NULL);
+	     ifXEntry ? ifXEntry->ifLinkUpDownTrapEnable : NULL);
     if (ifEntry->ifMtu) {
 	g_string_sprintfa(s, " MTU:     %d byte\n", *(ifEntry->ifMtu));
     } else {
@@ -248,7 +248,7 @@ fmt_interface_details(GString *s,
     
     g_string_append(s, "Connector:   ");
     xxx_enum(s, width, if_mib_enums_ifConnectorPresent,
-	     (ifXEntry && ifXEntry) ? ifXEntry->ifConnectorPresent : NULL);
+	     ifXEntry ? ifXEntry->ifConnectorPresent : NULL);
     if (ifEntry->ifSpeed) {
 	if (*(ifEntry->ifSpeed) == 0xffffffff
 	    && ifXEntry && ifXEntry->ifHighSpeed) {
@@ -264,7 +264,7 @@ fmt_interface_details(GString *s,
     
     g_string_append(s, "Promiscuous: ");
     xxx_enum(s, width, if_mib_enums_ifPromiscuousMode,
-	     (ifXEntry && ifXEntry) ? ifXEntry->ifPromiscuousMode : NULL);
+	     ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
     if (ifEntry->ifLastChange && system && system->sysUpTime) {
 	guint32 dsecs = *(system->sysUpTime) - *(ifEntry->ifLastChange);
 	g_string_sprintfa(s, " Change:  %s\n", fmt_timeticks(dsecs));
@@ -294,8 +294,7 @@ fmt_interface_details(GString *s,
 			  ifEntry->ifDescr);
     }
     
-    if (ifXEntry && ifXEntry
-	&& ifXEntry->ifAlias && ifXEntry->_ifAliasLength) {
+    if (ifXEntry && ifXEntry->ifAlias && ifXEntry->_ifAliasLength) {
 	g_string_sprintfa(s, "Alias:       %.*s\n",
 			  (int) ifXEntry->_ifAliasLength,
 			  ifXEntry->ifAlias);
@@ -312,7 +311,7 @@ xml_interface_details(xmlNodePtr root,
 		      ip_mib_ipAddrEntry_t **ipAddrTable)
 {
     int j;
-    xmlNodePtr tree;
+    xmlNodePtr tree, node;
     const char *s;
 
     tree = xmlNewChild(root, NULL, "interface", NULL);
@@ -329,33 +328,6 @@ xml_interface_details(xmlNodePtr root,
 	(void) xml_new_child(tree, NULL, "operational", "%s", s);
     }
     
-#if 0
-    
-    if (ifEntry->ifPhysAddress && ifEntry->_ifPhysAddressLength) {
-	g_string_append(s, " Address: ");
-	for (j = 0; j < ifEntry->_ifPhysAddressLength; j++) {
-	    g_string_sprintfa(s, "%s%02X", (j == 0) ? "" : ":",
-			      ifEntry->ifPhysAddress[j]);
-	}
-	/* See RFC 2665 section 3.2.6. why the test below is so ugly... */
-	if (ifEntry->ifType && ifEntry->_ifPhysAddressLength == 6
-	    && (*ifEntry->ifType == IF_MIB_IFTYPE_ETHERNETCSMACD
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_ISO88023CSMACD
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_STARLAN
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_FASTETHER
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_FASTETHERFX
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_GIGABITETHERNET)) {
-	    name = fmt_ether_address(ifEntry->ifPhysAddress, SCLI_FMT_NAME);
-	    if (name) {
-		g_string_sprintfa(s, " (%s)", name);
-	    }
-	}
-	g_string_append(s, "\n");
-    } else {
-	g_string_append(s, " Address:\n");
-    }
-#endif
-
     s = fmt_enum(if_mib_enums_ifAdminStatus, ifEntry->ifAdminStatus);
     if (s) {
 	(void) xml_new_child(tree, NULL, "administrative", "%s", s);
@@ -366,42 +338,59 @@ xml_interface_details(xmlNodePtr root,
 	(void) xml_new_child(tree, NULL, "type", "%s", s);
     }
 
-#if 0
-    g_string_append(s, "Traps:       ");
-    xxx_enum(s, width, if_mib_enums_ifLinkUpDownTrapEnable,
-	     (ifXEntry && ifXEntry) ? ifXEntry->ifLinkUpDownTrapEnable : NULL);
-    if (ifEntry->ifMtu) {
-	g_string_sprintfa(s, " MTU:     %d byte\n", *(ifEntry->ifMtu));
-    } else {
-	g_string_append(s, " MTU:\n");
+    if (ifEntry->ifPhysAddress && ifEntry->_ifPhysAddressLength) {
+	char *a, *b;
+	a = g_malloc(ifEntry->_ifPhysAddressLength * 3);
+	for (j = 0, b = a; j < ifEntry->_ifPhysAddressLength; j++) {
+	    sprintf(b, "%s%02X", (j == 0) ? "" : ":",
+		    ifEntry->ifPhysAddress[j]);
+	    b += strlen(b);
+	}
+	(void) xml_new_child(tree, NULL, "address", "%s", a);
+	g_free(a);
     }
-    
-    g_string_append(s, "Connector:   ");
-    xxx_enum(s, width, if_mib_enums_ifConnectorPresent,
-	     (ifXEntry && ifXEntry) ? ifXEntry->ifConnectorPresent : NULL);
+
+    if (ifEntry->ifMtu) {
+	node = xml_new_child(tree, NULL, "mtu", "%d", *ifEntry->ifMtu);
+	xml_set_prop(node, "unit", "byte");	
+    }
+
     if (ifEntry->ifSpeed) {
 	if (*(ifEntry->ifSpeed) == 0xffffffff
 	    && ifXEntry && ifXEntry->ifHighSpeed) {
-	    g_string_sprintfa(s, " Speed:   %s bps\n",
-			      fmt_gtp(*(ifXEntry->ifHighSpeed)));
+	    node = xml_new_child(tree, NULL, "speed", "%s",
+				 fmt_gtp(*(ifXEntry->ifHighSpeed)));
 	} else {
-	    g_string_sprintfa(s, " Speed:   %s bps\n",
-			      fmt_kmg(*(ifEntry->ifSpeed)));
+	    node = xml_new_child(tree, NULL, "speed", "%s",
+				 fmt_kmg(*(ifEntry->ifSpeed)));
 	}
-    } else {
-	g_string_append(s, " Speed:\n");
+	xml_set_prop(node, "unit", "bps");
     }
     
-    g_string_append(s, "Promiscuous: ");
-    xxx_enum(s, width, if_mib_enums_ifPromiscuousMode,
-	     (ifXEntry && ifXEntry) ? ifXEntry->ifPromiscuousMode : NULL);
-    if (ifEntry->ifLastChange && system && system->sysUpTime) {
-	guint32 dsecs = *(system->sysUpTime) - *(ifEntry->ifLastChange);
-	g_string_sprintfa(s, " Change:  %s\n", fmt_timeticks(dsecs));
-    } else {
-	g_string_append(s, " Change:\n");
+    s = fmt_enum(if_mib_enums_ifConnectorPresent,
+		 ifXEntry ? ifXEntry->ifConnectorPresent : NULL);
+    if (s) {
+	(void) xml_new_child(tree, NULL, "connector", s);
     }
 
+    s = fmt_enum(if_mib_enums_ifPromiscuousMode,
+		 ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
+    if (s) {
+	(void) xml_new_child(tree, NULL, "promiscuous", s);
+    }
+
+    s = fmt_enum(if_mib_enums_ifLinkUpDownTrapEnable,
+		 ifXEntry ? ifXEntry->ifLinkUpDownTrapEnable : NULL);
+    if (s) {
+	(void) xml_new_child(tree, NULL, "notifications", s);
+    }
+
+    if (ifEntry->ifLastChange && system && system->sysUpTime) {
+	guint32 dsecs = *(system->sysUpTime) - *(ifEntry->ifLastChange);
+	(void) xml_new_child(tree, NULL, "change", "%s", fmt_timeticks(dsecs));
+    }
+
+#if 0
     if (ipAddrTable) {
 	for (j = 0; ipAddrTable[j]; j++) {
 	    if (ipAddrTable[j]->ipAdEntIfIndex
@@ -425,8 +414,7 @@ xml_interface_details(xmlNodePtr root,
 			     ifEntry->ifDescr);
     }
     
-    if (ifXEntry && ifXEntry
-	&& ifXEntry->ifAlias && ifXEntry->_ifAliasLength) {
+    if (ifXEntry && ifXEntry->ifAlias && ifXEntry->_ifAliasLength) {
 	(void) xml_new_child(tree, NULL, "alias", "%.*s", 
 			     (int) ifXEntry->_ifAliasLength,
 			     ifXEntry->ifAlias);
