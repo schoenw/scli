@@ -297,6 +297,9 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 	}
 	if (interp->result) {
 	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+		if (g_snmp_list_decode_hook) {
+		    fputs("\r                         \r", stdout);
+		}
 		page(interp->result);
 	    } else {
 		fputs(interp->result->str, stdout);
@@ -397,6 +400,9 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	    }
 	    code = eval_all_cmd_node(interp, node, s);
 	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+		if (g_snmp_list_decode_hook) {
+		    fputs("\r                         \r", stdout);
+		}
 		page(s);
 	    } else {
 		fputs(s->str, stdout);
