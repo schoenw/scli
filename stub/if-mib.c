@@ -527,6 +527,14 @@ unpack_ifEntry(GSnmpVarBind *vb, if_mib_ifEntry_t *ifEntry)
     return 0;
 }
 
+static void
+pack_ifEntry(guint32 *base, if_mib_ifEntry_t *ifEntry)
+{
+    int idx = 10;
+
+    base[idx++] = ifEntry->ifIndex;
+}
+
 static if_mib_ifEntry_t *
 assign_ifEntry(GSList *vbl)
 {
@@ -659,6 +667,32 @@ if_mib_get_ifTable(GSnmpSession *s, if_mib_ifEntry_t ***ifEntry)
     return 0;
 }
 
+int
+if_mib_set_ifEntry(GSnmpSession *s, if_mib_ifEntry_t *ifEntry)
+{
+    GSList *in = NULL, *out = NULL;
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 0, 0};
+
+    pack_ifEntry(base, ifEntry);
+
+    if (ifEntry->ifAdminStatus) {
+        base[9] = 7;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       ifEntry->ifAdminStatus,
+                       0);
+    }
+
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (! out) {
+        return -2;
+    }
+    g_snmp_vbl_free(out);
+
+    return 0;
+}
+
 void
 if_mib_free_ifEntry(if_mib_ifEntry_t *ifEntry)
 {
@@ -786,6 +820,14 @@ unpack_ifXEntry(GSnmpVarBind *vb, if_mib_ifXEntry_t *ifXEntry)
     return 0;
 }
 
+static void
+pack_ifXEntry(guint32 *base, if_mib_ifXEntry_t *ifXEntry)
+{
+    int idx = 11;
+
+    base[idx++] = ifXEntry->ifIndex;
+}
+
 static if_mib_ifXEntry_t *
 assign_ifXEntry(GSList *vbl)
 {
@@ -911,6 +953,46 @@ if_mib_get_ifXTable(GSnmpSession *s, if_mib_ifXEntry_t ***ifXEntry)
     return 0;
 }
 
+int
+if_mib_set_ifXEntry(GSnmpSession *s, if_mib_ifXEntry_t *ifXEntry)
+{
+    GSList *in = NULL, *out = NULL;
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 0, 0};
+
+    pack_ifXEntry(base, ifXEntry);
+
+    if (ifXEntry->ifLinkUpDownTrapEnable) {
+        base[10] = 14;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       ifXEntry->ifLinkUpDownTrapEnable,
+                       0);
+    }
+    if (ifXEntry->ifPromiscuousMode) {
+        base[10] = 16;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       ifXEntry->ifPromiscuousMode,
+                       0);
+    }
+    if (ifXEntry->ifAlias) {
+        base[10] = 18;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_OCTET_STRING,
+                       ifXEntry->ifAlias,
+                       ifXEntry->_ifAliasLength);
+    }
+
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (! out) {
+        return -2;
+    }
+    g_snmp_vbl_free(out);
+
+    return 0;
+}
+
 void
 if_mib_free_ifXEntry(if_mib_ifXEntry_t *ifXEntry)
 {
@@ -958,6 +1040,15 @@ unpack_ifStackEntry(GSnmpVarBind *vb, if_mib_ifStackEntry_t *ifStackEntry)
     ifStackEntry->ifStackLowerLayer = vb->id[idx++];
     if (vb->id_len > idx) return -1;
     return 0;
+}
+
+static void
+pack_ifStackEntry(guint32 *base, if_mib_ifStackEntry_t *ifStackEntry)
+{
+    int idx = 11;
+
+    base[idx++] = ifStackEntry->ifStackHigherLayer;
+    base[idx++] = ifStackEntry->ifStackLowerLayer;
 }
 
 static if_mib_ifStackEntry_t *
@@ -1029,6 +1120,32 @@ if_mib_get_ifStackTable(GSnmpSession *s, if_mib_ifStackEntry_t ***ifStackEntry)
     return 0;
 }
 
+int
+if_mib_set_ifStackEntry(GSnmpSession *s, if_mib_ifStackEntry_t *ifStackEntry)
+{
+    GSList *in = NULL, *out = NULL;
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 31, 1, 2, 1, 0, 0};
+
+    pack_ifStackEntry(base, ifStackEntry);
+
+    if (ifStackEntry->ifStackStatus) {
+        base[10] = 3;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       ifStackEntry->ifStackStatus,
+                       0);
+    }
+
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (! out) {
+        return -2;
+    }
+    g_snmp_vbl_free(out);
+
+    return 0;
+}
+
 void
 if_mib_free_ifStackEntry(if_mib_ifStackEntry_t *ifStackEntry)
 {
@@ -1074,6 +1191,14 @@ unpack_ifTestEntry(GSnmpVarBind *vb, if_mib_ifTestEntry_t *ifTestEntry)
     ifTestEntry->ifIndex = vb->id[idx++];
     if (vb->id_len > idx) return -1;
     return 0;
+}
+
+static void
+pack_ifTestEntry(guint32 *base, if_mib_ifTestEntry_t *ifTestEntry)
+{
+    int idx = 11;
+
+    base[idx++] = ifTestEntry->ifIndex;
 }
 
 static if_mib_ifTestEntry_t *
@@ -1163,6 +1288,53 @@ if_mib_get_ifTestTable(GSnmpSession *s, if_mib_ifTestEntry_t ***ifTestEntry)
     return 0;
 }
 
+int
+if_mib_set_ifTestEntry(GSnmpSession *s, if_mib_ifTestEntry_t *ifTestEntry)
+{
+    GSList *in = NULL, *out = NULL;
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 31, 1, 3, 1, 0, 0};
+
+    pack_ifTestEntry(base, ifTestEntry);
+
+    if (ifTestEntry->ifTestId) {
+        base[10] = 1;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       ifTestEntry->ifTestId,
+                       0);
+    }
+    if (ifTestEntry->ifTestStatus) {
+        base[10] = 2;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       ifTestEntry->ifTestStatus,
+                       0);
+    }
+    if (ifTestEntry->ifTestType) {
+        base[10] = 3;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_OBJECT_ID,
+                       ifTestEntry->ifTestType,
+                       ifTestEntry->_ifTestTypeLength);
+    }
+    if (ifTestEntry->ifTestOwner) {
+        base[10] = 6;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_OCTET_STRING,
+                       ifTestEntry->ifTestOwner,
+                       ifTestEntry->_ifTestOwnerLength);
+    }
+
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (! out) {
+        return -2;
+    }
+    g_snmp_vbl_free(out);
+
+    return 0;
+}
+
 void
 if_mib_free_ifTestEntry(if_mib_ifTestEntry_t *ifTestEntry)
 {
@@ -1215,6 +1387,15 @@ unpack_ifRcvAddressEntry(GSnmpVarBind *vb, if_mib_ifRcvAddressEntry_t *ifRcvAddr
     ifRcvAddressEntry->_ifRcvAddressAddressLength = len;
     if (vb->id_len > idx) return -1;
     return 0;
+}
+
+static void
+pack_ifRcvAddressEntry(guint32 *base, if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry)
+{
+    int i, len, idx = 11;
+
+    base[idx++] = ifRcvAddressEntry->ifIndex;
+    /* XXX how to pack ifRcvAddressEntry->ifRcvAddressAddress ? */
 }
 
 static if_mib_ifRcvAddressEntry_t *
@@ -1285,6 +1466,39 @@ if_mib_get_ifRcvAddressTable(GSnmpSession *s, if_mib_ifRcvAddressEntry_t ***ifRc
     for (row = out, i = 0; row; row = g_slist_next(row), i++) {
         (*ifRcvAddressEntry)[i] = assign_ifRcvAddressEntry(row->data);
     }
+
+    return 0;
+}
+
+int
+if_mib_set_ifRcvAddressEntry(GSnmpSession *s, if_mib_ifRcvAddressEntry_t *ifRcvAddressEntry)
+{
+    GSList *in = NULL, *out = NULL;
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 31, 1, 4, 1, 0, 0};
+
+    pack_ifRcvAddressEntry(base, ifRcvAddressEntry);
+
+    if (ifRcvAddressEntry->ifRcvAddressStatus) {
+        base[10] = 2;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       ifRcvAddressEntry->ifRcvAddressStatus,
+                       0);
+    }
+    if (ifRcvAddressEntry->ifRcvAddressType) {
+        base[10] = 3;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       ifRcvAddressEntry->ifRcvAddressType,
+                       0);
+    }
+
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (! out) {
+        return -2;
+    }
+    g_snmp_vbl_free(out);
 
     return 0;
 }

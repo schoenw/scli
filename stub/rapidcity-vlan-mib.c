@@ -253,6 +253,14 @@ unpack_rcVlanEntry(GSnmpVarBind *vb, rapidcity_vlan_mib_rcVlanEntry_t *rcVlanEnt
     return 0;
 }
 
+static void
+pack_rcVlanEntry(guint32 *base, rapidcity_vlan_mib_rcVlanEntry_t *rcVlanEntry)
+{
+    int idx = 12;
+
+    base[idx++] = rcVlanEntry->rcVlanId;
+}
+
 static rapidcity_vlan_mib_rcVlanEntry_t *
 assign_rcVlanEntry(GSList *vbl)
 {
@@ -373,6 +381,137 @@ rapidcity_vlan_mib_get_rcVlanTable(GSnmpSession *s, rapidcity_vlan_mib_rcVlanEnt
     for (row = out, i = 0; row; row = g_slist_next(row), i++) {
         (*rcVlanEntry)[i] = assign_rcVlanEntry(row->data);
     }
+
+    return 0;
+}
+
+int
+rapidcity_vlan_mib_set_rcVlanEntry(GSnmpSession *s, rapidcity_vlan_mib_rcVlanEntry_t *rcVlanEntry)
+{
+    GSList *in = NULL, *out = NULL;
+    static guint32 base[] = {1, 3, 6, 1, 4, 1, 2272, 1, 3, 2, 1, 0, 0};
+
+    pack_rcVlanEntry(base, rcVlanEntry);
+
+    if (rcVlanEntry->rcVlanName) {
+        base[11] = 2;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_OCTET_STRING,
+                       rcVlanEntry->rcVlanName,
+                       rcVlanEntry->_rcVlanNameLength);
+    }
+    if (rcVlanEntry->rcVlanColor) {
+        base[11] = 3;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       rcVlanEntry->rcVlanColor,
+                       0);
+    }
+    if (rcVlanEntry->rcVlanHighPriority) {
+        base[11] = 4;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       rcVlanEntry->rcVlanHighPriority,
+                       0);
+    }
+    if (rcVlanEntry->rcVlanRoutingEnable) {
+        base[11] = 5;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       rcVlanEntry->rcVlanRoutingEnable,
+                       0);
+    }
+    if (rcVlanEntry->rcVlanAction) {
+        base[11] = 7;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       rcVlanEntry->rcVlanAction,
+                       0);
+    }
+    if (rcVlanEntry->rcVlanStgId) {
+        base[11] = 9;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       rcVlanEntry->rcVlanStgId,
+                       0);
+    }
+    if (rcVlanEntry->rcVlanType) {
+        base[11] = 10;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       rcVlanEntry->rcVlanType,
+                       0);
+    }
+    if (rcVlanEntry->rcVlanPortMembers) {
+        base[11] = 11;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_OCTET_STRING,
+                       rcVlanEntry->rcVlanPortMembers,
+                       32);
+    }
+    if (rcVlanEntry->rcVlanPotentialMembers) {
+        base[11] = 12;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_OCTET_STRING,
+                       rcVlanEntry->rcVlanPotentialMembers,
+                       32);
+    }
+    if (rcVlanEntry->rcVlanStaticMembers) {
+        base[11] = 13;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_OCTET_STRING,
+                       rcVlanEntry->rcVlanStaticMembers,
+                       32);
+    }
+    if (rcVlanEntry->rcVlanNotAllowToJoin) {
+        base[11] = 14;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_OCTET_STRING,
+                       rcVlanEntry->rcVlanNotAllowToJoin,
+                       32);
+    }
+    if (rcVlanEntry->rcVlanProtocolId) {
+        base[11] = 15;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       rcVlanEntry->rcVlanProtocolId,
+                       0);
+    }
+    if (rcVlanEntry->rcVlanSubnetAddr) {
+        base[11] = 16;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_IPADDRESS,
+                       rcVlanEntry->rcVlanSubnetAddr,
+                       4);
+    }
+    if (rcVlanEntry->rcVlanSubnetMask) {
+        base[11] = 17;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_IPADDRESS,
+                       rcVlanEntry->rcVlanSubnetMask,
+                       4);
+    }
+    if (rcVlanEntry->rcVlanAgingTime) {
+        base[11] = 18;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       rcVlanEntry->rcVlanAgingTime,
+                       0);
+    }
+    if (rcVlanEntry->rcVlanRowStatus) {
+        base[11] = 20;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       rcVlanEntry->rcVlanRowStatus,
+                       0);
+    }
+
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (! out) {
+        return -2;
+    }
+    g_snmp_vbl_free(out);
 
     return 0;
 }
