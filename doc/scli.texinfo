@@ -6,7 +6,7 @@
 @setchapternewpage odd
 @c %**end of header
 
-@set VERSION 0.2.7
+@set VERSION 0.2.8
 
 @ifinfo
 This file documents the @code{scli} SNMP command line interface.
@@ -229,7 +229,1168 @@ structures that every programmer can easily understand and handle.
 The following sections describe the @code{scli} modes together with
 their commands.
 
-@include modes.texinfo
+3COM MODE
+
+The 3com scli mode allows to manipulate virtual lans (vlans)
+on 3com bridges. It is based on the PRODUCTMIB which is
+implemented at least on 3Com SuperStack II switches.
+
+@example
+@command{create 3com bridge vlan <vlanid> <name>}
+@command{delete 3com bridge vlan <regexp>}
+@command{set 3com bridge vlan name <vlanid> <name>}
+@command{set 3com bridge vlan ports <regexp> <ports>}
+@command{show 3com bridge vlan info [<regexp>]}
+@command{dump 3com bridge vlan}
+@end example
+
+The @command{create 3com bridge vlan} command is used to create a
+new virtual LAN with the given <vlanid> and <name>.
+
+The @command{delete 3com bridge vlan} command deletes all selected
+virtual LANs. The regular expression <regexp> is matched
+against the virtual LAN names to select the vlans that should
+be deleted.
+
+The @command{set 3com bridge vlan name} command changes the name of
+a virtual LAN.
+
+The @command{set 3com bridge vlan ports} command allows to assign ports
+to port-based virtual LANs. The regular expression <regexp>
+is matched against the virtual LAN names to select the vlans that
+should be modified. The <ports> argument contains a comma
+separated list of port numbers or port number ranges, e.g.
+1,5,7-8.
+
+The @command{show 3com bridge vlan info} command shows summary
+information about all selected virtual LANs. The optional
+regular expression <regexp> is matched against the virtual
+LAN names to select the virtual LANs of interest. The
+command generates a table with the following columns:
+
+@verbatim
+  VLAN     virtual LAN number
+  STATUS   status of the virutal LAN (see below)
+  NAME     name of the virutal LAN
+  INTERFCE virtual LAN interface number
+  PORTS    ports assigned to the virtual LAN
+@end verbatim
+
+The status is encoded in two characters. The first character
+indicates the status of the row (A=active, S=not in service,
+R=not ready). The second character indicates virutal LAN type
+(P=port, I=IP-subnet, O=protocol, S=src address, D=dst address).
+
+The @command{dump 3com bridge vlan} command generates a sequence of scli
+commands which can be used to restore the virtual LAN configuration.
+@section ATM MODE
+
+The atm scli mode is based on the ATM-MIB as published in RFC 2515.
+This mode is intended to display and configure ATM parameters.
+
+@example
+@command{show atm interface info <regexp>}
+@command{show atm interface details <regexp>}
+@end example
+
+The show atm interface info command displays summary
+information for all selected ATM interfaces. The optional
+regular expression <regexp> is matched against the interface
+descriptions to select the interfaces of interest. The command
+generates a table with the following columns:
+
+@verbatim
+  INTERFACE network interface number
+@end verbatim
+
+The show atm interface details command describes the selected
+ATM interfaces in more detail. The optional regular expression
+<regexp> is matched against the interface descriptions to
+select the interfaces of interest.
+@section BRIDGE MODE
+
+The scli bridge mode is based on the BRIDGE-MIB as published in
+RFC 1493. It provides commands to browse information specific
+to LAN bridges (also known as layer two switches).
+
+@example
+@command{show bridge info}
+@command{show bridge ports}
+@command{show bridge stp ports}
+@command{show bridge forwarding}
+@command{show bridge filter}
+@command{show bridge stats}
+@command{monitor bridge stats}
+@end example
+
+The show bridge info command displays summary information about
+a bridge, such as the number of ports and the supported bridging
+functions and associated parameters.
+
+The show bridge ports command displays information about the
+bridge ports.
+
+The show bridge stp ports command displays information about the
+bridge ports which participate in the spanning tree protocol. The
+command generates a table with the following columns:
+
+@verbatim
+  PORT     port number
+  PRIO     spanning tree priority of the port
+  STATE    spanning tree status of the port
+  P-COST   path costs for this port
+  D-ROOT   designated root port
+  D-COST   designated costs
+  D-BRIDGE designated bridge
+  D-PORT   designated port
+@end verbatim
+
+The status is encoded in two characters. The first character
+indicates whether STP on the port is enabled (E) or disabled
+(D). The second character indicates the current status
+(D=disabled, B=blocking, I=listening, L=learning, F=forwarding,
+X=broken).
+
+The show bridge forwarding command displays the forwarding
+data base used by transparent bridges. The command generates
+a table with the following columns:
+
+@verbatim
+  PORT    port number
+  STATUS  status of the forwarding entry
+  ADDRESS address associated with the port
+  NAME    name of the address (where known)
+  VENDOR  vendor info derived from the address
+@end verbatim
+
+The show bridge filter command shows filtering information.
+
+The show bridge stats command displays per port statistics for
+transparent bridges. The command generates a table with the
+following columns:
+
+@verbatim
+  PORT        port number
+  I-FPS       input frames per second
+  O-FPS       output frames per second
+  D-FPS       discarded frames per second
+  DESCRIPTION description of the port
+@end verbatim
+
+The monitor bridge stats command shows the same
+information as the show bridge stats command. Theinformation is updated periodically.
+@section CISCO MODE
+
+The cisco scli mode is used to display and configure cisco
+parameters.
+
+@example
+@command{show cisco ip accounting info}
+@command{show cisco ip accounting current}
+@command{show cisco ip accounting snapshot}
+@command{monitor cisco ip accounting current}
+@command{monitor cisco ip accounting snapshot}
+@end example
+
+cisco IP accounting info
+
+cisco IP current accounting data
+
+cisco IP snapshot accounting data
+
+cisco IP current accounting data
+
+cisco IP snapshot accounting data
+@section DISMAN MODE
+
+The disman scli mode is based on the DISMAN-SCRIPT-MIB as
+published in RFC 3165 and the DISMAN-SCHEDULE-MIB as
+published in RFC 3231. It allows to browse and configure
+distributed managers.
+
+@example
+@command{create disman script <owner> <name> <description>}
+@command{create disman run <owner> <name> <args>}
+@command{show disman languages}
+@command{show disman script info}
+@command{show disman script details}
+@command{show disman launch info}
+@command{show disman launch details}
+@command{show disman run info}
+@command{show disman run details}
+@command{show disman scheduler info}
+@command{show disman scheduler details}
+@command{monitor disman run}
+@end example
+
+...
+
+...
+
+languages supported by the distributed manager
+
+script summary information
+
+scripts installed at the distributed manager
+
+launch summary information
+
+launch buttons installed on the distributed manager
+
+summary information about running scripts
+
+running scripts on the distributed manager
+
+scheduler information
+
+schedules on the distributed manager
+
+monitor running scripts
+@section ENTITY MODE
+
+The entity scli mode is based on the ENTITY-MIB as published in
+RFC 2737. It provides commands to browse the physical entities
+or physical components what make up a managed system.
+
+@example
+@command{show entity info}
+@command{show entity details}
+@command{show entity containment}
+@end example
+
+The show entity info command displays summary information about
+the physical entities that compose the system. The command
+generates a table with the following columns:
+
+@verbatim
+  ENTITY      entity number
+  CLASS       class of the entity (see below)
+  NAME        name of the entity
+  DESCRIPTION description of the entity
+@end verbatim
+
+The show entity details command describes the physical entities
+in more detail.
+
+The show entity containment command displays the physical entity
+containment hierarchy.
+@section ETHERNET MODE
+
+The ethernet scli mode is based on the EtherLike-MIB as published
+in RFC 2665 and the MAU-MIB as published in RFC 2668.
+
+@example
+@command{show ethernet mau}
+@command{show ethernet stats}
+@command{monitor ethernet stats}
+@end example
+
+The show ethernet mau command displays information about the
+medium attachment units (MAUs) for each ethernet port. The
+command generates a table which has the following columns:
+
+@verbatim
+  INTERFACE network interface number
+  MAU       medium attachment unit number per interface
+  STATUS    status of the medium attachment unit
+  MEDIA     media availability
+  JABBER    jabber state of the medium attachment unit
+  AUTONEG   autonegation capabilities
+  TYPE      type of the medium attachment unit
+@end verbatim
+
+The show ethernet stats command displays ethernet specific
+statistics for each ethernet interface. The command outputs
+a table which has the following columns:
+
+@verbatim
+  INTERFACE network interface number
+  ALIGN     alignement errors per second
+  FCS       frame check sequence errors per second
+  RCV       MAC receive errors per second
+  LONG      frames exceeding maximum frame size per second
+  DEFER     deferred transmission per second
+  SCOL      single collisions per second
+  MCOLR     multiple collisions per second
+  XCOL      excessive collisions per second
+  LCOL      late collisions per second
+  XMIT      MAC transmit errors per second
+  CARR      carrier sense errors per second
+@end verbatim
+
+The monitor ethernet stats command shows the same information
+as the show ethernet stats command. The information is updated
+periodically.
+@section INTERFACE MODE
+
+The scli interface mode is based on the IF-MIB as published in
+RFC 2863. It provides commands to browse, monitor and configure
+arbitrary network interfaces.
+
+@example
+@command{create interface stack <lower-regexp> <higher-regexp>}
+@command{delete interface stack <lower-regexp> <higher-regexp>}
+@command{set interface status <regexp> <status>}
+@command{set interface alias <regexp> <string>}
+@command{set interface notifications <regexp> <value>}
+@command{set interface promiscuous <regexp> <bool>}
+@command{show interface info [<regexp>]}
+@command{show interface details [<regexp>]}
+@command{show interface stack [<regexp>]}
+@command{show interface stats [<regexp>]}
+@command{monitor interface stats [<regexp>]}
+@command{alert interface status <regexp> [<regexp>]}
+@command{dump interface}
+@end example
+
+
+
+
+
+The @command{set interface status} command modifies the administrative
+status of all selected interfaces. The regular expression
+<regexp> is matched against the interface descriptions to
+select the interfaces of interest. The <value> parameter must
+be one of the strings "up", "down", or "testing".
+
+The @command{set interface alias} command assigns the alias name
+<string> to the selected interfaces. The alias name provies
+a non-volatile handle which can be used by management
+applications to better identify interfaces. The regular
+expression <regexp> is matched against the interface
+descriptions to select the interfaces.
+
+The @command{set interface notifications} command controls whether the
+selected interfaces generate linkUp and linkDown notifications.
+The regular expression <regexp> is matched against the interface
+descriptions to select the interfaces. The <value> parameter
+must be one of the strings "enabled" or "disabled".
+
+The @command{set interface promiscuous} command controls whether the
+selected interfaces operate in promiscuous mode or not. The
+regular expression <regexp> is matched against the interface
+descriptions to select the interfaces. The <bool> parameter
+must be one of the strings "true" or "false".
+
+The @command{show interface info} command displays summary information
+for all selected interfaces. The optional regular expression
+<regexp> is matched against the interface descriptions to
+select the interfaces of interest. The command generates a
+table with the following columns:
+
+@verbatim
+  INTERFACE   network interface number
+  STATUS      interface status (see below)
+  MTU         maximum transfer unit
+  TYPE        type of the network interface
+  SPEED       speed in bits per second
+  NAME        name of the network interface
+  DESCRIPTION description of the network interface
+@end verbatim
+
+The status is encoded in four characters. The first character
+indicates the administrative status (U=up, D=down, T=testing).
+The second character indicates the operational status (U=up,
+D=down, T=testing, ?=unknown, O=dormant, N=not-present,
+L=lower-layer-down). The third character indicates whether a
+connector is present (C=connector, N=none) and the fourth
+character indicates whether the interface is in promiscuous
+mode (P=promiscuous, N=normal).
+
+The @command{show interface details} command describes the selected
+interfaces in more detail. The optional regular expression
+<regexp> is matched against the interface descriptions to
+select the interfaces of interest.
+
+The @command{show interface stack} command shows the stacking order
+of the interfaces. The command generates a table with the
+following columns:
+
+@verbatim
+  INTERFACE   network interface number
+  STACK       indication of the stacking order
+  TYPE        type of the network interface
+  DESCRIPTION description of the network interface
+@end verbatim
+
+The @command{show interface stats} command displays network
+interface statistics for all selected interfaces.
+The optional regular expression <regexp> is matched
+against the interface description to select the
+interfaces. The command outputs a table which has
+the following columns:
+
+@verbatim
+  INTERFACE   network interface number
+  STATUS      interface status (see above)
+  I-BPS       input bytes per second
+  O-BPS       output bytes per second
+  I-PPS       input packets per second
+  O-PPS       output packets per second
+  I-ERR       input errors per second
+  O-ERR       output errors per second
+  DESCRIPTION description of the network interface
+@end verbatim
+
+The @command{monitor interface stats} command shows the same
+information as the show interface stats command. The
+information is updated periodically.
+
+The @command{alarm interface status} command generates alerts for
+interfaces that are in given status.
+
+The @command{dump interface} command generates a sequence of scli commands
+which can be used to restore the interface configuration.
+
+@section IP MODE
+
+The ip scli mode is based on the IP-MIB as published in
+RFC 2011, the IP-FORWARD-MIB as published in RFC 2096, the
+IP-TUNNEL-MIB as published in RFC 2667 and the RFC1213-MIB
+as published in RFC 1213. It provides commands to browse,
+monitor and configure IP protocol engines.
+
+@example
+@command{set ip forwarding <value>}
+@command{set ip ttl <number>}
+@command{show ip info}
+@command{show ip forwarding}
+@command{show ip addresses}
+@command{show ip tunnel}
+@command{show ip mapping}
+@command{dump ip}
+@end example
+
+The set ip forwarding command controls whether the IP protocol
+engine forwards IP datagrams or not. The <value> parameter must
+be one of the strings "enabled" or "disabled".
+
+The set ip ttl command can be used to change the default
+time to live (TTL) value used by the IP protocol engine. The
+<number> parameter must be a number between 1 and 255 inclusive.
+
+The show ip info command displays paramters of the IP
+protocol engine, such as the default TTL or whether the
+node is forwarding IP packets.
+
+The show ip forwarding command displays the IP forwarding data
+base. The command generates a table with the following columns:
+
+@verbatim
+  DESTINATION
+  NEXT HOP
+  TYPE
+  PROTO
+  INTERFACE
+@end verbatim
+
+The show ip addresses command displays the IP addresses assigned
+to network interfaces. The command generates a table with the
+following columns:
+
+@verbatim
+  INTERFACE network interface number
+  ADDRESS   IP address
+  PREFIX    IP address prefix length
+  NAME      name of the IP address
+@end verbatim
+
+The show ip tunnel command displays information about existing
+IP tunnels.
+
+The show ip mapping command displays the mapping of IP address
+to lower layer address (e.g., IEEE 802 addresses). The command
+generates a table with the following columns:
+
+@verbatim
+  INTERFACE network interface number
+  STATUS    status of the mapping entry
+  ADDRESS   IP address
+  ADDRESS   lower layer address
+@end verbatim
+
+The dump ip command generates a sequence of scli commands
+which can be used to restore the IP configuration.
+
+@section NETSNMP MODE
+
+The netsnmp scli mode is used to display and configure netsnmp
+specific parameters. It is based on the UCD-SNMP-MIB.
+
+@example
+@command{set netsnmp debugging <value>}
+@command{set netsnmp restart}
+@command{show netsnmp info}
+@command{show netsnmp load}
+@command{show netsnmp exec}
+@command{show netsnmp proc}
+@command{dump netsnmp}
+@end example
+
+The @command{set netsnmp debugging} command controls whether the agent
+generates debug messages or not. The <value> parameter must
+be one of the strings "enabled" or "disabled".
+
+The @command{set netsnmp restart} command restarts the agent.
+
+The @command{show netsnmp info} command shows general information about
+the netsnmp/ucdsnmp agent such as the version number and the
+software configuration.
+
+The @command{show netsnmp load} command shows the load indices of the
+system. This is usually the length of the queue in front of
+the processor(s) averaged over some time interval.
+
+The @command{show netsnmp exec} command shows information about
+pre-configured commands that can be invoked.
+
+The @command{show netsnmp proc} command shows information about
+which processes netsnmp watches.
+
+The @command{dump netsnmp} command generates a sequence of scli commands
+which can be used to restore the netsnmp specific configuration.
+
+@section NORTEL MODE
+
+The nortel scli mode allows to manipulate virtual LANs (vlans)
+on nortel bridges. It is based on the RAPID-CITY MIB which
+is implemented at least on the baystack bridges.
+
+@example
+@command{create nortel bridge vlan <vlanid> <name>}
+@command{delete nortel bridge vlan <regexp>}
+@command{set nortel bridge vlan name <vlanid> <name>}
+@command{set nortel bridge vlan ports <regexp> <ports>}
+@command{set nortel bridge vlan default <string> <ports>}
+@command{show nortel bridge vlan info [<regexp>]}
+@command{show nortel bridge vlan details [<regexp>]}
+@command{show nortel bridge vlan ports}
+@command{dump nortel bridge vlan}
+@end example
+
+The @command{create nortel bridge vlan} command is used to create a
+new virtual LAN with the given <vlanid> and <name>.
+
+The @command{delete nortel bridge vlan} command deletes all selected
+virtual LANs. The regular expression <regexp> is matched
+against the virtual LAN names to select the vlans that should
+be deleted.
+
+The @command{set nortel bridge vlan name} command changes the name of
+a virtual LAN.
+
+The @command{set nortel bridge vlan ports} command allows to assign
+ports to port-based vlans. The regular expression <regexp>
+is matched against the vlan names to select the vlans that
+should be modified. The <ports> argument contains a comma
+separated list of port numbers or port number ranges, e.g.
+1,5,7-8.
+
+The @command{set nortel bridge vlan default} command allows to assign
+ports to a default vlan. The <string> argument is matched
+against the vlan names to select the vlan. The <ports> argument
+contains a comma separated list of port numbers or port number
+ranges, e.g. 1,5,7-8.
+
+The @command{show nortel bridge vlan info} command shows summary
+information about all selected virtual LANs. The optional
+regular expression <regexp> is matched against the virtual
+LAN names to select the virtual LANs of interest. The
+command generates a table with the following columns:
+
+@verbatim
+  VLAN   number of the virtual LAN
+  STATUS status of the virtual LAN (see below)
+  NAME   name of the virtual LAN
+  PORTS  ports assigned to the virtual LAN
+@end verbatim
+
+The status is encoded in four characters. The first character
+indicates the status of the row (A=active, S=not in service,
+R=not ready). The second character indicates virtual LAN type
+(P=port, I=IP-subnet, O=protocol, S=src address, D=dst address).
+The third character indicates the priority of the virtual LAN
+(H=high, N=normal) and the fourth character indicates whether
+routing is enabled (R=routing, N=no routing).
+
+The @command{show nortel bridge vlan details} command describes the
+selected vlans in more detail. The optional regular expression
+<regexp> is matched against the vlan names to select the vlans
+of interest.
+
+The @command{show nortel bridge vlan ports} command shows information
+for each vlan port. The command generates a table with the
+following columns:
+
+@verbatim
+  PORT    port number
+  FLAGS   port vlan flags (see below)
+  DEFAULT default vlan number
+  VLANS   vlan numbers the port is member of
+@end verbatim
+
+The flags are encoded in four characters. The first character
+indicates the port type (A=access, T=trunk). The second character
+indicates whether the port tags frames (T=tagging, N=none). The
+third character indicates whether the port discards tagged frames
+(D=discard, N=none) and the fourth character indicates whether
+the port discards untagged frames (D=discard, N=none).
+
+The @command{dump nortel bridge vlan} command generates a sequence of scli
+commands which can be used to restore the virtual LAN configuration.
+@section OSPF MODE
+
+The scli ospf mode is used to display and configure OSPF
+parameters.
+
+@example
+@command{show ospf area}
+@command{show ospf info}
+@command{show ospf interface}
+@end example
+
+show OSPF areas
+
+general OSPF information
+
+show OSPF interfaces
+@section PRINTER MODE
+
+The scli isdn mode is based on the ISDN-MIB as published
+in RFC 2127.
+
+@example
+@command{show isdn bearer}
+@end example
+
+The @command{show isdn bearer} command shows information about
+the ISDN B (bearer) channels.
+@section PRINTER MODE
+
+The scli printer mode is based on the Printer-MIB as published
+in RFC 1759 and some updates currently being worked on in the
+IETF Printer MIB working group.
+
+@example
+@command{show printer info}
+@command{show printer covers}
+@command{show printer inputs}
+@command{show printer outputs}
+@command{show printer markers}
+@command{show printer supplies}
+@command{show printer interpreter}
+@command{show printer channels}
+@command{show printer console display}
+@command{show printer console lights}
+@command{show printer alerts}
+@command{monitor printer console display}
+@command{monitor printer console lights}
+@command{monitor printer alerts}
+@end example
+
+The @command{show printer info} command shows general information about
+the printer including global status information.
+
+The @command{show printer covers} command shows information about the
+covers of a printer.
+
+The @command{show printer inputs} command shows information about the
+input sub-units of a printer which provide media for input to
+the printing process.
+
+The @command{show printer output} command shows information about the
+output sub-units of a printer capable of receiving media
+delivered from the printing process.
+
+The @command{show printer markers} command shows information about the
+marker sub-units of a printer which produce marks on the print
+media.
+
+The @command{show printer supplies} command shows information about the
+supplies which are consumed and the waste produced by the
+markers of a printer.
+
+The @command{show printer interpreter} command shows information about
+the page description language and control language interpreters
+supported by the printer.
+
+The @command{show printer channels} command shows information about
+the channels which can be used to submit data to the printer.
+
+The @command{show printer console display} command shows the current
+contents of the display attached to the printer. The command
+generates a table with the following columns:
+
+@verbatim
+  PRINTER logical printer number
+  LINE    display line number
+  TEXT    contents of the display line
+@end verbatim
+
+The @command{show printer console lights} command shows the current
+status of the lights attached to the printer. The command
+generates a table with the following columns:
+
+@verbatim
+  PRINTER     logical printer number
+  LIGHT       number identifying the light/led
+  DESCRIPTION description of the light/led
+  STATUS      current status (on, off, blink)
+  COLOR       current color of the light
+@end verbatim
+
+The @command{show printer alerts} command displays the list of active
+printer alerts including the alert code, the alert severity,
+the alert description, the alert time, the alert location and
+the personel required to handle the alert.
+
+The @command{monitor printer console display} command shows the same
+information as the show printer console display command. The
+information is updated periodically.
+
+The @command{monitor printer console lights} command shows the same
+information as the show printer console lights command. The
+information is updated periodically.
+
+The @command{monitor printer alerts} command shows the same information
+as the show printer alerts command. The information is updated
+periodically.
+RS232 MODE
+
+The rs232 scli mode is based on the RS-232-MIB as published
+in RFC 1659.
+
+@example
+@command{show rs232 details}
+@end example
+
+
+@section SCLI MODE
+
+The scli mode provides commands that can be used to display and
+manipulate the internal state of the scli interpreter.
+
+@example
+@command{open <nodename> [<community>]}
+@command{close}
+@command{create scli plugin <module>}
+@command{delete scli plugin <module>}
+@command{exit}
+@command{help}
+@command{history}
+@command{create scli alias <name> <value>}
+@command{delete scli alias <regexp>}
+@command{create scli interp <name>}
+@command{delete scli interp <regexp>}
+@command{set scli regex [<regexp>]}
+@command{set scli debugging [<regexp>]}
+@command{set scli pager <pager>}
+@command{set scli format <fmt>}
+@command{show scli info}
+@command{show scli command info [<regex]}
+@command{show scli command details [<regex]}
+@command{show scli command tree}
+@command{show scli aliases}
+@command{show scli interps}
+@command{show scli modes [<regex>]}
+@command{show scli schema [<regex>]}
+@command{show scli alarm info}
+@end example
+
+The @command{open} command establishes an association to a remote SNMP
+agent. The <nodename> argument is the DNS name or the IP
+address of the remote node. Scli will try to talk to the SNMP
+agent on this node by using the default port number (usually 161)
+and the default transport mapping (usually SNMP over UDP).
+The optional <community> argument is the community string
+needed to communicate with the remote SNMP agent. The default
+community string is "public". Opening an association while
+an association is already established is not considered an
+error. The existing established association will be closed
+automatically before an attempt to create a new association
+is started.
+
+The @command{close} command closes an established association to a remote
+SNMP agent. Invoking the close command when no association is
+established is not considered an error and will do just nothing.
+
+The @command{create scli plugin} command dynamically loads an scli mode
+into a running scli process. This can be used to dynamically
+extend scli with modules coming from other sources. Dynamic
+loadable modules also simplify the development and management
+of site-specific modules.
+
+The @command{delete scli plugin} command removes a previously loaded
+modules from a running scli process.
+
+The @command{exit} command terminates the scli interpreter. An end of file
+in the standard input stream will also terminate the the scli
+interpreter.
+
+The @command{help} command displays some help information including a list
+of all top-level scli commands.
+
+The @command{history} command displays the scli command history list with
+line numbers.
+
+The @command{create scli alias} command creates the alias <name> for the
+scli command (fragment) <value>. If the alias <name> already
+exists, then the new <value> will be assigned to the existing
+alias.
+
+The @command{delete scli alias} command removes previously defined
+aliases from the scli interpreter. The regular expression
+<regexp> is matched against all alias names in order to
+select the aliases that are deleted.
+
+The @command{create scli interp} command creates a new internal scli
+interpreter with the name <name>.
+
+The @command{delete scli interp} command deletes previously defined
+scli interpreters from the main scli interpreter. The regular
+expression <regexp> is matched against all alias names in order
+to select the interpreter(s) to be removed.
+
+The @command{set scli regex} command controls how scli matches regular
+expressions. The optional regular expression <regexp> is
+matched against the regular expression options. A successful
+match turns a regular expression option on while an unsuccessful
+match turns a regular expression option off. Invoking the command
+without the <regexp> argument will turn all regular expression
+options off. The currently defined regular expression options
+are "extended" for POSIX extended regular expressions and
+"case-insensitive" for case insensitive matches.
+
+The @command{set scli debugging} command sets the debugging level of
+the SNMP engine. The optional regular expression <regexp> is
+matched against the debugging levels. A successful match turns
+a debugging level on while an unsuccessful match turns a
+debugging level off. Invoking the command without the <regexp>
+argument will turn all debugging levels off. The currently
+defined debugging levels are "session" for the SNMP session
+layer, "request" for the SNMP request handling layer, 
+"transport" for the SNMP transport layer, "packet" for
+the SNMP packet layer, and "asn1" for the ASN.1 coding layer.
+
+The @command{set scli pager} command defines the shell command which is
+used as a pager if the output produced by an scli command does
+not fit on a single screen. The output is passed to the <pager>
+shell command via its standard input stream.
+
+The @command{set scli format} command defines the output format used by
+subsequent scli commands. The currently supported formats are
+"scli" and "xml". The "scli" format is the default output
+format and described in this documentation. The "xml" output
+format is experimental and therefore not described here.
+
+The @command{show scli info} command displays the current status of the
+scli interpreter.
+
+The @command{show scli command info} command displays summary information
+about scli commands. The optional regular expression <regexp> is
+matched against the command names to select the scli commands.
+
+
+The @command{show scli command details} command displays detailed information
+about scli commands. The optional regular expression <regexp> is
+matched against the command names to select the scli commands.
+
+
+The @command{show scli command tree} command displays the scli command
+tree. The full command syntax is displayed for each leaf node.
+
+The @command{show scli aliases} command lists all scli command aliases.
+The first column in the generated table lists the aliase names
+while the second column shows the alias values.
+
+The @command{show scli interps} command lists all scli interpreters.
+
+The @command{show scli modes} command shows information about the scli
+modes. An scli mode is a logical grouping of related commands
+(e.g., all commands that deal with printers). The optional
+regular expression <regex> can be use to select a subset of
+the available scli modes.
+
+The @command{show scli schema} command produces xml schema definitions for
+the selected scli modes. An scli mode is a logical grouping of
+related commands (e.g., all commands that deal with printers).
+The optional regular expression <regex> can be use to select a
+subset of the available scli modes.
+
+The @command{show scli alarm info} command displays summary information
+about all known alarms.
+@section SNMP MODE
+
+The snmp scli mode is based on the SNMPv2-MIB as published
+in RFC 1907, the SNMP-FRAMEWORK-MIB as published in RFC 2571,
+the SNMP-USER-BASED-SM-MIB as published in RFC 2574, the
+SNMP-VIEW-BASED-ACM-MIB as published in RFC 2575, the
+SNMP-TARGET-MIB as published in RFC 2573, and the
+SNMP-NOTIFICATION-MIB as published in RFC 2573.
+
+@example
+@command{create snmp vacm member <name> <group> [<model>]}
+@command{delete snmp vacm member <regex-name> <regex-group> [<model>]}
+@command{create snmp usm user <name> <template>}
+@command{set snmp authentication traps <status>}
+@command{show snmp engine}
+@command{show snmp resources}
+@command{show snmp vacm member}
+@command{show snmp vacm access}
+@command{show snmp vacm views}
+@command{show snmp usm users}
+@command{show snmp target addresses}
+@command{show snmp target parameters}
+@command{show snmp notification targets}
+@command{dump snmp}
+@end example
+
+The @command{create snmp vacm member} commands can be used to assign
+new members (security names) to vacm groups. New groups are
+created if they do not exist.
+
+The @command{delete snmp vacm member} commands can be used to delete
+members (security names) from vacm groups. Groups are deleted
+if the last member is deleted.
+
+The @command{create snmp usm user} commands can be used to create a
+new user by cloning an existing template.
+
+The @command{set snmp authentication traps} command controls whether the
+SNMP engine generates authentication failure notifications.
+The <value> parameter must be one of the strings "enabled"
+or "disabled".
+
+The @command{show snmp engine} command displays information about the
+SNMP protocol engine such as the number of boots, the current
+time relative to the last boot and the maximum message size.
+
+The @command{show snmp resources} command displays information about the
+MIB resources supported by the SNMP agent.
+
+The @command{show snmp vacm member} command displays the mapping of
+security names to group names. The command generates a table
+with the following columns:
+
+@verbatim
+  ROW    row storage type and status
+  MOD    security model
+  NAME   member name (security name)
+  GROUP  name of the vacm group
+@end verbatim
+
+The @command{show snmp vacm access} command display the access control
+rules for the security groups. The command generates a table
+with the following columns:
+
+@verbatim
+  ROW    row storage type and status
+  GROUP  security group name
+  MOD    security model
+  LVL    security level (--, a-, ap)
+  CTX    context name
+  MATCH  match (exact or prefix)
+  READ   view name for read access
+  WRITE  view name for write access
+  NOTIFY view name for notification
+@end verbatim
+
+The @command{show snmp vacm views} command displays MIB view definitions.
+The command generates a table with the following columns:
+
+@verbatim
+  ROW    row storage type and status
+  VIEW   view name
+  TYPE   access to the view subtree (incl/excl)
+  PREFIX object identifier wildcard prefix
+@end verbatim
+
+The @command{show snmp usm users} command displays the configured users.
+The command generates a table with the following columns:
+
+@verbatim
+  ROW    row storage type and status
+  USER   USM user name
+  NAME   security name of the USM user
+  AUTH   authentication protocol
+  PRIV   privacy protocol
+@end verbatim
+
+The @command{show snmp target addresses} command displays information
+about the configured SNMP target addresses. The command
+generates a table with the following columns:
+
+@verbatim
+  ROW      row storage type and status
+  TARGET   target name
+  DOMAIN   transport domain
+  ADDRESS  transport address
+  TMOUT    timeout value in ms
+  RETRY    number of retries
+  PARAMS   associated parameters
+  TAGS     tag list
+@end verbatim
+
+The @command{show snmp target parameters} command displays information
+about the configured SNMP target parameters. The command
+generates a table with the following columns:
+
+@verbatim
+  ROW      row storage type and status
+  PARAMS   parameter name
+  NAME     security name
+@end verbatim
+
+The @command{show snmp notification targets} command displays information
+about the configured SNMP notification targets. The command
+generates a table with the following columns:
+
+@verbatim
+  ROW      row storage type and status
+  NAME     notification target name
+  TYPE     notification type
+  TAG      tag reference to targets
+@end verbatim
+
+The @command{dump snmp} command generates a sequence of scli commands
+which can be used to restore the engine configuration.
+
+@section SYSTEM MODE
+
+The system scli mode is primarily based on the SNMPv2-MIB as
+published in RFC 1907 and the HOST-RESOURCES-MIB as publisched
+in RFC 2790. It can be used to browse and configure system
+parameters and characteristics.
+
+@example
+@command{set system contact <string>}
+@command{set system name <string>}
+@command{set system location <string>}
+@command{show system info}
+@command{show system devices}
+@command{show system storage}
+@command{show system mounts}
+@command{show system processes [<regexp>]}
+@command{monitor system storage}
+@command{monitor system processes [<regexp>]}
+@command{dump system}
+@end example
+
+The set system contact command configures the system contact
+information. The <string> argument should include information
+on how to contact a person who is responsible for this system.
+
+The set system name command configures the name of the system.
+By convention, this is the fully-qualified domain name.
+
+The set system location command configures the physical
+location of the system.
+
+The show system info command shows general information about the
+system.
+
+The show system devices command shows a list of system devices.
+The command generates a table with the following columns:
+
+@verbatim
+  INDEX       device number
+  STATUS      current status of the device
+  DESCRIPTION description of the device
+@end verbatim
+
+The show system storage command displays information about the
+logical areas attached in the system. The command generates a
+table with the following columns:
+
+@verbatim
+  INDEX       logical storage area number
+  DESCRIPTION description of the storage area
+  TYPE        logical storage area type
+  SIZE        total size of the storage area
+  USED        amount of storage in use
+  FREE        amount of storage available
+  USE%        used storage in percent
+@end verbatim
+
+The show system mounts command shows the list of filesystems
+mounted on the system. The command generates a table with the
+following columns:
+
+@verbatim
+  INDEX   filesystem identification number
+  LOCAL   local root path name of the filesystem
+  REMOTE  remote server and root path name (if any)
+  TYPE    filesytem type (if known)
+  OPTIONS access mode (ro/rw) and boot flag
+@end verbatim
+
+The show system processes command display information about the
+processes currently running on the system. The regular expression
+<regexp> is matched against the command executed by the process
+to select the processes of interest.The command generates a table
+with the following columns:
+
+@verbatim
+  PID     process identification number
+  S       status of the process (see below)
+  T       type of the process (see below)
+  MEMORY  memory used by the process
+  TIME    CPU time used by the process
+  COMMAND command executed by the process
+@end verbatim
+
+The process status values are C=running, R=runnable,
+S=not runnable, and Z=invalid. The process types values are
+?=unknown, O=operating system, D=device driver, and A=application.
+
+The monitor system storage command shows the same
+information as the show system storage command. The
+information is updated periodically.
+
+The monitor system processes command show the same
+information as the show system processes command. The
+information is updated periodically.
+
+The dump system command generates a sequence of scli commands
+which can be used to restore the system configuration.
+
+@section TCP MODE
+
+The scli tcp mode is based on the TCP-MIB as published in
+RFC 2012. It provides commands to browse information specific
+to the TCP transport protocol.
+
+@example
+@command{show tcp listener}
+@command{show tcp connections}
+@command{monitor tcp connections}
+@end example
+
+The show tcp listener command displays the listening TCP
+endpoints.
+
+The show tcp connections command displays the connected TCP
+endpoints including the current state of the connection as seen
+by the remote SNMP agent.
+
+The monitor tcp connections command displays the connected TCP
+endpoints including the current state of the connection as seen
+by the remote SNMP agent. The information is updated periodically.
+@section UDP MODE
+
+The scli udp mode is based on the UDP-MIB as published in
+RFC 2013. It provides commands to browse information specific
+to the UDP transport protocol.
+
+@example
+@command{show udp listener}
+@command{show udp stats}
+@end example
+
+The show udp listener command displays the listening UDP
+endpoints.
+
+The show udp statistics about datagrams received or sent.
 
 @node Extending, Problems, Modes and Commands, Top
 @chapter Writing Extensions
