@@ -29,6 +29,7 @@
 #include "ip-mib.h"
 #include "ip-forward-mib.h"
 #include "tunnel-mib.h"
+#include "if-mib.h"
 
 
 
@@ -148,8 +149,10 @@ cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_ip_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry)
+show_ip_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry, ifXEntry_t **ifXTable, ifEntry_t **ifTable)
 {
+    int i;
+
     g_return_if_fail(tunnelIfEntry);
 
     if (tunnelIfEntry->tunnelIfLocalAddress) {
@@ -206,13 +209,29 @@ show_ip_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry)
     } else {
 	g_string_append(s, "--");
     }
-    
-    if (tunnelIfEntry->ifIndex) {
-	g_string_sprintfa(s, " %5u   ", tunnelIfEntry->ifIndex);
-    } else {
-	g_string_sprintfa(s, " %5s   ", "--");
-    }
 
+    if (tunnelIfEntry->ifIndex) {
+	g_string_sprintfa(s, " %2u", tunnelIfEntry->ifIndex);
+        if (ifXTable) {
+	    for (i = 0; ifXTable[i]; i++) {
+	        if(ifXTable[i]->ifIndex == tunnelIfEntry->ifIndex) {
+		   g_string_sprintfa(s, " (%.*s)",
+                         (int) ifXTable[i]->_ifNameLength,
+			 ifXTable[i]->ifName);
+		   break;
+		}
+	    }
+	} else if (ifTable) {
+            for (i = 0; ifTable[i]; i++) {
+		if(ifTable[i]->ifIndex == tunnelIfEntry->ifIndex) {
+		  g_string_sprintfa(s, " (%.*s)",
+	                (int) ifTable[i]->_ifDescrLength,
+			ifTable[i]->ifDescr);
+		  break;
+		}
+	    }
+	}
+    }
     g_string_append(s, "\n");
 }
 
@@ -222,6 +241,8 @@ static int
 cmd_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 {
     tunnelIfEntry_t **tunnelIfTable = NULL;
+    ifEntry_t **ifTable = NULL;
+    ifXEntry_t **ifXTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -230,14 +251,20 @@ cmd_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_ERROR;
     }
 
+    (void) if_mib_get_ifTable(interp->peer, &ifTable);
+    (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
+    
     if (tunnelIfTable) {
+
 	g_string_append(interp->result,
-	"Local Address    Remote Address   Type    Sec.  TTL TOS    IF\n");
+	"Local Address    Remote Address   Type    Sec.  TTL TOS Interface\n");
 	for (i = 0; tunnelIfTable[i]; i++) {
-	    show_ip_tunnel(interp->result, tunnelIfTable[i]);
+	    show_ip_tunnel(interp->result, tunnelIfTable[i], ifXTable, ifTable);
 	}
     }
 
+    if (ifXTable) if_mib_free_ifXTable(ifXTable);
+    if (ifTable) if_mib_free_ifTable(ifTable);
     if (tunnelIfTable) tunnel_mib_free_tunnelIfTable(tunnelIfTable);
 
     return SCLI_OK;
