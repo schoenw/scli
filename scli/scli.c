@@ -32,6 +32,9 @@
 
 #include <getopt.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -47,8 +50,8 @@ static scli_interp_t *current_interp = NULL;
 static void
 mainloop(scli_interp_t *interp, int delay)
 {
-    char *input;
-    int code = SCLI_OK;
+    char *input, *expansion;
+    int result, code = SCLI_OK;
 
     g_assert(interp);
 
@@ -65,8 +68,14 @@ mainloop(scli_interp_t *interp, int delay)
 	    free(input);
 	    continue;
 	}
+	result = history_expand(input, &expansion);
+	if (result < 0 || result == 2) {
+	    free(input);
+	    free(expansion);
+	    continue;
+	}
+	free(input); input = expansion;
 	add_history(input);
-	
 	code = scli_eval(interp, input);
 	free(input);
     }
@@ -136,7 +145,7 @@ generator(char *text, int state)
 	scli_cmd_t *cmd = (scli_cmd_t *) node->data;
 	if (strncmp(cmd->name, text, len) == 0) {
 	    last_node = g_node_next_sibling(node);
-	    return (strdup(cmd->name));
+	    return (g_strdup(cmd->name));
 	}
     }
 
@@ -197,6 +206,7 @@ usage()
     printf(
 	"Options:\n"
 	"  -V, --version     show version information and exit\n"
+	"  -c, --command     process the given command and exit\n"
 	"  -f, --file        process commands from a file and exit\n"
 	"  -h, --help        display this help and exit\n"
 	"  -n, --norc        do not evaluate ~/.sclirc on startup\n"
@@ -217,23 +227,31 @@ main(int argc, char **argv)
     scli_interp_t *interp;
     system_t *system = NULL;
     char *file = NULL;
+    char *cmd = NULL;
     int c, i;
     
     int norc = 0, port = 161, delay = 5000, retries = 3, timeout = 500000;
 
     static scli_cmd_t cmds[] = {
 	{ NULL, "help",
-	  "help about the current mode and commands", scli_cmd_help },
+	  "help about the current mode and commands",
+	  scli_cmd_help },
+	{ NULL, "history",
+	  "display the command history list with line numbers",
+	  scli_cmd_history },
 	{ NULL, "exit",
-	  "exit the scli command line program", scli_cmd_exit },
+	  "exit the scli command line program",
+	  scli_cmd_exit },
 	{ NULL, "show",
-	  "show information about a certain topic", NULL },
+	  "show information about a certain topic",
+	  NULL },
 	{ NULL, NULL, NULL, NULL }
     };
 
     static struct option const long_options[] =
     {
         { "version", no_argument,       0, 'V' },
+	{ "command", required_argument, 0, 'c' },
         { "file",    required_argument, 0, 'f' },
         { "help",    no_argument,       0, 'h' },
         { "norc",    no_argument,       0, 'n' },
@@ -243,12 +261,15 @@ main(int argc, char **argv)
         { NULL, 0, NULL, 0}
     };
 
-    while ((c = getopt_long(argc, argv, "Vf:hnp:r:t:", long_options,
+    while ((c = getopt_long(argc, argv, "Vc:f:hnp:r:t:", long_options,
                             (int *) 0)) != EOF) {
         switch (c) {
         case 'V':
             printf("scli %s\n", VERSION);
             exit(0);
+	case 'c':
+	    cmd = optarg;
+	    break;
 	case 'f':
 	    file = optarg;
 	    break;
@@ -307,7 +328,7 @@ main(int argc, char **argv)
 	scli_create_command(interp, cmds + i);
     }
 
-    interp->interactive = (file == NULL && isatty(0));
+    interp->interactive = (file == NULL && cmd == NULL && isatty(0));
 
     /*
      * Lets see how we can talk to this guy. We first try to speek
@@ -368,6 +389,7 @@ main(int argc, char **argv)
     }
 
     scli_init_system_mode(interp);
+    scli_init_entity_mode(interp);
     scli_init_interface_mode(interp);
 
     if (! norc) {
@@ -391,6 +413,9 @@ main(int argc, char **argv)
 	}
 	mainloop(interp, delay);
 	if (path) {
+	    if (access(path, W_OK) != 0) {
+		close(creat(path, 0600));
+	    }
 	    if (access(path, W_OK) == 0) {
 		if (write_history(path) != 0) {
 		    perror("scli: writing history failed");
@@ -398,12 +423,12 @@ main(int argc, char **argv)
 	    }
 	    g_free(path);
 	}
+    } else if (file) {
+	(void) scli_eval_file(interp, file);
+    } else if (cmd) {
+	(void) scli_eval(interp, cmd);
     } else {
-	if (file) {
-	    (void) scli_eval_file(interp, file);
-	} else {
-	    (void) scli_eval_file_stream(interp, stdin);
-	}
+	(void) scli_eval_file_stream(interp, stdin);
     }
 
 #ifdef HAVE_DMALLOC_H

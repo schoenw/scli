@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4a from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -46,9 +46,10 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_STRIP_FLAG =
 transform = @program_transform_name@
 
 NORMAL_INSTALL = :
@@ -72,7 +73,7 @@ VERSION = @VERSION@
 
 INCLUDES = -I$(top_srcdir)/stub -I$(top_srcdir)/snmp $(GLIB_CFLAGS)
 bin_PROGRAMS = scli
-scli_SOURCES = scli.c scli.h scli.1 vendors.c 		  getopt.h getopt.c getopt1.c basic.c cmds.c 		  system.c interface.c
+scli_SOURCES = scli.c scli.h scli.1 vendors.c 		  getopt.h getopt.c getopt1.c basic.c cmds.c fmt.c 		  system.c entity.c interface.c
 
 scli_LDADD = -L../stub -lstub -L../snmp -lsnmp $(GLIB_LIBS)
 man_MANS = scli.1
@@ -86,8 +87,8 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I..
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-scli_OBJECTS =  scli.o vendors.o getopt.o getopt1.o basic.o cmds.o \
-system.o interface.o
+scli_OBJECTS =  scli.o vendors.o getopt.o getopt1.o basic.o cmds.o fmt.o \
+system.o entity.o interface.o
 scli_DEPENDENCIES = 
 scli_LDFLAGS = 
 CFLAGS = @CFLAGS@
@@ -105,8 +106,9 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/basic.P .deps/cmds.P .deps/getopt.P .deps/getopt1.P \
-.deps/interface.P .deps/scli.P .deps/system.P .deps/vendors.P
+DEP_FILES =  .deps/basic.P .deps/cmds.P .deps/entity.P .deps/fmt.P \
+.deps/getopt.P .deps/getopt1.P .deps/interface.P .deps/scli.P \
+.deps/system.P .deps/vendors.P
 SOURCES = $(scli_SOURCES)
 OBJECTS = $(scli_OBJECTS)
 
@@ -135,8 +137,8 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
 	@list='$(bin_PROGRAMS)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo "  $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`"; \
-	     $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
+	    echo "  $(INSTALL_PROGRAM) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`"; \
+	     $(INSTALL_PROGRAM) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
 	  else :; fi; \
 	done
 
@@ -247,7 +249,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
@@ -308,7 +310,7 @@ uninstall: uninstall-am
 all-am: Makefile $(PROGRAMS) $(MANS)
 all-redirect: all-am
 install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
 installdirs:
 	$(mkinstalldirs)  $(DESTDIR)$(bindir) $(DESTDIR)$(mandir)/man1
 

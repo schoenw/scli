@@ -27,7 +27,7 @@
 #include "stools.h"
 #include "scli.h"
 
-
+#include <readline/history.h>
 
 
 int
@@ -35,11 +35,6 @@ scli_cmd_exit(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
         
-    if (argc != 1) {
-	printf("wrong # args: should be \"exit\"\n");
-	return SCLI_ERROR;
-    }
-
     return SCLI_EXIT;
 }
 
@@ -49,25 +44,24 @@ static gboolean
 print_cmd(GNode *node, gpointer data)
 {
     scli_cmd_t *cmd = (scli_cmd_t *) node->data;
-    int i, depth;
-    GString *s;
+    int i, depth, len;
+    GString *s = (GString *) data;
 
     if (cmd) {
-	s = g_string_new(NULL);
 	depth = g_node_depth(node);
-	for (i = 2; i < depth; i++) {
+	for (i = 2, len = 0; i < depth; i++, len += 2) {
 	    if (i == 2) {
-		s = g_string_append(s, "  ");
+		g_string_append(s, "  ");
 	    } else {
-		s = g_string_append(s, "| ");
+		g_string_append(s, "| ");
 	    }
 	}
 	if (depth > 2) {
-	    s = g_string_append(s, "+-");
+	    g_string_append(s, "+-");
+	    len += 2;
 	}
-	s = g_string_append(s, cmd->name);
-	printf("%-20s %s\n", s->str, cmd->desc);
-	g_string_free(s, 1);
+	g_string_sprintfa(s, "%-*s %s\n", (20-len > 0) ? 20-len : 0,
+			  cmd->name, cmd->desc);
     }
     return FALSE;
 }
@@ -79,28 +73,43 @@ scli_cmd_help(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_mode_t *mode;
+    GString *s;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
         
-    if (argc != 1) {
-	printf("wrong # args: should be \"help\"\n");
-	return SCLI_ERROR;
-    }
-    
-    printf("scli version %s %s\n\n", VERSION, scli_copyright);
-    printf("Supported modes:\n");
+    s = interp->result;
+    g_string_sprintfa(s, "scli version %s %s\n\n", VERSION, scli_copyright);
+    g_string_append(s, "Supported modes:\n");
     for (elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
 	mode = (scli_mode_t *) elem->data;
-	printf("%-15s %s\n", mode->name, mode->desc);
+	g_string_sprintfa(s, "%-15s %s\n", mode->name, mode->desc);
     }
-    printf("\n");
-    printf("List of scli commands:\n");
+    g_string_append(s, "\nList of scli commands:\n");
     if (interp->cmd_root) {
 	g_node_traverse(interp->cmd_root, G_PRE_ORDER, G_TRAVERSE_ALL,
-			G_MAXINT, print_cmd, NULL);
-	printf("\n");
+			G_MAXINT, print_cmd, s);
+	g_string_append(s, "\n");
+    }
+
+    interp->result = s;
+    return SCLI_OK;
+}
+
+
+
+int
+scli_cmd_history(scli_interp_t *interp, int argc, char **argv)
+{
+    HIST_ENTRY **the_list;
+    int i;
+    
+    the_list = history_list();
+    if (the_list) {
+	for (i = 0; the_list[i]; i++) {
+	    g_string_sprintfa(interp->result, "%4d %s\n",
+			      i + history_base, the_list[i]->line);
+	}
     }
 
     return SCLI_OK;
 }
-

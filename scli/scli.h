@@ -100,16 +100,14 @@ scli_eval_init_file(scli_interp_t *interp);
 extern void
 scli_register_mode(scli_interp_t *interp, scli_mode_t *mode);
 
-#if 0
-extern void
-scli_activate_mode(scli_interp_t *interp, scli_mode_t *mode);
-#endif
-
 extern int
 scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd);
 
 extern void
 scli_init_system_mode(scli_interp_t *interp);
+
+extern void
+scli_init_entity_mode(scli_interp_t *interp);
 
 extern void
 scli_init_interface_mode(scli_interp_t *interp);
@@ -121,7 +119,7 @@ extern int
 scli_cmd_help(scli_interp_t *interp, int argc, char **argv);
 
 extern int
-scli_cmd_mode(scli_interp_t *interp, int argc, char **argv);
+scli_cmd_history(scli_interp_t *interp, int argc, char **argv);
 
 /* 
  * A data structure used to obtain vendor information from the
@@ -137,4 +135,28 @@ typedef struct scli_vendor {
 extern scli_vendor_t*
 scli_get_vendor(guint32 oid[], gsize len);
 
+/*
+ * Formatting utilities that are used frequently by scli modes.
+ */
+
+extern void
+fmt_time_ticks(GString *s, guint32 timeticks);
+
+extern void
+fmt_date_and_time(GString *s, guchar *data, gsize len);
+
+extern void
+fmt_kbytes(GString *s, guint32 kbytes);
+
+extern void
+fmt_enum(GString *s, int width, stls_table_t *table, gint32 *number);
+
+extern char*
+fmt_kmg(guint32 number);
+
+extern char*
+fmt_gtp(guint32 number);
+
+
 #endif /* _SCLI_H */
+

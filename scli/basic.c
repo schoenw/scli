@@ -41,6 +41,7 @@ scli_interp_create()
     interp = g_malloc0(sizeof(scli_interp_t));
     interp->cmd_root = g_node_new(NULL);
     interp->peer = g_malloc0(sizeof(host_snmp));
+    interp->result = g_string_new(NULL);
 
     return interp;
 }
@@ -55,6 +56,9 @@ scli_interp_delete(scli_interp_t *interp)
 	}
 	if (interp->peer) {
 	    g_free(interp->peer);
+	}
+	if (interp->result) {
+	    g_string_free(interp->result, 1);
 	}
 	g_free(interp);
     }
@@ -75,28 +79,6 @@ scli_register_mode(scli_interp_t *interp, scli_mode_t *mode)
     }
 }
 
-
-#if 0
-void
-scli_activate_mode(scli_interp_t *interp, scli_mode_t *mode)
-{
-    g_assert(interp);
-    
-    if (interp->active_mode) {
-	if (interp->active_mode->leave) {
-	    (interp->active_mode->leave) (interp);
-	}
-    }
-    if (mode) {
-	interp->active_mode = mode;
-	if (interp->active_mode) {
-	    if (interp->active_mode->enter) {
-		(interp->active_mode->enter) (interp);
-	    }
-	}
-    }
-}
-#endif
 
 
 /*
@@ -224,8 +206,7 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	    node = g_node_next_sibling(node);
 	}
 	if (! node) {
-	    if (argv) g_free(argv);
-	    return SCLI_ERROR;
+	    break;
 	}
 	if (i < argc-1 && g_node_first_child(node)) {
 	    node = g_node_first_child(node);
@@ -233,13 +214,22 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
 	    done = 1;
 	    if (cmd->func) {
+		g_string_truncate(interp->result, 0);
 		code = (cmd->func) (interp, argc-i, argv+i);
+		if (interp->result) {
+		    fputs(interp->result->str, stdout);
+		}
 	    }
 	}
     }
 
     if (! done) {
-	printf("scli: unknown command `%s'\n", argv[0]);
+	int j;
+	printf("invalid command name \"");
+	for (j = 0; j <= i; j++) {
+	    printf("%s%s", j ? " ": "", argv[j]);
+	}
+	printf("\"\n");
 	code = SCLI_ERROR;
     }
 

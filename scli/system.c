@@ -1,5 +1,5 @@
 /* 
- * system.c -- scli system mode command implementation
+ * system.c -- scli system mode implementation
  *
  * Copyright (C) 2001 Juergen Schoenwaelder
  *
@@ -28,107 +28,12 @@
 #include "scli.h"
 
 
-static char*
-fmt_time_ticks(guint32 timeticks)
-{
-    static char buffer[80];
-    unsigned days, hours, minutes, seconds;
-    guint32 secs = timeticks/100;
-    
-    days = secs / (24 * 60 * 60);
-    hours = (secs / (60 * 60)) % 24;
-    minutes = (secs / 60) % 60;
-    seconds = secs % 60;
-
-    g_snprintf(buffer, sizeof(buffer), "%d %s %02d:%02d:%02d",
-	       days, (days == 1) ? "day" : "days",
-	       hours, minutes, seconds);
-    return buffer;
-}
-
-
-
-static char*
-fmt_date_and_time(unsigned char *data, size_t len)
-{
-    static char buffer[80];
-
-    if (len == 8) {
-	g_snprintf(buffer, sizeof(buffer),
-		   "%04u-%02u-%02u %02u:%02u:%02u",
-		   (data[0] << 8) + data[1], data[2], data[3],
-		   data[4], data[5], data[6]);
-	return buffer;
-    }
-
-    if (len == 11) {
-	g_snprintf(buffer, sizeof(buffer),
-		   "%04u-%02u-%02u %02u:%02u:%02u %c%02u:%02u",
-		   (data[0] << 8) + data[1], data[2], data[3],
-		   data[4], data[5], data[6],
-		   data[8], data[9], data[10]);
-	return buffer;
-    }
-    
-    return NULL;
-}
-
-
-
-static char*
-fmt_kbytes(guint32 bytes)
-{
-    static char buffer[80];
-    
-    if (bytes > 9999999) {
-	g_snprintf(buffer, sizeof(buffer), "%u GByte", bytes / 1024 / 1024);
-    } else if (bytes > 9999) {
-	g_snprintf(buffer, sizeof(buffer), "%u MByte", bytes / 1024);
-    } else {
-	g_snprintf(buffer, sizeof(buffer), "%u KByte", bytes);
-    }
-    return buffer;
-}
-
-
-
-static void
-print_string(char *label, guchar *string, gsize len)
-{
-    if (len < 0) {
-	len = strlen((char *) string);
-    }
-    if (string && len) {
-	if (label) {
-	    printf("%-10s %.*s\n", label, (int) len, string);
-	} else {
-	    printf("%.*s\n", (int) len, string);
-	}
-    }
-}
-
-
-
-static void
-stls_string_append_string(GString *s, gint width, guchar *str, gsize len)
-{
-    /* XXX add code here to make sure the characters are displayable */
-     
-    if (str && len) {
-	g_string_sprintfa(s, width < 0 ? "%-*.*s" : "%*.*s",
-			  ABS(width), (int) MIN(len, ABS(width)), str);
-    } else {
-	g_string_sprintfa(s, "%*s", ABS(width), "");
-    }
-}
-
-
-
 static int
 cmd_mounts(scli_interp_t *interp, int argc, char **argv)
 {
     hrFSEntry_t **hrFSEntry = NULL;
-    int i;
+    GString *s;
+    int i, loc_len = 0, rem_len = 0;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -136,30 +41,61 @@ cmd_mounts(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
+    s = interp->result;
     if (hrFSEntry) {
-	GString *s;
-	s = g_string_new("Mount Point              Remote Mount Point\n");
 	for (i = 0; hrFSEntry[i]; i++) {
-	    stls_string_append_string(s, -25,
-			      hrFSEntry[i]->hrFSMountPoint,
+	    if (hrFSEntry[i]->hrFSMountPoint) {
+		loc_len = MAX(loc_len,
 			      hrFSEntry[i]->_hrFSMountPointLength);
-	    stls_string_append_string(s, -50,
-			      hrFSEntry[i]->hrFSRemoteMountPoint,
+	    }
+	    if (hrFSEntry[i]->hrFSRemoteMountPoint) {
+		rem_len = MAX(rem_len,
 			      hrFSEntry[i]->_hrFSRemoteMountPointLength);
-	    s = g_string_append(s, "\n");
+	    }
 	}
-	puts(s->str);
-	g_string_free(s, 1);
+	loc_len++, rem_len++;
+	g_string_sprintfa(s, "%-*s%-*sAccess\n",
+			  loc_len, "Mount Point",
+			  rem_len, "Remote Mount Point");
+	for (i = 0; hrFSEntry[i]; i++) {
+	    if (hrFSEntry[i]->hrFSMountPoint) {
+		g_string_sprintfa(s, "%-*.*s", loc_len,
+			  (int) hrFSEntry[i]->_hrFSMountPointLength,
+				hrFSEntry[i]->hrFSMountPoint);
+	    } else {
+		g_string_sprintfa(s, "%*s", loc_len, "");
+	    }
+	    if (hrFSEntry[i]->hrFSRemoteMountPoint) {
+		g_string_sprintfa(s, "%-*.*s", rem_len,
+			  (int) hrFSEntry[i]->_hrFSRemoteMountPointLength,
+				hrFSEntry[i]->hrFSRemoteMountPoint);
+	    } else {
+		g_string_sprintfa(s, "%*s", rem_len, "");
+	    }
+
+	    if (hrFSEntry[i]->hrFSAccess) {
+		fmt_enum(s, 0, host_resources_mib_enums_hrFSAccess,
+			 hrFSEntry[i]->hrFSAccess);
+	    }
+	    
+	    if (hrFSEntry[i]->hrFSBootable
+		&& *(hrFSEntry[i]->hrFSBootable) == 1) {
+		g_string_append(s, ", bootable");
+	    }
+
+	    g_string_append(s, "\n");
+	}
 	host_resources_mib_free_hrFSEntry(hrFSEntry);
     }
 
+    interp->result = s;
     return SCLI_OK;
 }
 
 
 
 static void
-storage(hrStorageEntry_t *hrStorageEntry)
+show_storage(GString *s, hrStorageEntry_t *hrStorageEntry)
 {
     static guint32 const hrStorageTypes[] = {1, 3, 6, 1, 2, 1, 25, 2, 1};
     guint const idx = sizeof(hrStorageTypes)/sizeof(guint32);
@@ -190,10 +126,11 @@ storage(hrStorageEntry_t *hrStorageEntry)
 
     if (hrStorageEntry->hrStorageDescr
 	&& hrStorageEntry->_hrStorageDescrLength) {
-	printf("%-20.*s", (int) MIN(25, hrStorageEntry->_hrStorageDescrLength),
-	       hrStorageEntry->hrStorageDescr);
+	g_string_sprintfa(s, "%-20.*s",
+			  (int) MIN(25, hrStorageEntry->_hrStorageDescrLength),
+			  hrStorageEntry->hrStorageDescr);
     } else {
-	printf("%20s", "");
+	g_string_sprintfa(s, "%20s", "");
     }
 
     if (hrStorageEntry->hrStorageAllocationUnits
@@ -212,19 +149,16 @@ storage(hrStorageEntry_t *hrStorageEntry)
 	storage_used *= *(hrStorageEntry->hrStorageAllocationUnits);
 	storage_used /= scale;
 
-        printf("%10llu %10llu %10llu %3u%%",
+        g_string_sprintfa(s, "%10llu %10llu %10llu %3u%%",
 	       storage_size, storage_used, storage_size - storage_used,
 	       (guint32) (storage_size
 			  ? storage_used / storage_size * 100 : 0));
 
 	if (type) {
-	    printf(" (%s)\n", type);
-	} else {
-	    printf("\n");
+	    g_string_sprintfa(s, " (%s)", type);
 	}
-    } else {
-	printf("\n");
     }
+    g_string_append(s, "\n");
 }
 
 
@@ -239,14 +173,14 @@ cmd_storage(scli_interp_t *interp, int argc, char **argv)
 
     if (host_resources_mib_get_hrStorageEntry(interp->peer,
 					      &hrStorageEntry)) {
-	return SCLI_OK;
+	return SCLI_ERROR;
     }
 
     if (hrStorageEntry) {
-	printf("Storage Area          "
+	g_string_append(interp->result, "Storage Area          "
 	       "Size [K]   Used [K]   Free [K] Use%%\n");
 	for (i = 0; hrStorageEntry[i]; i++) {
-	    storage(hrStorageEntry[i]);
+	    show_storage(interp->result, hrStorageEntry[i]);
 	}
 	host_resources_mib_free_hrStorageEntry(hrStorageEntry);
     }
@@ -257,112 +191,143 @@ cmd_storage(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-cmd_entities(scli_interp_t *interp, int argc, char **argv)
-{
-    entPhysicalEntry_t **entPhysicalEntry = NULL;
-    int i;
-
-    g_return_val_if_fail(interp, SCLI_ERROR);
-
-    if (entity_mib_get_entPhysicalEntry(interp->peer, &entPhysicalEntry) == 0 && entPhysicalEntry) {
-	for (i = 0; entPhysicalEntry[i]; i++) {
-	    print_string(NULL,
-			 entPhysicalEntry[i]->entPhysicalDescr,
-			 entPhysicalEntry[i]->_entPhysicalDescrLength);
-	    printf("\n");
-	}
-	entity_mib_free_entPhysicalEntry(entPhysicalEntry);
-    }
-    
-    return SCLI_OK;
-}
-
-
-
-static int
-cmd_show(scli_interp_t *interp, int argc, char **argv)
+cmd_system(scli_interp_t *interp, int argc, char **argv)
 {
     system_t *system = NULL;
     hrSystem_t *hrSystem = NULL;
     hrStorage_t *hrStorage = NULL;
+    interfaces_t *interfaces = NULL;
+    dot1dBase_t *dot1dBase = NULL;
+    smLangEntry_t **smLangEntry = NULL;
+    GString *s;
+    int i;
+    int const indent = 18;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+    s = interp->result;
     if (snmpv2_mib_get_system(interp->peer, &system) == 0 && system) {
-	print_string(NULL,
-		    system->sysDescr, system->_sysDescrLength);
-	printf("\n");
-	print_string("Name:",
-		    system->sysName, system->_sysNameLength);
-	printf("Address:   %s:%u\n", interp->peer->name, interp->peer->port);
-	print_string("Contact:",
-		    system->sysContact, system->_sysContactLength);
-	print_string("Location:",
-		    system->sysLocation, system->_sysLocationLength);
-	if (system->sysUpTime) {
-	    print_string("Agent:",
-			(guchar *) fmt_time_ticks(*(system->sysUpTime)), -1);
+	if (system->sysDescr) {
+	    g_string_sprintfa(s, "%.*s", (int) system->_sysDescrLength,
+			      system->sysDescr);
+	    g_string_append(s, "\n");
+	}
+	if (system->sysName) {
+	    g_string_sprintfa(s, "\n%-*s ", indent, "Name:");
+	    g_string_sprintfa(s, "%.*s", (int) system->_sysNameLength,
+			      system->sysName);
+	}
+	if (interp->peer->name) {
+	    g_string_sprintfa(s, "\n%-*s ", indent, "Address:");
+	    g_string_sprintfa(s, "%s:%d", interp->peer->name,
+			      interp->peer->port);
+	}
+	if (system->sysContact) {
+	    g_string_sprintfa(s, "\n%-*s ", indent, "Contact:");
+	    g_string_sprintfa(s, "%.*s", (int) system->_sysContactLength,
+			      system->sysContact);
+	}
+	if (system->sysLocation) {
+	    g_string_sprintfa(s, "\n%-*s ", indent, "Location:");
+	    g_string_sprintfa(s, "%.*s", (int) system->_sysLocationLength,
+			      system->sysLocation);
 	}
 	if (system->sysObjectID) {
 	    scli_vendor_t *vendor;
 	    vendor = scli_get_vendor(system->sysObjectID,
 				     system->_sysObjectIDLength);
 	    if (vendor) {
-		printf("Vendor:    ");
+		g_string_sprintfa(s, "\n%-*s ", indent, "Vendor:");
 		if (vendor->name) {
-		    printf("%s", vendor->name);
+		    g_string_append(s, vendor->name);
 		    if (vendor->url) {
-			printf(" <%s>", vendor->url);
+			g_string_sprintfa(s, " <%s>", vendor->url);
 		    }
 		}
-		printf("\n");
 	    }
 	}
 	if (system->sysServices) {
-	    guint32 services = *(system->sysServices);
-	    printf("Services:  ");
-	    if (services & 0x01) printf("physical ");
-	    if (services & 0x02) printf("datalink ");
-	    if (services & 0x04) printf("network ");
-	    if (services & 0x08) printf("transport ");
-	    if (services & 0x10) printf("session ");
-	    if (services & 0x20) printf("representation ");
-	    if (services & 0x40) printf("application ");
-	    printf("\n");
+	    char const *serv_names[] = {
+		"physical", "datalink", "network", "transport", "session",
+		"representation", "application", NULL
+	    };
+
+	    g_string_sprintfa(s, "\n%-*s ", indent, "Services:");
+	    for (i = 0; serv_names[i]; i++) {
+		if (*(system->sysServices) & (1 << i)) {
+		    g_string_sprintfa(s, "%s ", serv_names[i]);
+		}
+	    }
+	}
+	if (system->sysUpTime) {
+	    g_string_sprintfa(s, "\n%-*s ", indent, "Agent Boot Time:");
+	    fmt_time_ticks(s, *(system->sysUpTime));
 	}
 	snmpv2_mib_free_system(system);
     }
 
-    if (host_resources_mib_get_hrSystem(interp->peer, &hrSystem) == 0 && hrSystem) {
+    if (host_resources_mib_get_hrSystem(interp->peer, &hrSystem) == 0
+	&& hrSystem) {
 	if (hrSystem->hrSystemUptime) {
-	    print_string("Uptime:",
-			(guchar *) fmt_time_ticks(*(hrSystem->hrSystemUptime)), -1);
+	    g_string_sprintfa(s, "\n%-*s ", indent, "System Boot Time:");
+	    fmt_time_ticks(s, *(hrSystem->hrSystemUptime));
 	}
 	if (hrSystem->hrSystemDate && hrSystem->_hrSystemDateLength) {
-	    char *date = fmt_date_and_time(hrSystem->hrSystemDate,
-					   hrSystem->_hrSystemDateLength);
-	    if (date) {
-		print_string("Date:", (guchar *) date, -1);
-	    }
+	    g_string_sprintfa(s, "\n%-*s ", indent, "Current Time:");
+	    fmt_date_and_time(s, hrSystem->hrSystemDate,
+			      hrSystem->_hrSystemDateLength);
 	}
 	if (hrSystem->hrSystemNumUsers) {
-	    printf("Users:     %u\n",
-		   *(hrSystem->hrSystemNumUsers));
+	    g_string_sprintfa(s, "\n%-*s %u", indent, "Users:", 
+			      *(hrSystem->hrSystemNumUsers));
 	}
 	if (hrSystem->hrSystemProcesses) {
-	    printf("Processes: %u\n",
-		   *(hrSystem->hrSystemProcesses));
+	    g_string_sprintfa(s, "\n%-*s %u", indent, "Processes:",
+			      *(hrSystem->hrSystemProcesses));
 	}
 	host_resources_mib_free_hrSystem(hrSystem);
     }
 
-    if (host_resources_mib_get_hrStorage(interp->peer, &hrStorage) == 0 && hrStorage) {
+    if (host_resources_mib_get_hrStorage(interp->peer, &hrStorage) == 0
+	&& hrStorage) {
 	if (hrStorage->hrMemorySize) {
-	    print_string("Memory:", (guchar *) fmt_kbytes(*(hrStorage->hrMemorySize)), -1);
+	    g_string_sprintfa(s, "\n%-*s ", indent, "Memory:");
+	    fmt_kbytes(s, *(hrStorage->hrMemorySize));
 	}
 	host_resources_mib_free_hrStorage(hrStorage);
     }
 
+    if (if_mib_get_interfaces(interp->peer, &interfaces) == 0
+	&& interfaces) {
+	if (interfaces->ifNumber) {
+	    g_string_sprintfa(s, "\n%-*s %d", indent, "Interfaces:",
+			      *(interfaces->ifNumber));
+	}
+	if_mib_free_interfaces(interfaces);
+    }
+
+    if (bridge_mib_get_dot1dBase(interp->peer, &dot1dBase) == 0
+	&& dot1dBase) {
+	if (dot1dBase->dot1dBaseNumPorts) {
+	    g_string_sprintfa(s, "\n%-*s %d", indent, "Bridge Ports:",
+			      *(dot1dBase->dot1dBaseNumPorts));
+	    if (dot1dBase->dot1dBaseType) {
+		fmt_enum(s, 60, bridge_mib_enums_dot1dBaseType,
+			 dot1dBase->dot1dBaseType);
+	    }
+	}
+	bridge_mib_free_dot1dBase(dot1dBase);
+    }
+
+    if (disman_script_mib_get_smLangEntry(interp->peer, &smLangEntry) == 0
+	&& smLangEntry) {
+	for (i = 0; smLangEntry[i]; i++) ;
+	g_string_sprintfa(s, "\n%-*s %u", indent, "Script Languages:", i);
+	disman_script_mib_free_smLangEntry(smLangEntry);
+    }
+
+    g_string_append(s, "\n");
+    interp->result = s;
     return SCLI_OK;
 }
 
@@ -373,9 +338,7 @@ scli_init_system_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 	{ "show", "system",
-	  "show generic system information", cmd_show },
-	{ "show system", "entities",
-	  "show the entities that make up the system", cmd_entities },
+	  "show generic system information", cmd_system },
 	{ "show system", "storage",
 	  "show storage areas attached to the system", cmd_storage },
 	{ "show system", "mounts",
