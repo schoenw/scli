@@ -51,26 +51,10 @@ fmt_info(GString *s, ucd_snmp_mib_version_t *version)
 
 
 
-static void
-fmt_load(GString *s, ucd_snmp_mib_laEntry_t *laEntry)
-{
-    int const indent = 18;
-    
-    if (laEntry->laNames && laEntry->laLoad) {
-	g_string_sprintfa(s, "%-*.*s: %.*s\n", indent-1,
-			  laEntry->_laNamesLength, laEntry->laNames,
-			  laEntry->_laLoadLength, laEntry->laLoad);
-    }
-}
-
-
-
 static int
 show_netsnmp_info(scli_interp_t *interp, int argc, char **argv)
 {
     ucd_snmp_mib_version_t *version = NULL;
-    ucd_snmp_mib_laEntry_t **laTable = NULL;
-    int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -90,25 +74,188 @@ show_netsnmp_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SNMP;
     }
 
-    ucd_snmp_mib_get_laTable(interp->peer, &laTable,
-			     UCD_SNMP_MIB_LANAMES
-			     | UCD_SNMP_MIB_LALOAD);
-    if (interp->peer->error_status) {
-	return SCLI_SNMP;
-    }
-    
     if (version) {
 	fmt_info(interp->result, version);
     }
 
+    if (version) ucd_snmp_mib_free_version(version);
+
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_load(GString *s, ucd_snmp_mib_laEntry_t *laEntry)
+{
+    int const indent = 18;
+
+    if (laEntry->laNames && laEntry->laLoadInt) {
+	g_string_sprintfa(s, "%-*.*s: %.2f\n", indent-1,
+			  laEntry->_laNamesLength, laEntry->laNames,
+			  *laEntry->laLoadInt / 100.0);
+    }
+    if (laEntry->_laErrMessageLength) {
+	fmt_display_string(s, indent, "Error:",
+			   (int) laEntry->_laErrMessageLength,
+			   laEntry->laErrMessage);
+    }
+}
+
+
+
+static int
+show_netsnmp_load(scli_interp_t *interp, int argc, char **argv)
+{
+    ucd_snmp_mib_laEntry_t **laTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    ucd_snmp_mib_get_laTable(interp->peer, &laTable,
+			     UCD_SNMP_MIB_LANAMES
+			     | UCD_SNMP_MIB_LALOADINT
+			     | UCD_SNMP_MIB_LAERRMESSAGE);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+    
     if (laTable) {
 	for (i = 0; laTable[i]; i++) {
 	    fmt_load(interp->result, laTable[i]);
 	}
     }
     
-    if (version) ucd_snmp_mib_free_version(version);
     if (laTable) ucd_snmp_mib_free_laTable(laTable);
+
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_ext(GString *s, ucd_snmp_mib_extEntry_t *extEntry)
+{
+    int const indent = 18;
+
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Index:",
+		      extEntry->extIndex);
+    fmt_display_string(s, indent, "Name:",
+		       (int) extEntry->_extNamesLength,
+		       extEntry->extNames);
+    fmt_display_string(s, indent, "Command:",
+		       (int) extEntry->_extCommandLength,
+		       extEntry->extCommand);
+    fmt_display_string(s, indent, "Output:",
+		       (int) extEntry->_extOutputLength,
+		       extEntry->extOutput);
+    if (extEntry->extResult) {
+	g_string_sprintfa(s, "%-*s%d\n", indent, "Code:",
+			  *extEntry->extResult);
+    }
+}
+
+
+
+static int
+show_netsnmp_exec(scli_interp_t *interp, int argc, char **argv)
+{
+    ucd_snmp_mib_extEntry_t **extTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    ucd_snmp_mib_get_extTable(interp->peer, &extTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (extTable) {
+	for (i = 0; extTable[i]; i++) {
+	    fmt_ext(interp->result, extTable[i]);
+	}
+    }
+
+    if (extTable) ucd_snmp_mib_free_extTable(extTable);
+
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_proc(GString *s, ucd_snmp_mib_prEntry_t *prEntry)
+{
+    int const indent = 18;
+
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Index:",
+		      prEntry->prIndex);
+    fmt_display_string(s, indent, "Process:",
+		       (int) prEntry->_prNamesLength,
+		       prEntry->prNames);
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Minimum:",
+		      *prEntry->prMin);
+
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Maximum:",
+		      *prEntry->prMax);
+
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Current:",
+		      *prEntry->prCount);
+
+    if (prEntry->_prErrMessageLength) {
+	fmt_display_string(s, indent, "Error:",
+			   (int) prEntry->_prErrMessageLength,
+			   prEntry->prErrMessage);
+    }
+}
+
+
+
+static int
+show_netsnmp_proc(scli_interp_t *interp, int argc, char **argv)
+{
+    ucd_snmp_mib_prEntry_t **prTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    ucd_snmp_mib_get_prTable(interp->peer, &prTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (prTable) {
+	for (i = 0; prTable[i]; i++) {
+	    if (i) g_string_append(interp->result, "\n");
+	    fmt_proc(interp->result, prTable[i]);
+	}
+    }
+
+    if (prTable) ucd_snmp_mib_free_prTable(prTable);
 
     return SCLI_OK;
 }
@@ -127,13 +274,13 @@ set_netsnmp_debugging(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    if (scli_interp_dry(interp)) {
-	return SCLI_OK;
-    }
-
     if (! gsnmp_enum_get_number(ucd_snmp_mib_enums_versionDoDebugging,
 				argv[1], &value)) {
 	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     version = ucd_snmp_mib_new_version();
@@ -145,6 +292,73 @@ set_netsnmp_debugging(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SNMP;
     }
 
+    return SCLI_OK;
+}
+
+
+
+static int
+set_netsnmp_restart(scli_interp_t *interp, int argc, char **argv)
+{
+    ucd_snmp_mib_version_t *version = NULL;
+    gint32 value = 1;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    version = ucd_snmp_mib_new_version();
+    version->versionRestartAgent = &value;
+    ucd_snmp_mib_set_version(interp->peer, version,
+			     UCD_SNMP_MIB_VERSIONRESTARTAGENT);
+    ucd_snmp_mib_free_version(version);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+dump_netsnmp(scli_interp_t *interp, int argc, char **argv)
+{
+    ucd_snmp_mib_version_t *version = NULL;
+    const char *e;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    ucd_snmp_mib_get_version(interp->peer, &version,
+			     UCD_SNMP_MIB_VERSIONDODEBUGGING);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (version) {
+	e = fmt_enum(ucd_snmp_mib_enums_versionDoDebugging,
+		     version->versionDoDebugging);
+	if (e) {
+	    g_string_sprintfa(interp->result, "set netsnmp debugging %s\n", e);
+	}
+    }
+
+    if (version) ucd_snmp_mib_free_version(version);
+    
     return SCLI_OK;
 }
 
@@ -163,13 +377,46 @@ scli_init_netsnmp_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  set_netsnmp_debugging },
 	
+	{ "set netsnmp restart", NULL,
+	  "The set netsnmp restart command restarts the agent.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  set_netsnmp_restart },
+	
 	{ "show netsnmp info", NULL,
-	  "The show netsnmp info command show general information about\n"
+	  "The show netsnmp info command shows general information about\n"
 	  "the netsnmp/ucdsnmp agent such as the version number and the\n"
 	  "software configuration.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_netsnmp_info },
+
+	{ "show netsnmp load", NULL,
+	  "The show netsnmp load command shows the system's load.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_netsnmp_load },
+
+	{ "show netsnmp exec", NULL,
+	  "The show netsnmp exec command shows information about\n"
+	  "pre-configured commands that can be invoked.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_netsnmp_exec },
+
+	{ "show netsnmp proc", NULL,
+	  "The show netsnmp proc command shows information about\n"
+	  "which processes netsnmp watches.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_netsnmp_proc },
+
+	{ "dump netsnmp", NULL,
+	  "The dump netsnmp command generates a sequence of scli commands\n"
+	  "which can be used to restore the netsnmp specific configuration.\n",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  dump_netsnmp },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
