@@ -1,3 +1,157 @@
+2002-07-03 20:43  schoenw
+
+	* doc/scli.texinfo: Regenerated the file for the next release.
+
+2002-07-03 20:41  schoenw
+
+	* scli/bridge.c: Some layout fixes.
+
+2002-07-03 20:40  schoenw
+
+	* configure.in: Bumped the version number.
+
+2002-07-03 20:38  schoenw
+
+	* scli/: basic.c, tcp.c: Some minor changes to fix some oddities.
+
+2002-07-03 20:36  schoenw
+
+	* snmp/: g_asn1.c, g_asn1.h: Some code cleanup. Made some of the
+	internal functions invisible to the outside world and inlined them
+	to make things even faster...
+
+2002-07-03 10:18  schoenw
+
+	* scli/printer.c: Changed the registration of the xml output.
+
+2002-07-03 09:40  schoenw
+
+	* scli/system.c: Some more xml support.
+
+2002-07-03 08:52  schoenw
+
+	* stub/: Makefile.am, atm-mib.c, atm-mib.h, host-resources-mib.c,
+	host-resources-mib.h, ip-mib.c, ip-mib.h, snmpv2-mib.c,
+	snmpv2-mib.h: Started to add explicit makefile rules for each MIB
+	module. Added specific smidump flags to reduce the stubs to the
+	subset which is actually needed.
+
+2002-07-03 08:49  schoenw
+
+	* scli/system.c: Use hrSWRunType instead of hrSWInstalledType for
+	running software.
+
+2002-07-02 16:17  schoenw
+
+	* scli/monitor.c: Improved SNMP error message display in monitor
+	mode.
+
+2002-07-02 12:31  schoenw
+
+	* stub/: Makefile.am, if-mib.c, if-mib.h, ip-forward-mib.c,
+	ip-forward-mib.h: Regenerated stubs for the IP-FORWARDING-MIB and
+	the IF-MIB to exclude unused deprecated definitions.
+
+2002-07-02 10:37  schoenw
+
+	* scli/: basic.c, bridge.c, cisco.c, cmds.c, ether.c, interface.c:
+	Commands are now case insensitive, support for SMTP style reply
+	codes, generally prefer g_new0 over g_malloc0.
+
+2002-07-02 10:32  schoenw
+
+	* scli/: scli.1.in, scli.c, scli.h: Added the new option -q and
+	documented -i.
+
+2002-07-02 10:21  schoenw
+
+	* scli/ip.c: Minor edits of the command documentation.
+
+2002-07-01 14:59  schoenw
+
+	* scli/tcp.c: Added more detailed documentation for the "show tcp
+	states" command.
+
+2002-07-01 14:35  schoenw
+
+	* scli/tcp.c: Assume all connections where the local port matches a
+	local listening port are local services.
+
+2002-07-01 10:18  schoenw
+
+	* scli/tcp.c: Improved the layout to avoid empty lines.
+
+2002-07-01 10:13  schoenw
+
+	* scli/tcp.c: Added the "show tcp info" command and improved the
+	documentation.
+
+2002-07-01 10:12  schoenw
+
+	* scli/isdn.c: The idsn mode is called isdn mode of course.
+
+2002-06-29 23:18  schoenw
+
+	* scli/tcp.c: Added xml support for show tcp states and improved
+	the layout a bit.
+
+2002-06-28 17:58  schoenw
+
+	* scli/scli.c: Produce consistent error messages please.
+
+2002-06-28 17:43  schoenw
+
+	* scli/tcp.c: Added new commands show tcp states and monitor tcp
+	states.
+
+2002-06-26 19:40  schoenw
+
+	* scli/nortel.c: Fixed an error return in "create nortel bridge
+	vlan".
+
+2002-06-26 19:33  schoenw
+
+	* scli/interface.c: Improved the "show interface stack" command. It
+	does first check whether there are any stacked interfaces before
+	fetching more data and printing the header.
+
+2002-06-26 15:06  schoenw
+
+	* scli/bridge.c: Do not output stupid 00 numbers when bridges
+	report 0 time values (which is not legal according to the MIB but
+	does happen).
+
+2002-06-26 15:05  schoenw
+
+	* scli/vendors.c: Added Avaya.
+
+2002-06-26 11:25  schoenw
+
+	* scli/cmds.c: The help text now points to the new "show scli
+	command tree" command.
+
+2002-06-26 11:20  schoenw
+
+	* scli/: 3com.c, cmds.c, disman.c, interface.c, ip.c, netsnmp.c,
+	nortel.c, snmp.c, system.c: Remco reported a bug where a simple
+	"set" command produced a core dump.  It turns out that evaluating
+	set/create/delete command recursively does not really make sense.
+	All such commands are now flagged as non-recursive.
+
+2002-06-26 08:39  schoenw
+
+	* scli/: 3com.c, atm.c, basic.c, cmds.c, disman.c, interface.c,
+	ip.c, netsnmp.c, nortel.c, snmp.c, system.c: Improved syntax error
+	handling.
+
+2002-06-25 17:06  schoenw
+
+	* doc/Makefile.am: Fixed Makefile.am again...
+
+2002-06-25 17:03  schoenw
+
+	* ChangeLog, NEWS, TODO: Updates for release 0.2.10.
+
 2002-06-25 16:55  schoenw
 
 	* doc/: Makefile.am, scli.texinfo: Updated the version number and
