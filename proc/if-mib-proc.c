@@ -51,7 +51,7 @@ if_mib_proc_get_ifTable(GSnmpSession *s,
 	cache.data = NULL;
     }
 
-    if_mib_get_ifTable(s, ifEntry, mask);
+    if_mib_get_ifTable(s, ifEntry, 0);
     if (! s->error_status) {
 	cache.data = *ifEntry;
 	cache.time = now;

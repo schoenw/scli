@@ -21,8 +21,8 @@
  */
 
 #include "if-mib.h"
-#include "productmib-proc.h"
 
+#include "productmib-proc.h"
 
 void
 productmib_proc_create_vlan(GSnmpSession *s, gint32 vlanId,
@@ -30,7 +30,7 @@ productmib_proc_create_vlan(GSnmpSession *s, gint32 vlanId,
 {
     productmib_a3ComVirtualGroup_t *vg = NULL;
     productmib_a3ComVlanIfEntry_t *vlanEntry;
-    gint32 createAndGo = PRODUCTMIB_A3COMVLANIFSTATUS_CREATEANDGO;
+    gint32 createAndGo = PRODUCTMIB_ROWSTATUS_CREATEANDGO;
 
     productmib_get_a3ComVirtualGroup(s, &vg, 0);
     if (s->error_status || !vg) return;
@@ -38,7 +38,7 @@ productmib_proc_create_vlan(GSnmpSession *s, gint32 vlanId,
     if (! vlanEntry) return;
     if (!vg->a3ComNextAvailableVirtIfIndex
 	|| vg->a3ComNextAvailableVirtIfIndex == 0) {
-	s->error_status = G_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_ERR_PROCEDURE;
 	return;
     }
     vlanEntry->a3ComVlanIfIndex = *vg->a3ComNextAvailableVirtIfIndex;
@@ -57,7 +57,7 @@ void
 productmib_proc_delete_vlan(GSnmpSession *s, gint32 ifIndex)
 {
     productmib_a3ComVlanIfEntry_t *vlanEntry;
-    gint32 destroy = PRODUCTMIB_A3COMVLANIFSTATUS_DESTROY;
+    gint32 destroy = PRODUCTMIB_ROWSTATUS_DESTROY;
 
     productmib_get_a3ComVlanIfEntry(s, &vlanEntry, ifIndex,
 				    PRODUCTMIB_A3COMVLANIFSTATUS);

@@ -20,8 +20,9 @@
  * @(#) $Id$
  */
 
-#include "rapid-city-proc.h"
+#include "snmpv2-tc.h"
 
+#include "rapid-city-proc.h"
 
 void
 rapid_city_proc_create_vlan(GSnmpSession *s,
@@ -31,7 +32,7 @@ rapid_city_proc_create_vlan(GSnmpSession *s,
 			    guint32 type)
 {
     rapid_city_rcVlanEntry_t *vlanEntry;
-    gint32 createAndGo = RAPID_CITY_RCVLANROWSTATUS_CREATEANDGO;
+    gint32 createAndGo = SNMPV2_TC_ROWSTATUS_CREATEANDGO;
     
     vlanEntry = rapid_city_new_rcVlanEntry();
     if (vlanEntry) {
@@ -54,7 +55,7 @@ void
 rapid_city_proc_delete_vlan(GSnmpSession *s, gint32 vlanid)
 {
     rapid_city_rcVlanEntry_t *vlanEntry;
-    gint32 destroy = RAPID_CITY_RCVLANROWSTATUS_DESTROY;
+    gint32 destroy = SNMPV2_TC_ROWSTATUS_DESTROY;
 
     rapid_city_get_rcVlanEntry(s, &vlanEntry, vlanid,
 			       RAPID_CITY_RCVLANROWSTATUS);

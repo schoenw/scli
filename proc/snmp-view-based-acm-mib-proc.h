@@ -23,8 +23,6 @@
 #ifndef _SNMP_VIEW_BASED_ACM_MIB_PROC_H_
 #define _SNMP_VIEW_BASED_ACM_MIB_PROC_H_
 
-#include "g_snmp.h"
-
 #include "snmp-view-based-acm-mib.h"
 
 extern void

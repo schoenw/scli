@@ -23,10 +23,7 @@
 #ifndef _RAPID_CITY_PROC_H_
 #define _RAPID_CITY_PROC_H_
 
-#include "g_snmp.h"
-
 #include "rapid-city.h"
-
 
 extern void
 rapid_city_proc_create_vlan(GSnmpSession *s, gint32 vlanid,

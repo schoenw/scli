@@ -20,6 +20,8 @@
  * @(#) $Id$
  */
 
+#include "snmpv2-tc.h"
+
 #include "snmp-view-based-acm-mib-proc.h"
 
 void
@@ -29,11 +31,11 @@ snmp_view_based_acm_mib_proc_create_member(GSnmpSession *s,
 					   gint32 model)
 {
     snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t *vacmGroupEntry;
-    gint32 createAndGo = SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_CREATEANDGO;
+    gint32 createAndGo = SNMPV2_TC_ROWSTATUS_CREATEANDGO;
 
     vacmGroupEntry = snmp_view_based_acm_mib_new_vacmSecurityToGroupEntry();
     if (! vacmGroupEntry) {
-	s->error_status = G_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_ERR_PROCEDURE;
 	return;
     }
     vacmGroupEntry->_vacmSecurityNameLength = strlen(name);
@@ -54,11 +56,11 @@ snmp_view_based_acm_mib_proc_delete_member(GSnmpSession *s,
 					   gint32 model)
 {
     snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t *vacmGroupEntry;
-    gint32 destroy = SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_DESTROY;
+    gint32 destroy = SNMPV2_TC_ROWSTATUS_DESTROY;
 
     vacmGroupEntry = snmp_view_based_acm_mib_new_vacmSecurityToGroupEntry();
     if (! vacmGroupEntry) {
-	s->error_status = G_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_ERR_PROCEDURE;
 	return;
     }
     vacmGroupEntry->_vacmSecurityNameLength = name_len;

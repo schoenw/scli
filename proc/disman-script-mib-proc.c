@@ -20,6 +20,8 @@
  * @(#) $Id$
  */
 
+#include "snmpv2-tc.h"
+
 #include "disman-script-mib-proc.h"
 
 void
@@ -29,11 +31,11 @@ disman_script_mib_proc_create_script(GSnmpSession *s,
 				     guchar *descr)
 {
     disman_script_mib_smScriptEntry_t *smScriptEntry;
-    gint32 createAndGo = DISMAN_SCRIPT_MIB_SMSCRIPTROWSTATUS_CREATEANDGO;
+    gint32 createAndGo = SNMPV2_TC_ROWSTATUS_CREATEANDGO;
     
     smScriptEntry = disman_script_mib_new_smScriptEntry();
     if (! smScriptEntry) {
-	s->error_status = G_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_ERR_PROCEDURE;
 	return;
     }
     strcpy(smScriptEntry->smScriptOwner, owner);
@@ -70,7 +72,7 @@ disman_script_mib_proc_create_run(GSnmpSession *s,
     if (s->error_status) return;
     if (!smLaunchEntry || !smLaunchEntry->smLaunchRunIndexNext) {
     proc_error:
-	s->error_status = G_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_ERR_PROCEDURE;
 	return;
     }
     smRunIndex = *smLaunchEntry->smLaunchRunIndexNext;

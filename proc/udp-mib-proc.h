@@ -23,8 +23,6 @@
 #ifndef _UDP_MIB_PROC_H_
 #define _UDP_MIB_PROC_H_
 
-#include "g_snmp.h"
-
 #include "udp-mib.h"
 
 /*

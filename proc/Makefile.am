@@ -1,4 +1,4 @@
-INCLUDES		= $(GLIB_CFLAGS) -I$(top_srcdir)/snmp -I$(top_srcdir)/stub
+INCLUDES		= $(GSNMP_CFLAGS) $(GNET_CFLAGS) -I$(top_srcdir)/stub
 
 PROCS			= if-mib-proc.h if-mib-proc.c \
 			  rapid-city-proc.h rapid-city-proc.c \
@@ -6,7 +6,8 @@ PROCS			= if-mib-proc.h if-mib-proc.c \
 			  disman-script-mib-proc.h disman-script-mib-proc.c \
 			  snmp-view-based-acm-mib-proc.h snmp-view-based-acm-mib-proc.c \
 			  snmp-user-based-sm-mib-proc.h snmp-user-based-sm-mib-proc.c \
-			  udp-mib-proc.h udp-mib-proc.c
+			  udp-mib-proc.h udp-mib-proc.c \
+			  ianaiftype-mib-proc.h ianaiftype-mib-proc.c
 
 noinst_LIBRARIES	= libproc.a
 libproc_a_SOURCES	= $(PROCS)

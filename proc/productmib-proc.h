@@ -23,10 +23,7 @@
 #ifndef _PRODUCTMIB_PROC_H_
 #define _PRODUCTMIB_PROC_H_
 
-#include "g_snmp.h"
-
 #include "productmib.h"
-
 
 extern void
 productmib_proc_create_vlan(GSnmpSession *s, gint32 vlanid,

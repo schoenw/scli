@@ -1,7 +1,7 @@
 /* 
- * if-mib-proc.h -- IF-MIB procedures
+ * ianaiftype_mib_proc.c -- IANAifType-MIB procedures
  *
- * Copyright (C) 2001 Juergen Schoenwaelder
+ * Copyright (C) 2002 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,25 +20,19 @@
  * @(#) $Id$
  */
 
-#ifndef _IF_MIB_PROC_H_
-#define _IF_MIB_PROC_H_
-
-#include "if-mib.h"
+#include "ianaiftype-mib-proc.h"
 
 /*
- *  proc set_interface_status(ifAdminStatus)
- *  {
- *      set(ifAdminStatus);
- *  }
+ * See RFC 2665 section 3.2.6. why the test below is so ugly...
  */
 
-extern void
-if_mib_proc_get_ifTable(GSnmpSession *s,
-			if_mib_ifEntry_t ***ifEntry,
-			gint mask,
-			time_t epoch);
-
-extern void
-if_mib_proc_free_ifTable(if_mib_ifEntry_t **ifEntry);
-
-#endif /* _IF_MIB_PROC_H_ */
+extern int
+ianaiftype_mib_proc_isether(gint32 ifType)
+{
+    return (ifType == IANAIFTYPE_MIB_IANAIFTYPE_ETHERNETCSMACD
+	    || ifType == IANAIFTYPE_MIB_IANAIFTYPE_ISO88023CSMACD
+	    || ifType == IANAIFTYPE_MIB_IANAIFTYPE_STARLAN
+	    || ifType == IANAIFTYPE_MIB_IANAIFTYPE_FASTETHER
+	    || ifType == IANAIFTYPE_MIB_IANAIFTYPE_FASTETHERFX
+	    || ifType == IANAIFTYPE_MIB_IANAIFTYPE_GIGABITETHERNET);
+}

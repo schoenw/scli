@@ -23,8 +23,6 @@
 #ifndef _SNMP_USER_BASED_SM_MIB_PROC_H_
 #define _SNMP_USER_BASED_SM_MIB_PROC_H_
 
-#include "g_snmp.h"
-
 #include "snmp-framework-mib.h"
 #include "snmp-user-based-sm-mib.h"
 

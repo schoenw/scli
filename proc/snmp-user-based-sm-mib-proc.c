@@ -20,6 +20,8 @@
  * @(#) $Id$
  */
 
+#include "snmpv2-tc.h"
+
 #include "snmp-user-based-sm-mib-proc.h"
 
 void
@@ -29,7 +31,7 @@ snmp_user_based_sm_mib_proc_clone_user(GSnmpSession *s,
 {
     snmp_framework_mib_snmpEngine_t *snmpEngine;
     snmp_user_based_sm_mib_usmUserEntry_t *usmUser;
-    gint32 createAndWait = SNMP_USER_BASED_SM_MIB_USMUSERSTATUS_CREATEANDWAIT;
+    gint32 createAndWait = SNMPV2_TC_ROWSTATUS_CREATEANDWAIT;
     
     snmp_framework_mib_get_snmpEngine(s, &snmpEngine, 0);
     if (s->error_status) return;
@@ -37,7 +39,7 @@ snmp_user_based_sm_mib_proc_clone_user(GSnmpSession *s,
     usmUser = snmp_user_based_sm_mib_new_usmUserEntry();
     if (! usmUser) {
       proc_error:
-	s->error_status = G_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_ERR_PROCEDURE;
 	return;
     }
 

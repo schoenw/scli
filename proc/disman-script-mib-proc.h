@@ -23,8 +23,6 @@
 #ifndef _DISMAN_SCRIPT_MIB_PROC_H_
 #define _DISMAN_SCRIPT_MIB_PROC_H_
 
-#include "g_snmp.h"
-
 #include "disman-script-mib.h"
 
 /*
@@ -40,7 +38,7 @@ disman_script_mib_proc_create_script(GSnmpSession *s,
 				     guchar *name,
 				     guchar *descr);
 
-void
+extern void
 disman_script_mib_proc_create_run(GSnmpSession *s,
 				  guchar *lowner,
 				  guchar *lname,
