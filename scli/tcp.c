@@ -262,40 +262,124 @@ show_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 
 
 typedef struct tcp_state {
-    guint16 port;
     gchar  *name;
+    guint16 port;
     guint32 count;
 } tcp_state_t;
 
 
 
+static tcp_state_t *
+tcp_state_new(const gchar *name, const guint16 port)
+{
+    tcp_state_t *t;
+    
+    t = g_new0(tcp_state_t, 1);
+    t->name = name ? g_strdup(name) : NULL;
+    t->port = port;
+
+    return t;
+}
+
+
+
 static void
-fmt_tcp_state(GString *s, gint32 state , guint32 count, GSList *ports)
+tcp_state_free(gpointer data, gpointer user_data)
+{
+    tcp_state_t *t = (tcp_state_t *) data;
+
+    if (t->name) g_free(t->name);
+    g_free(t);
+}
+
+
+
+static gint
+tcp_state_cmp(gconstpointer a, gconstpointer b)
+{
+    tcp_state_t *state_a = (tcp_state_t *) a;
+    tcp_state_t *state_b = (tcp_state_t *) b;
+
+    if (state_a->port < state_b->port) {
+	return -1;
+    }
+    if (state_a->port > state_b->port) {
+	return 1;
+    }
+    return 0;
+}
+
+
+
+static tcp_state_t *
+tcp_state_lookup(GSList **list, const gchar *name, const guint16 port)
+{
+    GSList *elem;
+    tcp_state_t *t;
+
+    for (elem = *list; elem; elem = g_slist_next(elem)) {
+	t = (tcp_state_t *) elem->data;
+	if (strcmp(t->name, name) == 0) break;
+    }
+    
+    if (! elem) {
+	t = tcp_state_new(name, port);
+	*list = g_slist_insert_sorted(*list, t, tcp_state_cmp);
+    }
+    return t;
+}
+
+
+
+static void
+xml_tcp_state(xmlNodePtr root, gint32 state, guint32 count, GSList *ports)
+{
+    const char *e;
+    GSList *elem;
+    xmlNodePtr tree, node;
+
+    e = fmt_enum(tcp_mib_enums_tcpConnState, &state);
+    if (! e) return;
+		 
+    tree = xmlNewChild(root, NULL, "state", NULL);
+    xmlSetProp(tree, "state", e);
+
+    for (elem = ports; elem; elem = g_slist_next(elem)) {
+	tcp_state_t *t = (tcp_state_t *) elem->data;
+	node = xml_new_child(tree, NULL, "count", "%u", t->count);
+	xml_set_prop(node, "port", "%s", t->name);
+    }
+}
+
+
+
+static void
+fmt_tcp_state(GString *s, gint32 state, guint32 count, GSList *ports)
 {
     const char *e;
     GSList *elem;
     gint len;
 
     e = fmt_enum(tcp_mib_enums_tcpConnState, &state);
-    if (e) {
-	g_string_sprintfa(s, "%-12s%5u ", e, count);
-	len = 12 + 5 + 1;
-	for (elem = ports; elem; elem = g_slist_next(elem)) {
-	    tcp_state_t *t = (tcp_state_t *) elem->data;
-	    if (t->count > 1) {
-		g_string_sprintfa(s, "%s/%u ", t->name, t->count);
-		len += strlen(t->name) + 2 + 4;
-	    } else {
-		g_string_sprintfa(s, "%s ", t->name);
-		len += strlen(t->name) + 1;
-	    }
-	    if (len > 70) {
-		g_string_sprintfa(s, "\n%17s ", "");
-		len = 12 + 5 + 1;
-	    }
+    if (! e) return;
+    
+    g_string_sprintfa(s, "%5u %-11s ", count, e);
+    len = 12 + 5 + 1;
+    for (elem = ports; elem; elem = g_slist_next(elem)) {
+	tcp_state_t *t = (tcp_state_t *) elem->data;
+	if (t->count > 1) {
+	    g_string_sprintfa(s, "%s/%u ", t->name, t->count);
+	    len += strlen(t->name) + 2 + 4;
+	} else {
+	    g_string_sprintfa(s, "%s ", t->name);
+	    len += strlen(t->name) + 1;
 	}
-	g_string_sprintfa(s, "\n");
+	if (len > 70) {
+	    g_string_sprintfa(s, "\n%17s ", "");
+	    len = 12 + 5 + 1;
+	}
     }
+    g_string_sprintfa(s, "\n");
 }
 
 
@@ -306,8 +390,7 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
     tcp_mib_tcpConnEntry_t **tcpConnTable = NULL;
     int i, t;
 
-    const gint32 tcp_states[] = { TCP_MIB_TCPCONNSTATE_CLOSED,
-				  TCP_MIB_TCPCONNSTATE_LISTEN,
+    const gint32 tcp_states[] = { TCP_MIB_TCPCONNSTATE_LISTEN,
 				  TCP_MIB_TCPCONNSTATE_SYNSENT,
 				  TCP_MIB_TCPCONNSTATE_SYNRECEIVED,
 				  TCP_MIB_TCPCONNSTATE_ESTABLISHED,
@@ -316,7 +399,8 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 				  TCP_MIB_TCPCONNSTATE_CLOSEWAIT,
 				  TCP_MIB_TCPCONNSTATE_LASTACK,
 				  TCP_MIB_TCPCONNSTATE_CLOSING,
-				  TCP_MIB_TCPCONNSTATE_TIMEWAIT };
+				  TCP_MIB_TCPCONNSTATE_TIMEWAIT,
+				  TCP_MIB_TCPCONNSTATE_CLOSED };
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -334,7 +418,9 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (tcpConnTable) {
-	g_string_sprintfa(interp->header, "STATE       COUNT PORTS");
+	if (! scli_interp_xml(interp)) {
+	    g_string_sprintfa(interp->header, "COUNT STATE       PORTS");
+	}
 
 	for (t = 0; t < sizeof(tcp_states) / sizeof(gint32); t++) {
 
@@ -342,8 +428,8 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 	    gint32 c = 0;
 	    const char *name;
 	    guint16 port;
-	    GSList *list = NULL, *elem;
-	    tcp_state_t *p;
+	    GSList *list = NULL;
+	    tcp_state_t *t;
 		
 	    for (i = 0; tcpConnTable[i]; i++) {
 		if (! tcpConnTable[i]->tcpConnState
@@ -353,38 +439,26 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 		c++;
 		port = tcpConnTable[i]->tcpConnLocalPort;
 		name = fmt_tcp_port(port, SCLI_FMT_NAME);
-		if (! name && *tcpConnTable[i]->tcpConnState
-		    != TCP_MIB_TCPCONNSTATE_LISTEN) {
+		if (! name && s != TCP_MIB_TCPCONNSTATE_LISTEN) {
 		    port = tcpConnTable[i]->tcpConnRemPort;
 		    name = fmt_tcp_port(port, SCLI_FMT_NAME);
 		}
 		if (! name) {
 		    name = "other";
+		    port = 0xffff;
 		}
 
-		for (elem = list; elem; elem = g_slist_next(elem)) {
-		    tcp_state_t *t = (tcp_state_t *) elem->data;
-		    if (strcmp(t->name, name) == 0) {
-			break;
-		    }
-		}
-		if (! elem) {
-		    p = g_new0(tcp_state_t, 1);
-		    p->name = g_strdup(name);
-		    p->port = port;
-		    list = g_slist_append(list, p);
-		} else {
-		    p = (tcp_state_t *) elem->data;
-		}
-		p->count++;
+		t = tcp_state_lookup(&list, name, port);
+		t->count++;
 	    }
-	    fmt_tcp_state(interp->result, s, c, list);
-	    for (elem = list; elem; elem = g_slist_next(elem)) {
-		tcp_state_t *t = (tcp_state_t *) elem->data;
-		g_free(t->name);
-		g_free(t);
+
+	    if (scli_interp_xml(interp)) {
+		xml_tcp_state(interp->xml_node, s, c, list);
+	    } else {
+		fmt_tcp_state(interp->result, s, c, list);
 	    }
-	    g_slist_free_1(list);
+	    g_slist_foreach(list, tcp_state_free, NULL);
+	    g_slist_free(list);
 	}
     }
 
