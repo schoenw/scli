@@ -64,7 +64,7 @@ show_ether_summary(host_snmp *peer)
 static void
 show_ethers(WINDOW *win, host_snmp *peer, int flags)
 {
-    dot3StatsEntry_t **dot3StatsTable = NULL;
+    etherlike_mib_dot3StatsEntry_t **dot3StatsTable = NULL;
     static struct timeval last, now;
     double delta;
     int i;
