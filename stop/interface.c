@@ -191,7 +191,7 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	show_interface_summary(peer);
 	wattron(win, A_REVERSE);
 	mvwprintw(win, 0, 0, "%-*s",
-		  COLS, "  IF STAT   MTU SPEED  B IN B OUT  P IN P OUT  DESCR ...");
+		  COLS, "  IF STAT   MTU SPEED  BPS IN   OUT  PPS IN   OUT  DESCR ...");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
 	sleep(1);
@@ -246,14 +246,14 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	    if (ifEntry[i]->ifInOctets && delta > TV_DELTA) {
 		if (last.tv_sec && last.tv_usec) {
 		    double f_val = (*(ifEntry[i]->ifInOctets) - stats[i].inOctets) / delta;
-		    g_string_sprintfa(s, " %5s",
+		    g_string_sprintfa(s, "   %5s",
 				      fmt_kmg((guint32) f_val));
 		} else {
-		    g_string_sprintfa(s, "  ----");
+		    g_string_sprintfa(s, "    ----");
 		}
 		stats[i].inOctets = *(ifEntry[i]->ifInOctets);
 	    } else {
-		g_string_sprintfa(s, "  ----");
+		g_string_sprintfa(s, "    ----");
 	    }
 	    
 	    if (ifEntry[i]->ifOutOctets && delta > TV_DELTA) {
@@ -262,45 +262,59 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 		    g_string_sprintfa(s, " %5s",
 				      fmt_kmg((guint32) f_val));
 		} else {
-		    g_string_sprintfa(s, " -----");
+		    g_string_sprintfa(s, "  ----");
 		}
 		stats[i].outOctets = *(ifEntry[i]->ifOutOctets);
 	    } else {
-		g_string_sprintfa(s, " -----");
+		g_string_sprintfa(s, "  ----");
 	    }
 	    
 	    if (ifEntry[i]->ifInUcastPkts && delta > TV_DELTA) {
-		guint32 pkts = *(ifEntry[i]->ifInUcastPkts);
-		if (ifEntry[i]->ifInNUcastPkts) {
+		guint32 pkts;
+		pkts = *(ifEntry[i]->ifInUcastPkts);
+		if (ifXEntry[i]->ifInMulticastPkts
+		    && ifXEntry[i]->ifInBroadcastPkts) {
+		    pkts += *(ifXEntry[i]->ifInMulticastPkts);
+		    pkts += *(ifXEntry[i]->ifInBroadcastPkts);
+		} else if (ifEntry[i]->ifInNUcastPkts) {
 		    pkts += *(ifEntry[i]->ifInNUcastPkts);
+		} else {
+		    /* might be fixed length ??? */
 		}
 		if (last.tv_sec && last.tv_usec) {
 		    double f_val = (pkts - stats[i].inPkts) / delta;
-		    g_string_sprintfa(s, " %5s",
+		    g_string_sprintfa(s, "   %5s",
 				      fmt_kmg((guint32) f_val));
 		} else {
-		    g_string_sprintfa(s, " -----");
+		    g_string_sprintfa(s, "    ----");
 		}
 		stats[i].inPkts = pkts;
 	    } else {
-		g_string_sprintfa(s, " -----");
+		g_string_sprintfa(s, "    ----");
 	    }
 	    
 	    if (ifEntry[i]->ifOutUcastPkts && delta > TV_DELTA) {
-		guint32 pkts = *(ifEntry[i]->ifOutUcastPkts);
-		if (ifEntry[i]->ifOutNUcastPkts) {
+		guint32 pkts;
+		pkts = *(ifEntry[i]->ifOutUcastPkts);
+		if (ifXEntry[i]->ifOutMulticastPkts
+		    && ifXEntry[i]->ifOutBroadcastPkts) {
+		    pkts += *(ifXEntry[i]->ifOutMulticastPkts);
+		    pkts += *(ifXEntry[i]->ifOutBroadcastPkts);
+		} else if (ifEntry[i]->ifOutNUcastPkts) {
 		    pkts += *(ifEntry[i]->ifOutNUcastPkts);
+		} else {
+		    /* might be fixed length ??? */
 		}
 		if (last.tv_sec && last.tv_usec) {
 		    double f_val = (pkts - stats[i].outPkts) / delta;
 		    g_string_sprintfa(s, " %5s",
 				      fmt_kmg((guint32) f_val));
 		} else {
-		    g_string_sprintfa(s, " -----");
+		    g_string_sprintfa(s, "  ----");
 		}
 		stats[i].outPkts = pkts;
 	    } else {
-		g_string_sprintfa(s, " -----");
+		g_string_sprintfa(s, "  ----");
 	    }
 	    
 	    if (ifEntry[i]->ifDescr && ifEntry[i]->_ifDescrLength) {
