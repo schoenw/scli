@@ -53,6 +53,7 @@ static GSnmpEnum const prtAlertGroup[] = {
 };
 
 
+
 static const char *error_states[] = {
     "low paper", "no paper", "low toner", "no toner", "door open",
     "jammed", "offline", "service requested", "input tray missing",
@@ -69,7 +70,7 @@ fmt_bits(const char **labels, guchar *bits, gsize bits_len)
     int cnt = 0;
     
     if (! bits) {
-	return 0;
+	return NULL;
     }
     
     for (i = 0; labels[i]; i++) {
@@ -82,8 +83,76 @@ fmt_bits(const char **labels, guchar *bits, gsize bits_len)
 
     return labels[i];
 }
-
     
+
+
+static const char *
+fmt_subunit_availability(gint32 *status)
+{
+    static const char *labels[] = {
+	"available and idle", "unavailable on request",
+	"available and standby", "unavailable and broken",
+	"available and active", "unknown", "available and busy"
+    };
+
+    const char *a = "-";
+    
+    if (! status) {
+	return NULL;
+    }
+
+    if ((*status & 0x0f) < sizeof(labels)/sizeof(char *)) {
+	a = labels[*status & 0x0f];
+    }
+    return a;
+}
+
+
+
+static const char *
+fmt_subunit_alerts(gint32 *status)
+{
+    char *a;
+    
+    if (! status) {
+	return NULL;
+    }
+
+    if ((*status & 8) && (*status & 16)) {
+	a = "critical and non-critical";
+    } else if (*status & 16) {
+	a = "critical";
+    } else if (*status & 8) {
+	a = "non-critical";
+    } else {
+	a = "none";
+    }
+    return a;
+}
+
+
+
+static const char *
+fmt_subunit_status(gint32 *status)
+{
+    static const char *labels[] = {
+	"online", "offline",
+	"online and transitioning", "offline and transitioning",
+    };
+
+    const char *a = "-";
+    
+    if (! status) {
+	return NULL;
+    }
+
+    if (((*status >> 5) & 0x03) < sizeof(labels)/sizeof(char *)) {
+	a = labels[(*status >> 5) & 0x03];
+    }
+    return a;
+}
+
+
 
 static void
 misc_printer_printInputDimension(GString *s, gint32 * dim)
@@ -163,6 +232,7 @@ fmt_printer_info(GString *s,
 		 host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
 {
     int const indent = 18;
+    const char *e;
 
     g_string_sprintfa(s, "%-*s %d\n", indent, "Device:",
 		      hrPrinterEntry->hrDeviceIndex);
@@ -183,18 +253,18 @@ fmt_printer_info(GString *s,
 	}
     }
 	
-    if (hrDeviceEntry && hrDeviceEntry->hrDeviceStatus) {
-	g_string_sprintfa(s, "%-*s ", indent, "Device Status:");
-	xxx_enum(s, 0, host_resources_mib_enums_hrDeviceStatus,
-		 hrDeviceEntry->hrDeviceStatus);
-	g_string_append(s, "\n");
+    if (hrDeviceEntry) {
+	e = fmt_enum(host_resources_mib_enums_hrDeviceStatus,
+		     hrDeviceEntry->hrDeviceStatus);
+	if (e) {
+	    g_string_sprintfa(s, "%-*s %s\n", indent, "Device Status:", e);
+	}
     }
-    
-    if (hrPrinterEntry->hrPrinterStatus) {
-	g_string_sprintfa(s, "%-*s ", indent, "Printer Status:");
-	xxx_enum(s, 0, host_resources_mib_enums_hrPrinterStatus,
+
+    e = fmt_enum(host_resources_mib_enums_hrPrinterStatus,
 		 hrPrinterEntry->hrPrinterStatus);
-	g_string_append(s, "\n");
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Printer Status:", e);
     }
 
     if (hrPrinterEntry->hrPrinterDetectedErrorState) {
@@ -393,47 +463,52 @@ show_printer_info(scli_interp_t * interp, int argc, char **argv)
 static void
 fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 {
+    int const indent = 18;
+    const char *e;
+
+    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+		      prtInputEntry->hrDeviceIndex);
+
     if (prtInputEntry->prtInputIndex) {
-	g_string_sprintfa(s, "Input #%u\n", prtInputEntry->prtInputIndex);
+	g_string_sprintfa(s, "%-*s %u\n", indent, "Input:",
+			  prtInputEntry->prtInputIndex);
     }
     
     if (prtInputEntry->prtInputName &&
 	prtInputEntry->_prtInputNameLength > 0) {
-	g_string_sprintfa(s, "Name:        %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Name:",
 			  (int) prtInputEntry->_prtInputNameLength,
 			  prtInputEntry->prtInputName);
     }
 
     if (prtInputEntry->prtInputDescription &&
 	prtInputEntry->_prtInputDescriptionLength > 0) {
-	g_string_sprintfa(s, "Description: %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
 			  (int) prtInputEntry->_prtInputDescriptionLength,
 			  prtInputEntry->prtInputDescription);
     }
 
     if (prtInputEntry->prtInputVendorName &&
 	prtInputEntry->_prtInputVendorNameLength > 0) {
-	g_string_sprintfa(s, "Vendor:      %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Vendor",
 			  (int) prtInputEntry->_prtInputVendorNameLength,
 			  prtInputEntry->prtInputVendorName);
     }
     
-    if (prtInputEntry->prtInputType) {
-	g_string_append(s, "Type:        ");
-	xxx_enum(s, 30, printer_mib_enums_prtInputType,
-		 prtInputEntry->prtInputType);
-	g_string_append(s, "\n");
+    e = fmt_enum(printer_mib_enums_prtInputType, prtInputEntry->prtInputType);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", e);
     }
     
     if (prtInputEntry->prtInputModel &&
 	prtInputEntry->_prtInputModelLength > 0) {
-	g_string_sprintfa(s, "Model:       %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Model:",
 			  (int) prtInputEntry->_prtInputModelLength,
 			  prtInputEntry->prtInputModel);
     }
 
-    g_string_append(s, "Capacity:    ");
     if (prtInputEntry->prtInputCurrentLevel) {
+	g_string_sprintfa(s, "%-*s ", indent, "Level:");
 	switch (*prtInputEntry->prtInputCurrentLevel) {
 	case -1:
 	    g_string_append(s, "other ");
@@ -447,21 +522,18 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 	default:
 	    g_string_sprintfa(s, "%u ", *prtInputEntry->prtInputCurrentLevel);
 	}
-    } else {
-	g_string_append(s, "?");
+	e = fmt_enum(printer_mib_enums_prtInputCapacityUnit,
+		     prtInputEntry->prtInputCapacityUnit);
+	if (e) {
+	    g_string_append(s, e);
+	}
+	g_string_append(s, "\n");
     }
 
-    if (prtInputEntry->prtInputCapacityUnit) {
-	xxx_enum(s, 1,
-		 printer_mib_enums_prtInputCapacityUnit,
-		 prtInputEntry->prtInputCapacityUnit);
-    } else {
-	g_string_append(s, "?");
-    }
 
     if (prtInputEntry->prtInputMaxCapacity) {
-	g_string_append(s, " (max ");
-	switch ((long int) *prtInputEntry->prtInputMaxCapacity) {
+	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
+	switch (*prtInputEntry->prtInputMaxCapacity) {
 	case -1:
 	    g_string_append(s, "other)");
 	    break;
@@ -472,14 +544,19 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 	    g_string_sprintfa(s, "%u)",
 			      *prtInputEntry->prtInputMaxCapacity);
 	}
+	e = fmt_enum(printer_mib_enums_prtInputCapacityUnit,
+		     prtInputEntry->prtInputCapacityUnit);
+	if (e) {
+	    g_string_append(s, e);
+	}
+	g_string_append(s, "\n");
     }
-    g_string_append(s, "\n");
 
     if (prtInputEntry->prtInputNextIndex) {
 	g_string_append(s, "Next Input: ");
 	switch (*prtInputEntry->prtInputNextIndex) {
 	case 0:
-	    g_string_append(s, "No next unit");
+	    g_string_append(s, "none");
 	    break;
 	case -1:
 	    g_string_append(s, "other");
@@ -488,7 +565,7 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 	    g_string_append(s, "unknown");
 	    break;
 	case -3:
-	    g_string_append(s, "No input switching");
+	    g_string_append(s, "no input switching");
 	    break;
 	default:
 	    g_string_sprintfa(s, "input #%u",
@@ -498,92 +575,51 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
     }
 
     if (prtInputEntry->prtInputStatus) {
-	g_string_append(s, "Status:      ");
-	switch (*prtInputEntry->prtInputStatus & 7) {
-	case 0:
-	    g_string_append(s, "Available and Idle");
-	    break;
-	case 1:
-	    g_string_append(s,
-			    "Unavailable and OnRequest");
-	    break;
-	case 2:
-	    g_string_append(s, "Available and Standby");
-	    break;
-	case 3:
-	    g_string_append(s,
-			    "Unavailable because Broken");
-	    break;
-	case 4:
-	    g_string_append(s, "Available and Active");
-	    break;
-	case 5:
-	    g_string_append(s, "Unknown");
-	    break;
-	case 6:
-	    g_string_append(s, "Available and Busy");
-	    break;
-	default:
-	    g_string_append(s, "?");
-	    break;
-	}
-	if (*prtInputEntry->prtInputStatus & 8) {
-	    g_string_append(s, ", Non-Critical Alerts");
-	}
-	if (*prtInputEntry->prtInputStatus & 16) {
-	    g_string_append(s, ", Critical Alerts");
-	}
-	if (*prtInputEntry->prtInputStatus & 32) {
-	    g_string_append(s, ", Offline");
-	}
-	if (*prtInputEntry->prtInputStatus & 64) {
-	    g_string_append(s, ", Transitioning");
-	}
-	g_string_append(s, "\n");
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Availability:",
+		  fmt_subunit_availability(prtInputEntry->prtInputStatus));
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Alerts:",
+		  fmt_subunit_alerts(prtInputEntry->prtInputStatus));
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Status:",
+		  fmt_subunit_status(prtInputEntry->prtInputStatus));
     }
     
     if (prtInputEntry->prtInputSerialNumber &&
 	prtInputEntry->_prtInputSerialNumberLength > 0) {
-	g_string_sprintfa(s, "Serial number: %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Serial Number:",
 			  (int) prtInputEntry->_prtInputSerialNumberLength,
 			  prtInputEntry->prtInputSerialNumber);
     }
     
     if (prtInputEntry->prtInputVersion &&
 	prtInputEntry->_prtInputVersionLength > 0) {
-	g_string_sprintfa(s, "Input version: %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Input Version:",
 			  (int) prtInputEntry->_prtInputVersionLength,
 			  prtInputEntry->prtInputVersion);
     }
-    
-    g_string_append(s, "Security:    ");
-    if (prtInputEntry->prtInputSecurity) {
-	xxx_enum(s, 10,
-		 printer_mib_enums_prtOutputSecurity,
+
+    e = fmt_enum(printer_mib_enums_prtInputSecurity,
 		 prtInputEntry->prtInputSecurity);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Security:", e);
     }
-    else {
-	g_string_append(s, "?");
-    }
-    g_string_append(s, "\n");
 
     if (prtInputEntry->prtInputMediaName &&
 	prtInputEntry->_prtInputMediaNameLength > 0) {
-	g_string_sprintfa(s, "Media name:  %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Media Name",
 			  (int) prtInputEntry->_prtInputMediaNameLength,
 			  prtInputEntry->prtInputMediaName);
     }
     
     if (prtInputEntry->prtInputMediaType &&
 	prtInputEntry->_prtInputMediaTypeLength > 0) {
-	g_string_sprintfa(s, "Media type:   %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Media Type",
 			  (int) prtInputEntry->_prtInputMediaTypeLength,
 			  prtInputEntry->prtInputMediaType);
     }
     
     if (prtInputEntry->prtInputMediaWeight) {
-	g_string_append(s, "Media weight: ");
-	switch ((long int) *prtInputEntry->prtInputMaxCapacity) {
+	g_string_sprintfa(s, "%-*s ", indent, "Media Weight:");
+	switch (*prtInputEntry->prtInputMaxCapacity) {
 	case -2:
 	    g_string_append(s, "unknown");
 	    break;
@@ -597,13 +633,13 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
     
     if (prtInputEntry->prtInputMediaColor &&
 	prtInputEntry->_prtInputMediaColorLength > 0) {
-	g_string_sprintfa(s, "Media color:  %.*s\n",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Media Color:",
 			  (int) prtInputEntry->_prtInputMediaColorLength,
 			  prtInputEntry->prtInputMediaColor);
     }
     
     if (prtInputEntry->prtInputMediaFormParts) {
-	g_string_append(s, "Media parts: ");
+	g_string_sprintfa(s, "%-*s ", indent, "Media Parts:");
 	switch (*prtInputEntry->prtInputMediaFormParts) {
 	case -1:
 	    g_string_append(s, "other");
@@ -697,7 +733,7 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
     }
     
     if (prtInputEntry->prtInputMediaLoadTimeout) {
-	g_string_append(s, "Media load timeout: ");
+	g_string_sprintfa(s, "%-*s ", indent, "Media Load Timeout:");
 	switch (*prtInputEntry->prtInputMediaLoadTimeout) {
 	case -1:
 	    g_string_append(s, "wait forever");
@@ -707,7 +743,7 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 	    break;
 	default:
 	    g_string_sprintfa(s,
-			      "prtInputMediaLoadTimeout: %u",
+			      "%u secs",
 			      *prtInputEntry->prtInputMediaLoadTimeout);
 	}
 	g_string_append(s, "\n");
