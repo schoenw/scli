@@ -165,7 +165,6 @@ show_bridge_forwarding(GString *s, dot1dTpFdbEntry_t *dot1dTpFdbEntry,
     scli_vendor_t *vendor;
     guint32 prefix;
     char *name;
-    int i;
 
     if (dot1dTpFdbEntry->dot1dTpFdbPort) {
 	g_string_sprintfa(s, "%5u ", *dot1dTpFdbEntry->dot1dTpFdbPort);
@@ -178,7 +177,8 @@ show_bridge_forwarding(GString *s, dot1dTpFdbEntry_t *dot1dTpFdbEntry,
     if (dot1dTpFdbEntry->dot1dTpFdbAddress) {
 	g_string_sprintfa(s, "%s",
 		  fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress, 0));
-	name = fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress, 2);
+	name = fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress,
+				 SCLI_FMT_NAME);
 	g_string_sprintfa(s, " %-*s", name_width, name ? name : "");
 	prefix = dot1dTpFdbEntry->dot1dTpFdbAddress[0] * 65536
 	    + dot1dTpFdbEntry->dot1dTpFdbAddress[1] * 256
@@ -197,6 +197,7 @@ static int
 cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 {
     dot1dTpFdbEntry_t **dot1dTpFdbTable = NULL;
+    char *name;
     int i, p, max = 0;
     int name_width = 8;
     
@@ -213,7 +214,8 @@ cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 		max = *dot1dTpFdbTable[i]->dot1dTpFdbPort;
 	    }
 	    if (dot1dTpFdbTable[i]->dot1dTpFdbAddress) {
-		char *name = fmt_ether_address(dot1dTpFdbTable[i]->dot1dTpFdbAddress, 2);
+		name = fmt_ether_address(dot1dTpFdbTable[i]->dot1dTpFdbAddress,
+					 SCLI_FMT_NAME);
 		if (name && strlen(name) > name_width) {
 		    name_width = strlen(name);
 		}
@@ -243,8 +245,6 @@ cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 static void
 show_bridge_filter(GString *s, dot1dStaticEntry_t *dot1dStaticEntry)
 {
-    int i;
-    
     if (dot1dStaticEntry->dot1dStaticReceivePort) {
 	g_string_sprintfa(s, "%5d ",
 			  dot1dStaticEntry->dot1dStaticReceivePort);
@@ -253,10 +253,9 @@ show_bridge_filter(GString *s, dot1dStaticEntry_t *dot1dStaticEntry)
     }
 
     if (dot1dStaticEntry->dot1dStaticAddress) {
-	for (i = 0; i < 6; i++) {
-	    g_string_sprintfa(s, "%s%02x", i ? ":" : "",
-			      dot1dStaticEntry->dot1dStaticAddress[i]);
-	}
+	char *addr = fmt_ether_address(dot1dStaticEntry->dot1dStaticAddress,
+				       SCLI_FMT_ADDR);
+	g_string_append(s, addr);
     } else {
 	g_string_sprintfa(s, "--:--:--:--:--:--");
     }

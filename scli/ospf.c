@@ -46,7 +46,8 @@ cmd_ospf_info(scli_interp_t *interp, int argc, char **argv)
    if (ospfGeneralGroup) {
        if (ospfGeneralGroup->ospfRouterId) {
            g_string_sprintfa(interp->result, "Router-ID: %s\n",
-	   	fmt_ipv4_address(ospfGeneralGroup->ospfRouterId, 0));
+	   	fmt_ipv4_address(ospfGeneralGroup->ospfRouterId,
+				 SCLI_FMT_NAME_OR_ADDR));
        }
 
        if (ospfGeneralGroup->ospfAdminStat) {
@@ -144,7 +145,8 @@ show_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
     g_string_append(s, "\nArea: ");
     if (ospfAreaEntry->ospfAreaId) {
 	g_string_sprintfa(s,"%-15s", 
-			  fmt_ipv4_address(ospfAreaEntry->ospfAreaId, 0));
+			  fmt_ipv4_address(ospfAreaEntry->ospfAreaId,
+					   SCLI_FMT_NAME_OR_ADDR));
     } else {
 	g_string_append(s, "?   ");
     }
@@ -310,14 +312,16 @@ show_ospf_interfaces(GString *s, ospf_mib_ospfIfEntry_t *ospfIfEntry,
 		    (ospfIfEntry->ospfAddressLessIf == 
 		     *(ipAddrTable[j]->ipAdEntIfIndex))) {
 		    g_string_sprintfa(s, "IP Address: %s\n", 
-		      fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr, 0));
+		      fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr,
+				       SCLI_FMT_NAME_OR_ADDR));
 		    break;
 		}
 	    }
 	}
     } else if (ospfIfEntry->ospfIfIpAddress) {
 	g_string_sprintfa(s,"IP Address: %s\n", 
-			  fmt_ipv4_address(ospfIfEntry->ospfIfIpAddress, 0));
+			  fmt_ipv4_address(ospfIfEntry->ospfIfIpAddress,
+					   SCLI_FMT_NAME_OR_ADDR));
     } 
     
     g_string_append(s, "AdminStatus: ");
@@ -337,7 +341,8 @@ show_ospf_interfaces(GString *s, ospf_mib_ospfIfEntry_t *ospfIfEntry,
     g_string_append(s, "Area: ");
     if (ospfIfEntry->ospfIfAreaId) {
 	g_string_sprintfa(s,"%s", 
-			  fmt_ipv4_address(ospfIfEntry->ospfIfAreaId, 0));
+			  fmt_ipv4_address(ospfIfEntry->ospfIfAreaId,
+					   SCLI_FMT_NAME_OR_ADDR));
     } else {
 	g_string_append(s, "?");
     }

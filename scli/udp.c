@@ -36,8 +36,10 @@ show_udp_listener(GString *s, udpEntry_t *udpEntry, int width)
     int pos;
     
     g_string_sprintfa(s, "%s:%s%n",
-		      fmt_ipv4_address(udpEntry->udpLocalAddress, 1),
-		      fmt_udp_port(udpEntry->udpLocalPort, 1),
+		      fmt_ipv4_address(udpEntry->udpLocalAddress,
+				       SCLI_FMT_NAME_OR_ADDR),
+		      fmt_udp_port(udpEntry->udpLocalPort,
+				   SCLI_FMT_NAME_OR_ADDR),
 		      &pos);
     g_string_sprintfa(s, "%*s", MAX(width-pos+1, 1), "");
     g_string_append(s, "listen\n");
@@ -61,8 +63,10 @@ cmd_udp_listener(scli_interp_t *interp, int argc, char **argv)
 
     if (udpTable) {
 	for (i = 0; udpTable[i]; i++) {
-	    addr = fmt_ipv4_address(udpTable[i]->udpLocalAddress, 1);
-	    port = fmt_udp_port(udpTable[i]->udpLocalPort, 1);
+	    addr = fmt_ipv4_address(udpTable[i]->udpLocalAddress,
+				    SCLI_FMT_NAME_OR_ADDR);
+	    port = fmt_udp_port(udpTable[i]->udpLocalPort,
+				SCLI_FMT_NAME_OR_ADDR);
 	    len = strlen(addr) + strlen(port) + 1;
 	    if (len > width) {
 		width = len;

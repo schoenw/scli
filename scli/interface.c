@@ -79,6 +79,7 @@ show_if_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 		system_t *system, ipAddrEntry_t **ipAddrTable)
 {
     int j;
+    char *name;
     int const width = 20;
 
     g_string_sprintfa(s, "Interface:   %-*d", width,
@@ -98,6 +99,19 @@ show_if_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 	for (j = 0; j < ifEntry->_ifPhysAddressLength; j++) {
 	    g_string_sprintfa(s, "%s%02X", (j == 0) ? "" : ":",
 			      ifEntry->ifPhysAddress[j]);
+	}
+	/* See RFC 2665 section 3.2.6. why the test below is so ugly... */
+	if (ifEntry->ifType && ifEntry->_ifPhysAddressLength == 6
+	    && (*ifEntry->ifType == IF_MIB_IFTYPE_ETHERNETCSMACD
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_ISO88023CSMACD
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_STARLAN
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_FASTETHER
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_FASTETHERFX
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_GIGABITETHERNET)) {
+	    name = fmt_ether_address(ifEntry->ifPhysAddress, SCLI_FMT_NAME);
+	    if (name) {
+		g_string_sprintfa(s, " (%s)", name);
+	    }
 	}
 	g_string_append(s, "\n");
     } else {
@@ -153,7 +167,8 @@ show_if_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 		if (ipAddrTable[j]->ipAdEntAddr
 		    && ipAddrTable[j]->ipAdEntNetMask) {
 		    g_string_sprintfa(s, "IP Address:  %-*s", width,
-		      fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr, 0));
+		      fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr,
+				       SCLI_FMT_ADDR));
 		    g_string_sprintfa(s, " Prefix:  %s\n",
 		      fmt_ipv4_mask(ipAddrTable[j]->ipAdEntNetMask));
 		}

@@ -35,8 +35,10 @@ show_tcp_listener(GString *s, tcpConnEntry_t *tcpConnEntry, int width)
     int pos;
     
     g_string_sprintfa(s, "%s:%s%n",
-		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress, 1),
-		      fmt_tcp_port(tcpConnEntry->tcpConnLocalPort, 1),
+		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress,
+				       SCLI_FMT_NAME_OR_ADDR),
+		      fmt_tcp_port(tcpConnEntry->tcpConnLocalPort,
+				   SCLI_FMT_NAME_OR_ADDR),
 		      &pos);
     g_string_sprintfa(s, "%*s", MAX(width-pos+1, 1), "");
     if (tcpConnEntry->tcpConnState) {
@@ -70,8 +72,10 @@ cmd_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 		continue;
 	    }
 	    cnt++;
-	    addr = fmt_ipv4_address(tcpConnTable[i]->tcpConnLocalAddress, 1);
-	    port = fmt_tcp_port(tcpConnTable[i]->tcpConnLocalPort, 1);
+	    addr = fmt_ipv4_address(tcpConnTable[i]->tcpConnLocalAddress,
+				    SCLI_FMT_NAME_OR_ADDR);
+	    port = fmt_tcp_port(tcpConnTable[i]->tcpConnLocalPort,
+				SCLI_FMT_NAME_OR_ADDR);
 	    len = strlen(addr) + strlen(port) + 1;
 	    if (len > width) {
 		width = len;
@@ -104,13 +108,17 @@ show_tcp_connection(GString *s, tcpConnEntry_t *tcpConnEntry,
     int pos;
     
     g_string_sprintfa(s, "%s:%s%n",
-		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress, 1),
-		      fmt_tcp_port(tcpConnEntry->tcpConnLocalPort, 1),
+		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress,
+				       SCLI_FMT_NAME_OR_ADDR),
+		      fmt_tcp_port(tcpConnEntry->tcpConnLocalPort,
+				   SCLI_FMT_NAME_OR_ADDR),
 		      &pos);
     g_string_sprintfa(s, "%*s", MAX(local_width-pos+1, 1), "");
     g_string_sprintfa(s, "%s:%s%n",
-		      fmt_ipv4_address(tcpConnEntry->tcpConnRemAddress, 1),
-		      fmt_tcp_port(tcpConnEntry->tcpConnRemPort, 1),
+		      fmt_ipv4_address(tcpConnEntry->tcpConnRemAddress,
+				       SCLI_FMT_NAME_OR_ADDR),
+		      fmt_tcp_port(tcpConnEntry->tcpConnRemPort,
+				   SCLI_FMT_NAME_OR_ADDR),
 		      &pos);
     g_string_sprintfa(s, "%*s", MAX(remote_width-pos+1, 1), "");
     if (tcpConnEntry->tcpConnState) {
@@ -145,14 +153,18 @@ cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 		continue;
 	    }
 	    cnt++;
-	    addr = fmt_ipv4_address(tcpConnTable[i]->tcpConnLocalAddress, 1);
-	    port = fmt_tcp_port(tcpConnTable[i]->tcpConnLocalPort, 1);
+	    addr = fmt_ipv4_address(tcpConnTable[i]->tcpConnLocalAddress,
+				    SCLI_FMT_NAME_OR_ADDR);
+	    port = fmt_tcp_port(tcpConnTable[i]->tcpConnLocalPort,
+				SCLI_FMT_NAME_OR_ADDR);
 	    len = strlen(addr) + strlen(port) + 1;
 	    if (len > local_width) {
 		local_width = len;
 	    }
-	    addr = fmt_ipv4_address(tcpConnTable[i]->tcpConnRemAddress, 1);
-	    port = fmt_tcp_port(tcpConnTable[i]->tcpConnRemPort, 1);
+	    addr = fmt_ipv4_address(tcpConnTable[i]->tcpConnRemAddress,
+				    SCLI_FMT_NAME_OR_ADDR);
+	    port = fmt_tcp_port(tcpConnTable[i]->tcpConnRemPort,
+				SCLI_FMT_NAME_OR_ADDR);
 	    len = strlen(addr) + strlen(port) + 1;
 	    if (len > remote_width) {
 		remote_width = len;

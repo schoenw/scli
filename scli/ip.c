@@ -72,12 +72,14 @@ show_ip_route(GString *s, rfc1213_mib_ipRouteEntry_t *ipRouteEntry,
 	&& ipRouteEntry->ipRouteMask
 	&& ipRouteEntry->ipRouteIfIndex) {
 	g_string_sprintfa(s, "%s%s%n",
-			  fmt_ipv4_address(ipRouteEntry->ipRouteDest, 0),
+			  fmt_ipv4_address(ipRouteEntry->ipRouteDest,
+					   SCLI_FMT_ADDR),
 			  fmt_ipv4_mask(ipRouteEntry->ipRouteMask), &pos);
 	g_string_sprintfa(s, "%*s", MAX(20-pos, 1), "");
 	
 	g_string_sprintfa(s, "%-16s",
-			  fmt_ipv4_address(ipRouteEntry->ipRouteNextHop, 0));
+			  fmt_ipv4_address(ipRouteEntry->ipRouteNextHop,
+					   SCLI_FMT_ADDR));
 
 	label = NULL;
 	if (ipRouteEntry->ipRouteType) {
@@ -174,6 +176,7 @@ static void
 show_ip_address(GString *s, ipAddrEntry_t *ipAddrEntry)
 {
     unsigned prefix = 0;
+    char *name;
     int i, j;
 
     if (ipAddrEntry->ipAdEntNetMask) {
@@ -195,15 +198,17 @@ show_ip_address(GString *s, ipAddrEntry_t *ipAddrEntry)
 	g_string_sprintfa(s, "%6s    ", "");
     }
     g_string_sprintfa(s, "%-16s ",
-		      fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, 0));
+	      fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_ADDR));
     if (ipAddrEntry->ipAdEntNetMask) {
 	g_string_sprintfa(s, "%-6s",
 			  fmt_ipv4_mask(ipAddrEntry->ipAdEntNetMask));;
     } else {
 	g_string_sprintfa(s, "%-6s", "");
     }
-    g_string_sprintfa(s, "%s",
-		      fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, 1));
+    name = fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_NAME);
+    if (name) {
+	g_string_append(s, name);
+    }
     g_string_append(s, "\n");
 }
 
@@ -244,14 +249,16 @@ show_ip_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry,
 
     if (tunnelIfEntry->tunnelIfLocalAddress) {
 	g_string_sprintfa(s, "%-15s  ",
-		  fmt_ipv4_address(tunnelIfEntry->tunnelIfLocalAddress, 0));
+		  fmt_ipv4_address(tunnelIfEntry->tunnelIfLocalAddress,
+				   SCLI_FMT_NAME_OR_ADDR));
     } else {
 	g_string_sprintfa(s, "%-15s  ", "-");
     }
 
     if (tunnelIfEntry->tunnelIfRemoteAddress) {
 	g_string_sprintfa(s, "%-15s  ",
-		  fmt_ipv4_address(tunnelIfEntry->tunnelIfRemoteAddress, 0));
+		  fmt_ipv4_address(tunnelIfEntry->tunnelIfRemoteAddress,
+				   SCLI_FMT_NAME_OR_ADDR));
     } else {
 	g_string_sprintfa(s, "%-15s  ", "-");
     }
@@ -360,8 +367,10 @@ cmd_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_ip_arp(GString *s, ipNetToMediaEntry_t *ipNetToMediaEntry)
+show_ip_arp(GString *s, ipNetToMediaEntry_t *ipNetToMediaEntry,
+	    ifEntry_t *ifEntry)
 {
+    char *name;
     int i;
 
     g_string_sprintfa(s, "%6u    ",
@@ -371,13 +380,28 @@ show_ip_arp(GString *s, ipNetToMediaEntry_t *ipNetToMediaEntry)
 	     ipNetToMediaEntry->ipNetToMediaType);
     
     g_string_sprintfa(s, " %-16s ",
-	      fmt_ipv4_address(ipNetToMediaEntry->ipNetToMediaNetAddress, 0));
+	      fmt_ipv4_address(ipNetToMediaEntry->ipNetToMediaNetAddress,
+			       SCLI_FMT_NAME_OR_ADDR));
 
     if (ipNetToMediaEntry->ipNetToMediaPhysAddress) {
 	for (i = 0;
 	     i < ipNetToMediaEntry->_ipNetToMediaPhysAddressLength; i++) {
 	    g_string_sprintfa(s, "%s%02x", i ? ":" : "",
 			      ipNetToMediaEntry->ipNetToMediaPhysAddress[i]);
+	}
+	/* See RFC 2665 section 3.2.6. why the test below is so ugly... */
+	if (ifEntry && ifEntry->ifType
+	    && ipNetToMediaEntry->_ipNetToMediaPhysAddressLength == 6
+	    && (*ifEntry->ifType == IF_MIB_IFTYPE_ETHERNETCSMACD
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_ISO88023CSMACD
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_STARLAN
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_FASTETHER
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_FASTETHERFX
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_GIGABITETHERNET)) {
+	    name = fmt_ether_address(ipNetToMediaEntry->ipNetToMediaPhysAddress, SCLI_FMT_NAME);
+	    if (name) {
+		g_string_sprintfa(s, " (%s)", name);
+	    }
 	}
     }
     
@@ -390,7 +414,8 @@ static int
 cmd_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
 {
     ipNetToMediaEntry_t **ipNetToMediaTable = NULL;
-    int i;
+    ifEntry_t **ifTable = NULL, *ifEntry = NULL;
+    int i, j;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -398,16 +423,26 @@ cmd_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_ERROR;
     }
 
+    (void) if_mib_get_ifTable(interp->peer, &ifTable);
+
     if (ipNetToMediaTable) {
 	g_string_append(interp->result,
 	"Interface Type     IP Address       Physical Address\n");
 	for (i = 0; ipNetToMediaTable[i]; i++) {
-	    show_ip_arp(interp->result, ipNetToMediaTable[i]);
+	    if (ifTable) {
+		for (j = 0; ifTable[j]; j++) {
+		    if (ipNetToMediaTable[i]->ipNetToMediaIfIndex
+			== ifTable[j]->ifIndex) break;
+		}
+		ifEntry = ifTable[j];
+	    }
+	    show_ip_arp(interp->result, ipNetToMediaTable[i], ifEntry);
 	}
     }
 
 
     if (ipNetToMediaTable) ip_mib_free_ipNetToMediaTable(ipNetToMediaTable);
+    if (ifTable) if_mib_free_ifTable(ifTable);
     
     return SCLI_OK;
 }

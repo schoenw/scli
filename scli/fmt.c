@@ -32,6 +32,9 @@
 #ifdef HAVE_NETINET_IF_ETHER_H
 #include <netinet/if_ether.h>
 #endif
+#ifdef HAVE_NETINET_ETHER_H
+#include <netinet/ether.h>
+#endif
 
 
 
@@ -200,12 +203,12 @@ fmt_gtp(guint32 number)
 
 
 char*
-fmt_udp_port(int port, int name)
+fmt_udp_port(int port, int flags)
 {
     struct servent *s;
     static char buffer[12];
 
-    if (name) {
+    if (flags & SCLI_FMT_NAME) {
 	if (! port) {
 	    return "*";
 	}
@@ -214,19 +217,22 @@ fmt_udp_port(int port, int name)
 	    return s->s_name;
 	}
     }
-    sprintf(buffer, "%d", port);
-    return buffer;
+    if (flags & SCLI_FMT_ADDR) {
+	sprintf(buffer, "%d", port);
+	return buffer;
+    }
+    return NULL;
 }
 
 
 
 char*
-fmt_tcp_port(int port, int name)
+fmt_tcp_port(int port, int flags)
 {
     struct servent *s;
     static char buffer[12];
 
-    if (name) {
+    if (flags & SCLI_FMT_NAME) {
 	if (! port) {
 	    return "*";
 	}
@@ -235,19 +241,22 @@ fmt_tcp_port(int port, int name)
 	    return s->s_name;
 	}
     }
-    sprintf(buffer, "%d", port);
-    return buffer;
+    if (flags & SCLI_FMT_ADDR) {
+	sprintf(buffer, "%d", port);
+	return buffer;
+    }
+    return NULL;
 }
 
 
 
 char*
-fmt_ipv4_address(guchar *addr, int name)
+fmt_ipv4_address(guchar *addr, int flags)
 {
     static char buffer[16];
     struct hostent *h;
 
-    if (name) {
+    if (flags & SCLI_FMT_NAME) {
 	if (! addr[0] && ! addr[1] && ! addr[2] && ! addr[3]) {
 	    return "*";
 	}
@@ -256,9 +265,12 @@ fmt_ipv4_address(guchar *addr, int name)
 	    return h->h_name;
 	}
     }
-    g_snprintf(buffer, sizeof(buffer), "%d.%d.%d.%d",
-	       addr[0], addr[1], addr[2], addr[3]);
-    return buffer;
+    if (flags & SCLI_FMT_ADDR) {
+	g_snprintf(buffer, sizeof(buffer), "%d.%d.%d.%d",
+		   addr[0], addr[1], addr[2], addr[3]);
+	return buffer;
+    }
+    return NULL;
 }
 
 
@@ -290,17 +302,17 @@ fmt_ether_address(guchar *addr, int flags)
 {
     static char buffer[256]; /* xxx */
 
-    if (flags & SCLI_FLAG_NAME_OR_ADDR || flags & SCLI_FLAG_NAME_ONLY) {
+    if (flags & SCLI_FMT_NAME) {
 #ifdef HAVE_ETHER_NTOHOST
-	if (ether_ntohost(buffer, addr) == 0) {
+	if (ether_ntohost(buffer, (struct ether_addr *) addr) == 0) {
 	    return buffer;
 	}
 #endif
-	if (flags & SCLI_FLAG_NAME_ONLY) {
-	    return NULL;
-	}
     }
-    g_snprintf(buffer, sizeof(buffer), "%02x:%02x:%02x:%02x:%02x:%02x",
-	       addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
-    return buffer;
+    if (flags & SCLI_FMT_ADDR) {
+	g_snprintf(buffer, sizeof(buffer), "%02x:%02x:%02x:%02x:%02x:%02x",
+		   addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
+	return buffer;
+    }
+    return NULL;
 }
