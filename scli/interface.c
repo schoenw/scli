@@ -829,8 +829,8 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-fmt_interface_stack(GString *s, if_mib_ifEntry_t *ifEntry,
-		    int type_width, const char *o)
+fmt_interface_stack_line(GString *s, if_mib_ifEntry_t *ifEntry,
+			 int type_width, const char *o)
 {
     const char *e;
 
@@ -843,6 +843,136 @@ fmt_interface_stack(GString *s, if_mib_ifEntry_t *ifEntry,
 			  ifEntry->ifDescr);
     }
     g_string_append(s, "\n");
+}
+
+
+
+static void
+fmt_interface_stack(scli_interp_t *interp,
+		    if_mib_ifEntry_t **ifTable,
+		    if_mib_ifStackEntry_t **ifStackTable,
+		    regex_t *regex_iface, int type_width)
+{
+    int i, j;
+    
+    /*
+     * First check for all 1:1 stacks...
+     */
+    
+    for (i = 0; ifTable[i]; i++) {
+	if_mib_ifEntry_t *ifEntry = NULL;
+	int l = 0, h = 0;
+	
+	for (j = 0; ifStackTable[j]; j++) {
+	    if (ifStackTable[j]->ifStackLowerLayer == ifTable[i]->ifIndex
+		&& ifStackTable[j]->ifStackHigherLayer) {
+		if (! ifEntry) {
+		    ifEntry = get_ifEntry(ifTable,
+					  ifStackTable[j]->ifStackHigherLayer);
+		    if (! ifEntry) {
+			g_warning("unknown stacked interface #%d",
+				  ifStackTable[j]->ifStackHigherLayer);
+			continue;
+			}
+		}
+		h++;
+	    }
+	}
+	if (h == 1 && ifEntry) {
+	    for (j = 0; ifStackTable[j]; j++) {
+		if (ifStackTable[j]->ifStackHigherLayer == ifEntry->ifIndex
+		    && ifStackTable[j]->ifStackLowerLayer) {
+		    l++;
+		}
+	    }
+	}
+	if (h == 1 && l == 1 && ifTable[i] && ifEntry) {
+	    if (match_interface(regex_iface, ifTable[i])
+		|| match_interface(regex_iface, ifEntry)) {
+		fmt_interface_stack_line(interp->result, ifTable[i],
+					 type_width, "-.   ");
+		fmt_interface_stack_line(interp->result, ifEntry,
+					 type_width, "  `->");
+	    }
+	}
+    }
+    
+    /*
+     * Check for all 1:n and n:1 stacks with n > 1.
+     */
+    
+    for (i = 0; ifTable[i]; i++) {
+	int l = 0, h = 0;
+	if (! match_interface(regex_iface, ifTable[i])) {
+	    continue;
+	}
+	for (j = 0; ifStackTable[j]; j++) {
+	    if (ifStackTable[j]->ifStackLowerLayer == ifTable[i]->ifIndex
+		&& ifStackTable[j]->ifStackHigherLayer) {
+		h++;
+	    }
+	    if (ifStackTable[j]->ifStackHigherLayer == ifTable[i]->ifIndex
+		&& ifStackTable[j]->ifStackLowerLayer) {
+		l++;
+	    }
+	}
+	if (h > 1) {
+	    int cnt = 0;
+	    for (j = 0; ifStackTable[j]; j++) {
+		if (ifStackTable[j]->ifStackLowerLayer == ifTable[i]->ifIndex
+		    && ifStackTable[j]->ifStackHigherLayer) {
+		    if_mib_ifEntry_t *ifEntry;
+		    ifEntry = get_ifEntry(ifTable,
+					  ifStackTable[j]->ifStackHigherLayer);
+		    if (! ifEntry) {
+			g_warning("unknown stacked interface #%d",
+				  ifStackTable[j]->ifStackHigherLayer);
+			continue;
+		    }
+		    if (cnt == 0) {
+			fmt_interface_stack_line(interp->result, ifTable[i],
+						 type_width, "--.  ");
+		    }
+		    if (cnt+1 == h) {
+			fmt_interface_stack_line(interp->result, ifEntry,
+						 type_width, "  `->");
+		    } else {
+			fmt_interface_stack_line(interp->result, ifEntry,
+						 type_width, "  |->");
+		    }
+		    cnt++;
+		}
+	    }
+	}
+	if (l > 1) {
+	    int cnt = 0;
+	    for (j = 0; ifStackTable[j]; j++) {
+		if (ifStackTable[j]->ifStackHigherLayer == ifTable[i]->ifIndex
+		    && ifStackTable[j]->ifStackLowerLayer) {
+		    if_mib_ifEntry_t *ifEntry;
+		    ifEntry = get_ifEntry(ifTable,
+					  ifStackTable[j]->ifStackLowerLayer);
+		    if (! ifEntry) {
+			g_warning("unknown stacked interface #%d",
+				  ifStackTable[j]->ifStackLowerLayer);
+			continue;
+		    }
+		    if (cnt == 0) {
+			fmt_interface_stack_line(interp->result, ifEntry,
+						 type_width, "--.  ");
+		    } else {
+			fmt_interface_stack_line(interp->result, ifEntry,
+						 type_width, "--|  ");
+		    }
+		    if (cnt == l-1) {
+			fmt_interface_stack_line(interp->result, ifTable[i],
+						 type_width, "  `->");
+		    }
+		    cnt++;
+		}
+	    }
+	}
+    }
 }
 
 
@@ -879,121 +1009,26 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (ifStackTable) {
-	if_mib_proc_get_ifTable(interp->peer, &ifTable,
-				IF_MIB_IFENTRY_PARAMS, interp->epoch);
-	type_width = get_if_type_width(ifTable);
 
-	g_string_sprintfa(interp->header,
-			  "INTERFACE STACK %-*s DESCRIPTION",
-			  type_width, "TYPE");
 	/*
-	 * First check for all 1:1 stacks...
+	 * Check whether there is anything interesting to report -
+	 * otherwise we quit early saving some resources.
 	 */
-
-	for (i = 0; ifTable[i]; i++) {
-	    if_mib_ifEntry_t *ifEntry = NULL;
-	    int l = 0, h = 0;
-	    for (j = 0; ifStackTable[j]; j++) {
-		if (ifStackTable[j]->ifStackLowerLayer == ifTable[i]->ifIndex
-		    && ifStackTable[j]->ifStackHigherLayer) {
-		    if (! ifEntry) {
-			ifEntry = get_ifEntry(ifTable,
-					      ifStackTable[j]->ifStackHigherLayer);
-			if (! ifEntry) {
-			    g_warning("unknown stacked interface #%d",
-				      ifStackTable[j]->ifStackHigherLayer);
-			    continue;
-			}
-		    }
-		    h++;
-		}
-	    }
-	    if (h == 1 && ifEntry) {
-		for (j = 0; ifStackTable[j]; j++) {
-		    if (ifStackTable[j]->ifStackHigherLayer == ifEntry->ifIndex
-			&& ifStackTable[j]->ifStackLowerLayer) {
-			l++;
-		    }
-		}
-	    }
-	    if (h == 1 && l == 1 && ifTable[i] && ifEntry) {
-		if (match_interface(regex_iface, ifTable[i])
-		    || match_interface(regex_iface, ifEntry)) {
-		    fmt_interface_stack(interp->result, ifTable[i], type_width, "-.   ");
-		    fmt_interface_stack(interp->result, ifEntry, type_width, "  `->");
-		}
-	    }
+	
+	for (i = 0; ifStackTable[i]; i++) {
+	    if (ifStackTable[i]->ifStackLowerLayer
+		&& ifStackTable[i]->ifStackHigherLayer) break;
 	}
-	
-	/*
-	 * Check for all 1:n and n:1 stacks with n > 1.
-	 */
-	
-	for (i = 0; ifTable[i]; i++) {
-	    int l = 0, h = 0;
-	    if (! match_interface(regex_iface, ifTable[i])) {
-		continue;
-	    }
-	    for (j = 0; ifStackTable[j]; j++) {
-		if (ifStackTable[j]->ifStackLowerLayer == ifTable[i]->ifIndex
-		    && ifStackTable[j]->ifStackHigherLayer) {
-		    h++;
-		}
-		if (ifStackTable[j]->ifStackHigherLayer == ifTable[i]->ifIndex
-		    && ifStackTable[j]->ifStackLowerLayer) {
-		    l++;
-		}
-	    }
-	    if (h > 1) {
-		int cnt = 0;
-		for (j = 0; ifStackTable[j]; j++) {
-		    if (ifStackTable[j]->ifStackLowerLayer == ifTable[i]->ifIndex
-			&& ifStackTable[j]->ifStackHigherLayer) {
-			if_mib_ifEntry_t *ifEntry;
-			ifEntry = get_ifEntry(ifTable,
-					      ifStackTable[j]->ifStackHigherLayer);
-			if (! ifEntry) {
-			    g_warning("unknown stacked interface #%d",
-				      ifStackTable[j]->ifStackHigherLayer);
-			    continue;
-			}
-			if (cnt == 0) {
-			    fmt_interface_stack(interp->result, ifTable[i], type_width, "--.  ");
-			}
-			if (cnt+1 == h) {
-			    fmt_interface_stack(interp->result, ifEntry, type_width, "  `->");
-			} else {
-			    fmt_interface_stack(interp->result, ifEntry, type_width, "  |->");
-			}
-			cnt++;
-		    }
-		}
-	    }
-	    if (l > 1) {
-		int cnt = 0;
-		for (j = 0; ifStackTable[j]; j++) {
-		    if (ifStackTable[j]->ifStackHigherLayer == ifTable[i]->ifIndex
-			&& ifStackTable[j]->ifStackLowerLayer) {
-			if_mib_ifEntry_t *ifEntry;
-			ifEntry = get_ifEntry(ifTable,
-					      ifStackTable[j]->ifStackLowerLayer);
-			if (! ifEntry) {
-			    g_warning("unknown stacked interface #%d",
-				      ifStackTable[j]->ifStackLowerLayer);
-			    continue;
-			}
-			if (cnt == 0) {
-			    fmt_interface_stack(interp->result, ifEntry, type_width, "--.  ");
-			} else {
-			    fmt_interface_stack(interp->result, ifEntry, type_width, "--|  ");
-			}
-			if (cnt == l-1) {
-			    fmt_interface_stack(interp->result, ifTable[i], type_width, "  `->");
-			}
-			cnt++;
-		    }
-		}
-	    }
+
+	if (ifStackTable[i]) {
+	    if_mib_proc_get_ifTable(interp->peer, &ifTable,
+				    IF_MIB_IFENTRY_PARAMS, interp->epoch);
+	    type_width = get_if_type_width(ifTable);
+	    g_string_sprintfa(interp->header,
+			      "INTERFACE STACK %-*s DESCRIPTION",
+			      type_width, "TYPE");
+	    fmt_interface_stack(interp, ifTable, ifStackTable,
+				regex_iface, type_width);
 	}
     }
 
