@@ -85,7 +85,7 @@ fmt_sonet_media(GString *s, sonet_mib_sonetMediumEntry_t *sonetMediumEntry,
 
     e = fmt_enum(sonetMediumType,
 		 sonetMediumEntry->sonetMediumType);
-    g_string_sprintfa(s, "%-5s ", e ? e : "");
+    g_string_sprintfa(s, "%-5s  ", e ? e : "");
 
     e = fmt_enum(sonetMediumLineCoding,
 		 sonetMediumEntry->sonetMediumLineCoding);
@@ -109,7 +109,6 @@ static int
 show_sonet_media(scli_interp_t *interp, int argc, char **argv)
 {
     sonet_mib_sonetMediumEntry_t **sonetMediumTable = NULL;
-    int line_type_width;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
 
@@ -139,20 +138,19 @@ show_sonet_media(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (sonetMediumTable) {
-	if_mib_ifEntry_t *ifEntry;
+	int line_type_width = get_line_type_width(sonetMediumTable);
 	g_string_sprintfa(interp->header,
-			  "INTERFACE TYPE  CODING LINE-TYPE");
+			  "INTERFACE SIGNAL CODING %-*s DESCRIPTION",
+			  line_type_width, "LINE");
 	for (i = 0; sonetMediumTable[i]; i++) {
+	    if_mib_ifEntry_t *ifEntry;
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
 			       sonetMediumTable[i]->ifIndex, IF_MIB_IFDESCR);
-	    line_type_width = get_line_type_width(sonetMediumTable);
 	    if (interface_match(regex_iface, ifEntry)) {
 		fmt_sonet_media(interp->result, sonetMediumTable[i], ifEntry,
 				line_type_width);
 	    }
-	    if (ifEntry) {
-		if_mib_free_ifEntry(ifEntry);
-	    }
+	    if (ifEntry) if_mib_free_ifEntry(ifEntry);
 	}
     }
 
@@ -183,7 +181,8 @@ INTERFACE INTERVAL LOST   ES  SES SEFS   CV DESCRIPTION
 
 static void
 fmt_sonet_section_stats(GString *s,
-			sonet_mib_sonetSectionCurrentEntry_t *sonetSectionEntry)
+			sonet_mib_sonetSectionCurrentEntry_t *sonetSectionEntry,
+			if_mib_ifEntry_t *ifEntry)
 {
     const char *e;
     
@@ -196,7 +195,6 @@ fmt_sonet_section_stats(GString *s,
 	g_string_sprintfa(s, " %c%c  ",
 			  (t == 0x02) ? 'S' : '-',
 			  (t == 0x04) ? 'F' : '-');
-	
     } else {
 	g_string_sprintfa(s, " %2s  ", "");
     }
@@ -227,6 +225,11 @@ fmt_sonet_section_stats(GString *s,
 	g_string_sprintfa(s, "%5s ", e);
     } else {
 	g_string_sprintfa(s, "%5s ", "");
+    }
+
+    if (ifEntry && ifEntry->ifDescr) {
+	g_string_sprintfa(s, "%.*s",
+			  (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);
     }
 
     g_string_append(s, "\n");
@@ -268,9 +271,15 @@ show_sonet_section_stats(scli_interp_t *interp, int argc, char **argv)
 
     if (sonetSectionTable) {
 	g_string_sprintfa(interp->header,
-			  "INTERFACE INTERVAL LOST    ES   SES  SEFS    CV DESCRIPTION");
+			  "INTERFACE INTERVAL LOSS    ES   SES  SEFS    CV DESCRIPTION");
 	for (i = 0; sonetSectionTable[i]; i++) {
-	    fmt_sonet_section_stats(interp->result, sonetSectionTable[i]);
+            if_mib_ifEntry_t *ifEntry;
+	    if_mib_get_ifEntry(interp->peer, &ifEntry,
+			       sonetSectionTable[i]->ifIndex, IF_MIB_IFDESCR);
+	    if (interface_match(regex_iface, ifEntry)) {
+                fmt_sonet_section_stats(interp->result, sonetSectionTable[i], ifEntry);
+	    }
+	    if (ifEntry) if_mib_free_ifEntry(ifEntry);
 	}
     }
 
@@ -290,25 +299,40 @@ scli_init_sonet_mode(scli_interp_t *interp)
 
 	{ "show sonet media", "[<regexp>]",
 	  "The `show sonet media' command displays information about the\n"
-	  "configuration of SONET/SDH interfaces.\n",
+	  "configuration of SONET/SDH interfaces. The command outputs a table\n"
+	  "which has the following columns:\n"
+	  "\n"
+	  "  INTERFACE   network interface number\n"
+	  "  SIGNAL      type of the signal (SONET/SDH)\n"
+	  "  CODING      line coding (B3ZS, CMI, NRZ, RZ)\n"
+	  "  LINE        optical or electrical line type\n"
+	  "  DESCRIPTION description of the network interface",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_sonet_media },
 
-	{ "show sonet section stats", NULL,
+	{ "show sonet section stats", "[<regexp>]",
 	  "The `show sonet section stats' command displays statistics\n"
 	  "about SONET/SDH section errors. The command outputs a table\n"
 	  "which has the following columns:\n"
-	  "\n"
-	  "  INTERFACE	 network interface number\n"
-	  "  INTERVAL    xxx\n"
-	  "  LOST        xxx\n"
-	  "  ES          errored seconds\n"
-	  "  SES	 severely errored seconds\n"
-	  "  SEFS	 severely errored framing seconds\n"
-	  "  CV          coding violations\n"
-	  "  DESCRIPTION description of the network interface",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+          "\n"
+          "  INTERFACE   network interface number\n"
+          "  INTERVAL    measurement interval\n"
+          "  LOSS        flags indicating loss of signal/frame\n"
+          "  ES          errored seconds\n"
+          "  SES         severely errored seconds\n"
+          "  SEFS        severely errored framing seconds\n"
+          "  CV          coding violations\n"
+          "  DESCRIPTION description of the network interface",
+          SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+          NULL, NULL,
+	  show_sonet_section_stats },
+
+	{ "monitor sonet section stats", "[<regexp>]",
+	  "The `monitor sonet section stats' command shows the same\n"
+	  "information as the show sonet section stats command. The\n"
+	  "information is updated periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_sonet_section_stats },
 
