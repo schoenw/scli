@@ -9,6 +9,14 @@
 @set VERSION 0.2.12
 
 @ifinfo
+
+@format
+@dircategory Net utilities:
+@direntry
+* scli: (scli).				SNMP Command Line Interface
+@end direntry
+@end format
+
 This file documents the @code{scli} SNMP command line interface.
 
 Copyright (C) 2001-2002 J@"urgen Sch@"onw@"alder
