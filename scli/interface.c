@@ -179,6 +179,103 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+show_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry)
+{
+    g_return_if_fail(tunnelIfEntry);
+
+    if (tunnelIfEntry->ifIndex) {
+	g_string_sprintfa(s, "%-2i   ", tunnelIfEntry->ifIndex);
+    } else {
+	g_string_sprintfa(s, "%2s   ", "--");
+    }
+
+    if (tunnelIfEntry->tunnelIfLocalAddress) {
+	g_string_sprintfa(s, "%-15s  ",
+		  fmt_ipv4_address(tunnelIfEntry->tunnelIfLocalAddress, 0));
+    } else {
+	g_string_sprintfa(s, "%-15s  ", "-");
+    }
+
+    if (tunnelIfEntry->tunnelIfRemoteAddress) {
+	g_string_sprintfa(s, "%-15s  ",
+		  fmt_ipv4_address(tunnelIfEntry->tunnelIfRemoteAddress, 0));
+    } else {
+	g_string_sprintfa(s, "%-15s  ", "-");
+    }
+
+    if (tunnelIfEntry->tunnelIfEncapsMethod) {
+	fmt_enum(s, 8, tunnel_mib_enums_tunnelIfEncapsMethod,
+		 tunnelIfEntry->tunnelIfEncapsMethod);
+    } else {
+	g_string_sprintfa(s, "%-6s  ", "-");
+    }
+
+    if (tunnelIfEntry->tunnelIfSecurity) {
+	fmt_enum(s, 6, tunnel_mib_enums_tunnelIfSecurity,
+		 tunnelIfEntry->tunnelIfSecurity);
+    } else {
+	g_string_sprintfa(s, "%-4s  ", "-");
+    }
+
+    if (tunnelIfEntry->tunnelIfHopLimit) {
+	g_string_sprintfa(s, "%3i  ", *tunnelIfEntry->tunnelIfHopLimit);
+    } else {
+	g_string_sprintfa(s, "%3s  ", "---");
+    }
+    
+    if (tunnelIfEntry->tunnelIfTOS) {
+	switch (*tunnelIfEntry->tunnelIfTOS) {
+	case -1:
+	    /* A value of -1 indicates that the bits are copied from the
+	     * payload's header. */
+	    g_string_append(s, "CP");
+	    break;
+	case -2:
+	    /* A value of -2 indicates that a traffic conditioner is
+	     * invoked and more information may be available in a traffic
+	     * conditioner MIB. */
+	    g_string_append(s, "TC");
+	    break;
+        default:
+	    g_string_sprintfa(s, "%2i", *tunnelIfEntry->tunnelIfTOS);
+	    break;
+	}
+    } else {
+	g_string_append(s, "--");
+    }
+    
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+cmd_tunnel(scli_interp_t *interp, int argc, char **argv)
+{
+    tunnelIfEntry_t **tunnelIfTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (tunnel_mib_get_tunnelIfTable(interp->peer, &tunnelIfTable)) {
+	return SCLI_ERROR;
+    }
+
+    if (tunnelIfTable) {
+	g_string_append(interp->result,
+	"If   local address    remote address   type    sec.  TTL TOS\n");
+	for (i = 0; tunnelIfTable[i]; i++) {
+	    show_tunnel(interp->result, tunnelIfTable[i]);
+	}
+	tunnel_mib_free_tunnelIfTable(tunnelIfTable);
+    }
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_interface_mode(scli_interp_t *interp)
 {
@@ -187,6 +284,9 @@ scli_init_interface_mode(scli_interp_t *interp)
 	{ "show interface", "info",
 	  "show information about the network interfaces",
 	  cmd_interfaces },
+	{ "show interface", "tunnel",
+	  "show interface tunnel summary information",
+	  cmd_tunnel },
 	{ NULL, NULL, NULL, NULL }
     };
     

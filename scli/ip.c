@@ -132,7 +132,7 @@ cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 
     if (ipAddrTable) {
 	g_string_sprintfa(interp->result,
-			  "Address        Prefix  Interface   Name\n");
+			  "Address         Prefix  Interface   Name\n");
 	for (i = 0; ipAddrTable[i]; i++) {
 	    show_ip_address(interp->result, ipAddrTable[i]);
 	}
