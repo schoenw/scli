@@ -50,6 +50,7 @@ extern char const scli_copyright[];
 typedef struct scli_interp	scli_interp_t;
 typedef struct scli_mode	scli_mode_t;
 typedef struct scli_cmd		scli_cmd_t;
+typedef struct scli_alias	scli_alias_t;
 
 
 #define SCLI_CMD_FLAG_NEED_PEER	0x01
@@ -69,12 +70,20 @@ struct scli_mode {
     scli_cmd_t *cmds;		/* array of command provided by the mode */
 };
 
+struct scli_alias {
+    char *name;			/* name of the command alias */
+    char *value;		/* value of the command alias */
+    guint32 count;		/* usage counter for the alias */
+};
+
+
 #define SCLI_INTERP_FLAG_INTERACTIVE	0x01
 #define SCLI_INTERP_FLAG_RECURSIVE	0x02
 
 struct scli_interp {
     GNode *cmd_root;		/* root of the command tree */
-    GSList *mode_list;		/* root of list of registered modes */
+    GSList *mode_list;		/* list of registered modes */
+    GSList *alias_list;		/* list of command aliases */
     int	flags;			/* interpreter flags */
     GString *result;		/* string result buffer */
     char *pager;		/* external pager we are using */
@@ -138,6 +147,15 @@ scli_cmd_open(scli_interp_t *interp, int argc, char **argv);
 
 extern int
 scli_cmd_close(scli_interp_t *interp, int argc, char **argv);
+
+extern int
+scli_cmd_alias(scli_interp_t *interp, int argc, char **argv);
+
+extern int
+scli_cmd_unalias(scli_interp_t *interp, int argc, char **argv);
+
+extern int
+scli_cmd_show_aliases(scli_interp_t *interp, int argc, char **argv);
 
 extern int
 scli_cmd_show_peer(scli_interp_t *interp, int argc, char **argv);

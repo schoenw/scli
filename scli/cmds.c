@@ -29,6 +29,17 @@
 #include <readline/history.h>
 
 
+static gint
+alias_compare(gconstpointer a, gconstpointer b)
+{
+    scli_alias_t *alias_a = (scli_alias_t *) a;
+    scli_alias_t *alias_b = (scli_alias_t *) b;
+
+    return strcmp(alias_a->name, alias_b->name);
+}
+
+
+
 int
 scli_cmd_exit(scli_interp_t *interp, int argc, char **argv)
 {
@@ -146,6 +157,95 @@ scli_cmd_close(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     scli_close(interp);
+
+    return SCLI_OK;
+}
+
+
+
+int
+scli_cmd_alias(scli_interp_t *interp, int argc, char **argv)
+{
+    scli_alias_t *alias = NULL;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc == 3) {
+	alias = (scli_alias_t *) g_malloc0(sizeof(scli_alias_t));
+	alias->name = g_strdup(argv[1]);
+	alias->value = g_strdup(argv[2]);
+	interp->alias_list = g_slist_insert_sorted(interp->alias_list,
+						   alias, alias_compare);
+    } else {
+	return SCLI_ERROR;
+    }
+    
+    return SCLI_OK;
+}
+
+
+
+int
+scli_cmd_unalias(scli_interp_t *interp, int argc, char **argv)
+{
+    GSList *elem;
+    scli_alias_t *alias = NULL;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 2) {
+	return SCLI_ERROR;
+    }
+    
+ again:
+    for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
+	alias = (scli_alias_t *) elem->data;
+	if (strcmp(alias->name, argv[1]) == 0) {
+	    interp->alias_list = g_slist_remove(interp->alias_list,
+						elem->data);
+	    g_free(alias->name);
+	    g_free(alias->value);
+	    g_free(alias);
+	    goto again;
+	}
+    }
+    
+    return SCLI_OK;
+}
+
+
+
+int
+scli_cmd_show_aliases(scli_interp_t *interp, int argc, char **argv)
+{
+    GSList *elem;
+    scli_alias_t *alias;
+    int name_width = 16;
+    int value_width = 16;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (interp->alias_list) {
+	for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
+	    alias = (scli_alias_t *) elem->data;
+	    if (strlen(alias->name) > name_width) {
+		name_width = strlen(alias->name);
+	    }
+	    if (strlen(alias->value) > value_width) {
+		value_width = strlen(alias->value);
+	    }
+	}
+	g_string_sprintfa(interp->result, "%-*s %-*s Usage\n",
+			  name_width, "Alias Name",
+			  value_width, "Alias Value");
+	for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
+	    alias = (scli_alias_t *) elem->data;
+	    g_string_sprintfa(interp->result, "%-*s %-*s %4d\n",
+			      name_width, alias->name,
+			      value_width, alias->value,
+			      alias->count);
+	}
+    }
 
     return SCLI_OK;
 }

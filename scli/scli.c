@@ -238,6 +238,10 @@ main(int argc, char **argv)
     int norc = 0, port = 161, delay = 5000, retries = 3, timeout = 500000;
 
     static scli_cmd_t cmds[] = {
+        { "create scli alias",
+	  0,
+	  "create an scli command alias",
+	  scli_cmd_alias },
 	{ "close",
 	  0,
 	  "close the association to a remote SNMP agent",
@@ -258,6 +262,10 @@ main(int argc, char **argv)
 	  0,
 	  "open an association to a remote SNMP agent",
 	  scli_cmd_open },
+	{ "show scli aliases",
+	  0,
+	  "show information about scli aliases",
+	  scli_cmd_show_aliases },
 	{ "show scli association",
 	  0,
 	  "show information about the current scli association",
@@ -266,6 +274,10 @@ main(int argc, char **argv)
 	  0,
 	  "show information about the terminal parameters",
 	  scli_cmd_show_term },
+	{ "delete scli alias",
+	  0,
+	  "delete an scli command alias",
+	  scli_cmd_unalias },
 	{ NULL, 0, NULL, NULL }
     };
 
