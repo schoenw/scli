@@ -18,8 +18,8 @@
 #include "snmpv2-mib.h"
 
 stls_table_t const snmpv2_mib_enums_snmpEnableAuthenTraps[] = {
-    { 1, "enabled" },
-    { 2, "disabled" },
+    { SNMPV2_MIB_SNMPENABLEAUTHENTRAPS_ENABLED,	"enabled" },
+    { SNMPV2_MIB_SNMPENABLEAUTHENTRAPS_DISABLED,	"disabled" },
     { 0, NULL }
 };
 

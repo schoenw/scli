@@ -72,80 +72,80 @@
 #include "host-resources-mib.h"
 
 stls_table_t const host_resources_mib_enums_hrDeviceStatus[] = {
-    { 1, "unknown" },
-    { 2, "running" },
-    { 3, "warning" },
-    { 4, "testing" },
-    { 5, "down" },
+    { HOST_RESOURCES_MIB_HRDEVICESTATUS_UNKNOWN,	"unknown" },
+    { HOST_RESOURCES_MIB_HRDEVICESTATUS_RUNNING,	"running" },
+    { HOST_RESOURCES_MIB_HRDEVICESTATUS_WARNING,	"warning" },
+    { HOST_RESOURCES_MIB_HRDEVICESTATUS_TESTING,	"testing" },
+    { HOST_RESOURCES_MIB_HRDEVICESTATUS_DOWN,	"down" },
     { 0, NULL }
 };
 
 stls_table_t const host_resources_mib_enums_hrPrinterStatus[] = {
-    { 1, "other" },
-    { 2, "unknown" },
-    { 3, "idle" },
-    { 4, "printing" },
-    { 5, "warmup" },
+    { HOST_RESOURCES_MIB_HRPRINTERSTATUS_OTHER,	"other" },
+    { HOST_RESOURCES_MIB_HRPRINTERSTATUS_UNKNOWN,	"unknown" },
+    { HOST_RESOURCES_MIB_HRPRINTERSTATUS_IDLE,	"idle" },
+    { HOST_RESOURCES_MIB_HRPRINTERSTATUS_PRINTING,	"printing" },
+    { HOST_RESOURCES_MIB_HRPRINTERSTATUS_WARMUP,	"warmup" },
     { 0, NULL }
 };
 
 stls_table_t const host_resources_mib_enums_hrDiskStorageAccess[] = {
-    { 1, "readWrite" },
-    { 2, "readOnly" },
+    { HOST_RESOURCES_MIB_HRDISKSTORAGEACCESS_READWRITE,	"readWrite" },
+    { HOST_RESOURCES_MIB_HRDISKSTORAGEACCESS_READONLY,	"readOnly" },
     { 0, NULL }
 };
 
 stls_table_t const host_resources_mib_enums_hrDiskStorageMedia[] = {
-    { 1, "other" },
-    { 2, "unknown" },
-    { 3, "hardDisk" },
-    { 4, "floppyDisk" },
-    { 5, "opticalDiskROM" },
-    { 6, "opticalDiskWORM" },
-    { 7, "opticalDiskRW" },
-    { 8, "ramDisk" },
+    { HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_OTHER,	"other" },
+    { HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_UNKNOWN,	"unknown" },
+    { HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_HARDDISK,	"hardDisk" },
+    { HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_FLOPPYDISK,	"floppyDisk" },
+    { HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_OPTICALDISKROM,	"opticalDiskROM" },
+    { HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_OPTICALDISKWORM,	"opticalDiskWORM" },
+    { HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_OPTICALDISKRW,	"opticalDiskRW" },
+    { HOST_RESOURCES_MIB_HRDISKSTORAGEMEDIA_RAMDISK,	"ramDisk" },
     { 0, NULL }
 };
 
 stls_table_t const host_resources_mib_enums_hrDiskStorageRemoveble[] = {
-    { 1, "true" },
-    { 2, "false" },
+    { HOST_RESOURCES_MIB_HRDISKSTORAGEREMOVEBLE_TRUE,	"true" },
+    { HOST_RESOURCES_MIB_HRDISKSTORAGEREMOVEBLE_FALSE,	"false" },
     { 0, NULL }
 };
 
 stls_table_t const host_resources_mib_enums_hrFSAccess[] = {
-    { 1, "readWrite" },
-    { 2, "readOnly" },
+    { HOST_RESOURCES_MIB_HRFSACCESS_READWRITE,	"readWrite" },
+    { HOST_RESOURCES_MIB_HRFSACCESS_READONLY,	"readOnly" },
     { 0, NULL }
 };
 
 stls_table_t const host_resources_mib_enums_hrFSBootable[] = {
-    { 1, "true" },
-    { 2, "false" },
+    { HOST_RESOURCES_MIB_HRFSBOOTABLE_TRUE,	"true" },
+    { HOST_RESOURCES_MIB_HRFSBOOTABLE_FALSE,	"false" },
     { 0, NULL }
 };
 
 stls_table_t const host_resources_mib_enums_hrSWRunType[] = {
-    { 1, "unknown" },
-    { 2, "operatingSystem" },
-    { 3, "deviceDriver" },
-    { 4, "application" },
+    { HOST_RESOURCES_MIB_HRSWRUNTYPE_UNKNOWN,	"unknown" },
+    { HOST_RESOURCES_MIB_HRSWRUNTYPE_OPERATINGSYSTEM,	"operatingSystem" },
+    { HOST_RESOURCES_MIB_HRSWRUNTYPE_DEVICEDRIVER,	"deviceDriver" },
+    { HOST_RESOURCES_MIB_HRSWRUNTYPE_APPLICATION,	"application" },
     { 0, NULL }
 };
 
 stls_table_t const host_resources_mib_enums_hrSWRunStatus[] = {
-    { 1, "running" },
-    { 2, "runnable" },
-    { 3, "notRunnable" },
-    { 4, "invalid" },
+    { HOST_RESOURCES_MIB_HRSWRUNSTATUS_RUNNING,	"running" },
+    { HOST_RESOURCES_MIB_HRSWRUNSTATUS_RUNNABLE,	"runnable" },
+    { HOST_RESOURCES_MIB_HRSWRUNSTATUS_NOTRUNNABLE,	"notRunnable" },
+    { HOST_RESOURCES_MIB_HRSWRUNSTATUS_INVALID,	"invalid" },
     { 0, NULL }
 };
 
 stls_table_t const host_resources_mib_enums_hrSWInstalledType[] = {
-    { 1, "unknown" },
-    { 2, "operatingSystem" },
-    { 3, "deviceDriver" },
-    { 4, "application" },
+    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_UNKNOWN,	"unknown" },
+    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_OPERATINGSYSTEM,	"operatingSystem" },
+    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_DEVICEDRIVER,	"deviceDriver" },
+    { HOST_RESOURCES_MIB_HRSWINSTALLEDTYPE_APPLICATION,	"application" },
     { 0, NULL }
 };
 

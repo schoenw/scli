@@ -25,8 +25,18 @@
  * Tables to map enumerations to strings and vice versa.
  */
 
+#define IP_MIB_IPFORWARDING_FORWARDING	1
+#define IP_MIB_IPFORWARDING_NOTFORWARDING	2
+
 extern stls_table_t const ip_mib_enums_ipForwarding[];
+
+#define IP_MIB_IPNETTOMEDIATYPE_OTHER	1
+#define IP_MIB_IPNETTOMEDIATYPE_INVALID	2
+#define IP_MIB_IPNETTOMEDIATYPE_DYNAMIC	3
+#define IP_MIB_IPNETTOMEDIATYPE_STATIC	4
+
 extern stls_table_t const ip_mib_enums_ipNetToMediaType[];
+
 
 /*
  * C type definitions for IP-MIB::ip.

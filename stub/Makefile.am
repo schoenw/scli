@@ -7,6 +7,7 @@ MIBS			= IF-MIB \
 			  TCP-MIB \
 			  SNMPv2-MIB \
 			  HOST-RESOURCES-MIB \
+			  HOST-RESOURCES-TYPES \
 			  ENTITY-MIB \
 			  BRIDGE-MIB \
 			  DISMAN-SCRIPT-MIB \
@@ -27,6 +28,7 @@ STUBS			= if-mib.h if-mib.c \
 			  tcp-mib.h tcp-mib.c \
 			  snmpv2-mib.h snmpv2-mib.c \
 			  host-resources-mib.h host-resources-mib.c \
+			  host-resources-types.h host-resources-types.c \
 			  entity-mib.h entity-mib.c \
 			  bridge-mib.h bridge-mib.c \
 			  disman-script-mib.h disman-script-mib.c \

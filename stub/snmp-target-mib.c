@@ -20,47 +20,47 @@
 #include "snmp-target-mib.h"
 
 stls_table_t const snmp_target_mib_enums_snmpTargetAddrStorageType[] = {
-    { 1, "other" },
-    { 2, "volatile" },
-    { 3, "nonVolatile" },
-    { 4, "permanent" },
-    { 5, "readOnly" },
+    { SNMP_TARGET_MIB_SNMPTARGETADDRSTORAGETYPE_OTHER,	"other" },
+    { SNMP_TARGET_MIB_SNMPTARGETADDRSTORAGETYPE_VOLATILE,	"volatile" },
+    { SNMP_TARGET_MIB_SNMPTARGETADDRSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
+    { SNMP_TARGET_MIB_SNMPTARGETADDRSTORAGETYPE_PERMANENT,	"permanent" },
+    { SNMP_TARGET_MIB_SNMPTARGETADDRSTORAGETYPE_READONLY,	"readOnly" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_target_mib_enums_snmpTargetAddrRowStatus[] = {
-    { 1, "active" },
-    { 2, "notInService" },
-    { 3, "notReady" },
-    { 4, "createAndGo" },
-    { 5, "createAndWait" },
-    { 6, "destroy" },
+    { SNMP_TARGET_MIB_SNMPTARGETADDRROWSTATUS_ACTIVE,	"active" },
+    { SNMP_TARGET_MIB_SNMPTARGETADDRROWSTATUS_NOTINSERVICE,	"notInService" },
+    { SNMP_TARGET_MIB_SNMPTARGETADDRROWSTATUS_NOTREADY,	"notReady" },
+    { SNMP_TARGET_MIB_SNMPTARGETADDRROWSTATUS_CREATEANDGO,	"createAndGo" },
+    { SNMP_TARGET_MIB_SNMPTARGETADDRROWSTATUS_CREATEANDWAIT,	"createAndWait" },
+    { SNMP_TARGET_MIB_SNMPTARGETADDRROWSTATUS_DESTROY,	"destroy" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_target_mib_enums_snmpTargetParamsSecurityLevel[] = {
-    { 1, "noAuthNoPriv" },
-    { 2, "authNoPriv" },
-    { 3, "authPriv" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSSECURITYLEVEL_NOAUTHNOPRIV,	"noAuthNoPriv" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSSECURITYLEVEL_AUTHNOPRIV,	"authNoPriv" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSSECURITYLEVEL_AUTHPRIV,	"authPriv" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_target_mib_enums_snmpTargetParamsStorageType[] = {
-    { 1, "other" },
-    { 2, "volatile" },
-    { 3, "nonVolatile" },
-    { 4, "permanent" },
-    { 5, "readOnly" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSSTORAGETYPE_OTHER,	"other" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSSTORAGETYPE_VOLATILE,	"volatile" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSSTORAGETYPE_PERMANENT,	"permanent" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSSTORAGETYPE_READONLY,	"readOnly" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_target_mib_enums_snmpTargetParamsRowStatus[] = {
-    { 1, "active" },
-    { 2, "notInService" },
-    { 3, "notReady" },
-    { 4, "createAndGo" },
-    { 5, "createAndWait" },
-    { 6, "destroy" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSROWSTATUS_ACTIVE,	"active" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSROWSTATUS_NOTINSERVICE,	"notInService" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSROWSTATUS_NOTREADY,	"notReady" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSROWSTATUS_CREATEANDGO,	"createAndGo" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSROWSTATUS_CREATEANDWAIT,	"createAndWait" },
+    { SNMP_TARGET_MIB_SNMPTARGETPARAMSROWSTATUS_DESTROY,	"destroy" },
     { 0, NULL }
 };
 

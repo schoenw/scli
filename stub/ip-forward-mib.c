@@ -14,67 +14,67 @@
 #include "ip-forward-mib.h"
 
 stls_table_t const ip_forward_mib_enums_ipForwardType[] = {
-    { 1, "other" },
-    { 2, "invalid" },
-    { 3, "local" },
-    { 4, "remote" },
+    { IP_FORWARD_MIB_IPFORWARDTYPE_OTHER,	"other" },
+    { IP_FORWARD_MIB_IPFORWARDTYPE_INVALID,	"invalid" },
+    { IP_FORWARD_MIB_IPFORWARDTYPE_LOCAL,	"local" },
+    { IP_FORWARD_MIB_IPFORWARDTYPE_REMOTE,	"remote" },
     { 0, NULL }
 };
 
 stls_table_t const ip_forward_mib_enums_ipForwardProto[] = {
-    { 1, "other" },
-    { 2, "local" },
-    { 3, "netmgmt" },
-    { 4, "icmp" },
-    { 5, "egp" },
-    { 6, "ggp" },
-    { 7, "hello" },
-    { 8, "rip" },
-    { 9, "is-is" },
-    { 10, "es-is" },
-    { 11, "ciscoIgrp" },
-    { 12, "bbnSpfIgp" },
-    { 13, "ospf" },
-    { 14, "bgp" },
-    { 15, "idpr" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_OTHER,	"other" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_LOCAL,	"local" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_NETMGMT,	"netmgmt" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_ICMP,	"icmp" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_EGP,	"egp" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_GGP,	"ggp" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_HELLO,	"hello" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_RIP,	"rip" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_IS_IS,	"is-is" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_ES_IS,	"es-is" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_CISCOIGRP,	"ciscoIgrp" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_BBNSPFIGP,	"bbnSpfIgp" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_OSPF,	"ospf" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_BGP,	"bgp" },
+    { IP_FORWARD_MIB_IPFORWARDPROTO_IDPR,	"idpr" },
     { 0, NULL }
 };
 
 stls_table_t const ip_forward_mib_enums_ipCidrRouteType[] = {
-    { 1, "other" },
-    { 2, "reject" },
-    { 3, "local" },
-    { 4, "remote" },
+    { IP_FORWARD_MIB_IPCIDRROUTETYPE_OTHER,	"other" },
+    { IP_FORWARD_MIB_IPCIDRROUTETYPE_REJECT,	"reject" },
+    { IP_FORWARD_MIB_IPCIDRROUTETYPE_LOCAL,	"local" },
+    { IP_FORWARD_MIB_IPCIDRROUTETYPE_REMOTE,	"remote" },
     { 0, NULL }
 };
 
 stls_table_t const ip_forward_mib_enums_ipCidrRouteProto[] = {
-    { 1, "other" },
-    { 2, "local" },
-    { 3, "netmgmt" },
-    { 4, "icmp" },
-    { 5, "egp" },
-    { 6, "ggp" },
-    { 7, "hello" },
-    { 8, "rip" },
-    { 9, "isIs" },
-    { 10, "esIs" },
-    { 11, "ciscoIgrp" },
-    { 12, "bbnSpfIgp" },
-    { 13, "ospf" },
-    { 14, "bgp" },
-    { 15, "idpr" },
-    { 16, "ciscoEigrp" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_OTHER,	"other" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_LOCAL,	"local" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_NETMGMT,	"netmgmt" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_ICMP,	"icmp" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_EGP,	"egp" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_GGP,	"ggp" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_HELLO,	"hello" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_RIP,	"rip" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_ISIS,	"isIs" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_ESIS,	"esIs" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_CISCOIGRP,	"ciscoIgrp" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_BBNSPFIGP,	"bbnSpfIgp" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_OSPF,	"ospf" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_BGP,	"bgp" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_IDPR,	"idpr" },
+    { IP_FORWARD_MIB_IPCIDRROUTEPROTO_CISCOEIGRP,	"ciscoEigrp" },
     { 0, NULL }
 };
 
 stls_table_t const ip_forward_mib_enums_ipCidrRouteStatus[] = {
-    { 1, "active" },
-    { 2, "notInService" },
-    { 3, "notReady" },
-    { 4, "createAndGo" },
-    { 5, "createAndWait" },
-    { 6, "destroy" },
+    { IP_FORWARD_MIB_IPCIDRROUTESTATUS_ACTIVE,	"active" },
+    { IP_FORWARD_MIB_IPCIDRROUTESTATUS_NOTINSERVICE,	"notInService" },
+    { IP_FORWARD_MIB_IPCIDRROUTESTATUS_NOTREADY,	"notReady" },
+    { IP_FORWARD_MIB_IPCIDRROUTESTATUS_CREATEANDGO,	"createAndGo" },
+    { IP_FORWARD_MIB_IPCIDRROUTESTATUS_CREATEANDWAIT,	"createAndWait" },
+    { IP_FORWARD_MIB_IPCIDRROUTESTATUS_DESTROY,	"destroy" },
     { 0, NULL }
 };
 

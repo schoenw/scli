@@ -16,65 +16,65 @@
 #include "disman-schedule-mib.h"
 
 stls_table_t const disman_schedule_mib_enums_schedType[] = {
-    { 1, "periodic" },
-    { 2, "calendar" },
-    { 3, "oneshot" },
+    { DISMAN_SCHEDULE_MIB_SCHEDTYPE_PERIODIC,	"periodic" },
+    { DISMAN_SCHEDULE_MIB_SCHEDTYPE_CALENDAR,	"calendar" },
+    { DISMAN_SCHEDULE_MIB_SCHEDTYPE_ONESHOT,	"oneshot" },
     { 0, NULL }
 };
 
 stls_table_t const disman_schedule_mib_enums_schedAdminStatus[] = {
-    { 1, "enabled" },
-    { 2, "disabled" },
+    { DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_ENABLED,	"enabled" },
+    { DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_DISABLED,	"disabled" },
     { 0, NULL }
 };
 
 stls_table_t const disman_schedule_mib_enums_schedOperStatus[] = {
-    { 1, "enabled" },
-    { 2, "disabled" },
-    { 3, "finished" },
+    { DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_ENABLED,	"enabled" },
+    { DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_DISABLED,	"disabled" },
+    { DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_FINISHED,	"finished" },
     { 0, NULL }
 };
 
 stls_table_t const disman_schedule_mib_enums_schedLastFailure[] = {
-    { -1, "noResponse" },
-    { 0, "noError" },
-    { 1, "tooBig" },
-    { 2, "noSuchName" },
-    { 3, "badValue" },
-    { 4, "readOnly" },
-    { 5, "genErr" },
-    { 6, "noAccess" },
-    { 7, "wrongType" },
-    { 8, "wrongLength" },
-    { 9, "wrongEncoding" },
-    { 10, "wrongValue" },
-    { 11, "noCreation" },
-    { 12, "inconsistentValue" },
-    { 13, "resourceUnavailable" },
-    { 14, "commitFailed" },
-    { 15, "undoFailed" },
-    { 16, "authorizationError" },
-    { 17, "notWritable" },
-    { 18, "inconsistentName" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_NORESPONSE,	"noResponse" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_NOERROR,	"noError" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_TOOBIG,	"tooBig" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_NOSUCHNAME,	"noSuchName" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_BADVALUE,	"badValue" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_READONLY,	"readOnly" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_GENERR,	"genErr" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_NOACCESS,	"noAccess" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_WRONGTYPE,	"wrongType" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_WRONGLENGTH,	"wrongLength" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_WRONGENCODING,	"wrongEncoding" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_WRONGVALUE,	"wrongValue" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_NOCREATION,	"noCreation" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_INCONSISTENTVALUE,	"inconsistentValue" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_RESOURCEUNAVAILABLE,	"resourceUnavailable" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_COMMITFAILED,	"commitFailed" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_UNDOFAILED,	"undoFailed" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_AUTHORIZATIONERROR,	"authorizationError" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_NOTWRITABLE,	"notWritable" },
+    { DISMAN_SCHEDULE_MIB_SCHEDLASTFAILURE_INCONSISTENTNAME,	"inconsistentName" },
     { 0, NULL }
 };
 
 stls_table_t const disman_schedule_mib_enums_schedStorageType[] = {
-    { 1, "other" },
-    { 2, "volatile" },
-    { 3, "nonVolatile" },
-    { 4, "permanent" },
-    { 5, "readOnly" },
+    { DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE_OTHER,	"other" },
+    { DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE_VOLATILE,	"volatile" },
+    { DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
+    { DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE_PERMANENT,	"permanent" },
+    { DISMAN_SCHEDULE_MIB_SCHEDSTORAGETYPE_READONLY,	"readOnly" },
     { 0, NULL }
 };
 
 stls_table_t const disman_schedule_mib_enums_schedRowStatus[] = {
-    { 1, "active" },
-    { 2, "notInService" },
-    { 3, "notReady" },
-    { 4, "createAndGo" },
-    { 5, "createAndWait" },
-    { 6, "destroy" },
+    { DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_ACTIVE,	"active" },
+    { DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_NOTINSERVICE,	"notInService" },
+    { DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_NOTREADY,	"notReady" },
+    { DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_CREATEANDGO,	"createAndGo" },
+    { DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_CREATEANDWAIT,	"createAndWait" },
+    { DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS_DESTROY,	"destroy" },
     { 0, NULL }
 };
 

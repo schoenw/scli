@@ -15,45 +15,45 @@
 #include "tunnel-mib.h"
 
 stls_table_t const tunnel_mib_enums_tunnelIfEncapsMethod[] = {
-    { 1, "other" },
-    { 2, "direct" },
-    { 3, "gre" },
-    { 4, "minimal" },
-    { 5, "l2tp" },
-    { 6, "pptp" },
-    { 7, "l2f" },
-    { 8, "udp" },
-    { 9, "atmp" },
+    { TUNNEL_MIB_TUNNELIFENCAPSMETHOD_OTHER,	"other" },
+    { TUNNEL_MIB_TUNNELIFENCAPSMETHOD_DIRECT,	"direct" },
+    { TUNNEL_MIB_TUNNELIFENCAPSMETHOD_GRE,	"gre" },
+    { TUNNEL_MIB_TUNNELIFENCAPSMETHOD_MINIMAL,	"minimal" },
+    { TUNNEL_MIB_TUNNELIFENCAPSMETHOD_L2TP,	"l2tp" },
+    { TUNNEL_MIB_TUNNELIFENCAPSMETHOD_PPTP,	"pptp" },
+    { TUNNEL_MIB_TUNNELIFENCAPSMETHOD_L2F,	"l2f" },
+    { TUNNEL_MIB_TUNNELIFENCAPSMETHOD_UDP,	"udp" },
+    { TUNNEL_MIB_TUNNELIFENCAPSMETHOD_ATMP,	"atmp" },
     { 0, NULL }
 };
 
 stls_table_t const tunnel_mib_enums_tunnelIfSecurity[] = {
-    { 1, "none" },
-    { 2, "ipsec" },
-    { 3, "other" },
+    { TUNNEL_MIB_TUNNELIFSECURITY_NONE,	"none" },
+    { TUNNEL_MIB_TUNNELIFSECURITY_IPSEC,	"ipsec" },
+    { TUNNEL_MIB_TUNNELIFSECURITY_OTHER,	"other" },
     { 0, NULL }
 };
 
 stls_table_t const tunnel_mib_enums_tunnelConfigEncapsMethod[] = {
-    { 1, "other" },
-    { 2, "direct" },
-    { 3, "gre" },
-    { 4, "minimal" },
-    { 5, "l2tp" },
-    { 6, "pptp" },
-    { 7, "l2f" },
-    { 8, "udp" },
-    { 9, "atmp" },
+    { TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_OTHER,	"other" },
+    { TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_DIRECT,	"direct" },
+    { TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_GRE,	"gre" },
+    { TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_MINIMAL,	"minimal" },
+    { TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_L2TP,	"l2tp" },
+    { TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_PPTP,	"pptp" },
+    { TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_L2F,	"l2f" },
+    { TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_UDP,	"udp" },
+    { TUNNEL_MIB_TUNNELCONFIGENCAPSMETHOD_ATMP,	"atmp" },
     { 0, NULL }
 };
 
 stls_table_t const tunnel_mib_enums_tunnelConfigStatus[] = {
-    { 1, "active" },
-    { 2, "notInService" },
-    { 3, "notReady" },
-    { 4, "createAndGo" },
-    { 5, "createAndWait" },
-    { 6, "destroy" },
+    { TUNNEL_MIB_TUNNELCONFIGSTATUS_ACTIVE,	"active" },
+    { TUNNEL_MIB_TUNNELCONFIGSTATUS_NOTINSERVICE,	"notInService" },
+    { TUNNEL_MIB_TUNNELCONFIGSTATUS_NOTREADY,	"notReady" },
+    { TUNNEL_MIB_TUNNELCONFIGSTATUS_CREATEANDGO,	"createAndGo" },
+    { TUNNEL_MIB_TUNNELCONFIGSTATUS_CREATEANDWAIT,	"createAndWait" },
+    { TUNNEL_MIB_TUNNELCONFIGSTATUS_DESTROY,	"destroy" },
     { 0, NULL }
 };
 

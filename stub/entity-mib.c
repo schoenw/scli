@@ -21,23 +21,23 @@
 #include "entity-mib.h"
 
 stls_table_t const entity_mib_enums_entPhysicalClass[] = {
-    { 1, "other" },
-    { 2, "unknown" },
-    { 3, "chassis" },
-    { 4, "backplane" },
-    { 5, "container" },
-    { 6, "powerSupply" },
-    { 7, "fan" },
-    { 8, "sensor" },
-    { 9, "module" },
-    { 10, "port" },
-    { 11, "stack" },
+    { ENTITY_MIB_ENTPHYSICALCLASS_OTHER,	"other" },
+    { ENTITY_MIB_ENTPHYSICALCLASS_UNKNOWN,	"unknown" },
+    { ENTITY_MIB_ENTPHYSICALCLASS_CHASSIS,	"chassis" },
+    { ENTITY_MIB_ENTPHYSICALCLASS_BACKPLANE,	"backplane" },
+    { ENTITY_MIB_ENTPHYSICALCLASS_CONTAINER,	"container" },
+    { ENTITY_MIB_ENTPHYSICALCLASS_POWERSUPPLY,	"powerSupply" },
+    { ENTITY_MIB_ENTPHYSICALCLASS_FAN,	"fan" },
+    { ENTITY_MIB_ENTPHYSICALCLASS_SENSOR,	"sensor" },
+    { ENTITY_MIB_ENTPHYSICALCLASS_MODULE,	"module" },
+    { ENTITY_MIB_ENTPHYSICALCLASS_PORT,	"port" },
+    { ENTITY_MIB_ENTPHYSICALCLASS_STACK,	"stack" },
     { 0, NULL }
 };
 
 stls_table_t const entity_mib_enums_entPhysicalIsFRU[] = {
-    { 1, "true" },
-    { 2, "false" },
+    { ENTITY_MIB_ENTPHYSICALISFRU_TRUE,	"true" },
+    { ENTITY_MIB_ENTPHYSICALISFRU_FALSE,	"false" },
     { 0, NULL }
 };
 
@@ -531,6 +531,7 @@ entity_mib_get_entLPMappingTable(host_snmp *s, entLPMappingEntry_t ***entLPMappi
 
     *entLPMappingEntry = NULL;
 
+    base[11] = 1; stls_vbl_add_null(&in, base, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
@@ -770,6 +771,7 @@ entity_mib_get_entPhysicalContainsTable(host_snmp *s, entPhysicalContainsEntry_t
 
     *entPhysicalContainsEntry = NULL;
 
+    base[11] = 1; stls_vbl_add_null(&in, base, 12);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

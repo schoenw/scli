@@ -24,7 +24,11 @@
  * Tables to map enumerations to strings and vice versa.
  */
 
+#define SNMPV2_MIB_SNMPENABLEAUTHENTRAPS_ENABLED	1
+#define SNMPV2_MIB_SNMPENABLEAUTHENTRAPS_DISABLED	2
+
 extern stls_table_t const snmpv2_mib_enums_snmpEnableAuthenTraps[];
+
 
 /*
  * C type definitions for SNMPv2-MIB::system.

@@ -18,26 +18,26 @@
 #include "tcp-mib.h"
 
 stls_table_t const tcp_mib_enums_tcpRtoAlgorithm[] = {
-    { 1, "other" },
-    { 2, "constant" },
-    { 3, "rsre" },
-    { 4, "vanj" },
+    { TCP_MIB_TCPRTOALGORITHM_OTHER,	"other" },
+    { TCP_MIB_TCPRTOALGORITHM_CONSTANT,	"constant" },
+    { TCP_MIB_TCPRTOALGORITHM_RSRE,	"rsre" },
+    { TCP_MIB_TCPRTOALGORITHM_VANJ,	"vanj" },
     { 0, NULL }
 };
 
 stls_table_t const tcp_mib_enums_tcpConnState[] = {
-    { 1, "closed" },
-    { 2, "listen" },
-    { 3, "synSent" },
-    { 4, "synReceived" },
-    { 5, "established" },
-    { 6, "finWait1" },
-    { 7, "finWait2" },
-    { 8, "closeWait" },
-    { 9, "lastAck" },
-    { 10, "closing" },
-    { 11, "timeWait" },
-    { 12, "deleteTCB" },
+    { TCP_MIB_TCPCONNSTATE_CLOSED,	"closed" },
+    { TCP_MIB_TCPCONNSTATE_LISTEN,	"listen" },
+    { TCP_MIB_TCPCONNSTATE_SYNSENT,	"synSent" },
+    { TCP_MIB_TCPCONNSTATE_SYNRECEIVED,	"synReceived" },
+    { TCP_MIB_TCPCONNSTATE_ESTABLISHED,	"established" },
+    { TCP_MIB_TCPCONNSTATE_FINWAIT1,	"finWait1" },
+    { TCP_MIB_TCPCONNSTATE_FINWAIT2,	"finWait2" },
+    { TCP_MIB_TCPCONNSTATE_CLOSEWAIT,	"closeWait" },
+    { TCP_MIB_TCPCONNSTATE_LASTACK,	"lastAck" },
+    { TCP_MIB_TCPCONNSTATE_CLOSING,	"closing" },
+    { TCP_MIB_TCPCONNSTATE_TIMEWAIT,	"timeWait" },
+    { TCP_MIB_TCPCONNSTATE_DELETETCB,	"deleteTCB" },
     { 0, NULL }
 };
 

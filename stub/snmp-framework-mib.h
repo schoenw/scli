@@ -23,6 +23,13 @@
 #include "stools.h"
 
 /*
+ * Tables to map identities to strings and vice versa.
+ */
+
+#define SNMP_FRAMEWORK_MIB_SNMPAUTHPROTOCOLS	1,3,6,1,6,3,10,1,1
+#define SNMP_FRAMEWORK_MIB_SNMPPRIVPROTOCOLS	1,3,6,1,6,3,10,1,2
+
+/*
  * C type definitions for SNMP-FRAMEWORK-MIB::snmpEngine.
  */
 

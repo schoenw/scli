@@ -19,78 +19,78 @@
 #include "snmp-view-based-acm-mib.h"
 
 stls_table_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStorageType[] = {
-    { 1, "other" },
-    { 2, "volatile" },
-    { 3, "nonVolatile" },
-    { 4, "permanent" },
-    { 5, "readOnly" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTORAGETYPE_OTHER,	"other" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTORAGETYPE_VOLATILE,	"volatile" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTORAGETYPE_PERMANENT,	"permanent" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTORAGETYPE_READONLY,	"readOnly" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_view_based_acm_mib_enums_vacmSecurityToGroupStatus[] = {
-    { 1, "active" },
-    { 2, "notInService" },
-    { 3, "notReady" },
-    { 4, "createAndGo" },
-    { 5, "createAndWait" },
-    { 6, "destroy" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_ACTIVE,	"active" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_NOTINSERVICE,	"notInService" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_NOTREADY,	"notReady" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_CREATEANDGO,	"createAndGo" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_CREATEANDWAIT,	"createAndWait" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMSECURITYTOGROUPSTATUS_DESTROY,	"destroy" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessSecurityLevel[] = {
-    { 1, "noAuthNoPriv" },
-    { 2, "authNoPriv" },
-    { 3, "authPriv" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_NOAUTHNOPRIV,	"noAuthNoPriv" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_AUTHNOPRIV,	"authNoPriv" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSECURITYLEVEL_AUTHPRIV,	"authPriv" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessContextMatch[] = {
-    { 1, "exact" },
-    { 2, "prefix" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSCONTEXTMATCH_EXACT,	"exact" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSCONTEXTMATCH_PREFIX,	"prefix" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessStorageType[] = {
-    { 1, "other" },
-    { 2, "volatile" },
-    { 3, "nonVolatile" },
-    { 4, "permanent" },
-    { 5, "readOnly" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE_OTHER,	"other" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE_VOLATILE,	"volatile" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE_PERMANENT,	"permanent" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTORAGETYPE_READONLY,	"readOnly" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_view_based_acm_mib_enums_vacmAccessStatus[] = {
-    { 1, "active" },
-    { 2, "notInService" },
-    { 3, "notReady" },
-    { 4, "createAndGo" },
-    { 5, "createAndWait" },
-    { 6, "destroy" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_ACTIVE,	"active" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_NOTINSERVICE,	"notInService" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_NOTREADY,	"notReady" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_CREATEANDGO,	"createAndGo" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_CREATEANDWAIT,	"createAndWait" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMACCESSSTATUS_DESTROY,	"destroy" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyType[] = {
-    { 1, "included" },
-    { 2, "excluded" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE_INCLUDED,	"included" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE_EXCLUDED,	"excluded" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStorageType[] = {
-    { 1, "other" },
-    { 2, "volatile" },
-    { 3, "nonVolatile" },
-    { 4, "permanent" },
-    { 5, "readOnly" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE_OTHER,	"other" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE_VOLATILE,	"volatile" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE_PERMANENT,	"permanent" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTORAGETYPE_READONLY,	"readOnly" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_view_based_acm_mib_enums_vacmViewTreeFamilyStatus[] = {
-    { 1, "active" },
-    { 2, "notInService" },
-    { 3, "notReady" },
-    { 4, "createAndGo" },
-    { 5, "createAndWait" },
-    { 6, "destroy" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_ACTIVE,	"active" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_NOTINSERVICE,	"notInService" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_NOTREADY,	"notReady" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_CREATEANDGO,	"createAndGo" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_CREATEANDWAIT,	"createAndWait" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYSTATUS_DESTROY,	"destroy" },
     { 0, NULL }
 };
 
@@ -167,6 +167,7 @@ snmp_view_based_acm_mib_get_vacmContextTable(host_snmp *s, vacmContextEntry_t **
 
     *vacmContextEntry = NULL;
 
+    base[10] = 1; stls_vbl_add_null(&in, base, 11);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */

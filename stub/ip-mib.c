@@ -19,16 +19,16 @@
 #include "ip-mib.h"
 
 stls_table_t const ip_mib_enums_ipForwarding[] = {
-    { 1, "forwarding" },
-    { 2, "notForwarding" },
+    { IP_MIB_IPFORWARDING_FORWARDING,	"forwarding" },
+    { IP_MIB_IPFORWARDING_NOTFORWARDING,	"notForwarding" },
     { 0, NULL }
 };
 
 stls_table_t const ip_mib_enums_ipNetToMediaType[] = {
-    { 1, "other" },
-    { 2, "invalid" },
-    { 3, "dynamic" },
-    { 4, "static" },
+    { IP_MIB_IPNETTOMEDIATYPE_OTHER,	"other" },
+    { IP_MIB_IPNETTOMEDIATYPE_INVALID,	"invalid" },
+    { IP_MIB_IPNETTOMEDIATYPE_DYNAMIC,	"dynamic" },
+    { IP_MIB_IPNETTOMEDIATYPE_STATIC,	"static" },
     { 0, NULL }
 };
 

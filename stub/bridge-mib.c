@@ -10,51 +10,51 @@
 #include "bridge-mib.h"
 
 stls_table_t const bridge_mib_enums_dot1dBaseType[] = {
-    { 1, "unknown" },
-    { 2, "transparent-only" },
-    { 3, "sourceroute-only" },
-    { 4, "srt" },
+    { BRIDGE_MIB_DOT1DBASETYPE_UNKNOWN,	"unknown" },
+    { BRIDGE_MIB_DOT1DBASETYPE_TRANSPARENT_ONLY,	"transparent-only" },
+    { BRIDGE_MIB_DOT1DBASETYPE_SOURCEROUTE_ONLY,	"sourceroute-only" },
+    { BRIDGE_MIB_DOT1DBASETYPE_SRT,	"srt" },
     { 0, NULL }
 };
 
 stls_table_t const bridge_mib_enums_dot1dStpProtocolSpecification[] = {
-    { 1, "unknown" },
-    { 2, "decLb100" },
-    { 3, "ieee8021d" },
+    { BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_UNKNOWN,	"unknown" },
+    { BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_DECLB100,	"decLb100" },
+    { BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_IEEE8021D,	"ieee8021d" },
     { 0, NULL }
 };
 
 stls_table_t const bridge_mib_enums_dot1dStpPortState[] = {
-    { 1, "disabled" },
-    { 2, "blocking" },
-    { 3, "listening" },
-    { 4, "learning" },
-    { 5, "forwarding" },
-    { 6, "broken" },
+    { BRIDGE_MIB_DOT1DSTPPORTSTATE_DISABLED,	"disabled" },
+    { BRIDGE_MIB_DOT1DSTPPORTSTATE_BLOCKING,	"blocking" },
+    { BRIDGE_MIB_DOT1DSTPPORTSTATE_LISTENING,	"listening" },
+    { BRIDGE_MIB_DOT1DSTPPORTSTATE_LEARNING,	"learning" },
+    { BRIDGE_MIB_DOT1DSTPPORTSTATE_FORWARDING,	"forwarding" },
+    { BRIDGE_MIB_DOT1DSTPPORTSTATE_BROKEN,	"broken" },
     { 0, NULL }
 };
 
 stls_table_t const bridge_mib_enums_dot1dStpPortEnable[] = {
-    { 1, "enabled" },
-    { 2, "disabled" },
+    { BRIDGE_MIB_DOT1DSTPPORTENABLE_ENABLED,	"enabled" },
+    { BRIDGE_MIB_DOT1DSTPPORTENABLE_DISABLED,	"disabled" },
     { 0, NULL }
 };
 
 stls_table_t const bridge_mib_enums_dot1dTpFdbStatus[] = {
-    { 1, "other" },
-    { 2, "invalid" },
-    { 3, "learned" },
-    { 4, "self" },
-    { 5, "mgmt" },
+    { BRIDGE_MIB_DOT1DTPFDBSTATUS_OTHER,	"other" },
+    { BRIDGE_MIB_DOT1DTPFDBSTATUS_INVALID,	"invalid" },
+    { BRIDGE_MIB_DOT1DTPFDBSTATUS_LEARNED,	"learned" },
+    { BRIDGE_MIB_DOT1DTPFDBSTATUS_SELF,	"self" },
+    { BRIDGE_MIB_DOT1DTPFDBSTATUS_MGMT,	"mgmt" },
     { 0, NULL }
 };
 
 stls_table_t const bridge_mib_enums_dot1dStaticStatus[] = {
-    { 1, "other" },
-    { 2, "invalid" },
-    { 3, "permanent" },
-    { 4, "deleteOnReset" },
-    { 5, "deleteOnTimeout" },
+    { BRIDGE_MIB_DOT1DSTATICSTATUS_OTHER,	"other" },
+    { BRIDGE_MIB_DOT1DSTATICSTATUS_INVALID,	"invalid" },
+    { BRIDGE_MIB_DOT1DSTATICSTATUS_PERMANENT,	"permanent" },
+    { BRIDGE_MIB_DOT1DSTATICSTATUS_DELETEONRESET,	"deleteOnReset" },
+    { BRIDGE_MIB_DOT1DSTATICSTATUS_DELETEONTIMEOUT,	"deleteOnTimeout" },
     { 0, NULL }
 };
 

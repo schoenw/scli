@@ -24,8 +24,28 @@
  * Tables to map enumerations to strings and vice versa.
  */
 
+#define TCP_MIB_TCPRTOALGORITHM_OTHER	1
+#define TCP_MIB_TCPRTOALGORITHM_CONSTANT	2
+#define TCP_MIB_TCPRTOALGORITHM_RSRE	3
+#define TCP_MIB_TCPRTOALGORITHM_VANJ	4
+
 extern stls_table_t const tcp_mib_enums_tcpRtoAlgorithm[];
+
+#define TCP_MIB_TCPCONNSTATE_CLOSED	1
+#define TCP_MIB_TCPCONNSTATE_LISTEN	2
+#define TCP_MIB_TCPCONNSTATE_SYNSENT	3
+#define TCP_MIB_TCPCONNSTATE_SYNRECEIVED	4
+#define TCP_MIB_TCPCONNSTATE_ESTABLISHED	5
+#define TCP_MIB_TCPCONNSTATE_FINWAIT1	6
+#define TCP_MIB_TCPCONNSTATE_FINWAIT2	7
+#define TCP_MIB_TCPCONNSTATE_CLOSEWAIT	8
+#define TCP_MIB_TCPCONNSTATE_LASTACK	9
+#define TCP_MIB_TCPCONNSTATE_CLOSING	10
+#define TCP_MIB_TCPCONNSTATE_TIMEWAIT	11
+#define TCP_MIB_TCPCONNSTATE_DELETETCB	12
+
 extern stls_table_t const tcp_mib_enums_tcpConnState[];
+
 
 /*
  * C type definitions for TCP-MIB::tcp.

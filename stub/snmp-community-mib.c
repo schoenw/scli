@@ -18,21 +18,21 @@
 #include "snmp-community-mib.h"
 
 stls_table_t const snmp_community_mib_enums_snmpCommunityStorageType[] = {
-    { 1, "other" },
-    { 2, "volatile" },
-    { 3, "nonVolatile" },
-    { 4, "permanent" },
-    { 5, "readOnly" },
+    { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTORAGETYPE_OTHER,	"other" },
+    { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTORAGETYPE_VOLATILE,	"volatile" },
+    { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
+    { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTORAGETYPE_PERMANENT,	"permanent" },
+    { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTORAGETYPE_READONLY,	"readOnly" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_community_mib_enums_snmpCommunityStatus[] = {
-    { 1, "active" },
-    { 2, "notInService" },
-    { 3, "notReady" },
-    { 4, "createAndGo" },
-    { 5, "createAndWait" },
-    { 6, "destroy" },
+    { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_ACTIVE,	"active" },
+    { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_NOTINSERVICE,	"notInService" },
+    { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_NOTREADY,	"notReady" },
+    { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_CREATEANDGO,	"createAndGo" },
+    { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_CREATEANDWAIT,	"createAndWait" },
+    { SNMP_COMMUNITY_MIB_SNMPCOMMUNITYSTATUS_DESTROY,	"destroy" },
     { 0, NULL }
 };
 

@@ -19,21 +19,21 @@
 #include "snmp-user-based-sm-mib.h"
 
 stls_table_t const snmp_user_based_sm_mib_enums_usmUserStorageType[] = {
-    { 1, "other" },
-    { 2, "volatile" },
-    { 3, "nonVolatile" },
-    { 4, "permanent" },
-    { 5, "readOnly" },
+    { SNMP_USER_BASED_SM_MIB_USMUSERSTORAGETYPE_OTHER,	"other" },
+    { SNMP_USER_BASED_SM_MIB_USMUSERSTORAGETYPE_VOLATILE,	"volatile" },
+    { SNMP_USER_BASED_SM_MIB_USMUSERSTORAGETYPE_NONVOLATILE,	"nonVolatile" },
+    { SNMP_USER_BASED_SM_MIB_USMUSERSTORAGETYPE_PERMANENT,	"permanent" },
+    { SNMP_USER_BASED_SM_MIB_USMUSERSTORAGETYPE_READONLY,	"readOnly" },
     { 0, NULL }
 };
 
 stls_table_t const snmp_user_based_sm_mib_enums_usmUserStatus[] = {
-    { 1, "active" },
-    { 2, "notInService" },
-    { 3, "notReady" },
-    { 4, "createAndGo" },
-    { 5, "createAndWait" },
-    { 6, "destroy" },
+    { SNMP_USER_BASED_SM_MIB_USMUSERSTATUS_ACTIVE,	"active" },
+    { SNMP_USER_BASED_SM_MIB_USMUSERSTATUS_NOTINSERVICE,	"notInService" },
+    { SNMP_USER_BASED_SM_MIB_USMUSERSTATUS_NOTREADY,	"notReady" },
+    { SNMP_USER_BASED_SM_MIB_USMUSERSTATUS_CREATEANDGO,	"createAndGo" },
+    { SNMP_USER_BASED_SM_MIB_USMUSERSTATUS_CREATEANDWAIT,	"createAndWait" },
+    { SNMP_USER_BASED_SM_MIB_USMUSERSTATUS_DESTROY,	"destroy" },
     { 0, NULL }
 };
 
