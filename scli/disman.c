@@ -56,6 +56,25 @@ static lang_t const languages[] = {
 
 
 
+static char const *
+get_lang_name(smLangEntry_t *smLangEntry)
+{
+    int l;
+    
+    for (l = 0; languages[l].oidlen; l++) {
+	if (languages[l].oidlen == smLangEntry->_smLangLanguageLength) {
+	    if (memcmp(languages[l].oid, smLangEntry->smLangLanguage,
+		       languages[l].oidlen) == 0) {
+		return languages[l].name;
+	    }
+	}
+    }
+
+    return NULL;
+}
+
+
+
 static void
 fmt_script_admin_status(GString *s, gint32 *status)
 {
@@ -140,13 +159,13 @@ fmt_last_change(GString *s, guchar *data, gsize len)
     int year;
     
     if (! data || (len != 8 && len != 11)) {
-	g_string_sprintfa(s, "--- --  ----- ");
+	g_string_sprintfa(s, "--- -- ----- ");
 	return;
     }
 
     year = (data[0] << 8) + data[1];
 
-    g_string_sprintfa(s, "%3s %2u %4u",
+    g_string_sprintfa(s, "%3s %2u  %4u ",
 		      months[data[2] < 13 ? data[2] : 0], data[3], year);
 }
 
@@ -175,6 +194,26 @@ show_extension(GString *s, smExtsnEntry_t *smExtsnEntry)
 			  (int) smExtsnEntry->_smExtsnRevisionLength,
 			  smExtsnEntry->smExtsnRevision);
     }
+}
+
+
+
+static char const *
+get_script_lang_name(smScriptEntry_t *smScriptEntry,
+		     smLangEntry_t **smLangTable)
+{
+    int i, l;
+
+    if (! smScriptEntry->smScriptLanguage) {
+	return NULL;
+    }
+    
+    for (i = 0; smLangTable[i]; i++) {
+	if (smLangTable[i]->smLangIndex == *smScriptEntry->smScriptLanguage) {
+	    return get_lang_name(smLangTable[i]);
+	}
+    }
+    return NULL;
 }
 
 
@@ -249,33 +288,44 @@ cmd_languages(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_script_details(GString *s, smScriptEntry_t *smScriptEntry)
+show_script_details(GString *s, smScriptEntry_t *smScriptEntry,
+		    char const *language)
 {
     int const width = 20;
     
-    g_string_append(s, "Owner:       ");
-    g_string_sprintfa(s, "%-*.*s", width,
-		      (int) smScriptEntry->_smScriptOwnerLength,
-		      smScriptEntry->smScriptOwner);
-    g_string_append(s, "Name:     ");
-    g_string_sprintfa(s, "%-*.*s\n", width,
-		      (int) smScriptEntry->_smScriptNameLength,
-		      smScriptEntry->smScriptName);
-
     g_string_append(s, "AdminStatus: ");
     fmt_enum(s, width, disman_script_mib_enums_smScriptAdminStatus,
 	     smScriptEntry->smScriptAdminStatus);
-    g_string_append(s, "Language: ");
-    if (smScriptEntry->smScriptLanguage) {
-	g_string_sprintfa(s, "%d (xxx)\n",
-			  *(smScriptEntry->smScriptLanguage));
-    } else {
-	g_string_append(s, "\n");
-    }
+    g_string_append(s, "Owner:    ");
+    g_string_sprintfa(s, "%-*.*s\n", width,
+		      (int) smScriptEntry->_smScriptOwnerLength,
+		      smScriptEntry->smScriptOwner);
 
     g_string_append(s, "OperStatus:  ");
     fmt_enum(s, width, disman_script_mib_enums_smScriptOperStatus,
 	     smScriptEntry->smScriptOperStatus);
+    g_string_append(s, "Name:     ");
+    g_string_sprintfa(s, "%-*.*s\n", width,
+		      (int) smScriptEntry->_smScriptNameLength,
+		      smScriptEntry->smScriptName);
+    
+    g_string_append(s, "RowStatus:   ");
+    fmt_enum(s, width, disman_script_mib_enums_smScriptRowStatus,
+	     smScriptEntry->smScriptRowStatus);
+    g_string_append(s, "Language: ");
+    if (smScriptEntry->smScriptLanguage) {
+	if (language) {
+	    g_string_sprintfa(s, "%s", language);
+	} else {
+	    g_string_sprintfa(s, "%d",
+			      *(smScriptEntry->smScriptLanguage));
+	}
+    }
+    g_string_append(s, "\n");
+    
+    g_string_append(s, "Storage:     ");
+    fmt_enum(s, width, disman_script_mib_enums_smScriptStorageType,
+	     smScriptEntry->smScriptStorageType);
     g_string_append(s, "Change:   ");
 #if 0
     if (smScriptEntry->smScriptLastChange) {
@@ -283,14 +333,6 @@ show_script_details(GString *s, smScriptEntry_t *smScriptEntry)
 			  smScriptEntry->_smScriptLastChangeLength);
     }
 #endif
-    g_string_append(s, "\n");
-    
-    g_string_append(s, "RowStatus:   ");
-    fmt_enum(s, width, disman_script_mib_enums_smScriptRowStatus,
-	     smScriptEntry->smScriptRowStatus);
-    g_string_append(s, "Storage:  ");
-    fmt_enum(s, width, disman_script_mib_enums_smScriptStorageType,
-	     smScriptEntry->smScriptStorageType);
     g_string_append(s, "\n");
     
     if (smScriptEntry->smScriptSource) {
@@ -319,24 +361,30 @@ show_script_details(GString *s, smScriptEntry_t *smScriptEntry)
 static int
 cmd_script_details(scli_interp_t *interp, int argc, char **argv)
 {
+    smLangEntry_t **smLangTable = NULL;
     smScriptEntry_t **smScriptTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable)) {
+    if (disman_script_mib_get_smLangTable(interp->peer, &smLangTable)) {
 	return SCLI_ERROR;
     }
+
+    (void) disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable);
 
     if (smScriptTable) {
 	for (i = 0; smScriptTable[i]; i++) {
 	    if (i) {
 		g_string_append(interp->result, "\n");
 	    }
-	    show_script_details(interp->result, smScriptTable[i]);
+	    show_script_details(interp->result, smScriptTable[i],
+			get_script_lang_name(smScriptTable[i], smLangTable));
 	}
-	disman_script_mib_free_smScriptTable(smScriptTable);
     }
+
+    if (smScriptTable) disman_script_mib_free_smScriptTable(smScriptTable);
+    if (smLangTable) disman_script_mib_free_smLangTable(smLangTable);
 
     return SCLI_OK;
 }
@@ -404,32 +452,6 @@ count_launches(smScriptEntry_t *smScriptEntry, smLaunchEntry_t **smLaunchTable)
 
 
 
-static char const *
-language_name(smScriptEntry_t *smScriptEntry, smLangEntry_t **smLangTable)
-{
-    int i, l;
-
-    if (! smScriptEntry->smScriptLanguage) {
-	return NULL;
-    }
-    
-    for (i = 0; smLangTable[i]; i++) {
-	if (smLangTable[i]->smLangIndex == *smScriptEntry->smScriptLanguage) {
-	    for (l = 0; languages[l].oidlen; l++) {
-		if (languages[l].oidlen
-		    == smLangTable[i]->_smLangLanguageLength) {
-		    if (memcmp(languages[l].oid, smLangTable[i]->smLangLanguage, languages[l].oidlen) == 0) {
-			return languages[i].name;
-		    }
-		}
-	    }
-	}
-    }
-    return NULL;
-}
-
-
-
 static int
 cmd_script_info(scli_interp_t *interp, int argc, char **argv)
 {
@@ -445,10 +467,7 @@ cmd_script_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_ERROR;
     }
 
-    if (disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable)) {
-	return SCLI_ERROR;
-    }
-
+    (void) disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable);
     (void) disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable);
 
     if (smScriptTable) {
@@ -458,16 +477,92 @@ cmd_script_info(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 	g_string_sprintfa(interp->result,
-			  "State  L %-*s %-*s Last Change   Name\n",
+			  "State  L %-*s %-*s Last Change  Name\n",
 			  owner_width, "Owner", lang_width, "Language");
 	for (i = 0; smScriptTable[i]; i++) {
 	    show_script_info(interp->result, smScriptTable[i],
-			     language_name(smScriptTable[i], smLangTable),
+		     get_script_lang_name(smScriptTable[i], smLangTable),
 			     count_launches(smScriptTable[i], smLaunchTable),
 			     owner_width, lang_width);
 	}
-	disman_script_mib_free_smScriptTable(smScriptTable);
     }
+
+    if (smLaunchTable) disman_script_mib_free_smLaunchTable(smLaunchTable);
+    if (smScriptTable) disman_script_mib_free_smScriptTable(smScriptTable);
+    if (smLangTable) disman_script_mib_free_smLangTable(smLangTable);
+
+    return SCLI_OK;
+}
+
+
+
+static void
+show_launch_info(GString *s, smLaunchEntry_t *smLaunchEntry,
+		 int owner_width)
+{
+#if 0
+    fmt_script_admin_status(s, smScriptEntry->smScriptAdminStatus);
+    fmt_script_oper_status(s, smScriptEntry->smScriptOperStatus);
+    fmt_storage_type(s, smScriptEntry->smScriptStorageType);
+    fmt_row_status(s, smScriptEntry->smScriptRowStatus);
+
+    g_string_sprintfa(s, " %3u ", launches);
+#endif
+    
+    g_string_sprintfa(s, "%-*.*s ", owner_width,
+		      (int) smLaunchEntry->_smLaunchOwnerLength,
+		      smLaunchEntry->smLaunchOwner);
+
+#if 0
+    g_string_sprintfa(s, "%-*s ", lang_width, language ? language : "");
+#endif
+
+    fmt_last_change(s, NULL, 0);
+    
+    g_string_sprintfa(s, "%.*s",
+		      (int) smLaunchEntry->_smLaunchNameLength,
+		      smLaunchEntry->smLaunchName);
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
+{
+    smScriptEntry_t **smScriptTable = NULL;
+    smLaunchEntry_t **smLaunchTable = NULL;
+    smRunEntry_t **smRunTable = NULL;
+    int i;
+    int owner_width = 8, lang_width = 8;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable)) {
+	return SCLI_ERROR;
+    }
+
+    (void) disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable);
+    (void) disman_script_mib_get_smRunTable(interp->peer, &smRunTable);
+
+    if (smLaunchTable) {
+	for (i = 0; smLaunchTable[i]; i++) {
+	    if (smLaunchTable[i]->_smLaunchOwnerLength > owner_width) {
+		owner_width = smLaunchTable[i]->_smLaunchOwnerLength;
+	    }
+	}
+	g_string_sprintfa(interp->result,
+			  "State  L %-*s %-*s Last Change  Name\n",
+			  owner_width, "Owner", lang_width, "Language");
+	for (i = 0; smLaunchTable[i]; i++) {
+	    show_launch_info(interp->result, smLaunchTable[i],
+			     owner_width);
+	}
+    }
+
+    if (smRunTable) disman_script_mib_free_smRunTable(smRunTable);
+    if (smScriptTable) disman_script_mib_free_smScriptTable(smScriptTable);
+    if (smLaunchTable) disman_script_mib_free_smLaunchTable(smLaunchTable);
 
     return SCLI_OK;
 }
@@ -489,6 +584,10 @@ scli_init_disman_mode(scli_interp_t *interp)
 	{ "show disman script", "info",
 	  "show script summary information",
 	  cmd_script_info },
+	{ "show disman", "launch", NULL, NULL },
+	{ "show disman launch", "info",
+	  "show script summary information",
+	  cmd_launch_info },
 	{ NULL, NULL, NULL, NULL }
     };
     
