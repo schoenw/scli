@@ -284,15 +284,22 @@ show_ospf_interfaces(GString *s,
 		     if_mib_ifXEntry_t **ifXTable,
 		     ip_mib_ipAddrEntry_t **ipAddrTable)
 {
+    int const indent = 18;
     int j;
     
+    /* This should probably become a table (interface info) and a
+       detailed list command (interface details).
+
+       INTERFACE IP-ADDRESS STATUS TYPE AREA DESCRIPTION */
+
     if (ospfIfEntry->ospfAddressLessIf
 	&& (ospfIfEntry->ospfAddressLessIf > 0)) {
 	
 	if (ifXTable) {
 	    for (j = 0; ifXTable[j]; j++) {
 		if (ifXTable[j]->ifIndex == ospfIfEntry->ospfAddressLessIf) {
-	            g_string_sprintfa(s, "Interface: %.*s\n", 
+	            g_string_sprintfa(s, "%-*s %.*s\n",
+				      indent, "Interface:",
 				      (int) ifXTable[j]->_ifNameLength,
 				      ifXTable[j]->ifName);
 		    break;
@@ -301,7 +308,8 @@ show_ospf_interfaces(GString *s,
 	} else if (ifTable) {
 	    for (j = 0; ifTable[j]; j++) {
 		if (ifTable[j]->ifIndex == ospfIfEntry->ospfAddressLessIf) {
-                    g_string_sprintfa(s, "Interface: %.*s\n", 
+                    g_string_sprintfa(s, "%-*s %.*s\n",
+				      indent, "Interface:",
 				      (int) ifTable[j]->_ifDescrLength,
 				      ifTable[j]->ifDescr);
 		    break;
@@ -314,7 +322,8 @@ show_ospf_interfaces(GString *s,
 		if (ipAddrTable[j]->ipAdEntIfIndex &&
 		    (ospfIfEntry->ospfAddressLessIf == 
 		     *(ipAddrTable[j]->ipAdEntIfIndex))) {
-		    g_string_sprintfa(s, "IP Address: %s\n", 
+		    g_string_sprintfa(s, "%-*s %s\n",
+				      indent, "IP Address:",
 		      fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr,
 				       SCLI_FMT_NAME_OR_ADDR));
 		    break;
@@ -322,34 +331,32 @@ show_ospf_interfaces(GString *s,
 	    }
 	}
     } else if (ospfIfEntry->ospfIfIpAddress) {
-	g_string_sprintfa(s,"IP Address: %s\n", 
+	g_string_sprintfa(s,"%-*s %s\n", indent, "IP Address:",
 			  fmt_ipv4_address(ospfIfEntry->ospfIfIpAddress,
 					   SCLI_FMT_NAME_OR_ADDR));
-    } 
+    }
+
+    if (ospfIfEntry->ospfIfAdminStat) {
+	g_string_sprintfa(s, "%-*s ", indent, "AdminStatus:");
+	fmt_enum(s, 16, ospf_mib_enums_ospfIfAdminStat,
+		 ospfIfEntry->ospfIfAdminStat);
+	g_string_append(s, "\n");
+    }
     
-    g_string_append(s, "AdminStatus: ");
-    fmt_enum(s, 16, ospf_mib_enums_ospfIfAdminStat,
-	     ospfIfEntry->ospfIfAdminStat);
-    g_string_append(s, "\n");
-    
-    g_string_append(s, "IfType: ");
     if (ospfIfEntry->ospfIfType) {
+	g_string_sprintfa(s, "%-*s ", indent, "Type:");
 	fmt_enum(s, 16, ospf_mib_enums_ospfIfType,
 		 ospfIfEntry->ospfIfType);
-    } else {
-	g_string_append(s, "?");
+	g_string_append(s, "\n");
     }
-    g_string_append(s, "\n");
     
-    g_string_append(s, "Area: ");
     if (ospfIfEntry->ospfIfAreaId) {
+	g_string_sprintfa(s, "%-*s ", indent, "Area:");
 	g_string_sprintfa(s,"%s", 
 			  fmt_ipv4_address(ospfIfEntry->ospfIfAreaId,
 					   SCLI_FMT_ADDR));
-    } else {
-	g_string_append(s, "?");
+	g_string_append(s, "\n");
     }
-    g_string_append(s, "\n");
 }
 
 
