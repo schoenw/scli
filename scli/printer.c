@@ -378,13 +378,11 @@ show_printer_alert(GString *s, printer_mib_prtAlertEntry_t *prtAlertEntry)
 	g_string_append(s, "\n");
     }
 
-    if (prtAlertEntry->prtAlertDescription) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
-			  (int) prtAlertEntry->_prtAlertDescriptionLength,
-			  prtAlertEntry->prtAlertDescription);
-    }
+    fmt_display_string(s, indent+1, "Description:",
+		       (int) prtAlertEntry->_prtAlertDescriptionLength,
+		       prtAlertEntry->prtAlertDescription);
 
-    g_string_append(s, "Alert Code:  ");
+    g_string_sprintfa(s, "%-*s ", indent, "Alert Code:  ");
     if (prtAlertEntry->prtAlertGroup) {
 	xxx_enum(s, 1, printer_mib_enums_prtAlertGroup,
 		 prtAlertEntry->prtAlertGroup);
@@ -839,6 +837,7 @@ cmd_printer_console(scli_interp_t * interp, int argc, char **argv)
     }
 
     if (prtConsoleDisplayTable) {
+	g_string_sprintfa(interp->header, "LINE   TEXT");
 	for (i = 0; prtConsoleDisplayTable[i]; i++) {
 	    if (prtConsoleDisplayTable[i]->hrDeviceIndex != last) {
 		if (i > 0) {
@@ -968,12 +967,6 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  NULL, NULL,
 	  cmd_printer_console },
 
-	{ "monitor printer console", NULL,
-	  "printer console information",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  NULL, NULL,
-	  cmd_printer_console },
-
 	{ "show printer lights", NULL,
 	  "printer console light information",
 	  SCLI_CMD_FLAG_NEED_PEER,
@@ -983,6 +976,24 @@ scli_init_printer_mode(scli_interp_t * interp)
 	{ "show printer alerts", NULL,
 	  "printer alert information",
 	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  cmd_printer_alert },
+
+	{ "monitor printer console", NULL,
+	  "printer console information",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  NULL, NULL,
+	  cmd_printer_console },
+
+	{ "monitor printer lights", NULL,
+	  "printer console light information",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  NULL, NULL,
+	  cmd_printer_lights },
+
+	{ "monitor printer alerts", NULL,
+	  "printer alert information",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  NULL, NULL,
 	  cmd_printer_alert },
 
