@@ -29,6 +29,7 @@ static scli_vendor_t iana_vendor_table[] = {
     {   43,	"3Com",			"http://www.3com.com/" },
     {   45,	"SynOptics",		"http://www.synoptics.com/" },
     {   59,	"Silicon Graphics",	"http://www.sgi.com/" },
+    {   81,	"Avaya",		"http://www.avaya.com/" },
     {   82,	"Network Computing Devices",	"http://www.ncd.com/" },
     {  253,	"Xerox",		"http://www.xerox.com/" },
     {  311,	"Microsoft",		"http://www.microsoft.com/" },
