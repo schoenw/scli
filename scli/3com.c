@@ -107,6 +107,8 @@ fmt_3com_bridge_vlan_info(GString *s,
 	g_string_sprintfa(s, "  %*s ", name_width, "");
     }
 
+    g_string_sprintfa(s, "%9d ", vlanEntry->a3ComVlanIfIndex);
+
     fmt_port_set(s, bits, bits_len);
 
     g_string_append(s, "\n");
@@ -121,12 +123,14 @@ create_port_list(guchar *bits, gsize bits_len, int ifIndex,
 {
     int i;
 
+    memset(bits, 0, bits_len);
+
     for (i = 0; ifStackTable[i]; i++) {
 	if (ifStackTable[i]->ifStackHigherLayer == ifIndex) {
 	    int l = ifStackTable[i]->ifStackLowerLayer;
 
-	    // ignore everything which is not a real physical interface
-	    
+	    // xxx ignore everything which is not a real physical interface
+
 	    if (l < bits_len * 8) {
 		bits[l/8] |= (1 <<(7-(l%8)));
 	    }
@@ -180,7 +184,8 @@ show_3com_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SNMP;
     }
 
-    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFTYPE);
+    if_mib_proc_get_ifTable(interp->peer, &ifTable,
+			    IF_MIB_IFTYPE, interp->epoch);
     if (interp->peer->error_status) {
 	if (regex_vlan) regfree(regex_vlan);
 	return SCLI_SNMP;
@@ -188,11 +193,9 @@ show_3com_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
 
     name_width = get_vlan_name_width(vlanTable);
 
-    memset(ports, 0, sizeof(ports));
-
     if (vlanTable) {
 	g_string_sprintfa(interp->header,
-			  "VLAN STATUS %-*s PORTS", name_width, "NAME");
+			  "VLAN STATUS %-*s INTERFACE PORTS", name_width, "NAME");
 	for (i = 0; vlanTable[i]; i++) {
 	    if (! match_vlan(regex_vlan, vlanTable[i])) continue;
 	    create_port_list(ports, sizeof(ports),
@@ -276,6 +279,11 @@ delete_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     if (vlanTable) {
 	for (i = 0; vlanTable[i]; i++) {
 	    if (match_vlan(regex_vlan, vlanTable[i])) {
+		productmib_proc_delete_vlan(interp->peer,
+					    vlanTable[i]->a3ComVlanIfIndex);
+		if (interp->peer->error_status) {
+		    /* xxx report errors here */
+		}
 #if 0
 		rapid_city_proc_delete_vlan(interp->peer,
 					    vlanTable[i]->a3ComVlanIfIndex);
@@ -382,10 +390,11 @@ scli_init_3com_mode(scli_interp_t *interp)
 	  "LAN names to select the virtual LANs of interest. The\n"
 	  "command generates a table with the following columns:\n"
 	  "\n"
-	  "  VLAN   virtual LAN number\n"
-	  "  STATUS status of the virutal LAN (see below)\n"
-	  "  NAME   name of the virutal LAN\n"
-	  "  PORTS  ports assigned to the virtual LAN\n"
+	  "  VLAN     virtual LAN number\n"
+	  "  STATUS   status of the virutal LAN (see below)\n"
+	  "  NAME     name of the virutal LAN\n"
+	  "  INTERFCE virtual LAN interface number\n"
+	  "  PORTS    ports assigned to the virtual LAN\n"
 	  "\n"
 	  "The status is encoded in two characters. The first character\n"
 	  "indicates the status of the row (A=active, S=not in service,\n"
