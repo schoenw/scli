@@ -26,6 +26,7 @@
 #include "host-resources-types.h"
 #include "snmpv2-mib.h"
 #include "if-mib.h"
+#include "entity-mib.h"
 #include "bridge-mib.h"
 #include "disman-script-mib.h"
 
@@ -1057,6 +1058,8 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     host_resources_mib_hrSystem_t *hrSystem = NULL;
     host_resources_mib_hrStorage_t *hrStorage = NULL;
     if_mib_interfaces_t *interfaces = NULL;
+    if_mib_ifMIBObjects_t *ifMibObjects = NULL;
+    entity_mib_entityGeneral_t *entityGeneral = NULL;
     bridge_mib_dot1dBase_t *dot1dBase = NULL;
     disman_script_mib_smLangEntry_t **smLangTable = NULL;
     const char *e;
@@ -1081,6 +1084,8 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     host_resources_mib_get_hrSystem(interp->peer, &hrSystem, 0);
     host_resources_mib_get_hrStorage(interp->peer, &hrStorage, 0);
     if_mib_get_interfaces(interp->peer, &interfaces, 0);
+    if_mib_get_ifMIBObjects(interp->peer, &ifMibObjects, 0);
+    entity_mib_get_entityGeneral(interp->peer, &entityGeneral, 0);
     bridge_mib_get_dot1dBase(interp->peer, &dot1dBase, 0);
     disman_script_mib_get_smLangTable(interp->peer, &smLangTable,
 				      DISMAN_SCRIPT_MIB_SMLANGDESCR);
@@ -1160,6 +1165,21 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	    g_string_sprintfa(s, "%-*s%d\n", indent, "Interfaces:",
 			      *(interfaces->ifNumber));
 	}
+	if (ifMibObjects && system && system->sysUpTime) {
+	    if (ifMibObjects->ifTableLastChange) {
+		guint32 dsecs = *(system->sysUpTime)
+		    - *(ifMibObjects->ifTableLastChange);
+		g_string_sprintfa(s, "%-*s%s\n", indent, "Interface Swap:",
+				  fmt_timeticks(dsecs));
+	    }
+	}
+    }
+
+    if (entityGeneral && system && system->sysUpTime) {
+	guint32 dsecs = *(system->sysUpTime)
+	    - *(entityGeneral->entLastChangeTime);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Entity Swap:",
+			  fmt_timeticks(dsecs));
     }
 
     if (dot1dBase) {
@@ -1188,6 +1208,10 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	host_resources_mib_free_hrStorage(hrStorage);
     if (interfaces)
 	if_mib_free_interfaces(interfaces);
+    if (ifMibObjects)
+	if_mib_free_ifMIBObjects(ifMibObjects);
+    if (entityGeneral)
+	entity_mib_free_entityGeneral(entityGeneral);
     if (dot1dBase)
 	bridge_mib_free_dot1dBase(dot1dBase);
     if (smLangTable)
