@@ -486,6 +486,11 @@ show_nortel_bridge_vlan_details(scli_interp_t *interp, int argc, char **argv)
 	}
     }
 
+    if (scli_interp_dry(interp)) {
+	if (regex_vlan) regfree(regex_vlan);
+	return SCLI_OK;
+    }
+
     rapid_city_get_rcVlanTable(interp->peer, &vlanTable, mask);
     if (interp->peer->error_status) {
 	if (regex_vlan) regfree(regex_vlan);
@@ -572,6 +577,11 @@ show_nortel_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
 	if (regcomp(regex_vlan, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
 	    return SCLI_SYNTAX_REGEXP;
 	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_vlan) regfree(regex_vlan);
+	return SCLI_OK;
     }
 
     rapid_city_get_rcVlanTable(interp->peer, &vlanTable, mask);
@@ -677,6 +687,10 @@ show_nortel_bridge_vlan_ports(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     rapid_city_get_rcVlanPortTable(interp->peer, &vlanPortTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -712,6 +726,11 @@ delete_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     regex_vlan = &_regex_vlan;
     if (regcomp(regex_vlan, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
 	return SCLI_SYNTAX_REGEXP;
+    }
+
+    if (scli_interp_dry(interp)) {
+	regfree(regex_vlan);
+	return SCLI_OK;
     }
 
     rapid_city_get_rcVlanTable(interp->peer, &vlanTable, RAPID_CITY_RCVLANNAME);
@@ -755,6 +774,10 @@ create_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMBER;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     rapid_city_proc_create_vlan(interp->peer, vlanId, argv[2],
 				RAPID_CITY_RCVLANTYPE_BYPORT);
     if (interp->peer->error_status) {
@@ -789,6 +812,11 @@ set_nortel_bridge_vlan_ports(scli_interp_t *interp, int argc, char **argv)
     if (scan_port_set(ports, sizeof(ports), argv[2]) != SCLI_OK) {
 	if (regex_vlan) regfree(regex_vlan);
 	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_vlan) regfree(regex_vlan);
+	return SCLI_OK;
     }
 
     rapid_city_get_rcVlanTable(interp->peer, &vlanTable, RAPID_CITY_RCVLANNAME);
@@ -834,6 +862,10 @@ set_nortel_bridge_vlan_default(scli_interp_t *interp, int argc, char **argv)
 
     if (scan_port_set(ports, sizeof(ports), argv[2]) != SCLI_OK) {
 	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     rapid_city_get_rcVlanTable(interp->peer, &vlanTable, RAPID_CITY_RCVLANNAME);
@@ -889,6 +921,10 @@ dump_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     rapid_city_get_rcVlanTable(interp->peer, &vlanTable, mask);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -935,7 +971,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	{ "create nortel bridge vlan", "<vlanid> <name>",
 	  "The create nortel bridge vlan command is used to create a\n"
 	  "new vlan with the given <vlanid> and <name>.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  create_nortel_bridge_vlan },
 
@@ -943,7 +979,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "The delete nortel bridge vlan command deletes all selected\n"
 	  "vlans. The regular expression <regexp> is matched against the\n"
 	  "vlan names to select the vlans that should be deleted.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  delete_nortel_bridge_vlan },
 
@@ -954,7 +990,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "should be modified. The <ports> argument contains a comma\n"
 	  "separated list of port numbers or port number ranges, e.g.\n"
 	  "1,5,7-8.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_nortel_bridge_vlan_ports },
 
@@ -964,7 +1000,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "against the vlan names to select the vlan. The <ports> argument\n"
 	  "contains a comma separated list of port numbers or port number\n"
 	  "ranges, e.g. 1,5,7-8.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_nortel_bridge_vlan_default },
 
@@ -987,7 +1023,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "The third character indicates the priority of the vlan (H=high,\n"
 	  "N=normal) and the fourth character indicates whether routing\n"
 	  "is enabled (R=routing, N=no routing).",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_nortel_bridge_vlan_info },
 
@@ -996,7 +1032,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "selected vlans in more detail. The optional regular expression\n"
 	  "<regexp> is matched against the vlan names to select the vlans\n"
 	  "of interest.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "nortel bridge vlans", NULL,
 	  show_nortel_bridge_vlan_details },
 
@@ -1016,14 +1052,14 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  "third character indicates whether the port discards tagged frames\n"
 	  "(D=discard, N=none) and the fourth character indicates whether\n"
 	  "the port discards untagged frames (D=discard, N=none).",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_nortel_bridge_vlan_ports },
 
 	{ "dump nortel bridge vlan", NULL,
 	  "The dump nortel bridge vlan command generates a sequence of scli\n"
 	  "commands which can be used to restore the vlan configuration.\n",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  dump_nortel_bridge_vlan },
 	

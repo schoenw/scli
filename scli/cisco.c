@@ -37,7 +37,7 @@ typedef struct {
 
 
 static int 
-stats_sort (const void *arg1, const void *arg2)
+stats_sort(const void *arg1, const void *arg2)
 {
     act_stats_t *p = (act_stats_t *) arg1;
     act_stats_t *q = (act_stats_t *) arg2;
@@ -57,7 +57,7 @@ stats_sort (const void *arg1, const void *arg2)
 
 
 static void
-show_cisco_ip_accounting(GString *s, act_stats_t *statEntry)
+fmt_cisco_ip_accounting(GString *s, act_stats_t *statEntry)
 {
     guint32 total_byts = 0;
     guint32 total_pkts = 0;
@@ -88,9 +88,9 @@ show_cisco_ip_accounting(GString *s, act_stats_t *statEntry)
 
 
 static void
-show_cisco_ip_accounting_current(GString *s,
-				 old_cisco_ip_mib_lipAccountEntry_t *srcActEntry,
-				 old_cisco_ip_mib_lipAccountEntry_t *dstActEntry)
+fmt_cisco_ip_accounting_current(GString *s,
+				old_cisco_ip_mib_lipAccountEntry_t *srcActEntry,
+				old_cisco_ip_mib_lipAccountEntry_t *dstActEntry)
 {
     guint32 total_byts = 0;
     guint32 total_pkts = 0;
@@ -146,7 +146,7 @@ show_cisco_ip_accounting_current(GString *s,
 
 
 static int
-cmd_cisco_ip_accounting_current(scli_interp_t *interp, int argc, char **argv)
+show_cisco_ip_accounting_current(scli_interp_t *interp, int argc, char **argv)
 {
     old_cisco_ip_mib_lipAccountEntry_t **lipAccountTable = NULL;
     int i, j, n;
@@ -156,6 +156,10 @@ cmd_cisco_ip_accounting_current(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     old_cisco_ip_mib_get_lipAccountingTable(interp->peer,
@@ -194,7 +198,7 @@ cmd_cisco_ip_accounting_current(scli_interp_t *interp, int argc, char **argv)
 	qsort((void *) stats, (size_t) n, sizeof(act_stats_t), stats_sort);
 
 	for (i = 0; i < n; i++) {
-	    show_cisco_ip_accounting(interp->result, stats+i);
+	    fmt_cisco_ip_accounting(interp->result, stats+i);
 	}
 	g_free(stats);
     }
@@ -208,7 +212,7 @@ cmd_cisco_ip_accounting_current(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-cmd_cisco_ip_accounting_snapshot(scli_interp_t *interp, int argc, char **argv)
+show_cisco_ip_accounting_snapshot(scli_interp_t *interp, int argc, char **argv)
 {
     old_cisco_ip_mib_lipCkAccountEntry_t **lipCkAccountTable = NULL;
     int i, j;
@@ -217,6 +221,10 @@ cmd_cisco_ip_accounting_snapshot(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     old_cisco_ip_mib_get_lipCkAccountingTable(interp->peer,
@@ -238,7 +246,7 @@ cmd_cisco_ip_accounting_snapshot(scli_interp_t *interp, int argc, char **argv)
 		    break;
 		}
 	    }
-	    show_cisco_ip_accounting_current(interp->result,
+	    fmt_cisco_ip_accounting_current(interp->result,
 	     (old_cisco_ip_mib_lipAccountEntry_t *) lipCkAccountTable[i],
 	     (old_cisco_ip_mib_lipAccountEntry_t *) (lipCkAccountTable[j] ?
 				     lipCkAccountTable[j] : NULL));
@@ -254,8 +262,8 @@ cmd_cisco_ip_accounting_snapshot(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_cisco_ip_accounting_info(GString *s,
-			      old_cisco_ip_mib_lip_t *lip)
+fmt_cisco_ip_accounting_info(GString *s,
+			     old_cisco_ip_mib_lip_t *lip)
 {
     if (lip->actThresh) {
 	g_string_sprintfa(s, "Threshold:    %10d", *lip->actThresh);
@@ -290,7 +298,7 @@ show_cisco_ip_accounting_info(GString *s,
 
 
 static int
-cmd_cisco_ip_accounting_info(scli_interp_t *interp, int argc, char **argv)
+show_cisco_ip_accounting_info(scli_interp_t *interp, int argc, char **argv)
 {
     old_cisco_ip_mib_lip_t *lip;
 
@@ -300,13 +308,17 @@ cmd_cisco_ip_accounting_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     old_cisco_ip_mib_get_lip(interp->peer, &lip, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
 
     if (lip) {
-	show_cisco_ip_accounting_info(interp->result, lip);
+	fmt_cisco_ip_accounting_info(interp->result, lip);
     }
 
     if (lip) old_cisco_ip_mib_free_lip(lip);
@@ -323,40 +335,41 @@ scli_init_cisco_mode(scli_interp_t *interp)
 	
 	{ "show cisco ip accounting info", NULL,
 	  "cisco IP accounting info",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_cisco_ip_accounting_info },
+	  show_cisco_ip_accounting_info },
 
 	{ "show cisco ip accounting current", NULL,
 	  "cisco IP current accounting data",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_cisco_ip_accounting_current },
+	  show_cisco_ip_accounting_current },
 
 	{ "show cisco ip accounting snapshot", NULL,
 	  "cisco IP snapshot accounting data",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_cisco_ip_accounting_snapshot },
+	  show_cisco_ip_accounting_snapshot },
 
 	{ "monitor cisco ip accounting current", NULL,
 	  "cisco IP current accounting data",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_cisco_ip_accounting_current },
+	  show_cisco_ip_accounting_current },
 
 	{ "monitor cisco ip accounting snapshot", NULL,
 	  "cisco IP snapshot accounting data",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  cmd_cisco_ip_accounting_snapshot },
+	  show_cisco_ip_accounting_snapshot },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
     static scli_mode_t cisco_mode = {
 	"cisco",
-	"scli mode to display and configure cisco parameters",
+	"The cisco scli mode is used to display and configure cisco\n"
+	"parameters.",
 	cmds
     };
 
