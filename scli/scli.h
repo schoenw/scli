@@ -100,6 +100,7 @@ typedef struct scli_interp	scli_interp_t;
 typedef struct scli_mode	scli_mode_t;
 typedef struct scli_cmd		scli_cmd_t;
 typedef struct scli_alias	scli_alias_t;
+typedef struct scli_alarm	scli_alarm_t;
 
 
 #define SCLI_CMD_FLAG_NEED_PEER	0x01
@@ -132,6 +133,39 @@ struct scli_alias {
     char *value;		/* value of the command alias */
 };
 
+/*
+ * The following severity values are aligned with ITU M.3100
+ * and X.733 and the IETF DISMAN Alarm MIB.
+ */
+
+#define SCLI_ALARM_SEVERITY_CLEARED		0x01
+#define SCLI_ALARM_SEVERITY_INDETERMINATE	0x02
+#define SCLI_ALARM_SEVERITY_CRITICAL		0x03
+#define SCLI_ALARM_SEVERITY_MAJOR		0x04
+#define SCLI_ALARM_SEVERITY_MINOR		0x05
+#define SCLI_ALARM_SEVERITY_WARNING		0x06
+
+/*
+ * The following trend indication values are aligned with
+ * ITU M.3100 and X.733 and the IETF DISMAN Alarm MIB.
+ */
+
+#define SCLI_ALARM_TREN_MORESEVERE	0x01
+#define SCLI_ALARM_TREN_NOCHANGE	0x02
+#define SCLI_ALARM_TREN_LESSSEVERE	0x03
+
+struct scli_alarm {
+    time_t	detected;	/* detection time of the alarm */
+    time_t	verified;	/* last verification of the alarm */
+    time_t	cleared;	/* clear time of the alarm */
+    gchar	*desc;		/* description of the alarm */
+    int		state;		/* state of the alarm */
+    int		severity;	/* perceived severity of the alarm */
+    int		trend;		/* trend indication */
+    gpointer	detector;	/* identification of the detector */
+    gpointer	resource;	/* identification of the resource */
+};
+
 
 #define SCLI_INTERP_FLAG_INTERACTIVE	0x01
 #define SCLI_INTERP_FLAG_RECURSIVE	0x02
@@ -144,6 +178,7 @@ struct scli_interp {
     GNode *cmd_root;		/* root of the command tree */
     GSList *mode_list;		/* list of registered modes */
     GSList *alias_list;		/* list of command aliases */
+    GSList *alarm_list;		/* list of detected alarms */
     int	flags;			/* interpreter flags */
     GString *result;		/* string result buffer */
     GString *header;		/* header line to display */
@@ -175,6 +210,12 @@ scli_interp_reset(scli_interp_t *interp);
 	(interp->flags & SCLI_INTERP_FLAG_MONITOR)
 #define scli_interp_dry(interp) \
 	(interp->flags & SCLI_INTERP_FLAG_DRY)
+
+extern scli_alarm_t *
+scli_alarm_create(scli_interp_t *interp, char *desc);
+
+extern void
+scli_alarm_delete(scli_interp_t *interp, scli_alarm_t *alarm);
 
 extern int
 scli_split(char *string, int *argc, char ***argv);

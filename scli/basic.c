@@ -296,6 +296,34 @@ scli_register_mode(scli_interp_t *interp, scli_mode_t *mode)
 
 
 
+scli_alarm_t*
+scli_alarm_create(scli_interp_t *interp, char *desc)
+{
+    scli_alarm_t *alarm;
+
+    alarm = g_malloc0(sizeof(scli_alarm_t));
+    alarm->detected = time(NULL);
+    alarm->verified = alarm->detected;
+    if (desc) alarm->desc = g_strdup(desc);
+
+    interp->alarm_list = g_slist_append(interp->alarm_list, alarm);
+
+    return alarm;
+}
+
+
+
+void
+scli_alarm_delete(scli_interp_t *interp, scli_alarm_t *alarm)
+{
+    g_slist_remove(interp->alias_list, alarm);
+    
+    if (alarm->desc) g_free(alarm->desc);
+    g_free(alarm);
+}
+
+
+
 static char *
 next_token(char *string, char *out)
 {
