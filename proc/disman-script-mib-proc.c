@@ -25,7 +25,7 @@
 #include "disman-script-mib-proc.h"
 
 void
-disman_script_mib_proc_create_script(GSnmpSession *s,
+disman_script_mib_proc_create_script(GNetSnmp *s,
 				     guchar *owner,
 				     guchar *name,
 				     guchar *descr)
@@ -55,7 +55,7 @@ disman_script_mib_proc_create_script(GSnmpSession *s,
  */
 
 void
-disman_script_mib_proc_create_run(GSnmpSession *s,
+disman_script_mib_proc_create_run(GNetSnmp *s,
 				  guchar *lowner,
 				  guchar *lname,
 				  guchar *args)

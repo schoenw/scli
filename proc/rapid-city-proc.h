@@ -26,16 +26,16 @@
 #include "rapid-city.h"
 
 extern void
-rapid_city_proc_create_vlan(GSnmpSession *s, gint32 vlanid,
+rapid_city_proc_create_vlan(GNetSnmp *s, gint32 vlanid,
 			    guchar *name, gsize name_len, guint32 type);
 extern void
-rapid_city_proc_delete_vlan(GSnmpSession *s, gint32 vlanid);
+rapid_city_proc_delete_vlan(GNetSnmp *s, gint32 vlanid);
 
 extern void
-rapid_city_proc_set_vlan_port_default(GSnmpSession *s, gint32 port,
+rapid_city_proc_set_vlan_port_default(GNetSnmp *s, gint32 port,
 				      gint32 vlanid);
 extern void
-rapid_city_proc_set_vlan_port_member(GSnmpSession *s, gint32 vlanid,
+rapid_city_proc_set_vlan_port_member(GNetSnmp *s, gint32 vlanid,
 				     guchar *ports);
     
 #endif /* _RAPID_CITY_PROC_H_ */

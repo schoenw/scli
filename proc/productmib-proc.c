@@ -25,7 +25,7 @@
 #include "productmib-proc.h"
 
 void
-productmib_proc_create_vlan(GSnmpSession *s, gint32 vlanId,
+productmib_proc_create_vlan(GNetSnmp *s, gint32 vlanId,
 			    guchar *name, gsize name_len, guint32 type)
 {
     productmib_a3ComVirtualGroup_t *vg = NULL;
@@ -54,7 +54,7 @@ productmib_proc_create_vlan(GSnmpSession *s, gint32 vlanId,
 
 
 void
-productmib_proc_delete_vlan(GSnmpSession *s, gint32 ifIndex)
+productmib_proc_delete_vlan(GNetSnmp *s, gint32 ifIndex)
 {
     productmib_a3ComVlanIfEntry_t *vlanEntry;
     gint32 destroy = PRODUCTMIB_ROWSTATUS_DESTROY;
@@ -70,7 +70,7 @@ productmib_proc_delete_vlan(GSnmpSession *s, gint32 ifIndex)
 
 
 void
-productmib_proc_set_vlan_port_member(GSnmpSession *s,
+productmib_proc_set_vlan_port_member(GNetSnmp *s,
 				     gint32 ifIndex,
 				     guchar *bits,
 				     gsize bits_len)

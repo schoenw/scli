@@ -35,7 +35,7 @@ struct state {
 };
 
 extern void
-udp_mib_proc_get_stats(GSnmpSession *s,
+udp_mib_proc_get_stats(GNetSnmp *s,
 		       udp_mib_proc_stats_t **udpStatsEntry)
 {
     udp_mib_udp_t *udp;
@@ -59,8 +59,8 @@ udp_mib_proc_get_stats(GSnmpSession *s,
 
     if (udp && state.udp && state.last_poll_time.tv_sec && state.last_poll_time.tv_usec) {
 	if (state.udp->udpInDatagrams && udp->udpInDatagrams) {
-	    (*udpStatsEntry)->inDatagrams = (*udp->udpInDatagrams - *state.udp->udpInDatagrams);
-	    g_printerr("** old: %u new: %u delta: %u\n", *state.udp->udpInDatagrams, *udp->udpInDatagrams, (*udpStatsEntry)->inDatagrams);
+	    (*udpStatsEntry)->udpInDatagrams = (*udp->udpInDatagrams - *state.udp->udpInDatagrams);
+	    g_printerr("** old: %u new: %u delta: %u\n", *state.udp->udpInDatagrams, *udp->udpInDatagrams, (*udpStatsEntry)->udpInDatagrams);
 	}
     }
 

@@ -25,7 +25,7 @@
 #include "rapid-city-proc.h"
 
 void
-rapid_city_proc_create_vlan(GSnmpSession *s,
+rapid_city_proc_create_vlan(GNetSnmp *s,
 			    gint32 vlanid,
 			    guchar *name,
 			    gsize name_len,
@@ -52,7 +52,7 @@ rapid_city_proc_create_vlan(GSnmpSession *s,
 
 
 void
-rapid_city_proc_delete_vlan(GSnmpSession *s, gint32 vlanid)
+rapid_city_proc_delete_vlan(GNetSnmp *s, gint32 vlanid)
 {
     rapid_city_rcVlanEntry_t *vlanEntry;
     gint32 destroy = SNMPV2_TC_ROWSTATUS_DESTROY;
@@ -69,7 +69,7 @@ rapid_city_proc_delete_vlan(GSnmpSession *s, gint32 vlanid)
 
 
 void
-rapid_city_proc_set_vlan_port_default(GSnmpSession *s,
+rapid_city_proc_set_vlan_port_default(GNetSnmp *s,
 				      gint32 port,
 				      gint32 vlanid)
 {
@@ -87,7 +87,7 @@ rapid_city_proc_set_vlan_port_default(GSnmpSession *s,
 
 
 void
-rapid_city_proc_set_vlan_port_member(GSnmpSession *s,
+rapid_city_proc_set_vlan_port_member(GNetSnmp *s,
 				     gint32 vlanid,
 				     guchar *ports)
 {

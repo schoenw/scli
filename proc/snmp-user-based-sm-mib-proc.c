@@ -25,7 +25,7 @@
 #include "snmp-user-based-sm-mib-proc.h"
 
 void
-snmp_user_based_sm_mib_proc_clone_user(GSnmpSession *s,
+snmp_user_based_sm_mib_proc_clone_user(GNetSnmp *s,
 				       guchar *user, size_t user_len,
 				       guchar *dolly, size_t dolly_len)
 {
@@ -67,7 +67,7 @@ snmp_user_based_sm_mib_proc_clone_user(GSnmpSession *s,
 }
 
 void
-snmp_user_based_sm_mib_proc_delete_user(GSnmpSession *s,
+snmp_user_based_sm_mib_proc_delete_user(GNetSnmp *s,
 					guchar *name, gsize name_len,
 					guchar *group, gsize group_len,
 					gint32 model)

@@ -25,7 +25,7 @@
 #include "snmp-view-based-acm-mib-proc.h"
 
 void
-snmp_view_based_acm_mib_proc_create_member(GSnmpSession *s,
+snmp_view_based_acm_mib_proc_create_member(GNetSnmp *s,
 					   guchar *name,
 					   guchar *group,
 					   gint32 model)
@@ -50,7 +50,7 @@ snmp_view_based_acm_mib_proc_create_member(GSnmpSession *s,
 }
 
 void
-snmp_view_based_acm_mib_proc_delete_member(GSnmpSession *s,
+snmp_view_based_acm_mib_proc_delete_member(GNetSnmp *s,
 					   guchar *name, gsize name_len,
 					   guchar *group, gsize group_len,
 					   gint32 model)
@@ -76,7 +76,7 @@ snmp_view_based_acm_mib_proc_delete_member(GSnmpSession *s,
 
 #if 0
 void
-disman_script_mib_proc_create_script(GSnmpSession *s,
+disman_script_mib_proc_create_script(GNetSnmp *s,
 				     guchar *owner,
 				     guchar *name,
 				     guchar *descr)

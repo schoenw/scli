@@ -33,14 +33,21 @@
  */
 
 typedef struct {
-    guint32 inDatagrams;
-    guint32 outDatagrams;
-    guint32 inDiscards;
+    guint32 udpInDatagrams;
+    guint32 udpOutDatagrams;
+    guint32 udpInDiscards;
+    guint32 _udpInDatagrams;
+    guint32 _udpNoPorts;
+    guint32 _udpInErrors;
+    guint32 _udpOutDatagrams;
+    guint32 _sysUpTime;
+    /* handle to detect invalidated sessions ? */
+    /* handle to detect discontinuities ? */
 } udp_mib_proc_stats_t;
 
 
 extern void
-udp_mib_proc_get_stats(GSnmpSession *s,
+udp_mib_proc_get_stats(GNetSnmp *s,
 		       udp_mib_proc_stats_t **udpStatsEntry);
 
 

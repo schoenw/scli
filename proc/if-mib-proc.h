@@ -33,7 +33,7 @@
  */
 
 extern void
-if_mib_proc_get_ifTable(GSnmpSession *s,
+if_mib_proc_get_ifTable(GNetSnmp *s,
 			if_mib_ifEntry_t ***ifEntry,
 			gint mask,
 			time_t epoch);

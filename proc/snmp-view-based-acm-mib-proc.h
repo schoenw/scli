@@ -26,13 +26,13 @@
 #include "snmp-view-based-acm-mib.h"
 
 extern void
-snmp_view_based_acm_mib_proc_create_member(GSnmpSession *s,
+snmp_view_based_acm_mib_proc_create_member(GNetSnmp *s,
 					   guchar *name,
 					   guchar *group,
 					   gint32 model);
 
 extern void
-snmp_view_based_acm_mib_proc_delete_member(GSnmpSession *s,
+snmp_view_based_acm_mib_proc_delete_member(GNetSnmp *s,
 					   guchar *name, gsize name_len,
 					   guchar *group, gsize group_len,
 					   gint32 model);

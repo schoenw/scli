@@ -26,13 +26,13 @@
 #include "productmib.h"
 
 extern void
-productmib_proc_create_vlan(GSnmpSession *s, gint32 vlanid,
+productmib_proc_create_vlan(GNetSnmp *s, gint32 vlanid,
 			    guchar *name, gsize name_len, guint32 type);
 extern void
-productmib_proc_delete_vlan(GSnmpSession *s, gint32 ifIndex);
+productmib_proc_delete_vlan(GNetSnmp *s, gint32 ifIndex);
 
 extern void
-productmib_proc_set_vlan_port_member(GSnmpSession *s, gint32 ifIndex,
+productmib_proc_set_vlan_port_member(GNetSnmp *s, gint32 ifIndex,
 				     guchar *ports, gsize ports_len);
     
 #endif /* _PRODUCTMIB_PROC_H_ */
