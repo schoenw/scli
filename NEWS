@@ -1,3 +1,13 @@
+Changes in stools 0.1.14:
+
+- scli supports a new "show ip mapping" command
+- scli supports a new bridge mode (info, ports, forwarding, filter)
+- stop supports a new disman mode
+- scli supports a new "show interface info" command
+- scli supports a new "show disman script info" command
+- renamed "show interface tunnel" to "show ip tunnel"
+- minor bug fixes
+
 Changes in stools 0.1.13:
 
 - scli supports a new "show interface tunnel" command
