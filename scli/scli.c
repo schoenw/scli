@@ -419,7 +419,7 @@ main(int argc, char **argv)
      */
 
     if (! g_snmp_init(FALSE)) {
-	g_error("scli: Initialization of SNMP library failed");
+	g_error("scli: initialization of SNMP library failed");
         exit(1);
     }
 
