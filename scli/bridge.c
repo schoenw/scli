@@ -295,16 +295,16 @@ scli_init_bridge_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 	{ "show", "bridge", 0, NULL, NULL },
 	{ "show bridge", "info", SCLI_CMD_FLAG_NEED_PEER,
-	  "show bridge information",
+	  "bridge summary information",
 	  cmd_bridge_info },
 	{ "show bridge", "ports", SCLI_CMD_FLAG_NEED_PEER,
-	  "show bridge ports",
+	  "bridge ports",
 	  cmd_bridge_ports },
 	{ "show bridge", "forwarding", SCLI_CMD_FLAG_NEED_PEER,
-	  "show bridge forwarding data base",
+	  "bridge forwarding data base",
 	  cmd_bridge_forwarding },
 	{ "show bridge", "filter", SCLI_CMD_FLAG_NEED_PEER,
-	  "show bridge filtering data base",
+	  "bridge filtering data base",
 	  cmd_bridge_filter },
 	{ NULL, NULL, 0, NULL, NULL }
     };

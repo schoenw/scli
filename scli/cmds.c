@@ -39,30 +39,36 @@ scli_cmd_exit(scli_interp_t *interp, int argc, char **argv)
 
 
 
-static gboolean
-print_cmd(GNode *node, gpointer data)
+static void
+print_cmd_tree(GString *s, GNode *node, char *prefix)
 {
     scli_cmd_t *cmd = (scli_cmd_t *) node->data;
-    int i, depth, len;
-    GString *s = (GString *) data;
+    int len;
 
+    len = strlen(prefix);
+    
     if (cmd) {
-	depth = g_node_depth(node);
-	for (i = 2, len = 0; i < depth; i++, len += 2) {
-	    if (i == 2) {
-		g_string_append(s, "  ");
-	    } else {
-		g_string_append(s, "| ");
-	    }
-	}
-	if (depth > 2) {
-	    g_string_append(s, "+-");
-	    len += 2;
-	}
+	g_string_sprintfa(s, "%s- ", prefix);
 	g_string_sprintfa(s, "%-*s %s\n", (20-len > 0) ? 20-len : 0,
 			  cmd->name, cmd->desc ? cmd->desc : "");
     }
-    return FALSE;
+
+    for (node = g_node_first_child(node);
+	 node; node = g_node_next_sibling(node)) {
+	char *new_prefix;
+	new_prefix = g_malloc(len + 3);
+	strcpy(new_prefix, prefix);
+	if (new_prefix[len-1] == '`') {
+	    new_prefix[len-1] = ' ';
+	}
+	if (g_node_next_sibling(node)) {
+	    strcat(new_prefix, len ? "  |" : " ");
+	} else {
+	    strcat(new_prefix, len ? "  `" : " ");
+	}
+	print_cmd_tree(s, node, new_prefix);
+	g_free(new_prefix);
+    }
 }
 
 
@@ -85,8 +91,7 @@ scli_cmd_help(scli_interp_t *interp, int argc, char **argv)
     }
     g_string_append(s, "\nList of scli commands:\n");
     if (interp->cmd_root) {
-	g_node_traverse(interp->cmd_root, G_PRE_ORDER, G_TRAVERSE_ALL,
-			G_MAXINT, print_cmd, s);
+	print_cmd_tree(s, interp->cmd_root, "");
 	g_string_append(s, "\n");
     }
 

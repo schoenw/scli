@@ -105,7 +105,7 @@ scli_init_tcp_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 	{ "show", "tcp", 0, NULL, NULL },
 	{ "show tcp", "connections", SCLI_CMD_FLAG_NEED_PEER,
-	  "show existing tcp connections",
+	  "existing tcp connections",
 	  cmd_tcp_connections },
 	{ NULL, NULL, 0, NULL, NULL }
     };

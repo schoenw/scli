@@ -569,25 +569,104 @@ cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
+{
+#if 0
+    smScriptEntry_t **smScriptTable = NULL;
+    smLaunchEntry_t **smLaunchTable = NULL;
+    smRunEntry_t **smRunTable = NULL;
+    int i;
+    int owner_width = 8, lang_width = 8;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable)) {
+	return SCLI_ERROR;
+    }
+
+    (void) disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable);
+    (void) disman_script_mib_get_smRunTable(interp->peer, &smRunTable);
+
+    if (smLaunchTable) {
+	for (i = 0; smLaunchTable[i]; i++) {
+	    if (smLaunchTable[i]->_smLaunchOwnerLength > owner_width) {
+		owner_width = smLaunchTable[i]->_smLaunchOwnerLength;
+	    }
+	}
+	g_string_sprintfa(interp->result,
+			  "State  L %-*s %-*s Last Change  Name\n",
+			  owner_width, "Owner", lang_width, "Language");
+	for (i = 0; smLaunchTable[i]; i++) {
+	    show_launch_info(interp->result, smLaunchTable[i],
+			     owner_width);
+	}
+    }
+
+    if (smRunTable) disman_script_mib_free_smRunTable(smRunTable);
+    if (smScriptTable) disman_script_mib_free_smScriptTable(smScriptTable);
+    if (smLaunchTable) disman_script_mib_free_smLaunchTable(smLaunchTable);
+#endif
+    return SCLI_OK;
+}
+
+
+
+static int
+cmd_run_info(scli_interp_t *interp, int argc, char **argv)
+{
+    smRunEntry_t **smRunTable = NULL;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (disman_script_mib_get_smRunTable(interp->peer, &smRunTable)) {
+	return SCLI_ERROR;
+    }
+
+    if (smRunTable) disman_script_mib_free_smRunTable(smRunTable);
+	
+    return SCLI_OK;
+}
+
+
+
+static int
+cmd_run_details(scli_interp_t *interp, int argc, char **argv)
+{
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_disman_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 	{ "show", "disman", 0, NULL, NULL },
 	{ "show disman", "languages", SCLI_CMD_FLAG_NEED_PEER,
-	  "show languages supported by the distributed manager",
+	  "languages supported by the distributed manager",
 	  cmd_languages },
 	{ "show disman", "script", 0, NULL, NULL },
-	{ "show disman script", "details", SCLI_CMD_FLAG_NEED_PEER,
-	  "show scripts installed at the distributed manager",
-	  cmd_script_details },
 	{ "show disman script", "info", SCLI_CMD_FLAG_NEED_PEER,
-	  "show script summary information",
+	  "script summary information",
 	  cmd_script_info },
+	{ "show disman script", "details", SCLI_CMD_FLAG_NEED_PEER,
+	  "scripts installed at the distributed manager",
+	  cmd_script_details },
 	{ "show disman", "launch", 0, NULL, NULL },
 	{ "show disman launch", "info", SCLI_CMD_FLAG_NEED_PEER,
-	  "show script summary information",
+	  "launch summary information",
 	  cmd_launch_info },
+	{ "show disman launch", "details", SCLI_CMD_FLAG_NEED_PEER,
+	  "launch buttons installed on the distributed manager",
+	  cmd_launch_details },
+	{ "show disman", "runs", 0, NULL, NULL },
+	{ "show disman runs", "info", SCLI_CMD_FLAG_NEED_PEER,
+	  "summary information about running scripts",
+	  cmd_run_info },
+	{ "show disman run", "details", SCLI_CMD_FLAG_NEED_PEER,
+	  "running scripts on the distributed manager",
+	  cmd_run_details },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     

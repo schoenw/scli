@@ -52,7 +52,7 @@ mainloop(scli_interp_t *interp, int delay)
     char *input, *expansion, *prompt;
     int result, code = SCLI_OK;
 
-    g_assert(interp);
+    g_return_if_fail(interp);
 
     while (code != SCLI_EXIT) {
 	current_interp = interp;
