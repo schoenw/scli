@@ -117,6 +117,9 @@ scli_close(scli_interp_t *interp);
 extern char*
 scli_prompt(scli_interp_t *interp);
 
+extern void
+scli_get_screen(int *rows, int *cols);
+
 /*
  * Core scli commands:
  */
@@ -137,7 +140,10 @@ extern int
 scli_cmd_close(scli_interp_t *interp, int argc, char **argv);
 
 extern int
-scli_cmd_show(scli_interp_t *interp, int argc, char **argv);
+scli_cmd_show_peer(scli_interp_t *interp, int argc, char **argv);
+
+extern int
+scli_cmd_show_term(scli_interp_t *interp, int argc, char **argv);
 
 /*
  * Initialization functions for the various scli modes.

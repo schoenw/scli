@@ -440,7 +440,7 @@ scli_init_snmp_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 	{ "show snmp engine",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "information about the snmp engine",
+	  "information about the SNMP engine",
 	  cmd_snmp_engine },
 	{ "show snmp resources",
 	  SCLI_CMD_FLAG_NEED_PEER,

@@ -39,8 +39,8 @@ char const scli_copyright[] = "(c) 2001 Juergen Schoenwaelder";
 
 
 
-static int
-get_lines()
+void
+scli_get_screen(int *lines, int *columns)
 {
 #ifdef HAVE_RESIZETERM
     struct winsize size;
@@ -51,11 +51,14 @@ get_lines()
 	}
     } while (errno == EINTR);
 
-    return size.ws_row;
+    *lines = size.ws_row;
+    *columns = size.ws_col;
+    return;
 #endif
 
  failure:
-    return 24;	/* best guess */
+    *lines = 24;	/* best guess */
+    *columns = 80;	/* best guess */
 }
 
 
@@ -66,7 +69,7 @@ page(scli_interp_t *interp, GString *s)
     char *file_name;
     char cmd[1024];
     FILE *f = NULL;
-    int i, cnt;
+    int i, cnt, cols, rows;
 
     if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
 	if (g_snmp_list_decode_hook) {
@@ -89,7 +92,8 @@ page(scli_interp_t *interp, GString *s)
 	}
     }
 
-    if (cnt < get_lines()) {
+    scli_get_screen(&rows, &cols);
+    if (cnt < rows) {
 	goto nopager;
     }
 

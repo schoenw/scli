@@ -258,10 +258,14 @@ main(int argc, char **argv)
 	  0,
 	  "open an association to a remote SNMP agent",
 	  scli_cmd_open },
-	{ "show scli",
+	{ "show scli association",
 	  0,
-	  "scli internal information",
-	  scli_cmd_show },
+	  "scli information about the current scli association",
+	  scli_cmd_show_peer },
+	{ "show scli term",
+	  0,
+	  "scli information about the terminal parameters",
+	  scli_cmd_show_term },
 	{ NULL, 0, NULL, NULL }
     };
 

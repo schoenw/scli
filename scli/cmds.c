@@ -153,16 +153,11 @@ scli_cmd_close(scli_interp_t *interp, int argc, char **argv)
 
 
 int
-scli_cmd_show(scli_interp_t *interp, int argc, char **argv)
+scli_cmd_show_peer(scli_interp_t *interp, int argc, char **argv)
 {
     int const indent = 18;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
-
-    if (interp->pager) {
-	g_string_sprintfa(interp->result, "%-*s %s \n", indent,
-			  "Pager:", interp->pager);
-    }
 
     if (interp->peer) {
 	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
@@ -177,6 +172,32 @@ scli_cmd_show(scli_interp_t *interp, int argc, char **argv)
 			  "Community:", interp->peer->rcomm);
 	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
 			  "Version:", interp->peer->version);
+    }
+
+    return SCLI_OK;
+}
+
+
+
+int
+scli_cmd_show_term(scli_interp_t *interp, int argc, char **argv)
+{
+    int const indent = 18;
+    int rows, cols;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    /* show terminal type ? */
+
+    scli_get_screen(&rows, &cols);
+    g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+		      "Rows:", rows);
+    g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+		      "Columns:", cols);
+    
+    if (interp->pager) {
+	g_string_sprintfa(interp->result, "%-*s %s \n", indent,
+			  "Pager:", interp->pager);
     }
 
     return SCLI_OK;
