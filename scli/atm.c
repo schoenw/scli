@@ -25,22 +25,55 @@
 #include "atm-mib.h"
 #include "if-mib.h"
 
+#include <regex.h>
+
+
+static int
+match_interface(regex_t *regex_iface,
+		if_mib_ifEntry_t *ifEntry)
+{
+    int status;
+
+    if (! regex_iface) {
+	return 1;
+    }
+
+    /*
+     * Does it really make sense to filter only on the description?
+     * This way, we do not need to read the ifXTable at all...
+     */
+
+    if (ifEntry->ifDescr) {
+	char *s = g_strdup_printf("%.*s",
+				  (int) ifEntry->_ifDescrLength,
+				  ifEntry->ifDescr);
+	status = regexec(regex_iface, s, (size_t) 0, NULL, 0);
+	g_free(s);
+	if (status == 0) {
+	    return 1;
+	}
+    }
+
+    return 0;
+}
+
+
 
 static void
 fmt_atm_interface_info(GString *s,
-		       atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry,
+		       atm_mib_atmInterfaceConfEntry_t *atmIfaceConfEntry,
 		       if_mib_ifEntry_t *ifEntry)
 {
-    g_string_sprintfa(s, "%9u  ", atmInterfaceConfEntry->ifIndex);
+    g_string_sprintfa(s, "%9u  ", atmIfaceConfEntry->ifIndex);
 
-    if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
+    if (atmIfaceConfEntry->atmInterfaceMaxVpcs) {
 	g_string_sprintfa(s, "%6d   ",
-			  *atmInterfaceConfEntry->atmInterfaceMaxVpcs);
+			  *atmIfaceConfEntry->atmInterfaceMaxVpcs);
     }
 
-    if (atmInterfaceConfEntry->atmInterfaceMaxVccs) {
+    if (atmIfaceConfEntry->atmInterfaceMaxVccs) {
 	g_string_sprintfa(s, "%6d ",
-			  *atmInterfaceConfEntry->atmInterfaceMaxVccs);
+			  *atmIfaceConfEntry->atmInterfaceMaxVccs);
     }
 
     g_string_append(s, "\n");
@@ -53,15 +86,24 @@ show_atm_interface_info(scli_interp_t *interp, int argc, char **argv)
 {
     atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfTable = NULL;
     if_mib_ifEntry_t *ifEntry = NULL;
+    regex_t _regex_iface, *regex_iface = NULL;
     int i;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (argc > 1) {
+    if (argc > 2) {
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (argc == 2) {
+	regex_iface = &_regex_iface;
+	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
     if (scli_interp_dry(interp)) {
+	if (regex_iface) regfree(regex_iface);
 	return SCLI_OK;
     }
 
@@ -78,14 +120,19 @@ show_atm_interface_info(scli_interp_t *interp, int argc, char **argv)
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
 			       atmInterfaceConfTable[i]->ifIndex,
 			       IF_MIB_IFDESCR);
-	    fmt_atm_interface_info(interp->result,
-				   atmInterfaceConfTable[i], ifEntry);
-	    if (ifEntry) if_mib_free_ifEntry(ifEntry);
+	    if (! ifEntry) continue;
+	    if (match_interface(regex_iface, ifEntry)) {
+		fmt_atm_interface_info(interp->result,
+				       atmInterfaceConfTable[i], ifEntry);
+	    }
+	    if_mib_free_ifEntry(ifEntry);
 	}
     }
 
     if (atmInterfaceConfTable)
 	atm_mib_free_atmInterfaceConfTable(atmInterfaceConfTable);
+
+    if (regex_iface) regfree(regex_iface);
 
     return SCLI_OK;
 }
@@ -94,33 +141,33 @@ show_atm_interface_info(scli_interp_t *interp, int argc, char **argv)
 
 static void
 xml_atm_interface_details(xmlNodePtr root,
-			  atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry,
+			  atm_mib_atmInterfaceConfEntry_t *atmIfaceConfEntry,
 			  if_mib_ifEntry_t *ifEntry,
 			  if_mib_ifXEntry_t *ifXEntry)
 {
     xmlNodePtr tree;
 
     tree = xmlNewChild(root, NULL, "interface", NULL);
-    xml_set_prop(tree, "index", "%d", atmInterfaceConfEntry->ifIndex);
+    xml_set_prop(tree, "index", "%d", atmIfaceConfEntry->ifIndex);
     
-    if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
+    if (atmIfaceConfEntry->atmInterfaceMaxVpcs) {
 	(void) xml_new_child(tree, NULL, "max-vpcs", "%d",
-			     *atmInterfaceConfEntry->atmInterfaceMaxVpcs);
+			     *atmIfaceConfEntry->atmInterfaceMaxVpcs);
     }
 
-    if (atmInterfaceConfEntry->atmInterfaceMaxVccs) {
+    if (atmIfaceConfEntry->atmInterfaceMaxVccs) {
 	(void) xml_new_child(tree, NULL, "max-vccs", "%d",
-			     *atmInterfaceConfEntry->atmInterfaceMaxVccs);
+			     *atmIfaceConfEntry->atmInterfaceMaxVccs);
     }
 
-    if (atmInterfaceConfEntry->atmInterfaceConfVpcs) {
+    if (atmIfaceConfEntry->atmInterfaceConfVpcs) {
 	(void) xml_new_child(tree, NULL, "conf-vpcs", "%d",
-			     *atmInterfaceConfEntry->atmInterfaceConfVpcs);
+			     *atmIfaceConfEntry->atmInterfaceConfVpcs);
     }
 
-    if (atmInterfaceConfEntry->atmInterfaceConfVccs) {
+    if (atmIfaceConfEntry->atmInterfaceConfVccs) {
 	(void) xml_new_child(tree, NULL, "conf-vccs", "%d",
-			     *atmInterfaceConfEntry->atmInterfaceConfVccs);
+			     *atmIfaceConfEntry->atmInterfaceConfVccs);
     }
 }
 
@@ -128,33 +175,51 @@ xml_atm_interface_details(xmlNodePtr root,
 
 static void
 fmt_atm_interface_details(GString *s,
-			  atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry,
+			  atm_mib_atmInterfaceConfEntry_t *atmIfaceConfEntry,
 			  if_mib_ifEntry_t *ifEntry,
 			  if_mib_ifXEntry_t *ifXEntry)
 {
     const int indent = 18;
     
     g_string_sprintfa(s, "%-*s%u\n", indent, "Interface:",
-		      atmInterfaceConfEntry->ifIndex);
+		      atmIfaceConfEntry->ifIndex);
 
-    if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
+    if (atmIfaceConfEntry->atmInterfaceMaxVpcs) {
 	g_string_sprintfa(s, "%-*s%d\n", indent, "Maximum VPCs:",
-			  *atmInterfaceConfEntry->atmInterfaceMaxVpcs);
+			  *atmIfaceConfEntry->atmInterfaceMaxVpcs);
     }
 
-    if (atmInterfaceConfEntry->atmInterfaceMaxVccs) {
+    if (atmIfaceConfEntry->atmInterfaceMaxVccs) {
 	g_string_sprintfa(s, "%-*s%d\n", indent, "Maximum VCCs:",
-			  *atmInterfaceConfEntry->atmInterfaceMaxVccs);
+			  *atmIfaceConfEntry->atmInterfaceMaxVccs);
     }
 
-    if (atmInterfaceConfEntry->atmInterfaceConfVpcs) {
+    if (atmIfaceConfEntry->atmInterfaceConfVpcs) {
 	g_string_sprintfa(s, "%-*s%d\n", indent, "Configured VPCs:",
-			  *atmInterfaceConfEntry->atmInterfaceConfVpcs);
+			  *atmIfaceConfEntry->atmInterfaceConfVpcs);
     }
 
-    if (atmInterfaceConfEntry->atmInterfaceConfVccs) {
+    if (atmIfaceConfEntry->atmInterfaceConfVccs) {
 	g_string_sprintfa(s, "%-*s%d\n", indent, "Configured VCCs:",
-			  *atmInterfaceConfEntry->atmInterfaceConfVccs);
+			  *atmIfaceConfEntry->atmInterfaceConfVccs);
+    }
+
+    if (atmIfaceConfEntry->atmInterfaceMaxActiveVpiBits) {
+	g_string_sprintfa(s, "%-*s%d\n", indent, "Active VPI Bits:",
+			  *atmIfaceConfEntry->atmInterfaceMaxActiveVpiBits);
+    }
+
+    if (atmIfaceConfEntry->atmInterfaceMaxActiveVciBits) {
+	g_string_sprintfa(s, "%-*s%d\n", indent, "Active VCI Bits:",
+			  *atmIfaceConfEntry->atmInterfaceMaxActiveVciBits);
+    }
+
+    if (atmIfaceConfEntry->atmInterfaceIlmiVpi
+	&& atmIfaceConfEntry->atmInterfaceIlmiVci) {
+	g_string_sprintfa(s, "%-*s%d\n", indent, "Active ILMI VPI:",
+			  *atmIfaceConfEntry->atmInterfaceIlmiVpi);
+	g_string_sprintfa(s, "%-*s%d\n", indent, "Active ILMI VCI:",
+			  *atmIfaceConfEntry->atmInterfaceIlmiVci);
     }
 
     g_string_append(s, "\n");
@@ -167,15 +232,24 @@ show_atm_interface_details(scli_interp_t *interp, int argc, char **argv)
 {
     atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfTable = NULL;
     if_mib_ifEntry_t *ifEntry = NULL;
+    regex_t _regex_iface, *regex_iface = NULL;
     int i;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (argc > 1) {
+    if (argc > 2) {
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (argc == 2) {
+	regex_iface = &_regex_iface;
+	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
     if (scli_interp_dry(interp)) {
+	if (regex_iface) regfree(regex_iface);
 	return SCLI_OK;
     }
 
@@ -190,21 +264,26 @@ show_atm_interface_details(scli_interp_t *interp, int argc, char **argv)
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
 			       atmInterfaceConfTable[i]->ifIndex,
 			       IF_MIB_IFDESCR);
-	    if (scli_interp_xml(interp)) {
-		xml_atm_interface_details(interp->xml_node,
-					  atmInterfaceConfTable[i],
-					  NULL, NULL);
-	    } else {
-		fmt_atm_interface_details(interp->result,
-					  atmInterfaceConfTable[i],
-					  NULL, NULL);
+	    if (! ifEntry) continue;
+	    if (match_interface(regex_iface, ifEntry)) {
+		if (scli_interp_xml(interp)) {
+		    xml_atm_interface_details(interp->xml_node,
+					      atmInterfaceConfTable[i],
+					      NULL, NULL);
+		} else {
+		    fmt_atm_interface_details(interp->result,
+					      atmInterfaceConfTable[i],
+					      NULL, NULL);
+		}
 	    }
-	    if (ifEntry) if_mib_free_ifEntry(ifEntry);
+	    if_mib_free_ifEntry(ifEntry);
 	}
     }
 
     if (atmInterfaceConfTable)
 	atm_mib_free_atmInterfaceConfTable(atmInterfaceConfTable);
+
+    if (regex_iface) regfree(regex_iface);
 
     return SCLI_OK;
 }
@@ -223,7 +302,7 @@ scli_init_atm_mode(scli_interp_t *interp)
 	  "descriptions to select the interfaces of interest. The command\n"
 	  "generates a table with the following columns:\n"
 	  "\n"
-	  "\n",
+	  "  INTERFACE network interface number",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_atm_interface_info },
