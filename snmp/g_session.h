@@ -44,7 +44,7 @@ typedef struct _GSnmpSession {
     gpointer      magic;               /* additional data for callbacks */
 } GSnmpSession;
 
-GSnmpSession*	g_snmp_session_new();
+GSnmpSession*	g_snmp_session_new(void);
 void		g_snmp_session_destroy(GSnmpSession *s);
 
 gpointer g_snmp_session_async_set    (GSnmpSession *session,
@@ -85,7 +85,7 @@ typedef struct _snmp_request {
 } snmp_request;
 
 
-snmp_request*	g_snmp_request_new();
+snmp_request*	g_snmp_request_new(void);
 void		g_snmp_request_destroy(snmp_request *request);
 
 void		g_snmp_request_queue(snmp_request *request);

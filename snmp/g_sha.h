@@ -49,7 +49,7 @@ typedef struct {
 
 /* Message digest functions */
 
-void SHAInit();
-void SHAUpdate();
-void SHAFinal();
-void SHATransform();
+void SHAInit(SHA_CTX *context);
+void SHAUpdate(SHA_CTX *context, guchar *buf, int len);
+void SHAFinal(char *key, SHA_CTX *context);
+void SHATransform(guint32 *digest, guint32 *data);

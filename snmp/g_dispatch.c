@@ -761,7 +761,6 @@ static gboolean
 transport_io_invoke(GIOChannel *source, GIOCondition condition, gpointer data)
 {
     void (*func)(void);
-
     func = data;
     func();
     return TRUE;
@@ -770,19 +769,18 @@ transport_io_invoke(GIOChannel *source, GIOCondition condition, gpointer data)
 static void
 fe_transport(gpointer key, gpointer value, gpointer userdata)
 {
-  GSnmpTransport *trp_model;
-  guint result, socket;
-  GIOChannel *channel;
-  GIOCondition cond;
+    GSnmpTransport *trp_model;
+    guint result, socket;
+    GIOChannel *channel;
+    GIOCondition cond;
 
-  trp_model = (GSnmpTransport *) value;
-  socket=trp_model->getSocket();
-  cond = (G_IO_IN | G_IO_PRI); /* GDK_INPUT_READ */
-  channel = g_io_channel_unix_new(socket);
-  result = g_io_add_watch_full(channel, G_PRIORITY_DEFAULT, cond,
-    transport_io_invoke, trp_model->receiveMessage, NULL);
-  g_io_channel_unref(channel);
-
+    trp_model = (GSnmpTransport *) value;
+    socket=trp_model->getSocket();
+    cond = (G_IO_IN | G_IO_PRI); /* GDK_INPUT_READ */
+    channel = g_io_channel_unix_new(socket);
+    result = g_io_add_watch_full(channel, G_PRIORITY_DEFAULT, cond,
+				 transport_io_invoke, trp_model->receiveMessage, NULL);
+    g_io_channel_unref(channel);
 }
 
 gboolean

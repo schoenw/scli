@@ -72,6 +72,8 @@ typedef enum {
 /* Errors */
 
 typedef enum {
+    G_SNMP_ERR_INTERNAL		      = -2,
+    G_SNMP_ERR_NORESPONSE	      = -1,
     G_SNMP_ERR_NOERROR		      = 0,
     G_SNMP_ERR_TOOBIG                 = 1,
     G_SNMP_ERR_NOSUCHNAME             = 2,

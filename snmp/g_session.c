@@ -25,6 +25,7 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <string.h>                   /* Quite the memmove warning */
+#include <time.h>
 
 static GSList  *request_queue = NULL;   /* queue of active requests */
 
@@ -196,92 +197,77 @@ static gpointer
 g_async_send(GSnmpSession *session, GSnmpPduType type,
 	     GSList *objs, guint32 arg1, guint32 arg2)
 {
-  snmp_request *request;
-  time_t        now;
-  int           model = 0, pduv = 0;
-  static gint32	id = -1;
-
-  if (id < 0) {
-      id = random();
-  }
-
-  now = time(NULL);
+    snmp_request *request;
+    time_t        now;
+    int           model = 0, pduv = 0;
+    static gint32 id = -1;
+    
+    if (id < 0) {
+	id = random();
+    }
+    
+    now = time(NULL);
 
 #ifdef SNMP_DEBUG
-  printf("g_async_send for %s\n", host->name);
+    printf("g_async_send for %s\n", host->name);
 #endif
-  request = g_snmp_request_new();
+    
+    if (!session->address) {
+	if (!g_setup_address(session)) {
+	    return NULL;
+	}
+    }
 
-  if (session->done_callback)
+    session->error_status = G_SNMP_ERR_NOERROR;
+    session->error_index = 0;
+    
+    request = g_snmp_request_new();
     request->callback = session->done_callback;
-  else
-    request->callback = NULL;
-
-  if (session->time_callback)
     request->timeout  = session->time_callback;
-  else
-    request->timeout  = NULL;
-
-  if (!session->address) {
-      if (!g_setup_address(session))
-      {
-	  g_snmp_request_destroy(request);
-	  return NULL;
-      }
-  }
-
-  request->pdu.request.id           = id++;
-  request->pdu.request.error_status = arg1;
-  request->pdu.request.error_index  = arg2;
-  request->pdu.request.variables    = objs;
-
-  if (type == G_SNMP_PDU_SET)
-    {
-      request->auth=g_string_append(request->auth, session->wcomm);
+    request->pdu.request.id           = id++;
+    request->pdu.request.error_status = arg1;
+    request->pdu.request.error_index  = arg2;
+    request->pdu.request.variables    = objs;
+    if (type == G_SNMP_PDU_SET) {
+	request->auth = g_string_append(request->auth, session->wcomm);
+    } else {
+	request->auth = g_string_append(request->auth, session->rcomm);
     }
-  else
-    {
-      request->auth=g_string_append(request->auth, session->rcomm);
-    }
+    request->pdu.type	            = type;
+    request->retries                = session->retries;
+    request->timeoutval             = session->timeout;
+    request->magic                  = session->magic;
+    request->version                = session->version;
+    request->domain                 = session->domain;
+    request->address                = session->address;
+    request->session                = session;
+    request->time                   = now + request->timeoutval;
 
-  request->pdu.type	            = type;
-  request->retries                  = session->retries;
-  request->timeoutval               = session->timeout;
-  request->magic                    = session->magic;
-  request->version                  = session->version;
-  request->domain                   = session->domain;
-  request->address                  = session->address;
-  request->session                  = session;
-  request->time                     = now + request->timeoutval;
-
-  switch (request->version)
-    {
-      case 0: 
-        model = PMODEL_SNMPV1;
-        pduv  = PDUV1;
-        break;
-      case 1: 
-        model = PMODEL_SNMPV2C;
-        pduv  = PDUV2;
-        break;
-      case 3: 
-        model = PMODEL_SNMPV3;
-        pduv  = PDUV2;
-        break;
-      default:
-	g_printerr("Unknown protocol version!!!");
-	g_snmp_request_destroy(request);
-	return NULL;
+    switch (request->version) {
+    case 0: 
+	model = PMODEL_SNMPV1;
+	pduv  = PDUV1;
+	break;
+    case 1: 
+	model = PMODEL_SNMPV2C;
+	pduv  = PDUV2;
+	break;
+    case 3: 
+	model = PMODEL_SNMPV3;
+	pduv  = PDUV2;
+	break;
+    default:
+	g_assert_not_reached();
     }
 #ifdef SNMP_DEBUG 
-  printf("sending Pdu for %s, version %d\n", session->name, request->version);
+    printf("sending Pdu for %s, version %d\n", session->name, request->version);
 #endif
-  sendPdu(request->domain, request->address, model, SMODEL_ANY, 
-          request->auth, SLEVEL_NANP, NULL, NULL, pduv, &request->pdu, TRUE);
-
-  g_snmp_request_queue(request);
-
-  return request;
+    sendPdu(request->domain, request->address, model, SMODEL_ANY, 
+	    request->auth, SLEVEL_NANP, NULL, NULL, pduv, &request->pdu, TRUE);
+    
+    g_snmp_request_queue(request);
+    
+    return request;
 }
 
 gpointer
@@ -329,65 +315,65 @@ struct inputcb {
 };
 
 struct syncmagic {
-  GMainLoop *loop;
-  GSList *result;
+    GMainLoop *loop;
+    GSList *result;
 };
 
 static void
 cb_time(GSnmpSession *session, void *magic)
 {
-  struct syncmagic *sm = (struct syncmagic *) magic;
-  sm->result = NULL;
+    struct syncmagic *sm = (struct syncmagic *) magic;
+    sm->result = NULL;
+    session->error_index = 0;
+    session->error_status = G_SNMP_ERR_NORESPONSE;
 #ifdef SNMP_DEBUG
-  g_print("cb_time: Quit loop %p\n", sm->loop);
+    g_print("cb_time: Quit loop %p\n", sm->loop);
 #endif
-  g_main_quit(sm->loop);
+    g_main_quit(sm->loop);
 }
 
 static gboolean
 cb_done(GSnmpSession *session, void *magic, GSnmpPdu *spdu, GSList *objs)
 {
-  struct syncmagic *sm = (struct syncmagic *) magic;
-  sm->result = objs;
-  if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
-      g_printerr("session %p: error-status = %d, error-index = %d\n",
-		 session, session->error_status, session->error_index);
-  }
-  g_main_quit(sm->loop);
-  return FALSE;
+    struct syncmagic *sm = (struct syncmagic *) magic;
+    sm->result = objs;
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_printerr("session %p: error-status = %d, error-index = %d\n",
+		   session, session->error_status, session->error_index);
+    }
+    g_main_quit(sm->loop);
+    return FALSE;
 }
 
 static GSList *
 g_sync_send(GSnmpSession *session, GSnmpPduType type,
 	    GSList *objs, guint32 arg1, guint32 arg2)
 {
-  struct syncmagic * magic;
-  GSList *result;
-
-  magic = (struct syncmagic *) g_malloc(sizeof(struct syncmagic));
-  magic->loop = g_main_new(TRUE);
-
-  session->done_callback = cb_done;
-  session->time_callback = cb_time;
-  session->magic = magic;
-  if (!g_async_send(session, type, objs, arg1, arg2)) {
-      if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
-	  g_printerr("session %p: g_sync_send failed to send PDU\n",
-		     session);
-      }
-      g_main_destroy(magic->loop);
-      g_free(magic);
-      return NULL;
-  }
-
-  while(g_main_is_running(magic->loop)) {
-      g_main_run(magic->loop);
-  }
-  g_main_destroy(magic->loop);
-  
-  result = magic->result;
-  g_free(magic);
-  return result;
+    struct syncmagic * magic;
+    GSList *result;
+    
+    magic = (struct syncmagic *) g_malloc(sizeof(struct syncmagic));
+    magic->loop = g_main_new(TRUE);
+    
+    session->done_callback = cb_done;
+    session->time_callback = cb_time;
+    session->magic = magic;
+    if (! g_async_send(session, type, objs, arg1, arg2)) {
+	if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	    g_printerr("session %p: g_sync_send failed to send PDU\n", session);
+	}
+	g_main_destroy(magic->loop);
+	g_free(magic);
+	return NULL;
+    }
+    
+    while(g_main_is_running(magic->loop)) {
+	g_main_run(magic->loop);
+    }
+    g_main_destroy(magic->loop);
+    result = magic->result;
+    g_free(magic);
+    return result;
 }
 
 GSList *
