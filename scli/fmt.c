@@ -52,7 +52,7 @@ static guint32 const snmpIPXDomain[]
 static guint32 const rfc1157Domain[]
 	= { SNMPV2_TM_RFC1157DOMAIN };
 
-static GSnmpIdentity const tdomain_identities[] = {
+static GNetSnmpIdentity const tdomain_identities[] = {
     { snmpUDPDomain,
       sizeof(snmpUDPDomain)/sizeof(guint32),
       "udp" },
@@ -209,7 +209,7 @@ fmt_seconds(guint32 seconds)
     min  = (seconds / 60) % 60;
     hour = (seconds / 60 / 60);
 
-    g_snprintf(buffer, sizeof(buffer), "%3d:%02d:%02d", hour, min, sec);
+    g_snprintf(buffer, sizeof(buffer), "%4d:%02d:%02d", hour, min, sec);
 
     return buffer;
 }
@@ -217,7 +217,7 @@ fmt_seconds(guint32 seconds)
 
 
 char const *
-fmt_enum(GSnmpEnum const *table, gint32 *number)
+fmt_enum(GNetSnmpEnum const *table, gint32 *number)
 {
     static char buffer[80];
     gchar const *name;
@@ -226,7 +226,7 @@ fmt_enum(GSnmpEnum const *table, gint32 *number)
 	return NULL;
     }
 
-    name = gsnmp_enum_get_label(table, *number);
+    name = gnet_snmp_enum_get_label(table, *number);
     if (! name) {
 	g_snprintf(buffer, sizeof(buffer), "%d", *number);
 	name = buffer;
@@ -237,7 +237,7 @@ fmt_enum(GSnmpEnum const *table, gint32 *number)
 
 
 void
-xxx_enum(GString *s, int width, GSnmpEnum const *table, gint32 *number)
+xxx_enum(GString *s, int width, GNetSnmpEnum const *table, gint32 *number)
 {
     gchar const *name;
 
@@ -252,7 +252,7 @@ xxx_enum(GString *s, int width, GSnmpEnum const *table, gint32 *number)
 
 
 char const *
-fmt_identity(GSnmpIdentity const *table,
+fmt_identity(GNetSnmpIdentity const *table,
 	     guint32 const *oid, gsize oidlen)
 {
 #if 0
@@ -264,7 +264,7 @@ fmt_identity(GSnmpIdentity const *table,
 	return NULL;
     }
 
-    name = gsnmp_identity_get_label(table, oid, oidlen);
+    name = gnet_snmp_identity_get_label(table, oid, oidlen);
 #if 0
     if (! name) {
 	/* xxx */
@@ -588,7 +588,7 @@ fmt_taddress(guint32 *tdomain, gsize tdomain_len,
 void
 fmt_row_status(GString *s, gint32 *status)
 {
-    static GSnmpEnum const row_states[] = {
+    static GNetSnmpEnum const row_states[] = {
 	{ 1, "A" },	/* active */
 	{ 2, "S" },	/* notInService */
 	{ 3, "R" },	/* notReady */
@@ -602,7 +602,7 @@ fmt_row_status(GString *s, gint32 *status)
 	return;
     }
 
-    label = gsnmp_enum_get_label(row_states, *status);
+    label = gnet_snmp_enum_get_label(row_states, *status);
     if (label) {
 	g_string_append(s, label);
     } else {
@@ -615,7 +615,7 @@ fmt_row_status(GString *s, gint32 *status)
 void
 fmt_storage_type(GString *s, gint32 *storage)
 {
-    static GSnmpEnum const storage_types[] = {
+    static GNetSnmpEnum const storage_types[] = {
 	{ 1, "O" },	/* other */
 	{ 2, "V" },	/* volatile */
 	{ 3, "N" },	/* nonVolatile */
@@ -631,7 +631,7 @@ fmt_storage_type(GString *s, gint32 *storage)
 	return;
     }
     
-    label = gsnmp_enum_get_label(storage_types, *storage);
+    label = gnet_snmp_enum_get_label(storage_types, *storage);
     if (label) {
 	g_string_append(s, label);
     } else {

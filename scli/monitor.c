@@ -83,7 +83,7 @@ fix_string(guchar *s, guint16 *len)
 
 
 static void
-snmp_decode_hook(GSList *list)
+snmp_decode_hook(GList *list)
 {
     static char x[] = { '-', '/', '-', '\\', '|' };
     static int i = 0;
@@ -179,7 +179,7 @@ prompt(char *message)
 
 
 static int
-show_system(GSnmpSession *peer, int flags)
+show_system(GNetSnmp *peer, int flags)
 {
     snmpv2_mib_system_t *system = NULL;
     static struct timeval last, now;
@@ -206,10 +206,17 @@ show_system(GSnmpSession *peer, int flags)
     }
     snmpv2_mib_get_system(peer, &system, mask);
     if (peer->error_status) {
+	GURI *uri;
+	gchar *name = NULL;
+	uri = gnet_snmp_get_uri(peer);
+	if (uri) {
+	    name = gnet_uri_get_string(uri);
+	}
         move(0, 10);
         clrtoeol();
-        mvprintw(0, 10, "%s:%d", peer->taddress, peer->port);
+        mvprintw(0, 10, "%s", name ? name : "?");
         mvaddstr(0, (int) (COLS-strlen(timestr)-1), timestr);
+	if (name) g_free(name);
         return STOP_FLAG_SNMP_FAILURE;
     }
 
@@ -218,6 +225,8 @@ show_system(GSnmpSession *peer, int flags)
 	if (system->sysUpTime) {
 	    unsigned days, hours, minutes, seconds;
 	    guint32 secs;
+	    gchar *name = NULL;
+	    GURI *uri;
 	    if (last.tv_sec && last.tv_usec) {
 		if (sysUpTime > *(system->sysUpTime)) {
 		    return STOP_FLAG_RESTART;
@@ -230,11 +239,16 @@ show_system(GSnmpSession *peer, int flags)
 	    seconds = secs % 60;
 	    move(0, 10);
 	    clrtoeol();
-	    mvprintw(0, 10, "%s:%d up %d %s %02d:%02d:%02d",
-		     peer->taddress, peer->port,
+	    uri = gnet_snmp_get_uri(peer);
+	    if (uri) {
+		name = gnet_uri_get_string(uri);
+	    }
+	    mvprintw(0, 10, "%s up %d %s %02d:%02d:%02d",
+		     name ? name : "?",
 		     days, (days == 1) ? "day" : "days",
 		     hours, minutes, seconds);
 	    sysUpTime = *(system->sysUpTime);
+	    if (name) g_free(name);
 	}
 	if (system->sysDescr) {
 	    fix_string(system->sysDescr, &(system->_sysDescrLength));
@@ -270,7 +284,7 @@ show_system(GSnmpSession *peer, int flags)
 
 
 static void
-show_ip(GSnmpSession *peer, int flags)
+show_ip(GNetSnmp *peer, int flags)
 {
     ip_mib_ip_t *ip = NULL;
     static guint32 ipInReceives = 0;
@@ -363,7 +377,7 @@ show_ip(GSnmpSession *peer, int flags)
 
 
 static void
-show_udp(GSnmpSession *peer, int flags)
+show_udp(GNetSnmp *peer, int flags)
 {
     udp_mib_udp_t *udp = NULL;
     static guint32 udpInDatagrams = 0;
@@ -409,7 +423,7 @@ show_udp(GSnmpSession *peer, int flags)
 
 
 static void
-show_tcp(GSnmpSession *peer, int flags)
+show_tcp(GNetSnmp *peer, int flags)
 {
     tcp_mib_tcp_t *tcp = NULL;
     static guint32 tcpInSegs = 0;
@@ -481,13 +495,21 @@ show_tcp(GSnmpSession *peer, int flags)
 
 
 static void
-show_interior(GSnmpSession *peer)
+show_interior(GNetSnmp *peer)
 {
     int y = 0;
+    GURI *uri;
+    gchar *name = NULL;
+
+    uri = gnet_snmp_get_uri(peer);
+    if (uri) {
+	name = gnet_uri_get_string(uri);
+    }
     
     clear();
     y = 0;
-    mvprintw(y, 10, "%s:%d", peer->taddress, peer->port);
+    mvprintw(y, 10, "%s", name ? name : "?");
+    if (name) g_free(name); name = NULL;
     mvaddstr(y++, 0, "Agent:");
     sys_des_line = y;
     mvaddstr(y++, 0, "Descr:");
@@ -604,8 +626,8 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 	if (flags & STOP_FLAG_SNMP_FAILURE) {
 	    const char *error = NULL;
 	    if (interp->peer && interp->peer->error_status) {
-		error = gsnmp_enum_get_label(gsnmp_enum_error_table,
-					     interp->peer->error_status);
+		error = gnet_snmp_enum_get_label(gnet_snmp_enum_error_table,
+						 interp->peer->error_status);
 	    }
 	    scli_interp_reset(interp);
 	    g_string_assign(interp->header, "NO DATA AVAILABLE");
