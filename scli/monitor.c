@@ -186,6 +186,7 @@ show_system(GSnmpSession *peer, int flags)
     static guint32 sysUpTime = 0;
     char timestr[10];
     struct tm *now_tm;
+    int mask = (SNMPV2_MIB_SYSDESCR | SNMPV2_MIB_SYSUPTIME);
 
     if (flags & STOP_FLAG_RESTART) {
         last.tv_sec = last.tv_usec = 0;
@@ -199,61 +200,72 @@ show_system(GSnmpSession *peer, int flags)
         strcpy(timestr, "--:--:--");
     }
 
-    if (snmpv2_mib_get_system(peer, &system) != 0 || system == NULL) {
+    if (do_contact_summary) {
+	mask |= SNMPV2_MIB_SYSCONTACT;
+	mask |= SNMPV2_MIB_SYSLOCATION;
+    }
+    snmpv2_mib_get_system(peer, &system, mask);
+    if (peer->error_status) {
+	const char *error;
+	error = gsnmp_enum_get_label(gsnmp_error_status_table,
+				     peer->error_status);
         move(0, 10);
         clrtoeol();
         mvprintw(0, 10, "%s:%d", peer->name, peer->port);
         attron(A_BOLD);
         mvprintw(0, 10 + strlen(peer->name) + 8,
-                 "SNMP communication problem");
+		 error ? error : "internalError");
         attroff(A_BOLD);
         mvaddstr(0, COLS-strlen(timestr)-1, timestr);
         return STOP_FLAG_SNMP_FAILURE;
     }
+
+    if (system) {
     
-    if (system->sysUpTime) {
-	unsigned days, hours, minutes, seconds;
-        guint32 secs;
-        if (last.tv_sec && last.tv_usec) {
-            if (sysUpTime > *(system->sysUpTime)) {
-		return STOP_FLAG_RESTART;
-            }
-        }
-        secs = *(system->sysUpTime)/100;
-	days = secs / (24 * 60 * 60);
-	hours = (secs / (60 * 60)) % 24;
-	minutes = (secs / 60) % 60;
-	seconds = secs % 60;
-        move(0, 10);
-        clrtoeol();
-        mvprintw(0, 10, "%s:%d up %d %s %02d:%02d:%02d",
-                 peer->name, peer->port,
-		 days, (days == 1) ? "day" : "days",
-		 hours, minutes, seconds);
-        sysUpTime = *(system->sysUpTime);
-    }
-    if (system->sysDescr) {
-        fix_string(system->sysDescr, &(system->_sysDescrLength));
-        mvprintw(sys_des_line, 10, "%.*s",
-		 MIN(system->_sysDescrLength, COLS-11),
-		 system->sysDescr);
-	clrtoeol();
-    }
-    if (do_contact_summary
-        && system->sysContact && system->_sysContactLength) {
-        fix_string(system->sysContact, &(system->_sysContactLength));
-        mvprintw(sys_con_line, 10, "%.*s",
+	if (system->sysUpTime) {
+	    unsigned days, hours, minutes, seconds;
+	    guint32 secs;
+	    if (last.tv_sec && last.tv_usec) {
+		if (sysUpTime > *(system->sysUpTime)) {
+		    return STOP_FLAG_RESTART;
+		}
+	    }
+	    secs = *(system->sysUpTime)/100;
+	    days = secs / (24 * 60 * 60);
+	    hours = (secs / (60 * 60)) % 24;
+	    minutes = (secs / 60) % 60;
+	    seconds = secs % 60;
+	    move(0, 10);
+	    clrtoeol();
+	    mvprintw(0, 10, "%s:%d up %d %s %02d:%02d:%02d",
+		     peer->name, peer->port,
+		     days, (days == 1) ? "day" : "days",
+		     hours, minutes, seconds);
+	    sysUpTime = *(system->sysUpTime);
+	}
+	if (system->sysDescr) {
+	    fix_string(system->sysDescr, &(system->_sysDescrLength));
+	    mvprintw(sys_des_line, 10, "%.*s",
+		     MIN(system->_sysDescrLength, COLS-11),
+		     system->sysDescr);
+	    clrtoeol();
+	}
+	if (do_contact_summary
+	    && system->sysContact && system->_sysContactLength) {
+	    fix_string(system->sysContact, &(system->_sysContactLength));
+	    mvprintw(sys_con_line, 10, "%.*s",
 		 MIN(system->_sysContactLength, COLS-11),
-		 system->sysContact);
-	clrtoeol();
-    }
-    if (do_contact_summary
-        && system->sysLocation && system->_sysLocationLength) {
-        fix_string(system->sysLocation, &(system->_sysLocationLength));
-        mvprintw(sys_loc_line, 10, "%.*s",
-		 MIN(system->_sysLocationLength, COLS-11),
-                 system->sysLocation);
-	clrtoeol();
+		     system->sysContact);
+	    clrtoeol();
+	}
+	if (do_contact_summary
+	    && system->sysLocation && system->_sysLocationLength) {
+	    fix_string(system->sysLocation, &(system->_sysLocationLength));
+	    mvprintw(sys_loc_line, 10, "%.*s",
+		     MIN(system->_sysLocationLength, COLS-11),
+		     system->sysLocation);
+	    clrtoeol();
+	}
     }
     
     last = now;
@@ -275,12 +287,14 @@ show_ip(GSnmpSession *peer, int flags)
     static guint32 ipOutSent = 0;
     static struct timeval last, now;
     double delta;
+    int mask = 0;
 
     if (flags & STOP_FLAG_RESTART) {
         last.tv_sec = last.tv_usec = 0;
     }
 
-    if (ip_mib_get_ip(peer, &ip) != 0 || ip == NULL) {
+    ip_mib_get_ip(peer, &ip, mask);
+    if (peer->error_status || !ip) {
         return;
     }
     
@@ -363,12 +377,14 @@ show_udp(GSnmpSession *peer, int flags)
     static guint32 udpOutDatagrams = 0;
     static struct timeval last, now;
     double delta;
+    int mask = (UDP_MIB_UDPINDATAGRAMS | UDP_MIB_UDPOUTDATAGRAMS);
     
     if (flags & STOP_FLAG_RESTART) {
         last.tv_sec = last.tv_usec = 0;
     }
 
-    if (udp_mib_get_udp(peer, &udp) != 0 || udp == NULL) {
+    udp_mib_get_udp(peer, &udp, mask);
+    if (peer->error_status || !udp) {
         return;
     }
 
@@ -409,14 +425,16 @@ show_tcp(GSnmpSession *peer, int flags)
     static guint32 tcpPassiveOpens = 0; 
     static struct timeval last, now;
     double delta;
+    int mask = (TCP_MIB_TCPINSEGS | TCP_MIB_TCPOUTSEGS | TCP_MIB_TCPCURRESTAB
+	| TCP_MIB_TCPACTIVEOPENS | TCP_MIB_TCPPASSIVEOPENS);
 
     if (flags & STOP_FLAG_RESTART) {
         last.tv_sec = last.tv_usec = 0;
     }
 
-    if (tcp_mib_get_tcp(peer, &tcp) != 0 || tcp == NULL) {
+    tcp_mib_get_tcp(peer, &tcp, mask);
+    if (peer->error_status || !tcp) {
         return;
-        
     }
 
     gettimeofday (&now, NULL);
@@ -573,8 +591,7 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 	move(status_line, 0);
         refresh();
         if (! (flags & STOP_FLAG_SNMP_FAILURE)) {
-	    g_string_truncate(interp->result, 0);
-	    g_string_truncate(interp->header, 0);
+	    scli_interp_reset(interp);
 	    code = (cmd->func) (interp, argc, argv);
 	    if (code != SCLI_OK) {
 		break;
@@ -676,7 +693,7 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 }
 
 
-#if 1
+
 int
 scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv)
 {
@@ -684,33 +701,84 @@ scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv)
     int code = SCLI_OK;
 
     scli_curses_on();
-
     g_snmp_list_decode_hook = snmp_decode_hook;
     code = mainloop(interp, cmd, argc, argv);
     if (code == SCLI_OK || code == SCLI_EXIT) {
-	g_string_truncate(interp->result, 0);
+	scli_interp_reset(interp);
     }
-
     scli_curses_off();
     return code;
 }
 
-#else
 
-int
-scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv)
+struct loop_data {
+    scli_interp_t *interp;
+    scli_cmd_t *cmd;
+    int argc;
+    char **argv;
+};
+
+
+static gboolean
+loop_iteration(gpointer data)
 {
-    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
-    int code = SCLI_OK;
-
-    while (1) {
-	g_string_truncate(interp->result, 0);
-	code = (cmd->func) (interp, argc, argv);
-	g_print("%s", interp->result->str);
-	sleep(1);
-    }
+    struct loop_data *loop_data = (struct loop_data *) data;
+    scli_interp_t *interp = loop_data->interp;
+    scli_cmd_t *cmd = loop_data->cmd;
+    int argc = loop_data->argc;
+    char **argv = loop_data->argv;
     
-    return code;
+    g_printerr("loop_iteration()\n");
+    scli_interp_reset(interp);
+    (void) (cmd->func) (interp, argc, argv);
+    g_print("%s\n%s", interp->header->str, interp->result->str);
+    return TRUE;
 }
 
-#endif
+
+
+static gboolean
+loop_input(GIOChannel *source, GIOCondition condition, gpointer data)
+{
+    GMainLoop *loop = (GMainLoop *) data;
+    g_printerr("loop_input()\n");
+    g_main_quit(loop);
+    return TRUE;
+}
+
+
+
+int
+scli_loop(scli_interp_t *interp, GNode *node, int argc, char **argv)
+{
+    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
+    GMainLoop *loop;
+    GIOChannel *channel;
+    struct loop_data loop_data;
+    int code;
+
+    code = (cmd->func) (interp, argc, argv);
+    if (code != SCLI_OK) {
+	return code;
+    }
+
+    loop_data.interp = interp;
+    loop_data.cmd = cmd;
+    loop_data.argc = argc;
+    loop_data.argv = argv;
+
+    loop = g_main_new(TRUE);
+    
+    g_timeout_add(1000, loop_iteration, &loop_data);
+
+    channel = g_io_channel_unix_new(fileno(stdin));
+    g_io_add_watch(channel, (G_IO_IN | G_IO_PRI), loop_input, loop);
+    g_io_channel_unref(channel);
+
+    while(g_main_is_running(loop)) {
+	g_main_run(loop);
+    }
+    g_main_destroy(loop);
+
+    return SCLI_OK;
+}

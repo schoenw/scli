@@ -127,16 +127,17 @@ show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (ip_forward_mib_get_ipCidrRouteTable(interp->peer, &ipCidrRouteTable)) {
-	if (rfc1213_mib_get_ipRouteTable(interp->peer, &ipRouteTable)) {
-	    return SCLI_ERROR;
+    ip_forward_mib_get_ipCidrRouteTable(interp->peer, &ipCidrRouteTable, 0);
+    if (interp->peer->error_status || !ipCidrRouteTable) {
+	rfc1213_mib_get_ipRouteTable(interp->peer, &ipRouteTable, 0);
+	if (interp->peer->error_status) {
+	    return SCLI_SNMP;
 	}
     }
 
-    (void) if_mib_get_ifTable(interp->peer, &ifTable);
-    (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
-
     if (ipCidrRouteTable || ipRouteTable) {
+	if_mib_get_ifTable(interp->peer, &ifTable, 0);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, 0);
 	g_string_sprintfa(interp->header, "%-20s%-16s%-10s%-10s%s",
 		  "DESTINATION", "NEXT HOP", "TYPE", "PROTO", "INTERFACE");
 	if (ipCidrRouteTable) {
@@ -220,8 +221,9 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable)) {
-	return SCLI_ERROR;
+    ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (ipAddrTable) {
@@ -340,14 +342,14 @@ show_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (tunnel_mib_get_tunnelIfTable(interp->peer, &tunnelIfTable)) {
-	return SCLI_ERROR;
+    tunnel_mib_get_tunnelIfTable(interp->peer, &tunnelIfTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
-
-    (void) if_mib_get_ifTable(interp->peer, &ifTable);
-    (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
     
     if (tunnelIfTable) {
+	if_mib_get_ifTable(interp->peer, &ifTable, 0);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, 0);
 	g_string_append(interp->header,
 	"LOCAL ADDRESS    REMOTE ADDRESS   TYPE    SEC.  TTL TOS INTERFACE");
 	for (i = 0; tunnelIfTable[i]; i++) {
@@ -425,13 +427,13 @@ show_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (ip_mib_get_ipNetToMediaTable(interp->peer, &ipNetToMediaTable)) {
-	return SCLI_ERROR;
+    ip_mib_get_ipNetToMediaTable(interp->peer, &ipNetToMediaTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
-    (void) if_mib_get_ifTable(interp->peer, &ifTable);
-
     if (ipNetToMediaTable) {
+	if_mib_get_ifTable(interp->peer, &ifTable, 0);
 	g_string_append(interp->header,
 		"INTERFACE TYPE     ADDRESS          LOWER LAYER ADDRESS");
 	for (i = 0; ipNetToMediaTable[i]; i++) {
@@ -489,8 +491,9 @@ show_ip_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (ip_mib_get_ip(interp->peer, &ip)) {
-	return SCLI_ERROR;
+    ip_mib_get_ip(interp->peer, &ip, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (ip) {
@@ -522,7 +525,7 @@ set_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 
     ip = ip_mib_new_ip();
     ip->ipForwarding = &value;
-    ip_mib_set_ip(interp->peer, ip);
+    ip_mib_set_ip(interp->peer, ip, IP_MIB_IPFORWARDING);
     ip_mib_free_ip(ip);
 
     if (interp->peer->error_status) {
@@ -554,7 +557,7 @@ set_ip_default_ttl(scli_interp_t *interp, int argc, char **argv)
 
     ip = ip_mib_new_ip();
     ip->ipDefaultTTL = &value;
-    ip_mib_set_ip(interp->peer, ip);
+    ip_mib_set_ip(interp->peer, ip, IP_MIB_IPDEFAULTTTL);
     ip_mib_free_ip(ip);
 
     if (interp->peer->error_status) {

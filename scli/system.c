@@ -340,8 +340,9 @@ show_system_devices(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable)) {
-	return SCLI_ERROR;
+    host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
     
     if (hrDeviceTable) {
@@ -479,13 +480,14 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (host_resources_mib_get_hrSWRunTable(interp->peer, &hrSWRunTable)) {
-	return SCLI_ERROR;
+    host_resources_mib_get_hrSWRunTable(interp->peer, &hrSWRunTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
-    (void) host_resources_mib_get_hrSWRunPerfTable(interp->peer,
-						   &hrSWRunPerfTable);
 
     if (hrSWRunTable) {
+	host_resources_mib_get_hrSWRunPerfTable(interp->peer,
+						&hrSWRunPerfTable, 0);
 	if (! scli_interp_xml(interp)) {
 	    g_string_append(interp->header,
 			    "  PID S T MEMORY     TIME COMMAND");
@@ -613,8 +615,9 @@ show_system_mounts(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (host_resources_mib_get_hrFSTable(interp->peer, &hrFSTable)) {
-	return SCLI_ERROR;
+    host_resources_mib_get_hrFSTable(interp->peer, &hrFSTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (hrFSTable) {
@@ -771,10 +774,11 @@ show_system_storage(scli_interp_t *interp, int argc, char **argv)
     if (argc > 1) {
 	return SCLI_SYNTAX;
     }
-
-    if (host_resources_mib_get_hrStorageTable(interp->peer,
-					      &hrStorageTable)) {
-	return SCLI_ERROR;
+    
+    host_resources_mib_get_hrStorageTable(interp->peer,
+					  &hrStorageTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (hrStorageTable) {
@@ -959,14 +963,16 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (snmpv2_mib_get_system(interp->peer, &system)) {
-	return SCLI_ERROR;
+    snmpv2_mib_get_system(interp->peer, &system, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
-    (void) host_resources_mib_get_hrSystem(interp->peer, &hrSystem);
-    (void) host_resources_mib_get_hrStorage(interp->peer, &hrStorage);
-    (void) if_mib_get_interfaces(interp->peer, &interfaces);
-    (void) bridge_mib_get_dot1dBase(interp->peer, &dot1dBase);
-    (void) disman_script_mib_get_smLangTable(interp->peer, &smLangTable);
+    host_resources_mib_get_hrSystem(interp->peer, &hrSystem, 0);
+    host_resources_mib_get_hrStorage(interp->peer, &hrStorage, 0);
+    if_mib_get_interfaces(interp->peer, &interfaces, 0);
+    bridge_mib_get_dot1dBase(interp->peer, &dot1dBase, 0);
+    disman_script_mib_get_smLangTable(interp->peer, &smLangTable,
+				      DISMAN_SCRIPT_MIB_SMLANGDESCR);
 
     if (scli_interp_xml(interp)) {
 	xml_system_info(interp->xml_node, interp, system);
@@ -997,6 +1003,16 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	    g_string_sprintfa(s, "%-*s", indent, "System Boot Time:");
 	    g_string_append(s, fmt_timeticks(*(hrSystem->hrSystemUptime)));
 	    g_string_append_c(s, '\n');
+	}
+	if (hrSystem->hrSystemInitialLoadDevice) {
+	    host_resources_mib_hrDeviceEntry_t *dev;
+	    host_resources_mib_get_hrDeviceEntry(interp->peer, &dev, *hrSystem->hrSystemInitialLoadDevice, 0);
+	    if (dev->hrDeviceDescr) {
+		g_string_sprintfa(s, "%-*s%.*s\n", indent, "System Boot Dev:",
+				  (int) dev->_hrDeviceDescrLength,
+				  dev->hrDeviceDescr);
+	    }
+	    host_resources_mib_free_hrDeviceEntry(dev);
 	}
 	if (hrSystem->hrSystemInitialLoadParameters) {
 	    g_string_sprintfa(s, "%-*s%.*s", indent, "System Boot Args:",
@@ -1076,7 +1092,6 @@ static int
 set_system_contact(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_system_t *system = NULL;
-    int code;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1087,12 +1102,11 @@ set_system_contact(scli_interp_t *interp, int argc, char **argv)
     system = snmpv2_mib_new_system();
     system->sysContact = argv[1];
     system->_sysContactLength = strlen(system->sysContact);
-    code = snmpv2_mib_set_system(interp->peer, system);
+    snmpv2_mib_set_system(interp->peer, system, SNMPV2_MIB_SYSCONTACT);
     snmpv2_mib_free_system(system);
 
     if (interp->peer->error_status) {
-	scli_snmp_error(interp);
-	return SCLI_ERROR;
+	return SCLI_SNMP;
     }
 
     return SCLI_OK;
@@ -1114,12 +1128,11 @@ set_system_name(scli_interp_t *interp, int argc, char **argv)
     system = snmpv2_mib_new_system();
     system->sysName = argv[1];
     system->_sysNameLength = strlen(system->sysName);
-    (void) snmpv2_mib_set_system(interp->peer, system);
+    snmpv2_mib_set_system(interp->peer, system, SNMPV2_MIB_SYSNAME);
     snmpv2_mib_free_system(system);
     
     if (interp->peer->error_status) {
-	scli_snmp_error(interp);
-	return SCLI_ERROR;
+	return SCLI_SNMP;
     }
 
     return SCLI_OK;
@@ -1141,12 +1154,11 @@ set_system_location(scli_interp_t *interp, int argc, char **argv)
     system = snmpv2_mib_new_system();
     system->sysLocation = argv[1];
     system->_sysLocationLength = strlen(system->sysLocation);
-    (void) snmpv2_mib_set_system(interp->peer, system);
+    snmpv2_mib_set_system(interp->peer, system, SNMPV2_MIB_SYSLOCATION);
     snmpv2_mib_free_system(system);
 
     if (interp->peer->error_status) {
-	scli_snmp_error(interp);
-	return SCLI_ERROR;
+	return SCLI_SNMP;
     }
 
     return SCLI_OK;
@@ -1289,6 +1301,14 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "information as the show system storage command. The\n"
 	  "information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  NULL, NULL,
+	  show_system_storage },
+
+	{ "loop system storage", NULL,
+	  "The monitor system storage command shows the same\n"
+	  "information as the show system storage command. The\n"
+	  "information is updated periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_LOOP | SCLI_CMD_FLAG_XML,
 	  NULL, NULL,
 	  show_system_storage },
 

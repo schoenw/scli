@@ -309,8 +309,8 @@ show_printer_general(GString *s,
 static int
 cmd_printer_info(scli_interp_t * interp, int argc, char **argv)
 {
-    host_resources_mib_hrPrinterEntry_t **hrPrinterTable;
-    host_resources_mib_hrDeviceEntry_t **hrDeviceTable;
+    host_resources_mib_hrPrinterEntry_t **hrPrinterTable = NULL;
+    host_resources_mib_hrDeviceEntry_t **hrDeviceTable = NULL;
     printer_mib_prtGeneralEntry_t **prtGeneralTable = NULL;
     printer_mib_prtLocalizationEntry_t **prtLocalTable = NULL;
     gint32 last = 0;
@@ -318,14 +318,15 @@ cmd_printer_info(scli_interp_t * interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (host_resources_mib_get_hrPrinterTable(interp->peer, &hrPrinterTable)) {
-	return SCLI_ERROR;
+    host_resources_mib_get_hrPrinterTable(interp->peer, &hrPrinterTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
-    (void) host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable);
-    (void) printer_mib_get_prtGeneralTable(interp->peer, &prtGeneralTable);
-    (void) printer_mib_get_prtLocalizationTable(interp->peer, &prtLocalTable);
 
     if (hrPrinterTable) {
+	host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable, 0);
+	printer_mib_get_prtGeneralTable(interp->peer, &prtGeneralTable, 0);
+	printer_mib_get_prtLocalizationTable(interp->peer, &prtLocalTable, 0);
 	for (i = 0; hrPrinterTable[i]; i++) {
 	    if (hrPrinterTable[i]->hrDeviceIndex != last) {
 		if (i > 0) {
@@ -429,8 +430,9 @@ cmd_printer_alert(scli_interp_t * interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (printer_mib_get_prtAlertTable(interp->peer, &prtAlertTable)) {
-	return SCLI_ERROR;
+    printer_mib_get_prtAlertTable(interp->peer, &prtAlertTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (prtAlertTable) {
@@ -783,8 +785,9 @@ cmd_printer_inputs(scli_interp_t * interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (printer_mib_get_prtInputTable(interp->peer, &prtInputTable)) {
-	return SCLI_ERROR;
+    printer_mib_get_prtInputTable(interp->peer, &prtInputTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (prtInputTable) {
@@ -829,9 +832,10 @@ cmd_printer_console(scli_interp_t * interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (printer_mib_get_prtConsoleDisplayBufferTable(interp->peer,
-					     &prtConsoleDisplayTable)) {
-	return SCLI_ERROR;
+    printer_mib_get_prtConsoleDisplayBufferTable(interp->peer,
+						 &prtConsoleDisplayTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (prtConsoleDisplayTable) {
@@ -906,9 +910,10 @@ cmd_printer_lights(scli_interp_t * interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (printer_mib_get_prtConsoleLightTable(interp->peer, &
-					     prtConsoleLightTable)) {
-	return SCLI_ERROR;
+    printer_mib_get_prtConsoleLightTable(interp->peer,
+					 &prtConsoleLightTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (prtConsoleLightTable) {

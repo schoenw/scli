@@ -70,10 +70,11 @@ extern char const scli_copyright[];	/* copyright message (surprise) */
 #define SCLI_OK			0	/* normal return code */
 #define SCLI_ERROR		1	/* generic error return code */
 #define SCLI_EXIT		2	/* return and exit the command loop */
-#define SCLI_SYNTAX		3	/* generic syntax error */
-#define SCLI_SYNTAX_REGEXP	4	/* syntax error in regexp */
-#define SCLI_SYNTAX_NUMBER	5	/* syntax error in number */
-#define SCLI_SYNTAX_VALUE	6	/* syntax error in value */
+#define SCLI_SNMP		3	/* snmp error return code */
+#define SCLI_SYNTAX		4	/* generic syntax error */
+#define SCLI_SYNTAX_REGEXP	5	/* syntax error in regexp */
+#define SCLI_SYNTAX_NUMBER	6	/* syntax error in number */
+#define SCLI_SYNTAX_VALUE	7	/* syntax error in value */
 
 
 typedef struct scli_interp	scli_interp_t;
@@ -84,7 +85,8 @@ typedef struct scli_alias	scli_alias_t;
 
 #define SCLI_CMD_FLAG_NEED_PEER	0x01
 #define SCLI_CMD_FLAG_MONITOR	0x02
-#define SCLI_CMD_FLAG_XML	0x04
+#define SCLI_CMD_FLAG_LOOP	0x04
+#define SCLI_CMD_FLAG_XML	0x08
 
 struct scli_cmd {
     char *path;			/* absolute command name */
@@ -112,8 +114,9 @@ struct scli_alias {
 
 #define SCLI_INTERP_FLAG_INTERACTIVE	0x01
 #define SCLI_INTERP_FLAG_RECURSIVE	0x02
-#define SCLI_INTERP_FLAG_XML		0x04
-#define SCLI_INTERP_FLAG_MONITOR	0x08
+#define SCLI_INTERP_FLAG_MONITOR	0x04
+#define SCLI_INTERP_FLAG_LOOP		0x08
+#define SCLI_INTERP_FLAG_XML		0x10
 
 struct scli_interp {
     GNode *cmd_root;		/* root of the command tree */
@@ -131,10 +134,13 @@ struct scli_interp {
 };
 
 extern scli_interp_t *
-scli_interp_create();
+scli_interp_create(void);
 
 extern void
-scli_interp_delete();
+scli_interp_delete(scli_interp_t *interp);
+
+extern void
+scli_interp_reset(scli_interp_t *interp);
 
 #define scli_interp_interactive(interp) \
 	(interp->flags & SCLI_INTERP_FLAG_INTERACTIVE)
@@ -150,6 +156,9 @@ scli_split(char *string, int *argc, char ***argv);
 
 extern int
 scli_monitor(scli_interp_t *interp, GNode *node, int argc, char **argv);
+
+extern int
+scli_loop(scli_interp_t *interp, GNode *node, int argc, char **argv);
 
 extern int
 scli_eval(scli_interp_t *interp, char *cmd);
@@ -182,10 +191,10 @@ extern void
 scli_get_screen(int *rows, int *cols);
 
 extern void
-scli_curses_on();
+scli_curses_on(void);
 
 extern void
-scli_curses_off();
+scli_curses_off(void);
 
 extern int
 scli_set_pager(scli_interp_t *interp, const char *pager);

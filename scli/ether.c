@@ -248,13 +248,13 @@ cmd_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (mau_mib_get_ifMauTable(interp->peer, &ifMauTable)) {
-	return SCLI_ERROR;
+    mau_mib_get_ifMauTable(interp->peer, &ifMauTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
-    (void) mau_mib_get_ifJackTable(interp->peer, &ifJackTable);
-
     if (ifMauTable) {
+	mau_mib_get_ifJackTable(interp->peer, &ifJackTable, 0);
 	g_string_sprintfa(interp->header,
 		  "INTERFACE   MAU STATUS      MEDIA         JABBER   AUTONEG TYPE");
 	for (i = 0; ifMauTable[i]; i++) {
@@ -301,8 +301,9 @@ cmd_ether_stats(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (etherlike_mib_get_dot3StatsTable(interp->peer, &dot3StatsTable)) {
-	return SCLI_ERROR;
+    etherlike_mib_get_dot3StatsTable(interp->peer, &dot3StatsTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (epoch < interp->epoch) {

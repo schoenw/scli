@@ -154,11 +154,12 @@ show_snmp_engine(scli_interp_t *interp, int argc, char **argv)
     snmpv2_mib_snmp_t *snmp;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
-    
-    if (snmp_framework_mib_get_snmpEngine(interp->peer, &snmpEngine)) {
-	return SCLI_ERROR;
+
+    snmp_framework_mib_get_snmpEngine(interp->peer, &snmpEngine, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
-    (void) snmpv2_mib_get_snmp(interp->peer, &snmp);
+    snmpv2_mib_get_snmp(interp->peer, &snmp, 0);
 
     fmt_snmp_engine(interp->result, snmpEngine, snmp);
     
@@ -211,11 +212,12 @@ show_snmp_resources(scli_interp_t *interp, int argc, char **argv)
     int i;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
-    
-    if (snmpv2_mib_get_sysORTable(interp->peer, &sysORTable)) {
-	return SCLI_ERROR;
+
+    snmpv2_mib_get_sysORTable(interp->peer, &sysORTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
-    (void) snmpv2_mib_get_system(interp->peer, &system);
+    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
         
     if (sysORTable) {
 	for (i = 0; sysORTable[i]; i++) {
@@ -276,9 +278,10 @@ show_snmp_vacm_groups(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(interp->peer,
-						     &vacmGroupTable)) {
-	return SCLI_ERROR;
+    snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(interp->peer,
+							 &vacmGroupTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (vacmGroupTable) {
@@ -367,9 +370,10 @@ show_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (snmp_view_based_acm_mib_get_vacmAccessTable(interp->peer,
-						    &vacmAccessTable)) {
-	return SCLI_ERROR;
+    snmp_view_based_acm_mib_get_vacmAccessTable(interp->peer,
+						&vacmAccessTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (vacmAccessTable) {
@@ -466,9 +470,10 @@ show_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (snmp_view_based_acm_mib_get_vacmViewTreeFamilyTable(interp->peer,
-						    &vacmViewTable)) {
-	return SCLI_ERROR;
+    snmp_view_based_acm_mib_get_vacmViewTreeFamilyTable(interp->peer,
+							&vacmViewTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (vacmViewTable) {

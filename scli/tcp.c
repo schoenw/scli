@@ -77,8 +77,9 @@ show_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable)) {
-	return SCLI_ERROR;
+    tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (tcpConnTable) {
@@ -195,8 +196,9 @@ show_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable)) {
-	return SCLI_ERROR;
+    tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (tcpConnTable) {

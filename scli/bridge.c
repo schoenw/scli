@@ -49,11 +49,11 @@ fmt_bridge_info(GString *s,
 		    || *dot1dBase->dot1dBaseType == 4)
 		&& dot1dTp
 		&& dot1dTp->dot1dTpAgingTime) {
-		g_string_sprintfa(s, "%-*s %d sec\n", indent, "Aging Time:",
+		g_string_sprintfa(s, "%-*s %d sec\n", indent, "Tp Aging Time:",
 				  *dot1dTp->dot1dTpAgingTime);
 	    }
 	    if (dot1dStp && dot1dStp->dot1dStpMaxAge) {
-		g_string_sprintfa(s, "%-*s %d sec\n", indent, "Aging Time:",
+		g_string_sprintfa(s, "%-*s %d sec\n", indent, "Stp Aging Time:",
 				  *dot1dStp->dot1dStpMaxAge);
 	    }
 	}
@@ -75,11 +75,12 @@ show_bridge_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (bridge_mib_get_dot1dBase(interp->peer, &dot1dBase)) {
-	return SCLI_ERROR;
+    bridge_mib_get_dot1dBase(interp->peer, &dot1dBase, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
-    (void) bridge_mib_get_dot1dTp(interp->peer, &dot1dTp);
-    (void) bridge_mib_get_dot1dStp(interp->peer, &dot1dStp);
+    bridge_mib_get_dot1dTp(interp->peer, &dot1dTp, 0);
+    bridge_mib_get_dot1dStp(interp->peer, &dot1dStp, 0);
     
     if (dot1dBase
 	&& dot1dBase->dot1dBaseNumPorts
@@ -165,12 +166,12 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (bridge_mib_get_dot1dBasePortTable(interp->peer, &dot1dBasePortTable)) {
-	return SCLI_ERROR;
+    bridge_mib_get_dot1dBasePortTable(interp->peer, &dot1dBasePortTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
-
-    (void) if_mib_get_ifTable(interp->peer, &ifTable);
-    (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
+    if_mib_get_ifTable(interp->peer, &ifTable, 0);
+    if_mib_get_ifXTable(interp->peer, &ifXTable, 0);
     
     if (dot1dBasePortTable) {
 	for (i = 0; ifTable[i]; i++) {
@@ -270,8 +271,9 @@ show_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (bridge_mib_get_dot1dTpFdbTable(interp->peer, &dot1dTpFdbTable)) {
-	return SCLI_ERROR;
+    bridge_mib_get_dot1dTpFdbTable(interp->peer, &dot1dTpFdbTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (dot1dTpFdbTable) {
@@ -357,8 +359,9 @@ show_bridge_filter(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (bridge_mib_get_dot1dStaticTable(interp->peer, &dot1dStaticTable)) {
-	return SCLI_ERROR;
+    bridge_mib_get_dot1dStaticTable(interp->peer, &dot1dStaticTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (dot1dStaticTable) {
@@ -397,8 +400,9 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (bridge_mib_get_dot1dTpPortTable(interp->peer, &portTable)) {
-	return SCLI_ERROR;
+    bridge_mib_get_dot1dTpPortTable(interp->peer, &portTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (epoch < interp->epoch) {

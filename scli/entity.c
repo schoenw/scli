@@ -102,8 +102,9 @@ show_entity_containment(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable)) {
-	return SCLI_ERROR;
+    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (entPhysicalTable) {
@@ -313,8 +314,9 @@ show_entity_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable)) {
-	return SCLI_ERROR;
+    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (entPhysicalTable) {
@@ -385,8 +387,9 @@ show_entity_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable)) {
-	return SCLI_ERROR;
+    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (entPhysicalTable) {

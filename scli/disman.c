@@ -24,6 +24,7 @@
 
 #include "iana-language-mib.h"
 #include "disman-script-mib.h"
+#include "disman-script-mib-proc.h"
 #include "disman-schedule-mib.h"
 
 #include <time.h>
@@ -642,12 +643,13 @@ cmd_languages(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (disman_script_mib_get_smLangTable(interp->peer, &smLangTable)) {
-	return SCLI_ERROR;
+    disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
-    (void) disman_script_mib_get_smExtsnTable(interp->peer, &smExtsnTable);
 
     if (smLangTable) {
+	disman_script_mib_get_smExtsnTable(interp->peer, &smExtsnTable, 0);
 	for (i = 0; smLangTable[i]; i++) {
 	    if (i) {
 		g_string_append(interp->result, "\n");
@@ -745,13 +747,13 @@ cmd_script_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (disman_script_mib_get_smLangTable(interp->peer, &smLangTable)) {
-	return SCLI_ERROR;
+    disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
-    (void) disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable);
-
     if (smScriptTable) {
+	disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable, 0);
 	for (i = 0; smScriptTable[i]; i++) {
 	    if (i) {
 		g_string_append(interp->result, "\n");
@@ -848,14 +850,14 @@ cmd_script_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (disman_script_mib_get_smLangTable(interp->peer, &smLangTable)) {
-	return SCLI_ERROR;
+    disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
-    (void) disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable);
-    (void) disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable);
-
     if (smScriptTable) {
+	disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable, 0);
+	disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
 	for (i = 0; smScriptTable[i]; i++) {
 	    if (smScriptTable[i]->_smScriptOwnerLength > owner_width) {
 		owner_width = smScriptTable[i]->_smScriptOwnerLength;
@@ -971,14 +973,14 @@ cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable)) {
-	return SCLI_ERROR;
+    disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
-    (void) disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable);
-    (void) disman_script_mib_get_smRunTable(interp->peer, &smRunTable);
-
     if (smLaunchTable) {
+	disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable, 0);
+	disman_script_mib_get_smRunTable(interp->peer, &smRunTable, 0);
 	for (i = 0; smLaunchTable[i]; i++) {
 	    if (smLaunchTable[i]->_smLaunchOwnerLength > owner_width) {
 		owner_width = smLaunchTable[i]->_smLaunchOwnerLength;
@@ -1129,8 +1131,9 @@ cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable)) {
-	return SCLI_ERROR;
+    disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (smLaunchTable) {
@@ -1204,8 +1207,9 @@ cmd_run_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (disman_script_mib_get_smRunTable(interp->peer, &smRunTable)) {
-	return SCLI_ERROR;
+    disman_script_mib_get_smRunTable(interp->peer, &smRunTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (smRunTable) {
@@ -1351,13 +1355,13 @@ cmd_run_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (disman_script_mib_get_smRunTable(interp->peer, &smRunTable)) {
-	return SCLI_ERROR;
+    disman_script_mib_get_smRunTable(interp->peer, &smRunTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
-    (void) disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable);
-
     if (smRunTable) {
+	disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
 	for (i = 0; smRunTable[i]; i++) {
 	    if (i) {
 		g_string_append(interp->result, "\n");
@@ -1414,8 +1418,9 @@ cmd_scheduler_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (disman_schedule_mib_get_schedTable(interp->peer, &schedTable)) {
-	return SCLI_ERROR;
+    disman_schedule_mib_get_schedTable(interp->peer, &schedTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (schedTable) {
@@ -1532,8 +1537,9 @@ cmd_scheduler_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (disman_schedule_mib_get_schedTable(interp->peer, &schedTable)) {
-	return SCLI_ERROR;
+    disman_schedule_mib_get_schedTable(interp->peer, &schedTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (schedTable) {
@@ -1552,10 +1558,40 @@ cmd_scheduler_details(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+create_disman_script(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 4) {
+	return SCLI_SYNTAX;
+    }
+
+    if (strlen(argv[1]) > 32 || strlen(argv[2]) > 32) {
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    disman_script_mib_proc_create_script(interp->peer,
+					 argv[1], argv[2], argv[3]);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_disman_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
+	{ "create disman script", "<owner> <name> [<description>]",
+	  "...",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  create_disman_script },	  
 
 	{ "show disman languages", NULL,
 	  "languages supported by the distributed manager",

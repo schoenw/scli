@@ -36,8 +36,9 @@ show_ospf_info(scli_interp_t *interp, int argc, char **argv)
 
    g_return_val_if_fail(interp, SCLI_ERROR);
 
-   if (ospf_mib_get_ospfGeneralGroup(interp->peer, &ospfGeneralGroup)) {
-       return SCLI_ERROR;
+   ospf_mib_get_ospfGeneralGroup(interp->peer, &ospfGeneralGroup, 0);
+   if (interp->peer->error_status) {
+       return SCLI_SNMP;
    }
 
    if (ospfGeneralGroup) {
@@ -254,8 +255,9 @@ show_ospf_area(scli_interp_t *interp, int argc, char **argv)
 
    g_return_val_if_fail(interp, SCLI_ERROR);
 
-   if (ospf_mib_get_ospfAreaTable(interp->peer, &ospfAreaTable)) {
-       return SCLI_ERROR;
+   ospf_mib_get_ospfAreaTable(interp->peer, &ospfAreaTable, 0);
+   if (interp->peer->error_status) {
+       return SCLI_SNMP;
    }
 
    if (ospfAreaTable) {
@@ -369,15 +371,15 @@ show_ospf_interfaces(scli_interp_t *interp, int argc, char **argv)
 
    g_return_val_if_fail(interp, SCLI_ERROR);
 
-   if (ospf_mib_get_ospfIfTable(interp->peer, &ospfIfTable)) {
-       return SCLI_ERROR;
+   ospf_mib_get_ospfIfTable(interp->peer, &ospfIfTable, 0);
+   if (interp->peer->error_status) {
+       return SCLI_SNMP;
    }
 
-   (void) if_mib_get_ifTable(interp->peer, &ifTable);
-   (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
-   (void) ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable);
-
    if (ospfIfTable) {
+       if_mib_get_ifTable(interp->peer, &ifTable, 0);
+       if_mib_get_ifXTable(interp->peer, &ifXTable, 0);
+       ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0);
        for (i = 0; ospfIfTable[i]; i++) {
 	   if (i) {
 	       g_string_append(interp->result, "\n");

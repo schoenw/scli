@@ -71,8 +71,9 @@ show_udp_listener(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (udp_mib_get_udpTable(interp->peer, &udpTable)) {
-	return SCLI_ERROR;
+    udp_mib_get_udpTable(interp->peer, &udpTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
 
     if (udpTable) {

@@ -87,14 +87,15 @@ show_atm_interface(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (atm_mib_get_atmInterfaceConfTable(interp->peer,
-					  &atmInterfaceConfTable)) {
-	return SCLI_ERROR;
+    atm_mib_get_atmInterfaceConfTable(interp->peer,
+				      &atmInterfaceConfTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
     }
-    (void) if_mib_get_ifTable(interp->peer, &ifTable);
-    (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
     
     if (atmInterfaceConfTable) {
+	if_mib_get_ifTable(interp->peer, &ifTable, 0);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, 0);
 	if (! scli_interp_xml(interp)) {
 	    g_string_append(interp->header, "INTERFACE MAX-VPCS MAX-VCCS");
 	}

@@ -91,13 +91,16 @@ scli_set_pager(scli_interp_t *interp, const char *pager)
 void
 scli_snmp_error(scli_interp_t *interp)
 {
-    if (interp->peer->error_status) {
+    if (interp->peer) {
 	const char *error;
 	error = gsnmp_enum_get_label(gsnmp_error_status_table,
 				     interp->peer->error_status);
-	g_string_sprintfa(interp->result, "%s@%d",
-			  error ? error : "genError",
-			  interp->peer->error_index);
+	g_string_sprintfa(interp->result,
+			  "%s", error ? error : "internalError");
+	if ((int) (interp->peer->error_status) > 0) {
+	    g_string_sprintfa(interp->result,
+			      "@%d", interp->peer->error_index);
+	}
     }
 }
 
@@ -557,23 +560,40 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 	interp->flags |= SCLI_INTERP_FLAG_MONITOR;
 	code = scli_monitor(interp, node, argc, argv);
 	interp->flags &= ~SCLI_INTERP_FLAG_MONITOR;
+    } else if (cmd->flags & SCLI_CMD_FLAG_LOOP) {
+	interp->flags |= SCLI_INTERP_FLAG_LOOP;
+	code = scli_loop(interp, node, argc, argv);
+	interp->flags &= ~SCLI_INTERP_FLAG_LOOP;
     } else {
 	code = (cmd->func) (interp, argc, argv);
     }
 
     switch (code) {
     case SCLI_SYNTAX_VALUE:
-	g_printerr("error: invalid value\n");
+	g_printerr("syntax error: invalid value\n");
 	break;
     case SCLI_SYNTAX_NUMBER:
-	g_printerr("error: invalid number\n");
+	g_printerr("syntax error: invalid number\n");
 	break;
     case SCLI_SYNTAX_REGEXP:
-	g_printerr("error: invalid regular expression\n");
+	g_printerr("syntax error: invalid regular expression\n");
 	break;
     case SCLI_SYNTAX:
 	g_printerr("usage: %s %s\n", cmd->path,
 		   cmd->options ? cmd->options : "");
+	break;
+    case SCLI_SNMP:
+	g_printerr("snmp error:");
+	if (interp->peer) {
+	    const char *error;
+	    error = gsnmp_enum_get_label(gsnmp_error_status_table,
+					 interp->peer->error_status);
+	    g_printerr(" %s", error ? error : "internalError");
+	    if ((int) (interp->peer->error_status) > 0) {
+		g_printerr("@%d", interp->peer->error_index);
+	    }
+	}
+	g_printerr("\n");
 	break;
     case SCLI_ERROR:
 	g_printerr("error: %s\n",
@@ -848,7 +868,8 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
     if (scli_interp_interactive(interp)) {
 	g_print("Trying SNMPv2c ... ");
     }
-    if (snmpv2_mib_get_system(interp->peer, &system) == 0 && system) {
+    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
+    if (interp->peer->error_status == 0) {
 	if (scli_interp_interactive(interp)) {
 	    g_print("good!\n");
 	}
@@ -857,7 +878,8 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 	    g_print("timeout.\nTrying SNMPv1  ... ");
 	}
 	interp->peer->version = G_SNMP_V1;
-	if (snmpv2_mib_get_system(interp->peer, &system) == 0 && system) {
+	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
+	if (interp->peer->error_status == 0) {
 	    if (scli_interp_interactive(interp)) {
 		g_print("ok.\n");
 	    }
