@@ -134,14 +134,17 @@ xml_tcp_connection(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry,
 				       SCLI_FMT_ADDR),
 		      fmt_tcp_port(tcpConnEntry->tcpConnLocalPort,
 				   SCLI_FMT_ADDR));
-    g_string_sprintfa(s, " dst=\"%s:%s:\" state=\"",
+    g_string_sprintfa(s, " dst=\"%s:%s\">\n",
 		      fmt_ipv4_address(tcpConnEntry->tcpConnRemAddress,
 				       SCLI_FMT_ADDR),
 		      fmt_tcp_port(tcpConnEntry->tcpConnRemPort,
 				   SCLI_FMT_ADDR));
-    fmt_enum(s, 1, tcp_mib_enums_tcpConnState,
-	     tcpConnEntry->tcpConnState);
-    g_string_append(s, "\"/>\n");
+
+    g_string_append(s, "    <state>");
+    fmt_enum(s, 1, tcp_mib_enums_tcpConnState, tcpConnEntry->tcpConnState);
+    g_string_append(s, "</state>\n");
+
+    g_string_append(s, "  </connection>\n");
 }
 
 
