@@ -126,16 +126,16 @@ cmd_processes(scli_interp_t *interp, int argc, char **argv)
 	    } else {
 		g_string_sprintfa(s, " %5s", "--:--");
 	    }
-	    if (hrSWRunEntry[i]->hrSWRunName
-		&& hrSWRunEntry[i]->_hrSWRunNameLength) {
+	    if (hrSWRunEntry[i]->hrSWRunPath
+		&& hrSWRunEntry[i]->_hrSWRunPathLength) {
 		g_string_sprintfa(s, " %.*s",
-				  (int) hrSWRunEntry[i]->_hrSWRunNameLength,
-				  hrSWRunEntry[i]->hrSWRunName);
+			    (int) hrSWRunEntry[i]->_hrSWRunPathLength,
+				  hrSWRunEntry[i]->hrSWRunPath);
 	    }
 	    if (hrSWRunEntry[i]->hrSWRunParameters
 		&& hrSWRunEntry[i]->_hrSWRunParametersLength) {
 		g_string_sprintfa(s, " %.*s",
-				  (int) hrSWRunEntry[i]->_hrSWRunParametersLength,
+			    (int) hrSWRunEntry[i]->_hrSWRunParametersLength,
 				  hrSWRunEntry[i]->hrSWRunParameters);
 	    }
 	    g_string_append(s, "\n");
@@ -434,7 +434,7 @@ cmd_system(scli_interp_t *interp, int argc, char **argv)
     if (bridge_mib_get_dot1dBase(interp->peer, &dot1dBase) == 0
 	&& dot1dBase) {
 	if (dot1dBase->dot1dBaseNumPorts) {
-	    g_string_sprintfa(s, "\n%-*s %d", indent, "Bridge Ports:",
+	    g_string_sprintfa(s, "\n%-*s %d ", indent, "Bridge Ports:",
 			      *(dot1dBase->dot1dBaseNumPorts));
 	    if (dot1dBase->dot1dBaseType) {
 		fmt_enum(s, 60, bridge_mib_enums_dot1dBaseType,
