@@ -82,9 +82,8 @@ ipv4_init(gboolean dobind)
 }
 
 static gboolean
-ipv4_resolve_address(gchar *taddress, struct sockaddr **address)
+ipv4_resolve_address(gchar *taddress, guint16 port, struct sockaddr **address)
 {
-    struct servent *port;
     struct hostent *hp;
     struct sockaddr_in *adr;
     
@@ -98,10 +97,7 @@ ipv4_resolve_address(gchar *taddress, struct sockaddr **address)
     }
     g_memmove((char *)&adr->sin_addr, (char *)hp->h_addr, hp->h_length);
 
-    /* XXX we should allow the application to provide the port number */
-    
-    port = getservbyname("snmp","udp");
-    adr->sin_port = port ? port->s_port : htons(161);
+    adr->sin_port = htons(port);
     *address = (struct sockaddr *)adr;
     return TRUE;
 }
@@ -159,7 +155,7 @@ ipv4_get_socket()
 static gint ipx_socket  = 0;      /* file handle for SNMP traffic */
 
 static gboolean
-ipx_resolve_address (guchar *hostname, struct sockaddr **address)
+ipx_resolve_address(guchar *hostname, guint16 port, struct sockaddr **address)
 {
   struct sockaddr_ipx *adr;
   char *net, *hwaddr;
@@ -275,7 +271,7 @@ ipx_get_socket()
 static gint ipv6_socket  = 0;      /* file handle for SNMP traffic */
 
 static gboolean
-ipv6_resolve_address (guchar *hostname, struct sockaddr **address)
+ipv6_resolve_address(guchar *hostname, guint16 port, struct sockaddr **address)
 {
   struct sockaddr_in6 *adr;
   struct servent *port;
