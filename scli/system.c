@@ -534,8 +534,8 @@ cmd_system_info(scli_interp_t *interp, int argc, char **argv)
     if (hrSystem) {
 	if (hrSystem->hrSystemDate && hrSystem->_hrSystemDateLength) {
 	    g_string_sprintfa(s, "\n%-*s ", indent, "Current Time:");
-	    fmt_date_and_time(s, hrSystem->hrSystemDate,
-			      hrSystem->_hrSystemDateLength);
+	    g_string_append(s, fmt_date_and_time(hrSystem->hrSystemDate,
+					 hrSystem->_hrSystemDateLength));
 	}
     }
 
@@ -568,8 +568,8 @@ cmd_system_info(scli_interp_t *interp, int argc, char **argv)
 
     if (hrStorage) {
 	if (hrStorage->hrMemorySize) {
-	    g_string_sprintfa(s, "\n%-*s ", indent, "Memory:");
-	    fmt_kbytes(s, *(hrStorage->hrMemorySize));	
+	    g_string_sprintfa(s, "\n%-*s %s", indent, "Memory:",
+			      fmt_kbytes(*(hrStorage->hrMemorySize)));
 	}
     }
 

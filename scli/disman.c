@@ -682,8 +682,8 @@ show_script_details(GString *s,
 	     smScriptEntry->smScriptStorageType);
     g_string_append(s, "Change:   ");
     if (smScriptEntry->smScriptLastChange) {
-	fmt_date_and_time(s, smScriptEntry->smScriptLastChange,
-			  smScriptEntry->_smScriptLastChangeLength);
+	g_string_append(s, fmt_date_and_time(smScriptEntry->smScriptLastChange,
+			     smScriptEntry->_smScriptLastChangeLength));
     }
     g_string_append(s, "\n");
     
@@ -1048,8 +1048,8 @@ show_launch_details(GString *s,
 	     smLaunchEntry->smLaunchStorageType);
     g_string_append(s, "Change:   ");
     if (smLaunchEntry->smLaunchLastChange) {
-	fmt_date_and_time(s, smLaunchEntry->smLaunchLastChange,
-			  smLaunchEntry->_smLaunchLastChangeLength);
+	g_string_append(s, fmt_date_and_time(smLaunchEntry->smLaunchLastChange,
+			     smLaunchEntry->_smLaunchLastChangeLength));
     }
     g_string_append(s, "\n");
 
@@ -1226,8 +1226,8 @@ show_run_details(GString *s,
 	     smRunEntry->smRunState);
     g_string_append(s, "Start:    ");
     if (smRunEntry->smRunStartTime) {
-	fmt_date_and_time(s, smRunEntry->smRunStartTime,
-			  smRunEntry->_smRunStartTimeLength);
+	g_string_append(s, fmt_date_and_time( smRunEntry->smRunStartTime,
+				      smRunEntry->_smRunStartTimeLength));
     }
     g_string_append(s, "\n");
 
@@ -1236,8 +1236,8 @@ show_run_details(GString *s,
 	     smRunEntry->smRunExitCode);
     g_string_append(s, "Result:   ");
     if (smRunEntry->smRunResultTime) {
-	fmt_date_and_time(s, smRunEntry->smRunResultTime,
-			  smRunEntry->_smRunResultTimeLength);
+	g_string_append(s, fmt_date_and_time(smRunEntry->smRunResultTime,
+				     smRunEntry->_smRunResultTimeLength));
     }
     g_string_append(s, "\n");
     
@@ -1254,8 +1254,8 @@ show_run_details(GString *s,
     }
     g_string_append(s, "  Error:    ");
     if (smRunEntry->smRunErrorTime) {
-	fmt_date_and_time(s, smRunEntry->smRunErrorTime,
-			  smRunEntry->_smRunErrorTimeLength);
+	g_string_append(s, fmt_date_and_time(smRunEntry->smRunErrorTime,
+				     smRunEntry->_smRunErrorTimeLength));
     }
     g_string_append(s, "\n");
 
@@ -1268,8 +1268,8 @@ show_run_details(GString *s,
     }
     g_string_append(s, "  End:      ");
     if (smRunEntry->smRunEndTime) {
-	fmt_date_and_time(s, smRunEntry->smRunEndTime,
-			  smRunEntry->_smRunEndTimeLength);
+	g_string_append(s, fmt_date_and_time(smRunEntry->smRunEndTime,
+				     smRunEntry->_smRunEndTimeLength));
     }
     g_string_append(s, "\n");
 
@@ -1436,8 +1436,8 @@ show_scheduler_details(GString *s,
 	     schedEntry->schedLastFailure);
     g_string_append(s, "Error:    ");
     if (schedEntry->schedLastFailed) {
-	fmt_date_and_time(s, schedEntry->schedLastFailed,
-			  schedEntry->_schedLastFailedLength);
+	g_string_append(s, fmt_date_and_time(schedEntry->schedLastFailed,
+				     schedEntry->_schedLastFailedLength));
     }
     g_string_append(s, "\n");
     

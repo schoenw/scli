@@ -60,13 +60,19 @@ date_to_time(guchar *date, gsize len)
 
 
 
-void
-fmt_date_and_time(GString *s, guchar *data, gsize len)
+char const *
+fmt_date_and_time(guchar *data, gsize len)
 {
+    static char buffer[80];
     int i;
+
+    if (! data) {
+	buffer[0] = 0;
+	return buffer;
+    }
     
     /*
-     * Check if it is a NULL value consisting of all 0x00 bytes or if
+     * Check if it is a null value consisting of all 0x00 bytes or if
      * it has a length of 0 (not really legal, but people sometimes
      * do it this way.
      */
@@ -76,8 +82,8 @@ fmt_date_and_time(GString *s, guchar *data, gsize len)
     }
 
     if (len == 0 || i == len) {
-	g_string_sprintfa(s, "-");
-	return;
+	strcpy(buffer, "-");
+	return buffer;
     }
 
     /*
@@ -85,16 +91,18 @@ fmt_date_and_time(GString *s, guchar *data, gsize len)
      */
     
     if (len == 8) {
-	g_string_sprintfa(s, "%04u-%02u-%02u %02u:%02u:%02u",
-			  (data[0] << 8) + data[1], data[2], data[3],
-			  data[4], data[5], data[6]);
+	g_snprintf(buffer, sizeof(buffer),
+		   "%04u-%02u-%02u %02u:%02u:%02u",
+		   (data[0] << 8) + data[1], data[2], data[3],
+		   data[4], data[5], data[6]);
+    } else if (len == 11) {
+	g_snprintf(buffer, sizeof(buffer),
+		   "%04u-%02u-%02u %02u:%02u:%02u %c%02u:%02u",
+		   (data[0] << 8) + data[1], data[2], data[3],
+		   data[4], data[5], data[6],
+		   data[8], data[9], data[10]);
     }
-    if (len == 11) {
-	g_string_sprintfa(s, "%04u-%02u-%02u %02u:%02u:%02u %c%02u:%02u",
-			  (data[0] << 8) + data[1], data[2], data[3],
-			  data[4], data[5], data[6],
-			  data[8], data[9], data[10]);
-    }
+    return buffer;
 }
 
 
@@ -114,14 +122,14 @@ fmt_date_and_time_delta(guchar *date1, gsize len1,
 
 
 char const *
-fmt_seconds(guint32 number)
+fmt_seconds(guint32 seconds)
 {
     static char buffer[80];
     guint32 sec, min, hour;
 
-    sec  = (number) % 60;
-    min  = (number / 60) % 60;
-    hour = (number / 60 / 60);
+    sec  = (seconds) % 60;
+    min  = (seconds / 60) % 60;
+    hour = (seconds / 60 / 60);
 
     g_snprintf(buffer, sizeof(buffer), "%2d:%02d:%02d", hour, min, sec);
 
@@ -130,16 +138,19 @@ fmt_seconds(guint32 number)
 
 
 
-void
-fmt_kbytes(GString *s, guint32 kbytes)
+char const *
+fmt_kbytes(guint32 kbytes)
 {
+    static char buffer[80];
+    
     if (kbytes > 9999999) {
-	g_string_sprintfa(s, "%u GByte", kbytes / 1024 / 1024);
+	g_snprintf(buffer, sizeof(buffer), "%u GByte", kbytes / 1024 / 1024);
     } else if (kbytes > 9999) {
-	g_string_sprintfa(s, "%u MByte", kbytes / 1024);
+	g_snprintf(buffer, sizeof(buffer), "%u MByte", kbytes / 1024);
     } else {
-	g_string_sprintfa(s, "%u KByte", kbytes);
+	g_snprintf(buffer, sizeof(buffer), "%u KByte", kbytes);
     }
+    return buffer;
 }
 
 
@@ -164,7 +175,7 @@ fmt_enum(GString *s, int width, stls_enum_t const *table, gint32 *number)
 
 
 
-char*
+char const *
 fmt_kmg(guint32 number)
 {
     static char buffer[80];
@@ -183,7 +194,7 @@ fmt_kmg(guint32 number)
 
 
 
-char*
+char const *
 fmt_gtp(guint32 number)
 {
     static char buffer[80];

@@ -233,25 +233,25 @@ scli_get_ieee_vendor(guint32 prefix);
 extern void
 fmt_time_ticks(GString *s, guint32 timeticks);
 
-extern void
-fmt_date_and_time(GString *s, guchar *data, gsize len);
+extern char const *
+fmt_date_and_time(guchar *data, gsize len);
 
 extern char const *
 fmt_date_and_time_delta(guchar *date1, gsize len1, guchar *date2, gsize len2);
 
 extern char const *
-fmt_seconds(guint32 number);
+fmt_seconds(guint32 seconds);
 
-extern void
-fmt_kbytes(GString *s, guint32 kbytes);
+extern char const *
+fmt_kbytes(guint32 kbytes);
 
 extern void
 fmt_enum(GString *s, int width, stls_enum_t const *table, gint32 *number);
 
-extern char*
+extern char const *
 fmt_kmg(guint32 number);
 
-extern char*
+extern char const *
 fmt_gtp(guint32 number);
 
 #define SCLI_FMT_ADDR		0x01
