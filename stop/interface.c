@@ -191,7 +191,7 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	show_interface_summary(peer);
 	wattron(win, A_REVERSE);
 	mvwprintw(win, 0, 0, "%-*s",
-		  COLS, "  IF STAT   MTU SPEED I-BPS O-BPS I-PPS O-PPS  DESCR ...");
+		  COLS, "   IF STAT   MTU SPEED I-BPS O-BPS I-PPS O-PPS  DESCR ...");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
 	sleep(1);
@@ -218,9 +218,9 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	    GString *s;
 	    s = g_string_new(NULL);
 	    if (ifEntry[i]->ifIndex) {
-		g_string_sprintfa(s, "%4u", *(ifEntry[i]->ifIndex));
+		g_string_sprintfa(s, "%5u", *(ifEntry[i]->ifIndex));
 	    } else {
-		g_string_sprintfa(s, "%4u", i+1);
+		g_string_sprintfa(s, "%5u", i+1);
 	    }
 	    g_string_sprintfa(s, " %4s",
 			      fmt_ifStatus(ifEntry[i]->ifAdminStatus,
