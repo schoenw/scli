@@ -20,6 +20,7 @@ MIBS			= IF-MIB \
 			  SNMP-COMMUNITY-MIB \
 			  SNMP-VIEW-BASED-ACM-MIB \
 			  SNMP-TARGET-MIB \
+			  SNMP-NOTIFICATION-MIB \
 			  TUNNEL-MIB \
 			  EtherLike-MIB \
 			  MAU-MIB \
@@ -49,6 +50,7 @@ STUBS			= if-mib.h if-mib.c \
 			  snmp-community-mib.h snmp-community-mib.c \
 			  snmp-view-based-acm-mib.h snmp-view-based-acm-mib.c \
 			  snmp-target-mib.h snmp-target-mib.c \
+			  snmp-notification-mib.h snmp-notification-mib.c \
 			  tunnel-mib.h tunnel-mib.c \
 			  atm-mib.h atm-mib.c \
 			  etherlike-mib.h etherlike-mib.c \
