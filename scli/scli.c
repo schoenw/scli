@@ -226,7 +226,11 @@ completion(char *text, int start, int end)
      */
     
     if (! matches) {
+#ifdef HAVE_RL_COMPLETION_MATCHES
        rl_completion_entry_function = (rl_compentry_func_t *) completion;
+#else
+       rl_completion_entry_function = (Function *) completion;
+#endif
     }
     
     return matches;
