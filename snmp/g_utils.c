@@ -206,13 +206,32 @@ gsnmp_attr_assign(GSList *vbl,
 	 if (! attributes[i].label) {
 	      continue;
 	 }
-    
+
+#define CLASS_INT(x) (x == G_SNMP_INTEGER32 || x == G_SNMP_UNSIGNED32 || x == G_SNMP_COUNTER32 || x == G_SNMP_TIMETICKS)
+
+ #define CLASS_STRING(x) (x == G_SNMP_OCTETSTRING || x == G_SNMP_IPADDRESS || x == G_SNMP_OPAQUE)
+
 	 if (vb->type != attributes[i].type) {
-	      const char *a = gsnmp_enum_get_label(gsnmp_enum_type_table, vb->type);
-	      const char *b = gsnmp_enum_get_label(gsnmp_enum_type_table, attributes[i].type);
-	      g_warning("%s: type mismatch: %s%s%s", attributes[i].label,
-			(a) ? a : "", (a || b) ? " != " : "", (b) ? b : "");
-	      continue;
+	      const char *a = gsnmp_enum_get_label(gsnmp_enum_type_table,
+						   vb->type);
+	      const char *b = gsnmp_enum_get_label(gsnmp_enum_type_table,
+						   attributes[i].type);
+	      if ((a && b)
+		  && ((CLASS_INT(vb->type)
+		       && CLASS_INT(attributes[i].type))
+		      || (CLASS_STRING(vb->type)
+			  && CLASS_STRING(attributes[i].type)))) {
+		  g_warning("%s: type mismatch: converting %s to %s",
+			    attributes[i].label, b, a);
+	      } else {
+		  if (a && b) {
+		      g_warning("%s: type mismatch: got %s, expected %s",
+				attributes[i].label, b, a);
+		  } else {
+		      g_warning("%s: type mismatch", attributes[i].label);
+		  }
+		  continue;
+	      }
 	 }
 
 	 if (attributes[i].val_offset < 0) {
