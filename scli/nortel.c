@@ -86,6 +86,23 @@ match_vlan(regex_t *regex_vlan,
 
 
 static void
+xml_ports(xmlNodePtr root, guchar *bits, gsize bits_len)
+{
+    int bit, i;
+    xmlNodePtr node;
+
+    for (i = 0; i < bits_len * 8; i++) {
+	bit = bits[i/8] & 1 << (7-(i%8));
+	if (bit) {
+	    node = xmlNewChild(root, NULL, "port", NULL);
+	    xml_set_prop(node, "number", "%d", i);
+	}
+    }
+}
+
+
+
+static void
 fmt_ports(GString *s, guchar *bits, gsize bits_len)
 {
     int bit, i;
@@ -234,6 +251,26 @@ xml_nortel_baystack_vlan_details(xmlNodePtr root,
     if (s) {
 	node = xmlNewChild(tree, NULL, "status", s);
     }
+
+    if (vlanEntry->rcVlanType
+	&& *vlanEntry->rcVlanType == RAPIDCITY_VLAN_MIB_RCVLANTYPE_BYPORT) {
+	if (vlanEntry->rcVlanPortMembers) {
+	    node = xmlNewChild(tree, NULL, "member", NULL);
+	    xml_ports(node, vlanEntry->rcVlanPortMembers, 32);
+	}
+	if (vlanEntry->rcVlanStaticMembers) {
+	    node = xmlNewChild(tree, NULL, "static", NULL);
+	    xml_ports(node, vlanEntry->rcVlanStaticMembers, 32);
+	}
+	if (vlanEntry->rcVlanPotentialMembers) {
+	    node = xmlNewChild(tree, NULL, "allowed", NULL);
+	    xml_ports(node, vlanEntry->rcVlanPotentialMembers, 32);
+	}
+	if (vlanEntry->rcVlanNotAllowToJoin) {
+	    node = xmlNewChild(tree, NULL, "disallowed", NULL);
+	    xml_ports(node, vlanEntry->rcVlanNotAllowToJoin, 32);
+	}
+    }
 }
 
 
@@ -243,6 +280,7 @@ fmt_nortel_baystack_vlan_details(GString *s,
 				 rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry)
 {
     const int width = 20;
+    const char *e;
 
     g_string_sprintfa(s, "VLan:        %-*d", width, vlanEntry->rcVlanId);
     if (vlanEntry->rcVlanName && vlanEntry->_rcVlanNameLength) {
@@ -253,9 +291,26 @@ fmt_nortel_baystack_vlan_details(GString *s,
 	g_string_append(s, " Name:\n");
     }
 
-    g_string_append(s, "Type:        ");
-    xxx_enum(s, width, rapidcity_vlan_mib_enums_rcVlanType,
-	     vlanEntry->rcVlanType);
+    e = fmt_enum(vlan_priority, vlanEntry->rcVlanHighPriority);
+    g_string_sprintfa(s, "Priority:    %-*s", width, e ? e : "");
+
+    e = fmt_enum(rapidcity_vlan_mib_enums_rcVlanRowStatus,
+		 vlanEntry->rcVlanRowStatus);
+    g_string_sprintfa(s, " Status:   %-*s\n", width, e ? e : "");
+
+    e = fmt_enum(rapidcity_vlan_mib_enums_rcVlanRoutingEnable,
+		 vlanEntry->rcVlanRoutingEnable);
+    g_string_sprintfa(s, "Routing:     %-*s", width, e ? e : "");
+
+    if (vlanEntry->rcVlanColor) {
+	g_string_sprintfa(s, " Color:    %d\n", *vlanEntry->rcVlanColor);
+    } else {
+	g_string_append(s, " Color:\n");
+    }
+
+    e = fmt_enum(rapidcity_vlan_mib_enums_rcVlanType,
+		 vlanEntry->rcVlanType);
+    g_string_sprintfa(s, "Type:        %-*s", width, e ? e : "");
 
     if (vlanEntry->rcVlanType
 	&& *vlanEntry->rcVlanType == RAPIDCITY_VLAN_MIB_RCVLANTYPE_BYPORT) {
@@ -293,10 +348,9 @@ fmt_nortel_baystack_vlan_details(GString *s,
 	&& (*vlanEntry->rcVlanType
 	    == RAPIDCITY_VLAN_MIB_RCVLANTYPE_BYPROTOCOLID)) {
 	if (vlanEntry->rcVlanProtocolId) {
-	    g_string_append(s, " Protocol: ");
-	    xxx_enum(s, width, rapidcity_vlan_mib_enums_rcVlanProtocolId,
-		     vlanEntry->rcVlanProtocolId);
-	    g_string_append(s, "\n");
+	    e = fmt_enum(rapidcity_vlan_mib_enums_rcVlanProtocolId,
+			 vlanEntry->rcVlanProtocolId);
+	    g_string_sprintfa(s, " Protocol: %s\n", e ? e : "");
 	} else {
 	    g_string_append(s, "\n");
 	}
@@ -361,6 +415,8 @@ fmt_nortel_baystack_vlan_info(GString *s,
 			      rapidcity_vlan_mib_rcVlanEntry_t *vlanEntry,
 			      int name_width, int type_width)
 {
+    const char *e;
+    
     g_string_sprintfa(s, "%4d ", vlanEntry->rcVlanId);
 
     if (vlanEntry->rcVlanName && vlanEntry->_rcVlanNameLength) {
@@ -371,8 +427,8 @@ fmt_nortel_baystack_vlan_info(GString *s,
 	g_string_sprintfa(s, "%*s ", name_width, "");
     }
 
-    xxx_enum(s, type_width, rapidcity_vlan_mib_enums_rcVlanType,
-	     vlanEntry->rcVlanType);
+    e = fmt_enum(rapidcity_vlan_mib_enums_rcVlanType, vlanEntry->rcVlanType);
+    g_string_sprintfa(s, "%*s", type_width, e ? e : "");
 
     if (vlanEntry->rcVlanColor) {
 	g_string_sprintfa(s, " %4d   ", *vlanEntry->rcVlanColor);
@@ -380,16 +436,16 @@ fmt_nortel_baystack_vlan_info(GString *s,
 	g_string_append(s, "        ");
     }
 
-    xxx_enum(s, 9, vlan_priority,
-	     vlanEntry->rcVlanHighPriority);
+    e = fmt_enum(vlan_priority, vlanEntry->rcVlanHighPriority);
+    g_string_sprintfa(s, "%-*s   ", 6, e ? e : "");
 
-    xxx_enum(s, 7, rapidcity_vlan_mib_enums_rcVlanRoutingEnable,
-	     vlanEntry->rcVlanRoutingEnable);
-    
-    xxx_enum(s, 8, rapidcity_vlan_mib_enums_rcVlanRowStatus,
-	     vlanEntry->rcVlanRowStatus);
+    e = fmt_enum(rapidcity_vlan_mib_enums_rcVlanRoutingEnable,
+		 vlanEntry->rcVlanRoutingEnable);
+    g_string_sprintfa(s, "%-*s ", 6, e ? e : "");
 
-    g_string_append(s, "\n");
+    e = fmt_enum(rapidcity_vlan_mib_enums_rcVlanRowStatus,
+		 vlanEntry->rcVlanRowStatus);
+    g_string_sprintfa(s, "%s\n", e ? e : "");
 }
 
 
@@ -671,10 +727,10 @@ scli_init_nortel_mode(scli_interp_t *interp)
 
 	{ "show nortel bridge vlan details", "[<regexp>]",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  "The  show nortel bridge vlan details command describes the\n"
+	  "The show nortel bridge vlan details command describes the\n"
 	  "selected vlans in more detail. The optional regular expression\n"
 	  "<regexp> is matched against the vlan names to select the vlans\n"
-	  "of interest. <xxx>",
+	  "of interest.",
 	  show_nortel_baystack_vlan_details },
 
 	{ NULL, NULL, 0, NULL, NULL }
