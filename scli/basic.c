@@ -1027,11 +1027,15 @@ scli_eval_file(scli_interp_t *interp, char *path)
     g_return_val_if_fail(interp, SCLI_ERROR);
     g_return_val_if_fail(path, SCLI_ERROR);
 
-    stream = fopen(path, "r");
-    if (! stream) {
-	g_print("%3d failed to open file \"%s\": %s\n", SCLI_ERROR,
-		path, g_strerror(errno));
-	return SCLI_ERROR;
+    if (strcmp(path, "-") == 0) {
+	stream = stdin;
+    } else {
+	stream = fopen(path, "r");
+	if (! stream) {
+	    g_print("%3d failed to open file \"%s\": %s\n", SCLI_ERROR,
+		    path, g_strerror(errno));
+	    return SCLI_ERROR;
+	}
     }
     code = scli_eval_file_stream(interp, stream);
     (void) fclose(stream);
