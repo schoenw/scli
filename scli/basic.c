@@ -309,7 +309,12 @@ next_token(char *string, char *out)
 		p++;
 	    }
 	    break;
-	    /* what about backslashes ? */
+	case '\\':
+	    if (p[1]) {
+		p++;			/* skip backslash and */
+		*d++ = *p++;		/* copy next character */
+	    }
+	    break;
 	case ' ':
 	case '\f':
 	case '\n':
@@ -792,6 +797,7 @@ scli_eval_file_stream(scli_interp_t *interp, FILE *stream)
     while (code != SCLI_EXIT
 	   && code != SCLI_ERROR
 	   && fgets(buffer, sizeof(buffer), stream) != NULL) {
+	/* xxx allow for backslash line completion */
 	code = scli_eval(interp, buffer);
     }
     

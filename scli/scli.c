@@ -100,6 +100,7 @@ mainloop(scli_interp_t *interp)
 	    continue;
 	}
 	free(input); input = expansion;
+	/* xxx allow for backslash line completion */
 	add_history(input);
 	code = scli_eval(interp, input);
 	free(input);
