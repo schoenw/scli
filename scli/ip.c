@@ -269,6 +269,7 @@ fmt_ip_address(GString *s,
 {
     char *name;
     int i;
+    int done = 0;
 
     g_string_sprintfa(s, "%-17s ",
 	      fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_ADDR));
@@ -282,24 +283,27 @@ fmt_ip_address(GString *s,
     g_string_sprintfa(s, "%-*s ", name_width, name ? name : "");
     
     if (ipAddrEntry->ipAdEntIfIndex) {
-	g_string_sprintfa(s, " %u", *(ipAddrEntry->ipAdEntIfIndex));
-	if (ifXTable) {
+	g_string_sprintfa(s, "%9u", *(ipAddrEntry->ipAdEntIfIndex));
+	if (! done && ifXTable) {
 	    for (i = 0; ifXTable[i]; i++) {
 		if (ifXTable[i]->ifIndex == *ipAddrEntry->ipAdEntIfIndex
 		    && ifXTable[i]->ifName) {
 		    g_string_sprintfa(s, " (%.*s)",
 				      (int) ifXTable[i]->_ifNameLength,
 				      ifXTable[i]->ifName);
+		    done = 1;
 		    break;
 		}
 	    }
-	} else if (ifTable) {
+	}
+	if (! done && ifTable) {
 	    for (i = 0; ifTable[i]; i++) {
 		if (ifTable[i]->ifIndex == *ipAddrEntry->ipAdEntIfIndex
 		    && ifTable[i]->ifDescr) {
 		    g_string_sprintfa(s, " (%.*s)",
 				      (int) ifTable[i]->_ifDescrLength,
 				      ifTable[i]->ifDescr);
+		    done = 1;
 		    break;
 		}
 	    }
@@ -345,7 +349,7 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 		}
 	    }
 	    g_string_sprintfa(interp->header,
-			      "ADDRESS         PREFIX %-*s INTERFACE",
+		      "ADDRESS         PREFIX %-*s INTERFACE DESCRIPTION",
 			      name_width, "NAME");
 	}
 	for (i = 0; ipAddrTable[i]; i++) {
@@ -622,6 +626,49 @@ fmt_ip_info(GString *s, ip_mib_ip_t *ip)
 
 
 
+static void
+xml_ip_info(xmlNodePtr tree, ip_mib_ip_t *ip)
+{
+    xmlNodePtr node;
+    const char *e;
+
+    e = fmt_enum(forwarding, ip->ipForwarding);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "forwarding", "%s", e);
+    }
+
+    if (ip->ipDefaultTTL) {
+	node = xml_new_child(tree, NULL, "default-ttl", "%d",
+			     *ip->ipDefaultTTL);
+	xml_set_prop(node, "unit", "hops");
+    }
+
+    if (ip->ipReasmTimeout) {
+	node = xml_new_child(tree, NULL, "reassemble-timeout", "%d",
+			     *ip->ipDefaultTTL);
+	xml_set_prop(node, "unit", "seconds");
+    }
+}
+
+
+
+static void
+xxx_ip_info(GString *s, xmlNodePtr tree)
+{
+    int const indent = 16;
+    xmlNodePtr node;
+
+    for (node = tree->children; node; node = node->next) {
+	g_printerr("%s\n", xmlGetNodePath(node));
+	if (xmlStrcmp(node->name, (const xmlChar *) "forwarding") == 0) {
+	    g_string_sprintfa(s, "%-*s%s\n", indent, "Forwarding:", 
+			      node->content);
+	}
+    }
+}
+
+
+
 static int
 show_ip_info(scli_interp_t *interp, int argc, char **argv)
 {
@@ -643,7 +690,16 @@ show_ip_info(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (ip) {
-	fmt_ip_info(interp->result, ip);
+	if (scli_interp_xml(interp)) {
+	    xml_ip_info(interp->xml_node, ip);
+	} else {
+	    fmt_ip_info(interp->result, ip);
+	}
+    }
+
+    if (scli_interp_xml(interp)) {
+	xxx_ip_info(interp->result, interp->xml_node);
+	g_printerr(interp->result->str);
     }
 
     if (ip) ip_mib_free_ip(ip);
@@ -791,8 +847,8 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "The `show ip info' command displays parameters of the IP\n"
 	  "protocol engine, such as the default TTL or whether the\n"
 	  "node is forwarding IP packets.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "ip info", NULL,
 	  show_ip_info },
 	
 	{ "show ip forwarding", NULL,
@@ -814,10 +870,11 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "assigned to network interfaces. The command generates a table\n"
 	  "with the following columns:\n"
 	  "\n"
-	  "  INTERFACE network interface number\n"
-	  "  ADDRESS   IP address\n"
-	  "  PREFIX    IP address prefix length\n"
-	  "  NAME      name of the IP address",
+	  "  ADDRESS     IP address\n"
+	  "  PREFIX      IP address prefix length\n"
+	  "  NAME        name of the IP address\n"
+	  "  INTERFACE   network interface number\n"
+	  "  DESCRIPTION description of the network interface",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "ip", NULL,
 	  show_ip_addresses },
