@@ -299,7 +299,7 @@ xml_system_process(xmlNodePtr root,
 
 
 static void
-show_system_process(GString *s,
+fmt_system_process(GString *s,
 		    host_resources_mib_hrSWRunEntry_t *hrSWRunEntry,
 		    host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry)
 {
@@ -370,7 +370,7 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 		xml_system_process(interp->xml_node, hrSWRunTable[i],
 			   hrSWRunPerfTable ? hrSWRunPerfTable[i] : NULL);
 	    } else {
-		show_system_process(interp->result, hrSWRunTable[i],
+		fmt_system_process(interp->result, hrSWRunTable[i],
 			    hrSWRunPerfTable ? hrSWRunPerfTable[i] : NULL);
 	    }
 	}
@@ -387,10 +387,51 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_system_mount(GString *s,
-		  host_resources_mib_hrFSEntry_t *hrFSEntry,
-		  int loc_len, int rem_len)
+xml_system_mount(xmlNodePtr root,
+		 host_resources_mib_hrFSEntry_t *hrFSEntry)
 {
+    const char *e;
+    xmlNodePtr tree;
+    
+    g_return_if_fail(hrFSEntry);
+
+    tree = xmlNewChild(root, NULL, "filesystem", NULL);
+    xml_set_prop(tree, "index", "%d", hrFSEntry->hrFSIndex);
+
+    if (hrFSEntry->hrFSMountPoint
+	&& hrFSEntry->_hrFSMountPointLength) {
+	(void) xml_new_child(tree, NULL, "local", "%.*s", 
+			     (int) hrFSEntry->_hrFSMountPointLength,
+			     hrFSEntry->hrFSMountPoint);
+    }
+
+    if (hrFSEntry->hrFSRemoteMountPoint
+	&& hrFSEntry->_hrFSRemoteMountPointLength) {
+	(void) xml_new_child(tree, NULL, "remote", "%.*s", 
+			     (int) hrFSEntry->_hrFSRemoteMountPointLength,
+			     hrFSEntry->hrFSRemoteMountPoint);
+    }
+
+    e = fmt_enum(host_resources_mib_enums_hrFSAccess,
+		 hrFSEntry->hrFSAccess);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "access", "%s", e);
+    }
+
+    if (hrFSEntry->hrFSBootable && *(hrFSEntry->hrFSBootable) == 1) {
+	(void) xmlNewChild(tree, NULL, "bootable", NULL);
+    }
+}
+
+
+
+static void
+fmt_system_mount(GString *s,
+		 host_resources_mib_hrFSEntry_t *hrFSEntry,
+		 int loc_len, int rem_len)
+{
+    const char *e;
+    
     g_return_if_fail(hrFSEntry);
 
     if (hrFSEntry->hrFSMountPoint) {
@@ -407,14 +448,16 @@ show_system_mount(GString *s,
     } else {
 	g_string_sprintfa(s, "%*s", rem_len, "");
     }
-    if (hrFSEntry->hrFSAccess) {
-	xxx_enum(s, 0, host_resources_mib_enums_hrFSAccess,
+
+    e = fmt_enum(host_resources_mib_enums_hrFSAccess,
 		 hrFSEntry->hrFSAccess);
-    }
+    g_string_sprintfa(s, "%s", e ? e : "");
+
     if (hrFSEntry->hrFSBootable
 	&& *(hrFSEntry->hrFSBootable) == 1) {
 	g_string_append(s, ", bootable");
     }
+
     g_string_append(s, "\n");
 }
 
@@ -452,7 +495,12 @@ show_system_mounts(scli_interp_t *interp, int argc, char **argv)
 			  loc_len, "LOCAL MOUNT POINT",
 			  rem_len, "REMOTE MOUNT POINT");
 	for (i = 0; hrFSTable[i]; i++) {
-	    show_system_mount(interp->result, hrFSTable[i], loc_len, rem_len);
+	    if (scli_interp_xml(interp)) {
+		xml_system_mount(interp->xml_node, hrFSTable[i]);
+	    } else {
+		fmt_system_mount(interp->result, hrFSTable[i],
+				 loc_len, rem_len);
+	    }
 	}
     }
 
@@ -559,6 +607,133 @@ show_system_storage(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+xml_system_info(xmlNodePtr root, scli_interp_t *interp,
+		snmpv2_mib_system_t *system)
+{
+    if (system) {
+	if (system->sysName && system->_sysNameLength) {
+	    (void) xml_new_child(root, NULL, "name", "%.*s",
+				 (int) system->_sysNameLength,
+				 system->sysName);
+	}
+	if (interp->peer->name) {
+	    (void) xml_new_child(root, NULL, "address", "%s:%d",
+				 interp->peer->name,
+				 interp->peer->port);
+	}
+	if (system->sysDescr && system->_sysDescrLength) {
+	    (void) xml_new_child(root, NULL, "description", "%.*s",
+				 (int) system->_sysDescrLength,
+				 system->sysDescr);
+	}
+	if (system->sysContact && system->_sysContactLength) {
+	    (void) xml_new_child(root, NULL, "contact", "%.*s",
+				 (int) system->_sysContactLength,
+				 system->sysContact);
+	}
+	if (system->sysLocation && system->_sysLocationLength) {
+	    (void) xml_new_child(root, NULL, "location", "%.*s",
+				 (int) system->_sysLocationLength,
+				 system->sysLocation);
+	}
+
+	if (system->sysObjectID) {
+	    scli_vendor_t *vendor;
+	    vendor = scli_get_iana_vendor(system->sysObjectID,
+					  system->_sysObjectIDLength);
+	    if (vendor && vendor->name) {
+		(void) xml_new_child(root, NULL, "vendor", "%s", vendor->name);
+	    }
+	}
+
+	if (system->sysServices) {
+	    char const *serv_names[] = {
+		"physical", "datalink", "network", "transport", "session",
+		"representation", "application", NULL
+	    };
+	    int i;
+
+	    for (i = 0; serv_names[i]; i++) {
+		if (*(system->sysServices) & (1 << i)) {
+		    (void) xml_new_child(root, NULL, "service", "%s",
+					 serv_names[i]);
+		}
+	    }
+	}
+    }
+}
+
+
+
+static void
+fmt_system_info(GString *s, scli_interp_t *interp,
+		snmpv2_mib_system_t *system)
+{
+    int i;
+    int const indent = 18;
+
+    if (system) {
+	if (system->sysName) {
+	    fmt_display_string(s, indent, "Name:",
+			       (int) system->_sysNameLength,
+			       system->sysName);
+	}
+	if (interp->peer->name) {
+	    g_string_sprintfa(s, "%-*s ", indent, "Address:");
+	    g_string_sprintfa(s, "%s:%d\n", interp->peer->name,
+			      interp->peer->port);
+	}
+	if (system->sysDescr && system->_sysDescrLength) {
+	    fmt_display_string(s, indent, "Description:",
+			       (int) system->_sysDescrLength,
+			       system->sysDescr);
+	}
+	if (system->sysContact) {
+	    fmt_display_string(s, indent, "Contact:",
+			       (int) system->_sysContactLength,
+			       system->sysContact);
+	}
+	if (system->sysLocation) {
+	    fmt_display_string(s, indent, "Location:",
+			       (int) system->_sysLocationLength,
+			       system->sysLocation);
+	}
+	if (system->sysObjectID) {
+	    scli_vendor_t *vendor;
+	    vendor = scli_get_iana_vendor(system->sysObjectID,
+					  system->_sysObjectIDLength);
+	    if (vendor && vendor->name) {
+		g_string_sprintfa(s, "%-*s ", indent, "Vendor:");
+		if (vendor->id) {
+		    g_string_append(s, vendor->name);
+		    if (vendor->url) {
+			g_string_sprintfa(s, " <%s>\n", vendor->url);
+		    }
+		} else {
+		    g_string_sprintfa(s, "unknown (%s)\n", vendor->name);
+		}
+	    }
+	}
+	if (system->sysServices) {
+	    char const *serv_names[] = {
+		"physical", "datalink", "network", "transport", "session",
+		"representation", "application", NULL
+	    };
+
+	    g_string_sprintfa(s, "%-*s ", indent, "Services:");
+	    for (i = 0; serv_names[i]; i++) {
+		if (*(system->sysServices) & (1 << i)) {
+		    g_string_sprintfa(s, "%s ", serv_names[i]);
+		}
+	    }
+	    g_string_append_c(s, '\n');
+	}
+    }
+}
+
+
+
 static int
 show_system_info(scli_interp_t *interp, int argc, char **argv)
 {
@@ -586,134 +761,84 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     (void) if_mib_get_interfaces(interp->peer, &interfaces);
     (void) bridge_mib_get_dot1dBase(interp->peer, &dot1dBase);
     (void) disman_script_mib_get_smLangTable(interp->peer, &smLangTable);
-    
-    s = interp->result;
-    if (system) {
-	if (system->sysDescr && system->_sysDescrLength) {
-	    g_string_sprintfa(s, "%.*s\n",
-			      (int) system->_sysDescrLength,
-			      system->sysDescr);
-	}
-	if (system->sysName) {
-	    g_string_sprintfa(s, "\n%-*s ", indent, "Name:");
-	    g_string_sprintfa(s, "%.*s",
-			      (int) system->_sysNameLength,
-			      system->sysName);
-	}
-	if (interp->peer->name) {
-	    g_string_sprintfa(s, "\n%-*s ", indent, "Address:");
-	    g_string_sprintfa(s, "%s:%d", interp->peer->name,
-			      interp->peer->port);
-	}
-	if (system->sysContact) {
-	    g_string_sprintfa(s, "\n%-*s ", indent, "Contact:");
-	    g_string_sprintfa(s, "%.*s",
-			      (int) system->_sysContactLength,
-			      system->sysContact);
-	}
-	if (system->sysLocation) {
-	    g_string_sprintfa(s, "\n%-*s ", indent, "Location:");
-	    g_string_sprintfa(s, "%.*s",
-			      (int) system->_sysLocationLength,
-			      system->sysLocation);
-	}
-	if (system->sysObjectID) {
-	    scli_vendor_t *vendor;
-	    vendor = scli_get_iana_vendor(system->sysObjectID,
-					  system->_sysObjectIDLength);
-	    if (vendor && vendor->name) {
-		g_string_sprintfa(s, "\n%-*s ", indent, "Vendor:");
-		if (vendor->id) {
-		    g_string_append(s, vendor->name);
-		    if (vendor->url) {
-			g_string_sprintfa(s, " <%s>", vendor->url);
-		    }
-		} else {
-		    g_string_sprintfa(s, "unknown (%s)", vendor->name);
-		}
-	    }
-	}
-	if (system->sysServices) {
-	    char const *serv_names[] = {
-		"physical", "datalink", "network", "transport", "session",
-		"representation", "application", NULL
-	    };
 
-	    g_string_sprintfa(s, "\n%-*s ", indent, "Services:");
-	    for (i = 0; serv_names[i]; i++) {
-		if (*(system->sysServices) & (1 << i)) {
-		    g_string_sprintfa(s, "%s ", serv_names[i]);
-		}
-	    }
-	}
+    if (scli_interp_xml(interp)) {
+	xml_system_info(interp->xml_node, interp, system);
+    } else {
+	fmt_system_info(interp->result, interp, system);
     }
 
+    s = interp->result;
     if (hrSystem) {
 	if (hrSystem->hrSystemDate && hrSystem->_hrSystemDateLength) {
-	    g_string_sprintfa(s, "\n%-*s ", indent, "Current Time:");
+	    g_string_sprintfa(s, "%-*s ", indent, "Current Time:");
 	    g_string_append(s, fmt_date_and_time(hrSystem->hrSystemDate,
 					 hrSystem->_hrSystemDateLength));
+	    g_string_append_c(s, '\n');
 	}
     }
 
     if (system) {
 	if (system->sysUpTime) {
-	    g_string_sprintfa(s, "\n%-*s ", indent, "Agent Boot Time:");
+	    g_string_sprintfa(s, "%-*s ", indent, "Agent Boot Time:");
 	    g_string_append(s, fmt_timeticks(*(system->sysUpTime)));
+	    g_string_append_c(s, '\n');
 	}
     }
     
     if (hrSystem) {
 	if (hrSystem->hrSystemUptime) {
-	    g_string_sprintfa(s, "\n%-*s ", indent, "System Boot Time:");
+	    g_string_sprintfa(s, "%-*s ", indent, "System Boot Time:");
 	    g_string_append(s, fmt_timeticks(*(hrSystem->hrSystemUptime)));
+	    g_string_append_c(s, '\n');
 	}
 	if (hrSystem->hrSystemNumUsers) {
-	    g_string_sprintfa(s, "\n%-*s %u", indent, "Users:", 
+	    g_string_sprintfa(s, "%-*s %u", indent, "Users:", 
 			      *(hrSystem->hrSystemNumUsers));
+	    g_string_append_c(s, '\n');
 	}
 	if (hrSystem->hrSystemProcesses) {
-	    g_string_sprintfa(s, "\n%-*s %u", indent, "Processes:",
+	    g_string_sprintfa(s, "%-*s %u", indent, "Processes:",
 			      *(hrSystem->hrSystemProcesses));
-	}
-	if (hrSystem->hrSystemMaxProcesses
-	    && *(hrSystem->hrSystemMaxProcesses)) {
-	    g_string_sprintfa(s, " (%u maximum)",
-			      *(hrSystem->hrSystemMaxProcesses));
+	    if (hrSystem->hrSystemMaxProcesses
+		&& *(hrSystem->hrSystemMaxProcesses)) {
+		g_string_sprintfa(s, " (%u maximum)",
+				  *(hrSystem->hrSystemMaxProcesses));
+	    }
+	    g_string_append_c(s, '\n');
 	}
     }
 
     if (hrStorage) {
 	if (hrStorage->hrMemorySize) {
-	    g_string_sprintfa(s, "\n%-*s %s", indent, "Memory:",
+	    g_string_sprintfa(s, "%-*s %s\n", indent, "Memory:",
 			      fmt_kbytes(*(hrStorage->hrMemorySize)));
 	}
     }
 
     if (interfaces) {
 	if (interfaces->ifNumber) {
-	    g_string_sprintfa(s, "\n%-*s %d", indent, "Interfaces:",
+	    g_string_sprintfa(s, "%-*s %d\n", indent, "Interfaces:",
 			      *(interfaces->ifNumber));
 	}
     }
 
     if (dot1dBase) {
 	if (dot1dBase->dot1dBaseNumPorts && *dot1dBase->dot1dBaseNumPorts) {
-	    g_string_sprintfa(s, "\n%-*s %d ", indent, "Bridge Ports:",
+	    g_string_sprintfa(s, "%-*s %d ", indent, "Bridge Ports:",
 			      *(dot1dBase->dot1dBaseNumPorts));
 	    if (dot1dBase->dot1dBaseType) {
 		xxx_enum(s, 20, bridge_mib_enums_dot1dBaseType,
 			 dot1dBase->dot1dBaseType);
-           }
+	    }
+	    g_string_append_c(s, '\n');
 	}
     }
 
     if (smLangTable) {
 	for (i = 0; smLangTable[i]; i++) ;
-	g_string_sprintfa(s, "\n%-*s %u", indent, "Script Languages:", i);
+	g_string_sprintfa(s, "%-*s %u\n", indent, "Script Languages:", i);
     }
-
-    g_string_append(s, "\n");
 
     if (system)
 	snmpv2_mib_free_system(system);
@@ -863,22 +988,27 @@ scli_init_system_mode(scli_interp_t *interp)
 
 	{ "set system contact", "<contact>",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "set system contact",
+	  "The set system contact command configures the system's contact\n"
+	  "information. The <contact> string should include information\n"
+	  "on how to contact a person who is responsible for this system.",
 	  set_system_contact },
 
 	{ "set system name", "<name>",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "set system name",
+	  "The set system name command configures the systems's name. By\n"
+	  "convention, this is the system's fully-qualified domain name.",
 	  set_system_name },
 
 	{ "set system location", "<location>",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "set system location",
+	  "The set system location command configures the system's physical\n"
+	  "location.",
 	  set_system_location },
 
 	{ "show system info", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "system summary information",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  "The show system info command shows general information about the\n"
+	  "system.",
 	  show_system_info },
 
 	{ "show system devices", NULL,
@@ -892,7 +1022,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  show_system_storage },
 
 	{ "show system mounts", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "file systems mounted on the system",
 	  show_system_mounts },
 
