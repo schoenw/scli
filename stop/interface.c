@@ -31,8 +31,10 @@ extern time_t timezone;
 
 
 typedef struct {
-    int inOctets;
-    int outOctets;
+    guint32 inOctets;
+    guint32 outOctets;
+    guint32 inPkts;
+    guint32 outPkts;
 } if_stats_t;
 
 
@@ -189,7 +191,7 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	show_interface_summary(peer);
 	wattron(win, A_REVERSE);
 	mvwprintw(win, 0, 0, "%-*s",
-		  COLS, "  IF STAT   MTU SPEED    IN   OUT  DESCR ...");
+		  COLS, "  IF STAT   MTU SPEED  B IN B OUT  P IN P OUT  DESCR ...");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
 	sleep(1);
@@ -266,11 +268,47 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	    } else {
 		g_string_sprintfa(s, " -----");
 	    }
+	    
+	    if (ifEntry[i]->ifInUcastPkts && delta > TV_DELTA) {
+		guint32 pkts = *(ifEntry[i]->ifInUcastPkts);
+		if (ifEntry[i]->ifInNUcastPkts) {
+		    pkts += *(ifEntry[i]->ifInNUcastPkts);
+		}
+		if (last.tv_sec && last.tv_usec) {
+		    double f_val = (pkts - stats[i].inPkts) / delta;
+		    g_string_sprintfa(s, " %5s",
+				      fmt_kmg((guint32) f_val));
+		} else {
+		    g_string_sprintfa(s, " -----");
+		}
+		stats[i].inPkts = pkts;
+	    } else {
+		g_string_sprintfa(s, " -----");
+	    }
+	    
+	    if (ifEntry[i]->ifOutUcastPkts && delta > TV_DELTA) {
+		guint32 pkts = *(ifEntry[i]->ifOutUcastPkts);
+		if (ifEntry[i]->ifOutNUcastPkts) {
+		    pkts += *(ifEntry[i]->ifOutNUcastPkts);
+		}
+		if (last.tv_sec && last.tv_usec) {
+		    double f_val = (pkts - stats[i].outPkts) / delta;
+		    g_string_sprintfa(s, " %5s",
+				      fmt_kmg((guint32) f_val));
+		} else {
+		    g_string_sprintfa(s, " -----");
+		}
+		stats[i].outPkts = pkts;
+	    } else {
+		g_string_sprintfa(s, " -----");
+	    }
+	    
 	    if (ifEntry[i]->ifDescr && ifEntry[i]->_ifDescrLength) {
 		g_string_sprintfa(s, "  %.*s",
 				  (int) ifEntry[i]->_ifDescrLength,
 				  ifEntry[i]->ifDescr);
 	    }
+	    g_string_truncate(s, COLS);
 	    mvwprintw(win, i+1, 0, s->str);
 	    g_string_free(s, 1);
 	}
