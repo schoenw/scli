@@ -70,7 +70,19 @@ fmt_storage_type(GString *s, gint32 *storage)
 	{ 0, NULL }
     };
 
-    fmt_enum(s, 1, storage_types, storage);
+    const char *label;
+
+    if (! storage) {
+	g_string_append(s, " ");
+	return;
+    }
+
+    label = stls_enum_get_label(storage_types, *storage);
+    if (label) {
+	g_string_append(s, label);
+    } else {
+	g_string_append(s, "-");
+    }
 }
 
 
@@ -85,7 +97,19 @@ fmt_row_status(GString *s, gint32 *status)
 	{ 0, NULL }
     };
 
-    fmt_enum(s, 1, row_states, status);
+    const char *label;
+
+    if (! status) {
+	g_string_append(s, " ");
+	return;
+    }
+
+    label = stls_enum_get_label(row_states, *status);
+    if (label) {
+	g_string_append(s, label);
+    } else {
+	g_string_append(s, "-");
+    }
 }
 
 

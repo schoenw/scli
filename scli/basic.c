@@ -43,6 +43,7 @@ char const scli_copyright[] = "(c) 2001 Juergen Schoenwaelder";
 static int scli_curses_running = 0;
 
 
+
 void
 scli_curses_on()
 {
@@ -71,7 +72,7 @@ scli_curses_off()
 int
 scli_set_pager(scli_interp_t *interp, const char *pager)
 {
-    char *unsafe = "; '\\\"&|";
+    char *unsafe = ";'\\\"&|<>";
 
     if (pager) {
 	if (strpbrk(pager, unsafe)) {
@@ -224,6 +225,21 @@ scli_interp_delete(scli_interp_t *interp)
 
 
 void
+scli_interp_reset(scli_interp_t *interp)
+{
+    g_string_truncate(interp->result, 0);
+    g_string_truncate(interp->header, 0);
+    if (interp->xml_doc) {
+	xmlFreeDoc(interp->xml_doc);
+    }
+    interp->xml_doc = xmlNewDoc("1.0");
+    interp->xml_doc->children = xmlNewDocNode(interp->xml_doc, NULL, "scli", NULL);
+    interp->xml_node = interp->xml_doc->children;
+}
+
+
+
+void
 scli_register_mode(scli_interp_t *interp, scli_mode_t *mode)
 {
     int i;
@@ -248,6 +264,7 @@ scli_register_mode(scli_interp_t *interp, scli_mode_t *mode)
  * to free up all of this storage.
  *
  * XXX This code should handle "quoted strings".
+ * XXX This code should handle backslash substitutions.
  * XXX This code should handle ; as command separators.
  */
 
@@ -399,9 +416,18 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
     case SCLI_EXIT:
 	if (! (scli_interp_recursive(interp))
 	    && ! (cmd->flags & SCLI_CMD_FLAG_MONITOR)) {
-	    if (interp->header->len) {
-		g_string_prepend_c(interp->result, '\n');
-		g_string_prepend(interp->result, interp->header->str);
+	    if (scli_interp_xml(interp)) {
+		xmlChar *buffer;
+		int len;
+		xmlDocDumpFormatMemory(interp->xml_doc, &buffer, &len, 2);
+		g_string_truncate(interp->header, 0);
+		g_string_assign(interp->result, buffer);
+		xmlFree(buffer);
+	    } else {
+		if (interp->header->len) {
+		    g_string_prepend_c(interp->result, '\n');
+		    g_string_prepend(interp->result, interp->header->str);
+		}
 	    }
 	    page(interp, interp->result);
 	}
@@ -416,10 +442,19 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 static int
 eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 {
+    scli_cmd_t *cmd, *root_cmd;
     int code;
+    xmlNodePtr current_xml_node = NULL;
+    
+    root_cmd = node->data;
+    if (scli_interp_xml(interp)) {
+	current_xml_node = interp->xml_node;
+	interp->xml_node = xmlNewChild(interp->xml_node, NULL, root_cmd->name, NULL);
+    }
     
     for (node = g_node_first_child(node);
 	 node; node = g_node_next_sibling(node)) {
+	cmd = node->data;
 	if (G_NODE_IS_LEAF(node)) {
 	    scli_cmd_t *cmd = node->data;
 	    if (cmd
@@ -433,17 +468,21 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 			g_string_sprintfa(s, "%c %s [%s]\n\n", '#',
 					  cmd->desc ? cmd->desc : "",
 				  (interp->peer) ? interp->peer->name : "?");
+			if (interp->header->len) {
+			    g_string_prepend_c(interp->result, '\n');
+			    g_string_prepend(interp->result, interp->header->str);
+			}
+			g_string_append(s, interp->result->str);
 		    }
-		    if (interp->header->len) {
-			g_string_prepend_c(interp->result, '\n');
-			g_string_prepend(interp->result, interp->header->str);
-		    }
-		    g_string_append(s, interp->result->str);
 		}
 	    }
 	} else {
 	    eval_all_cmd_node(interp, node, s);
 	}
+    }
+
+    if (scli_interp_xml(interp)) {
+	interp->xml_node = current_xml_node;
     }
 
     return SCLI_OK;
@@ -471,6 +510,8 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	return SCLI_OK;
     }
 
+    scli_interp_reset(interp);
+
     node = g_node_first_child(interp->cmd_root);
     for (i = 0; i < argc && ! done; i++) {
 	while (node) {
@@ -484,6 +525,10 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	    break;
 	}
 	if (i < argc-1 && ! G_NODE_IS_LEAF(node)) {
+	    if (scli_interp_xml(interp)) {
+		scli_cmd_t *cmd = (scli_cmd_t *) node->data;
+		interp->xml_node = xmlNewChild(interp->xml_node, NULL, cmd->name, NULL);
+	    }
 	    node = g_node_first_child(node);
 	} else if (G_NODE_IS_LEAF(node)) {
 	    if (scli_interp_interactive(interp)) {
@@ -506,9 +551,16 @@ scli_eval(scli_interp_t *interp, char *cmd)
 		g_snmp_list_decode_hook = NULL;
 	    }
 	    code = eval_all_cmd_node(interp, node, s);
+	    if (scli_interp_xml(interp)) {
+		xmlChar *buffer;
+		int len;
+		xmlDocDumpFormatMemory(interp->xml_doc, &buffer, &len, 2);
+		g_string_append(s, buffer);
+		xmlFree(buffer);
+	    }
 	    page(interp, s);
 	    g_string_free(s, 1);
-	    g_string_truncate(interp->result, 0);
+	    scli_interp_reset(interp);
 	    interp->flags &= ~SCLI_INTERP_FLAG_RECURSIVE;
 	}
     }

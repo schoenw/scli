@@ -90,6 +90,31 @@ static stls_identity_t const storage_types[] = {
 
 
 
+static stls_enum_t const error_strings[] = {
+    { 0, "noError" },
+    { 1, "tooBig" },
+    { 2, "noSuchName"},
+    { 3, "badValue" },
+    { 4, "readOnly" },
+    { 5, "genErr" },
+    { 6, "noAccess" },
+    { 7, "wrongType" },
+    { 8, "wrongLength" },
+    { 9, "wrongEncoding" },
+    { 10, "wrongValue" },
+    { 11, "noCreation" },
+    { 12, "inconsistentValue" },
+    { 13, "resourceUnavailable" },
+    { 14, "commitFailed" },
+    { 15, "undoFailed" },
+    { 16, "authorizationError" },
+    { 17, "notWritable" },
+    { 18, "inconsistentName" },
+    { 0, 0 }
+};
+
+
+
 static void
 strip_white(guchar *s, gsize *len)
 {
@@ -145,21 +170,24 @@ fmt_x_kbytes(GString *s, guint32 bytes)
 
 
 static void
-xml_system_device(GString *s,
+xml_system_device(xmlNodePtr root,
 		  host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
 {
+    xmlNodePtr tree, node;
     char const *type;
+    char buffer[80];
     
     g_return_if_fail(hrDeviceEntry);
 
-    g_string_sprintfa(s, "  <device index=\"%d\"/>\n",
-		      hrDeviceEntry->hrDeviceIndex);
+    tree = xmlNewChild(root, NULL, "device", NULL);
+    g_snprintf(buffer, sizeof(buffer), "%d",
+	       hrDeviceEntry->hrDeviceIndex);
+    xmlSetProp(tree, "index", buffer);
 
     if (hrDeviceEntry->hrDeviceStatus) {
-	g_string_append(s, "    <status>");
-	fmt_enum(s, 1, host_resources_mib_enums_hrDeviceStatus,
-		 hrDeviceEntry->hrDeviceStatus);
-	g_string_append(s, "</status>\n");
+	node = xmlNewChild(tree, NULL, "status",
+			   fmt_enum(host_resources_mib_enums_hrDeviceStatus,
+				    hrDeviceEntry->hrDeviceStatus));
     }
 
     if (hrDeviceEntry->hrDeviceType) {
@@ -167,16 +195,17 @@ xml_system_device(GString *s,
 				       hrDeviceEntry->hrDeviceType,
 				       hrDeviceEntry->_hrDeviceDescrLength);
 	if (type) {
-	    g_string_sprintfa(s, "    <type>%s</type>\n", type);
+	    node = xmlNewChild(tree, NULL, "type", type);
 	}
     }
 	
+#if 0
     if (hrDeviceEntry->hrDeviceDescr) {
 	g_string_sprintfa(s, "    <description>%.*s</description>\n",
 			  (int) hrDeviceEntry->_hrDeviceDescrLength,
 			  hrDeviceEntry->hrDeviceDescr);
     }
-    g_string_append(s, "  </device>\n");
+#endif
 }
 
 
@@ -185,18 +214,16 @@ static void
 show_system_device(GString *s,
 		   host_resources_mib_hrDeviceEntry_t *hrDeviceEntry)
 {
+    char const *status;
     char const *type;
     
     g_return_if_fail(hrDeviceEntry);
 
     g_string_sprintfa(s, "%5u ", hrDeviceEntry->hrDeviceIndex);
-    
-    if (hrDeviceEntry->hrDeviceStatus) {
-	fmt_enum(s, 8, host_resources_mib_enums_hrDeviceStatus,
-		 hrDeviceEntry->hrDeviceStatus);
-    } else {
-	g_string_append(s, "        ");
-    }
+
+    status = fmt_enum(host_resources_mib_enums_hrDeviceStatus,
+		      hrDeviceEntry->hrDeviceStatus);
+    g_string_sprintfa(s, "%-8s", status ? status : "");
 
     if (hrDeviceEntry->hrDeviceType) {
 	type = stls_identity_get_label(host_resources_types_identities,
@@ -233,20 +260,15 @@ cmd_system_devices(scli_interp_t *interp, int argc, char **argv)
     }
     
     if (hrDeviceTable) {
-	if (scli_interp_xml(interp)) {
-	    g_string_append(interp->result, "<system>\n");
-	} else {
+	if (! scli_interp_xml(interp)) {
 	    g_string_sprintfa(interp->header, "INDEX STATUS  DESCRIPTION");
 	}
 	for (i = 0; hrDeviceTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
-		xml_system_device(interp->result, hrDeviceTable[i]);
+		xml_system_device(interp->xml_node, hrDeviceTable[i]);
 	    } else {
 		show_system_device(interp->result, hrDeviceTable[i]);
 	    }
-	}
-	if (scli_interp_xml(interp)) {
-	    g_string_append(interp->result, "</system>\n");
 	}
     }
 
@@ -258,25 +280,31 @@ cmd_system_devices(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-xml_system_process(GString *s,
+xml_system_process(xmlNodePtr root,
 		   host_resources_mib_hrSWRunEntry_t *hrSWRunEntry,
 		   host_resources_mib_hrSWRunPerfEntry_t *hrSWRunPerfEntry)
 {
-    g_string_sprintfa(s, "  <process index=\"%d\">\n",
-		      hrSWRunEntry->hrSWRunIndex);
+    xmlNodePtr tree, node;
+    char buffer[80];
 
+    tree = xmlNewChild(root, NULL, "process", NULL);
+    g_snprintf(buffer, sizeof(buffer), "%d",
+	       hrSWRunEntry->hrSWRunIndex);
+    xmlSetProp(tree, "index", buffer);
+    
     if (hrSWRunEntry->hrSWRunStatus) {
-	g_string_append(s, "    <status>");
-	fmt_enum(s, 1, host_resources_mib_enums_hrSWRunStatus,
-		 hrSWRunEntry->hrSWRunStatus);
-	g_string_append(s, "</status>\n");
+	node = xmlNewChild(tree, NULL, "status",
+			   fmt_enum(host_resources_mib_enums_hrSWRunStatus,
+				    hrSWRunEntry->hrSWRunStatus));
     }
+
     if (hrSWRunEntry->hrSWRunType) {
-	g_string_append(s, "    <type>");
-	fmt_enum(s, 1, host_resources_mib_enums_hrSWRunType,
-		 hrSWRunEntry->hrSWRunType);
-	g_string_append(s, "</type>\n");
+	node = xmlNewChild(tree, NULL, "type",
+			   fmt_enum(host_resources_mib_enums_hrSWRunType,
+				    hrSWRunEntry->hrSWRunType));
     }
+
+#if 0
 
     if (hrSWRunPerfEntry && hrSWRunPerfEntry->hrSWRunPerfMem) {
 	g_string_sprintfa(s, "    <memory unit=\"KByte\">%u</memory>\n",
@@ -303,8 +331,7 @@ xml_system_process(GString *s,
 			  (int) hrSWRunEntry->_hrSWRunParametersLength,
 			  hrSWRunEntry->hrSWRunParameters);
     }
-
-    g_string_append(s, "  </process>\n");
+#endif
 }
 
 
@@ -372,23 +399,18 @@ cmd_system_processes(scli_interp_t *interp, int argc, char **argv)
 						   &hrSWRunPerfTable);
 
     if (hrSWRunTable) {
-	if (scli_interp_xml(interp)) {
-	    g_string_append(interp->result, "<system>\n");
-	} else {
+	if (! scli_interp_xml(interp)) {
 	    g_string_append(interp->header,
 			    "  PID S T MEMORY     TIME COMMAND");
 	}
 	for (i = 0; hrSWRunTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
-		xml_system_process(interp->result, hrSWRunTable[i],
+		xml_system_process(interp->xml_node, hrSWRunTable[i],
 			   hrSWRunPerfTable ? hrSWRunPerfTable[i] : NULL);
 	    } else {
 		show_system_process(interp->result, hrSWRunTable[i],
 			    hrSWRunPerfTable ? hrSWRunPerfTable[i] : NULL);
 	    }
-	}
-	if (scli_interp_xml(interp)) {
-	    g_string_append(interp->result, "</system>\n");
 	}
     }
 	
@@ -424,7 +446,7 @@ show_system_mount(GString *s,
 	g_string_sprintfa(s, "%*s", rem_len, "");
     }
     if (hrFSEntry->hrFSAccess) {
-	fmt_enum(s, 0, host_resources_mib_enums_hrFSAccess,
+	xxx_enum(s, 0, host_resources_mib_enums_hrFSAccess,
 		 hrFSEntry->hrFSAccess);
     }
     if (hrFSEntry->hrFSBootable
@@ -718,7 +740,7 @@ cmd_system_info(scli_interp_t *interp, int argc, char **argv)
 	    g_string_sprintfa(s, "\n%-*s %d ", indent, "Bridge Ports:",
 			      *(dot1dBase->dot1dBaseNumPorts));
 	    if (dot1dBase->dot1dBaseType) {
-		fmt_enum(s, 60, bridge_mib_enums_dot1dBaseType,
+		xxx_enum(s, 60, bridge_mib_enums_dot1dBaseType,
 			 dot1dBase->dot1dBaseType);
            }
 	}
@@ -812,6 +834,14 @@ conf_system_location(scli_interp_t *interp, int argc, char **argv)
     system->_sysLocationLength = strlen(system->sysLocation);
     code = snmpv2_mib_set_system(interp->peer, system);
     snmpv2_mib_free_system(system);
+    if (interp->peer->error_status) {
+	const char *error;
+	error = stls_enum_get_label(error_strings,
+				    interp->peer->error_status);
+	g_string_sprintfa(interp->result, "%s at varbind %d\n",
+			  error ? error : "oops",
+			  interp->peer->error_index);
+    }
 
     return SCLI_OK;
 }

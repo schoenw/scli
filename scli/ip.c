@@ -259,14 +259,14 @@ show_ip_tunnel(GString *s,
     }
 
     if (tunnelIfEntry->tunnelIfEncapsMethod) {
-	fmt_enum(s, 8, tunnel_mib_enums_tunnelIfEncapsMethod,
+	xxx_enum(s, 8, tunnel_mib_enums_tunnelIfEncapsMethod,
 		 tunnelIfEntry->tunnelIfEncapsMethod);
     } else {
 	g_string_sprintfa(s, "%-6s  ", "-");
     }
 
     if (tunnelIfEntry->tunnelIfSecurity) {
-	fmt_enum(s, 6, tunnel_mib_enums_tunnelIfSecurity,
+	xxx_enum(s, 6, tunnel_mib_enums_tunnelIfSecurity,
 		 tunnelIfEntry->tunnelIfSecurity);
     } else {
 	g_string_sprintfa(s, "%-4s  ", "-");
@@ -376,7 +376,7 @@ show_ip_arp(GString *s,
     g_string_sprintfa(s, "%6u    ",
 		      ipNetToMediaEntry->ipNetToMediaIfIndex);
     
-    fmt_enum(s, 8, ip_mib_enums_ipNetToMediaType,
+    xxx_enum(s, 8, ip_mib_enums_ipNetToMediaType,
 	     ipNetToMediaEntry->ipNetToMediaType);
     
     g_string_sprintfa(s, " %-16s ",
@@ -463,7 +463,7 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  cmd_ip_forwarding },
 	{ "show ip addresses", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "assigned IP addresses",
+	  "IP addresses assigned to interfaces",
 	  cmd_ip_addresses },
 	{ "show ip tunnel", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,

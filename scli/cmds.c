@@ -43,6 +43,20 @@ static SnmpDebugFlagToStringEntry debug_flag_table[] = {
 
 
 
+typedef struct {
+    GSnmpVersion version;
+    gchar        *name;
+} SnmpVersionToStringEntry;
+
+static SnmpVersionToStringEntry version_name_table[] = {
+    { G_SNMP_V1, "SNMPv1" },
+    { G_SNMP_V2C, "SNMPv2c" },
+    { G_SNMP_V3, "SNMPv3" },
+    { 0, 0 }
+};
+
+
+
 static gint
 alias_compare(gconstpointer a, gconstpointer b)
 {
@@ -103,11 +117,11 @@ print_cmd_tree(GString *s, GNode *node, char *prefix)
 
 
 static int
-cmd_scli_modes(scli_interp_t *interp, int argc, char **argv)
+show_interp_modes(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_mode_t *mode;
-    GString *s;
+    xmlNodePtr tree;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -115,14 +129,18 @@ cmd_scli_modes(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX;
     }
 
-    if (! scli_interp_xml(interp)) {
-	s = interp->result;
-	g_string_sprintfa(s, "%-15s %s\n", "Mode", "Description");
+    if (scli_interp_xml(interp)) {
 	for (elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
 	    mode = (scli_mode_t *) elem->data;
-	    g_string_sprintfa(s, "%-15s %s\n", mode->name, mode->desc);
+	    tree = xmlNewChild(interp->xml_node, NULL, "mode", mode->desc);
+	    xmlSetProp(tree, "name", mode->name);
 	}
-	interp->result = s;
+    } else {
+	g_string_sprintfa(interp->header, "%-15s %s", "MODE", "DESCRIPTION");
+	for (elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
+	    mode = (scli_mode_t *) elem->data;
+	    g_string_sprintfa(interp->result, "%-15s %s\n", mode->name, mode->desc);
+	}
     }
     return SCLI_OK;
 }
@@ -262,12 +280,13 @@ cmd_scli_unalias(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-cmd_scli_aliases(scli_interp_t *interp, int argc, char **argv)
+show_interp_aliases(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_alias_t *alias;
     int name_width = 16;
     int value_width = 16;
+    xmlNodePtr tree;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -276,24 +295,32 @@ cmd_scli_aliases(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (interp->alias_list) {
-	for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
-	    alias = (scli_alias_t *) elem->data;
-	    if (strlen(alias->name) > name_width) {
-		name_width = strlen(alias->name);
+	if (scli_interp_xml(interp)) {
+	    for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
+		alias = (scli_alias_t *) elem->data;
+		tree = xmlNewChild(interp->xml_node, NULL, "alias", alias->value);
+		xmlSetProp(tree, "name", alias->name);
 	    }
-	    if (strlen(alias->value) > value_width) {
-		value_width = strlen(alias->value);
+	} else {
+	    for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
+		alias = (scli_alias_t *) elem->data;
+		if (strlen(alias->name) > name_width) {
+		    name_width = strlen(alias->name);
+		}
+		if (strlen(alias->value) > value_width) {
+		    value_width = strlen(alias->value);
+		}
 	    }
-	}
-	g_string_sprintfa(interp->result, "%-*s %-*s Usage\n",
-			  name_width, "Alias Name",
-			  value_width, "Alias Value");
-	for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
-	    alias = (scli_alias_t *) elem->data;
-	    g_string_sprintfa(interp->result, "%-*s %-*s %4d\n",
-			      name_width, alias->name,
-			      value_width, alias->value,
-			      alias->count);
+	    g_string_sprintfa(interp->header, "%-*s %-*s USAGE",
+			      name_width, "ALIAS NAME",
+			  value_width, "ALIAS VALUE");
+	    for (elem = interp->alias_list; elem; elem = g_slist_next(elem)) {
+		alias = (scli_alias_t *) elem->data;
+		g_string_sprintfa(interp->result, "%-*s %-*s %4d\n",
+				  name_width, alias->name,
+				  value_width, alias->value,
+				  alias->count);
+	    }
 	}
     }
 
@@ -303,42 +330,12 @@ cmd_scli_aliases(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-cmd_scli_peer(scli_interp_t *interp, int argc, char **argv)
-{
-    int const indent = 18;
-
-    g_return_val_if_fail(interp, SCLI_ERROR);
-
-    if (argc > 1) {
-	return SCLI_SYNTAX;
-    }
-
-    if (interp->peer) {
-	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
-			  "Host:", interp->peer->name);
-	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
-			  "Port:", interp->peer->port);
-	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
-			  "Retries:", interp->peer->retries);
-	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
-			  "Timeout:", interp->peer->timeout);
-	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
-			  "Community:", interp->peer->rcomm);
-	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
-			  "Version:", interp->peer->version);
-    }
-
-    return SCLI_OK;
-}
-
-
-
-static int
-cmd_scli_interp(scli_interp_t *interp, int argc, char **argv)
+show_interp_info(scli_interp_t *interp, int argc, char **argv)
 {
     int const indent = 18;
     int rows, cols;
     SnmpDebugFlagToStringEntry *dft;
+    SnmpVersionToStringEntry *vnt;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -374,13 +371,37 @@ cmd_scli_interp(scli_interp_t *interp, int argc, char **argv)
     g_string_sprintfa(interp->result, "%-*s %s\n", indent,
 		      "Pager:", interp->pager ? interp->pager : "scli");
 
+    if (interp->peer) {
+	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
+			  "Host:", interp->peer->name);
+	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+			  "Port:", interp->peer->port);
+	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+			  "Retries:", interp->peer->retries);
+	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+			  "Timeout:", interp->peer->timeout);
+	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
+			  "Community:", interp->peer->rcomm);
+	for (vnt = version_name_table; vnt && vnt->name; vnt++) {
+	    if (vnt->version == interp->peer->version) {
+		g_string_sprintfa(interp->result, "%-*s %s\n", indent,
+				  "Version:", vnt->name);
+		break;
+	    }
+	}
+	if (! vnt || (vnt && ! vnt->name)) {
+	    g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+			      "Version:", interp->peer->version);
+	}
+    }
+
     return SCLI_OK;
 }
 
 
 
 static int
-conf_scli_debugging(scli_interp_t *interp, int argc, char **argv)
+conf_interp_debugging(scli_interp_t *interp, int argc, char **argv)
 {
     GSnmpDebugFlags flags = 0;
     SnmpDebugFlagToStringEntry *dft;
@@ -409,7 +430,7 @@ conf_scli_debugging(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-conf_scli_pager(scli_interp_t *interp, int argc, char **argv)
+conf_interp_pager(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -421,6 +442,30 @@ conf_scli_pager(scli_interp_t *interp, int argc, char **argv)
 	g_string_sprintfa(interp->result,
 			  "pager `%s' contains unsafe characters",
 			  argv[1]);
+	return SCLI_ERROR;	
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+conf_interp_format(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 2) {
+	return SCLI_SYNTAX;
+    }
+
+    if (strcmp(argv[1], "xml") == 0) {
+	interp->flags |= SCLI_INTERP_FLAG_XML;
+    } else if (strcmp(argv[1], "scli") == 0) {
+	interp->flags &= ~SCLI_INTERP_FLAG_XML;
+    } else {
+	g_string_sprintfa(interp->result,
+			  "unknown format `%s'", argv[1]);
 	return SCLI_ERROR;	
     }
 
@@ -457,34 +502,34 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  "open an association to a remote SNMP agent",
 	  scli_cmd_open },
-	{ "show scli aliases", NULL,
+	{ "show interp aliases", NULL,
 	  0,
-	  "show information about scli aliases",
-	  cmd_scli_aliases },
-	{ "show scli agent", NULL,
+	  "show information about the interpreter aliases",
+	  show_interp_aliases },
+	{ "show interp info", NULL,
 	  0,
-	  "show information about the current SNMP agent",
-	  cmd_scli_peer },
-	{ "show scli interp", NULL,
+	  "show status information about the interpreter",
+	  show_interp_info },
+	{ "show interp modes", NULL,
 	  0,
-	  "show information about the interpreter",
-	  cmd_scli_interp },
-	{ "show scli modes", NULL,
-	  0,
-	  "show information about the available modes",
-	  cmd_scli_modes },
+	  "show information about the available interpreter modes",
+	  show_interp_modes },
 	{ "delete scli alias", "<name>",
 	  0,
 	  "delete an scli command alias",
 	  cmd_scli_unalias },
-	{ "config scli interp debugging", "<layer> ...",
+	{ "config interp debugging", "<layer> ...",
 	  0,
-	  "configure scli interpreter debugging options",
-	  conf_scli_debugging },
-	{ "config scli interp pager", "<pager>",
+	  "configure interpreter debugging options",
+	  conf_interp_debugging },
+	{ "config interp pager", "<pager>",
 	  0,
-	  "configure scli interpreter pager",
-	  conf_scli_pager },
+	  "configure pager used by the interpreter",
+	  conf_interp_pager },
+	{ "config interp format", "<pager>",
+	  0,
+	  "configure output format produced by the interpreter",
+	  conf_interp_format },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     

@@ -156,20 +156,36 @@ fmt_kbytes(guint32 kbytes)
 
 
 void
-fmt_enum(GString *s, int width, stls_enum_t const *table, gint32 *number)
+xxx_enum(GString *s, int width, stls_enum_t const *table, gint32 *number)
 {
     gchar const *name;
 
-    if (! number) {
+    name = fmt_enum(table, number);
+    if (name) {
+	g_string_sprintfa(s, "%-*s", width, name);
+    } else {
 	g_string_sprintfa(s, "%*s", width, "");
-	return;
     }
-    
+}
+
+
+
+char const *
+fmt_enum(stls_enum_t const *table, gint32 *number)
+{
+    static char buffer[80];
+    gchar const *name;
+
+    if (! number) {
+	return NULL;
+    }
+
     name = stls_enum_get_label(table, *number);
     if (! name) {
-	g_string_sprintfa(s, "%-*d", width, *number);
+	g_snprintf(buffer, sizeof(buffer), "%d", *number);
+	return buffer;
     } else {
-	g_string_sprintfa(s, "%-*s", width, name);
+	return name;
     }
 }
 

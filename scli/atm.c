@@ -31,22 +31,30 @@
 
 
 static void
-xml_atm_interface(GString *s,
+xml_atm_interface(xmlNodePtr root,
 		  atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry,
 		  if_mib_ifEntry_t *ifEntry,
 		  if_mib_ifXEntry_t *ifXEntry)
 {
-    g_string_sprintfa(s, "  <interface index=\"%d\">\n",
-		      atmInterfaceConfEntry->ifIndex);
+    xmlNodePtr tree, node;
+    char buffer[80];
+
+    g_snprintf(buffer, sizeof(buffer), "%d",
+	       atmInterfaceConfEntry->ifIndex);
+    tree = xmlNewChild(root, NULL, "interface", NULL);
+    xmlSetProp(tree, "index", buffer);
+    
     if (atmInterfaceConfEntry->atmInterfaceMaxVpcs) {
-	g_string_sprintfa(s, "    <max-vpcs>%d</max-vpcs>\n",
-			  *atmInterfaceConfEntry->atmInterfaceMaxVpcs);
+	g_snprintf(buffer, sizeof(buffer), "%d",
+		   *atmInterfaceConfEntry->atmInterfaceMaxVpcs);
+	node = xmlNewChild(tree, NULL, "max_vpcs", buffer);
     }
+
     if (atmInterfaceConfEntry->atmInterfaceMaxVccs) {
-	g_string_sprintfa(s, "    <max-vpcs>%d</max-vpcs>\n",
-			  *atmInterfaceConfEntry->atmInterfaceMaxVccs);
+	g_snprintf(buffer, sizeof(buffer), "%d",
+		   *atmInterfaceConfEntry->atmInterfaceMaxVccs);
+	node = xmlNewChild(tree, NULL, "max_vccs", buffer);
     }
-    g_string_sprintfa(s, "  </interface>\n");
 }
 
 
@@ -96,22 +104,17 @@ show_atm_interface(scli_interp_t *interp, int argc, char **argv)
     (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
     
     if (atmInterfaceConfTable) {
-	if (scli_interp_xml(interp)) {
-	    g_string_append(interp->result, "<atm>\n");
-	} else {
+	if (! scli_interp_xml(interp)) {
 	    g_string_append(interp->header, "INTERFACE MAX-VPCS MAX-VCCS");
 	}
 	for (i = 0; atmInterfaceConfTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
-		xml_atm_interface(interp->result, atmInterfaceConfTable[i],
+		xml_atm_interface(interp->xml_node, atmInterfaceConfTable[i],
 				  NULL, NULL);
 	    } else {
 		fmt_atm_interface(interp->result, atmInterfaceConfTable[i],
 				  NULL, NULL);
 	    }
-	}
-	if (scli_interp_xml(interp)) {
-	    g_string_append(interp->result, "</atm>\n");
 	}
     }
 

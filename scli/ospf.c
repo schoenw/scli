@@ -33,7 +33,7 @@
 
 
 static int
-cmd_ospf_info(scli_interp_t *interp, int argc, char **argv)
+show_ospf_info(scli_interp_t *interp, int argc, char **argv)
 {
    ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup = NULL;
 
@@ -52,7 +52,7 @@ cmd_ospf_info(scli_interp_t *interp, int argc, char **argv)
 
        if (ospfGeneralGroup->ospfAdminStat) {
            g_string_append(interp->result, "AdminStatus: ");
-           fmt_enum(interp->result, 8, ospf_mib_enums_ospfIfAdminStat,
+           xxx_enum(interp->result, 8, ospf_mib_enums_ospfIfAdminStat,
            	ospfGeneralGroup->ospfAdminStat);
            g_string_append(interp->result, "\n");
        }
@@ -140,7 +140,7 @@ cmd_ospf_info(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
+fmt_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
 {
     g_string_append(s, "\nArea: ");
     if (ospfAreaEntry->ospfAreaId) {
@@ -154,7 +154,7 @@ show_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
 
     g_string_append(s, "Area status:       ");
     if (ospfAreaEntry->ospfAreaStatus) {
-	fmt_enum(s, 13, ospf_mib_enums_ospfAreaStatus,
+	xxx_enum(s, 13, ospf_mib_enums_ospfAreaStatus,
 		 ospfAreaEntry->ospfAreaStatus);
     } else {
 	g_string_append(s, "?");
@@ -184,7 +184,7 @@ show_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
     
     g_string_append(s, "AS external LSAs:  ");
     if (ospfAreaEntry->ospfImportAsExtern) {	 
-	fmt_enum(s, 16, ospf_mib_enums_ospfImportAsExtern,
+	xxx_enum(s, 16, ospf_mib_enums_ospfImportAsExtern,
 		 ospfAreaEntry->ospfImportAsExtern);
     } else {
 	g_string_append(s, "?");
@@ -250,7 +250,7 @@ show_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
 
 
 static int
-cmd_ospf_area(scli_interp_t *interp, int argc, char **argv)
+show_ospf_area(scli_interp_t *interp, int argc, char **argv)
 {
    int i;
    ospf_mib_ospfAreaEntry_t **ospfAreaTable = NULL;
@@ -266,7 +266,7 @@ cmd_ospf_area(scli_interp_t *interp, int argc, char **argv)
 	   if (i) {
 	       g_string_append(interp->result, "\n");
 	   }
-	   show_ospf_area(interp->result, ospfAreaTable[i]);
+	   fmt_ospf_area(interp->result, ospfAreaTable[i]);
        }
    }
 
@@ -278,11 +278,11 @@ cmd_ospf_area(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_ospf_interfaces(GString *s,
-		     ospf_mib_ospfIfEntry_t *ospfIfEntry,
-		     if_mib_ifEntry_t **ifTable,
-		     if_mib_ifXEntry_t **ifXTable,
-		     ip_mib_ipAddrEntry_t **ipAddrTable)
+fmt_ospf_interfaces(GString *s,
+		    ospf_mib_ospfIfEntry_t *ospfIfEntry,
+		    if_mib_ifEntry_t **ifTable,
+		    if_mib_ifXEntry_t **ifXTable,
+		    ip_mib_ipAddrEntry_t **ipAddrTable)
 {
     int const indent = 18;
     int j;
@@ -338,14 +338,14 @@ show_ospf_interfaces(GString *s,
 
     if (ospfIfEntry->ospfIfAdminStat) {
 	g_string_sprintfa(s, "%-*s ", indent, "AdminStatus:");
-	fmt_enum(s, 16, ospf_mib_enums_ospfIfAdminStat,
+	xxx_enum(s, 16, ospf_mib_enums_ospfIfAdminStat,
 		 ospfIfEntry->ospfIfAdminStat);
 	g_string_append(s, "\n");
     }
     
     if (ospfIfEntry->ospfIfType) {
 	g_string_sprintfa(s, "%-*s ", indent, "Type:");
-	fmt_enum(s, 16, ospf_mib_enums_ospfIfType,
+	xxx_enum(s, 16, ospf_mib_enums_ospfIfType,
 		 ospfIfEntry->ospfIfType);
 	g_string_append(s, "\n");
     }
@@ -362,7 +362,7 @@ show_ospf_interfaces(GString *s,
 
 
 static int
-cmd_ospf_interfaces(scli_interp_t *interp, int argc, char **argv)
+show_ospf_interfaces(scli_interp_t *interp, int argc, char **argv)
 {
    ospf_mib_ospfIfEntry_t **ospfIfTable = NULL;
    if_mib_ifEntry_t **ifTable = NULL;
@@ -385,8 +385,8 @@ cmd_ospf_interfaces(scli_interp_t *interp, int argc, char **argv)
 	   if (i) {
 	       g_string_append(interp->result, "\n");
 	   }
-	   show_ospf_interfaces(interp->result, ospfIfTable[i],
-				ifTable, ifXTable, ipAddrTable);
+	   fmt_ospf_interfaces(interp->result, ospfIfTable[i],
+			       ifTable, ifXTable, ipAddrTable);
        }
    }
 
@@ -403,18 +403,18 @@ void
 scli_init_ospf_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-        { "show ip ospf area", NULL,
+        { "show ospf area", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "show OSPF areas",
-	   cmd_ospf_area },
-	{ "show ip ospf info", NULL,
+	   show_ospf_area },
+	{ "show ospf info", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "general OSPF information",
-	   cmd_ospf_info },
-	{ "show ip ospf interface", NULL,
+	   show_ospf_info },
+	{ "show ospf interface", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "show OSPF interfaces",
-	   cmd_ospf_interfaces },
+	   show_ospf_interfaces },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     

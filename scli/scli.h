@@ -41,6 +41,9 @@
 #include <curses.h>
 #endif
 
+#include <libxml/xmlmemory.h>
+#include <libxml/tree.h>
+
 #include "stools.h"
 
 
@@ -110,6 +113,8 @@ struct scli_interp {
     int	flags;			/* interpreter flags */
     GString *result;		/* string result buffer */
     GString *header;		/* header line to display */
+    xmlDocPtr xml_doc;		/* xml document if we produce xml output */
+    xmlNodePtr xml_node;	/* current xml node in the xml document */
     char *pager;		/* external pager we are using */
     GSnmpSession *peer;		/* snmp peer we are talking to */
     gint delay;			/* delay between updates in milliseconds */
@@ -250,9 +255,6 @@ scli_get_ieee_vendor(guint32 prefix);
  * Formatting utilities that are used frequently by scli modes.
  */
 
-extern void
-fmt_time_ticks(GString *s, guint32 timeticks);
-
 extern char const *
 fmt_date_and_time(guchar *data, gsize len);
 
@@ -265,8 +267,11 @@ fmt_seconds(guint32 seconds);
 extern char const *
 fmt_kbytes(guint32 kbytes);
 
+extern char const *
+fmt_enum(stls_enum_t const *table, gint32 *number);
+
 extern void
-fmt_enum(GString *s, int width, stls_enum_t const *table, gint32 *number);
+xxx_enum(GString *s, int width, stls_enum_t const *table, gint32 *number);
 
 extern char const *
 fmt_kmg(guint32 number);

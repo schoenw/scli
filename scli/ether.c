@@ -193,16 +193,16 @@ show_ether_mau_info(GString *s, mau_mib_ifMauEntry_t *ifMauEntry)
     g_string_sprintfa(s, "%7u ", ifMauEntry->ifMauIfIndex);
     g_string_sprintfa(s, "%7u ", ifMauEntry->ifMauIndex);
     
-    fmt_enum(s, 12, mau_mib_enums_ifMauStatus,
+    xxx_enum(s, 12, mau_mib_enums_ifMauStatus,
 	     ifMauEntry->ifMauStatus);
 
-    fmt_enum(s, 14, mau_mib_enums_ifMauMediaAvailable,
+    xxx_enum(s, 14, mau_mib_enums_ifMauMediaAvailable,
 	     ifMauEntry->ifMauMediaAvailable);
 
-    fmt_enum(s, 9, mau_mib_enums_ifMauJabberState,
+    xxx_enum(s, 9, mau_mib_enums_ifMauJabberState,
 	     ifMauEntry->ifMauJabberState);
 
-    fmt_enum(s, 7, mau_mib_enums_ifMauAutoNegSupported,
+    xxx_enum(s, 7, mau_mib_enums_ifMauAutoNegSupported,
 	     ifMauEntry->ifMauAutoNegSupported);
 
     if (ifMauEntry->ifMauType) {

@@ -37,15 +37,17 @@ show_bridge_info(GString *s,
 		 bridge_mib_dot1dStp_t *dot1dStp)
 {
     int const indent = 18;
+    const char *type;
 
     if (dot1dBase->dot1dBaseNumPorts) {
 	g_string_sprintfa(s, "%-*s %d\n", indent, "Ports:",
 			  *(dot1dBase->dot1dBaseNumPorts));
 	if (dot1dBase->dot1dBaseType) {
-	    g_string_sprintfa(s, "%-*s ", indent, "Type:");
-	    fmt_enum(s, 1, bridge_mib_enums_dot1dBaseType,
-		     dot1dBase->dot1dBaseType);
-	    g_string_append(s, "\n");
+	    type = fmt_enum(bridge_mib_enums_dot1dBaseType,
+			    dot1dBase->dot1dBaseType);
+	    if (type) {
+		g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", type);
+	    }
 	    if (dot1dBase->dot1dBaseType
 		&& (*dot1dBase->dot1dBaseType == 2
 		    || *dot1dBase->dot1dBaseType == 4)
@@ -116,7 +118,9 @@ show_bridge_port(GString *s,
 	g_string_sprintfa(s, "%9s ", "");
     }
     if (ifEntry) {
-	fmt_enum(s, type_width, if_mib_enums_ifType, ifEntry->ifType);
+	const char *type;
+	type = fmt_enum(if_mib_enums_ifType, ifEntry->ifType);
+	g_string_sprintfa(s, "%-*s", type_width, type ? type : "");
 	if (ifEntry->ifSpeed) {
 	    if (*(ifEntry->ifSpeed) == 0xffffffff
 		&& ifXEntry && ifXEntry->ifHighSpeed) {
@@ -226,15 +230,16 @@ show_bridge_forwarding(GString *s,
     scli_vendor_t *vendor;
     guint32 prefix;
     char *name;
+    const char *status;
 
     if (dot1dTpFdbEntry->dot1dTpFdbPort) {
 	g_string_sprintfa(s, "%5u ", *dot1dTpFdbEntry->dot1dTpFdbPort);
     } else {
 	g_string_sprintfa(s, "%5s ", "");
     }
-    fmt_enum(s, 8, bridge_mib_enums_dot1dTpFdbStatus,
+    status = fmt_enum(bridge_mib_enums_dot1dTpFdbStatus,
 	     dot1dTpFdbEntry->dot1dTpFdbStatus);
-    g_string_append(s, " ");
+    g_string_sprintfa(s, "%-*s ", 8, status ? status : "");
     if (dot1dTpFdbEntry->dot1dTpFdbAddress) {
 	g_string_sprintfa(s, "%s",
 		  fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress,
@@ -312,6 +317,8 @@ static void
 show_bridge_filter(GString *s,
 		   bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry)
 {
+    const char *status;
+    
     if (dot1dStaticEntry->dot1dStaticReceivePort) {
 	g_string_sprintfa(s, "%5d ",
 			  dot1dStaticEntry->dot1dStaticReceivePort);
@@ -331,10 +338,12 @@ show_bridge_filter(GString *s,
 	/* xxx */
     }
 
-    g_string_append(s, " ");
-    fmt_enum(s, 15, bridge_mib_enums_dot1dStaticStatus,
-	     dot1dStaticEntry->dot1dStaticStatus);
- 
+    status = fmt_enum(bridge_mib_enums_dot1dStaticStatus,
+		      dot1dStaticEntry->dot1dStaticStatus);
+    if (status) {
+	g_string_sprintfa(s, " %s", status);
+    }
+    
     g_string_append(s, "\n");
 }
 

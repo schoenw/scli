@@ -30,13 +30,17 @@
 
 
 static void
-xml_tcp_listener(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry, int width)
+xml_tcp_listener(xmlNodePtr root, tcp_mib_tcpConnEntry_t *tcpConnEntry, int width)
 {
-    g_string_sprintfa(s, "  <listener address=\"%s\" port=\"%s\"/>\n",
-		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress,
-				       SCLI_FMT_ADDR),
-		      fmt_udp_port(tcpConnEntry->tcpConnLocalPort,
-				   SCLI_FMT_ADDR));
+    xmlNodePtr node;
+
+    node = xmlNewChild(root, NULL, "listener", NULL);
+    xmlSetProp(node, "address",
+	       fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress,
+				SCLI_FMT_ADDR));
+    xmlSetProp(node, "port",
+	       fmt_tcp_port(tcpConnEntry->tcpConnLocalPort,
+			    SCLI_FMT_ADDR));
 }
 
 
@@ -54,8 +58,8 @@ fmt_tcp_listener(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry, int width)
 		      &pos);
     g_string_sprintfa(s, "%*s", MAX(width-pos+1, 1), "");
     if (tcpConnEntry->tcpConnState) {
-	fmt_enum(s, 1, tcp_mib_enums_tcpConnState,
-		 tcpConnEntry->tcpConnState);
+	g_string_append(s, fmt_enum(tcp_mib_enums_tcpConnState,
+				    tcpConnEntry->tcpConnState));
     }
     g_string_append(s, "\n");
 }
@@ -98,9 +102,7 @@ show_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 	if (cnt) {
-	    if (scli_interp_xml(interp)) {
-		g_string_append(interp->result, "<tcp>\n");
-	    } else {
+	    if (! scli_interp_xml(interp)) {
 		g_string_sprintfa(interp->header, "%-*s %s",
 				  width, "LOCAL ADDRESS", "STATE");
 	    }
@@ -109,16 +111,13 @@ show_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 		    && (*tcpConnTable[i]->tcpConnState
 			== TCP_MIB_TCPCONNSTATE_LISTEN)) {
 		    if (scli_interp_xml(interp)) {
-			xml_tcp_listener(interp->result,
+			xml_tcp_listener(interp->xml_node,
 					 tcpConnTable[i], width);
 		    } else {
 			fmt_tcp_listener(interp->result,
 					 tcpConnTable[i], width);
 		    }
 		}
-	    }
-	    if (scli_interp_xml(interp)) {
-		g_string_append(interp->result, "</tcp>\n");
 	    }
 	}
     }
@@ -130,25 +129,27 @@ show_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-xml_tcp_connection(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry,
-		   int local_width, int remote_width)
+xml_tcp_connection(xmlNodePtr root, tcp_mib_tcpConnEntry_t *tcpConnEntry)
 {
-    g_string_sprintfa(s, "  <connection src=\"%s:%s\"",
-		      fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress,
-				       SCLI_FMT_ADDR),
-		      fmt_tcp_port(tcpConnEntry->tcpConnLocalPort,
-				   SCLI_FMT_ADDR));
-    g_string_sprintfa(s, " dst=\"%s:%s\">\n",
-		      fmt_ipv4_address(tcpConnEntry->tcpConnRemAddress,
-				       SCLI_FMT_ADDR),
-		      fmt_tcp_port(tcpConnEntry->tcpConnRemPort,
-				   SCLI_FMT_ADDR));
+    xmlNodePtr node;
 
-    g_string_append(s, "    <state>");
-    fmt_enum(s, 1, tcp_mib_enums_tcpConnState, tcpConnEntry->tcpConnState);
-    g_string_append(s, "</state>\n");
+    node = xmlNewChild(root, NULL, "connection", NULL);
+    xmlSetProp(node, "local-address",
+	       fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress,
+				SCLI_FMT_ADDR));
+    xmlSetProp(node, "local-port",
+	       fmt_tcp_port(tcpConnEntry->tcpConnLocalPort,
+			    SCLI_FMT_ADDR));
+    xmlSetProp(node, "remote-address",
+	       fmt_ipv4_address(tcpConnEntry->tcpConnRemAddress,
+				SCLI_FMT_ADDR));
+    xmlSetProp(node, "remote-port",
+	       fmt_tcp_port(tcpConnEntry->tcpConnRemPort,
+			    SCLI_FMT_ADDR));
 
-    g_string_append(s, "  </connection>\n");
+    node = xmlNewChild(node, NULL, "state",
+		       fmt_enum(tcp_mib_enums_tcpConnState,
+				tcpConnEntry->tcpConnState));
 }
 
 
@@ -174,8 +175,8 @@ fmt_tcp_connection(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry,
 		      &pos);
     g_string_sprintfa(s, "%*s", MAX(remote_width-pos+1, 1), "");
     if (tcpConnEntry->tcpConnState) {
-	fmt_enum(s, 1, tcp_mib_enums_tcpConnState,
-		 tcpConnEntry->tcpConnState);
+	g_string_append(s, fmt_enum(tcp_mib_enums_tcpConnState,
+				    tcpConnEntry->tcpConnState));
     }
     g_string_append(s, "\n");
 }
@@ -227,9 +228,7 @@ show_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 	if (cnt) {
-	    if (scli_interp_xml(interp)) {
-		g_string_append(interp->result, "<tcp>\n");
-	    } else {
+	    if (! scli_interp_xml(interp)) {
 		g_string_sprintfa(interp->header, "%-*s %-*s %s",
 				  local_width, "LOCAL ADDRESS",
 				  remote_width, "REMOTE ADDRESS", "STATE");
@@ -239,16 +238,12 @@ show_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 		    && (*tcpConnTable[i]->tcpConnState
 			!= TCP_MIB_TCPCONNSTATE_LISTEN)) {
 		    if (scli_interp_xml(interp)) {
-			xml_tcp_connection(interp->result, tcpConnTable[i],
-					   local_width, remote_width);
+			xml_tcp_connection(interp->xml_node, tcpConnTable[i]);
 		    } else {
 			fmt_tcp_connection(interp->result, tcpConnTable[i],
 					   local_width, remote_width);
 		    }
 		}
-	    }
-	    if (scli_interp_xml(interp)) {
-		g_string_append(interp->result, "</tcp>\n");
 	    }
 	}
     }

@@ -67,7 +67,7 @@ static void
 misc_printer_printInputDimension(GString *s, gint32 * dim)
 {
     if (dim) {
-	fmt_enum(s, 22, printer_mib_enums_prtInputDimUnit, dim);
+	xxx_enum(s, 22, printer_mib_enums_prtInputDimUnit, dim);
     }
 }
 
@@ -163,14 +163,14 @@ show_printer_info(GString *s,
 	
     if (hrDeviceEntry && hrDeviceEntry->hrDeviceStatus) {
 	g_string_sprintfa(s, "%-*s ", indent, "Device Status:");
-	fmt_enum(s, 0, host_resources_mib_enums_hrDeviceStatus,
+	xxx_enum(s, 0, host_resources_mib_enums_hrDeviceStatus,
 		 hrDeviceEntry->hrDeviceStatus);
 	g_string_append(s, "\n");
     }
     
     if (hrPrinterEntry->hrPrinterStatus) {
 	g_string_sprintfa(s, "%-*s ", indent, "Printer Status:");
-	fmt_enum(s, 0, host_resources_mib_enums_hrPrinterStatus,
+	xxx_enum(s, 0, host_resources_mib_enums_hrPrinterStatus,
 		 hrPrinterEntry->hrPrinterStatus);
 	g_string_append(s, "\n");
     }
@@ -252,7 +252,7 @@ show_printer_general(GString *s,
     
     if (prtGeneralEntry->prtConsoleDisable) {
 	g_string_sprintfa(s, "%-*s ", indent, "Console Access:");
-	fmt_enum(s, 8, printer_mib_enums_prtConsoleDisable,
+	xxx_enum(s, 8, printer_mib_enums_prtConsoleDisable,
 		 prtGeneralEntry->prtConsoleDisable);
 	g_string_append(s, "\n");
     }
@@ -375,7 +375,7 @@ show_printer_alert(GString *s, printer_mib_prtAlertEntry_t *prtAlertEntry)
 
     if (prtAlertEntry->prtAlertSeverityLevel) {
 	g_string_sprintfa(s, "%-*s ", indent, "Severity:");
-	fmt_enum(s, 24,
+	xxx_enum(s, 24,
 		 printer_mib_enums_prtAlertSeverityLevel,
 		 prtAlertEntry->prtAlertSeverityLevel);
 	g_string_append(s, "\n");
@@ -389,7 +389,7 @@ show_printer_alert(GString *s, printer_mib_prtAlertEntry_t *prtAlertEntry)
 
     g_string_append(s, "Alert Code:  ");
     if (prtAlertEntry->prtAlertGroup) {
-	fmt_enum(s, 1, printer_mib_enums_prtAlertGroup,
+	xxx_enum(s, 1, printer_mib_enums_prtAlertGroup,
 		 prtAlertEntry->prtAlertGroup);
     } else {
 	g_string_append(s, "?");
@@ -402,7 +402,7 @@ show_printer_alert(GString *s, printer_mib_prtAlertEntry_t *prtAlertEntry)
     }
     g_string_append(s, " / ");
     if (prtAlertEntry->prtAlertCode) {
-	fmt_enum(s, 1, printer_mib_enums_prtAlertCode,
+	xxx_enum(s, 1, printer_mib_enums_prtAlertCode,
 		 prtAlertEntry->prtAlertCode);
     } else {
 	g_string_append(s, "?");
@@ -416,7 +416,7 @@ show_printer_alert(GString *s, printer_mib_prtAlertEntry_t *prtAlertEntry)
     
     if (prtAlertEntry->prtAlertTrainingLevel) {
 	g_string_sprintfa(s, "%-*s ", indent, "Personnel:");
-	fmt_enum(s, 22,
+	xxx_enum(s, 22,
 		 printer_mib_enums_prtAlertTrainingLevel,
 		 prtAlertEntry->prtAlertTrainingLevel);
 	g_string_append(s, "\n");
@@ -483,7 +483,7 @@ show_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
     
     if (prtInputEntry->prtInputType) {
 	g_string_append(s, "Type:        ");
-	fmt_enum(s, 30, printer_mib_enums_prtInputType,
+	xxx_enum(s, 30, printer_mib_enums_prtInputType,
 		 prtInputEntry->prtInputType);
 	g_string_append(s, "\n");
     }
@@ -515,7 +515,7 @@ show_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
     }
 
     if (prtInputEntry->prtInputCapacityUnit) {
-	fmt_enum(s, 1,
+	xxx_enum(s, 1,
 		 printer_mib_enums_prtInputCapacityUnit,
 		 prtInputEntry->prtInputCapacityUnit);
     } else {
@@ -621,7 +621,7 @@ show_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
     
     g_string_append(s, "Security:    ");
     if (prtInputEntry->prtInputSecurity) {
-	fmt_enum(s, 10,
+	xxx_enum(s, 10,
 		 printer_mib_enums_prtOutputSecurity,
 		 prtInputEntry->prtInputSecurity);
     }
@@ -880,7 +880,7 @@ show_printer_console_light(GString *s,
 		      (int) prtConsoleLightEntry->_prtConsoleDescriptionLength,
 		      prtConsoleLightEntry->prtConsoleDescription);
     
-    fmt_enum(s, 10,
+    xxx_enum(s, 10,
 	     printer_mib_enums_prtConsoleColor,
 	     prtConsoleLightEntry->prtConsoleColor);
     

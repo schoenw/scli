@@ -31,13 +31,15 @@
 
 
 static void
-xml_udp_listener(GString *s, udp_mib_udpEntry_t *udpEntry, int width)
+xml_udp_listener(xmlNodePtr root, udp_mib_udpEntry_t *udpEntry, int width)
 {
-    g_string_sprintfa(s, "  <listener address=\"%s\" port=\"%s\"/>\n",
-		      fmt_ipv4_address(udpEntry->udpLocalAddress,
-				       SCLI_FMT_ADDR),
-		      fmt_udp_port(udpEntry->udpLocalPort,
-				   SCLI_FMT_ADDR));
+    xmlNodePtr node;
+
+    node = xmlNewChild(root, NULL, "listener", NULL);
+    xmlSetProp(node, "address",
+	       fmt_ipv4_address(udpEntry->udpLocalAddress, SCLI_FMT_ADDR));
+    xmlSetProp(node, "port",
+	       fmt_udp_port(udpEntry->udpLocalPort, SCLI_FMT_ADDR));
 }
 
 
@@ -88,21 +90,16 @@ show_udp_listener(scli_interp_t *interp, int argc, char **argv)
 		width = len;
 	    }
 	}
-	if (scli_interp_xml(interp)) {
-	    g_string_append(interp->result, "<udp>\n");
-	} else {
+	if (! scli_interp_xml(interp)) {
 	    g_string_sprintfa(interp->header, "%-*s %s",
 			      width, "LOCAL ADDRESS", "STATE");
 	}
 	for (i = 0; udpTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
-		xml_udp_listener(interp->result, udpTable[i], width);
+		xml_udp_listener(interp->xml_node, udpTable[i], width);
 	    } else {
 		fmt_udp_listener(interp->result, udpTable[i], width);
 	    }
-	}
-	if (scli_interp_xml(interp)) {
-	    g_string_append(interp->result, "</udp>\n");
 	}
     }
 

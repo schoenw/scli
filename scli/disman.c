@@ -173,7 +173,19 @@ fmt_storage_type(GString *s, gint32 *storage)
 	{ 0, NULL }
     };
 
-    fmt_enum(s, 1, storage_types, storage);
+    const char *label;
+
+    if (! storage) {
+	g_string_append(s, " ");
+	return;
+    }
+
+    label = stls_enum_get_label(storage_types, *storage);
+    if (label) {
+	g_string_append(s, label);
+    } else {
+	g_string_append(s, "-");
+    }
 }
 
 
@@ -188,7 +200,19 @@ fmt_row_status(GString *s, gint32 *status)
 	{ 0, NULL }
     };
 
-    fmt_enum(s, 1, row_states, status);
+    const char *label;
+
+    if (! status) {
+	g_string_append(s, " ");
+	return;
+    }
+
+    label = stls_enum_get_label(row_states, *status);
+    if (label) {
+	g_string_append(s, label);
+    } else {
+	g_string_append(s, "-");
+    }
 }
 
 
@@ -203,7 +227,7 @@ fmt_script_admin_status(GString *s, gint32 *status)
 	{ 0, NULL }
     };
 
-    fmt_enum(s, 1, script_admin_states, status);
+    xxx_enum(s, 1, script_admin_states, status);
 }
 
 
@@ -229,7 +253,7 @@ fmt_script_oper_status(GString *s, gint32 *status)
 	{ 0, NULL }
     };
 
-    fmt_enum(s, 1, script_oper_states, status);
+    xxx_enum(s, 1, script_oper_states, status);
 }
 
 
@@ -244,7 +268,7 @@ fmt_launch_admin_status(GString *s, gint32 *status)
 	{ 0, NULL }
     };
 
-    fmt_enum(s, 1, launch_admin_states, status);
+    xxx_enum(s, 1, launch_admin_states, status);
 }
 
 
@@ -259,7 +283,7 @@ fmt_launch_oper_status(GString *s, gint32 *status)
 	{ 0, NULL }
     };
 
-    fmt_enum(s, 1, launch_oper_states, status);
+    xxx_enum(s, 1, launch_oper_states, status);
 }
 
 
@@ -336,7 +360,7 @@ fmt_schedule_admin_status(GString *s, gint32 *status)
 	{ 0, NULL }
     };
 
-    fmt_enum(s, 1, schedule_admin_states, status);
+    xxx_enum(s, 1, schedule_admin_states, status);
 }
 
 
@@ -351,7 +375,7 @@ fmt_schedule_oper_status(GString *s, gint32 *status)
 	{ 0, NULL }
     };
 
-    fmt_enum(s, 1, schedule_oper_states, status);
+    xxx_enum(s, 1, schedule_oper_states, status);
 }
 
 
@@ -652,7 +676,7 @@ show_script_details(GString *s,
     int const width = 20;
     
     g_string_append(s, "AdminStatus: ");
-    fmt_enum(s, width, disman_script_mib_enums_smScriptAdminStatus,
+    xxx_enum(s, width, disman_script_mib_enums_smScriptAdminStatus,
 	     smScriptEntry->smScriptAdminStatus);
     g_string_append(s, "Owner:    ");
     g_string_sprintfa(s, "%*s\n",
@@ -660,7 +684,7 @@ show_script_details(GString *s,
 		      smScriptEntry->smScriptOwner);
 
     g_string_append(s, "OperStatus:  ");
-    fmt_enum(s, width, disman_script_mib_enums_smScriptOperStatus,
+    xxx_enum(s, width, disman_script_mib_enums_smScriptOperStatus,
 	     smScriptEntry->smScriptOperStatus);
     g_string_append(s, "Name:     ");
     g_string_sprintfa(s, "%*s\n",
@@ -668,7 +692,7 @@ show_script_details(GString *s,
 		      smScriptEntry->smScriptName);
     
     g_string_append(s, "RowStatus:   ");
-    fmt_enum(s, width, disman_script_mib_enums_smScriptRowStatus,
+    xxx_enum(s, width, disman_script_mib_enums_smScriptRowStatus,
 	     smScriptEntry->smScriptRowStatus);
     g_string_append(s, "Language: ");
     if (smScriptEntry->smScriptLanguage) {
@@ -682,7 +706,7 @@ show_script_details(GString *s,
     g_string_append(s, "\n");
     
     g_string_append(s, "Storage:     ");
-    fmt_enum(s, width, disman_script_mib_enums_smScriptStorageType,
+    xxx_enum(s, width, disman_script_mib_enums_smScriptStorageType,
 	     smScriptEntry->smScriptStorageType);
     g_string_append(s, "Change:   ");
     if (smScriptEntry->smScriptLastChange) {
@@ -1024,7 +1048,7 @@ show_launch_details(GString *s,
     g_string_append(s, "\n");
         
     g_string_append(s, "AdminStatus: ");
-    fmt_enum(s, width, disman_script_mib_enums_smLaunchAdminStatus,
+    xxx_enum(s, width, disman_script_mib_enums_smLaunchAdminStatus,
 	     smLaunchEntry->smLaunchAdminStatus);
     g_string_append(s, "S-Owner:  ");
     if (smLaunchEntry->smLaunchScriptOwner) {
@@ -1035,7 +1059,7 @@ show_launch_details(GString *s,
     g_string_append(s, "\n");
 
     g_string_append(s, "OperStatus:  ");
-    fmt_enum(s, width, disman_script_mib_enums_smScriptOperStatus,
+    xxx_enum(s, width, disman_script_mib_enums_smScriptOperStatus,
 	     smLaunchEntry->smLaunchOperStatus);
     g_string_append(s, "S-Name:   ");
     if (smLaunchEntry->smLaunchScriptName) {
@@ -1046,7 +1070,7 @@ show_launch_details(GString *s,
     g_string_append(s, "\n");
     
     g_string_append(s, "RowStatus:   ");
-    fmt_enum(s, width, disman_script_mib_enums_smLaunchRowStatus,
+    xxx_enum(s, width, disman_script_mib_enums_smLaunchRowStatus,
 	     smLaunchEntry->smLaunchRowStatus);
     g_string_append(s, "Expires:  ");
     if (smLaunchEntry->smLaunchRowExpireTime) {
@@ -1060,7 +1084,7 @@ show_launch_details(GString *s,
     g_string_append(s, "\n");
     
     g_string_append(s, "Storage:     ");
-    fmt_enum(s, width, disman_script_mib_enums_smLaunchStorageType,
+    xxx_enum(s, width, disman_script_mib_enums_smLaunchStorageType,
 	     smLaunchEntry->smLaunchStorageType);
     g_string_append(s, "Change:   ");
     if (smLaunchEntry->smLaunchLastChange) {
@@ -1246,7 +1270,7 @@ show_run_details(GString *s,
     }
     
     g_string_append(s, "Status:      ");
-    fmt_enum(s, width, disman_script_mib_enums_smRunState,
+    xxx_enum(s, width, disman_script_mib_enums_smRunState,
 	     smRunEntry->smRunState);
     g_string_append(s, "Start:    ");
     if (smRunEntry->smRunStartTime) {
@@ -1256,7 +1280,7 @@ show_run_details(GString *s,
     g_string_append(s, "\n");
 
     g_string_append(s, "Exit Code:   ");
-    fmt_enum(s, width, disman_script_mib_enums_smRunExitCode,
+    xxx_enum(s, width, disman_script_mib_enums_smRunExitCode,
 	     smRunEntry->smRunExitCode);
     g_string_append(s, "Result:   ");
     if (smRunEntry->smRunResultTime) {
@@ -1373,7 +1397,7 @@ show_scheduler_info(GString *s,
 		      (int) schedEntry->_schedNameLength,
 		      schedEntry->schedName);
 
-    fmt_enum(s, 8, disman_schedule_mib_enums_schedType,
+    xxx_enum(s, 8, disman_schedule_mib_enums_schedType,
 	     schedEntry->schedType);
 
     g_string_sprintfa(s, " %s\n", fmt_expression(schedEntry));
@@ -1431,7 +1455,7 @@ show_scheduler_details(GString *s,
     int i;
     
     g_string_append(s, "AdminStatus: ");
-    fmt_enum(s, width, disman_schedule_mib_enums_schedAdminStatus,
+    xxx_enum(s, width, disman_schedule_mib_enums_schedAdminStatus,
 	     schedEntry->schedAdminStatus);
     g_string_append(s, "Owner:    ");
     g_string_sprintfa(s, "%.*s\n",
@@ -1439,7 +1463,7 @@ show_scheduler_details(GString *s,
 		      schedEntry->schedOwner);
 
     g_string_append(s, "OperStatus:  ");
-    fmt_enum(s, width, disman_schedule_mib_enums_schedOperStatus,
+    xxx_enum(s, width, disman_schedule_mib_enums_schedOperStatus,
 	     schedEntry->schedOperStatus);
     g_string_append(s, "Name:     ");
     g_string_sprintfa(s, "%*s\n",
@@ -1447,15 +1471,15 @@ show_scheduler_details(GString *s,
 		      schedEntry->schedName);
 
     g_string_append(s, "RowStatus:   ");
-    fmt_enum(s, width, disman_schedule_mib_enums_schedRowStatus,
+    xxx_enum(s, width, disman_schedule_mib_enums_schedRowStatus,
 	     schedEntry->schedRowStatus);
     g_string_append(s, "Type:     ");
-    fmt_enum(s, 1, disman_schedule_mib_enums_schedType,
+    xxx_enum(s, 1, disman_schedule_mib_enums_schedType,
 	     schedEntry->schedType);
     g_string_append(s, "\n");
     
     g_string_append(s, "Storage:     ");
-    fmt_enum(s, width, disman_schedule_mib_enums_schedStorageType,
+    xxx_enum(s, width, disman_schedule_mib_enums_schedStorageType,
 	     schedEntry->schedStorageType);
     g_string_append(s, "Value:    ");
     if (schedEntry->schedValue) {
@@ -1464,7 +1488,7 @@ show_scheduler_details(GString *s,
     g_string_append(s, "\n");
     
     g_string_append(s, "Last Error:  ");
-    fmt_enum(s, width, disman_schedule_mib_enums_schedLastFailure,
+    xxx_enum(s, width, disman_schedule_mib_enums_schedLastFailure,
 	     schedEntry->schedLastFailure);
     g_string_append(s, "Error:    ");
     if (schedEntry->schedLastFailed) {

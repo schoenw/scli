@@ -114,6 +114,8 @@ show_system_containment(scli_interp_t *interp, int argc, char **argv)
 static void
 fmt_entity(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 {
+    const char *class;
+    
     if (entPhysicalEntry->entPhysicalDescr) {
 	g_string_sprintfa(s, "%.*s\n",
 		    (int) entPhysicalEntry->_entPhysicalDescrLength,
@@ -127,15 +129,17 @@ fmt_entity(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
     } else {
 	g_string_sprintfa(s, "Name:   %-30s", "");
     }
-    g_string_sprintfa(s, "Class:  ");
-    fmt_enum(s, 1, entity_mib_enums_entPhysicalClass,
-	     entPhysicalEntry->entPhysicalClass);
-    if (entPhysicalEntry->entPhysicalIsFRU) {
-	if (*entPhysicalEntry->entPhysicalIsFRU == 2) {
-	    g_string_append(s, " (replaceable)");
+    class = fmt_enum(entity_mib_enums_entPhysicalClass,
+		     entPhysicalEntry->entPhysicalClass);
+    if (class) {
+	g_string_sprintfa(s, "Class:  %s", class);
+	if (entPhysicalEntry->entPhysicalIsFRU) {
+	    if (*entPhysicalEntry->entPhysicalIsFRU == 2) {
+		g_string_append(s, " (replaceable)");
+	    }
 	}
+	g_string_append(s, "\n");
     }
-    g_string_append(s, "\n");
     
     if (entPhysicalEntry->entPhysicalMfgName) {
 	g_string_sprintfa(s, "Vendor: %-30.*s",
@@ -219,7 +223,7 @@ xml_entity(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
     }
 
     g_string_sprintfa(s, "    <class>");
-    fmt_enum(s, 1, entity_mib_enums_entPhysicalClass,
+    xxx_enum(s, 1, entity_mib_enums_entPhysicalClass,
 	     entPhysicalEntry->entPhysicalClass);
     g_string_sprintfa(s, "</class>\n");
 
