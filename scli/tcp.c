@@ -315,7 +315,7 @@ static tcp_state_t *
 tcp_state_lookup(GSList **list, const gchar *name, const guint16 port)
 {
     GSList *elem;
-    tcp_state_t *t;
+    tcp_state_t *t = NULL;
 
     for (elem = *list; elem; elem = g_slist_next(elem)) {
 	t = (tcp_state_t *) elem->data;
@@ -368,15 +368,19 @@ fmt_tcp_state(GString *s, gint32 state, guint32 count, GSList *ports)
     for (elem = ports; elem; elem = g_slist_next(elem)) {
 	tcp_state_t *t = (tcp_state_t *) elem->data;
 	if (t->count > 1) {
-	    g_string_sprintfa(s, "%s/%u ", t->name, t->count);
+	    g_string_sprintfa(s, "%s/%u", t->name, t->count);
 	    len += strlen(t->name) + 2 + 4;
 	} else {
-	    g_string_sprintfa(s, "%s ", t->name);
+	    g_string_sprintfa(s, "%s", t->name);
 	    len += strlen(t->name) + 1;
 	}
-	if (len > 70) {
-	    g_string_sprintfa(s, "\n%17s ", "");
-	    len = 12 + 5 + 1;
+	if (elem->next) {
+	    if (len > 70) {
+		g_string_sprintfa(s, "\n%17s ", "");
+		len = 12 + 5 + 1;
+	    } else {
+		g_string_sprintfa(s, " ");
+	    }
 	}
     }
     g_string_sprintfa(s, "\n");
