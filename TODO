@@ -2,11 +2,34 @@ This is just a bunch of ideas - completely unordered and there is no
 reason to assume I actually do the things mentioned below. Anyway, if
 you want to volunteer, you might find some ideas below. ;-)
 
-- Improve the SNMP version autoprobe feature to get rid of these timeouts
+- Transparently map RFC 1213 ipRouteTable in the CIDR routing table
+  in the proc layer.
+
+- Extend the show ip forwarding command with an optional argument
+  which contains a destination address and compute the set of possible
+  routes.
+
+- Extend the show bridge forwarding command with an optional argument
+  which contains a MAC address and compute the port this MAC is
+  forwarded to. (Does the current sorting of the forwarding table by
+  port really make so much sense? We do not do this for the IP layer
+  forwarding table.)
+
+- Does it make sense to introduce query commands that do specific
+  computations on retrieved data that would normally be done by a
+  device, such as:
+
+  query snmp vacm <name> <mod> <lvl> <ctxt> [<oid>]
+  query bridge forwarding <mac>
+  query ip forwarding <ip>[/<prefix>]
+
+  The last two ones could also be implemented by adding an optional
+  argument to the "show ip forwarding" and "show bridge forwarding"
+  commands.
+
+- Improve the SNMP version autoprobe feature to get rid of the timeouts
 
 - Plug the table retrieval memory leaks
-
-- Complete support for the whole printer MIB
 
 - Implement a real curses top command (with sorting)
 
@@ -16,8 +39,6 @@ you want to volunteer, you might find some ideas below. ;-)
   -t --transport (udp/tcp)
   -u --user
   -c --context
-
-- Add reasonable error reporting to the stub code.
 
 - Create some sort of a test suite (which is not that easy for highly
   interactive programs).

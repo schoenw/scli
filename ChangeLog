@@ -1,3 +1,212 @@
+2002-06-25 16:55  schoenw
+
+	* doc/: Makefile.am, scli.texinfo: Updated the version number and
+	again the Makefile.am.
+
+2002-06-25 16:54  schoenw
+
+	* doc/: Makefile.am, scli.texinfo: Fixed Makefile and regenerated
+	the mode descriptions.
+
+2002-06-25 16:52  schoenw
+
+	* configure.in: Bumped the version number.
+
+2002-06-25 16:42  schoenw
+
+	* scli/nortel.c: Added the set nortel bridge vlan ports command.
+
+2002-06-25 16:33  schoenw
+
+	* scli/: 3com.c, nortel.c: Added the set 3com bridge vlan name
+	command. Check vlan name length restrictions before actually trying
+	to set names.
+
+2002-06-25 16:31  schoenw
+
+	* proc/: productmib-proc.c, productmib-proc.h, rapid-city-proc.c,
+	rapid-city-proc.h: Pass the name length as a parameter to the vlan
+	creation procedures.
+
+2002-06-25 09:56  schoenw
+
+	* proc/productmib-proc.c: Assignment of port members now actually
+	works.
+
+2002-06-25 09:55  schoenw
+
+	* scli/3com.c: Fixed calls to the wrong free function.
+
+2002-06-25 09:46  schoenw
+
+	* scli/3com.c: Added `set 3com bridge vlan ports' and implemented
+	`dump 3com bridge vlan'.
+
+2002-06-25 09:45  schoenw
+
+	* scli/basic.c: Some improvements for the server mode.
+
+2002-06-25 09:44  schoenw
+
+	* scli/: fmt.c, nortel.c: Moved scan_port_set() to fmt.c
+
+2002-06-25 09:43  schoenw
+
+	* scli/: scli.c, scli.h: Added SCLI_INTERP_FLAG_PROTO which is set
+	if scli is running as a network service (a somewhat real command
+	line interface ;-).
+
+2002-06-25 09:41  schoenw
+
+	* proc/: productmib-proc.c, productmib-proc.h: Added
+	productmib_proc_set_vlan_port_member().
+
+2002-06-25 09:41  schoenw
+
+	* proc/: if-mib-proc.c, if-mib-proc.h: Added
+	if_mib_proc_stack_interface() and if_mib_proc_unstack_interface().
+
+2002-06-25 09:38  schoenw
+
+	* snmp/g_asn1.c: Added debugging output for the ASN.1/BER.
+
+2002-06-25 09:35  schoenw
+
+	* scli/3com.c: Fixed an error code.
+
+2002-06-25 09:34  schoenw
+
+	* scli/basic.c: Code cosmetic.
+
+2002-06-19 17:32  schoenw
+
+	* scli/3com.c: The create 3com bridge vlan and the delete 3com
+	bridge vlan now seem to work. Added an INTERFACE column to the show
+	3com bridge vlan info command.
+
+2002-06-19 17:30  schoenw
+
+	* proc/: productmib-proc.c, productmib-proc.h: Updated the
+	create/delete procs so that they work with my test bridge.
+
+2002-06-18 11:29  schoenw
+
+	* proc/: snmp-user-based-sm-mib-proc.c,
+	snmp-user-based-sm-mib-proc.h: Added proc for the
+	SNMP-USER-BASED-SM-MIB.
+
+2002-06-18 11:27  schoenw
+
+	* scli/basic.c: Treat the filename - specially to refer to stdin.
+
+2002-06-18 11:26  schoenw
+
+	* scli/3com.c: Added some not yet completed commands to
+	create/delete vlans.
+
+2002-06-18 11:26  schoenw
+
+	* stub/: Makefile.am, productmib.c, productmib.h: Regenerated
+	PRODUCTMIB stubs to include a3ComVirtualGroup.
+
+2002-06-18 11:25  schoenw
+
+	* proc/: Makefile.am, productmib-proc.c, productmib-proc.h: Added
+	proc files for 3com's PRODUCTMIB.
+
+2002-06-17 11:11  schoenw
+
+	* scli/bridge.c: Removed definition of fmt_port_set() since this is
+	now in fmt.c.
+
+2002-06-17 11:09  schoenw
+
+	* scli/nortel.c: Code and documentation cleanup.
+
+2002-06-17 11:03  schoenw
+
+	* scli/: 3com.c, fmt.c, nortel.c, scli.h: Moved fmt_port_set() into
+	fmt.c and added code to compute port sets for 3com vlans based on
+	the ifStackTable.
+
+2002-06-11 13:54  schoenw
+
+	* scli/interface.c: Changed format produced by the show interface
+	stack command slightly based on Frank's feedback.
+
+2002-06-10 15:58  schoenw
+
+	* scli/interface.c: Rewrote the 'show interface stack' command. It
+	should now show some useful information.
+
+2002-06-07 16:15  schoenw
+
+	* scli/cmds.c: Fixed the boolean constants.
+
+2002-06-07 16:04  schoenw
+
+	* AUTHORS: Added Urs Thuerman who provided date and time related
+	fixes.
+
+2002-06-07 15:24  schoenw
+
+	* scli/cmds.c: Added "create scli interp", "delete scli interp",
+	"show scli interps", "show scli command info", "show scli command
+	details".  Renamed "show scli commands" to "show scli command
+	tree".
+
+2002-06-07 15:22  schoenw
+
+	* scli/basic.c: Fixed the error reporting even more.
+
+2002-06-07 15:08  schoenw
+
+	* scli/: fmt.c, scli.h: Added fmt_indent_string().
+
+2002-06-07 15:07  schoenw
+
+	* scli/snmp.c: Updates to the documentation.
+
+2002-06-07 15:06  schoenw
+
+	* scli/3com.c: Align with updated stubs.
+
+2002-06-06 21:08  schoenw
+
+	* scli/: basic.c, scli.c, scli.h: More numeric error codes.
+	Interpreter now support slaves. Moved the initialization into a
+	special function.
+
+2002-06-05 18:36  schoenw
+
+	* stub/: productmib.c, productmib.h: Regenerated the stubs now that
+	Frank has fixed the libsmi parser.
+
+2002-06-05 16:27  schoenw
+
+	* scli/: basic.c, scli.1.in, scli.c, scli.h: Added a command line
+	option to specify the SNMP version which turns off auto-probing.
+
+2002-05-27 20:53  schoenw
+
+	* scli/interface.c: The "show interface details" command now also
+	displays the physical receive addresses.
+
+2002-05-27 20:41  schoenw
+
+	* scli/: disman.c, fmt.c, scli.h, snmp.c: Moved fmt_row_status()
+	and fmt_storage_type() into fmt.c to reuse them.
+
+2002-05-27 19:00  schoenw
+
+	* scli/: 3com.c, Makefile.am: Minor updates to better handle 3com
+	boxes.
+
+2002-05-27 10:57  schoenw
+
+	* ChangeLog, Makefile.am, NEWS, configure.in: Updates for release
+	0.2.9.
+
 2002-05-27 10:55  schoenw
 
 	* scli/3com.c: Indicate the vlan entry status.
