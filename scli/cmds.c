@@ -907,8 +907,8 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  "defined debugging levels are \"session\" for the SNMP session\n"
 	  "layer, \"request\" for the SNMP request handling layer, and\n"
 	  "\"transport\" for the SNMP transport layer.",
-	  0,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_XML,
+	  "", NULL,
 	  set_scli_debugging },
 	
 	{ "set scli pager", "<pager>",
