@@ -22,11 +22,15 @@
 
 #include "scli.h"
 
+#include "snmpv2-tc.h"
 #include "snmpv2-mib.h"
 #include "if-mib.h"
-#include "if-mib-proc.h"
 #include "ip-mib.h"
 #include "entity-mib.h"
+#include "ianaiftype-mib.h"
+
+#include "if-mib-proc.h"
+#include "ianaiftype-mib-proc.h"
 
 #include <ctype.h>
 
@@ -38,7 +42,7 @@
 	( IF_MIB_IFDESCR | IF_MIB_IFADMINSTATUS )
 
 #define IF_MIB_IFENTRY_STATUS \
-	( IF_MIB_IFDESCR | IF_MIB_IFOPERSTATUS )
+	( IF_MIB_IFDESCR | IF_MIB_IFOPERSTATUS | IF_MIB_IFADMINSTATUS )
 
 #define IF_MIB_IFENTRY_PARAMS \
 	( IF_MIB_IFDESCR | IF_MIB_IFTYPE | IF_MIB_IFMTU | IF_MIB_IFSPEED \
@@ -99,14 +103,14 @@ fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 {
     const char *e;
 
-    static GSnmpEnum const admin_states[] = {
+    static GNetSnmpEnum const admin_states[] = {
 	{ IF_MIB_IFADMINSTATUS_UP,	"U" },
 	{ IF_MIB_IFADMINSTATUS_DOWN,	"D" },
 	{ IF_MIB_IFADMINSTATUS_TESTING,	"T" },
 	{ 0, NULL }
     };
 
-    static GSnmpEnum const oper_states[] = {
+    static GNetSnmpEnum const oper_states[] = {
 	{ IF_MIB_IFOPERSTATUS_UP,		"U" },
 	{ IF_MIB_IFOPERSTATUS_DOWN,		"D" },
 	{ IF_MIB_IFOPERSTATUS_TESTING,		"T" },
@@ -117,15 +121,15 @@ fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 	{ 0, NULL }
     };
 
-    static GSnmpEnum const conn_states[] = {
-	{ IF_MIB_IFCONNECTORPRESENT_TRUE,	"C" },
-	{ IF_MIB_IFCONNECTORPRESENT_FALSE,	"N" },
+    static GNetSnmpEnum const conn_states[] = {
+	{ SNMPV2_TC_TRUTHVALUE_TRUE,	"C" },
+	{ SNMPV2_TC_TRUTHVALUE_FALSE,	"N" },
 	{ 0, NULL }
     };
 
-    static GSnmpEnum const prom_states[] = {
-	{ IF_MIB_IFPROMISCUOUSMODE_TRUE,	"P" },
-	{ IF_MIB_IFPROMISCUOUSMODE_FALSE,	"N" },
+    static GNetSnmpEnum const prom_states[] = {
+	{ SNMPV2_TC_TRUTHVALUE_TRUE,	"P" },
+	{ SNMPV2_TC_TRUTHVALUE_FALSE,	"N" },
 	{ 0, NULL }
     };
 
@@ -227,8 +231,8 @@ get_if_type_width(if_mib_ifEntry_t **ifTable)
 	for (i = 0; ifTable[i]; i++) {
 	    if (ifTable[i]->ifType) {
 		char const *label;
-		label = gsnmp_enum_get_label(if_mib_enums_ifType,
-					     *ifTable[i]->ifType);
+		label = gnet_snmp_enum_get_label(ianaiftype_mib_enums_IANAifType,
+						 *ifTable[i]->ifType);
 		if (label && strlen(label) > type_width) {
 		    type_width = strlen(label);
 		}
@@ -243,7 +247,7 @@ get_if_type_width(if_mib_ifEntry_t **ifTable)
 static int
 get_if_name_width(if_mib_ifXEntry_t **ifXTable)
 {
-    int i, name_width = 6;
+    int i, name_width = 4;
     
     if (ifXTable) {
 	for (i = 0; ifXTable[i]; i++) {
@@ -269,7 +273,7 @@ fmt_entity_root(scli_interp_t *interp,
 
     while (entPhysicalEntry) {
 	if (entPhysicalEntry && entPhysicalEntry->entPhysicalDescr) {
-	    e = fmt_enum(entity_mib_enums_entPhysicalClass,
+	    e = fmt_enum(entity_mib_enums_PhysicalClass,
 			 entPhysicalEntry->entPhysicalClass);
 	    if (e) {
 		char *x = g_strconcat(e, ":", NULL);
@@ -326,14 +330,8 @@ fmt_interface_details(GString *s,
 	g_string_append(s, " Address: ");
 	fmt_phys_address(s, ifEntry->ifPhysAddress,
 			 ifEntry->_ifPhysAddressLength);
-	/* See RFC 2665 section 3.2.6. why the test below is so ugly... */
 	if (ifEntry->ifType && ifEntry->_ifPhysAddressLength == 6
-	    && (*ifEntry->ifType == IF_MIB_IFTYPE_ETHERNETCSMACD
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_ISO88023CSMACD
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_STARLAN
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_FASTETHER
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_FASTETHERFX
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_GIGABITETHERNET)) {
+	    && ianaiftype_mib_proc_isether(*ifEntry->ifType)) {
 	    name = fmt_ether_address(ifEntry->ifPhysAddress, SCLI_FMT_NAME);
 	    if (name) {
 		g_string_sprintfa(s, " (%s)", name);
@@ -346,7 +344,7 @@ fmt_interface_details(GString *s,
 
     e = fmt_enum(if_mib_enums_ifAdminStatus, ifEntry->ifAdminStatus);
     g_string_sprintfa(s, "AdminStatus: %-*s", width, e ? e : "");
-    e = fmt_enum(if_mib_enums_ifType, ifEntry->ifType);
+    e = fmt_enum(ianaiftype_mib_enums_IANAifType, ifEntry->ifType);
     g_string_sprintfa(s, " Type:    %-*s\n", width, e ? e : "");
 
     e = fmt_enum(if_mib_enums_ifLinkUpDownTrapEnable,
@@ -358,7 +356,7 @@ fmt_interface_details(GString *s,
 	g_string_append(s, " MTU:\n");
     }
 
-    e = fmt_enum(if_mib_enums_ifConnectorPresent,
+    e = fmt_enum(snmpv2_tc_enums_TruthValue,
 		 ifXEntry ? ifXEntry->ifConnectorPresent : NULL);
     g_string_sprintfa(s, "Connector:   %-*s", width, e ? e : "");
     if (ifEntry->ifSpeed) {
@@ -374,7 +372,7 @@ fmt_interface_details(GString *s,
 	g_string_append(s, " Speed:\n");
     }
 
-    e = fmt_enum(if_mib_enums_ifPromiscuousMode,
+    e = fmt_enum(snmpv2_tc_enums_TruthValue,
 		 ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
     g_string_sprintfa(s, "Promiscuous: %-*s", width, e ? e : "");
     if (ifEntry->ifLastChange && system && system->sysUpTime) {
@@ -388,7 +386,7 @@ fmt_interface_details(GString *s,
 	for (j = 0; ifRcvAddrTable[j]; j++) {
 	    if (ifRcvAddrTable[j]->ifIndex == ifEntry->ifIndex
 		&& ifRcvAddrTable[j]->ifRcvAddressAddress) {
-		e = fmt_enum(if_mib_enums_ifRcvAddressStatus,
+		e = fmt_enum(snmpv2_tc_enums_RowStatus,
 			     ifRcvAddrTable[j]->ifRcvAddressStatus);
 		f = fmt_enum(if_mib_enums_ifRcvAddressType,
 			     ifRcvAddrTable[j]->ifRcvAddressType);
@@ -468,7 +466,7 @@ xml_interface_details(xmlNodePtr root,
 	(void) xml_new_child(tree, NULL, "administrative", "%s", s);
     }
 
-    s = fmt_enum(if_mib_enums_ifType, ifEntry->ifType);
+    s = fmt_enum(ianaiftype_mib_enums_IANAifType, ifEntry->ifType);
     if (s) {
 	(void) xml_new_child(tree, NULL, "type", "%s", s);
     }
@@ -502,13 +500,13 @@ xml_interface_details(xmlNodePtr root,
 	xml_set_prop(node, "unit", "bps");
     }
     
-    s = fmt_enum(if_mib_enums_ifConnectorPresent,
+    s = fmt_enum(snmpv2_tc_enums_TruthValue,
 		 ifXEntry ? ifXEntry->ifConnectorPresent : NULL);
     if (s) {
 	(void) xml_new_child(tree, NULL, "connector", s);
     }
 
-    s = fmt_enum(if_mib_enums_ifPromiscuousMode,
+    s = fmt_enum(snmpv2_tc_enums_TruthValue,
 		 ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
     if (s) {
 	(void) xml_new_child(tree, NULL, "promiscuous", s);
@@ -723,7 +721,7 @@ fmt_interface_info(GString *s,
 	g_string_sprintfa(s, "      ");
     }
 
-    e = fmt_enum(if_mib_enums_ifType, ifEntry->ifType);
+    e = fmt_enum(ianaiftype_mib_enums_IANAifType, ifEntry->ifType);
     g_string_sprintfa(s, " %-*s ", type_width, e ? e : "");
 
     if (ifEntry->ifSpeed) {
@@ -835,7 +833,7 @@ fmt_interface_stack_line(GString *s, if_mib_ifEntry_t *ifEntry,
     const char *e;
 
     g_string_sprintfa(s, "%9u %s ", ifEntry->ifIndex, o);
-    e = fmt_enum(if_mib_enums_ifType, ifEntry->ifType);
+    e = fmt_enum(ianaiftype_mib_enums_IANAifType, ifEntry->ifType);
     g_string_sprintfa(s, "%-*s ", type_width, e ? e : "");
     if (ifEntry->ifDescr) {
 	g_string_sprintfa(s, "%.*s",
@@ -1049,6 +1047,9 @@ typedef struct {
     guint32 outPkts;
     guint32 inErrors;
     guint32 outErrors;
+    guint32 inDiscards;
+    guint32 outDiscards;
+    guint32 inUnknownProtos;
 } if_stats_t;
 
 
@@ -1106,7 +1107,7 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 
     if (ifTable) {
 	g_string_append(interp->header, "INTERFACE STATUS "
-			"I-BPS O-BPS I-PPS O-PPS I-ERR O-ERR  DESCRIPTION");
+			"I-BPS O-BPS I-PPS O-PPS I-ERR O-ERR I-DIS O-DIS I-UNK  DESCRIPTION");
 	for (i = 0; ifTable[i]; i++) {
 	    GString *s;
 	    if_mib_ifXEntry_t *ifXEntry;
@@ -1181,6 +1182,15 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 			   &last, delta);
 
 	    fmt_counter_dt(s, ifTable[i]->ifOutErrors, &(stats[i].outErrors),
+			   &last, delta);
+	    
+	    fmt_counter_dt(s, ifTable[i]->ifInDiscards, &(stats[i].inDiscards),
+			   &last, delta);
+	    
+	    fmt_counter_dt(s, ifTable[i]->ifOutDiscards, &(stats[i].outDiscards),
+			   &last, delta);
+    
+	    fmt_counter_dt(s, ifTable[i]->ifInUnknownProtos, &(stats[i].inUnknownProtos),
 			   &last, delta);
 	    
 	    if (ifTable[i]->ifDescr && ifTable[i]->_ifDescrLength) {
@@ -1273,7 +1283,8 @@ set_interface_status(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    if (! gsnmp_enum_get_number(if_mib_enums_ifAdminStatus, argv[2], &value)) {
+    if (! gnet_snmp_enum_get_number(if_mib_enums_ifAdminStatus,
+				    argv[2], &value)) {
 	g_string_assign(interp->result, argv[2]);
 	return SCLI_SYNTAX_VALUE;
     }
@@ -1340,8 +1351,8 @@ set_interface_promiscuous(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    if (! gsnmp_enum_get_number(if_mib_enums_ifPromiscuousMode,
-				argv[2], &value)) {
+    if (! gnet_snmp_enum_get_number(snmpv2_tc_enums_TruthValue,
+				    argv[2], &value)) {
 	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;
     }
@@ -1378,8 +1389,8 @@ set_interface_notifications(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    if (! gsnmp_enum_get_number(if_mib_enums_ifLinkUpDownTrapEnable,
-				argv[2], &value)) {
+    if (! gnet_snmp_enum_get_number(if_mib_enums_ifLinkUpDownTrapEnable,
+				    argv[2], &value)) {
 	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;
     }
@@ -1435,14 +1446,16 @@ dump_interface(scli_interp_t *interp, int argc, char **argv)
 				      (int) ifXEntry->_ifAliasLength,
 				      ifXEntry->ifAlias);
 		}
-		e = fmt_enum(if_mib_enums_ifLinkUpDownTrapEnable, ifXEntry->ifLinkUpDownTrapEnable);
+		e = fmt_enum(if_mib_enums_ifLinkUpDownTrapEnable,
+			     ifXEntry->ifLinkUpDownTrapEnable);
 		if (e) {
 		    g_string_sprintfa(interp->result,
 				      "set interface notifications \"^%.*s$\" \"%s\"\n",
 				      (int) ifTable[i]->_ifDescrLength,
 				      ifTable[i]->ifDescr, e);
 		}
-		e = fmt_enum(if_mib_enums_ifPromiscuousMode, ifXEntry->ifPromiscuousMode);
+		e = fmt_enum(snmpv2_tc_enums_TruthValue,
+			     ifXEntry->ifPromiscuousMode);
 		if (e) {
 		    g_string_sprintfa(interp->result,
 				      "set interface promiscuous \"^%.*s$\" \"%s\"\n",
@@ -1460,72 +1473,100 @@ dump_interface(scli_interp_t *interp, int argc, char **argv)
 }
 
 
+/*
+ * The checks below roughly follow RFC 2863 section 3.1.13. Note that
+ * the code below allows transient inconsistent states for one minute
+ * on systems that provide ifLastChange.
+ */
+
+static void
+check_if_status(GString *s,
+		if_mib_ifEntry_t *ifEntry,
+		snmpv2_mib_system_t *system)
+{
+    int fault = 0;
+    
+    if (! ifEntry->ifOperStatus || ! ifEntry->ifAdminStatus) {
+	return;
+    }
+
+    if (ifEntry->ifLastChange && system && system->sysUpTime) {
+	guint32 dsecs = *(system->sysUpTime) - *(ifEntry->ifLastChange);
+	if (dsecs < 60) {
+	    return;
+	}
+    }
+	
+    if (*ifEntry->ifAdminStatus != IF_MIB_IFADMINSTATUS_DOWN
+	&& *ifEntry->ifOperStatus == IF_MIB_IFOPERSTATUS_DOWN) {
+	fault = 1;
+    }
+
+    if (*ifEntry->ifAdminStatus == IF_MIB_IFADMINSTATUS_DOWN
+	&& *ifEntry->ifOperStatus != IF_MIB_IFOPERSTATUS_DOWN
+	&& *ifEntry->ifOperStatus != IF_MIB_IFOPERSTATUS_NOTPRESENT) {
+	fault = 1;
+    }
+
+    if (fault) {
+	g_string_sprintfa(s,
+		  "Interface #%d (%.*s) has an operational status (%s) "
+		  "which does not match its administrative status (%s).\n\n",
+		  ifEntry->ifIndex, ifEntry->_ifDescrLength,
+		  ifEntry->ifDescr,
+		  fmt_enum(if_mib_enums_ifOperStatus, ifEntry->ifOperStatus),
+		  fmt_enum(if_mib_enums_ifAdminStatus, ifEntry->ifAdminStatus));
+    }
+}
+
+
 
 static int
-alert_interface_status(scli_interp_t *interp, int argc, char **argv)
+check_interface_status(scli_interp_t *interp, int argc, char **argv)
 {
     if_mib_ifEntry_t **ifTable = NULL;
+    snmpv2_mib_system_t *system = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
-    regex_t _regex_status, *regex_status = NULL;
-    const char *e;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (argc < 2 || argc > 3) {
+    if (argc > 2) {
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    regex_status = &_regex_status;
-    if (regcomp(regex_status, argv[1], interp->regex_flags) != 0) {
-	g_string_assign(interp->result, argv[1]);
-	return SCLI_SYNTAX_REGEXP;
-    }
-
-    if (argc == 3) {
+    if (argc == 2) {
 	regex_iface = &_regex_iface;
-	if (regcomp(regex_iface, argv[2], interp->regex_flags) != 0) {
-	    if (regex_status) regfree(regex_status);
-	    g_string_assign(interp->result, argv[2]);
+	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
 	    return SCLI_SYNTAX_REGEXP;
 	}
     }
 
     if (scli_interp_dry(interp)) {
-	if (regex_status) regfree(regex_status);
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_OK;
     }
     
     if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_STATUS);
     if (interp->peer->error_status) {
+	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
     }
 
+    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
+    
     if (ifTable) {
 	for (i = 0; ifTable[i]; i++) {
 	    if (interface_match(regex_iface, ifTable[i])) {
-		e = fmt_enum(if_mib_enums_ifOperStatus,
-			     ifTable[i]->ifOperStatus);
-		if (e) {
-		    int status = regexec(regex_status, e, (size_t) 0, NULL, 0);
-		    if (status == 0) {
-			g_string_sprintfa(interp->result, "interface %d %s",
-					  i, e ? e : "");
-			if (ifTable[i]->ifDescr && ifTable[i]->_ifDescrLength) {
-			    g_string_sprintfa(interp->result, " (%.*s)",
-		      (int) ifTable[i]->_ifDescrLength, ifTable[i]->ifDescr);
-			}
-			g_string_append(interp->result, "\n");
-		    }
-		}
+		check_if_status(interp->result, ifTable[i], system);
 	    }
 	}
     }
 
     if (ifTable) if_mib_free_ifTable(ifTable);
+    if (system) snmpv2_mib_free_system(system);
 
-    if (regex_status) regfree(regex_status);
     if (regex_iface) regfree(regex_iface);
     
     return SCLI_OK;
@@ -1640,7 +1681,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	
 	{ "show interface details", "[<regexp>]",
 	  "The `show interface details' command describes the selected\n"
-	  "interfaces in more detail. The optional regular expression\n"
+	  "interfaces in detail. The optional regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
@@ -1676,6 +1717,9 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "  O-PPS       output packets per second\n"
 	  "  I-ERR       input errors per second\n"
 	  "  O-ERR       output errors per second\n"
+	  "  I-DIS       input packets discarded per second\n"
+	  "  O-DIS       output packets discarded per second\n"
+	  "  I-UNK       input packets with unknown protocols per second\n"
 	  "  DESCRIPTION description of the network interface",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
@@ -1689,12 +1733,17 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_interface_stats },
 
-	{ "alert interface status", "<regexp> [<regexp>]",
-	  "The `alarm interface status' command generates alerts for\n"
-	  "interfaces that are in given status.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_LOOP,
+	{ "check interface status", "[<regexp>]",
+	  "The `check interface status' command checks the status of\n"
+	  "interfaces. The optional regular expression <regexp> is matched\n"
+	  "against the interface description to select the interfaces\n"
+	  "In particular, the check interface status commands detects\n"
+	  "fault conditions if (a) ifAdminStatus is not down and\n"
+	  "ifOperStatus is down or (b) ifAdminStatus is down and\n"
+	  "ifOperStatus is not down and not notPresent",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  alert_interface_status },
+	  check_interface_status },
 #if 0
 	{ "rrd interface stats", "<path> [<regexp>]",
 	  "The `rrd interface stats' command periodically collects\n"
@@ -1705,8 +1754,9 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  rrd_interface_stats },
 #endif
 	{ "dump interface", NULL,
-	  "The `dump interface' command generates a sequence of scli commands\n"
-	  "which can be used to restore the interface configuration.\n",
+	  "The `dump interface' command generates a sequence of scli\n"
+	  "commands which can be used to restore the interface\n"
+	  "configuration.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  dump_interface },

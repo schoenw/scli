@@ -23,10 +23,14 @@
 #include "scli.h"
 
 #include "bridge-mib.h"
-#include "if-mib.h"
+#include "if-mib-proc.h"
+#if 1
+#include "ip-mib.h"
+#endif
+#include "ianaiftype-mib.h"
 
 
-static GSnmpEnum const dot1dBaseType[] = {
+static GNetSnmpEnum const dot1dBaseType[] = {
     { BRIDGE_MIB_DOT1DBASETYPE_UNKNOWN,	"unknown" },
     { BRIDGE_MIB_DOT1DBASETYPE_TRANSPARENT_ONLY,	"transparent (TP)" },
     { BRIDGE_MIB_DOT1DBASETYPE_SOURCEROUTE_ONLY,	"source route (SR)" },
@@ -35,7 +39,7 @@ static GSnmpEnum const dot1dBaseType[] = {
 };
 
 
-GSnmpEnum const dot1dStpProtocolSpecification[] = {
+static GNetSnmpEnum const dot1dStpProtocolSpecification[] = {
     { BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_UNKNOWN,	"unknown" },
     { BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_DECLB100,	"DEC LANbridge 100 Spanning Tree Protocol" },
     { BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_IEEE8021D,	"IEEE 802.1d Spanning Tree Protocol" },
@@ -62,7 +66,7 @@ fmt_stpStatus(GString *s, gint32 *enable, gint32 *state)
 {
     const char *e;
 
-    GSnmpEnum const port_state[] = {
+    GNetSnmpEnum const port_state[] = {
 	{ BRIDGE_MIB_DOT1DSTPPORTSTATE_DISABLED,	"D" },
 	{ BRIDGE_MIB_DOT1DSTPPORTSTATE_BLOCKING,	"B" },
 	{ BRIDGE_MIB_DOT1DSTPPORTSTATE_LISTENING,	"I" },
@@ -72,7 +76,7 @@ fmt_stpStatus(GString *s, gint32 *enable, gint32 *state)
 	{ 0, NULL }
     };
     
-    GSnmpEnum const port_enable[] = {
+    GNetSnmpEnum const port_enable[] = {
 	{ BRIDGE_MIB_DOT1DSTPPORTENABLE_ENABLED,	"E" },
 	{ BRIDGE_MIB_DOT1DSTPPORTENABLE_DISABLED,	"D" },
 	{ 0, NULL }
@@ -278,7 +282,7 @@ fmt_bridge_port(GString *s,
     }
     if (ifEntry) {
 	const char *type;
-	type = fmt_enum(if_mib_enums_ifType, ifEntry->ifType);
+	type = fmt_enum(ianaiftype_mib_enums_IANAifType, ifEntry->ifType);
 	g_string_sprintfa(s, "%-*s", type_width, type ? type : "");
 	if (ifEntry->ifSpeed) {
 	    if (*(ifEntry->ifSpeed) == 0xffffffff
@@ -336,8 +340,8 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
-    if_mib_get_ifTable(interp->peer, &ifTable,
-		       IF_MIB_IFTYPE | IF_MIB_IFSPEED | IF_MIB_IFDESCR);
+    if_mib_proc_get_ifTable(interp->peer, &ifTable,
+			    IF_MIB_IFTYPE | IF_MIB_IFSPEED | IF_MIB_IFDESCR, interp->epoch);
     if_mib_get_ifXTable(interp->peer, &ifXTable,
 			IF_MIB_IFNAME | IF_MIB_IFHIGHSPEED);
     
@@ -350,8 +354,8 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 	    }
 	    if (ifTable[i]->ifType) {
 		char const *label;
-		label = gsnmp_enum_get_label(if_mib_enums_ifType,
-					     *ifTable[i]->ifType);
+		label = gnet_snmp_enum_get_label(ianaiftype_mib_enums_IANAifType,
+						 *ifTable[i]->ifType);
 		if (label && strlen(label) > type_width) {
 		    type_width = strlen(label);
 		}
@@ -379,7 +383,7 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 
     if (dot1dBasePortTable)
 	bridge_mib_free_dot1dBasePortTable(dot1dBasePortTable);
-    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifTable) if_mib_proc_free_ifTable(ifTable);
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
 
     return SCLI_OK;
@@ -469,6 +473,7 @@ show_bridge_stp_ports(scli_interp_t *interp, int argc, char **argv)
 static void
 fmt_bridge_forwarding(GString *s,
 		      bridge_mib_dot1dTpFdbEntry_t *dot1dTpFdbEntry,
+		      ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry,
 		      int name_width)
 {
     const scli_vendor_t *vendor;
@@ -491,6 +496,12 @@ fmt_bridge_forwarding(GString *s,
 	name = fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress,
 				 SCLI_FMT_NAME);
 	g_string_sprintfa(s, " %-*s", name_width, name ? name : "");
+	if (ipNetToMediaEntry) {
+	    g_string_sprintfa(s, " %-15s",
+			      fmt_ipv4_address(ipNetToMediaEntry->ipNetToMediaNetAddress, SCLI_FMT_ADDR));
+	} else {
+	    g_string_sprintfa(s, " %-15s", "");
+	}
 	prefix = dot1dTpFdbEntry->dot1dTpFdbAddress[0] * 65536
 	    + dot1dTpFdbEntry->dot1dTpFdbAddress[1] * 256
 	    + dot1dTpFdbEntry->dot1dTpFdbAddress[2];
@@ -499,6 +510,7 @@ fmt_bridge_forwarding(GString *s,
 	    g_string_sprintfa(s, " %s", vendor->name);
 	}
     }
+
     g_string_append(s, "\n");
 }
 
@@ -508,9 +520,13 @@ static int
 show_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 {
     bridge_mib_dot1dTpFdbEntry_t **dot1dTpFdbTable = NULL;
+#if 1
+    ip_mib_ipNetToMediaEntry_t **ipNetToMediaTable = NULL;
+#endif
     char *name;
     int i, p, max = 0;
     int name_width = 8;
+    int k = 0;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -527,6 +543,11 @@ show_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SNMP;
     }
 
+#if 1
+    ip_mib_get_ipNetToMediaTable(interp->peer, &ipNetToMediaTable,
+				 IP_MIB_IPNETTOMEDIAPHYSADDRESS);
+#endif
+
     if (dot1dTpFdbTable) {
 	for (i = 0; dot1dTpFdbTable[i]; i++) {
 	    if (dot1dTpFdbTable[i]->dot1dTpFdbPort
@@ -542,19 +563,39 @@ show_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 	    }
 	};
 	g_string_sprintfa(interp->header,
-			  " PORT STATUS   ADDRESS           %-*s VENDOR",
+			  " PORT STATUS   ADDRESS           %-*s IP ADDRESS      VENDOR",
 			  name_width, "NAME");
 	for (p = 0; p < max+1; p++) {
 	    for (i = 0; dot1dTpFdbTable[i]; i++) {
 		if (dot1dTpFdbTable[i]->dot1dTpFdbPort
 		    && *dot1dTpFdbTable[i]->dot1dTpFdbPort == p) {
+
+		    /* do not follow the mapping port number ->
+		     * interface number -> ipNetToMedia entry since
+		     * this won't work on some bridges (e.g. 3com)
+		     */
+
+		    if (ipNetToMediaTable) {
+			for (k = 0; ipNetToMediaTable[k]; k++) {
+			    if (ipNetToMediaTable[k]->_ipNetToMediaPhysAddressLength == 6
+				&& ipNetToMediaTable[k]->ipNetToMediaPhysAddress
+				&& memcmp(ipNetToMediaTable[k]->ipNetToMediaPhysAddress, dot1dTpFdbTable[i]->dot1dTpFdbAddress, 6) == 0) {
+				break;
+			    }
+			}
+		    }
+		    
 		    fmt_bridge_forwarding(interp->result, dot1dTpFdbTable[i],
+					  (ipNetToMediaTable && ipNetToMediaTable[k]) ? ipNetToMediaTable[k] : NULL,
 					  name_width);
 		}
 	    }
 	}
     }
 
+#if 1
+    if (ipNetToMediaTable) ip_mib_free_ipNetToMediaTable(ipNetToMediaTable);
+#endif
     if (dot1dTpFdbTable) bridge_mib_free_dot1dTpFdbTable(dot1dTpFdbTable);
 
     return SCLI_OK;

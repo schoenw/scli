@@ -24,6 +24,15 @@
 
 #include "ucd-snmp-mib.h"
 
+#define UCD_SNMP_MIB_VERSIONDODEBUGGING_DISABLED 0
+#define UCD_SNMP_MIB_VERSIONDODEBUGGING_ENABLED  1
+
+static GNetSnmpEnum const ucd_snmp_mib_enums_versionDoDebugging[] = {
+    { UCD_SNMP_MIB_VERSIONDODEBUGGING_DISABLED, "disabled" },
+    { UCD_SNMP_MIB_VERSIONDODEBUGGING_ENABLED,  "enabled" },
+    { 0, NULL }
+};
+
 
 static void
 fmt_info(GString *s, ucd_snmp_mib_version_t *version)
@@ -285,8 +294,8 @@ set_netsnmp_debugging(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    if (! gsnmp_enum_get_number(ucd_snmp_mib_enums_versionDoDebugging,
-				argv[1], &value)) {
+    if (! gnet_snmp_enum_get_number(ucd_snmp_mib_enums_versionDoDebugging,
+				    argv[1], &value)) {
 	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;
     }

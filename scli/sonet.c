@@ -33,13 +33,13 @@
 #include "sonet-mib.h"
 
 
-static GSnmpEnum const sonetMediumType[] = {
+static GNetSnmpEnum const sonetMediumType[] = {
     { SONET_MIB_SONETMEDIUMTYPE_SONET, "SONET" },
     { SONET_MIB_SONETMEDIUMTYPE_SDH,   "SDH" },
     { 0, NULL }
 };
 
-static GSnmpEnum const sonetMediumLineCoding[] = {
+static GNetSnmpEnum const sonetMediumLineCoding[] = {
     { SONET_MIB_SONETMEDIUMLINECODING_SONETMEDIUMOTHER, "other" },
     { SONET_MIB_SONETMEDIUMLINECODING_SONETMEDIUMB3ZS,  "B3ZS" },
     { SONET_MIB_SONETMEDIUMLINECODING_SONETMEDIUMCMI,   "CMI" },
@@ -48,7 +48,7 @@ static GSnmpEnum const sonetMediumLineCoding[] = {
     { 0, NULL }
 };
 
-static GSnmpEnum const sonetMediumLineType[] = {
+static GNetSnmpEnum const sonetMediumLineType[] = {
     { SONET_MIB_SONETMEDIUMLINETYPE_SONETOTHER,           "other" },
     { SONET_MIB_SONETMEDIUMLINETYPE_SONETSHORTSINGLEMODE, "ShortSingleMode" },
     { SONET_MIB_SONETMEDIUMLINETYPE_SONETLONGSINGLEMODE,  "LongSingleMode" },

@@ -27,6 +27,9 @@
 #include "tunnel-mib.h"
 #include "if-mib.h"
 #include "rfc1213-mib.h"
+#include "ianaiftype-mib.h"
+
+#include "ianaiftype-mib-proc.h"
 
 #define RFC1213_MIB_IPROUTE_MASK \
 	( RFC1213_MIB_IPROUTEDEST | RFC1213_MIB_IPROUTEIFINDEX \
@@ -34,11 +37,28 @@
 	  | RFC1213_MIB_IPROUTEPROTO | RFC1213_MIB_IPROUTEMASK )
 
 
-GSnmpEnum const forwarding[] = {
+GNetSnmpEnum const forwarding[] = {
     { IP_MIB_IPFORWARDING_FORWARDING,	"enabled" },
     { IP_MIB_IPFORWARDING_NOTFORWARDING,	"disabled" },
     { 0, NULL }
 };
+
+
+
+static int
+get_if_name_width(if_mib_ifXEntry_t **ifXTable)
+{
+    int i, name_width = 4;
+    
+    if (ifXTable) {
+	for (i = 0; ifXTable[i]; i++) {
+	    if (ifXTable[i]->_ifNameLength > name_width) {
+		name_width = ifXTable[i]->_ifNameLength;
+	    }
+	}
+    }
+    return name_width;
+}
 
 
 
@@ -52,7 +72,6 @@ fmt_ip_forward(GString *s,
     int i, pos;
     
     if (ipCidrRouteEntry->ipCidrRouteIfIndex) {
-	g_string_append(s, "\n");
 	g_string_sprintfa(s, "%s/%s%n",
 			  fmt_ipv4_address(ipCidrRouteEntry->ipCidrRouteDest,
 					   SCLI_FMT_ADDR),
@@ -67,15 +86,15 @@ fmt_ip_forward(GString *s,
 
 	label = NULL;
 	if (ipCidrRouteEntry->ipCidrRouteType) {
-	    label = gsnmp_enum_get_label(ip_forward_mib_enums_ipCidrRouteType,
-					 *ipCidrRouteEntry->ipCidrRouteType);
+	    label = gnet_snmp_enum_get_label(ip_forward_mib_enums_ipCidrRouteType,
+					     *ipCidrRouteEntry->ipCidrRouteType);
 	}
 	g_string_sprintfa(s, "%-10s", label ? label : "");
 
 	label = NULL;
 	if (ipCidrRouteEntry->ipCidrRouteProto) {
-	    label = gsnmp_enum_get_label(ip_forward_mib_enums_ipCidrRouteProto,
-					*ipCidrRouteEntry->ipCidrRouteProto);
+	    label = gnet_snmp_enum_get_label(ip_forward_mib_enums_ipCidrRouteProto,
+					     *ipCidrRouteEntry->ipCidrRouteProto);
 	}
 	g_string_sprintfa(s, "%-10s", label ? label : "");
 
@@ -102,6 +121,7 @@ fmt_ip_forward(GString *s,
 		}
 	    }
 	}
+	g_string_append(s, "\n");
     }
 }
 
@@ -134,15 +154,15 @@ fmt_ip_route(GString *s,
 
 	label = NULL;
 	if (ipRouteEntry->ipRouteType) {
-	    label = gsnmp_enum_get_label(rfc1213_mib_enums_ipRouteType,
-					 *ipRouteEntry->ipRouteType);
+	    label = gnet_snmp_enum_get_label(rfc1213_mib_enums_ipRouteType,
+					     *ipRouteEntry->ipRouteType);
 	}
 	g_string_sprintfa(s, "%-10s", label ? label : "");
 
 	label = NULL;
 	if (ipRouteEntry->ipRouteProto) {
-	    label = gsnmp_enum_get_label(rfc1213_mib_enums_ipRouteProto,
-					*ipRouteEntry->ipRouteProto);
+	    label = gnet_snmp_enum_get_label(rfc1213_mib_enums_ipRouteProto,
+					     *ipRouteEntry->ipRouteProto);
 	}
 	g_string_sprintfa(s, "%-10s", label ? label : "");
 
@@ -265,11 +285,11 @@ fmt_ip_address(GString *s,
 	       ip_mib_ipAddrEntry_t *ipAddrEntry,
 	       int name_width,
 	       if_mib_ifXEntry_t **ifXTable,
-	       if_mib_ifEntry_t **ifTable)
+	       if_mib_ifEntry_t **ifTable,
+	       int ifName_width)
 {
     char *name;
     int i;
-    int done = 0;
 
     g_string_sprintfa(s, "%-17s ",
 	      fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_ADDR));
@@ -284,26 +304,25 @@ fmt_ip_address(GString *s,
     
     if (ipAddrEntry->ipAdEntIfIndex) {
 	g_string_sprintfa(s, "%9u", *(ipAddrEntry->ipAdEntIfIndex));
-	if (! done && ifXTable) {
-	    for (i = 0; ifXTable[i]; i++) {
-		if (ifXTable[i]->ifIndex == *ipAddrEntry->ipAdEntIfIndex
-		    && ifXTable[i]->ifName) {
-		    g_string_sprintfa(s, " (%.*s)",
-				      (int) ifXTable[i]->_ifNameLength,
-				      ifXTable[i]->ifName);
-		    done = 1;
-		    break;
-		}
+	for (i = 0; ifXTable && ifXTable[i]; i++) {
+	    if (ifXTable[i]->ifIndex == *ipAddrEntry->ipAdEntIfIndex
+		&& ifXTable[i]->ifName) {
+		g_string_sprintfa(s, " %*.*s", ifName_width,
+				  (int) ifXTable[i]->_ifNameLength,
+				  ifXTable[i]->ifName);
+		break;
 	    }
 	}
-	if (! done && ifTable) {
+	if (!ifXTable || !ifXTable[i]) {
+	    g_string_sprintfa(s, " %*s", ifName_width, "");
+	}
+	if (ifTable) {
 	    for (i = 0; ifTable[i]; i++) {
 		if (ifTable[i]->ifIndex == *ipAddrEntry->ipAdEntIfIndex
 		    && ifTable[i]->ifDescr) {
-		    g_string_sprintfa(s, " (%.*s)",
+		    g_string_sprintfa(s, " %.*s",
 				      (int) ifTable[i]->_ifDescrLength,
 				      ifTable[i]->ifDescr);
-		    done = 1;
 		    break;
 		}
 	    }
@@ -320,7 +339,7 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
     ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
     if_mib_ifEntry_t **ifTable = NULL;
     if_mib_ifXEntry_t **ifXTable = NULL;
-    int i, name_width = 4;
+    int i, name_width = 4, ifName_width;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -340,6 +359,7 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
     if (ipAddrTable) {
 	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR);
 	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFNAME);
+	ifName_width = get_if_name_width(ifXTable);
 	if (! scli_interp_xml(interp)) {
 	    for (i = 0; ipAddrTable[i]; i++) {
 		char *name;
@@ -349,15 +369,15 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 		}
 	    }
 	    g_string_sprintfa(interp->header,
-		      "ADDRESS         PREFIX %-*s INTERFACE DESCRIPTION",
-			      name_width, "NAME");
+		      "ADDRESS         PREFIX %-*s INTERFACE %-*s DESCRIPTION",
+			      name_width, "NAME", ifName_width, "NAME");
 	}
 	for (i = 0; ipAddrTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
 		xml_ip_address(interp->xml_node, ipAddrTable[i]);
 	    } else {
 		fmt_ip_address(interp->result, ipAddrTable[i],
-			       name_width, ifXTable, ifTable);
+			       name_width, ifXTable, ifTable, ifName_width);
 	    }
 	}
     }
@@ -535,12 +555,7 @@ fmt_ip_mapping(GString *s,
 	/* See RFC 2665 section 3.2.6. why the test below is so ugly... */
 	if (ifEntry && ifEntry->ifType
 	    && ipNetToMediaEntry->_ipNetToMediaPhysAddressLength == 6
-	    && (*ifEntry->ifType == IF_MIB_IFTYPE_ETHERNETCSMACD
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_ISO88023CSMACD
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_STARLAN
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_FASTETHER
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_FASTETHERFX
-		|| *ifEntry->ifType == IF_MIB_IFTYPE_GIGABITETHERNET)) {
+	    && ianaiftype_mib_proc_isether(*ifEntry->ifType)) {
 	    name = fmt_ether_address(ipNetToMediaEntry->ipNetToMediaPhysAddress, SCLI_FMT_NAME);
 	    if (name) {
 		g_string_sprintfa(s, " (%s)", name);
@@ -605,7 +620,7 @@ show_ip_mapping(scli_interp_t *interp, int argc, char **argv)
 static void
 fmt_ip_info(GString *s, ip_mib_ip_t *ip)
 {
-    int const indent = 16;
+    int const indent = 18;
     const char *e;
 
     e = fmt_enum(forwarding, ip->ipForwarding);
@@ -655,7 +670,7 @@ xml_ip_info(xmlNodePtr tree, ip_mib_ip_t *ip)
 static void
 xxx_ip_info(GString *s, xmlNodePtr tree)
 {
-    int const indent = 16;
+    int const indent = 18;
     xmlNodePtr node;
 
     for (node = tree->children; node; node = node->next) {
@@ -721,7 +736,7 @@ set_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    if (! gsnmp_enum_get_number(forwarding, argv[1], &value)) {
+    if (! gnet_snmp_enum_get_number(forwarding, argv[1], &value)) {
 	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;
     }

@@ -48,11 +48,11 @@
 
 #include <libxml/xmlmemory.h>
 #include <libxml/tree.h>
+#include <libxml/xpath.h>
 
 #include <glib.h>
 #include <gmodule.h>
-
-#include "g_snmp.h"
+#include <gsnmp.h>
 
 
 extern char const scli_copyright[];	/* copyright message (surprise) */
@@ -169,14 +169,15 @@ struct scli_alarm {
 };
 
 
-#define SCLI_INTERP_FLAG_INTERACTIVE	0x01
-#define SCLI_INTERP_FLAG_RECURSIVE	0x02
-#define SCLI_INTERP_FLAG_MONITOR	0x04
-#define SCLI_INTERP_FLAG_LOOP		0x08
-#define SCLI_INTERP_FLAG_XML		0x10
-#define SCLI_INTERP_FLAG_DRY		0x20
-#define SCLI_INTERP_FLAG_PROTO		0x40
-#define SCLI_INTERP_FLAG_QUIET		0x80
+#define SCLI_INTERP_FLAG_INTERACTIVE	0x001
+#define SCLI_INTERP_FLAG_RECURSIVE	0x002
+#define SCLI_INTERP_FLAG_MONITOR	0x004
+#define SCLI_INTERP_FLAG_LOOP		0x008
+#define SCLI_INTERP_FLAG_XML		0x010
+#define SCLI_INTERP_FLAG_DRY		0x020
+#define SCLI_INTERP_FLAG_PROTO		0x040
+#define SCLI_INTERP_FLAG_QUIET		0x080
+#define SCLI_INTERP_FLAG_NOLOOKUP	0x100
 
 struct scli_interp {
     char *name;			/* name of the interpreter */
@@ -191,14 +192,17 @@ struct scli_interp {
     xmlDocPtr xml_doc;		/* xml document if we produce xml output */
     xmlNodePtr xml_node;	/* current xml node in the xml document */
     char *pager;		/* external pager we are using */
-    GSnmpSession *peer;		/* snmp peer we are talking to */
+    GNetSnmp *peer;		/* snmp session we are using */
     gint delay;			/* delay between updates in milliseconds */
-    int port;			/* default port number, defaults to 161 */
+    GNetSnmpTDomain tdomain;	/* transport domain */
+    GInetAddr *taddress;	/* transport address */
     int snmp;			/* version of the preferred SNMP protocol */
     time_t epoch;		/* epoch (used to invalidate cached data) */
     int xid;			/* unique identifier for each transaction */
     time_t xtime;		/* transaction time */
     int regex_flags;		/* regular expression flags (see regcomp(3)) */
+    guint retries;		/* number of retries */
+    guint timeout;		/* timeout causing a retry in ms */
 };
 
 extern scli_interp_t *
@@ -227,6 +231,8 @@ scli_interp_reset(scli_interp_t *interp);
 	(interp->flags & SCLI_INTERP_FLAG_PROTO)
 #define scli_interp_quiet(interp) \
 	(interp->flags & SCLI_INTERP_FLAG_QUIET)
+#define scli_interp_nolookup(interp) \
+	(interp->flags & SCLI_INTERP_FLAG_NOLOOKUP)
 
 extern scli_alarm_t *
 scli_alarm_create(scli_interp_t *interp, char *desc);
@@ -268,8 +274,8 @@ extern int
 scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd);
 
 extern int
-scli_open_community(scli_interp_t *interp, char *host, int port,
-		    char *community);
+scli_open_community(scli_interp_t *interp, GNetSnmpTDomain tdomain,
+		    GInetAddr *addr, char *community);
 extern void
 scli_close(scli_interp_t *interp);
 
@@ -287,6 +293,12 @@ scli_curses_off(void);
 
 extern int
 scli_set_pager(scli_interp_t *interp, const char *pager);
+
+extern int
+scli_set_retries(scli_interp_t *interp, const guint retries);
+
+extern int
+scli_set_timeout(scli_interp_t *interp, guint timeout);
 
 extern void
 scli_snmp_error(scli_interp_t *interp);
@@ -373,7 +385,7 @@ extern const scli_vendor_t*
 scli_get_vendor(guint32 enterp);
 
 extern const scli_vendor_t*
-scli_get_vendor_oid(guint32 oid[], gsize len);
+scli_get_vendor_oid(guint32 oid[], guint16 len);
 
 extern const scli_vendor_t*
 scli_get_ieee_vendor(guint32 prefix);
@@ -396,13 +408,13 @@ extern char const *
 fmt_seconds(guint32 seconds);
 
 extern char const *
-fmt_enum(GSnmpEnum const *table, gint32 *number);
+fmt_enum(GNetSnmpEnum const *table, gint32 *number);
 
 extern void
-xxx_enum(GString *s, int width, GSnmpEnum const *table, gint32 *number);
+xxx_enum(GString *s, int width, GNetSnmpEnum const *table, gint32 *number);
 
 extern char const *
-fmt_identity(GSnmpIdentity const *table,
+fmt_identity(GNetSnmpIdentity const *table,
 	     guint32 const *oid, gsize oidlen);
 
 extern char const *
