@@ -892,9 +892,9 @@ scli_init_scli_mode(scli_interp_t *interp)
 	{ "open", "<nodename> [<community>]",
 	  "The open command establishes an association to a remote SNMP\n"
 	  "agent. The <nodename> argument is the DNS name or the IP\n"
-	  "address of the remote node. Scli will try to talks to this\n"
-	  "node's SNMP agent on the default port number (usually 161)\n"
-	  "using the default transport mapping (usually SNMP over UDP).\n"
+	  "address of the remote node. Scli will try to talk to the SNMP\n"
+	  "agent on this node by using the default port number (usually 161)\n"
+	  "and the default transport mapping (usually SNMP over UDP).\n"
 	  "The optional <community> argument is the community string\n"
 	  "needed to communicate with the remote SNMP agent. The default\n"
 	  "community string is \"public\". Opening an association while\n"

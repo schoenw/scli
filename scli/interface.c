@@ -1394,7 +1394,7 @@ scli_init_interface_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "set interface status", "<regexp> <status>",
-	  "The set interface status command modifies the administrative\n"
+	  "The `set interface status' command modifies the administrative\n"
 	  "status of all selected interfaces. The regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest. The <value> parameter must\n"
@@ -1404,9 +1404,9 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  set_interface_status },
 
 	{ "set interface alias", "<regexp> <string>",
-	  "The set interface alias command assigns the alias name\n"
+	  "The `set interface alias' command assigns the alias name\n"
 	  "<string> to the selected interfaces. The alias name provies\n"
-	  "a non-volatile 'handle' which can be used by management\n"
+	  "a non-volatile handle which can be used by management\n"
 	  "applications to better identify interfaces. The regular\n"
 	  "expression <regexp> is matched against the interface\n"
 	  "descriptions to select the interfaces.",
@@ -1415,7 +1415,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  set_interface_alias },
 
 	{ "set interface notifications", "<regexp> <value>",
-	  "The set interface notifications command controls whether the\n"
+	  "The `set interface notifications' command controls whether the\n"
 	  "selected interfaces generate linkUp and linkDown notifications.\n"
 	  "The regular expression <regexp> is matched against the interface\n"
 	  "descriptions to select the interfaces. The <value> parameter\n"
@@ -1425,7 +1425,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  set_interface_notifications },
 
 	{ "set interface promiscuous", "<regexp> <bool>",
-	  "The set interface promiscuous command controls whether the\n"
+	  "The `set interface promiscuous' command controls whether the\n"
 	  "selected interfaces operate in promiscuous mode or not. The\n"
 	  "regular expression <regexp> is matched against the interface\n"
 	  "descriptions to select the interfaces. The <bool> parameter\n"
@@ -1435,7 +1435,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  set_interface_promiscuous },
 
 	{ "show interface info", "[<regexp>]",
-	  "The show interface info command displays summary information\n"
+	  "The `show interface info' command displays summary information\n"
 	  "for all selected interfaces. The optional regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest. The command generates a\n"
@@ -1462,7 +1462,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  show_interface_info },
 	
 	{ "show interface details", "[<regexp>]",
-	  "The show interface details command describes the selected\n"
+	  "The `show interface details' command describes the selected\n"
 	  "interfaces in more detail. The optional regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest.",
@@ -1471,14 +1471,14 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  show_interface_details },
 	
 	{ "show interface stack", "[<regexp>]",
-	  "The show interface stack command shows the stacking order\n"
+	  "The `show interface stack' command shows the stacking order\n"
 	  "of the interfaces.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  show_interface_stack },
 	
 	{ "show interface stats", "[<regexp>]",
-	  "The show interface stats command displays network\n"
+	  "The `show interface stats' command displays network\n"
 	  "interface statistics for all selected interfaces.\n"
 	  "The optional regular expression <regexp> is matched\n"
 	  "against the interface description to select the\n"
@@ -1499,7 +1499,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  show_interface_stats },
 	
 	{ "monitor interface stats", "[<regexp>]",
-	  "The monitor interface stats command shows the same\n"
+	  "The `monitor interface stats' command shows the same\n"
 	  "information as the show interface stats command. The\n"
 	  "information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
@@ -1507,14 +1507,14 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  show_interface_stats },
 
 	{ "alert interface status", "<regexp> [<regexp>]",
-	  "The alarm interface status command generates alerts for\n"
+	  "The `alarm interface status' command generates alerts for\n"
 	  "interfaces that are in given status.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_LOOP,
 	  NULL, NULL,
 	  alert_interface_status },
 	
 	{ "dump interface", NULL,
-	  "The dump interface command generates a sequence of scli commands\n"
+	  "The `dump interface' command generates a sequence of scli commands\n"
 	  "which can be used to restore the interface configuration.\n",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,

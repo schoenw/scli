@@ -1268,6 +1268,83 @@ show_printer_interpreter(scli_interp_t * interp, int argc, char **argv)
 
 
 static void
+fmt_printer_channel(GString *s,
+			printer_mib_prtChannelEntry_t *channelEntry)
+{
+    int const indent = 14;
+    const char *e;
+
+    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+		      channelEntry->hrDeviceIndex);
+
+    g_string_sprintfa(s, "%-*s %d\n", indent, "Channel:",
+		      channelEntry->prtChannelIndex);
+
+    e = fmt_enum(printer_mib_enums_prtChannelType,
+		 channelEntry->prtChannelType);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", e);
+    }
+
+    fmt_display_string(s, indent+1, "Version:",
+		       (int) channelEntry->_prtChannelProtocolVersionLength,
+		       channelEntry->prtChannelProtocolVersion);
+
+    /*
+      prtChannelCurrentJobCntlLangIndex
+      prtChannelDefaultPageDescLangIndex
+      prtChannelState
+      prtChannelIfIndex
+    */
+
+    fmt_subunit(s, indent, channelEntry->prtChannelStatus);
+
+    fmt_display_string(s, indent+1, "Information:",
+		       (int) channelEntry->_prtChannelInformationLength,
+		       channelEntry->prtChannelInformation);
+}
+
+
+
+static int
+show_printer_channels(scli_interp_t * interp, int argc, char **argv)
+{
+    printer_mib_prtChannelEntry_t **channelTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    printer_mib_get_prtChannelTable(interp->peer, &channelTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (channelTable) {
+	for (i = 0; channelTable[i]; i++) {
+	    if (i > 0) {
+		g_string_append(interp->result, "\n");
+	    }
+	    fmt_printer_channel(interp->result, channelTable[i]);
+	}
+    }
+
+    if (channelTable)
+	printer_mib_free_prtChannelTable(channelTable);
+	
+    return SCLI_OK;
+}
+
+
+
+static void
 fmt_printer_console_display(GString *s,
 	    printer_mib_prtConsoleDisplayBufferEntry_t *displayEntry)
 {
@@ -1638,21 +1715,21 @@ scli_init_printer_mode(scli_interp_t * interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show printer info", NULL,
-	  "The show printer info command shows general information about\n"
+	  "The `show printer info' command shows general information about\n"
 	  "the printer including global status information.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_info },
 
 	{ "show printer covers", NULL,
-	  "The show printer covers command shows information about the\n"
+	  "The `show printer covers' command shows information about the\n"
 	  "covers of a printer.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_covers },
 
 	{ "show printer inputs", NULL,
-	  "The show printer inputs command shows information about the\n"
+	  "The `show printer inputs' command shows information about the\n"
 	  "input sub-units of a printer which provide media for input to\n"
 	  "the printing process.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
@@ -1660,7 +1737,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  show_printer_inputs },
 
 	{ "show printer outputs", NULL,
-	  "The show printer output command shows information about the\n"
+	  "The `show printer output' command shows information about the\n"
 	  "output sub-units of a printer capable of receiving media\n"
 	  "delivered from the printing process.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
@@ -1668,7 +1745,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  show_printer_outputs },
 
 	{ "show printer markers", NULL,
-	  "The show printer markers command shows information about the\n"
+	  "The `show printer markers' command shows information about the\n"
 	  "marker sub-units of a printer which produce marks on the print\n"
 	  "media.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
@@ -1676,7 +1753,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  show_printer_markers },
 
 	{ "show printer supplies", NULL,
-	  "The show printer supplies command shows information about the\n"
+	  "The `show printer supplies' command shows information about the\n"
 	  "supplies which are consumed and the waste produced by the\n"
 	  "markers of a printer.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
@@ -1684,17 +1761,24 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  show_printer_supplies },
 
 	{ "show printer interpreter", NULL,
-	  "The show printer interpreter command shows information about\n"
+	  "The `show printer interpreter' command shows information about\n"
 	  "the page description language and control language interpreters\n"
 	  "supported by the printer.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_interpreter },
 
+	{ "show printer channels", NULL,
+	  "The `show printer channels' command shows information about\n"
+	  "the channels which can be used to submit data to the printer.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_printer_channels },
+	
 	{ "show printer console display", NULL,
-	  "The show printer console display command shows the current\n"
-	  "contents of the printer's display. The command generates a\n"
-	  "table with the following columns:\n"
+	  "The `show printer console display' command shows the current\n"
+	  "contents of the display attached to the printer. The command\n"
+	  "generates a table with the following columns:\n"
 	  "\n"
 	  "  PRINTER logical printer number\n"
 	  "  LINE    display line number\n"
@@ -1705,9 +1789,9 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  show_printer_console_display },
 
 	{ "show printer console lights", NULL,
-	  "The show printer console lights command shows the current\n"
-	  "status of the printer's lights. The command generates a table\n"
-	  "with the following columns:\n"
+	  "The `show printer console lights' command shows the current\n"
+	  "status of the lights attached to the printer. The command\n"
+	  "generates a table with the following columns:\n"
 	  "\n"
 	  "  PRINTER     logical printer number\n"
 	  "  LIGHT       number identifying the light/led\n"
@@ -1751,7 +1835,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  show_printer_console_lights },
 
 	{ "show printer alerts", NULL,
-	  "The show printer alerts command displays the list of active\n"
+	  "The `show printer alerts' command displays the list of active\n"
 	  "printer alerts including the alert code, the alert severity,\n"
 	  "the alert description, the alert time, the alert location and\n"
 	  "the personel required to handle the alert.",
@@ -1793,7 +1877,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  show_printer_alert },
 
 	{ "monitor printer console display", NULL,
-	  "The monitor printer console display command shows the same\n"
+	  "The `monitor printer console display' command shows the same\n"
           "information as the show printer console display command. The\n"
 	  "information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
@@ -1801,7 +1885,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  show_printer_console_display },
 
 	{ "monitor printer console lights", NULL,
-	  "The monitor printer console lights command shows the same\n"
+	  "The `monitor printer console lights' command shows the same\n"
 	  "information as the show printer console lights command. The\n"
 	  "information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
@@ -1809,7 +1893,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  show_printer_console_lights },
 
 	{ "monitor printer alerts", NULL,
-	  "The monitor printer alerts command shows the same information\n"
+	  "The `monitor printer alerts' command shows the same information\n"
 	  "as the show printer alerts command. The information is updated\n"
 	  "periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,

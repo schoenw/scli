@@ -382,7 +382,7 @@ scli_init_netsnmp_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "set netsnmp debugging", "<value>",
-	  "The set netsnmp debugging command controls whether the agent\n"
+	  "The `set netsnmp debugging' command controls whether the agent\n"
 	  "generates debug messages or not. The <value> parameter must\n"
 	  "be one of the strings \"enabled\" or \"disabled\".",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
@@ -390,13 +390,13 @@ scli_init_netsnmp_mode(scli_interp_t *interp)
 	  set_netsnmp_debugging },
 	
 	{ "set netsnmp restart", NULL,
-	  "The set netsnmp restart command restarts the agent.",
+	  "The `set netsnmp restart' command restarts the agent.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_netsnmp_restart },
 	
 	{ "show netsnmp info", NULL,
-	  "The show netsnmp info command shows general information about\n"
+	  "The `show netsnmp info' command shows general information about\n"
 	  "the netsnmp/ucdsnmp agent such as the version number and the\n"
 	  "software configuration.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
@@ -404,27 +404,29 @@ scli_init_netsnmp_mode(scli_interp_t *interp)
 	  show_netsnmp_info },
 
 	{ "show netsnmp load", NULL,
-	  "The show netsnmp load command shows the system's load.",
+	  "The `show netsnmp load' command shows the load indices of the\n"
+	  "system. This is usually the length of the queue in front of\n"
+	  "the processor(s) averaged over some time interval.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_netsnmp_load },
 
 	{ "show netsnmp exec", NULL,
-	  "The show netsnmp exec command shows information about\n"
+	  "The `show netsnmp exec' command shows information about\n"
 	  "pre-configured commands that can be invoked.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_netsnmp_exec },
 
 	{ "show netsnmp proc", NULL,
-	  "The show netsnmp proc command shows information about\n"
+	  "The `show netsnmp proc' command shows information about\n"
 	  "which processes netsnmp watches.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_netsnmp_proc },
 
 	{ "dump netsnmp", NULL,
-	  "The dump netsnmp command generates a sequence of scli commands\n"
+	  "The `dump netsnmp' command generates a sequence of scli commands\n"
 	  "which can be used to restore the netsnmp specific configuration.\n",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
