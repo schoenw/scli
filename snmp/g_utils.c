@@ -287,7 +287,7 @@ gsnmp_attr_assign(GSList *vbl,
 	 default:
 	     break;
 	 }
-	 if (attributes[i].len_offset) {
+	 if (gp && attributes[i].len_offset) {
 	     guint16 *lp;
 	     lp = (guint16 *) G_STRUCT_MEMBER_P(p, attributes[i].len_offset);
 	     *lp = vb->syntax_len;
