@@ -130,7 +130,8 @@ scli_init_sonet_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show sonet media", NULL,
-	  "The `show sonet media' command displays information about ...\n",
+	  "The `show sonet media' command displays information about the"
+	  "configuration of SONET/SDH interfaces.\n",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_sonet_media },
@@ -141,7 +142,8 @@ scli_init_sonet_mode(scli_interp_t *interp)
     static scli_mode_t sonet_mode = {
 	"sonet",
 	"The sonet scli mode is based on the SONET-MIB as published\n"
-	"in RFC 2558.",
+	"in RFC 2558. It provides commands to manage Synchronous Optical\n"
+	"Network/Synchronous Digital Hierarchy (SONET/SDH) interfaces.",
 	cmds
     };
     

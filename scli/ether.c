@@ -392,7 +392,7 @@ scli_init_ether_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show ethernet mau", NULL,
-	  "The show ethernet mau command displays information about the\n"
+	  "The `show ethernet mau' command displays information about the\n"
 	  "medium attachment units (MAUs) for each ethernet port. The\n"
 	  "command generates a table which has the following columns:\n"
 	  "\n"
@@ -408,7 +408,7 @@ scli_init_ether_mode(scli_interp_t *interp)
 	  show_ether_mau_info },
 
 	{ "show ethernet stats", NULL,
-	  "The show ethernet stats command displays ethernet specific\n"
+	  "The `show ethernet stats' command displays ethernet specific\n"
 	  "statistics for each ethernet interface. The command outputs\n"
 	  "a table which has the following columns:\n"
 	  "\n"
@@ -429,7 +429,7 @@ scli_init_ether_mode(scli_interp_t *interp)
 	  show_ether_stats },
 
 	{ "monitor ethernet stats", NULL,
-	  "The monitor ethernet stats command shows the same information\n"
+	  "The `monitor ethernet stats' command shows the same information\n"
 	  "as the show ethernet stats command. The information is updated\n"
 	  "periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
