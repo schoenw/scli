@@ -848,6 +848,7 @@ scli_eval_argc_argv(scli_interp_t *interp, int argc, char **argv)
     int i, code = SCLI_OK;
 
     scli_interp_reset(interp);
+    interp->xid++;
 
     node = g_node_first_child(interp->cmd_root);
     for (i = 0; i < argc && ! done; i++) {
