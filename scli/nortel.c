@@ -675,6 +675,39 @@ show_nortel_bridge_vlan_ports(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
+create_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
+{
+    gint32 vlanId;
+    char *end;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 3) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    vlanId = strtol(argv[1], &end, 0);
+    if (*end) {
+	return SCLI_SYNTAX_NUMBER;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    rapid_city_proc_create_vlan(interp->peer, vlanId, argv[2],
+				RAPID_CITY_RCVLANTYPE_BYPORT);
+    if (interp->peer->error_status) {
+	vlan_snmp_error(interp, NULL);
+	return SCLI_ERROR;
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
 delete_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 {
     rapid_city_rcVlanEntry_t **vlanTable = NULL;
@@ -718,39 +751,6 @@ delete_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     if (vlanTable) rapid_city_free_rcVlanTable(vlanTable);
     regfree(regex_vlan);
     
-    return SCLI_OK;
-}
-
-
-
-static int
-create_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
-{
-    gint32 vlanId;
-    char *end;
-
-    g_return_val_if_fail(interp, SCLI_ERROR);
-
-    if (argc != 3) {
-	return SCLI_SYNTAX_NUMARGS;
-    }
-
-    vlanId = strtol(argv[1], &end, 0);
-    if (*end) {
-	return SCLI_SYNTAX_NUMBER;
-    }
-
-    if (scli_interp_dry(interp)) {
-	return SCLI_OK;
-    }
-
-    rapid_city_proc_create_vlan(interp->peer, vlanId, argv[2],
-				RAPID_CITY_RCVLANTYPE_BYPORT);
-    if (interp->peer->error_status) {
-	vlan_snmp_error(interp, NULL);
-	return SCLI_ERROR;
-    }
-
     return SCLI_OK;
 }
 
@@ -935,22 +935,23 @@ scli_init_nortel_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 	{ "create nortel bridge vlan", "<vlanid> <name>",
-	  "The create nortel bridge vlan command is used to create a\n"
-	  "new vlan with the given <vlanid> and <name>.",
+	  "The `create nortel bridge vlan' command is used to create a\n"
+	  "new virtual LAN with the given <vlanid> and <name>.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  create_nortel_bridge_vlan },
 
 	{ "delete nortel bridge vlan", "<regexp>",
-	  "The delete nortel bridge vlan command deletes all selected\n"
-	  "vlans. The regular expression <regexp> is matched against the\n"
-	  "vlan names to select the vlans that should be deleted.",
+	  "The `delete nortel bridge vlan' command deletes all selected\n"
+	  "virtual LANs. The regular expression <regexp> is matched\n"
+	  "against the virtual LAN names to select the vlans that should\n"
+	  "be deleted.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  delete_nortel_bridge_vlan },
 
 	{ "set nortel bridge vlan ports", "<regexp> <ports>",
-	  "The set nortel bridge vlan ports command allows to assign\n"
+	  "The `set nortel bridge vlan ports' command allows to assign\n"
 	  "ports to port-based vlans. The regular expression <regexp>\n"
 	  "is matched against the vlan names to select the vlans that\n"
 	  "should be modified. The <ports> argument contains a comma\n"
@@ -961,7 +962,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  set_nortel_bridge_vlan_ports },
 
 	{ "set nortel bridge vlan default", "<string> <ports>",
-	  "The set nortel bridge vlan default command allows to assign\n"
+	  "The `set nortel bridge vlan default' command allows to assign\n"
 	  "ports to a default vlan. The <string> argument is matched\n"
 	  "against the vlan names to select the vlan. The <ports> argument\n"
 	  "contains a comma separated list of port numbers or port number\n"
@@ -971,30 +972,30 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  set_nortel_bridge_vlan_default },
 
 	{ "show nortel bridge vlan info", "[<regexp>]",
-	  "The show nortel bridge vlan info command shows summary\n"
-	  "information about all selected vlans. The optional regular\n"
-	  "expression <regexp> is matched against the vlan names to\n"
-	  "select the vlans of interest. The command generates a table\n"
-	  "with the following columns:\n"
+	  "The `show nortel bridge vlan info' command shows summary\n"
+	  "information about all selected virtual LANs. The optional\n"
+	  "regular expression <regexp> is matched against the virtual\n"
+	  "LAN names to select the virtual LANs of interest. The\n"
+	  "command generates a table with the following columns:\n"
 	  "\n"
-	  "  VLAN   vlan number\n"
-	  "  STATUS status of the vlan (see below)\n"
-	  "  NAME   vlan name\n"
-	  "  PORTS  ports assigned to the vlan\n"
+	  "  VLAN   number of the virtual LAN\n"
+	  "  STATUS status of the virtual LAN (see below)\n"
+	  "  NAME   name of the virtual LAN\n"
+	  "  PORTS  ports assigned to the virtual LAN\n"
 	  "\n"
 	  "The status is encoded in four characters. The first character\n"
 	  "indicates the status of the row (A=active, S=not in service,\n"
-	  "R=not ready). The second character indicates  vlan type (P=B\n"
-	  "port, I=IP-subnet, O=protocol, S=src address, D=dst address).\n"
-	  "The third character indicates the priority of the vlan (H=high,\n"
-	  "N=normal) and the fourth character indicates whether routing\n"
-	  "is enabled (R=routing, N=no routing).",
+	  "R=not ready). The second character indicates virtual LAN type\n"
+	  "(P=port, I=IP-subnet, O=protocol, S=src address, D=dst address).\n"
+	  "The third character indicates the priority of the virtual LAN\n"
+	  "(H=high, N=normal) and the fourth character indicates whether\n"
+	  "routing is enabled (R=routing, N=no routing).",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_nortel_bridge_vlan_info },
 
 	{ "show nortel bridge vlan details", "[<regexp>]",
-	  "The show nortel bridge vlan details command describes the\n"
+	  "The `show nortel bridge vlan details' command describes the\n"
 	  "selected vlans in more detail. The optional regular expression\n"
 	  "<regexp> is matched against the vlan names to select the vlans\n"
 	  "of interest.",
@@ -1003,7 +1004,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  show_nortel_bridge_vlan_details },
 
 	{ "show nortel bridge vlan ports", NULL,
-	  "The show nortel bridge vlan ports command shows information\n"
+	  "The `show nortel bridge vlan ports' command shows information\n"
 	  "for each vlan port. The command generates a table with the\n"
 	  "following columns:\n"
 	  "\n"
@@ -1023,8 +1024,8 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  show_nortel_bridge_vlan_ports },
 
 	{ "dump nortel bridge vlan", NULL,
-	  "The dump nortel bridge vlan command generates a sequence of scli\n"
-	  "commands which can be used to restore the vlan configuration.\n",
+	  "The `dump nortel bridge vlan' command generates a sequence of scli\n"
+	  "commands which can be used to restore the virtual LAN configuration.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  dump_nortel_bridge_vlan },
@@ -1034,7 +1035,7 @@ scli_init_nortel_mode(scli_interp_t *interp)
     
     static scli_mode_t nortel_mode = {
 	"nortel",
-	"The nortel scli mode allows to manipulate virtual lans (vlans)\n"
+	"The nortel scli mode allows to manipulate virtual LANs (vlans)\n"
 	"on nortel bridges. It is based on the RAPID-CITY MIB which\n"
 	"is implemented at least on the baystack bridges.",
 	cmds
