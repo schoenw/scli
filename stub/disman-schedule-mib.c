@@ -7,11 +7,11 @@
  *   schedule SNMP set operations periodically or at specific
  *   points in time.
  *
- * Revision 2001-06-18 00:00:
- *   Revised version, published as RFC XXXX.
+ * Revision 2002-01-07 00:00:
+ *   Revised version, published as RFC 3231.
  *   
  *   This revision introduces a new object type called
- *   schedTriggers. Created new conformance and compliance
+ *   schedTriggers.  Created new conformance and compliance
  *   statements that take care of the new schedTriggers object.
  *   
  *   Several clarifications have been added to remove ambiguities
