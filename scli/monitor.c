@@ -133,7 +133,7 @@ page(WINDOW *win, scli_interp_t *interp)
 
 
 static void
-show_message(char *message)
+show_message(const char *message)
 {
     move(status_line, 0);
     clrtoeol();
@@ -206,16 +206,9 @@ show_system(GSnmpSession *peer, int flags)
     }
     snmpv2_mib_get_system(peer, &system, mask);
     if (peer->error_status) {
-	const char *error;
-	error = gsnmp_enum_get_label(gsnmp_enum_error_table,
-				     peer->error_status);
         move(0, 10);
         clrtoeol();
         mvprintw(0, 10, "%s:%d", peer->taddress, peer->port);
-        attron(A_BOLD);
-        mvprintw(0, (int) (10 + strlen(peer->taddress) + 8),
-		 error ? error : "internalError");
-        attroff(A_BOLD);
         mvaddstr(0, (int) (COLS-strlen(timestr)-1), timestr);
         return STOP_FLAG_SNMP_FAILURE;
     }
@@ -608,6 +601,17 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 	}
         move(status_line, 0);
         clrtoeol();
+	if (flags & STOP_FLAG_SNMP_FAILURE) {
+	    const char *error = NULL;
+	    if (interp->peer && interp->peer->error_status) {
+		error = gsnmp_enum_get_label(gsnmp_enum_error_table,
+					     interp->peer->error_status);
+	    }
+	    scli_interp_reset(interp);
+	    g_string_assign(interp->header, "NO DATA AVAILABLE");
+	    page(mode_win, interp);
+	    show_message(error ? error : "internalError");
+	}
 	if (flags & STOP_FLAG_NODELAY) {
 	    timeout(1000);
 	} else {
