@@ -144,9 +144,9 @@ union _GSnmpVarBindSyntax
 struct _GSnmpVarBind
 {
     guint32		*id;
-    guint		id_len;
+    guint8		id_len;
     GSnmpVarBindType	type;
-    guint		syntax_len;
+    guint16		syntax_len;
     GSnmpVarBindSyntax	syntax;
 };
 

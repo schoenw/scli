@@ -34,7 +34,7 @@ typedef struct _GSnmpSession {
     gchar        *wcomm;
     guint         retries;
     gchar         *name;
-    guint32       error_status;
+    gint32        error_status;
     guint32	  error_index;
     guint         port;
     guint         timeout;
