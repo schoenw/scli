@@ -999,14 +999,27 @@ scli_init_interface_mode(scli_interp_t *interp)
 	{ "show interface info", "[<regexp>]",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "The show interface info command display summary information\n"
-	  "about all selected interfaces. The optional regular expression\n"
+	  "for all selected interfaces. The optional regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
 	  "select the interfaces of interest. The command generates a\n"
-	  "table which displays the interface number, its status\n"
-	  "(administrative status, operational status, connector present,\n"
-	  "promiscuous mode), the maximum transfer unit (MTU) of the\n"
-	  "interface, the interface type and speed, the interface's local\n"
-	  "name and its description.",
+	  "table with the following columns:\n"
+	  "\n"
+	  "  INTERFACE   network interface number\n"
+	  "  STATUS      interface status (see below)\n"
+	  "  MTU         maximum transfer unit\n"
+	  "  TYPE        type of the network interface\n"
+	  "  SPEED       speed in bits per second\n"
+	  "  NAME        name of the network interface\n"
+	  "  DESCRIPTION description of the network interface\n"
+	  "\n"
+	  "The status is encoded in four characters. The first character\n"
+	  "indicates the administrative status (U=up, D=down, T=testing).\n"
+	  "The second character indicates the operational status (U=up,\n"
+	  "D=down, T=testing, ?=unknown, O=dormant, N=not-present,\n"
+	  "L=lower-layer-down). The third character indicates whether a\n"
+	  "connector is present (C=connector, N=none) and the fourth\n"
+	  "character indicates whether the interface is in promiscuous\n"
+	  "mode (P=promiscuous, N=normal).",
 	  show_interface_info },
 	
 	{ "show interface details", "[<regexp>]",
@@ -1014,7 +1027,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "The show interface details command describes the selected\n"
 	  "interfaces in more detail. The optional regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
-	  "select the interfaces of interest. <xxx>\n",
+	  "select the interfaces of interest.",
 	  show_interface_details },
 	
 	{ "show interface stack", "[<regexp>]",
@@ -1025,12 +1038,29 @@ scli_init_interface_mode(scli_interp_t *interp)
 	
 	{ "show interface stats", "[<regexp>]",
 	  SCLI_CMD_FLAG_NEED_PEER,
-	  "The show interface stats command <xxx>",
+	  "The show interface stats command displays network\n"
+	  "interface statistics for all selected interfaces.\n"
+	  "The optional regular expression <regexp> is matched\n"
+	  "against the interface description to select the\n"
+	  "interfaces. The command outputs a table which has\n"
+	  "the following columns:\n"
+	  "\n"
+	  "  INTERFACE   network interface number\n"
+	  "  STATUS      interface status (see above)\n"
+	  "  I-BPS       input bytes per second\n"
+	  "  O-BPS       output bytes per second\n"
+	  "  I-PPS       input packets per second\n"
+	  "  O-PPS       output packets per second\n"
+	  "  I-ERR       input errors per second\n"
+	  "  O-ERR       output errors per second\n"
+	  "  DESCRIPTION description of the network interface",
 	  show_interface_stats },
 	
 	{ "monitor interface stats", "[<regexp>]",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  "The monitor network interface stats command <xxx>",
+	  "The monitor interface stats command shows the same\n"
+	  "information as the show interface stats command. The\n"
+	  "information is updated periodically.",
 	  show_interface_stats },
 	
 #if 0
@@ -1038,10 +1068,12 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "set interface alias",
 	  set_if_alias },
+
 	{ "set interface notifications", "<regexp> <value>",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "set interface notifications",
 	  set_if_notifications },
+
 	{ "set interface promiscuous", "<regexp> <bool>",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "set interface promiscuous",

@@ -1601,7 +1601,10 @@ scli_init_disman_mode(scli_interp_t *interp)
     
     static scli_mode_t disman_mode = {
 	"disman",
-	"scli mode to display and configure distributed managers",
+	"The disman scli mode is based on the DISMAN-SCRIPT-MIB as\n"
+	"published in RFC 3165 and the DISMAN-SCHEDULE-MIB as\n"
+	"published in RFC xxxx. It allows to browse and configure\n"
+	"distributed managers.",
 	cmds
     };
     

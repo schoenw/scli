@@ -273,7 +273,7 @@ scli_init_tcp_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "The monitor tcp connections command displays the connected TCP\n"
 	  "endpoints including the current state of the connection as seen\n"
-	  "by the remote SNMP agent.",
+	  "by the remote SNMP agent. The information is updated periodically.",
 	  show_tcp_connections },
 
 	{ NULL, NULL, 0, NULL, NULL }

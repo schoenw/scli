@@ -342,7 +342,7 @@ show_system_process(GString *s,
 
 
 static int
-cmd_system_processes(scli_interp_t *interp, int argc, char **argv)
+show_system_processes(scli_interp_t *interp, int argc, char **argv)
 {
     host_resources_mib_hrSWRunEntry_t **hrSWRunTable = NULL;
     host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfTable = NULL;
@@ -421,7 +421,7 @@ show_system_mount(GString *s,
 
 
 static int
-cmd_system_mounts(scli_interp_t *interp, int argc, char **argv)
+show_system_mounts(scli_interp_t *interp, int argc, char **argv)
 {
     host_resources_mib_hrFSEntry_t **hrFSTable = NULL;
     int i, loc_len = 20, rem_len = 20;
@@ -464,9 +464,9 @@ cmd_system_mounts(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_system_storage(GString *s,
-		    host_resources_mib_hrStorageEntry_t *hrStorageEntry,
-		    int descr_width)
+fmt_system_storage(GString *s,
+		   host_resources_mib_hrStorageEntry_t *hrStorageEntry,
+		   int descr_width)
 {
     gchar const *type = NULL;
 
@@ -519,7 +519,7 @@ show_system_storage(GString *s,
 
 
 static int
-cmd_system_storage(scli_interp_t *interp, int argc, char **argv)
+show_system_storage(scli_interp_t *interp, int argc, char **argv)
 {
     host_resources_mib_hrStorageEntry_t **hrStorageTable = NULL;
     int descr_width = 14;
@@ -547,8 +547,8 @@ cmd_system_storage(scli_interp_t *interp, int argc, char **argv)
 			  "%-*s  SIZE [K]   USED [K]   FREE [K] USE%%",
 			  descr_width, "STORAGE AREA");
 	for (i = 0; hrStorageTable[i]; i++) {
-	    show_system_storage(interp->result, hrStorageTable[i],
-				descr_width);
+	    fmt_system_storage(interp->result, hrStorageTable[i],
+			       descr_width);
 	}
     }
 
@@ -560,7 +560,7 @@ cmd_system_storage(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-cmd_system_info(scli_interp_t *interp, int argc, char **argv)
+show_system_info(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_system_t *system = NULL;
     host_resources_mib_hrSystem_t *hrSystem = NULL;
@@ -860,58 +860,73 @@ void
 scli_init_system_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show system info", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "system summary information",
-	  cmd_system_info },
-	{ "show system devices", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  "list of system devices",
-	  show_system_devices },
-	{ "show system storage", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "storage areas attached to the system",
-	  cmd_system_storage },
-	{ "show system mounts", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER,
-	  "file systems mounted on the system",
-	  cmd_system_mounts },
-	{ "show system processes", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
-	  "processes running on the system",
-	  cmd_system_processes },
-	{ "monitor system storage", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  "storage areas attached to the system",
-	  cmd_system_storage },
-	{ "monitor system processes", NULL,
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
-	  "processes running on the system",
-	  cmd_system_processes },
+
 	{ "set system contact", "<contact>",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "set system contact",
 	  set_system_contact },
+
 	{ "set system name", "<name>",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "set system name",
 	  set_system_name },
+
 	{ "set system location", "<location>",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "set system location",
 	  set_system_location },
+
+	{ "show system info", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "system summary information",
+	  show_system_info },
+
+	{ "show system devices", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  "list of system devices",
+	  show_system_devices },
+
+	{ "show system storage", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "storage areas attached to the system",
+	  show_system_storage },
+
+	{ "show system mounts", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "file systems mounted on the system",
+	  show_system_mounts },
+
+	{ "show system processes", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  "processes running on the system",
+	  show_system_processes },
+
+	{ "monitor system storage", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  "storage areas attached to the system",
+	  show_system_storage },
+
+	{ "monitor system processes", NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  "processes running on the system",
+	  show_system_processes },
+
 #ifdef MEM_DEBUG
 	{ "xxx", "<repetitions>",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "xxx",
 	  cmd_xxx },
 #endif
+
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t system_mode = {
 	"system",
-	"scli mode to display and configure system parameters",
+	"The system scli mode is primarily based on the SNMPv2-MIB as\n"
+	"published in RFC 1907 and the HOST-RESOURCES-MIB as publisched\n"
+	"in RFC 2790. It can be used to browse and configure system\n"
+	"parameters and characteristics.",
 	cmds
     };
     

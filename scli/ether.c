@@ -383,7 +383,7 @@ scli_init_ether_mode(scli_interp_t *interp)
 	  "command generates a table which has the following columns:\n"
 	  "\n"
 	  "  INTERFACE network interface number\n"
-	  "  MAU       medium attachment unit number for this interface\n"
+	  "  MAU       medium attachment unit number per interface\n"
 	  "  STATUS    status of the medium attachment unit\n"
 	  "  MEDIA     media availability\n"
 	  "  JABBER    jabber state of the medium attachment unit\n"
