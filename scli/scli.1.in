@@ -134,6 +134,10 @@ has many sub-commands focusing on various aspects of the system.
 activities. Information is shown in a compact human readable format
 and updated in regular intervals. The initial update interval length
 is determined by the delay command line option.
+.TP
+.B dump
+Dump scli command sequences to restore the configuration of the remote
+SNMP agent.
 .PP
 \fBscli\fP supports recursive command evaluation. When a command is
 entered which is not a leaf of the command tree, then the interpreter

@@ -240,6 +240,7 @@ help(scli_interp_t *interp, int argc, char **argv)
       " - set          Modify object instances on the remote SNMP agent.\n"
       " - show         Show information provided by the remote SNMP agent.\n"
       " - monitor      Monitor information provided by the remote SNMP agent.\n"
+      " - dump         Dump scli command sequences to restore configurations.\n"
       "\n"
       "Use the \"show scli commands\" command to browse the complete\n"
       "scli command tree and \"show scli modes\" command to obtain\n"
