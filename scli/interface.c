@@ -279,6 +279,137 @@ fmt_interface_details(GString *s,
 
 
 
+static void
+xml_interface_details(xmlNodePtr root,
+		      if_mib_ifEntry_t *ifEntry,
+		      if_mib_ifXEntry_t *ifXEntry,
+		      snmpv2_mib_system_t *system,
+		      ip_mib_ipAddrEntry_t **ipAddrTable)
+{
+    int j;
+    xmlNodePtr tree;
+    const char *s;
+
+    tree = xmlNewChild(root, NULL, "interface", NULL);
+    xml_set_prop(tree, "index", "%d", ifEntry->ifIndex);
+
+    if (ifXEntry && ifXEntry->ifName) {
+	(void) xml_new_child(tree, NULL, "name", "%.*s",
+			     (int) ifXEntry->_ifNameLength,
+			     ifXEntry->ifName);
+    }
+
+    s = fmt_enum(if_mib_enums_ifOperStatus, ifEntry->ifOperStatus);
+    if (s) {
+	(void) xml_new_child(tree, NULL, "operational", "%s", s);
+    }
+    
+#if 0
+    
+    if (ifEntry->ifPhysAddress && ifEntry->_ifPhysAddressLength) {
+	g_string_append(s, " Address: ");
+	for (j = 0; j < ifEntry->_ifPhysAddressLength; j++) {
+	    g_string_sprintfa(s, "%s%02X", (j == 0) ? "" : ":",
+			      ifEntry->ifPhysAddress[j]);
+	}
+	/* See RFC 2665 section 3.2.6. why the test below is so ugly... */
+	if (ifEntry->ifType && ifEntry->_ifPhysAddressLength == 6
+	    && (*ifEntry->ifType == IF_MIB_IFTYPE_ETHERNETCSMACD
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_ISO88023CSMACD
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_STARLAN
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_FASTETHER
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_FASTETHERFX
+		|| *ifEntry->ifType == IF_MIB_IFTYPE_GIGABITETHERNET)) {
+	    name = fmt_ether_address(ifEntry->ifPhysAddress, SCLI_FMT_NAME);
+	    if (name) {
+		g_string_sprintfa(s, " (%s)", name);
+	    }
+	}
+	g_string_append(s, "\n");
+    } else {
+	g_string_append(s, " Address:\n");
+    }
+#endif
+
+    s = fmt_enum(if_mib_enums_ifAdminStatus, ifEntry->ifAdminStatus);
+    if (s) {
+	(void) xml_new_child(tree, NULL, "administrative", "%s", s);
+    }
+
+    s = fmt_enum(if_mib_enums_ifType, ifEntry->ifType);
+    if (s) {
+	(void) xml_new_child(tree, NULL, "type", "%s", s);
+    }
+
+#if 0
+    g_string_append(s, "Traps:       ");
+    xxx_enum(s, width, if_mib_enums_ifLinkUpDownTrapEnable,
+	     (ifXEntry && ifXEntry) ? ifXEntry->ifLinkUpDownTrapEnable : NULL);
+    if (ifEntry->ifMtu) {
+	g_string_sprintfa(s, " MTU:     %d byte\n", *(ifEntry->ifMtu));
+    } else {
+	g_string_append(s, " MTU:\n");
+    }
+    
+    g_string_append(s, "Connector:   ");
+    xxx_enum(s, width, if_mib_enums_ifConnectorPresent,
+	     (ifXEntry && ifXEntry) ? ifXEntry->ifConnectorPresent : NULL);
+    if (ifEntry->ifSpeed) {
+	if (*(ifEntry->ifSpeed) == 0xffffffff
+	    && ifXEntry && ifXEntry->ifHighSpeed) {
+	    g_string_sprintfa(s, " Speed:   %s bps\n",
+			      fmt_gtp(*(ifXEntry->ifHighSpeed)));
+	} else {
+	    g_string_sprintfa(s, " Speed:   %s bps\n",
+			      fmt_kmg(*(ifEntry->ifSpeed)));
+	}
+    } else {
+	g_string_append(s, " Speed:\n");
+    }
+    
+    g_string_append(s, "Promiscuous: ");
+    xxx_enum(s, width, if_mib_enums_ifPromiscuousMode,
+	     (ifXEntry && ifXEntry) ? ifXEntry->ifPromiscuousMode : NULL);
+    if (ifEntry->ifLastChange && system && system->sysUpTime) {
+	guint32 dsecs = *(system->sysUpTime) - *(ifEntry->ifLastChange);
+	g_string_sprintfa(s, " Change:  %s\n", fmt_timeticks(dsecs));
+    } else {
+	g_string_append(s, " Change:\n");
+    }
+
+    if (ipAddrTable) {
+	for (j = 0; ipAddrTable[j]; j++) {
+	    if (ipAddrTable[j]->ipAdEntIfIndex
+		&& (ifEntry->ifIndex == *(ipAddrTable[j]->ipAdEntIfIndex))) {
+		if (ipAddrTable[j]->ipAdEntAddr
+		    && ipAddrTable[j]->ipAdEntNetMask) {
+		    g_string_sprintfa(s, "IP Address:  %-*s", width,
+		      fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr,
+				       SCLI_FMT_ADDR));
+		    g_string_sprintfa(s, " Prefix:  %s\n",
+		      fmt_ipv4_mask(ipAddrTable[j]->ipAdEntNetMask));
+		}
+	    }
+	}
+    }
+#endif
+    
+    if (ifEntry->ifDescr && ifEntry->_ifDescrLength) {
+	(void) xml_new_child(tree, NULL, "description", "%.*s",
+			     (int) ifEntry->_ifDescrLength,
+			     ifEntry->ifDescr);
+    }
+    
+    if (ifXEntry && ifXEntry
+	&& ifXEntry->ifAlias && ifXEntry->_ifAliasLength) {
+	(void) xml_new_child(tree, NULL, "alias", "%.*s", 
+			     (int) ifXEntry->_ifAliasLength,
+			     ifXEntry->ifAlias);
+    }
+}
+
+
+
 static gint32
 get_entity_index(gint32 ifIndex,
 		 entity_mib_entAliasMappingEntry_t **entAliasMappingTable,
@@ -374,14 +505,20 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
     if (ifTable) {
 	for (i = 0, c = 0; ifTable[i]; i++) {
 	    if (match_interface(regex_iface, ifTable[i])) {
-		if (c) {
-		    g_string_append(interp->result, "\n");
+		if (scli_interp_xml(interp)) {
+		    xml_interface_details(interp->xml_node, ifTable[i],
+					  ifXTable ? ifXTable[i] : NULL,
+					  system, ipAddrTable);
+		} else {
+		    if (c) {
+			g_string_append(interp->result, "\n");
+		    }
+		    (void) get_entity_index(ifTable[i]->ifIndex,
+					    entAliasMappingTable, entPhysicalTable);
+		    fmt_interface_details(interp->result, ifTable[i],
+					  ifXTable ? ifXTable[i] : NULL,
+					  system, ipAddrTable);
 		}
-		(void) get_entity_index(ifTable[i]->ifIndex,
-					entAliasMappingTable, entPhysicalTable);
-		fmt_interface_details(interp->result, ifTable[i],
-				      ifXTable ? ifXTable[i] : NULL,
-				      system, ipAddrTable);
 		c++;
 	    }
 	}
@@ -873,7 +1010,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  show_interface_info },
 	
 	{ "show interface details", "[<regexp>]",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
 	  "The show interface details command describes the selected\n"
 	  "interfaces in more detail. The optional regular expression\n"
 	  "<regexp> is matched against the interface descriptions to\n"
