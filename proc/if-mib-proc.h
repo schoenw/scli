@@ -35,6 +35,16 @@
  */
 
 extern void
+if_mib_proc_stack_interface(GSnmpSession *s,
+			    gint32 ifStackLowerLayer,
+			    gint32 ifStackHigherLayer);
+
+extern void
+if_mib_proc_unstack_interface(GSnmpSession *s,
+			      gint32 ifStackLowerLayer,
+			      gint32 ifStackHigherLayer);
+    
+extern void
 if_mib_proc_set_interface_status(GSnmpSession *s,
 				 gint32 ifIndex,
 				 gint32 ifAdminStatus);

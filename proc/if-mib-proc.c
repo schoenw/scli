@@ -27,6 +27,40 @@
 #define CACHE_TIME	10
 
 void
+if_mib_proc_stack_interface(GSnmpSession *s,
+			    gint32 ifStackLowerLayer,
+			    gint32 ifStackHigherLayer)
+{
+    if_mib_ifStackEntry_t *ifStackEntry;
+    gint32 createAndGo = IF_MIB_IFSTACKSTATUS_CREATEANDGO;
+
+    ifStackEntry = if_mib_new_ifStackEntry();
+    ifStackEntry->ifStackLowerLayer = ifStackLowerLayer;
+    ifStackEntry->ifStackHigherLayer = ifStackHigherLayer;
+    ifStackEntry->ifStackStatus = &createAndGo;
+    if_mib_set_ifStackEntry(s, ifStackEntry, IF_MIB_IFSTACKSTATUS);
+    if_mib_free_ifStackEntry(ifStackEntry);
+}
+
+
+void
+if_mib_proc_unstack_interface(GSnmpSession *s,
+			      gint32 ifStackLowerLayer,
+			      gint32 ifStackHigherLayer)
+{
+    if_mib_ifStackEntry_t *ifStackEntry;
+    gint32 destroy = IF_MIB_IFSTACKSTATUS_DESTROY;
+
+    if_mib_get_ifStackEntry(s, &ifStackEntry, ifStackHigherLayer,
+			    ifStackLowerLayer, IF_MIB_IFSTACKSTATUS);
+    if (s->error_status || !ifStackEntry) return;
+    ifStackEntry->ifStackStatus = &destroy;
+    if_mib_set_ifStackEntry(s, ifStackEntry, IF_MIB_IFSTACKSTATUS);
+    if_mib_free_ifStackEntry(ifStackEntry);
+}
+
+
+void
 if_mib_proc_set_interface_status(GSnmpSession *s,
 				 gint32 ifIndex,
 				 gint32 ifAdminStatus)
