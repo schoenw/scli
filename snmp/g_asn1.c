@@ -450,6 +450,9 @@ g_asn1_header_decode(ASN1_SCK *asn1, guchar **eoc, guint *cls,
         *eoc = asn1->pointer + len;
     else
         *eoc = 0;
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_ASN1 && *con) {
+	g_printerr("asn1dec %p: CONSTRUCTED\n", asn1);
+    }
     return TRUE;
 }
 
@@ -595,8 +598,8 @@ g_asn1_eoc_decode (ASN1_SCK *asn1, guchar   *eoc)
 gboolean 
 g_asn1_null_encode ( ASN1_SCK *asn1, guchar **eoc )
 {
-  *eoc = asn1->pointer;
-  return TRUE;
+    *eoc = asn1->pointer;
+    return TRUE;
 }
 
 /*
@@ -618,8 +621,11 @@ g_asn1_null_encode ( ASN1_SCK *asn1, guchar **eoc )
 gboolean 
 g_asn1_null_decode ( ASN1_SCK *asn1, guchar *eoc)
 {
-  asn1->pointer = eoc;
-  return TRUE;
+    asn1->pointer = eoc;
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_ASN1) {
+	g_printerr("asn1dec %p: NULL\n", asn1);
+    }
+    return TRUE;
 }
 
 /*
@@ -643,26 +649,21 @@ g_asn1_int32_encode ( ASN1_SCK *asn1, guchar **eoc, gint32 integer)
 {
     guchar ch,sign;
     int    lim;
-
+    
     *eoc = asn1->pointer;
-    if (integer < 0)
-    {
+    if (integer < 0) {
         lim  = -1;
         sign = 0x80;
-    }
-    else
-    {
+    } else {
         lim  = 0;
         sign = 0x00;
     }
-    do
-    {
+    do {
         ch = (guchar) integer;
         integer >>= 8;
         if (!g_asn1_octet_encode (asn1, ch))
             return FALSE;
-    }
-    while ((integer != lim) || (guchar) (ch & 0x80) != sign);
+    } while ((integer != lim) || (guchar) (ch & 0x80) != sign);
     return TRUE;
 }
 
@@ -688,22 +689,23 @@ g_asn1_int32_decode ( ASN1_SCK *asn1, guchar *eoc, gint32 *integer)
 {
     guchar ch;
     guint  len;
-
+    
     if (!g_asn1_octet_decode (asn1, &ch))
         return FALSE;
     *integer = (gchar) ch;
     len = 1;
-    while (asn1->pointer < eoc)
-    {
-        if (++len > sizeof (gint32))
-		{
-			asn1->error = ASN1_ERR_DEC_BADVALUE;
+    while (asn1->pointer < eoc) {
+        if (++len > sizeof (gint32)) {
+	    asn1->error = ASN1_ERR_DEC_BADVALUE;
             return FALSE;
-		}
+	}
         if (!g_asn1_octet_decode (asn1, &ch))
             return FALSE;
         *integer <<= 8;
         *integer |= ch;
+    }
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_ASN1) {
+	g_printerr("asn1dec %p: INTEGER %d\n", asn1, *integer);
     }
     return TRUE;
 }
@@ -729,26 +731,21 @@ g_asn1_int64_encode ( ASN1_SCK *asn1, guchar **eoc, gint64 integer)
 {
     guchar ch, sign;
     glong  lim;
-
+    
     *eoc = asn1->pointer;
-    if (integer < 0)
-    {
+    if (integer < 0) {
         lim  = -1;
         sign = 0x80;
-    }
-    else
-    {
+    } else {
         lim  = 0;
         sign = 0x00;
     }
-    do
-    {
+    do {
         ch = (guchar) integer;
         integer >>= 8;
         if (!g_asn1_octet_encode (asn1, ch))
             return FALSE;
-    }
-    while ((integer != lim) || (guchar) (ch & 0x80) != sign);
+    } while ((integer != lim) || (guchar) (ch & 0x80) != sign);
     return TRUE;
 }
 
@@ -779,17 +776,15 @@ g_asn1_int64_decode ( ASN1_SCK *asn1, guchar *eoc, gint64 *integer)
         return FALSE;
     *integer = (gchar) ch;
     len = 1;
-    while (asn1->pointer < eoc)
-    {
-      if (++len > sizeof (gint64))
-	{
-	  asn1->error = ASN1_ERR_DEC_BADVALUE;
-	  return FALSE;
+    while (asn1->pointer < eoc) {
+	if (++len > sizeof (gint64)) {
+	    asn1->error = ASN1_ERR_DEC_BADVALUE;
+	    return FALSE;
 	}
-      if (!g_asn1_octet_decode (asn1, &ch))
-	return FALSE;
-      *integer <<= 8;
-      *integer |= ch;
+	if (!g_asn1_octet_decode (asn1, &ch))
+	    return FALSE;
+	*integer <<= 8;
+	*integer |= ch;
     }
     return TRUE;
 }
@@ -813,18 +808,16 @@ g_asn1_int64_decode ( ASN1_SCK *asn1, guchar *eoc, gint64 *integer)
 gboolean 
 g_asn1_uint32_encode ( ASN1_SCK *asn1, guchar **eoc, guint32 integer)
 {
-  guchar ch;
-  
-  *eoc = asn1->pointer;
-  do
-    {
-      ch = (guchar) integer;
-      integer >>= 8;
-      if (!g_asn1_octet_encode (asn1, ch))
-	return FALSE;
-    }
-  while ((integer != 0) || (ch & 0x80) != 0x00);
-  return TRUE;
+    guchar ch;
+    
+    *eoc = asn1->pointer;
+    do {
+	ch = (guchar) integer;
+	integer >>= 8;
+	if (!g_asn1_octet_encode (asn1, ch))
+	    return FALSE;
+    } while ((integer != 0) || (ch & 0x80) != 0x00);
+    return TRUE;
 }
 
 /*
@@ -849,23 +842,23 @@ g_asn1_uint32_decode ( ASN1_SCK *asn1, guchar *eoc, guint32 *integer)
 {
     guchar ch;
     guint  len;
-
+    
     if (!g_asn1_octet_decode (asn1, &ch))
         return FALSE;
     *integer = ch;
-    if (ch == 0) len = 0;
-    else len = 1;
-    while (asn1->pointer < eoc)
-    {
-        if (++len > sizeof (guint32))
-		{
-			asn1->error = ASN1_ERR_DEC_BADVALUE;
+    len = (ch == 0) ? 0 : 1;
+    while (asn1->pointer < eoc) {
+        if (++len > sizeof (guint32)) {
+	    asn1->error = ASN1_ERR_DEC_BADVALUE;
             return FALSE;
-		}
+	}
         if (!g_asn1_octet_decode (asn1, &ch))
             return FALSE;
         *integer <<= 8;
         *integer |= ch;
+    }
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_ASN1) {
+	g_printerr("asn1dec %p: INTEGER %u\n", asn1, *integer);
     }
     return TRUE;
 }
@@ -892,8 +885,7 @@ g_asn1_uint64_encode ( ASN1_SCK *asn1, guchar **eoc, guint64 integer)
     guchar ch;
 
     *eoc = asn1->pointer;
-    do
-    {
+    do {
         ch = (guchar) integer;
         integer >>= 8;
         if (!g_asn1_octet_encode (asn1, ch))
@@ -929,17 +921,12 @@ g_asn1_uint64_decode ( ASN1_SCK *asn1, guchar *eoc, guint64 *integer)
     if (!g_asn1_octet_decode (asn1, &ch))
         return FALSE;
     *integer = ch;
-    if (ch == 0)
-        len = 0;
-    else
-        len = 1;
-    while (asn1->pointer < eoc)
-    {
-        if (++len > sizeof (guint64))
-		{
-			asn1->error = ASN1_ERR_DEC_BADVALUE;
+    len = (ch == 0) ? 0 : 1;
+    while (asn1->pointer < eoc) {
+        if (++len > sizeof (guint64)) {
+	    asn1->error = ASN1_ERR_DEC_BADVALUE;
             return FALSE;
-		}
+	}
         if (!g_asn1_octet_decode (asn1, &ch))
             return FALSE;
         *integer <<= 8;
@@ -968,17 +955,16 @@ g_asn1_uint64_decode ( ASN1_SCK *asn1, guchar *eoc, guint64 *integer)
 gboolean 
 g_asn1_octets_encode ( ASN1_SCK *asn1, guchar **eoc, guchar *octets, guint len)
 {
-  guchar *ptr;
+    guchar *ptr;
 
-  *eoc = asn1->pointer;
-  ptr = octets + len;
-
-  while (len-- > 0)
-    {
-      if (!g_asn1_octet_encode (asn1, *--ptr))
-        return FALSE;
+    *eoc = asn1->pointer;
+    ptr = octets + len;
+    
+    while (len-- > 0) {
+	if (!g_asn1_octet_encode (asn1, *--ptr))
+	    return FALSE;
     }
-  return TRUE;
+    return TRUE;
 }
 
 /*
@@ -1002,23 +988,29 @@ g_asn1_octets_encode ( ASN1_SCK *asn1, guchar **eoc, guchar *octets, guint len)
 gboolean 
 g_asn1_octets_decode ( ASN1_SCK *asn1, guchar *eoc, guchar **octets, guint *len)
 {
-  guchar *ptr;
-
-  *octets = NULL;
-  *len = 0;
-  *octets = g_malloc (eoc - asn1->pointer);
-  ptr = *octets;
-  while (asn1->pointer < eoc)
-    {
-      if (!g_asn1_octet_decode (asn1, (guchar *)ptr++))
-        {
-          g_free(*octets);
-          *octets = NULL;
-	  return FALSE;
-        }
-      (*len)++;
+    guchar *ptr;
+    
+    *octets = NULL;
+    *len = 0;
+    *octets = g_malloc(eoc - asn1->pointer);
+    ptr = *octets;
+    while (asn1->pointer < eoc) {
+	if (!g_asn1_octet_decode (asn1, (guchar *)ptr++)) {
+	    g_free(*octets);
+	    *octets = NULL;
+	    return FALSE;
+	}
+	(*len)++;
     }
-  return TRUE;
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_ASN1) {
+	guint i;
+	g_printerr("asn1dec %p: OCTET STRING '", asn1);
+	for (i = 0; i < *len; i++) {
+	    g_printerr("%02x", (*octets)[i]);
+	}
+	g_printerr("'h\n");
+    }
+    return TRUE;
 }
 
 /*
@@ -1038,20 +1030,19 @@ g_asn1_octets_decode ( ASN1_SCK *asn1, guchar *eoc, guchar **octets, guint *len)
 gboolean 
 g_asn1_subid_encode ( ASN1_SCK *asn1, guint32 subid)
 {
-  guchar ch;
-  
-  ch = (guchar) (subid & 0x7F);
-  subid >>= 7;
-  if (!g_asn1_octet_encode (asn1, ch))
-    return FALSE;
-  while (subid > 0)
-    {
-      ch = (guchar) (subid | 0x80);
-      subid >>= 7;
-      if (!g_asn1_octet_encode (asn1, ch))
+    guchar ch;
+    
+    ch = (guchar) (subid & 0x7F);
+    subid >>= 7;
+    if (!g_asn1_octet_encode (asn1, ch))
 	return FALSE;
+    while (subid > 0) {
+	ch = (guchar) (subid | 0x80);
+	subid >>= 7;
+	if (!g_asn1_octet_encode (asn1, ch))
+	    return FALSE;
     }
-  return TRUE;
+    return TRUE;
 }
 
 /*
@@ -1072,10 +1063,9 @@ gboolean
 g_asn1_subid_decode ( ASN1_SCK *asn1, guint32 *subid)
 {
     guchar ch;
-
+    
     *subid = 0;
-    do
-    {
+    do {
         if (!g_asn1_octet_decode(asn1, &ch))
             return FALSE;
         *subid <<= 7;
@@ -1107,24 +1097,31 @@ gboolean
 g_asn1_oid_encode ( ASN1_SCK *asn1, guchar **eoc, guint32 *oid,
 		    guint len)
 {
-  gulong subid;
-  
-  *eoc = asn1->pointer;
-  if (len < 2)
-    {
-      asn1->error = ASN1_ERR_ENC_BADVALUE;
-      return FALSE;
-    }
-  subid = oid [1] + oid [0] * 40;
-  oid += len;
-  while (len-- > 2)
-    {
-      if (!g_asn1_subid_encode (asn1, *--oid))
+    gulong subid;
+    guint l = len;
+    
+    *eoc = asn1->pointer;
+    if (len < 2) {
+	asn1->error = ASN1_ERR_ENC_BADVALUE;
 	return FALSE;
     }
-  if (!g_asn1_subid_encode (asn1, subid))
-    return FALSE;
-  return TRUE;
+    subid = oid [1] + oid [0] * 40;
+    oid += len;
+    while (l-- > 2) {
+	if (!g_asn1_subid_encode (asn1, *--oid))
+	    return FALSE;
+    }
+    if (!g_asn1_subid_encode (asn1, subid))
+	return FALSE;
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_ASN1) {
+	guint i;
+	g_printerr("asn1enc %p: OBJECT IDENTIFIER ", asn1);
+	for (i = 0; i < len; i++) {
+	    g_printerr("%s%u", i ? "." : "", oid[i]);
+	}
+	g_printerr("\n");
+    }
+    return TRUE;
 }
 
 /*
@@ -1151,54 +1148,54 @@ gboolean
 g_asn1_oid_decode ( ASN1_SCK *asn1, guchar *eoc, guint32 **oid, 
 		    guint *len)
 {
-  guint32 subid;
-  guint  size;
-  guint32 *optr;
-
-  size = eoc - asn1->pointer + 1;
-  *oid = g_malloc(size * sizeof(guint32));
-  optr = *oid;
- 
-  if (!g_asn1_subid_decode (asn1, &subid))
-    {
-      g_free(*oid);
-      *oid = NULL;
-      return FALSE;
+    guint32 subid;
+    guint  size;
+    guint32 *optr;
+    
+    size = eoc - asn1->pointer + 1;
+    *oid = g_malloc(size * sizeof(guint32));
+    optr = *oid;
+    
+    if (!g_asn1_subid_decode (asn1, &subid)) {
+	g_free(*oid);
+	*oid = NULL;
+	return FALSE;
     }
-  if (subid < 40)
-    {
-      optr [0] = 0;
-      optr [1] = subid;
+    if (subid < 40) {
+	optr [0] = 0;
+	optr [1] = subid;
+    } else if (subid < 80) {
+	optr [0] = 1;
+	optr [1] = subid - 40;
+    } else {
+	optr [0] = 2;
+	optr [1] = subid - 80;
     }
-  else if (subid < 80)
-    {
-      optr [0] = 1;
-      optr [1] = subid - 40;
-    }
-  else
-    {
-      optr [0] = 2;
-      optr [1] = subid - 80;
-    }
-  *len = 2;
-  optr += 2;
-  while (asn1->pointer < eoc)
-    {
-      if (++(*len) > size)
-	{
-	  asn1->error = ASN1_ERR_DEC_BADVALUE;
-          g_free(*oid);
-          *oid = NULL;
-	  return FALSE;
+    *len = 2;
+    optr += 2;
+    while (asn1->pointer < eoc) {
+	if (++(*len) > size) {
+	    asn1->error = ASN1_ERR_DEC_BADVALUE;
+	    g_free(*oid);
+	    *oid = NULL;
+	    return FALSE;
 	}
-      if (!g_asn1_subid_decode (asn1, optr++))
-        {
-          g_free(*oid);
-          *oid = NULL;
-	  return FALSE;
+	if (!g_asn1_subid_decode (asn1, optr++)) {
+	    g_free(*oid);
+	    *oid = NULL;
+	    return FALSE;
         }
     }
-  return TRUE;
+    
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_ASN1) {
+	guint i;
+	g_printerr("asn1dec %p: OBJECT IDENTIFIER ", asn1);
+	for (i = 0; i < *len; i++) {
+	    g_printerr("%s%u", i ? "." : "", (*oid)[i]);
+	}
+	g_printerr("\n");
+    }
+    return TRUE;
 }
 
 /* EOF */
