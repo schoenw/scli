@@ -260,7 +260,7 @@ xml_media_dimensions(xmlNodePtr tree, gchar *label,
 
 
 static xmlNodePtr
-get_printer_node(xmlNodePtr tree, gint32 printer)
+get_printer_node(xmlNodePtr tree, gint32 printer, const char *xpath)
 {
     xmlNodePtr node;
     char buffer[20];
@@ -269,7 +269,7 @@ get_printer_node(xmlNodePtr tree, gint32 printer)
 
     for (node = tree->children; node; node = node->next) {
 	if (xmlStrcmp(node->name, (const xmlChar *) "printer") == 0) {
-	    xmlChar *prop = xmlGetProp(node, (const xmlChar *) "number");
+	    xmlChar *prop = xmlGetProp(node, (const xmlChar *) "device");
 	    if (xmlStrcmp(prop, (const xmlChar *) buffer) == 0) {
 		break;
 	    }
@@ -277,8 +277,26 @@ get_printer_node(xmlNodePtr tree, gint32 printer)
     }
     if (! node) {
 	node = xmlNewChild(tree, NULL, "printer", NULL);
-	xml_set_prop(node, "number", "%s", buffer);
+	xml_set_prop(node, "device", "%s", buffer);
     }
+
+    /*
+     * XXX We should treat this really like a path...
+     */
+    
+    if (xpath) {
+	xmlNodePtr child;
+	for (child = node->children; child; child = child->next) {
+            if (xmlStrcmp(child->name, (const xmlChar *) xpath) == 0) {
+		break;
+	    }
+	}
+	if (! child) {
+	    child = xmlNewChild(node, NULL, xpath, NULL);
+	}
+	node = child;
+    }
+    
     return node;
 }
 
@@ -599,6 +617,32 @@ fmt_printer_cover(GString *s, printer_mib_prtCoverEntry_t *prtCoverEntry)
 
 
 
+static void
+xml_printer_cover(xmlNodePtr root,
+		  printer_mib_prtCoverEntry_t *prtCoverEntry)
+{
+    xmlNodePtr tree;
+    const char *e;
+    
+    tree = xmlNewChild(root, NULL, "cover", NULL);
+    xml_set_prop(tree, "number", "%d",
+		 prtCoverEntry->prtCoverIndex);
+
+    if (prtCoverEntry->prtCoverDescription) {
+	(void) xml_new_child(tree, NULL, "description", "%.*s",
+			  (int) prtCoverEntry->_prtCoverDescriptionLength,
+			  prtCoverEntry->prtCoverDescription);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtCoverStatus,
+		 prtCoverEntry->prtCoverStatus);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "status", "%s", e);
+    }
+}
+
+
+
 static int
 show_printer_covers(scli_interp_t * interp, int argc, char **argv)
 {
@@ -622,7 +666,14 @@ show_printer_covers(scli_interp_t * interp, int argc, char **argv)
 
     if (prtCoverTable) {
 	for (i = 0; prtCoverTable[i]; i++) {
-	    fmt_printer_cover(interp->result, prtCoverTable[i]);
+	    if (scli_interp_xml(interp)) {
+		xmlNodePtr node = get_printer_node(interp->xml_node,
+					   prtCoverTable[i]->hrDeviceIndex,
+						   "covers");
+		xml_printer_cover(node, prtCoverTable[i]);
+	    } else {
+		fmt_printer_cover(interp->result, prtCoverTable[i]);
+	    }
 	}
     }
 
@@ -850,9 +901,7 @@ xml_printer_inputs(xmlNodePtr root,
     const char *e;
 
     tree = xmlNewChild(root, NULL, "input", NULL);
-    xml_set_prop(tree, "printer", "%d",
-		 prtInputEntry->hrDeviceIndex);
-    xml_set_prop(tree, " number", "%d",
+    xml_set_prop(tree, "number", "%d",
 		 prtInputEntry->prtInputIndex);
 
     if (prtInputEntry->prtInputName) {
@@ -1047,7 +1096,8 @@ show_printer_inputs(scli_interp_t *interp, int argc, char **argv)
 	for (i = 0; prtInputTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
 		xmlNodePtr node = get_printer_node(interp->xml_node,
-					 prtInputTable[i]->hrDeviceIndex);
+					 prtInputTable[i]->hrDeviceIndex,
+						   "inputs");
 		xml_printer_inputs(node, prtInputTable[i]);
 	    } else {
 		if (i > 0) {
@@ -1676,9 +1726,7 @@ xml_printer_console_display(xmlNodePtr root,
 
     if (displayEntry->prtConsoleDisplayBufferText) {
 	tree = xmlNewChild(root, NULL, "line", NULL);
-	xml_set_prop(tree, "printer", "%d",
-		     displayEntry->hrDeviceIndex);
-	xml_set_prop(tree, " number", "%d",
+	xml_set_prop(tree, "number", "%d",
 		     displayEntry->prtConsoleDisplayBufferIndex);
 	xml_set_content(tree, "%.*s", 
 		  (int) displayEntry->_prtConsoleDisplayBufferTextLength,
@@ -1717,7 +1765,8 @@ show_printer_console_display(scli_interp_t * interp, int argc, char **argv)
 	for (i = 0; displayTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
 		xmlNodePtr node = get_printer_node(interp->xml_node,
-					 displayTable[i]->hrDeviceIndex);
+					 displayTable[i]->hrDeviceIndex,
+						   "display");
 		xml_printer_console_display(node,
 					    displayTable[i]);
 	    } else {
@@ -1782,7 +1831,6 @@ xml_printer_console_light(xmlNodePtr root,
     const char *e;
     
     tree = xmlNewChild(root, NULL, "light", NULL);
-    xml_set_prop(tree, "printer", "%d", lightEntry->hrDeviceIndex);
     xml_set_prop(tree, "number", "%d", lightEntry->prtConsoleLightIndex);
 
     if (lightEntry->prtConsoleDescription) {
@@ -1849,7 +1897,8 @@ show_printer_console_lights(scli_interp_t *interp, int argc, char **argv)
 	for (i = 0; lightTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
 		xmlNodePtr node = get_printer_node(interp->xml_node,
-					 lightTable[i]->hrDeviceIndex);
+					 lightTable[i]->hrDeviceIndex,
+						   "lights");
 		xml_printer_console_light(node, lightTable[i]);
 	    } else {
 		fmt_printer_console_light(interp->result, lightTable[i],
@@ -1929,8 +1978,7 @@ xml_printer_alert(xmlNodePtr root, printer_mib_prtAlertEntry_t *alertEntry)
     const char *e;
 
     tree = xmlNewChild(root, NULL, "alert", NULL);
-    xml_set_prop(tree, "printer", "%d", alertEntry->hrDeviceIndex);
-    xml_set_prop(tree, " number", "%d", alertEntry->prtAlertIndex);
+    xml_set_prop(tree, "number", "%d", alertEntry->prtAlertIndex);
 
     if (alertEntry->prtAlertTime) {
 	xml_new_child(tree, NULL, "date",
@@ -2004,7 +2052,8 @@ show_printer_alert(scli_interp_t * interp, int argc, char **argv)
 	for (i = 0; alertTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
 		xmlNodePtr node = get_printer_node(interp->xml_node,
-					 alertTable[i]->hrDeviceIndex);
+					 alertTable[i]->hrDeviceIndex,
+						   "alerts");
 		xml_printer_alert(node, alertTable[i]);
 	    } else {
 		if (i > 0) {
@@ -2081,8 +2130,8 @@ scli_init_printer_mode(scli_interp_t * interp)
 	{ "show printer covers", NULL,
 	  "The `show printer covers' command shows information about the\n"
 	  "covers of a printer.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "devices", NULL,
 	  show_printer_covers },
 
 	{ "show printer inputs", NULL,
