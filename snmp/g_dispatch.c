@@ -243,13 +243,13 @@ sendPdu(guint transportDomain, struct sockaddr *transportAddress,
 
   if (!result) 
     {
-      printf("Message processing failed!\n");
+      g_warning("Message processing failed!");
       return -1; /* Error reason: message processing failed */
     }
   if (!transport_models || !(trp_model = g_hash_table_lookup(transport_models,
       &destTransportDomain)))
     {
-      printf("No transport model found!\n");
+      g_warning("No transport model found!");
       g_free(outgoingMessage);
       return 0;
       /* Error reason: transport model unknown */
@@ -258,7 +258,7 @@ sendPdu(guint transportDomain, struct sockaddr *transportAddress,
   if (!trp_model->sendMessage(destTransportAddress, outgoingMessage, 
                               outgoingMessageLength))
     {
-      printf("Send failed!\n");
+      g_warning("Send failed!");
       g_free(outgoingMessage);
       return 0;
       /* Error reason: transport send failed. (network on fire?) */
