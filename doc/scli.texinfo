@@ -661,19 +661,19 @@ monitor and configure IP protocol engines.
 @command{dump ip}
 @end example
 
-The set ip forwarding command controls whether the IP protocol
+The @command{set ip forwarding} command controls whether the IP protocol
 engine forwards IP datagrams or not. The <value> parameter must
 be one of the strings "enabled" or "disabled".
 
-The set ip ttl command can be used to change the default
+The @command{set ip ttl} command can be used to change the default
 time to live (TTL) value used by the IP protocol engine. The
 <number> parameter must be a number between 1 and 255 inclusive.
 
-The show ip info command displays paramters of the IP
+The @command{show ip info} command displays parameters of the IP
 protocol engine, such as the default TTL or whether the
 node is forwarding IP packets.
 
-The show ip forwarding command displays the IP forwarding data
+The @command{show ip forwarding} command displays the IP forwarding data
 base. The command generates a table with the following columns:
 
 @verbatim
@@ -684,9 +684,9 @@ base. The command generates a table with the following columns:
   INTERFACE
 @end verbatim
 
-The show ip addresses command displays the IP addresses assigned
-to network interfaces. The command generates a table with the
-following columns:
+The @command{show ip addresses} command displays the IP addresses
+assigned to network interfaces. The command generates a table
+with the following columns:
 
 @verbatim
   INTERFACE network interface number
@@ -695,10 +695,10 @@ following columns:
   NAME      name of the IP address
 @end verbatim
 
-The show ip tunnel command displays information about existing
+The @command{show ip tunnel} command displays information about existing
 IP tunnels.
 
-The show ip mapping command displays the mapping of IP address
+The @command{show ip mapping} command displays the mapping of IP address
 to lower layer address (e.g., IEEE 802 addresses). The command
 generates a table with the following columns:
 
@@ -709,9 +709,20 @@ generates a table with the following columns:
   ADDRESS   lower layer address
 @end verbatim
 
-The dump ip command generates a sequence of scli commands
+The @command{dump ip} command generates a sequence of scli commands
 which can be used to restore the IP configuration.
 
+@section ISDN MODE
+
+The scli isdn mode is based on the ISDN-MIB as published
+in RFC 2127.
+
+@example
+@command{show isdn bearer}
+@end example
+
+The @command{show isdn bearer} command shows information about
+the ISDN B (bearer) channels.
 @section NETSNMP MODE
 
 The netsnmp scli mode is used to display and configure netsnmp
@@ -854,17 +865,6 @@ show OSPF areas
 general OSPF information
 
 show OSPF interfaces
-@section PRINTER MODE
-
-The scli isdn mode is based on the ISDN-MIB as published
-in RFC 2127.
-
-@example
-@command{show isdn bearer}
-@end example
-
-The @command{show isdn bearer} command shows information about
-the ISDN B (bearer) channels.
 @section PRINTER MODE
 
 The scli printer mode is based on the Printer-MIB as published
@@ -1361,21 +1361,68 @@ RFC 2012. It provides commands to browse information specific
 to the TCP transport protocol.
 
 @example
+@command{show tcp info}
 @command{show tcp listener}
 @command{show tcp connections}
+@command{show tcp states}
 @command{monitor tcp connections}
+@command{monitor tcp states}
 @end example
 
-The show tcp listener command displays the listening TCP
-endpoints.
+The @command{show tcp info} command displays parameters of the TCP
+protocol engine.
 
-The show tcp connections command displays the connected TCP
+The @command{show tcp listener} command displays the listening TCP
+endpoints. The command generates a table with the following
+columns:
+
+@verbatim
+  LOCAL  local TCP endpoint
+  STATE  transmission control block state (listen)
+@end verbatim
+
+The @command{show tcp connections} command displays the connected TCP
 endpoints including the current state of the connection as seen
-by the remote SNMP agent.
+by the remote SNMP agent. The command generates a table with
+the following columns:
 
-The monitor tcp connections command displays the connected TCP
+@verbatim
+  LOCAL  local  TCP endpoint
+  REMOTE remote TCP endpoint
+  STATE  transmission control block state
+@end verbatim
+
+The transmission control block state is either closed, synSent,
+synReceived, established, finWait1, finWait2, closeWait, lastAck,
+closing, or timeWait.
+
+The @command{show tcp states} command displays the distribution of TCP
+transmission control block states together with a list of known
+port names in each state. The command generates a table with
+the following columns:
+
+@verbatim
+  COUNT number of transmission control blocks per state
+  STATE transmission control block state
+  PORTS well-known ports associated with the state
+@end verbatim
+
+The command uses some heuristics to identify the interesting
+port numbers. First, all local port numbers are considered
+where the local port number matches one of the listening port
+numbers. From the remaining connections, all local port numbers
+are considered with a well known name. From the remaining
+connections, all remote port numbers are considered with a
+well known name. All remaining connections are aggregated
+under the pseudo name - (hyphen). Unspecified port numbers
+are show using the pseudo name * (star).
+
+The @command{monitor tcp connections} command displays the connected TCP
 endpoints including the current state of the connection as seen
 by the remote SNMP agent. The information is updated periodically.
+
+The @command{monitor tcp states} command displays the distribution of TCP
+connection states. The information is updated periodically.
 @section UDP MODE
 
 The scli udp mode is based on the UDP-MIB as published in
@@ -1387,10 +1434,10 @@ to the UDP transport protocol.
 @command{show udp stats}
 @end example
 
-The show udp listener command displays the listening UDP
+The @command{show udp listener} command displays the listening UDP
 endpoints.
 
-The show udp statistics about datagrams received or sent.
+The @command{show udp statistics} about datagrams received or sent.
 
 @node Extending, Problems, Modes and Commands, Top
 @chapter Writing Extensions
@@ -1541,12 +1588,6 @@ structure as part of the mode registration.
 
 @c [xxx]
 
-@section Dynamic Loading (Plugins)
-
-@c [xxx]
-This chapter explains how you can add functionality to @code{scli}
-programs.
-
 @section Adding MIB Stubs
 
 I might be necessary to add stubs for additional MIB modules. This
@@ -1566,6 +1607,16 @@ Edit @file{scli/scli.h} by adding the new header file(s) to the
 includes at the end of the file.
 @end enumerate
 
+
+@section Dynamic Loading (Plugins)
+
+@c [xxx]
+This chapter explains how you can add functionality to @code{scli}
+programs.
+
+@c Guidelines:
+@c - carefully validate user data before sending SNMP sets
+@c - avoid sending SNMP sets if the desired state is already there
 
 @node Problems, Concept Index, Extending, Top
 @chapter Problems
