@@ -95,13 +95,25 @@ assign_dot1dBase(GSList *vbl)
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 1) {
-            dot1dBase->dot1dBaseBridgeAddress = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                dot1dBase->dot1dBaseBridgeAddress = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for dot1dBaseBridgeAddress");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 2) {
-            dot1dBase->dot1dBaseNumPorts = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dBase->dot1dBaseNumPorts = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dBaseNumPorts");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 3) {
-            dot1dBase->dot1dBaseType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dBase->dot1dBaseType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dBaseType");
+            }
         }
     }
 
@@ -198,17 +210,33 @@ assign_dot1dBasePortEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            dot1dBasePortEntry->dot1dBasePortIfIndex = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dBasePortEntry->dot1dBasePortIfIndex = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dBasePortIfIndex");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            dot1dBasePortEntry->_dot1dBasePortCircuitLength = vb->syntax_len / sizeof(guint32);
-            dot1dBasePortEntry->dot1dBasePortCircuit = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                dot1dBasePortEntry->_dot1dBasePortCircuitLength = vb->syntax_len / sizeof(guint32);
+                dot1dBasePortEntry->dot1dBasePortCircuit = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for dot1dBasePortCircuit");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            dot1dBasePortEntry->dot1dBasePortDelayExceededDiscards = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_UNSIGNED32) {
+                dot1dBasePortEntry->dot1dBasePortDelayExceededDiscards = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for dot1dBasePortDelayExceededDiscards");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            dot1dBasePortEntry->dot1dBasePortMtuExceededDiscards = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_UNSIGNED32) {
+                dot1dBasePortEntry->dot1dBasePortMtuExceededDiscards = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for dot1dBasePortMtuExceededDiscards");
+            }
         }
     }
 
@@ -311,46 +339,102 @@ assign_dot1dStp(GSList *vbl)
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 1) {
-            dot1dStp->dot1dStpProtocolSpecification = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStp->dot1dStpProtocolSpecification = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpProtocolSpecification");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 2) {
-            dot1dStp->dot1dStpPriority = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStp->dot1dStpPriority = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpPriority");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 3) {
-            dot1dStp->dot1dStpTimeSinceTopologyChange = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                dot1dStp->dot1dStpTimeSinceTopologyChange = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpTimeSinceTopologyChange");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 4) {
-            dot1dStp->dot1dStpTopChanges = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_UNSIGNED32) {
+                dot1dStp->dot1dStpTopChanges = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpTopChanges");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 5) {
-            dot1dStp->dot1dStpDesignatedRoot = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                dot1dStp->dot1dStpDesignatedRoot = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for dot1dStpDesignatedRoot");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 6) {
-            dot1dStp->dot1dStpRootCost = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStp->dot1dStpRootCost = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpRootCost");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 7) {
-            dot1dStp->dot1dStpRootPort = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStp->dot1dStpRootPort = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpRootPort");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 8) {
-            dot1dStp->dot1dStpMaxAge = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStp->dot1dStpMaxAge = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpMaxAge");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 9) {
-            dot1dStp->dot1dStpHelloTime = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStp->dot1dStpHelloTime = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpHelloTime");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 10) {
-            dot1dStp->dot1dStpHoldTime = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStp->dot1dStpHoldTime = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpHoldTime");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 11) {
-            dot1dStp->dot1dStpForwardDelay = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStp->dot1dStpForwardDelay = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpForwardDelay");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 12) {
-            dot1dStp->dot1dStpBridgeMaxAge = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStp->dot1dStpBridgeMaxAge = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpBridgeMaxAge");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 13) {
-            dot1dStp->dot1dStpBridgeHelloTime = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStp->dot1dStpBridgeHelloTime = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpBridgeHelloTime");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 14) {
-            dot1dStp->dot1dStpBridgeForwardDelay = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStp->dot1dStpBridgeForwardDelay = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpBridgeForwardDelay");
+            }
         }
     }
 
@@ -458,31 +542,67 @@ assign_dot1dStpPortEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            dot1dStpPortEntry->dot1dStpPortPriority = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStpPortEntry->dot1dStpPortPriority = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpPortPriority");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            dot1dStpPortEntry->dot1dStpPortState = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStpPortEntry->dot1dStpPortState = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpPortState");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            dot1dStpPortEntry->dot1dStpPortEnable = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStpPortEntry->dot1dStpPortEnable = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpPortEnable");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            dot1dStpPortEntry->dot1dStpPortPathCost = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStpPortEntry->dot1dStpPortPathCost = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpPortPathCost");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            dot1dStpPortEntry->dot1dStpPortDesignatedRoot = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                dot1dStpPortEntry->dot1dStpPortDesignatedRoot = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for dot1dStpPortDesignatedRoot");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            dot1dStpPortEntry->dot1dStpPortDesignatedCost = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStpPortEntry->dot1dStpPortDesignatedCost = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpPortDesignatedCost");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 8) {
-            dot1dStpPortEntry->dot1dStpPortDesignatedBridge = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                dot1dStpPortEntry->dot1dStpPortDesignatedBridge = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for dot1dStpPortDesignatedBridge");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 9) {
-            dot1dStpPortEntry->dot1dStpPortDesignatedPort = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                dot1dStpPortEntry->dot1dStpPortDesignatedPort = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for dot1dStpPortDesignatedPort");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 10) {
-            dot1dStpPortEntry->dot1dStpPortForwardTransitions = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_UNSIGNED32) {
+                dot1dStpPortEntry->dot1dStpPortForwardTransitions = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for dot1dStpPortForwardTransitions");
+            }
         }
     }
 
@@ -590,10 +710,18 @@ assign_dot1dTp(GSList *vbl)
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 1) {
-            dot1dTp->dot1dTpLearnedEntryDiscards = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_UNSIGNED32) {
+                dot1dTp->dot1dTpLearnedEntryDiscards = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for dot1dTpLearnedEntryDiscards");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 2) {
-            dot1dTp->dot1dTpAgingTime = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dTp->dot1dTpAgingTime = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dTpAgingTime");
+            }
         }
     }
 
@@ -692,10 +820,18 @@ assign_dot1dTpFdbEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            dot1dTpFdbEntry->dot1dTpFdbPort = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dTpFdbEntry->dot1dTpFdbPort = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dTpFdbPort");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            dot1dTpFdbEntry->dot1dTpFdbStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dTpFdbEntry->dot1dTpFdbStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dTpFdbStatus");
+            }
         }
     }
 
@@ -813,16 +949,32 @@ assign_dot1dTpPortEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            dot1dTpPortEntry->dot1dTpPortMaxInfo = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dTpPortEntry->dot1dTpPortMaxInfo = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dTpPortMaxInfo");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            dot1dTpPortEntry->dot1dTpPortInFrames = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_UNSIGNED32) {
+                dot1dTpPortEntry->dot1dTpPortInFrames = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for dot1dTpPortInFrames");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            dot1dTpPortEntry->dot1dTpPortOutFrames = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_UNSIGNED32) {
+                dot1dTpPortEntry->dot1dTpPortOutFrames = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for dot1dTpPortOutFrames");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            dot1dTpPortEntry->dot1dTpPortInDiscards = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_UNSIGNED32) {
+                dot1dTpPortEntry->dot1dTpPortInDiscards = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for dot1dTpPortInDiscards");
+            }
         }
     }
 
@@ -947,11 +1099,19 @@ assign_dot1dStaticEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            dot1dStaticEntry->_dot1dStaticAllowedToGoToLength = vb->syntax_len;
-            dot1dStaticEntry->dot1dStaticAllowedToGoTo = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                dot1dStaticEntry->_dot1dStaticAllowedToGoToLength = vb->syntax_len;
+                dot1dStaticEntry->dot1dStaticAllowedToGoTo = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for dot1dStaticAllowedToGoTo");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            dot1dStaticEntry->dot1dStaticStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                dot1dStaticEntry->dot1dStaticStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for dot1dStaticStatus");
+            }
         }
     }
 

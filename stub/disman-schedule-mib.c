@@ -115,7 +115,11 @@ assign_schedObjects(GSList *vbl)
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 1) {
-            schedObjects->schedLocalTime = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                schedObjects->schedLocalTime = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for schedLocalTime");
+            }
         }
     }
 
@@ -222,67 +226,139 @@ assign_schedEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            schedEntry->_schedDescrLength = vb->syntax_len;
-            schedEntry->schedDescr = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                schedEntry->_schedDescrLength = vb->syntax_len;
+                schedEntry->schedDescr = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for schedDescr");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            schedEntry->schedInterval = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_UNSIGNED32) {
+                schedEntry->schedInterval = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for schedInterval");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            schedEntry->_schedWeekDayLength = vb->syntax_len;
-            schedEntry->schedWeekDay = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                schedEntry->_schedWeekDayLength = vb->syntax_len;
+                schedEntry->schedWeekDay = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for schedWeekDay");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            schedEntry->_schedMonthLength = vb->syntax_len;
-            schedEntry->schedMonth = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                schedEntry->_schedMonthLength = vb->syntax_len;
+                schedEntry->schedMonth = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for schedMonth");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            schedEntry->_schedDayLength = vb->syntax_len;
-            schedEntry->schedDay = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                schedEntry->_schedDayLength = vb->syntax_len;
+                schedEntry->schedDay = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for schedDay");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 8) {
-            schedEntry->_schedHourLength = vb->syntax_len;
-            schedEntry->schedHour = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                schedEntry->_schedHourLength = vb->syntax_len;
+                schedEntry->schedHour = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for schedHour");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 9) {
-            schedEntry->_schedMinuteLength = vb->syntax_len;
-            schedEntry->schedMinute = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                schedEntry->_schedMinuteLength = vb->syntax_len;
+                schedEntry->schedMinute = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for schedMinute");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 10) {
-            schedEntry->_schedContextNameLength = vb->syntax_len;
-            schedEntry->schedContextName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                schedEntry->_schedContextNameLength = vb->syntax_len;
+                schedEntry->schedContextName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for schedContextName");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 11) {
-            schedEntry->_schedVariableLength = vb->syntax_len / sizeof(guint32);
-            schedEntry->schedVariable = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                schedEntry->_schedVariableLength = vb->syntax_len / sizeof(guint32);
+                schedEntry->schedVariable = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for schedVariable");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 12) {
-            schedEntry->schedValue = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                schedEntry->schedValue = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for schedValue");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 13) {
-            schedEntry->schedType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                schedEntry->schedType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for schedType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 14) {
-            schedEntry->schedAdminStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                schedEntry->schedAdminStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for schedAdminStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 15) {
-            schedEntry->schedOperStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                schedEntry->schedOperStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for schedOperStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 16) {
-            schedEntry->schedFailures = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                schedEntry->schedFailures = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for schedFailures");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 17) {
-            schedEntry->schedLastFailure = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                schedEntry->schedLastFailure = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for schedLastFailure");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 18) {
-            schedEntry->_schedLastFailedLength = vb->syntax_len;
-            schedEntry->schedLastFailed = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                schedEntry->_schedLastFailedLength = vb->syntax_len;
+                schedEntry->schedLastFailed = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for schedLastFailed");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 19) {
-            schedEntry->schedStorageType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                schedEntry->schedStorageType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for schedStorageType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 20) {
-            schedEntry->schedRowStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                schedEntry->schedRowStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for schedRowStatus");
+            }
         }
     }
 

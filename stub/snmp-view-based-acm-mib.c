@@ -273,14 +273,26 @@ assign_vacmSecurityToGroupEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            vacmSecurityToGroupEntry->_vacmGroupNameLength = vb->syntax_len;
-            vacmSecurityToGroupEntry->vacmGroupName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                vacmSecurityToGroupEntry->_vacmGroupNameLength = vb->syntax_len;
+                vacmSecurityToGroupEntry->vacmGroupName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for vacmGroupName");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            vacmSecurityToGroupEntry->vacmSecurityToGroupStorageType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                vacmSecurityToGroupEntry->vacmSecurityToGroupStorageType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for vacmSecurityToGroupStorageType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            vacmSecurityToGroupEntry->vacmSecurityToGroupStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                vacmSecurityToGroupEntry->vacmSecurityToGroupStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for vacmSecurityToGroupStatus");
+            }
         }
     }
 
@@ -415,25 +427,49 @@ assign_vacmAccessEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            vacmAccessEntry->vacmAccessContextMatch = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                vacmAccessEntry->vacmAccessContextMatch = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for vacmAccessContextMatch");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            vacmAccessEntry->_vacmAccessReadViewNameLength = vb->syntax_len;
-            vacmAccessEntry->vacmAccessReadViewName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                vacmAccessEntry->_vacmAccessReadViewNameLength = vb->syntax_len;
+                vacmAccessEntry->vacmAccessReadViewName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for vacmAccessReadViewName");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            vacmAccessEntry->_vacmAccessWriteViewNameLength = vb->syntax_len;
-            vacmAccessEntry->vacmAccessWriteViewName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                vacmAccessEntry->_vacmAccessWriteViewNameLength = vb->syntax_len;
+                vacmAccessEntry->vacmAccessWriteViewName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for vacmAccessWriteViewName");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            vacmAccessEntry->_vacmAccessNotifyViewNameLength = vb->syntax_len;
-            vacmAccessEntry->vacmAccessNotifyViewName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                vacmAccessEntry->_vacmAccessNotifyViewNameLength = vb->syntax_len;
+                vacmAccessEntry->vacmAccessNotifyViewName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for vacmAccessNotifyViewName");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 8) {
-            vacmAccessEntry->vacmAccessStorageType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                vacmAccessEntry->vacmAccessStorageType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for vacmAccessStorageType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 9) {
-            vacmAccessEntry->vacmAccessStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                vacmAccessEntry->vacmAccessStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for vacmAccessStatus");
+            }
         }
     }
 
@@ -538,7 +574,11 @@ assign_vacmMIBViews(GSList *vbl)
             continue;
         }
         if (vb->id_len > 10 && vb->id[9] == 1) {
-            vacmMIBViews->vacmViewSpinLock = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                vacmMIBViews->vacmViewSpinLock = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for vacmViewSpinLock");
+            }
         }
     }
 
@@ -639,17 +679,33 @@ assign_vacmViewTreeFamilyEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 12 && vb->id[11] == 3) {
-            vacmViewTreeFamilyEntry->_vacmViewTreeFamilyMaskLength = vb->syntax_len;
-            vacmViewTreeFamilyEntry->vacmViewTreeFamilyMask = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                vacmViewTreeFamilyEntry->_vacmViewTreeFamilyMaskLength = vb->syntax_len;
+                vacmViewTreeFamilyEntry->vacmViewTreeFamilyMask = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for vacmViewTreeFamilyMask");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 4) {
-            vacmViewTreeFamilyEntry->vacmViewTreeFamilyType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                vacmViewTreeFamilyEntry->vacmViewTreeFamilyType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for vacmViewTreeFamilyType");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 5) {
-            vacmViewTreeFamilyEntry->vacmViewTreeFamilyStorageType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                vacmViewTreeFamilyEntry->vacmViewTreeFamilyStorageType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for vacmViewTreeFamilyStorageType");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 6) {
-            vacmViewTreeFamilyEntry->vacmViewTreeFamilyStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                vacmViewTreeFamilyEntry->vacmViewTreeFamilyStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for vacmViewTreeFamilyStatus");
+            }
         }
     }
 

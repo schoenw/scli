@@ -186,27 +186,55 @@ assign_hrSystem(GSList *vbl)
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 1) {
-            hrSystem->hrSystemUptime = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                hrSystem->hrSystemUptime = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for hrSystemUptime");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 2) {
-            hrSystem->_hrSystemDateLength = vb->syntax_len;
-            hrSystem->hrSystemDate = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrSystem->_hrSystemDateLength = vb->syntax_len;
+                hrSystem->hrSystemDate = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrSystemDate");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 3) {
-            hrSystem->hrSystemInitialLoadDevice = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrSystem->hrSystemInitialLoadDevice = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrSystemInitialLoadDevice");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 4) {
-            hrSystem->_hrSystemInitialLoadParametersLength = vb->syntax_len;
-            hrSystem->hrSystemInitialLoadParameters = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrSystem->_hrSystemInitialLoadParametersLength = vb->syntax_len;
+                hrSystem->hrSystemInitialLoadParameters = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrSystemInitialLoadParameters");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 5) {
-            hrSystem->hrSystemNumUsers = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_UNSIGNED32) {
+                hrSystem->hrSystemNumUsers = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for hrSystemNumUsers");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 6) {
-            hrSystem->hrSystemProcesses = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_UNSIGNED32) {
+                hrSystem->hrSystemProcesses = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for hrSystemProcesses");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 7) {
-            hrSystem->hrSystemMaxProcesses = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrSystem->hrSystemMaxProcesses = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrSystemMaxProcesses");
+            }
         }
     }
 
@@ -290,7 +318,11 @@ assign_hrStorage(GSList *vbl)
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 2) {
-            hrStorage->hrMemorySize = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrStorage->hrMemorySize = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrMemorySize");
+            }
         }
     }
 
@@ -385,24 +417,48 @@ assign_hrStorageEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            hrStorageEntry->_hrStorageTypeLength = vb->syntax_len / sizeof(guint32);
-            hrStorageEntry->hrStorageType = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                hrStorageEntry->_hrStorageTypeLength = vb->syntax_len / sizeof(guint32);
+                hrStorageEntry->hrStorageType = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for hrStorageType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            hrStorageEntry->_hrStorageDescrLength = vb->syntax_len;
-            hrStorageEntry->hrStorageDescr = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrStorageEntry->_hrStorageDescrLength = vb->syntax_len;
+                hrStorageEntry->hrStorageDescr = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrStorageDescr");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            hrStorageEntry->hrStorageAllocationUnits = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrStorageEntry->hrStorageAllocationUnits = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrStorageAllocationUnits");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            hrStorageEntry->hrStorageSize = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrStorageEntry->hrStorageSize = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrStorageSize");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            hrStorageEntry->hrStorageUsed = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrStorageEntry->hrStorageUsed = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrStorageUsed");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            hrStorageEntry->hrStorageAllocationFailures = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                hrStorageEntry->hrStorageAllocationFailures = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for hrStorageAllocationFailures");
+            }
         }
     }
 
@@ -524,22 +580,42 @@ assign_hrDeviceEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            hrDeviceEntry->_hrDeviceTypeLength = vb->syntax_len / sizeof(guint32);
-            hrDeviceEntry->hrDeviceType = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                hrDeviceEntry->_hrDeviceTypeLength = vb->syntax_len / sizeof(guint32);
+                hrDeviceEntry->hrDeviceType = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for hrDeviceType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            hrDeviceEntry->_hrDeviceDescrLength = vb->syntax_len;
-            hrDeviceEntry->hrDeviceDescr = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrDeviceEntry->_hrDeviceDescrLength = vb->syntax_len;
+                hrDeviceEntry->hrDeviceDescr = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrDeviceDescr");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            hrDeviceEntry->_hrDeviceIDLength = vb->syntax_len / sizeof(guint32);
-            hrDeviceEntry->hrDeviceID = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                hrDeviceEntry->_hrDeviceIDLength = vb->syntax_len / sizeof(guint32);
+                hrDeviceEntry->hrDeviceID = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for hrDeviceID");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            hrDeviceEntry->hrDeviceStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrDeviceEntry->hrDeviceStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrDeviceStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            hrDeviceEntry->hrDeviceErrors = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                hrDeviceEntry->hrDeviceErrors = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for hrDeviceErrors");
+            }
         }
     }
 
@@ -660,11 +736,19 @@ assign_hrProcessorEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 1) {
-            hrProcessorEntry->_hrProcessorFrwIDLength = vb->syntax_len / sizeof(guint32);
-            hrProcessorEntry->hrProcessorFrwID = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                hrProcessorEntry->_hrProcessorFrwIDLength = vb->syntax_len / sizeof(guint32);
+                hrProcessorEntry->hrProcessorFrwID = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for hrProcessorFrwID");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            hrProcessorEntry->hrProcessorLoad = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrProcessorEntry->hrProcessorLoad = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrProcessorLoad");
+            }
         }
     }
 
@@ -782,7 +866,11 @@ assign_hrNetworkEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 1) {
-            hrNetworkEntry->hrNetworkIfIndex = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrNetworkEntry->hrNetworkIfIndex = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrNetworkIfIndex");
+            }
         }
     }
 
@@ -899,11 +987,19 @@ assign_hrPrinterEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 1) {
-            hrPrinterEntry->hrPrinterStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrPrinterEntry->hrPrinterStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrPrinterStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            hrPrinterEntry->_hrPrinterDetectedErrorStateLength = vb->syntax_len;
-            hrPrinterEntry->hrPrinterDetectedErrorState = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrPrinterEntry->_hrPrinterDetectedErrorStateLength = vb->syntax_len;
+                hrPrinterEntry->hrPrinterDetectedErrorState = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrPrinterDetectedErrorState");
+            }
         }
     }
 
@@ -1021,16 +1117,32 @@ assign_hrDiskStorageEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 1) {
-            hrDiskStorageEntry->hrDiskStorageAccess = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrDiskStorageEntry->hrDiskStorageAccess = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrDiskStorageAccess");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            hrDiskStorageEntry->hrDiskStorageMedia = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrDiskStorageEntry->hrDiskStorageMedia = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrDiskStorageMedia");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            hrDiskStorageEntry->hrDiskStorageRemoveble = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrDiskStorageEntry->hrDiskStorageRemoveble = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrDiskStorageRemoveble");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            hrDiskStorageEntry->hrDiskStorageCapacity = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrDiskStorageEntry->hrDiskStorageCapacity = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrDiskStorageCapacity");
+            }
         }
     }
 
@@ -1152,18 +1264,34 @@ assign_hrPartitionEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            hrPartitionEntry->_hrPartitionLabelLength = vb->syntax_len;
-            hrPartitionEntry->hrPartitionLabel = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrPartitionEntry->_hrPartitionLabelLength = vb->syntax_len;
+                hrPartitionEntry->hrPartitionLabel = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrPartitionLabel");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            hrPartitionEntry->_hrPartitionIDLength = vb->syntax_len;
-            hrPartitionEntry->hrPartitionID = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrPartitionEntry->_hrPartitionIDLength = vb->syntax_len;
+                hrPartitionEntry->hrPartitionID = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrPartitionID");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            hrPartitionEntry->hrPartitionSize = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrPartitionEntry->hrPartitionSize = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrPartitionSize");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            hrPartitionEntry->hrPartitionFSIndex = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrPartitionEntry->hrPartitionFSIndex = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrPartitionFSIndex");
+            }
         }
     }
 
@@ -1283,33 +1411,65 @@ assign_hrFSEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            hrFSEntry->_hrFSMountPointLength = vb->syntax_len;
-            hrFSEntry->hrFSMountPoint = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrFSEntry->_hrFSMountPointLength = vb->syntax_len;
+                hrFSEntry->hrFSMountPoint = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrFSMountPoint");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            hrFSEntry->_hrFSRemoteMountPointLength = vb->syntax_len;
-            hrFSEntry->hrFSRemoteMountPoint = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrFSEntry->_hrFSRemoteMountPointLength = vb->syntax_len;
+                hrFSEntry->hrFSRemoteMountPoint = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrFSRemoteMountPoint");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            hrFSEntry->_hrFSTypeLength = vb->syntax_len / sizeof(guint32);
-            hrFSEntry->hrFSType = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                hrFSEntry->_hrFSTypeLength = vb->syntax_len / sizeof(guint32);
+                hrFSEntry->hrFSType = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for hrFSType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            hrFSEntry->hrFSAccess = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrFSEntry->hrFSAccess = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrFSAccess");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            hrFSEntry->hrFSBootable = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrFSEntry->hrFSBootable = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrFSBootable");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            hrFSEntry->hrFSStorageIndex = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrFSEntry->hrFSStorageIndex = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrFSStorageIndex");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 8) {
-            hrFSEntry->_hrFSLastFullBackupDateLength = vb->syntax_len;
-            hrFSEntry->hrFSLastFullBackupDate = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrFSEntry->_hrFSLastFullBackupDateLength = vb->syntax_len;
+                hrFSEntry->hrFSLastFullBackupDate = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrFSLastFullBackupDate");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 9) {
-            hrFSEntry->_hrFSLastPartialBackupDateLength = vb->syntax_len;
-            hrFSEntry->hrFSLastPartialBackupDate = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrFSEntry->_hrFSLastPartialBackupDateLength = vb->syntax_len;
+                hrFSEntry->hrFSLastPartialBackupDate = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrFSLastPartialBackupDate");
+            }
         }
     }
 
@@ -1416,7 +1576,11 @@ assign_hrSWRun(GSList *vbl)
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 1) {
-            hrSWRun->hrSWOSIndex = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrSWRun->hrSWOSIndex = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrSWOSIndex");
+            }
         }
     }
 
@@ -1511,26 +1675,50 @@ assign_hrSWRunEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            hrSWRunEntry->_hrSWRunNameLength = vb->syntax_len;
-            hrSWRunEntry->hrSWRunName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrSWRunEntry->_hrSWRunNameLength = vb->syntax_len;
+                hrSWRunEntry->hrSWRunName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrSWRunName");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            hrSWRunEntry->_hrSWRunIDLength = vb->syntax_len / sizeof(guint32);
-            hrSWRunEntry->hrSWRunID = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                hrSWRunEntry->_hrSWRunIDLength = vb->syntax_len / sizeof(guint32);
+                hrSWRunEntry->hrSWRunID = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for hrSWRunID");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            hrSWRunEntry->_hrSWRunPathLength = vb->syntax_len;
-            hrSWRunEntry->hrSWRunPath = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrSWRunEntry->_hrSWRunPathLength = vb->syntax_len;
+                hrSWRunEntry->hrSWRunPath = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrSWRunPath");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            hrSWRunEntry->_hrSWRunParametersLength = vb->syntax_len;
-            hrSWRunEntry->hrSWRunParameters = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrSWRunEntry->_hrSWRunParametersLength = vb->syntax_len;
+                hrSWRunEntry->hrSWRunParameters = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrSWRunParameters");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            hrSWRunEntry->hrSWRunType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrSWRunEntry->hrSWRunType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrSWRunType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            hrSWRunEntry->hrSWRunStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrSWRunEntry->hrSWRunStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrSWRunStatus");
+            }
         }
     }
 
@@ -1652,10 +1840,18 @@ assign_hrSWRunPerfEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 1) {
-            hrSWRunPerfEntry->hrSWRunPerfCPU = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrSWRunPerfEntry->hrSWRunPerfCPU = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrSWRunPerfCPU");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            hrSWRunPerfEntry->hrSWRunPerfMem = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrSWRunPerfEntry->hrSWRunPerfMem = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrSWRunPerfMem");
+            }
         }
     }
 
@@ -1756,10 +1952,18 @@ assign_hrSWInstalled(GSList *vbl)
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 1) {
-            hrSWInstalled->hrSWInstalledLastChange = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                hrSWInstalled->hrSWInstalledLastChange = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for hrSWInstalledLastChange");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 2) {
-            hrSWInstalled->hrSWInstalledLastUpdateTime = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                hrSWInstalled->hrSWInstalledLastUpdateTime = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for hrSWInstalledLastUpdateTime");
+            }
         }
     }
 
@@ -1855,19 +2059,35 @@ assign_hrSWInstalledEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            hrSWInstalledEntry->_hrSWInstalledNameLength = vb->syntax_len;
-            hrSWInstalledEntry->hrSWInstalledName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrSWInstalledEntry->_hrSWInstalledNameLength = vb->syntax_len;
+                hrSWInstalledEntry->hrSWInstalledName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrSWInstalledName");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            hrSWInstalledEntry->_hrSWInstalledIDLength = vb->syntax_len / sizeof(guint32);
-            hrSWInstalledEntry->hrSWInstalledID = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                hrSWInstalledEntry->_hrSWInstalledIDLength = vb->syntax_len / sizeof(guint32);
+                hrSWInstalledEntry->hrSWInstalledID = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for hrSWInstalledID");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            hrSWInstalledEntry->hrSWInstalledType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                hrSWInstalledEntry->hrSWInstalledType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for hrSWInstalledType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            hrSWInstalledEntry->_hrSWInstalledDateLength = vb->syntax_len;
-            hrSWInstalledEntry->hrSWInstalledDate = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                hrSWInstalledEntry->_hrSWInstalledDateLength = vb->syntax_len;
+                hrSWInstalledEntry->hrSWInstalledDate = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for hrSWInstalledDate");
+            }
         }
     }
 

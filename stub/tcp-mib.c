@@ -78,46 +78,102 @@ assign_tcp(GSList *vbl)
             continue;
         }
         if (vb->id_len > 8 && vb->id[7] == 1) {
-            tcp->tcpRtoAlgorithm = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                tcp->tcpRtoAlgorithm = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for tcpRtoAlgorithm");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 2) {
-            tcp->tcpRtoMin = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                tcp->tcpRtoMin = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for tcpRtoMin");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 3) {
-            tcp->tcpRtoMax = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                tcp->tcpRtoMax = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for tcpRtoMax");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 4) {
-            tcp->tcpMaxConn = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                tcp->tcpMaxConn = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for tcpMaxConn");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 5) {
-            tcp->tcpActiveOpens = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                tcp->tcpActiveOpens = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for tcpActiveOpens");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 6) {
-            tcp->tcpPassiveOpens = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                tcp->tcpPassiveOpens = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for tcpPassiveOpens");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 7) {
-            tcp->tcpAttemptFails = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                tcp->tcpAttemptFails = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for tcpAttemptFails");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 8) {
-            tcp->tcpEstabResets = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                tcp->tcpEstabResets = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for tcpEstabResets");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 9) {
-            tcp->tcpCurrEstab = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_UNSIGNED32) {
+                tcp->tcpCurrEstab = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for tcpCurrEstab");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 10) {
-            tcp->tcpInSegs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                tcp->tcpInSegs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for tcpInSegs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 11) {
-            tcp->tcpOutSegs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                tcp->tcpOutSegs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for tcpOutSegs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 12) {
-            tcp->tcpRetransSegs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                tcp->tcpRetransSegs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for tcpRetransSegs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 14) {
-            tcp->tcpInErrs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                tcp->tcpInErrs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for tcpInErrs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 15) {
-            tcp->tcpOutRsts = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                tcp->tcpOutRsts = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for tcpOutRsts");
+            }
         }
     }
 
@@ -237,7 +293,11 @@ assign_tcpConnEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 10 && vb->id[9] == 1) {
-            tcpConnEntry->tcpConnState = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                tcpConnEntry->tcpConnState = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for tcpConnState");
+            }
         }
     }
 

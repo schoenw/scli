@@ -55,17 +55,33 @@ assign_snmpEngine(GSList *vbl)
             continue;
         }
         if (vb->id_len > 10 && vb->id[9] == 1) {
-            snmpEngine->_snmpEngineIDLength = vb->syntax_len;
-            snmpEngine->snmpEngineID = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                snmpEngine->_snmpEngineIDLength = vb->syntax_len;
+                snmpEngine->snmpEngineID = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for snmpEngineID");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 2) {
-            snmpEngine->snmpEngineBoots = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpEngine->snmpEngineBoots = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpEngineBoots");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 3) {
-            snmpEngine->snmpEngineTime = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpEngine->snmpEngineTime = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpEngineTime");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 4) {
-            snmpEngine->snmpEngineMaxMessageSize = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpEngine->snmpEngineMaxMessageSize = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpEngineMaxMessageSize");
+            }
         }
     }
 

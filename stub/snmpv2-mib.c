@@ -60,33 +60,65 @@ assign_system(GSList *vbl)
             continue;
         }
         if (vb->id_len > 8 && vb->id[7] == 1) {
-            system->_sysDescrLength = vb->syntax_len;
-            system->sysDescr = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                system->_sysDescrLength = vb->syntax_len;
+                system->sysDescr = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for sysDescr");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 2) {
-            system->_sysObjectIDLength = vb->syntax_len / sizeof(guint32);
-            system->sysObjectID = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                system->_sysObjectIDLength = vb->syntax_len / sizeof(guint32);
+                system->sysObjectID = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for sysObjectID");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 3) {
-            system->sysUpTime = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                system->sysUpTime = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for sysUpTime");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 4) {
-            system->_sysContactLength = vb->syntax_len;
-            system->sysContact = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                system->_sysContactLength = vb->syntax_len;
+                system->sysContact = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for sysContact");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 5) {
-            system->_sysNameLength = vb->syntax_len;
-            system->sysName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                system->_sysNameLength = vb->syntax_len;
+                system->sysName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for sysName");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 6) {
-            system->_sysLocationLength = vb->syntax_len;
-            system->sysLocation = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                system->_sysLocationLength = vb->syntax_len;
+                system->sysLocation = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for sysLocation");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 7) {
-            system->sysServices = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                system->sysServices = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for sysServices");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 8) {
-            system->sysORLastChange = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                system->sysORLastChange = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for sysORLastChange");
+            }
         }
     }
 
@@ -188,15 +220,27 @@ assign_sysOREntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 10 && vb->id[9] == 2) {
-            sysOREntry->_sysORIDLength = vb->syntax_len / sizeof(guint32);
-            sysOREntry->sysORID = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                sysOREntry->_sysORIDLength = vb->syntax_len / sizeof(guint32);
+                sysOREntry->sysORID = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for sysORID");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 3) {
-            sysOREntry->_sysORDescrLength = vb->syntax_len;
-            sysOREntry->sysORDescr = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                sysOREntry->_sysORDescrLength = vb->syntax_len;
+                sysOREntry->sysORDescr = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for sysORDescr");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 4) {
-            sysOREntry->sysORUpTime = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                sysOREntry->sysORUpTime = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for sysORUpTime");
+            }
         }
     }
 
@@ -298,94 +342,214 @@ assign_snmp(GSList *vbl)
             continue;
         }
         if (vb->id_len > 8 && vb->id[7] == 1) {
-            snmp->snmpInPkts = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInPkts = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInPkts");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 2) {
-            snmp->snmpOutPkts = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpOutPkts = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpOutPkts");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 3) {
-            snmp->snmpInBadVersions = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInBadVersions = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInBadVersions");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 4) {
-            snmp->snmpInBadCommunityNames = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInBadCommunityNames = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInBadCommunityNames");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 5) {
-            snmp->snmpInBadCommunityUses = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInBadCommunityUses = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInBadCommunityUses");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 6) {
-            snmp->snmpInASNParseErrs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInASNParseErrs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInASNParseErrs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 8) {
-            snmp->snmpInTooBigs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInTooBigs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInTooBigs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 9) {
-            snmp->snmpInNoSuchNames = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInNoSuchNames = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInNoSuchNames");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 10) {
-            snmp->snmpInBadValues = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInBadValues = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInBadValues");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 11) {
-            snmp->snmpInReadOnlys = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInReadOnlys = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInReadOnlys");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 12) {
-            snmp->snmpInGenErrs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInGenErrs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInGenErrs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 13) {
-            snmp->snmpInTotalReqVars = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInTotalReqVars = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInTotalReqVars");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 14) {
-            snmp->snmpInTotalSetVars = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInTotalSetVars = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInTotalSetVars");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 15) {
-            snmp->snmpInGetRequests = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInGetRequests = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInGetRequests");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 16) {
-            snmp->snmpInGetNexts = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInGetNexts = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInGetNexts");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 17) {
-            snmp->snmpInSetRequests = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInSetRequests = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInSetRequests");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 18) {
-            snmp->snmpInGetResponses = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInGetResponses = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInGetResponses");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 19) {
-            snmp->snmpInTraps = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpInTraps = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInTraps");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 20) {
-            snmp->snmpOutTooBigs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpOutTooBigs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpOutTooBigs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 21) {
-            snmp->snmpOutNoSuchNames = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpOutNoSuchNames = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpOutNoSuchNames");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 22) {
-            snmp->snmpOutBadValues = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpOutBadValues = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpOutBadValues");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 24) {
-            snmp->snmpOutGenErrs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpOutGenErrs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpOutGenErrs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 25) {
-            snmp->snmpOutGetRequests = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpOutGetRequests = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpOutGetRequests");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 26) {
-            snmp->snmpOutGetNexts = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpOutGetNexts = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpOutGetNexts");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 27) {
-            snmp->snmpOutSetRequests = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpOutSetRequests = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpOutSetRequests");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 28) {
-            snmp->snmpOutGetResponses = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpOutGetResponses = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpOutGetResponses");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 29) {
-            snmp->snmpOutTraps = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpOutTraps = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpOutTraps");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 30) {
-            snmp->snmpEnableAuthenTraps = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmp->snmpEnableAuthenTraps = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpEnableAuthenTraps");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 31) {
-            snmp->snmpSilentDrops = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpSilentDrops = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpSilentDrops");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 32) {
-            snmp->snmpProxyDrops = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmp->snmpProxyDrops = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpProxyDrops");
+            }
         }
     }
 
@@ -492,7 +656,11 @@ assign_snmpSet(GSList *vbl)
             continue;
         }
         if (vb->id_len > 10 && vb->id[9] == 1) {
-            snmpSet->snmpSetSerialNo = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpSet->snmpSetSerialNo = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpSetSerialNo");
+            }
         }
     }
 

@@ -74,22 +74,46 @@ assign_usmStats(GSList *vbl)
             continue;
         }
         if (vb->id_len > 10 && vb->id[9] == 1) {
-            usmStats->usmStatsUnsupportedSecLevels = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                usmStats->usmStatsUnsupportedSecLevels = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for usmStatsUnsupportedSecLevels");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 2) {
-            usmStats->usmStatsNotInTimeWindows = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                usmStats->usmStatsNotInTimeWindows = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for usmStatsNotInTimeWindows");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 3) {
-            usmStats->usmStatsUnknownUserNames = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                usmStats->usmStatsUnknownUserNames = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for usmStatsUnknownUserNames");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 4) {
-            usmStats->usmStatsUnknownEngineIDs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                usmStats->usmStatsUnknownEngineIDs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for usmStatsUnknownEngineIDs");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 5) {
-            usmStats->usmStatsWrongDigests = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                usmStats->usmStatsWrongDigests = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for usmStatsWrongDigests");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 6) {
-            usmStats->usmStatsDecryptionErrors = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                usmStats->usmStatsDecryptionErrors = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for usmStatsDecryptionErrors");
+            }
         }
     }
 
@@ -172,7 +196,11 @@ assign_usmUser(GSList *vbl)
             continue;
         }
         if (vb->id_len > 10 && vb->id[9] == 1) {
-            usmUser->usmUserSpinLock = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                usmUser->usmUserSpinLock = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for usmUserSpinLock");
+            }
         }
     }
 
@@ -279,46 +307,90 @@ assign_usmUserEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 12 && vb->id[11] == 3) {
-            usmUserEntry->_usmUserSecurityNameLength = vb->syntax_len;
-            usmUserEntry->usmUserSecurityName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                usmUserEntry->_usmUserSecurityNameLength = vb->syntax_len;
+                usmUserEntry->usmUserSecurityName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for usmUserSecurityName");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 4) {
-            usmUserEntry->_usmUserCloneFromLength = vb->syntax_len / sizeof(guint32);
-            usmUserEntry->usmUserCloneFrom = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                usmUserEntry->_usmUserCloneFromLength = vb->syntax_len / sizeof(guint32);
+                usmUserEntry->usmUserCloneFrom = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for usmUserCloneFrom");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 5) {
-            usmUserEntry->_usmUserAuthProtocolLength = vb->syntax_len / sizeof(guint32);
-            usmUserEntry->usmUserAuthProtocol = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                usmUserEntry->_usmUserAuthProtocolLength = vb->syntax_len / sizeof(guint32);
+                usmUserEntry->usmUserAuthProtocol = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for usmUserAuthProtocol");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 6) {
-            usmUserEntry->_usmUserAuthKeyChangeLength = vb->syntax_len;
-            usmUserEntry->usmUserAuthKeyChange = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                usmUserEntry->_usmUserAuthKeyChangeLength = vb->syntax_len;
+                usmUserEntry->usmUserAuthKeyChange = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for usmUserAuthKeyChange");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 7) {
-            usmUserEntry->_usmUserOwnAuthKeyChangeLength = vb->syntax_len;
-            usmUserEntry->usmUserOwnAuthKeyChange = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                usmUserEntry->_usmUserOwnAuthKeyChangeLength = vb->syntax_len;
+                usmUserEntry->usmUserOwnAuthKeyChange = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for usmUserOwnAuthKeyChange");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 8) {
-            usmUserEntry->_usmUserPrivProtocolLength = vb->syntax_len / sizeof(guint32);
-            usmUserEntry->usmUserPrivProtocol = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                usmUserEntry->_usmUserPrivProtocolLength = vb->syntax_len / sizeof(guint32);
+                usmUserEntry->usmUserPrivProtocol = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for usmUserPrivProtocol");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 9) {
-            usmUserEntry->_usmUserPrivKeyChangeLength = vb->syntax_len;
-            usmUserEntry->usmUserPrivKeyChange = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                usmUserEntry->_usmUserPrivKeyChangeLength = vb->syntax_len;
+                usmUserEntry->usmUserPrivKeyChange = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for usmUserPrivKeyChange");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 10) {
-            usmUserEntry->_usmUserOwnPrivKeyChangeLength = vb->syntax_len;
-            usmUserEntry->usmUserOwnPrivKeyChange = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                usmUserEntry->_usmUserOwnPrivKeyChangeLength = vb->syntax_len;
+                usmUserEntry->usmUserOwnPrivKeyChange = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for usmUserOwnPrivKeyChange");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 11) {
-            usmUserEntry->_usmUserPublicLength = vb->syntax_len;
-            usmUserEntry->usmUserPublic = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                usmUserEntry->_usmUserPublicLength = vb->syntax_len;
+                usmUserEntry->usmUserPublic = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for usmUserPublic");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 12) {
-            usmUserEntry->usmUserStorageType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                usmUserEntry->usmUserStorageType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for usmUserStorageType");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 13) {
-            usmUserEntry->usmUserStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                usmUserEntry->usmUserStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for usmUserStatus");
+            }
         }
     }
 

@@ -111,22 +111,46 @@ assign_tunnelIfEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 13 && vb->id[12] == 1) {
-            tunnelIfEntry->tunnelIfLocalAddress = vb->syntax.uc;
+            if (vb->type == G_SNMP_IPADDRESS) {
+                tunnelIfEntry->tunnelIfLocalAddress = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for tunnelIfLocalAddress");
+            }
         }
         if (vb->id_len > 13 && vb->id[12] == 2) {
-            tunnelIfEntry->tunnelIfRemoteAddress = vb->syntax.uc;
+            if (vb->type == G_SNMP_IPADDRESS) {
+                tunnelIfEntry->tunnelIfRemoteAddress = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for tunnelIfRemoteAddress");
+            }
         }
         if (vb->id_len > 13 && vb->id[12] == 3) {
-            tunnelIfEntry->tunnelIfEncapsMethod = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                tunnelIfEntry->tunnelIfEncapsMethod = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for tunnelIfEncapsMethod");
+            }
         }
         if (vb->id_len > 13 && vb->id[12] == 4) {
-            tunnelIfEntry->tunnelIfHopLimit = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                tunnelIfEntry->tunnelIfHopLimit = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for tunnelIfHopLimit");
+            }
         }
         if (vb->id_len > 13 && vb->id[12] == 5) {
-            tunnelIfEntry->tunnelIfSecurity = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                tunnelIfEntry->tunnelIfSecurity = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for tunnelIfSecurity");
+            }
         }
         if (vb->id_len > 13 && vb->id[12] == 6) {
-            tunnelIfEntry->tunnelIfTOS = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                tunnelIfEntry->tunnelIfTOS = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for tunnelIfTOS");
+            }
         }
     }
 
@@ -260,10 +284,18 @@ assign_tunnelConfigEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 13 && vb->id[12] == 5) {
-            tunnelConfigEntry->tunnelConfigIfIndex = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                tunnelConfigEntry->tunnelConfigIfIndex = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for tunnelConfigIfIndex");
+            }
         }
         if (vb->id_len > 13 && vb->id[12] == 6) {
-            tunnelConfigEntry->tunnelConfigStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                tunnelConfigEntry->tunnelConfigStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for tunnelConfigStatus");
+            }
         }
     }
 

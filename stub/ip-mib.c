@@ -69,64 +69,144 @@ assign_ip(GSList *vbl)
             continue;
         }
         if (vb->id_len > 8 && vb->id[7] == 1) {
-            ip->ipForwarding = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                ip->ipForwarding = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for ipForwarding");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 2) {
-            ip->ipDefaultTTL = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                ip->ipDefaultTTL = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for ipDefaultTTL");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 3) {
-            ip->ipInReceives = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipInReceives = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipInReceives");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 4) {
-            ip->ipInHdrErrors = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipInHdrErrors = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipInHdrErrors");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 5) {
-            ip->ipInAddrErrors = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipInAddrErrors = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipInAddrErrors");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 6) {
-            ip->ipForwDatagrams = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipForwDatagrams = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipForwDatagrams");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 7) {
-            ip->ipInUnknownProtos = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipInUnknownProtos = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipInUnknownProtos");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 8) {
-            ip->ipInDiscards = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipInDiscards = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipInDiscards");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 9) {
-            ip->ipInDelivers = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipInDelivers = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipInDelivers");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 10) {
-            ip->ipOutRequests = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipOutRequests = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipOutRequests");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 11) {
-            ip->ipOutDiscards = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipOutDiscards = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipOutDiscards");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 12) {
-            ip->ipOutNoRoutes = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipOutNoRoutes = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipOutNoRoutes");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 13) {
-            ip->ipReasmTimeout = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                ip->ipReasmTimeout = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for ipReasmTimeout");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 14) {
-            ip->ipReasmReqds = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipReasmReqds = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipReasmReqds");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 15) {
-            ip->ipReasmOKs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipReasmOKs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipReasmOKs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 16) {
-            ip->ipReasmFails = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipReasmFails = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipReasmFails");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 17) {
-            ip->ipFragOKs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipFragOKs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipFragOKs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 18) {
-            ip->ipFragFails = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipFragFails = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipFragFails");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 19) {
-            ip->ipFragCreates = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipFragCreates = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipFragCreates");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 23) {
-            ip->ipRoutingDiscards = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                ip->ipRoutingDiscards = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for ipRoutingDiscards");
+            }
         }
     }
 
@@ -243,16 +323,32 @@ assign_ipAddrEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 10 && vb->id[9] == 2) {
-            ipAddrEntry->ipAdEntIfIndex = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                ipAddrEntry->ipAdEntIfIndex = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for ipAdEntIfIndex");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 3) {
-            ipAddrEntry->ipAdEntNetMask = vb->syntax.uc;
+            if (vb->type == G_SNMP_IPADDRESS) {
+                ipAddrEntry->ipAdEntNetMask = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for ipAdEntNetMask");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 4) {
-            ipAddrEntry->ipAdEntBcastAddr = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                ipAddrEntry->ipAdEntBcastAddr = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for ipAdEntBcastAddr");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 5) {
-            ipAddrEntry->ipAdEntReasmMaxSize = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                ipAddrEntry->ipAdEntReasmMaxSize = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for ipAdEntReasmMaxSize");
+            }
         }
     }
 
@@ -377,11 +473,19 @@ assign_ipNetToMediaEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 10 && vb->id[9] == 2) {
-            ipNetToMediaEntry->_ipNetToMediaPhysAddressLength = vb->syntax_len;
-            ipNetToMediaEntry->ipNetToMediaPhysAddress = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                ipNetToMediaEntry->_ipNetToMediaPhysAddressLength = vb->syntax_len;
+                ipNetToMediaEntry->ipNetToMediaPhysAddress = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for ipNetToMediaPhysAddress");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 4) {
-            ipNetToMediaEntry->ipNetToMediaType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                ipNetToMediaEntry->ipNetToMediaType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for ipNetToMediaType");
+            }
         }
     }
 
@@ -482,82 +586,186 @@ assign_icmp(GSList *vbl)
             continue;
         }
         if (vb->id_len > 8 && vb->id[7] == 1) {
-            icmp->icmpInMsgs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInMsgs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInMsgs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 2) {
-            icmp->icmpInErrors = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInErrors = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInErrors");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 3) {
-            icmp->icmpInDestUnreachs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInDestUnreachs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInDestUnreachs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 4) {
-            icmp->icmpInTimeExcds = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInTimeExcds = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInTimeExcds");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 5) {
-            icmp->icmpInParmProbs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInParmProbs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInParmProbs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 6) {
-            icmp->icmpInSrcQuenchs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInSrcQuenchs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInSrcQuenchs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 7) {
-            icmp->icmpInRedirects = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInRedirects = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInRedirects");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 8) {
-            icmp->icmpInEchos = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInEchos = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInEchos");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 9) {
-            icmp->icmpInEchoReps = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInEchoReps = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInEchoReps");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 10) {
-            icmp->icmpInTimestamps = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInTimestamps = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInTimestamps");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 11) {
-            icmp->icmpInTimestampReps = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInTimestampReps = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInTimestampReps");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 12) {
-            icmp->icmpInAddrMasks = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInAddrMasks = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInAddrMasks");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 13) {
-            icmp->icmpInAddrMaskReps = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpInAddrMaskReps = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpInAddrMaskReps");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 14) {
-            icmp->icmpOutMsgs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutMsgs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutMsgs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 15) {
-            icmp->icmpOutErrors = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutErrors = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutErrors");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 16) {
-            icmp->icmpOutDestUnreachs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutDestUnreachs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutDestUnreachs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 17) {
-            icmp->icmpOutTimeExcds = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutTimeExcds = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutTimeExcds");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 18) {
-            icmp->icmpOutParmProbs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutParmProbs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutParmProbs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 19) {
-            icmp->icmpOutSrcQuenchs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutSrcQuenchs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutSrcQuenchs");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 20) {
-            icmp->icmpOutRedirects = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutRedirects = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutRedirects");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 21) {
-            icmp->icmpOutEchos = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutEchos = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutEchos");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 22) {
-            icmp->icmpOutEchoReps = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutEchoReps = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutEchoReps");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 23) {
-            icmp->icmpOutTimestamps = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutTimestamps = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutTimestamps");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 24) {
-            icmp->icmpOutTimestampReps = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutTimestampReps = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutTimestampReps");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 25) {
-            icmp->icmpOutAddrMasks = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutAddrMasks = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutAddrMasks");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 26) {
-            icmp->icmpOutAddrMaskReps = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                icmp->icmpOutAddrMaskReps = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for icmpOutAddrMaskReps");
+            }
         }
     }
 

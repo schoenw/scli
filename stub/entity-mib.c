@@ -95,60 +95,120 @@ assign_entPhysicalEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 12 && vb->id[11] == 2) {
-            entPhysicalEntry->_entPhysicalDescrLength = vb->syntax_len;
-            entPhysicalEntry->entPhysicalDescr = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entPhysicalEntry->_entPhysicalDescrLength = vb->syntax_len;
+                entPhysicalEntry->entPhysicalDescr = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entPhysicalDescr");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 3) {
-            entPhysicalEntry->_entPhysicalVendorTypeLength = vb->syntax_len / sizeof(guint32);
-            entPhysicalEntry->entPhysicalVendorType = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                entPhysicalEntry->_entPhysicalVendorTypeLength = vb->syntax_len / sizeof(guint32);
+                entPhysicalEntry->entPhysicalVendorType = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for entPhysicalVendorType");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 4) {
-            entPhysicalEntry->entPhysicalContainedIn = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                entPhysicalEntry->entPhysicalContainedIn = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for entPhysicalContainedIn");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 5) {
-            entPhysicalEntry->entPhysicalClass = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                entPhysicalEntry->entPhysicalClass = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for entPhysicalClass");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 6) {
-            entPhysicalEntry->entPhysicalParentRelPos = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                entPhysicalEntry->entPhysicalParentRelPos = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for entPhysicalParentRelPos");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 7) {
-            entPhysicalEntry->_entPhysicalNameLength = vb->syntax_len;
-            entPhysicalEntry->entPhysicalName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entPhysicalEntry->_entPhysicalNameLength = vb->syntax_len;
+                entPhysicalEntry->entPhysicalName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entPhysicalName");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 8) {
-            entPhysicalEntry->_entPhysicalHardwareRevLength = vb->syntax_len;
-            entPhysicalEntry->entPhysicalHardwareRev = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entPhysicalEntry->_entPhysicalHardwareRevLength = vb->syntax_len;
+                entPhysicalEntry->entPhysicalHardwareRev = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entPhysicalHardwareRev");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 9) {
-            entPhysicalEntry->_entPhysicalFirmwareRevLength = vb->syntax_len;
-            entPhysicalEntry->entPhysicalFirmwareRev = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entPhysicalEntry->_entPhysicalFirmwareRevLength = vb->syntax_len;
+                entPhysicalEntry->entPhysicalFirmwareRev = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entPhysicalFirmwareRev");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 10) {
-            entPhysicalEntry->_entPhysicalSoftwareRevLength = vb->syntax_len;
-            entPhysicalEntry->entPhysicalSoftwareRev = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entPhysicalEntry->_entPhysicalSoftwareRevLength = vb->syntax_len;
+                entPhysicalEntry->entPhysicalSoftwareRev = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entPhysicalSoftwareRev");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 11) {
-            entPhysicalEntry->_entPhysicalSerialNumLength = vb->syntax_len;
-            entPhysicalEntry->entPhysicalSerialNum = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entPhysicalEntry->_entPhysicalSerialNumLength = vb->syntax_len;
+                entPhysicalEntry->entPhysicalSerialNum = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entPhysicalSerialNum");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 12) {
-            entPhysicalEntry->_entPhysicalMfgNameLength = vb->syntax_len;
-            entPhysicalEntry->entPhysicalMfgName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entPhysicalEntry->_entPhysicalMfgNameLength = vb->syntax_len;
+                entPhysicalEntry->entPhysicalMfgName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entPhysicalMfgName");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 13) {
-            entPhysicalEntry->_entPhysicalModelNameLength = vb->syntax_len;
-            entPhysicalEntry->entPhysicalModelName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entPhysicalEntry->_entPhysicalModelNameLength = vb->syntax_len;
+                entPhysicalEntry->entPhysicalModelName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entPhysicalModelName");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 14) {
-            entPhysicalEntry->_entPhysicalAliasLength = vb->syntax_len;
-            entPhysicalEntry->entPhysicalAlias = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entPhysicalEntry->_entPhysicalAliasLength = vb->syntax_len;
+                entPhysicalEntry->entPhysicalAlias = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entPhysicalAlias");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 15) {
-            entPhysicalEntry->_entPhysicalAssetIDLength = vb->syntax_len;
-            entPhysicalEntry->entPhysicalAssetID = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entPhysicalEntry->_entPhysicalAssetIDLength = vb->syntax_len;
+                entPhysicalEntry->entPhysicalAssetID = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entPhysicalAssetID");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 16) {
-            entPhysicalEntry->entPhysicalIsFRU = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                entPhysicalEntry->entPhysicalIsFRU = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for entPhysicalIsFRU");
+            }
         }
     }
 
@@ -279,32 +339,60 @@ assign_entLogicalEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 12 && vb->id[11] == 2) {
-            entLogicalEntry->_entLogicalDescrLength = vb->syntax_len;
-            entLogicalEntry->entLogicalDescr = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entLogicalEntry->_entLogicalDescrLength = vb->syntax_len;
+                entLogicalEntry->entLogicalDescr = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entLogicalDescr");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 3) {
-            entLogicalEntry->_entLogicalTypeLength = vb->syntax_len / sizeof(guint32);
-            entLogicalEntry->entLogicalType = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                entLogicalEntry->_entLogicalTypeLength = vb->syntax_len / sizeof(guint32);
+                entLogicalEntry->entLogicalType = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for entLogicalType");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 4) {
-            entLogicalEntry->_entLogicalCommunityLength = vb->syntax_len;
-            entLogicalEntry->entLogicalCommunity = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entLogicalEntry->_entLogicalCommunityLength = vb->syntax_len;
+                entLogicalEntry->entLogicalCommunity = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entLogicalCommunity");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 5) {
-            entLogicalEntry->_entLogicalTAddressLength = vb->syntax_len;
-            entLogicalEntry->entLogicalTAddress = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entLogicalEntry->_entLogicalTAddressLength = vb->syntax_len;
+                entLogicalEntry->entLogicalTAddress = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entLogicalTAddress");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 6) {
-            entLogicalEntry->_entLogicalTDomainLength = vb->syntax_len / sizeof(guint32);
-            entLogicalEntry->entLogicalTDomain = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                entLogicalEntry->_entLogicalTDomainLength = vb->syntax_len / sizeof(guint32);
+                entLogicalEntry->entLogicalTDomain = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for entLogicalTDomain");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 7) {
-            entLogicalEntry->_entLogicalContextEngineIDLength = vb->syntax_len;
-            entLogicalEntry->entLogicalContextEngineID = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entLogicalEntry->_entLogicalContextEngineIDLength = vb->syntax_len;
+                entLogicalEntry->entLogicalContextEngineID = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entLogicalContextEngineID");
+            }
         }
         if (vb->id_len > 12 && vb->id[11] == 8) {
-            entLogicalEntry->_entLogicalContextNameLength = vb->syntax_len;
-            entLogicalEntry->entLogicalContextName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                entLogicalEntry->_entLogicalContextNameLength = vb->syntax_len;
+                entLogicalEntry->entLogicalContextName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for entLogicalContextName");
+            }
         }
     }
 
@@ -544,8 +632,12 @@ assign_entAliasMappingEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 12 && vb->id[11] == 2) {
-            entAliasMappingEntry->_entAliasMappingIdentifierLength = vb->syntax_len / sizeof(guint32);
-            entAliasMappingEntry->entAliasMappingIdentifier = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                entAliasMappingEntry->_entAliasMappingIdentifierLength = vb->syntax_len / sizeof(guint32);
+                entAliasMappingEntry->entAliasMappingIdentifier = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for entAliasMappingIdentifier");
+            }
         }
     }
 
@@ -760,7 +852,11 @@ assign_entityGeneral(GSList *vbl)
             continue;
         }
         if (vb->id_len > 10 && vb->id[9] == 1) {
-            entityGeneral->entLastChangeTime = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                entityGeneral->entLastChangeTime = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for entLastChangeTime");
+            }
         }
     }
 

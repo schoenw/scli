@@ -292,13 +292,25 @@ assign_atmMIBObjects(GSList *vbl)
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 8) {
-            atmMIBObjects->atmVpCrossConnectIndexNext = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmMIBObjects->atmVpCrossConnectIndexNext = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVpCrossConnectIndexNext");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 10) {
-            atmMIBObjects->atmVcCrossConnectIndexNext = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmMIBObjects->atmVcCrossConnectIndexNext = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVcCrossConnectIndexNext");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 13) {
-            atmMIBObjects->atmTrafficDescrParamIndexNext = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmMIBObjects->atmTrafficDescrParamIndexNext = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmTrafficDescrParamIndexNext");
+            }
         }
     }
 
@@ -395,52 +407,112 @@ assign_atmInterfaceConfEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 1) {
-            atmInterfaceConfEntry->atmInterfaceMaxVpcs = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceConfEntry->atmInterfaceMaxVpcs = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceMaxVpcs");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            atmInterfaceConfEntry->atmInterfaceMaxVccs = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceConfEntry->atmInterfaceMaxVccs = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceMaxVccs");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            atmInterfaceConfEntry->atmInterfaceConfVpcs = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceConfEntry->atmInterfaceConfVpcs = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceConfVpcs");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            atmInterfaceConfEntry->atmInterfaceConfVccs = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceConfEntry->atmInterfaceConfVccs = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceConfVccs");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            atmInterfaceConfEntry->atmInterfaceMaxActiveVpiBits = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceConfEntry->atmInterfaceMaxActiveVpiBits = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceMaxActiveVpiBits");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            atmInterfaceConfEntry->atmInterfaceMaxActiveVciBits = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceConfEntry->atmInterfaceMaxActiveVciBits = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceMaxActiveVciBits");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            atmInterfaceConfEntry->atmInterfaceIlmiVpi = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceConfEntry->atmInterfaceIlmiVpi = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceIlmiVpi");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 8) {
-            atmInterfaceConfEntry->atmInterfaceIlmiVci = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceConfEntry->atmInterfaceIlmiVci = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceIlmiVci");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 9) {
-            atmInterfaceConfEntry->atmInterfaceAddressType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceConfEntry->atmInterfaceAddressType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceAddressType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 10) {
-            atmInterfaceConfEntry->_atmInterfaceAdminAddressLength = vb->syntax_len;
-            atmInterfaceConfEntry->atmInterfaceAdminAddress = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                atmInterfaceConfEntry->_atmInterfaceAdminAddressLength = vb->syntax_len;
+                atmInterfaceConfEntry->atmInterfaceAdminAddress = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for atmInterfaceAdminAddress");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 11) {
-            atmInterfaceConfEntry->atmInterfaceMyNeighborIpAddress = vb->syntax.uc;
+            if (vb->type == G_SNMP_IPADDRESS) {
+                atmInterfaceConfEntry->atmInterfaceMyNeighborIpAddress = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for atmInterfaceMyNeighborIpAddress");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 12) {
-            atmInterfaceConfEntry->_atmInterfaceMyNeighborIfNameLength = vb->syntax_len;
-            atmInterfaceConfEntry->atmInterfaceMyNeighborIfName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                atmInterfaceConfEntry->_atmInterfaceMyNeighborIfNameLength = vb->syntax_len;
+                atmInterfaceConfEntry->atmInterfaceMyNeighborIfName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for atmInterfaceMyNeighborIfName");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 13) {
-            atmInterfaceConfEntry->atmInterfaceCurrentMaxVpiBits = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceConfEntry->atmInterfaceCurrentMaxVpiBits = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceCurrentMaxVpiBits");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 14) {
-            atmInterfaceConfEntry->atmInterfaceCurrentMaxVciBits = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceConfEntry->atmInterfaceCurrentMaxVciBits = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceCurrentMaxVciBits");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 15) {
-            atmInterfaceConfEntry->_atmInterfaceSubscrAddressLength = vb->syntax_len;
-            atmInterfaceConfEntry->atmInterfaceSubscrAddress = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                atmInterfaceConfEntry->_atmInterfaceSubscrAddressLength = vb->syntax_len;
+                atmInterfaceConfEntry->atmInterfaceSubscrAddress = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for atmInterfaceSubscrAddress");
+            }
         }
     }
 
@@ -571,13 +643,25 @@ assign_atmInterfaceDs3PlcpEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 1) {
-            atmInterfaceDs3PlcpEntry->atmInterfaceDs3PlcpSEFSs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                atmInterfaceDs3PlcpEntry->atmInterfaceDs3PlcpSEFSs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceDs3PlcpSEFSs");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            atmInterfaceDs3PlcpEntry->atmInterfaceDs3PlcpAlarmState = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceDs3PlcpEntry->atmInterfaceDs3PlcpAlarmState = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceDs3PlcpAlarmState");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            atmInterfaceDs3PlcpEntry->atmInterfaceDs3PlcpUASs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                atmInterfaceDs3PlcpEntry->atmInterfaceDs3PlcpUASs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceDs3PlcpUASs");
+            }
         }
     }
 
@@ -696,10 +780,18 @@ assign_atmInterfaceTCEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 1) {
-            atmInterfaceTCEntry->atmInterfaceOCDEvents = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                atmInterfaceTCEntry->atmInterfaceOCDEvents = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceOCDEvents");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            atmInterfaceTCEntry->atmInterfaceTCAlarmState = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmInterfaceTCEntry->atmInterfaceTCAlarmState = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmInterfaceTCAlarmState");
+            }
         }
     }
 
@@ -817,35 +909,75 @@ assign_atmTrafficDescrParamEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            atmTrafficDescrParamEntry->_atmTrafficDescrTypeLength = vb->syntax_len / sizeof(guint32);
-            atmTrafficDescrParamEntry->atmTrafficDescrType = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                atmTrafficDescrParamEntry->_atmTrafficDescrTypeLength = vb->syntax_len / sizeof(guint32);
+                atmTrafficDescrParamEntry->atmTrafficDescrType = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for atmTrafficDescrType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            atmTrafficDescrParamEntry->atmTrafficDescrParam1 = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmTrafficDescrParamEntry->atmTrafficDescrParam1 = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmTrafficDescrParam1");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            atmTrafficDescrParamEntry->atmTrafficDescrParam2 = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmTrafficDescrParamEntry->atmTrafficDescrParam2 = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmTrafficDescrParam2");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            atmTrafficDescrParamEntry->atmTrafficDescrParam3 = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmTrafficDescrParamEntry->atmTrafficDescrParam3 = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmTrafficDescrParam3");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            atmTrafficDescrParamEntry->atmTrafficDescrParam4 = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmTrafficDescrParamEntry->atmTrafficDescrParam4 = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmTrafficDescrParam4");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            atmTrafficDescrParamEntry->atmTrafficDescrParam5 = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmTrafficDescrParamEntry->atmTrafficDescrParam5 = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmTrafficDescrParam5");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 8) {
-            atmTrafficDescrParamEntry->atmTrafficQoSClass = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmTrafficDescrParamEntry->atmTrafficQoSClass = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmTrafficQoSClass");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 9) {
-            atmTrafficDescrParamEntry->atmTrafficDescrRowStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmTrafficDescrParamEntry->atmTrafficDescrRowStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmTrafficDescrRowStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 10) {
-            atmTrafficDescrParamEntry->atmServiceCategory = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmTrafficDescrParamEntry->atmServiceCategory = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmServiceCategory");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 11) {
-            atmTrafficDescrParamEntry->atmTrafficFrameDiscard = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmTrafficDescrParamEntry->atmTrafficFrameDiscard = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmTrafficFrameDiscard");
+            }
         }
     }
 
@@ -973,31 +1105,67 @@ assign_atmVplEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            atmVplEntry->atmVplAdminStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVplEntry->atmVplAdminStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVplAdminStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            atmVplEntry->atmVplOperStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVplEntry->atmVplOperStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVplOperStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            atmVplEntry->atmVplLastChange = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                atmVplEntry->atmVplLastChange = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for atmVplLastChange");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            atmVplEntry->atmVplReceiveTrafficDescrIndex = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVplEntry->atmVplReceiveTrafficDescrIndex = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVplReceiveTrafficDescrIndex");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            atmVplEntry->atmVplTransmitTrafficDescrIndex = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVplEntry->atmVplTransmitTrafficDescrIndex = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVplTransmitTrafficDescrIndex");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            atmVplEntry->atmVplCrossConnectIdentifier = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVplEntry->atmVplCrossConnectIdentifier = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVplCrossConnectIdentifier");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 8) {
-            atmVplEntry->atmVplRowStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVplEntry->atmVplRowStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVplRowStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 9) {
-            atmVplEntry->atmVplCastType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVplEntry->atmVplCastType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVplCastType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 10) {
-            atmVplEntry->atmVplConnKind = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVplEntry->atmVplConnKind = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVplConnKind");
+            }
         }
     }
 
@@ -1126,43 +1294,95 @@ assign_atmVclEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            atmVclEntry->atmVclAdminStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVclEntry->atmVclAdminStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVclAdminStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            atmVclEntry->atmVclOperStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVclEntry->atmVclOperStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVclOperStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            atmVclEntry->atmVclLastChange = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                atmVclEntry->atmVclLastChange = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for atmVclLastChange");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            atmVclEntry->atmVclReceiveTrafficDescrIndex = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVclEntry->atmVclReceiveTrafficDescrIndex = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVclReceiveTrafficDescrIndex");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            atmVclEntry->atmVclTransmitTrafficDescrIndex = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVclEntry->atmVclTransmitTrafficDescrIndex = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVclTransmitTrafficDescrIndex");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 8) {
-            atmVclEntry->atmVccAalType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVclEntry->atmVccAalType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVccAalType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 9) {
-            atmVclEntry->atmVccAal5CpcsTransmitSduSize = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVclEntry->atmVccAal5CpcsTransmitSduSize = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVccAal5CpcsTransmitSduSize");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 10) {
-            atmVclEntry->atmVccAal5CpcsReceiveSduSize = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVclEntry->atmVccAal5CpcsReceiveSduSize = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVccAal5CpcsReceiveSduSize");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 11) {
-            atmVclEntry->atmVccAal5EncapsType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVclEntry->atmVccAal5EncapsType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVccAal5EncapsType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 12) {
-            atmVclEntry->atmVclCrossConnectIdentifier = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVclEntry->atmVclCrossConnectIdentifier = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVclCrossConnectIdentifier");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 13) {
-            atmVclEntry->atmVclRowStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVclEntry->atmVclRowStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVclRowStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 14) {
-            atmVclEntry->atmVclCastType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVclEntry->atmVclCastType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVclCastType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 15) {
-            atmVclEntry->atmVclConnKind = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVclEntry->atmVclConnKind = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVclConnKind");
+            }
         }
     }
 
@@ -1299,22 +1519,46 @@ assign_atmVpCrossConnectEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            atmVpCrossConnectEntry->atmVpCrossConnectAdminStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVpCrossConnectEntry->atmVpCrossConnectAdminStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVpCrossConnectAdminStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            atmVpCrossConnectEntry->atmVpCrossConnectL2HOperStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVpCrossConnectEntry->atmVpCrossConnectL2HOperStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVpCrossConnectL2HOperStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 8) {
-            atmVpCrossConnectEntry->atmVpCrossConnectH2LOperStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVpCrossConnectEntry->atmVpCrossConnectH2LOperStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVpCrossConnectH2LOperStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 9) {
-            atmVpCrossConnectEntry->atmVpCrossConnectL2HLastChange = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                atmVpCrossConnectEntry->atmVpCrossConnectL2HLastChange = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for atmVpCrossConnectL2HLastChange");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 10) {
-            atmVpCrossConnectEntry->atmVpCrossConnectH2LLastChange = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                atmVpCrossConnectEntry->atmVpCrossConnectH2LLastChange = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for atmVpCrossConnectH2LLastChange");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 11) {
-            atmVpCrossConnectEntry->atmVpCrossConnectRowStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVpCrossConnectEntry->atmVpCrossConnectRowStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVpCrossConnectRowStatus");
+            }
         }
     }
 
@@ -1448,22 +1692,46 @@ assign_atmVcCrossConnectEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 8) {
-            atmVcCrossConnectEntry->atmVcCrossConnectAdminStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVcCrossConnectEntry->atmVcCrossConnectAdminStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVcCrossConnectAdminStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 9) {
-            atmVcCrossConnectEntry->atmVcCrossConnectL2HOperStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVcCrossConnectEntry->atmVcCrossConnectL2HOperStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVcCrossConnectL2HOperStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 10) {
-            atmVcCrossConnectEntry->atmVcCrossConnectH2LOperStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVcCrossConnectEntry->atmVcCrossConnectH2LOperStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVcCrossConnectH2LOperStatus");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 11) {
-            atmVcCrossConnectEntry->atmVcCrossConnectL2HLastChange = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                atmVcCrossConnectEntry->atmVcCrossConnectL2HLastChange = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for atmVcCrossConnectL2HLastChange");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 12) {
-            atmVcCrossConnectEntry->atmVcCrossConnectH2LLastChange = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_TIMETICKS) {
+                atmVcCrossConnectEntry->atmVcCrossConnectH2LLastChange = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for atmVcCrossConnectH2LLastChange");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 13) {
-            atmVcCrossConnectEntry->atmVcCrossConnectRowStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                atmVcCrossConnectEntry->atmVcCrossConnectRowStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for atmVcCrossConnectRowStatus");
+            }
         }
     }
 
@@ -1589,13 +1857,25 @@ assign_aal5VccEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            aal5VccEntry->aal5VccCrcErrors = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                aal5VccEntry->aal5VccCrcErrors = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for aal5VccCrcErrors");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            aal5VccEntry->aal5VccSarTimeOuts = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                aal5VccEntry->aal5VccSarTimeOuts = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for aal5VccSarTimeOuts");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            aal5VccEntry->aal5VccOverSizedSDUs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                aal5VccEntry->aal5VccOverSizedSDUs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for aal5VccOverSizedSDUs");
+            }
         }
     }
 

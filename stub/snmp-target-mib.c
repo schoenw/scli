@@ -101,13 +101,25 @@ assign_snmpTargetObjects(GSList *vbl)
             continue;
         }
         if (vb->id_len > 9 && vb->id[8] == 1) {
-            snmpTargetObjects->snmpTargetSpinLock = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpTargetObjects->snmpTargetSpinLock = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpTargetSpinLock");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 4) {
-            snmpTargetObjects->snmpUnavailableContexts = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmpTargetObjects->snmpUnavailableContexts = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpUnavailableContexts");
+            }
         }
         if (vb->id_len > 9 && vb->id[8] == 5) {
-            snmpTargetObjects->snmpUnknownContexts = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmpTargetObjects->snmpUnknownContexts = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpUnknownContexts");
+            }
         }
     }
 
@@ -208,32 +220,64 @@ assign_snmpTargetAddrEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            snmpTargetAddrEntry->_snmpTargetAddrTDomainLength = vb->syntax_len / sizeof(guint32);
-            snmpTargetAddrEntry->snmpTargetAddrTDomain = vb->syntax.ui32;
+            if (vb->type == G_SNMP_OBJECT_ID) {
+                snmpTargetAddrEntry->_snmpTargetAddrTDomainLength = vb->syntax_len / sizeof(guint32);
+                snmpTargetAddrEntry->snmpTargetAddrTDomain = vb->syntax.ui32;
+            } else {
+                g_warning("illegal type for snmpTargetAddrTDomain");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            snmpTargetAddrEntry->_snmpTargetAddrTAddressLength = vb->syntax_len;
-            snmpTargetAddrEntry->snmpTargetAddrTAddress = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                snmpTargetAddrEntry->_snmpTargetAddrTAddressLength = vb->syntax_len;
+                snmpTargetAddrEntry->snmpTargetAddrTAddress = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for snmpTargetAddrTAddress");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            snmpTargetAddrEntry->snmpTargetAddrTimeout = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpTargetAddrEntry->snmpTargetAddrTimeout = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpTargetAddrTimeout");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            snmpTargetAddrEntry->snmpTargetAddrRetryCount = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpTargetAddrEntry->snmpTargetAddrRetryCount = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpTargetAddrRetryCount");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            snmpTargetAddrEntry->_snmpTargetAddrTagListLength = vb->syntax_len;
-            snmpTargetAddrEntry->snmpTargetAddrTagList = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                snmpTargetAddrEntry->_snmpTargetAddrTagListLength = vb->syntax_len;
+                snmpTargetAddrEntry->snmpTargetAddrTagList = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for snmpTargetAddrTagList");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            snmpTargetAddrEntry->_snmpTargetAddrParamsLength = vb->syntax_len;
-            snmpTargetAddrEntry->snmpTargetAddrParams = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                snmpTargetAddrEntry->_snmpTargetAddrParamsLength = vb->syntax_len;
+                snmpTargetAddrEntry->snmpTargetAddrParams = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for snmpTargetAddrParams");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 8) {
-            snmpTargetAddrEntry->snmpTargetAddrStorageType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpTargetAddrEntry->snmpTargetAddrStorageType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpTargetAddrStorageType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 9) {
-            snmpTargetAddrEntry->snmpTargetAddrRowStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpTargetAddrEntry->snmpTargetAddrRowStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpTargetAddrRowStatus");
+            }
         }
     }
 
@@ -361,23 +405,47 @@ assign_snmpTargetParamsEntry(GSList *vbl)
             continue;
         }
         if (vb->id_len > 11 && vb->id[10] == 2) {
-            snmpTargetParamsEntry->snmpTargetParamsMPModel = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpTargetParamsEntry->snmpTargetParamsMPModel = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpTargetParamsMPModel");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 3) {
-            snmpTargetParamsEntry->snmpTargetParamsSecurityModel = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpTargetParamsEntry->snmpTargetParamsSecurityModel = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpTargetParamsSecurityModel");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 4) {
-            snmpTargetParamsEntry->_snmpTargetParamsSecurityNameLength = vb->syntax_len;
-            snmpTargetParamsEntry->snmpTargetParamsSecurityName = vb->syntax.uc;
+            if (vb->type == G_SNMP_OCTET_STRING) {
+                snmpTargetParamsEntry->_snmpTargetParamsSecurityNameLength = vb->syntax_len;
+                snmpTargetParamsEntry->snmpTargetParamsSecurityName = vb->syntax.uc;
+            } else {
+                g_warning("illegal type for snmpTargetParamsSecurityName");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 5) {
-            snmpTargetParamsEntry->snmpTargetParamsSecurityLevel = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpTargetParamsEntry->snmpTargetParamsSecurityLevel = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpTargetParamsSecurityLevel");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 6) {
-            snmpTargetParamsEntry->snmpTargetParamsStorageType = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpTargetParamsEntry->snmpTargetParamsStorageType = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpTargetParamsStorageType");
+            }
         }
         if (vb->id_len > 11 && vb->id[10] == 7) {
-            snmpTargetParamsEntry->snmpTargetParamsRowStatus = &(vb->syntax.i32[0]);
+            if (vb->type == G_SNMP_INTEGER32) {
+                snmpTargetParamsEntry->snmpTargetParamsRowStatus = &(vb->syntax.i32[0]);
+            } else {
+                g_warning("illegal type for snmpTargetParamsRowStatus");
+            }
         }
     }
 

@@ -52,13 +52,25 @@ assign_snmpMPDStats(GSList *vbl)
             continue;
         }
         if (vb->id_len > 10 && vb->id[9] == 1) {
-            snmpMPDStats->snmpUnknownSecurityModels = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmpMPDStats->snmpUnknownSecurityModels = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpUnknownSecurityModels");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 2) {
-            snmpMPDStats->snmpInvalidMsgs = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmpMPDStats->snmpInvalidMsgs = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpInvalidMsgs");
+            }
         }
         if (vb->id_len > 10 && vb->id[9] == 3) {
-            snmpMPDStats->snmpUnknownPDUHandlers = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                snmpMPDStats->snmpUnknownPDUHandlers = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for snmpUnknownPDUHandlers");
+            }
         }
     }
 

@@ -53,16 +53,32 @@ assign_udp(GSList *vbl)
             continue;
         }
         if (vb->id_len > 8 && vb->id[7] == 1) {
-            udp->udpInDatagrams = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                udp->udpInDatagrams = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for udpInDatagrams");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 2) {
-            udp->udpNoPorts = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                udp->udpNoPorts = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for udpNoPorts");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 3) {
-            udp->udpInErrors = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                udp->udpInErrors = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for udpInErrors");
+            }
         }
         if (vb->id_len > 8 && vb->id[7] == 4) {
-            udp->udpOutDatagrams = &(vb->syntax.ui32[0]);
+            if (vb->type == G_SNMP_COUNTER32) {
+                udp->udpOutDatagrams = &(vb->syntax.ui32[0]);
+            } else {
+                g_warning("illegal type for udpOutDatagrams");
+            }
         }
     }
 
