@@ -172,6 +172,9 @@ fmt_port(int port, int name);
 extern char*
 fmt_ipv4_address(guchar *addr, int name);
 
+extern char*
+fmt_ipv4_mask(guchar *addr);
+
 
 #endif /* _SCLI_H */
 

@@ -182,3 +182,25 @@ fmt_ipv4_address(guchar *addr, int name)
     sprintf(buffer, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
     return buffer;
 }
+
+
+char *
+fmt_ipv4_mask(guchar *addr)
+{
+    static char buffer[4];
+    unsigned prefix = 0;
+    int i, j;
+
+    for (i = 0; i < 4; i++) {
+	for (j = 0; j < 8; j++) {
+	    if ((1 << (7-j)) & addr[i]) {
+		prefix++;
+	    } else {
+		i = 4;
+		break;
+	    }
+	}
+    }
+    sprintf(buffer, "/%u", prefix);
+    return buffer;
+}

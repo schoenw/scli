@@ -41,12 +41,6 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    /*
-     * TODO:
-     *
-     * - Show IPv4 addresses based on the IP-MIB::ipAddrTable.
-     */
-
     if (if_mib_get_ifEntry(interp->peer, &ifEntry)) {
 	return SCLI_ERROR;
     }
@@ -153,9 +147,9 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
 		    g_string_sprintfa(s, "IP Address:  %-*s", width,
 				      fmt_ipv4_address(
 					  ipAddrEntry[j]->ipAdEntAddr, 0));
-		    g_string_sprintfa(s, " Host:    %s\n",
-				      fmt_ipv4_address(
-					  ipAddrEntry[j]->ipAdEntAddr, 1));
+		    g_string_sprintfa(s, " Prefix:  %s\n",
+				      fmt_ipv4_mask(
+					  ipAddrEntry[j]->ipAdEntNetMask));
 		}
 	    }
 	    	    
