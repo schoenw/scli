@@ -29,5 +29,5 @@ scli.1.modes:	scli
 	     /^ $$/		{ next } \
 	     //			{ printf("%s\n", $$0) }' > scli.1.modes
 
-scli.1: scli.1.in scli.1.modes
+manual: scli.1.in scli.1.modes
 	m4 -P scli.1.in > scli.1
