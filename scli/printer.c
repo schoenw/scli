@@ -744,6 +744,195 @@ show_printer_inputs(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
+fmt_printer_outputs(GString *s, printer_mib_prtOutputEntry_t *prtOutputEntry)
+{
+    int const indent = 18;
+    const char *e;
+
+    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+		      prtOutputEntry->hrDeviceIndex);
+
+    if (prtOutputEntry->prtOutputIndex) {
+	g_string_sprintfa(s, "%-*s %u\n", indent, "Output:",
+			  prtOutputEntry->prtOutputIndex);
+    }
+    
+    if (prtOutputEntry->prtOutputName &&
+	prtOutputEntry->_prtOutputNameLength > 0) {
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Name:",
+			  (int) prtOutputEntry->_prtOutputNameLength,
+			  prtOutputEntry->prtOutputName);
+    }
+
+    if (prtOutputEntry->prtOutputDescription &&
+	prtOutputEntry->_prtOutputDescriptionLength > 0) {
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
+			  (int) prtOutputEntry->_prtOutputDescriptionLength,
+			  prtOutputEntry->prtOutputDescription);
+    }
+
+    if (prtOutputEntry->prtOutputVendorName &&
+	prtOutputEntry->_prtOutputVendorNameLength > 0) {
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Vendor",
+			  (int) prtOutputEntry->_prtOutputVendorNameLength,
+			  prtOutputEntry->prtOutputVendorName);
+    }
+    
+    e = fmt_enum(printer_mib_enums_prtOutputType,
+		 prtOutputEntry->prtOutputType);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", e);
+    }
+    
+    if (prtOutputEntry->prtOutputModel &&
+	prtOutputEntry->_prtOutputModelLength > 0) {
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Model:",
+			  (int) prtOutputEntry->_prtOutputModelLength,
+			  prtOutputEntry->prtOutputModel);
+    }
+
+    if (prtOutputEntry->prtOutputRemainingCapacity) {
+	g_string_sprintfa(s, "%-*s ", indent, "Remaining:");
+	switch (*prtOutputEntry->prtOutputRemainingCapacity) {
+	case -1:
+	    g_string_append(s, "other ");
+	    break;
+	case -2:
+	    g_string_append(s, "unknown ");
+	    break;
+	case -3:
+	    g_string_append(s, ">0 ");
+	    break;
+	default:
+	    g_string_sprintfa(s, "%u ", *prtOutputEntry->prtOutputRemainingCapacity);
+	}
+	e = fmt_enum(printer_mib_enums_prtOutputCapacityUnit,
+		     prtOutputEntry->prtOutputCapacityUnit);
+	if (e) {
+	    g_string_append(s, e);
+	}
+	g_string_append(s, "\n");
+    }
+
+    if (prtOutputEntry->prtOutputMaxCapacity) {
+	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
+	switch (*prtOutputEntry->prtOutputMaxCapacity) {
+	case -1:
+	    g_string_append(s, "other");
+	    break;
+	case -2:
+	    g_string_append(s, "unknown");
+	    break;
+	default:
+	    g_string_sprintfa(s, "%u ",
+			      *prtOutputEntry->prtOutputMaxCapacity);
+	}
+	e = fmt_enum(printer_mib_enums_prtOutputCapacityUnit,
+		     prtOutputEntry->prtOutputCapacityUnit);
+	if (e) {
+	    g_string_append(s, e);
+	}
+	g_string_append(s, "\n");
+    }
+
+    if (prtOutputEntry->prtOutputStatus) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Availability:",
+		  fmt_subunit_availability(prtOutputEntry->prtOutputStatus));
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Alerts:",
+		  fmt_subunit_alerts(prtOutputEntry->prtOutputStatus));
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Status:",
+		  fmt_subunit_status(prtOutputEntry->prtOutputStatus));
+    }
+    
+    if (prtOutputEntry->prtOutputSerialNumber &&
+	prtOutputEntry->_prtOutputSerialNumberLength > 0) {
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Serial Number:",
+			  (int) prtOutputEntry->_prtOutputSerialNumberLength,
+			  prtOutputEntry->prtOutputSerialNumber);
+    }
+    
+    if (prtOutputEntry->prtOutputVersion &&
+	prtOutputEntry->_prtOutputVersionLength > 0) {
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Output Version:",
+			  (int) prtOutputEntry->_prtOutputVersionLength,
+			  prtOutputEntry->prtOutputVersion);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputSecurity,
+		 prtOutputEntry->prtOutputSecurity);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Security:", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputDimUnit,
+		 prtOutputEntry->prtOutputDimUnit);
+
+    if (prtOutputEntry->prtOutputMinDimFeedDir &&
+	prtOutputEntry->prtOutputMinDimXFeedDir) {
+	
+	g_string_sprintfa(s, "%-*s %s", indent, "Min. Dimensions:",
+	  fmt_dimensions(prtOutputEntry->prtOutputMinDimFeedDir));
+	g_string_sprintfa(s, " x %s ",
+	  fmt_dimensions(prtOutputEntry->prtOutputMinDimXFeedDir));
+	g_string_sprintfa(s, "%s\n", e ? e : "");
+    }
+    
+    if (prtOutputEntry->prtOutputMaxDimFeedDir &&
+	prtOutputEntry->prtOutputMaxDimXFeedDir) {
+
+	g_string_sprintfa(s, "%-*s %s", indent, "Max. Dimension:",
+	  fmt_dimensions(prtOutputEntry->prtOutputMaxDimFeedDir));
+	g_string_sprintfa(s, " x %s ",
+	  fmt_dimensions(prtOutputEntry->prtOutputMaxDimXFeedDir));
+	g_string_sprintfa(s, "%s\n", e ? e : "");
+    }
+
+    /*
+      prtOutputStackingOrder            PrtOutputStackingOrderTC,
+      prtOutputPageDeliveryOrientation  PrtOutputPageDeliveryOrientationTC,
+      prtOutputBursting                 PresentOnOff,
+      prtOutputDecollating              PresentOnOff,
+      prtOutputPageCollated             PresentOnOff,
+      prtOutputOffsetStacking           PresentOnOff
+    */
+}
+
+
+
+static int
+show_printer_outputs(scli_interp_t *interp, int argc, char **argv)
+{
+    printer_mib_prtOutputEntry_t **prtOutputTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    printer_mib_get_prtOutputTable(interp->peer, &prtOutputTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (prtOutputTable) {
+	for (i = 0; prtOutputTable[i]; i++) {
+	    if (i > 0) {
+		g_string_append(interp->result, "\n");
+	    }
+	    fmt_printer_outputs(interp->result, prtOutputTable[i]);
+	}
+    }
+
+    if (prtOutputTable) printer_mib_free_prtOutputTable(prtOutputTable);
+	
+    return SCLI_OK;
+}
+
+
+
+static void
 fmt_printer_interpreter(GString *s,
 			printer_mib_prtInterpreterEntry_t *interpEntry)
 {
@@ -1166,16 +1355,27 @@ scli_init_printer_mode(scli_interp_t * interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show printer info", NULL,
-	  "general printer information",
+	  "The show printer info command shows general information about\n"
+	  "the printer including global status information.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  show_printer_info },
 
 	{ "show printer inputs", NULL,
-	  "printer input information",
+	  "The show printer inputs command shows information about the\n"
+	  "input sub-units of a printer which provide media for input to\n"
+	  "the printing process.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  show_printer_inputs },
+
+	{ "show printer outputs", NULL,
+	  "The show printer output command shows information about the\n"
+	  "output sub-units of a printer capable of receiving media\n"
+	  "delivered from the printing process.",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  show_printer_outputs },
 
 	{ "show printer interpreter", NULL,
 	  "The show printer interpreter command shows information about\n"
