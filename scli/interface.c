@@ -59,6 +59,8 @@ static void
 fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 	     gint32 *conn, gint32 *prom)
 {
+    const char *e;
+
     static GSnmpEnum const admin_states[] = {
 	{ IF_MIB_IFADMINSTATUS_UP,	"U" },
 	{ IF_MIB_IFADMINSTATUS_DOWN,	"D" },
@@ -89,10 +91,14 @@ fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 	{ 0, NULL }
     };
 
-    xxx_enum(s, 1, admin_states, admin);
-    xxx_enum(s, 1, oper_states, oper);
-    xxx_enum(s, 1, conn_states, conn);
-    xxx_enum(s, 1, prom_states, prom);
+    e = fmt_enum(admin_states, admin);
+    g_string_sprintfa(s, "%s", e ? e : "-");
+    e = fmt_enum(oper_states, oper);
+    g_string_sprintfa(s, "%s", e ? e : "-");
+    e = fmt_enum(conn_states, conn);
+    g_string_sprintfa(s, "%s", e ? e : "-");
+    e = fmt_enum(prom_states, prom);
+    g_string_sprintfa(s, "%s", e ? e : "-");
 }
 
 
@@ -194,6 +200,7 @@ fmt_interface_details(GString *s,
     int j;
     char *name;
     int const width = 20;
+    const char *e;
 
     g_string_sprintfa(s, "Interface:   %-*d", width,
 		      ifEntry->ifIndex);
@@ -204,9 +211,9 @@ fmt_interface_details(GString *s,
     } else {
 	g_string_append(s, " Name:\n");
     }
-	
-    g_string_append(s, "OperStatus:  ");
-    xxx_enum(s, width, if_mib_enums_ifOperStatus, ifEntry->ifOperStatus);
+
+    e = fmt_enum(if_mib_enums_ifOperStatus, ifEntry->ifOperStatus);
+    g_string_sprintfa(s, "OperStatus:  %-*s", width, e ? e : "");
     if (ifEntry->ifPhysAddress && ifEntry->_ifPhysAddressLength) {
 	g_string_append(s, " Address: ");
 	for (j = 0; j < ifEntry->_ifPhysAddressLength; j++) {
@@ -230,25 +237,24 @@ fmt_interface_details(GString *s,
     } else {
 	g_string_append(s, " Address:\n");
     }
-    
-    g_string_append(s, "AdminStatus: ");
-    xxx_enum(s, width, if_mib_enums_ifAdminStatus, ifEntry->ifAdminStatus);
-    g_string_append(s, " Type:    ");
-    xxx_enum(s, width, if_mib_enums_ifType, ifEntry->ifType);
-    g_string_append(s, "\n");
-    
-    g_string_append(s, "Traps:       ");
-    xxx_enum(s, width, if_mib_enums_ifLinkUpDownTrapEnable,
-	     ifXEntry ? ifXEntry->ifLinkUpDownTrapEnable : NULL);
+
+    e = fmt_enum(if_mib_enums_ifAdminStatus, ifEntry->ifAdminStatus);
+    g_string_sprintfa(s, "AdminStatus: %-*s", width, e ? e : "");
+    e = fmt_enum(if_mib_enums_ifType, ifEntry->ifType);
+    g_string_sprintfa(s, " Type:    %-*s\n", width, e ? e : "");
+
+    e = fmt_enum(if_mib_enums_ifLinkUpDownTrapEnable,
+		 ifXEntry ? ifXEntry->ifLinkUpDownTrapEnable : NULL);
+    g_string_sprintfa(s, "Traps:       %-*s", width, e ? e : "");
     if (ifEntry->ifMtu) {
 	g_string_sprintfa(s, " MTU:     %d byte\n", *(ifEntry->ifMtu));
     } else {
 	g_string_append(s, " MTU:\n");
     }
-    
-    g_string_append(s, "Connector:   ");
-    xxx_enum(s, width, if_mib_enums_ifConnectorPresent,
-	     ifXEntry ? ifXEntry->ifConnectorPresent : NULL);
+
+    e = fmt_enum(if_mib_enums_ifConnectorPresent,
+		 ifXEntry ? ifXEntry->ifConnectorPresent : NULL);
+    g_string_sprintfa(s, "Connector:   %-*s", width, e ? e : "");
     if (ifEntry->ifSpeed) {
 	if (*(ifEntry->ifSpeed) == 0xffffffff
 	    && ifXEntry && ifXEntry->ifHighSpeed) {
@@ -261,10 +267,10 @@ fmt_interface_details(GString *s,
     } else {
 	g_string_append(s, " Speed:\n");
     }
-    
-    g_string_append(s, "Promiscuous: ");
-    xxx_enum(s, width, if_mib_enums_ifPromiscuousMode,
-	     ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
+
+    e = fmt_enum(if_mib_enums_ifPromiscuousMode,
+		 ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
+    g_string_sprintfa(s, "Promiscuous: %-*s", width, e ? e : "");
     if (ifEntry->ifLastChange && system && system->sysUpTime) {
 	guint32 dsecs = *(system->sysUpTime) - *(ifEntry->ifLastChange);
 	g_string_sprintfa(s, " Change:  %s\n", fmt_timeticks(dsecs));
@@ -559,6 +565,8 @@ fmt_interface_info(GString *s,
 	     if_mib_ifXEntry_t *ifXEntry,
 	     int type_width, int name_width)
 {
+    const char *e;
+    
     g_string_sprintfa(s, "%9u  ", ifEntry->ifIndex);
 
     fmt_ifStatus(s,
@@ -572,9 +580,8 @@ fmt_interface_info(GString *s,
 	g_string_sprintfa(s, "      ");
     }
 
-    g_string_append(s, " ");
-    xxx_enum(s, type_width, if_mib_enums_ifType, ifEntry->ifType);
-    g_string_append(s, " ");
+    e = fmt_enum(if_mib_enums_ifType, ifEntry->ifType);
+    g_string_sprintfa(s, " %-*s ", type_width, e ? e : "");
 
     if (ifEntry->ifSpeed) {
 	if (*(ifEntry->ifSpeed) == 0xffffffff
@@ -681,6 +688,7 @@ fmt_interface_stack(GString *s,
      */
 
     int i = 0;
+    const char *e;
     char *ifDescr = NULL;
     int ifDescrLength = 0;
     if_mib_ifEntry_t *ifEntry = NULL;
@@ -698,7 +706,8 @@ fmt_interface_stack(GString *s,
     }
 
     g_string_sprintfa(s, "%9d ", ifStackEntry->ifStackHigherLayer);
-    xxx_enum(s, type_width, if_mib_enums_ifType, ifEntry->ifType);
+    e = fmt_enum(if_mib_enums_ifType, ifEntry->ifType);
+    g_string_sprintfa(s, "%-*s", type_width, e ? e : "");
     g_string_sprintfa(s, " %*s%s %.*s\n",
 		      level*4, "", level ? "`-" : " -",
 		      ifDescrLength, ifDescr ? ifDescr : "");

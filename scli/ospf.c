@@ -32,6 +32,7 @@ static int
 show_ospf_info(scli_interp_t *interp, int argc, char **argv)
 {
    ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup = NULL;
+   const char *e;
 
    g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -47,10 +48,10 @@ show_ospf_info(scli_interp_t *interp, int argc, char **argv)
        }
 
        if (ospfGeneralGroup->ospfAdminStat) {
-           g_string_append(interp->result, "AdminStatus: ");
-           xxx_enum(interp->result, 8, ospf_mib_enums_ospfIfAdminStat,
-           	ospfGeneralGroup->ospfAdminStat);
-           g_string_append(interp->result, "\n");
+	   e = fmt_enum(ospf_mib_enums_ospfIfAdminStat,
+			ospfGeneralGroup->ospfAdminStat);
+           g_string_sprintfa(interp->result, "AdminStatus: %-*s\n",
+			     8, e ? e : "");
        }
 
        if (ospfGeneralGroup->ospfVersionNumber) {
@@ -281,6 +282,7 @@ fmt_ospf_interfaces(GString *s,
 		    ip_mib_ipAddrEntry_t **ipAddrTable)
 {
     int const indent = 18;
+    const char *e;
     int j;
     
     /* This should probably become a table (interface info) and a
@@ -333,17 +335,16 @@ fmt_ospf_interfaces(GString *s,
     }
 
     if (ospfIfEntry->ospfIfAdminStat) {
-	g_string_sprintfa(s, "%-*s ", indent, "AdminStatus:");
-	xxx_enum(s, 16, ospf_mib_enums_ospfIfAdminStat,
-		 ospfIfEntry->ospfIfAdminStat);
-	g_string_append(s, "\n");
+	e = fmt_enum(ospf_mib_enums_ospfIfAdminStat,
+		     ospfIfEntry->ospfIfAdminStat);
+	g_string_sprintfa(s, "%-*s %16s\n",
+			  indent, "AdminStatus:", e ? e : "");
     }
     
     if (ospfIfEntry->ospfIfType) {
-	g_string_sprintfa(s, "%-*s ", indent, "Type:");
-	xxx_enum(s, 16, ospf_mib_enums_ospfIfType,
-		 ospfIfEntry->ospfIfType);
-	g_string_append(s, "\n");
+	e = fmt_enum(ospf_mib_enums_ospfIfType, ospfIfEntry->ospfIfType);
+	g_string_sprintfa(s, "%-*s %16s\n",
+			  indent, "Type:", e ? e : "");
     }
     
     if (ospfIfEntry->ospfIfAreaId) {

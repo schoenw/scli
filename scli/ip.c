@@ -244,6 +244,7 @@ fmt_ip_tunnel(GString *s,
 	      if_mib_ifEntry_t **ifTable)
 {
     int i;
+    const char *e;
 
     g_return_if_fail(tunnelIfEntry);
 
@@ -263,19 +264,13 @@ fmt_ip_tunnel(GString *s,
 	g_string_sprintfa(s, "%-15s  ", "-");
     }
 
-    if (tunnelIfEntry->tunnelIfEncapsMethod) {
-	xxx_enum(s, 8, tunnel_mib_enums_tunnelIfEncapsMethod,
+    e = fmt_enum(tunnel_mib_enums_tunnelIfEncapsMethod,
 		 tunnelIfEntry->tunnelIfEncapsMethod);
-    } else {
-	g_string_sprintfa(s, "%-6s  ", "-");
-    }
+    g_string_sprintfa(s, "%-8s", e ? e : "-");
 
-    if (tunnelIfEntry->tunnelIfSecurity) {
-	xxx_enum(s, 6, tunnel_mib_enums_tunnelIfSecurity,
+    e = fmt_enum(tunnel_mib_enums_tunnelIfSecurity,
 		 tunnelIfEntry->tunnelIfSecurity);
-    } else {
-	g_string_sprintfa(s, "%-4s  ", "-");
-    }
+    g_string_sprintfa(s, "%-6s", e ? e : "-");
 
     if (tunnelIfEntry->tunnelIfHopLimit) {
 	g_string_sprintfa(s, "%3d  ", *tunnelIfEntry->tunnelIfHopLimit);
@@ -376,13 +371,15 @@ fmt_ip_arp(GString *s,
 	    if_mib_ifEntry_t *ifEntry)
 {
     char *name;
+    const char *e;
     int i;
 
     g_string_sprintfa(s, "%6u    ",
 		      ipNetToMediaEntry->ipNetToMediaIfIndex);
-    
-    xxx_enum(s, 8, ip_mib_enums_ipNetToMediaType,
-	     ipNetToMediaEntry->ipNetToMediaType);
+
+    e = fmt_enum(ip_mib_enums_ipNetToMediaType,
+		 ipNetToMediaEntry->ipNetToMediaType);
+    g_string_sprintfa(s, "%-8s", e ? e : "");
     
     g_string_sprintfa(s, " %-16s ",
 	      fmt_ipv4_address(ipNetToMediaEntry->ipNetToMediaNetAddress,
