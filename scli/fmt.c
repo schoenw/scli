@@ -197,7 +197,7 @@ fmt_kmg(guint32 number)
     static char buffer[80];
 
     if (number > 999999999) {
-	g_snprintf(buffer, sizeof(buffer), "%3ug", number / 1000000);
+	g_snprintf(buffer, sizeof(buffer), "%3ug", number / 1000000000);
     } else if (number > 999999) {
 	g_snprintf(buffer, sizeof(buffer), "%3um", number / 1000000);
     } else if (number > 9999) {
