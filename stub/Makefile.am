@@ -177,10 +177,10 @@ old-cisco-ip-mib.h old-cisco-ip-mib.c:
 	$(SMIDUMP) -f scli OLD-CISCO-IP-MIB
 
 rapid-city.h rapid-city.c:
-	$(SMIDUMP) -f scli --scli-include='VlanEntry|VlanPortEntry' RAPID-CITY
+	$(SMIDUMP) -f scli --scli-include='vlanEntry|vlanPortEntry' RAPID-CITY
 
 ucd-snmp-mib.h ucd-snmp-mib.c:
-	$(SMIDUMP) -f scli UCD-SNMP-MIB
+	$(SMIDUMP) -f scli --scli-include='version|extEntry|prEntry|laEntry' UCD-SNMP-MIB
 
 productmib.h productmib.c:
 	$(SMIDUMP) -f scli --scli-include='a3ComVlanIfEntry|a3ComVirtualGroup' PRODUCTMIB
