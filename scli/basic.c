@@ -255,22 +255,36 @@ scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd)
 
 
 
+static void
+snmp_decode_hook(GSList *list)
+{
+    static char x[] = { '-', '/', '-', '\\', '|' };
+    static int i = 0, c = 0, n = 0;
+    static time_t start, now;
+
+    if (! list) {
+	i = 0, c = 0, n = 0;
+	start = time(NULL);
+	return;
+    }
+
+    now = time(NULL);
+    
+    n++, c += g_slist_length(list), i = (i+1) % 5;
+    printf("\r%c %6.2f vps %6.2f vpm \r", x[i],
+	   (now > start) ? c / (double) (now - start) : 0,
+	   c / (double) n);
+    fflush(stdout);
+}
+
+
+
 static int
 eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 {
     scli_cmd_t *cmd = (scli_cmd_t *) node->data;
     int code = SCLI_OK;
 
-#if 0
-    extern char *g_snmp_msg;
-    if (g_snmp_msg) g_free(g_snmp_msg);
-    g_snmp_msg = g_malloc(strlen(cmd->name)
-			  + (cmd->path ? strlen(cmd->path) : 0) + 2);
-    strcpy(g_snmp_msg, cmd->path ? cmd->path : "");
-    strcat(g_snmp_msg, " ");
-    strcat(g_snmp_msg, cmd->name);
-#endif
-    
     if (cmd->func) {
 	g_string_truncate(interp->result, 0);
 	if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER && ! interp->peer) {
@@ -362,6 +376,12 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	if (i < argc-1 && ! G_NODE_IS_LEAF(node)) {
 	    node = g_node_first_child(node);
 	} else if (G_NODE_IS_LEAF(node)) {
+	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+		snmp_decode_hook(NULL);
+		g_snmp_list_decode_hook = snmp_decode_hook;
+	    } else {
+		g_snmp_list_decode_hook = NULL;
+	    }
 	    code = eval_cmd_node(interp, node, argc - i, argv + i);
 	    done = 1;
 	} else if (! G_NODE_IS_LEAF(node)) {
@@ -369,6 +389,12 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	    done = 1;
 	    interp->flags |= SCLI_INTERP_FLAG_RECURSIVE;
 	    s = g_string_new(NULL);
+	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+		snmp_decode_hook(NULL);
+		g_snmp_list_decode_hook = snmp_decode_hook;
+	    } else {
+		g_snmp_list_decode_hook = NULL;
+	    }
 	    code = eval_all_cmd_node(interp, node, s);
 	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
 		page(s);
@@ -492,6 +518,8 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
      * SNMPv2c (since this protocol does much better error handling)
      * and we fall back to SNMPv1 only if this is necessary.
      */
+
+    g_snmp_list_decode_hook = NULL;
 
     if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
 	printf("Trying SNMPv2c ... ");
