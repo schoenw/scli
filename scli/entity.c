@@ -22,6 +22,7 @@
 
 #include "scli.h"
 
+#include "snmpv2-tc.h"
 #include "entity-mib.h"
 
 
@@ -55,10 +56,10 @@ fmt_containment(GString *s, char *prefix,
 		}
 	    }
 	    
-	    g_string_sprintfa(s, "%6d",
+	    g_string_sprintfa(s, "%10d",
 			      entPhysicalEntry[i]->entPhysicalIndex);
 
-	    class = fmt_enum(entity_mib_enums_entPhysicalClass,
+	    class = fmt_enum(entity_mib_enums_PhysicalClass,
 			     entPhysicalEntry[i]->entPhysicalClass);
 	    g_string_sprintfa(s, " %-*s", class_width, class ? class : "");
 
@@ -116,13 +117,13 @@ show_entity_containment(scli_interp_t *interp, int argc, char **argv)
 
     if (entPhysicalTable) {
 	for (i = 0; entPhysicalTable[i]; i++) {
-	    class = fmt_enum(entity_mib_enums_entPhysicalClass,
+	    class = fmt_enum(entity_mib_enums_PhysicalClass,
 			     entPhysicalTable[i]->entPhysicalClass);
 	    if (strlen(class) > class_width) {
 		class_width = strlen(class);
 	    }
 	}
-	g_string_sprintfa(interp->header, "ENTITY %-*s CONTAINMENT",
+	g_string_sprintfa(interp->header, "    ENTITY %-*s CONTAINMENT",
 			  class_width, "CLASS");
 	fmt_containment(interp->result, "", entPhysicalTable, 0, class_width);
     }
@@ -203,7 +204,7 @@ fmt_entity_details(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
 	g_string_sprintfa(s, "Asset:  %-30s", "");
     }
 
-    class = fmt_enum(entity_mib_enums_entPhysicalClass,
+    class = fmt_enum(entity_mib_enums_PhysicalClass,
 		     entPhysicalEntry->entPhysicalClass);
     if (class) {
 	g_string_sprintfa(s, "Class:  %s", class);
@@ -247,7 +248,7 @@ xml_entity_details(xmlNodePtr root,
 			     entPhysicalEntry->entPhysicalName);
     }
 
-    e = fmt_enum(entity_mib_enums_entPhysicalClass,
+    e = fmt_enum(entity_mib_enums_PhysicalClass,
 		 entPhysicalEntry->entPhysicalClass);
     if (e) {
 	(void) xml_new_child(tree, NULL, "class", "%s", e);
@@ -260,7 +261,7 @@ xml_entity_details(xmlNodePtr root,
 
     if (entPhysicalEntry->entPhysicalIsFRU
 	&& (*entPhysicalEntry->entPhysicalIsFRU
-	    == ENTITY_MIB_ENTPHYSICALISFRU_TRUE)) {
+	    == SNMPV2_TC_TRUTHVALUE_TRUE)) {
 	(void) xmlNewChild(tree, NULL, "replaceable", NULL);
     } 
  
@@ -361,9 +362,9 @@ fmt_entity_info(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry,
 {
     const char *class;
 
-    g_string_sprintfa(s, "%6d", entPhysicalEntry->entPhysicalIndex);
+    g_string_sprintfa(s, "%10d", entPhysicalEntry->entPhysicalIndex);
     
-    class = fmt_enum(entity_mib_enums_entPhysicalClass,
+    class = fmt_enum(entity_mib_enums_PhysicalClass,
 		     entPhysicalEntry->entPhysicalClass);
     if (class) {
 	g_string_sprintfa(s, " %-*s", class_width, class);
@@ -414,7 +415,7 @@ show_entity_info(scli_interp_t *interp, int argc, char **argv)
 
     if (entPhysicalTable) {
 	for (i = 0; entPhysicalTable[i]; i++) {
-	    class = fmt_enum(entity_mib_enums_entPhysicalClass,
+	    class = fmt_enum(entity_mib_enums_PhysicalClass,
 			     entPhysicalTable[i]->entPhysicalClass);
 	    if (strlen(class) > class_width) {
 		class_width = strlen(class);
@@ -425,7 +426,7 @@ show_entity_info(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 	g_string_sprintfa(interp->header,
-			  "ENTITY %-*s %-*s DESCRIPTION",
+			  "    ENTITY %-*s %-*s DESCRIPTION",
 			  class_width, "CLASS",
 			  name_width, "NAME");
 	for (i = 0; entPhysicalTable[i]; i++) {
