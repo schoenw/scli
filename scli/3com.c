@@ -22,19 +22,20 @@
 
 #include "scli.h"
 
-#include "productmib.h"
-#include "productmib-proc.h"
 #include "if-mib.h"
 #include "if-mib-proc.h"
+
+#include "productmib.h"
+#include "productmib-proc.h"
 
 
 static void
 fmt_vlanStatus(GString *s, productmib_a3ComVlanIfEntry_t *vlanEntry)
 {
     static GSnmpEnum const a3ComVlanIfStatus[] = {
-	{ PRODUCTMIB_A3COMVLANIFSTATUS_ACTIVE,		"A" },
-	{ PRODUCTMIB_A3COMVLANIFSTATUS_NOTINSERVICE,	"S" },
-	{ PRODUCTMIB_A3COMVLANIFSTATUS_NOTREADY,	"R" },
+	{ PRODUCTMIB_ROWSTATUS_ACTIVE,		"A" },
+	{ PRODUCTMIB_ROWSTATUS_NOTINSERVICE,	"S" },
+	{ PRODUCTMIB_ROWSTATUS_NOTREADY,	"R" },
 	{ 0, NULL }
     };
     
@@ -312,7 +313,7 @@ create_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     if (vlanTable) productmib_free_a3ComVlanIfTable(vlanTable);
 
     productmib_proc_create_vlan(interp->peer, vlanId, name, name_len,
-				PRODUCTMIB_A3COMVLANIFTYPE_VLANLAYER2);
+				PRODUCTMIB_A3COMVLANTYPE_VLANLAYER2);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
@@ -535,7 +536,7 @@ dump_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 		continue;
 	    }
 	    if (! vlanTable[i]->a3ComVlanIfStatus
-		|| *vlanTable[i]->a3ComVlanIfStatus != PRODUCTMIB_A3COMVLANIFSTATUS_ACTIVE) {
+		|| *vlanTable[i]->a3ComVlanIfStatus != PRODUCTMIB_ROWSTATUS_ACTIVE) {
 		continue;
 	    }
 	    create_port_list(ports, sizeof(ports),
@@ -554,7 +555,7 @@ dump_3com_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 		continue;
 	    }
 	    if (! vlanTable[i]->a3ComVlanIfStatus
-		|| *vlanTable[i]->a3ComVlanIfStatus != PRODUCTMIB_A3COMVLANIFSTATUS_ACTIVE) {
+		|| *vlanTable[i]->a3ComVlanIfStatus != PRODUCTMIB_ROWSTATUS_ACTIVE) {
 		continue;
 	    }
 	    create_port_list(ports, sizeof(ports),

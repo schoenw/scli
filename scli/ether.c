@@ -22,6 +22,7 @@
 
 #include "scli.h"
 
+#include "snmpv2-tc.h"
 #include "mau-mib.h"
 #include "etherlike-mib.h"
 
@@ -203,7 +204,7 @@ fmt_ether_mau_info(GString *s, mau_mib_ifMauEntry_t *ifMauEntry)
 		 ifMauEntry->ifMauJabberState);
     g_string_sprintfa(s, "%-9s", e ? e : "");
 
-    e = fmt_enum(mau_mib_enums_ifMauAutoNegSupported,
+    e = fmt_enum(snmpv2_tc_enums_TruthValue,
 		 ifMauEntry->ifMauAutoNegSupported);
     g_string_sprintfa(s, "%-7s", e ? e : "");
 
