@@ -193,19 +193,19 @@ fmt_ether_mau_info(GString *s, mau_mib_ifMauEntry_t *ifMauEntry)
 
     e = fmt_enum(mau_mib_enums_ifMauStatus,
 		 ifMauEntry->ifMauStatus);
-    g_string_sprintfa(s, "%12s", e ? e : "");
+    g_string_sprintfa(s, "%-12s", e ? e : "");
 
     e = fmt_enum(mau_mib_enums_ifMauMediaAvailable,
 		 ifMauEntry->ifMauMediaAvailable);
-    g_string_sprintfa(s, "%14s", e ? e : "");
+    g_string_sprintfa(s, "%-14s", e ? e : "");
 
     e = fmt_enum(mau_mib_enums_ifMauJabberState,
 		 ifMauEntry->ifMauJabberState);
-    g_string_sprintfa(s, "%9s", e ? e : "");
+    g_string_sprintfa(s, "%-9s", e ? e : "");
 
     e = fmt_enum(mau_mib_enums_ifMauAutoNegSupported,
 		 ifMauEntry->ifMauAutoNegSupported);
-    g_string_sprintfa(s, "%7s", e ? e : "");
+    g_string_sprintfa(s, "%-7s", e ? e : "");
 
     if (ifMauEntry->ifMauType) {
 	g_string_sprintfa(s, " %s", 
