@@ -32,6 +32,16 @@
 #include <ctype.h>
 
 
+static GSnmpEnum const dot1dBaseType[] = {
+    { BRIDGE_MIB_DOT1DBASETYPE_UNKNOWN,	"unknown" },
+    { BRIDGE_MIB_DOT1DBASETYPE_TRANSPARENT_ONLY,	"transparent (TP)" },
+    { BRIDGE_MIB_DOT1DBASETYPE_SOURCEROUTE_ONLY,	"source route (SR)" },
+    { BRIDGE_MIB_DOT1DBASETYPE_SRT,	"source route transparent (SRT)" },
+    { 0, NULL }
+};
+
+
+
 static guint32 const oid_other[]
     = { HOST_RESOURCES_TYPES_HRSTORAGEOTHER };
 static guint32 const oid_ram[]
@@ -953,6 +963,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     if_mib_interfaces_t *interfaces = NULL;
     bridge_mib_dot1dBase_t *dot1dBase = NULL;
     disman_script_mib_smLangEntry_t **smLangTable = NULL;
+    const char *e;
     GString *s;
     int i;
     int const indent = 18;
@@ -1053,15 +1064,14 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 
     if (dot1dBase) {
 	if (dot1dBase->dot1dBaseNumPorts && *dot1dBase->dot1dBaseNumPorts) {
-	    g_string_sprintfa(s, "%-*s%d ", indent, "Bridge Ports:",
+	    g_string_sprintfa(s, "%-*s%d\n", indent, "Bridge Ports:",
 			      *(dot1dBase->dot1dBaseNumPorts));
-	    if (dot1dBase->dot1dBaseType) {
-		const char *e;
-		e = fmt_enum(bridge_mib_enums_dot1dBaseType,
-			     dot1dBase->dot1dBaseType);
-		g_string_sprintfa(s, "%s", e ? e : "");
+	}
+	if (dot1dBase->dot1dBaseType) {
+	    e = fmt_enum(dot1dBaseType, dot1dBase->dot1dBaseType);
+	    if (e) {
+		g_string_sprintfa(s, "%-*s%s\n", indent, "Bridge Type:", e);
 	    }
-	    g_string_append_c(s, '\n');
 	}
     }
 

@@ -26,6 +26,83 @@
 #include "if-mib.h"
 
 
+static GSnmpEnum const dot1dBaseType[] = {
+    { BRIDGE_MIB_DOT1DBASETYPE_UNKNOWN,	"unknown" },
+    { BRIDGE_MIB_DOT1DBASETYPE_TRANSPARENT_ONLY,	"transparent (TP)" },
+    { BRIDGE_MIB_DOT1DBASETYPE_SOURCEROUTE_ONLY,	"source route (SR)" },
+    { BRIDGE_MIB_DOT1DBASETYPE_SRT,	"source route transparent (SRT)" },
+    { 0, NULL }
+};
+
+
+GSnmpEnum const dot1dStpProtocolSpecification[] = {
+    { BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_UNKNOWN,	"unknown" },
+    { BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_DECLB100,	"DEC LANbridge 100 Spanning Tree Protocol" },
+    { BRIDGE_MIB_DOT1DSTPPROTOCOLSPECIFICATION_IEEE8021D,	"IEEE 802.1d Spanning Tree Protocol" },
+    { 0, NULL }
+};
+
+
+char *
+fmt_bridgeid(guchar *addr)
+{
+    static char buffer[256];
+
+    g_snprintf(buffer, sizeof(buffer),
+	       "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
+	       addr[0], addr[1], addr[2], addr[3],
+	       addr[4], addr[5], addr[6], addr[7]);
+    return buffer;
+}
+
+
+
+static void
+fmt_bridge_stp_info(GString *s, bridge_mib_dot1dStp_t *dot1dStp)
+{
+    int const indent = 18;
+    const char *e;
+
+    if (dot1dStp->dot1dStpProtocolSpecification) {
+	e = fmt_enum(dot1dStpProtocolSpecification,
+		     dot1dStp->dot1dStpProtocolSpecification);
+	if (e) {
+	    g_string_sprintfa(s, "%-*s%s\n", indent, "Stp Type:", e);
+	}
+    }
+    
+    if (dot1dStp->dot1dStpPriority) {
+	g_string_sprintfa(s, "%-*s%d (%02x:%02x)\n", indent,
+			      "Stp Priority:",
+			  *dot1dStp->dot1dStpPriority,
+			  (*dot1dStp->dot1dStpPriority >> 8) & 0xff,
+			  (*dot1dStp->dot1dStpPriority) & 0xff);
+    }
+    
+    if (dot1dStp->dot1dStpDesignatedRoot) {
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Stp Root:",
+			  fmt_bridgeid(dot1dStp->dot1dStpDesignatedRoot));
+    }
+
+    if (dot1dStp->dot1dStpRootCost) {
+	g_string_sprintfa(s, "%-*s%d\n", indent, "Stp Root Cost:",
+			  *dot1dStp->dot1dStpRootCost);
+    }
+
+    if (dot1dStp->dot1dStpRootPort) {
+	g_string_sprintfa(s, "%-*s%d\n", indent, "Stp Root Port:",
+			  *dot1dStp->dot1dStpRootPort);
+    }
+
+    if (dot1dStp->dot1dStpMaxAge) {
+	g_string_sprintfa(s, "%-*s%d seconds\n", indent, "Stp Aging Time:",
+			  *dot1dStp->dot1dStpMaxAge);
+    }
+    
+}
+
+
+
 static void
 fmt_bridge_info(GString *s,
 		bridge_mib_dot1dBase_t *dot1dBase,
@@ -33,30 +110,46 @@ fmt_bridge_info(GString *s,
 		bridge_mib_dot1dStp_t *dot1dStp)
 {
     int const indent = 18;
-    const char *type;
+    const char *e;
+
+    if (dot1dBase->dot1dBaseBridgeAddress) {
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Address:",
+			  fmt_ether_address(dot1dBase->dot1dBaseBridgeAddress,
+					    SCLI_FMT_ADDR));
+	e = fmt_ether_address(dot1dBase->dot1dBaseBridgeAddress,
+			      SCLI_FMT_NAME);
+	if (e) {
+	    g_string_sprintfa(s, "%-*s%s\n", indent, "Name:", e);
+	}
+    }
 
     if (dot1dBase->dot1dBaseNumPorts) {
-	g_string_sprintfa(s, "%-*s %d\n", indent, "Ports:",
+	g_string_sprintfa(s, "%-*s%d\n", indent, "Ports:",
 			  *(dot1dBase->dot1dBaseNumPorts));
-	if (dot1dBase->dot1dBaseType) {
-	    type = fmt_enum(bridge_mib_enums_dot1dBaseType,
-			    dot1dBase->dot1dBaseType);
-	    if (type) {
-		g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", type);
-	    }
-	    if (dot1dBase->dot1dBaseType
-		&& (*dot1dBase->dot1dBaseType == 2
-		    || *dot1dBase->dot1dBaseType == 4)
-		&& dot1dTp
+    }
+	
+    if (dot1dBase->dot1dBaseType) {
+	e = fmt_enum(dot1dBaseType, dot1dBase->dot1dBaseType);
+	if (e) {
+	    g_string_sprintfa(s, "%-*s%s\n", indent, "Type:", e);
+	}
+	if (dot1dBase->dot1dBaseType
+	    && (*dot1dBase->dot1dBaseType == BRIDGE_MIB_DOT1DBASETYPE_TRANSPARENT_ONLY
+		|| *dot1dBase->dot1dBaseType == BRIDGE_MIB_DOT1DBASETYPE_SRT)
+	    && dot1dTp
 		&& dot1dTp->dot1dTpAgingTime) {
-		g_string_sprintfa(s, "%-*s %d sec\n", indent, "Tp Aging Time:",
+		g_string_sprintfa(s, "%-*s%d seconds\n", indent, "Tp Aging Time:",
 				  *dot1dTp->dot1dTpAgingTime);
 	    }
 	    if (dot1dStp && dot1dStp->dot1dStpMaxAge) {
-		g_string_sprintfa(s, "%-*s %d sec\n", indent, "Stp Aging Time:",
+		g_string_sprintfa(s, "%-*s %d seconds\n", indent, "Stp Aging Time:",
 				  *dot1dStp->dot1dStpMaxAge);
 	    }
 	}
+    }
+
+    if (dot1dStp) {
+	fmt_bridge_stp_info(s, dot1dStp);
     }
 }
 
@@ -104,8 +197,8 @@ static void
 fmt_bridge_port(GString *s,
 		bridge_mib_dot1dBasePortEntry_t *dot1dBasePortEntry,
 		if_mib_ifEntry_t *ifEntry,
-		 if_mib_ifXEntry_t *ifXEntry,
-		 int type_width, int name_width)
+		if_mib_ifXEntry_t *ifXEntry,
+		int type_width, int name_width)
 {
     g_string_sprintfa(s, "%5u ", dot1dBasePortEntry->dot1dBasePort);
     if (dot1dBasePortEntry->dot1dBasePortIfIndex) {
@@ -213,6 +306,85 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 	bridge_mib_free_dot1dBasePortTable(dot1dBasePortTable);
     if (ifTable) if_mib_free_ifTable(ifTable);
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
+
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_bridge_stp_port(GString *s,
+		    bridge_mib_dot1dStpPortEntry_t *dot1dStpPortEntry)
+{
+    const char *e;
+    
+    g_string_sprintfa(s, "%5u ", dot1dStpPortEntry->dot1dStpPort);
+
+    if (dot1dStpPortEntry->dot1dStpPortPriority) {
+	g_string_sprintfa(s, "%5u ", *dot1dStpPortEntry->dot1dStpPortPriority);
+    }
+
+    e = fmt_enum(bridge_mib_enums_dot1dStpPortState,
+		 dot1dStpPortEntry->dot1dStpPortState);
+    g_string_sprintfa(s, " %s ", e ? e : "");
+
+    e = fmt_enum(bridge_mib_enums_dot1dStpPortEnable,
+		 dot1dStpPortEntry->dot1dStpPortEnable);
+    g_string_sprintfa(s, " %s ", e ? e : "");
+
+    if (dot1dStpPortEntry->dot1dStpPortPathCost) {
+	g_string_sprintfa(s, "%5u ", *dot1dStpPortEntry->dot1dStpPortPathCost);
+    }
+
+    if (dot1dStpPortEntry->dot1dStpPortDesignatedRoot) {
+	g_string_sprintfa(s, " %s ",
+		  fmt_bridgeid(dot1dStpPortEntry->dot1dStpPortDesignatedRoot));
+    }
+
+    if (dot1dStpPortEntry->dot1dStpPortDesignatedCost) {
+	g_string_sprintfa(s, "%5u ", *dot1dStpPortEntry->dot1dStpPortDesignatedCost);
+    }
+    
+    if (dot1dStpPortEntry->dot1dStpPortDesignatedBridge) {
+	g_string_sprintfa(s, " %s ",
+		  fmt_bridgeid(dot1dStpPortEntry->dot1dStpPortDesignatedBridge));
+    }
+
+    if (dot1dStpPortEntry->dot1dStpPortDesignatedPort) {
+	g_string_sprintfa(s, "%5u ", *dot1dStpPortEntry->dot1dStpPortDesignatedPort);
+    }
+
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_bridge_stp_ports(scli_interp_t *interp, int argc, char **argv)
+{
+    bridge_mib_dot1dStpPortEntry_t **dot1dStpPortTable = NULL;
+    int i;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
+    if (bridge_mib_get_dot1dStpPortTable(interp->peer, &dot1dStpPortTable)) {
+	return SCLI_ERROR;
+    }
+
+    if (dot1dStpPortTable) {
+	g_string_sprintfa(interp->header,
+			  " PORT PRIO STATE STATUS P-COST D-ROOT D-COST D-BRIDGE D-PORT");
+	for (i = 0; dot1dStpPortTable[i]; i++) {
+	    fmt_bridge_stp_port(interp->result, dot1dStpPortTable[i]);
+	}
+    }
+
+    if (dot1dStpPortTable)
+	bridge_mib_free_dot1dStpPortTable(dot1dStpPortTable);
 
     return SCLI_OK;
 }
@@ -421,7 +593,7 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
     delta = TV_DIFF(last, now);
 
     if (portTable) {
-	g_string_append(interp->header, " PORT I-FPS O-FPS D-FPS DESCRIPTION");
+	g_string_append(interp->header, " PORT  I-FPS O-FPS D-FPS DESCRIPTION");
 	for (i = 0; portTable[i]; i++) {
 
 	    g_string_sprintfa(interp->result, "%5u ",
@@ -470,6 +642,13 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  show_bridge_ports },
+
+	{ "show bridge stp ports", NULL,
+	  "The show bridge stp ports command displays information about the\n"
+	  "bridge ports which participate in the spanning tree protocol.",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  show_bridge_stp_ports },
 
 	{ "show bridge forwarding", NULL,
 	  "The show bridge forwarding command displays the forwarding\n"
