@@ -57,32 +57,32 @@ fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 	     gint32 *conn, gint32 *prom)
 {
     static stls_table_t const admin_states[] = {
-	{ 1, "u" },	/* up */
-	{ 2, "d" },	/* down */
-	{ 3, "t" },	/* testing */
+	{ 1, "U" },	/* up */
+	{ 2, "D" },	/* down */
+	{ 3, "T" },	/* testing */
 	{ 0, NULL }
     };
 
     static stls_table_t const oper_states[] = {
-	{ 1, "u" },	/* up */
-	{ 2, "d" },	/* down */
-	{ 3, "t" },	/* testing */
+	{ 1, "U" },	/* up */
+	{ 2, "D" },	/* down */
+	{ 3, "T" },	/* testing */
 	{ 4, "?" },	/* unknown */
-	{ 5, "o" },	/* dormant */
-	{ 6, "n" },	/* notPresent */
-	{ 7, "l" },	/* lowerLayerDown */
+	{ 5, "O" },	/* dormant */
+	{ 6, "N" },	/* notPresent */
+	{ 7, "L" },	/* lowerLayerDown */
 	{ 0, NULL }
     };
 
     static stls_table_t const conn_states[] = {
-	{ 1, "c" },	/* connector present (true) */
-	{ 2, "n" },	/* no connector present (false) */
+	{ 1, "C" },	/* connector present (true) */
+	{ 2, "N" },	/* no connector present (false) */
 	{ 0, NULL }
     };
 
     static stls_table_t const prom_states[] = {
-	{ 1, "p" },	/* promiscuous (true) */
-	{ 2, "n" },	/* no promiscuous (false) */
+	{ 1, "P" },	/* promiscuous (true) */
+	{ 2, "N" },	/* no promiscuous (false) */
 	{ 0, NULL }
     };
 
@@ -233,19 +233,16 @@ show_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 {
     int j;
 
-    g_string_sprintfa(s, "%5u ", ifEntry->ifIndex);
-    g_string_sprintfa(s, "%-*s ", name_width,
-		      get_if_name(ifEntry, ifXEntry, 12));
+    g_string_sprintfa(s, "%5u  ", ifEntry->ifIndex);
+
     fmt_ifStatus(s,
 		 ifEntry->ifAdminStatus, ifEntry->ifOperStatus,
 		 ifXEntry ? ifXEntry->ifConnectorPresent : NULL,
 		 ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
 
-    if (ifEntry->ifMtu) {
-	g_string_sprintfa(s, " %6d", *(ifEntry->ifMtu));
-    } else {
-	g_string_append(s, "       ");
-    }
+    g_string_append(s, "  ");
+    fmt_enum(s, 20, if_mib_enums_ifType, ifEntry->ifType);
+    g_string_append(s, " ");
 
     if (ifEntry->ifSpeed) {
 	if (*(ifEntry->ifSpeed) == 0xffffffff
@@ -260,14 +257,13 @@ show_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
 	g_string_append(s, "       ");
     }
 
-    fmt_enum(s, 20, if_mib_enums_ifType, ifEntry->ifType);
-    g_string_append(s, " ");
+    g_string_sprintfa(s, "%-*s ", name_width,
+		      get_if_name(ifEntry, ifXEntry, 12));
 
-    if (ifEntry->ifPhysAddress && ifEntry->_ifPhysAddressLength) {
-	for (j = 0; j < ifEntry->_ifPhysAddressLength; j++) {
-	    g_string_sprintfa(s, "%s%02X", (j == 0) ? "" : ":",
-			      ifEntry->ifPhysAddress[j]);
-	}
+    if (ifEntry->ifDescr) {
+	g_string_sprintfa(s, "%.*s",
+			  ifEntry->_ifDescrLength,
+			  ifEntry->ifDescr);
     }
 
     g_string_append(s, "\n");
@@ -298,8 +294,7 @@ cmd_info(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 	g_string_sprintfa(interp->result,
-			  "Index %-*s Status  MTU Speed Type"
-			  "                 Address\n",
+	  "Index Status Type                  Speed %-*s Description\n",
 			  name_width, "Name");
 	for (i = 0; ifTable[i]; i++) {
 	    show_info(interp->result, ifTable[i],
