@@ -77,6 +77,10 @@ show_ethers(WINDOW *win, host_snmp *peer, int flags)
 		  "INDEX | ALIGN   FCS   MAC  LONG | DEFER  SCOL  MCOL  XCOL  LCOL   MAC  CARR");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
+	if (stats) {
+	    g_free(stats);
+	    stats = NULL;
+	}
     }
     
     if (etherlike_mib_get_dot3StatsTable(peer, &dot3StatsTable)
