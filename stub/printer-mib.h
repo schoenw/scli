@@ -694,6 +694,48 @@ printer_mib_set_prtGeneralEntry(GSnmpSession *s, printer_mib_prtGeneralEntry_t *
 extern void
 printer_mib_free_prtGeneralEntry(printer_mib_prtGeneralEntry_t *prtGeneralEntry);
 
+extern void
+printer_mib_set_prtGeneralCurrentLocalization(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtGeneralCurrentLocalization);
+
+extern void
+printer_mib_set_prtGeneralReset(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtGeneralReset);
+
+extern void
+printer_mib_set_prtGeneralCurrentOperator(GSnmpSession *s, gint32 hrDeviceIndex, guchar *prtGeneralCurrentOperator, guint16 _prtGeneralCurrentOperatorLength);
+
+extern void
+printer_mib_set_prtGeneralServicePerson(GSnmpSession *s, gint32 hrDeviceIndex, guchar *prtGeneralServicePerson, guint16 _prtGeneralServicePersonLength);
+
+extern void
+printer_mib_set_prtInputDefaultIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputDefaultIndex);
+
+extern void
+printer_mib_set_prtOutputDefaultIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputDefaultIndex);
+
+extern void
+printer_mib_set_prtMarkerDefaultIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtMarkerDefaultIndex);
+
+extern void
+printer_mib_set_prtMediaPathDefaultIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtMediaPathDefaultIndex);
+
+extern void
+printer_mib_set_prtConsoleLocalization(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtConsoleLocalization);
+
+extern void
+printer_mib_set_prtConsoleDisable(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtConsoleDisable);
+
+extern void
+printer_mib_set_prtAuxiliarySheetStartupPage(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtAuxiliarySheetStartupPage);
+
+extern void
+printer_mib_set_prtAuxiliarySheetBannerPage(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtAuxiliarySheetBannerPage);
+
+extern void
+printer_mib_set_prtGeneralPrinterName(GSnmpSession *s, gint32 hrDeviceIndex, guchar *prtGeneralPrinterName, guint16 _prtGeneralPrinterNameLength);
+
+extern void
+printer_mib_set_prtGeneralSerialNumber(GSnmpSession *s, gint32 hrDeviceIndex, guchar *prtGeneralSerialNumber, guint16 _prtGeneralSerialNumberLength);
+
 /*
  * C type definitions for Printer-MIB::prtStorageRefEntry.
  */
@@ -918,6 +960,45 @@ printer_mib_set_prtInputEntry(GSnmpSession *s, printer_mib_prtInputEntry_t *prtI
 extern void
 printer_mib_free_prtInputEntry(printer_mib_prtInputEntry_t *prtInputEntry);
 
+extern void
+printer_mib_set_prtInputMediaDimFeedDirDeclared(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputMediaDimFeedDirDeclared);
+
+extern void
+printer_mib_set_prtInputMediaDimXFeedDirDeclared(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputMediaDimXFeedDirDeclared);
+
+extern void
+printer_mib_set_prtInputMaxCapacity(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputMaxCapacity);
+
+extern void
+printer_mib_set_prtInputCurrentLevel(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputCurrentLevel);
+
+extern void
+printer_mib_set_prtInputMediaName(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, guchar *prtInputMediaName, guint16 _prtInputMediaNameLength);
+
+extern void
+printer_mib_set_prtInputName(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, guchar *prtInputName, guint16 _prtInputNameLength);
+
+extern void
+printer_mib_set_prtInputSecurity(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputSecurity);
+
+extern void
+printer_mib_set_prtInputMediaWeight(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputMediaWeight);
+
+extern void
+printer_mib_set_prtInputMediaType(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, guchar *prtInputMediaType, guint16 _prtInputMediaTypeLength);
+
+extern void
+printer_mib_set_prtInputMediaColor(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, guchar *prtInputMediaColor, guint16 _prtInputMediaColorLength);
+
+extern void
+printer_mib_set_prtInputMediaFormParts(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputMediaFormParts);
+
+extern void
+printer_mib_set_prtInputMediaLoadTimeout(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputMediaLoadTimeout);
+
+extern void
+printer_mib_set_prtInputNextIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputNextIndex);
+
 /*
  * C type definitions for Printer-MIB::prtOutputEntry.
  */
@@ -1009,6 +1090,48 @@ printer_mib_set_prtOutputEntry(GSnmpSession *s, printer_mib_prtOutputEntry_t *pr
 
 extern void
 printer_mib_free_prtOutputEntry(printer_mib_prtOutputEntry_t *prtOutputEntry);
+
+extern void
+printer_mib_set_prtOutputMaxCapacity(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputMaxCapacity);
+
+extern void
+printer_mib_set_prtOutputRemainingCapacity(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputRemainingCapacity);
+
+extern void
+printer_mib_set_prtOutputName(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, guchar *prtOutputName, guint16 _prtOutputNameLength);
+
+extern void
+printer_mib_set_prtOutputSecurity(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputSecurity);
+
+extern void
+printer_mib_set_prtOutputMaxDimFeedDir(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputMaxDimFeedDir);
+
+extern void
+printer_mib_set_prtOutputMaxDimXFeedDir(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputMaxDimXFeedDir);
+
+extern void
+printer_mib_set_prtOutputMinDimFeedDir(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputMinDimFeedDir);
+
+extern void
+printer_mib_set_prtOutputMinDimXFeedDir(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputMinDimXFeedDir);
+
+extern void
+printer_mib_set_prtOutputStackingOrder(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputStackingOrder);
+
+extern void
+printer_mib_set_prtOutputPageDeliveryOrientation(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputPageDeliveryOrientation);
+
+extern void
+printer_mib_set_prtOutputBursting(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputBursting);
+
+extern void
+printer_mib_set_prtOutputDecollating(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputDecollating);
+
+extern void
+printer_mib_set_prtOutputPageCollated(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputPageCollated);
+
+extern void
+printer_mib_set_prtOutputOffsetStacking(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputOffsetStacking);
 
 /*
  * C type definitions for Printer-MIB::prtMarkerEntry.
@@ -1109,6 +1232,12 @@ printer_mib_set_prtMarkerSuppliesEntry(GSnmpSession *s, printer_mib_prtMarkerSup
 
 extern void
 printer_mib_free_prtMarkerSuppliesEntry(printer_mib_prtMarkerSuppliesEntry_t *prtMarkerSuppliesEntry);
+
+extern void
+printer_mib_set_prtMarkerSuppliesMaxCapacity(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtMarkerSuppliesIndex, gint32 prtMarkerSuppliesMaxCapacity);
+
+extern void
+printer_mib_set_prtMarkerSuppliesLevel(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtMarkerSuppliesIndex, gint32 prtMarkerSuppliesLevel);
 
 /*
  * C type definitions for Printer-MIB::prtMarkerColorantEntry.
@@ -1244,6 +1373,18 @@ printer_mib_set_prtChannelEntry(GSnmpSession *s, printer_mib_prtChannelEntry_t *
 extern void
 printer_mib_free_prtChannelEntry(printer_mib_prtChannelEntry_t *prtChannelEntry);
 
+extern void
+printer_mib_set_prtChannelCurrentJobCntlLangIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtChannelIndex, gint32 prtChannelCurrentJobCntlLangIndex);
+
+extern void
+printer_mib_set_prtChannelDefaultPageDescLangIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtChannelIndex, gint32 prtChannelDefaultPageDescLangIndex);
+
+extern void
+printer_mib_set_prtChannelState(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtChannelIndex, gint32 prtChannelState);
+
+extern void
+printer_mib_set_prtChannelIfIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtChannelIndex, gint32 prtChannelIfIndex);
+
 /*
  * C type definitions for Printer-MIB::prtInterpreterEntry.
  */
@@ -1306,6 +1447,15 @@ printer_mib_set_prtInterpreterEntry(GSnmpSession *s, printer_mib_prtInterpreterE
 extern void
 printer_mib_free_prtInterpreterEntry(printer_mib_prtInterpreterEntry_t *prtInterpreterEntry);
 
+extern void
+printer_mib_set_prtInterpreterDefaultOrientation(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInterpreterIndex, gint32 prtInterpreterDefaultOrientation);
+
+extern void
+printer_mib_set_prtInterpreterDefaultCharSetIn(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInterpreterIndex, gint32 prtInterpreterDefaultCharSetIn);
+
+extern void
+printer_mib_set_prtInterpreterDefaultCharSetOut(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInterpreterIndex, gint32 prtInterpreterDefaultCharSetOut);
+
 /*
  * C type definitions for Printer-MIB::prtConsoleDisplayBufferEntry.
  */
@@ -1337,6 +1487,9 @@ printer_mib_set_prtConsoleDisplayBufferEntry(GSnmpSession *s, printer_mib_prtCon
 
 extern void
 printer_mib_free_prtConsoleDisplayBufferEntry(printer_mib_prtConsoleDisplayBufferEntry_t *prtConsoleDisplayBufferEntry);
+
+extern void
+printer_mib_set_prtConsoleDisplayBufferText(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtConsoleDisplayBufferIndex, guchar *prtConsoleDisplayBufferText, guint16 _prtConsoleDisplayBufferTextLength);
 
 /*
  * C type definitions for Printer-MIB::prtConsoleLightEntry.
@@ -1376,6 +1529,12 @@ printer_mib_set_prtConsoleLightEntry(GSnmpSession *s, printer_mib_prtConsoleLigh
 
 extern void
 printer_mib_free_prtConsoleLightEntry(printer_mib_prtConsoleLightEntry_t *prtConsoleLightEntry);
+
+extern void
+printer_mib_set_prtConsoleOnTime(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtConsoleLightIndex, gint32 prtConsoleOnTime);
+
+extern void
+printer_mib_set_prtConsoleOffTime(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtConsoleLightIndex, gint32 prtConsoleOffTime);
 
 /*
  * C type definitions for Printer-MIB::prtAlertEntry.

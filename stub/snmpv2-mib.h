@@ -81,6 +81,15 @@ snmpv2_mib_set_system(GSnmpSession *s, snmpv2_mib_system_t *system, gint mask);
 extern void
 snmpv2_mib_free_system(snmpv2_mib_system_t *system);
 
+extern void
+snmpv2_mib_set_sysContact(GSnmpSession *s, guchar *sysContact, guint16 _sysContactLength);
+
+extern void
+snmpv2_mib_set_sysName(GSnmpSession *s, guchar *sysName, guint16 _sysNameLength);
+
+extern void
+snmpv2_mib_set_sysLocation(GSnmpSession *s, guchar *sysLocation, guint16 _sysLocationLength);
+
 /*
  * C type definitions for SNMPv2-MIB::sysOREntry.
  */
@@ -197,6 +206,9 @@ snmpv2_mib_set_snmp(GSnmpSession *s, snmpv2_mib_snmp_t *snmp, gint mask);
 extern void
 snmpv2_mib_free_snmp(snmpv2_mib_snmp_t *snmp);
 
+extern void
+snmpv2_mib_set_snmpEnableAuthenTraps(GSnmpSession *s, gint32 snmpEnableAuthenTraps);
+
 /*
  * C type definitions for SNMPv2-MIB::snmpSet.
  */
@@ -217,6 +229,9 @@ snmpv2_mib_set_snmpSet(GSnmpSession *s, snmpv2_mib_snmpSet_t *snmpSet, gint mask
 
 extern void
 snmpv2_mib_free_snmpSet(snmpv2_mib_snmpSet_t *snmpSet);
+
+extern void
+snmpv2_mib_set_snmpSetSerialNo(GSnmpSession *s, gint32 snmpSetSerialNo);
 
 
 #endif /* _SNMPV2_MIB_H_ */

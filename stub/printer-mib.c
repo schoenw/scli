@@ -1661,7 +1661,7 @@ printer_mib_new_prtGeneralEntry()
     return prtGeneralEntry;
 }
 
-static int
+static inline int
 unpack_prtGeneralEntry(GSnmpVarBind *vb, printer_mib_prtGeneralEntry_t *prtGeneralEntry)
 {
     guint8 idx = 11;
@@ -1672,7 +1672,7 @@ unpack_prtGeneralEntry(GSnmpVarBind *vb, printer_mib_prtGeneralEntry_t *prtGener
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtGeneralEntry(guint32 *base, gint32 hrDeviceIndex)
 {
     guint8 idx = 11;
@@ -1681,7 +1681,7 @@ pack_prtGeneralEntry(guint32 *base, gint32 hrDeviceIndex)
     return idx;
 }
 
-static printer_mib_prtGeneralEntry_t *
+static inline printer_mib_prtGeneralEntry_t *
 assign_prtGeneralEntry(GSList *vbl)
 {
     printer_mib_prtGeneralEntry_t *prtGeneralEntry;
@@ -1818,6 +1818,178 @@ printer_mib_free_prtGeneralTable(printer_mib_prtGeneralEntry_t **prtGeneralEntry
     }
 }
 
+void
+printer_mib_set_prtGeneralCurrentLocalization(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtGeneralCurrentLocalization)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTGENERALCURRENTLOCALIZATION);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtGeneralCurrentLocalization = &prtGeneralCurrentLocalization;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTGENERALCURRENTLOCALIZATION);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtGeneralReset(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtGeneralReset)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTGENERALRESET);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtGeneralReset = &prtGeneralReset;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTGENERALRESET);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtGeneralCurrentOperator(GSnmpSession *s, gint32 hrDeviceIndex, guchar *prtGeneralCurrentOperator, guint16 _prtGeneralCurrentOperatorLength)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTGENERALCURRENTOPERATOR);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtGeneralCurrentOperator = prtGeneralCurrentOperator;
+    prtGeneralEntry->_prtGeneralCurrentOperatorLength = _prtGeneralCurrentOperatorLength;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTGENERALCURRENTOPERATOR);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtGeneralServicePerson(GSnmpSession *s, gint32 hrDeviceIndex, guchar *prtGeneralServicePerson, guint16 _prtGeneralServicePersonLength)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTGENERALSERVICEPERSON);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtGeneralServicePerson = prtGeneralServicePerson;
+    prtGeneralEntry->_prtGeneralServicePersonLength = _prtGeneralServicePersonLength;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTGENERALSERVICEPERSON);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtInputDefaultIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputDefaultIndex)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTINPUTDEFAULTINDEX);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtInputDefaultIndex = &prtInputDefaultIndex;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTINPUTDEFAULTINDEX);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtOutputDefaultIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputDefaultIndex)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTOUTPUTDEFAULTINDEX);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtOutputDefaultIndex = &prtOutputDefaultIndex;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTOUTPUTDEFAULTINDEX);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtMarkerDefaultIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtMarkerDefaultIndex)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTMARKERDEFAULTINDEX);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtMarkerDefaultIndex = &prtMarkerDefaultIndex;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTMARKERDEFAULTINDEX);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtMediaPathDefaultIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtMediaPathDefaultIndex)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTMEDIAPATHDEFAULTINDEX);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtMediaPathDefaultIndex = &prtMediaPathDefaultIndex;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTMEDIAPATHDEFAULTINDEX);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtConsoleLocalization(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtConsoleLocalization)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTCONSOLELOCALIZATION);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtConsoleLocalization = &prtConsoleLocalization;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTCONSOLELOCALIZATION);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtConsoleDisable(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtConsoleDisable)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTCONSOLEDISABLE);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtConsoleDisable = &prtConsoleDisable;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTCONSOLEDISABLE);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtAuxiliarySheetStartupPage(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtAuxiliarySheetStartupPage)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTAUXILIARYSHEETSTARTUPPAGE);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtAuxiliarySheetStartupPage = &prtAuxiliarySheetStartupPage;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTAUXILIARYSHEETSTARTUPPAGE);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtAuxiliarySheetBannerPage(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtAuxiliarySheetBannerPage)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTAUXILIARYSHEETBANNERPAGE);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtAuxiliarySheetBannerPage = &prtAuxiliarySheetBannerPage;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTAUXILIARYSHEETBANNERPAGE);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtGeneralPrinterName(GSnmpSession *s, gint32 hrDeviceIndex, guchar *prtGeneralPrinterName, guint16 _prtGeneralPrinterNameLength)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTGENERALPRINTERNAME);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtGeneralPrinterName = prtGeneralPrinterName;
+    prtGeneralEntry->_prtGeneralPrinterNameLength = _prtGeneralPrinterNameLength;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTGENERALPRINTERNAME);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
+void
+printer_mib_set_prtGeneralSerialNumber(GSnmpSession *s, gint32 hrDeviceIndex, guchar *prtGeneralSerialNumber, guint16 _prtGeneralSerialNumberLength)
+{
+    printer_mib_prtGeneralEntry_t *prtGeneralEntry;
+
+    printer_mib_get_prtGeneralEntry(s, &prtGeneralEntry, hrDeviceIndex, PRINTER_MIB_PRTGENERALSERIALNUMBER);
+    if (s->error_status || !prtGeneralEntry) return;
+    prtGeneralEntry->prtGeneralSerialNumber = prtGeneralSerialNumber;
+    prtGeneralEntry->_prtGeneralSerialNumberLength = _prtGeneralSerialNumberLength;
+    printer_mib_set_prtGeneralEntry(s, prtGeneralEntry, PRINTER_MIB_PRTGENERALSERIALNUMBER);
+    printer_mib_free_prtGeneralEntry(prtGeneralEntry);
+}
+
 printer_mib_prtStorageRefEntry_t *
 printer_mib_new_prtStorageRefEntry()
 {
@@ -1827,7 +1999,7 @@ printer_mib_new_prtStorageRefEntry()
     return prtStorageRefEntry;
 }
 
-static int
+static inline int
 unpack_prtStorageRefEntry(GSnmpVarBind *vb, printer_mib_prtStorageRefEntry_t *prtStorageRefEntry)
 {
     guint8 idx = 11;
@@ -1840,7 +2012,7 @@ unpack_prtStorageRefEntry(GSnmpVarBind *vb, printer_mib_prtStorageRefEntry_t *pr
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtStorageRefEntry(guint32 *base, gint32 hrStorageIndex, gint32 prtStorageRefSeqNumber)
 {
     guint8 idx = 11;
@@ -1850,7 +2022,7 @@ pack_prtStorageRefEntry(guint32 *base, gint32 hrStorageIndex, gint32 prtStorageR
     return idx;
 }
 
-static printer_mib_prtStorageRefEntry_t *
+static inline printer_mib_prtStorageRefEntry_t *
 assign_prtStorageRefEntry(GSList *vbl)
 {
     printer_mib_prtStorageRefEntry_t *prtStorageRefEntry;
@@ -1971,7 +2143,7 @@ printer_mib_new_prtDeviceRefEntry()
     return prtDeviceRefEntry;
 }
 
-static int
+static inline int
 unpack_prtDeviceRefEntry(GSnmpVarBind *vb, printer_mib_prtDeviceRefEntry_t *prtDeviceRefEntry)
 {
     guint8 idx = 11;
@@ -1984,7 +2156,7 @@ unpack_prtDeviceRefEntry(GSnmpVarBind *vb, printer_mib_prtDeviceRefEntry_t *prtD
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtDeviceRefEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtDeviceRefSeqNumber)
 {
     guint8 idx = 11;
@@ -1994,7 +2166,7 @@ pack_prtDeviceRefEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtDeviceRefS
     return idx;
 }
 
-static printer_mib_prtDeviceRefEntry_t *
+static inline printer_mib_prtDeviceRefEntry_t *
 assign_prtDeviceRefEntry(GSList *vbl)
 {
     printer_mib_prtDeviceRefEntry_t *prtDeviceRefEntry;
@@ -2115,7 +2287,7 @@ printer_mib_new_prtCoverEntry()
     return prtCoverEntry;
 }
 
-static int
+static inline int
 unpack_prtCoverEntry(GSnmpVarBind *vb, printer_mib_prtCoverEntry_t *prtCoverEntry)
 {
     guint8 idx = 11;
@@ -2128,7 +2300,7 @@ unpack_prtCoverEntry(GSnmpVarBind *vb, printer_mib_prtCoverEntry_t *prtCoverEntr
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtCoverEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtCoverIndex)
 {
     guint8 idx = 11;
@@ -2138,7 +2310,7 @@ pack_prtCoverEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtCoverIndex)
     return idx;
 }
 
-static printer_mib_prtCoverEntry_t *
+static inline printer_mib_prtCoverEntry_t *
 assign_prtCoverEntry(GSList *vbl)
 {
     printer_mib_prtCoverEntry_t *prtCoverEntry;
@@ -2259,7 +2431,7 @@ printer_mib_new_prtLocalizationEntry()
     return prtLocalizationEntry;
 }
 
-static int
+static inline int
 unpack_prtLocalizationEntry(GSnmpVarBind *vb, printer_mib_prtLocalizationEntry_t *prtLocalizationEntry)
 {
     guint8 idx = 11;
@@ -2272,7 +2444,7 @@ unpack_prtLocalizationEntry(GSnmpVarBind *vb, printer_mib_prtLocalizationEntry_t
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtLocalizationEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtLocalizationIndex)
 {
     guint8 idx = 11;
@@ -2282,7 +2454,7 @@ pack_prtLocalizationEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtLocaliz
     return idx;
 }
 
-static printer_mib_prtLocalizationEntry_t *
+static inline printer_mib_prtLocalizationEntry_t *
 assign_prtLocalizationEntry(GSList *vbl)
 {
     printer_mib_prtLocalizationEntry_t *prtLocalizationEntry;
@@ -2403,7 +2575,7 @@ printer_mib_new_prtInputEntry()
     return prtInputEntry;
 }
 
-static int
+static inline int
 unpack_prtInputEntry(GSnmpVarBind *vb, printer_mib_prtInputEntry_t *prtInputEntry)
 {
     guint8 idx = 11;
@@ -2416,7 +2588,7 @@ unpack_prtInputEntry(GSnmpVarBind *vb, printer_mib_prtInputEntry_t *prtInputEntr
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtInputEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtInputIndex)
 {
     guint8 idx = 11;
@@ -2426,7 +2598,7 @@ pack_prtInputEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtInputIndex)
     return idx;
 }
 
-static printer_mib_prtInputEntry_t *
+static inline printer_mib_prtInputEntry_t *
 assign_prtInputEntry(GSList *vbl)
 {
     printer_mib_prtInputEntry_t *prtInputEntry;
@@ -2563,6 +2735,166 @@ printer_mib_free_prtInputTable(printer_mib_prtInputEntry_t **prtInputEntry)
     }
 }
 
+void
+printer_mib_set_prtInputMediaDimFeedDirDeclared(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputMediaDimFeedDirDeclared)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTMEDIADIMFEEDDIRDECLARED);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputMediaDimFeedDirDeclared = &prtInputMediaDimFeedDirDeclared;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTMEDIADIMFEEDDIRDECLARED);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
+void
+printer_mib_set_prtInputMediaDimXFeedDirDeclared(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputMediaDimXFeedDirDeclared)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTMEDIADIMXFEEDDIRDECLARED);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputMediaDimXFeedDirDeclared = &prtInputMediaDimXFeedDirDeclared;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTMEDIADIMXFEEDDIRDECLARED);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
+void
+printer_mib_set_prtInputMaxCapacity(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputMaxCapacity)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTMAXCAPACITY);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputMaxCapacity = &prtInputMaxCapacity;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTMAXCAPACITY);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
+void
+printer_mib_set_prtInputCurrentLevel(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputCurrentLevel)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTCURRENTLEVEL);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputCurrentLevel = &prtInputCurrentLevel;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTCURRENTLEVEL);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
+void
+printer_mib_set_prtInputMediaName(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, guchar *prtInputMediaName, guint16 _prtInputMediaNameLength)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTMEDIANAME);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputMediaName = prtInputMediaName;
+    prtInputEntry->_prtInputMediaNameLength = _prtInputMediaNameLength;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTMEDIANAME);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
+void
+printer_mib_set_prtInputName(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, guchar *prtInputName, guint16 _prtInputNameLength)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTNAME);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputName = prtInputName;
+    prtInputEntry->_prtInputNameLength = _prtInputNameLength;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTNAME);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
+void
+printer_mib_set_prtInputSecurity(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputSecurity)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTSECURITY);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputSecurity = &prtInputSecurity;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTSECURITY);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
+void
+printer_mib_set_prtInputMediaWeight(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputMediaWeight)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTMEDIAWEIGHT);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputMediaWeight = &prtInputMediaWeight;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTMEDIAWEIGHT);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
+void
+printer_mib_set_prtInputMediaType(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, guchar *prtInputMediaType, guint16 _prtInputMediaTypeLength)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTMEDIATYPE);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputMediaType = prtInputMediaType;
+    prtInputEntry->_prtInputMediaTypeLength = _prtInputMediaTypeLength;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTMEDIATYPE);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
+void
+printer_mib_set_prtInputMediaColor(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, guchar *prtInputMediaColor, guint16 _prtInputMediaColorLength)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTMEDIACOLOR);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputMediaColor = prtInputMediaColor;
+    prtInputEntry->_prtInputMediaColorLength = _prtInputMediaColorLength;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTMEDIACOLOR);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
+void
+printer_mib_set_prtInputMediaFormParts(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputMediaFormParts)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTMEDIAFORMPARTS);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputMediaFormParts = &prtInputMediaFormParts;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTMEDIAFORMPARTS);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
+void
+printer_mib_set_prtInputMediaLoadTimeout(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputMediaLoadTimeout)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTMEDIALOADTIMEOUT);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputMediaLoadTimeout = &prtInputMediaLoadTimeout;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTMEDIALOADTIMEOUT);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
+void
+printer_mib_set_prtInputNextIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInputIndex, gint32 prtInputNextIndex)
+{
+    printer_mib_prtInputEntry_t *prtInputEntry;
+
+    printer_mib_get_prtInputEntry(s, &prtInputEntry, hrDeviceIndex, prtInputIndex, PRINTER_MIB_PRTINPUTNEXTINDEX);
+    if (s->error_status || !prtInputEntry) return;
+    prtInputEntry->prtInputNextIndex = &prtInputNextIndex;
+    printer_mib_set_prtInputEntry(s, prtInputEntry, PRINTER_MIB_PRTINPUTNEXTINDEX);
+    printer_mib_free_prtInputEntry(prtInputEntry);
+}
+
 printer_mib_prtOutputEntry_t *
 printer_mib_new_prtOutputEntry()
 {
@@ -2572,7 +2904,7 @@ printer_mib_new_prtOutputEntry()
     return prtOutputEntry;
 }
 
-static int
+static inline int
 unpack_prtOutputEntry(GSnmpVarBind *vb, printer_mib_prtOutputEntry_t *prtOutputEntry)
 {
     guint8 idx = 11;
@@ -2585,7 +2917,7 @@ unpack_prtOutputEntry(GSnmpVarBind *vb, printer_mib_prtOutputEntry_t *prtOutputE
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtOutputEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtOutputIndex)
 {
     guint8 idx = 11;
@@ -2595,7 +2927,7 @@ pack_prtOutputEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtOutputIndex)
     return idx;
 }
 
-static printer_mib_prtOutputEntry_t *
+static inline printer_mib_prtOutputEntry_t *
 assign_prtOutputEntry(GSList *vbl)
 {
     printer_mib_prtOutputEntry_t *prtOutputEntry;
@@ -2732,6 +3064,175 @@ printer_mib_free_prtOutputTable(printer_mib_prtOutputEntry_t **prtOutputEntry)
     }
 }
 
+void
+printer_mib_set_prtOutputMaxCapacity(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputMaxCapacity)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTMAXCAPACITY);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputMaxCapacity = &prtOutputMaxCapacity;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTMAXCAPACITY);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputRemainingCapacity(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputRemainingCapacity)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTREMAININGCAPACITY);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputRemainingCapacity = &prtOutputRemainingCapacity;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTREMAININGCAPACITY);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputName(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, guchar *prtOutputName, guint16 _prtOutputNameLength)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTNAME);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputName = prtOutputName;
+    prtOutputEntry->_prtOutputNameLength = _prtOutputNameLength;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTNAME);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputSecurity(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputSecurity)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTSECURITY);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputSecurity = &prtOutputSecurity;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTSECURITY);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputMaxDimFeedDir(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputMaxDimFeedDir)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTMAXDIMFEEDDIR);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputMaxDimFeedDir = &prtOutputMaxDimFeedDir;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTMAXDIMFEEDDIR);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputMaxDimXFeedDir(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputMaxDimXFeedDir)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTMAXDIMXFEEDDIR);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputMaxDimXFeedDir = &prtOutputMaxDimXFeedDir;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTMAXDIMXFEEDDIR);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputMinDimFeedDir(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputMinDimFeedDir)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTMINDIMFEEDDIR);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputMinDimFeedDir = &prtOutputMinDimFeedDir;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTMINDIMFEEDDIR);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputMinDimXFeedDir(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputMinDimXFeedDir)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTMINDIMXFEEDDIR);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputMinDimXFeedDir = &prtOutputMinDimXFeedDir;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTMINDIMXFEEDDIR);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputStackingOrder(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputStackingOrder)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTSTACKINGORDER);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputStackingOrder = &prtOutputStackingOrder;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTSTACKINGORDER);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputPageDeliveryOrientation(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputPageDeliveryOrientation)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTPAGEDELIVERYORIENTATION);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputPageDeliveryOrientation = &prtOutputPageDeliveryOrientation;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTPAGEDELIVERYORIENTATION);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputBursting(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputBursting)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTBURSTING);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputBursting = &prtOutputBursting;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTBURSTING);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputDecollating(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputDecollating)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTDECOLLATING);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputDecollating = &prtOutputDecollating;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTDECOLLATING);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputPageCollated(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputPageCollated)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTPAGECOLLATED);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputPageCollated = &prtOutputPageCollated;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTPAGECOLLATED);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
+void
+printer_mib_set_prtOutputOffsetStacking(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtOutputIndex, gint32 prtOutputOffsetStacking)
+{
+    printer_mib_prtOutputEntry_t *prtOutputEntry;
+
+    printer_mib_get_prtOutputEntry(s, &prtOutputEntry, hrDeviceIndex, prtOutputIndex, PRINTER_MIB_PRTOUTPUTOFFSETSTACKING);
+    if (s->error_status || !prtOutputEntry) return;
+    prtOutputEntry->prtOutputOffsetStacking = &prtOutputOffsetStacking;
+    printer_mib_set_prtOutputEntry(s, prtOutputEntry, PRINTER_MIB_PRTOUTPUTOFFSETSTACKING);
+    printer_mib_free_prtOutputEntry(prtOutputEntry);
+}
+
 printer_mib_prtMarkerEntry_t *
 printer_mib_new_prtMarkerEntry()
 {
@@ -2741,7 +3242,7 @@ printer_mib_new_prtMarkerEntry()
     return prtMarkerEntry;
 }
 
-static int
+static inline int
 unpack_prtMarkerEntry(GSnmpVarBind *vb, printer_mib_prtMarkerEntry_t *prtMarkerEntry)
 {
     guint8 idx = 11;
@@ -2754,7 +3255,7 @@ unpack_prtMarkerEntry(GSnmpVarBind *vb, printer_mib_prtMarkerEntry_t *prtMarkerE
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtMarkerEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtMarkerIndex)
 {
     guint8 idx = 11;
@@ -2764,7 +3265,7 @@ pack_prtMarkerEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtMarkerIndex)
     return idx;
 }
 
-static printer_mib_prtMarkerEntry_t *
+static inline printer_mib_prtMarkerEntry_t *
 assign_prtMarkerEntry(GSList *vbl)
 {
     printer_mib_prtMarkerEntry_t *prtMarkerEntry;
@@ -2885,7 +3386,7 @@ printer_mib_new_prtMarkerSuppliesEntry()
     return prtMarkerSuppliesEntry;
 }
 
-static int
+static inline int
 unpack_prtMarkerSuppliesEntry(GSnmpVarBind *vb, printer_mib_prtMarkerSuppliesEntry_t *prtMarkerSuppliesEntry)
 {
     guint8 idx = 11;
@@ -2898,7 +3399,7 @@ unpack_prtMarkerSuppliesEntry(GSnmpVarBind *vb, printer_mib_prtMarkerSuppliesEnt
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtMarkerSuppliesEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtMarkerSuppliesIndex)
 {
     guint8 idx = 11;
@@ -2908,7 +3409,7 @@ pack_prtMarkerSuppliesEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtMarke
     return idx;
 }
 
-static printer_mib_prtMarkerSuppliesEntry_t *
+static inline printer_mib_prtMarkerSuppliesEntry_t *
 assign_prtMarkerSuppliesEntry(GSList *vbl)
 {
     printer_mib_prtMarkerSuppliesEntry_t *prtMarkerSuppliesEntry;
@@ -3045,6 +3546,30 @@ printer_mib_free_prtMarkerSuppliesTable(printer_mib_prtMarkerSuppliesEntry_t **p
     }
 }
 
+void
+printer_mib_set_prtMarkerSuppliesMaxCapacity(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtMarkerSuppliesIndex, gint32 prtMarkerSuppliesMaxCapacity)
+{
+    printer_mib_prtMarkerSuppliesEntry_t *prtMarkerSuppliesEntry;
+
+    printer_mib_get_prtMarkerSuppliesEntry(s, &prtMarkerSuppliesEntry, hrDeviceIndex, prtMarkerSuppliesIndex, PRINTER_MIB_PRTMARKERSUPPLIESMAXCAPACITY);
+    if (s->error_status || !prtMarkerSuppliesEntry) return;
+    prtMarkerSuppliesEntry->prtMarkerSuppliesMaxCapacity = &prtMarkerSuppliesMaxCapacity;
+    printer_mib_set_prtMarkerSuppliesEntry(s, prtMarkerSuppliesEntry, PRINTER_MIB_PRTMARKERSUPPLIESMAXCAPACITY);
+    printer_mib_free_prtMarkerSuppliesEntry(prtMarkerSuppliesEntry);
+}
+
+void
+printer_mib_set_prtMarkerSuppliesLevel(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtMarkerSuppliesIndex, gint32 prtMarkerSuppliesLevel)
+{
+    printer_mib_prtMarkerSuppliesEntry_t *prtMarkerSuppliesEntry;
+
+    printer_mib_get_prtMarkerSuppliesEntry(s, &prtMarkerSuppliesEntry, hrDeviceIndex, prtMarkerSuppliesIndex, PRINTER_MIB_PRTMARKERSUPPLIESLEVEL);
+    if (s->error_status || !prtMarkerSuppliesEntry) return;
+    prtMarkerSuppliesEntry->prtMarkerSuppliesLevel = &prtMarkerSuppliesLevel;
+    printer_mib_set_prtMarkerSuppliesEntry(s, prtMarkerSuppliesEntry, PRINTER_MIB_PRTMARKERSUPPLIESLEVEL);
+    printer_mib_free_prtMarkerSuppliesEntry(prtMarkerSuppliesEntry);
+}
+
 printer_mib_prtMarkerColorantEntry_t *
 printer_mib_new_prtMarkerColorantEntry()
 {
@@ -3054,7 +3579,7 @@ printer_mib_new_prtMarkerColorantEntry()
     return prtMarkerColorantEntry;
 }
 
-static int
+static inline int
 unpack_prtMarkerColorantEntry(GSnmpVarBind *vb, printer_mib_prtMarkerColorantEntry_t *prtMarkerColorantEntry)
 {
     guint8 idx = 11;
@@ -3067,7 +3592,7 @@ unpack_prtMarkerColorantEntry(GSnmpVarBind *vb, printer_mib_prtMarkerColorantEnt
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtMarkerColorantEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtMarkerColorantIndex)
 {
     guint8 idx = 11;
@@ -3077,7 +3602,7 @@ pack_prtMarkerColorantEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtMarke
     return idx;
 }
 
-static printer_mib_prtMarkerColorantEntry_t *
+static inline printer_mib_prtMarkerColorantEntry_t *
 assign_prtMarkerColorantEntry(GSList *vbl)
 {
     printer_mib_prtMarkerColorantEntry_t *prtMarkerColorantEntry;
@@ -3198,7 +3723,7 @@ printer_mib_new_prtMediaPathEntry()
     return prtMediaPathEntry;
 }
 
-static int
+static inline int
 unpack_prtMediaPathEntry(GSnmpVarBind *vb, printer_mib_prtMediaPathEntry_t *prtMediaPathEntry)
 {
     guint8 idx = 11;
@@ -3211,7 +3736,7 @@ unpack_prtMediaPathEntry(GSnmpVarBind *vb, printer_mib_prtMediaPathEntry_t *prtM
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtMediaPathEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtMediaPathIndex)
 {
     guint8 idx = 11;
@@ -3221,7 +3746,7 @@ pack_prtMediaPathEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtMediaPathI
     return idx;
 }
 
-static printer_mib_prtMediaPathEntry_t *
+static inline printer_mib_prtMediaPathEntry_t *
 assign_prtMediaPathEntry(GSList *vbl)
 {
     printer_mib_prtMediaPathEntry_t *prtMediaPathEntry;
@@ -3342,7 +3867,7 @@ printer_mib_new_prtChannelEntry()
     return prtChannelEntry;
 }
 
-static int
+static inline int
 unpack_prtChannelEntry(GSnmpVarBind *vb, printer_mib_prtChannelEntry_t *prtChannelEntry)
 {
     guint8 idx = 11;
@@ -3355,7 +3880,7 @@ unpack_prtChannelEntry(GSnmpVarBind *vb, printer_mib_prtChannelEntry_t *prtChann
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtChannelEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtChannelIndex)
 {
     guint8 idx = 11;
@@ -3365,7 +3890,7 @@ pack_prtChannelEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtChannelIndex
     return idx;
 }
 
-static printer_mib_prtChannelEntry_t *
+static inline printer_mib_prtChannelEntry_t *
 assign_prtChannelEntry(GSList *vbl)
 {
     printer_mib_prtChannelEntry_t *prtChannelEntry;
@@ -3502,6 +4027,54 @@ printer_mib_free_prtChannelTable(printer_mib_prtChannelEntry_t **prtChannelEntry
     }
 }
 
+void
+printer_mib_set_prtChannelCurrentJobCntlLangIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtChannelIndex, gint32 prtChannelCurrentJobCntlLangIndex)
+{
+    printer_mib_prtChannelEntry_t *prtChannelEntry;
+
+    printer_mib_get_prtChannelEntry(s, &prtChannelEntry, hrDeviceIndex, prtChannelIndex, PRINTER_MIB_PRTCHANNELCURRENTJOBCNTLLANGINDEX);
+    if (s->error_status || !prtChannelEntry) return;
+    prtChannelEntry->prtChannelCurrentJobCntlLangIndex = &prtChannelCurrentJobCntlLangIndex;
+    printer_mib_set_prtChannelEntry(s, prtChannelEntry, PRINTER_MIB_PRTCHANNELCURRENTJOBCNTLLANGINDEX);
+    printer_mib_free_prtChannelEntry(prtChannelEntry);
+}
+
+void
+printer_mib_set_prtChannelDefaultPageDescLangIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtChannelIndex, gint32 prtChannelDefaultPageDescLangIndex)
+{
+    printer_mib_prtChannelEntry_t *prtChannelEntry;
+
+    printer_mib_get_prtChannelEntry(s, &prtChannelEntry, hrDeviceIndex, prtChannelIndex, PRINTER_MIB_PRTCHANNELDEFAULTPAGEDESCLANGINDEX);
+    if (s->error_status || !prtChannelEntry) return;
+    prtChannelEntry->prtChannelDefaultPageDescLangIndex = &prtChannelDefaultPageDescLangIndex;
+    printer_mib_set_prtChannelEntry(s, prtChannelEntry, PRINTER_MIB_PRTCHANNELDEFAULTPAGEDESCLANGINDEX);
+    printer_mib_free_prtChannelEntry(prtChannelEntry);
+}
+
+void
+printer_mib_set_prtChannelState(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtChannelIndex, gint32 prtChannelState)
+{
+    printer_mib_prtChannelEntry_t *prtChannelEntry;
+
+    printer_mib_get_prtChannelEntry(s, &prtChannelEntry, hrDeviceIndex, prtChannelIndex, PRINTER_MIB_PRTCHANNELSTATE);
+    if (s->error_status || !prtChannelEntry) return;
+    prtChannelEntry->prtChannelState = &prtChannelState;
+    printer_mib_set_prtChannelEntry(s, prtChannelEntry, PRINTER_MIB_PRTCHANNELSTATE);
+    printer_mib_free_prtChannelEntry(prtChannelEntry);
+}
+
+void
+printer_mib_set_prtChannelIfIndex(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtChannelIndex, gint32 prtChannelIfIndex)
+{
+    printer_mib_prtChannelEntry_t *prtChannelEntry;
+
+    printer_mib_get_prtChannelEntry(s, &prtChannelEntry, hrDeviceIndex, prtChannelIndex, PRINTER_MIB_PRTCHANNELIFINDEX);
+    if (s->error_status || !prtChannelEntry) return;
+    prtChannelEntry->prtChannelIfIndex = &prtChannelIfIndex;
+    printer_mib_set_prtChannelEntry(s, prtChannelEntry, PRINTER_MIB_PRTCHANNELIFINDEX);
+    printer_mib_free_prtChannelEntry(prtChannelEntry);
+}
+
 printer_mib_prtInterpreterEntry_t *
 printer_mib_new_prtInterpreterEntry()
 {
@@ -3511,7 +4084,7 @@ printer_mib_new_prtInterpreterEntry()
     return prtInterpreterEntry;
 }
 
-static int
+static inline int
 unpack_prtInterpreterEntry(GSnmpVarBind *vb, printer_mib_prtInterpreterEntry_t *prtInterpreterEntry)
 {
     guint8 idx = 11;
@@ -3524,7 +4097,7 @@ unpack_prtInterpreterEntry(GSnmpVarBind *vb, printer_mib_prtInterpreterEntry_t *
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtInterpreterEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtInterpreterIndex)
 {
     guint8 idx = 11;
@@ -3534,7 +4107,7 @@ pack_prtInterpreterEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtInterpre
     return idx;
 }
 
-static printer_mib_prtInterpreterEntry_t *
+static inline printer_mib_prtInterpreterEntry_t *
 assign_prtInterpreterEntry(GSList *vbl)
 {
     printer_mib_prtInterpreterEntry_t *prtInterpreterEntry;
@@ -3671,6 +4244,42 @@ printer_mib_free_prtInterpreterTable(printer_mib_prtInterpreterEntry_t **prtInte
     }
 }
 
+void
+printer_mib_set_prtInterpreterDefaultOrientation(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInterpreterIndex, gint32 prtInterpreterDefaultOrientation)
+{
+    printer_mib_prtInterpreterEntry_t *prtInterpreterEntry;
+
+    printer_mib_get_prtInterpreterEntry(s, &prtInterpreterEntry, hrDeviceIndex, prtInterpreterIndex, PRINTER_MIB_PRTINTERPRETERDEFAULTORIENTATION);
+    if (s->error_status || !prtInterpreterEntry) return;
+    prtInterpreterEntry->prtInterpreterDefaultOrientation = &prtInterpreterDefaultOrientation;
+    printer_mib_set_prtInterpreterEntry(s, prtInterpreterEntry, PRINTER_MIB_PRTINTERPRETERDEFAULTORIENTATION);
+    printer_mib_free_prtInterpreterEntry(prtInterpreterEntry);
+}
+
+void
+printer_mib_set_prtInterpreterDefaultCharSetIn(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInterpreterIndex, gint32 prtInterpreterDefaultCharSetIn)
+{
+    printer_mib_prtInterpreterEntry_t *prtInterpreterEntry;
+
+    printer_mib_get_prtInterpreterEntry(s, &prtInterpreterEntry, hrDeviceIndex, prtInterpreterIndex, PRINTER_MIB_PRTINTERPRETERDEFAULTCHARSETIN);
+    if (s->error_status || !prtInterpreterEntry) return;
+    prtInterpreterEntry->prtInterpreterDefaultCharSetIn = &prtInterpreterDefaultCharSetIn;
+    printer_mib_set_prtInterpreterEntry(s, prtInterpreterEntry, PRINTER_MIB_PRTINTERPRETERDEFAULTCHARSETIN);
+    printer_mib_free_prtInterpreterEntry(prtInterpreterEntry);
+}
+
+void
+printer_mib_set_prtInterpreterDefaultCharSetOut(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtInterpreterIndex, gint32 prtInterpreterDefaultCharSetOut)
+{
+    printer_mib_prtInterpreterEntry_t *prtInterpreterEntry;
+
+    printer_mib_get_prtInterpreterEntry(s, &prtInterpreterEntry, hrDeviceIndex, prtInterpreterIndex, PRINTER_MIB_PRTINTERPRETERDEFAULTCHARSETOUT);
+    if (s->error_status || !prtInterpreterEntry) return;
+    prtInterpreterEntry->prtInterpreterDefaultCharSetOut = &prtInterpreterDefaultCharSetOut;
+    printer_mib_set_prtInterpreterEntry(s, prtInterpreterEntry, PRINTER_MIB_PRTINTERPRETERDEFAULTCHARSETOUT);
+    printer_mib_free_prtInterpreterEntry(prtInterpreterEntry);
+}
+
 printer_mib_prtConsoleDisplayBufferEntry_t *
 printer_mib_new_prtConsoleDisplayBufferEntry()
 {
@@ -3680,7 +4289,7 @@ printer_mib_new_prtConsoleDisplayBufferEntry()
     return prtConsoleDisplayBufferEntry;
 }
 
-static int
+static inline int
 unpack_prtConsoleDisplayBufferEntry(GSnmpVarBind *vb, printer_mib_prtConsoleDisplayBufferEntry_t *prtConsoleDisplayBufferEntry)
 {
     guint8 idx = 11;
@@ -3693,7 +4302,7 @@ unpack_prtConsoleDisplayBufferEntry(GSnmpVarBind *vb, printer_mib_prtConsoleDisp
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtConsoleDisplayBufferEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtConsoleDisplayBufferIndex)
 {
     guint8 idx = 11;
@@ -3703,7 +4312,7 @@ pack_prtConsoleDisplayBufferEntry(guint32 *base, gint32 hrDeviceIndex, gint32 pr
     return idx;
 }
 
-static printer_mib_prtConsoleDisplayBufferEntry_t *
+static inline printer_mib_prtConsoleDisplayBufferEntry_t *
 assign_prtConsoleDisplayBufferEntry(GSList *vbl)
 {
     printer_mib_prtConsoleDisplayBufferEntry_t *prtConsoleDisplayBufferEntry;
@@ -3840,6 +4449,19 @@ printer_mib_free_prtConsoleDisplayBufferTable(printer_mib_prtConsoleDisplayBuffe
     }
 }
 
+void
+printer_mib_set_prtConsoleDisplayBufferText(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtConsoleDisplayBufferIndex, guchar *prtConsoleDisplayBufferText, guint16 _prtConsoleDisplayBufferTextLength)
+{
+    printer_mib_prtConsoleDisplayBufferEntry_t *prtConsoleDisplayBufferEntry;
+
+    printer_mib_get_prtConsoleDisplayBufferEntry(s, &prtConsoleDisplayBufferEntry, hrDeviceIndex, prtConsoleDisplayBufferIndex, PRINTER_MIB_PRTCONSOLEDISPLAYBUFFERTEXT);
+    if (s->error_status || !prtConsoleDisplayBufferEntry) return;
+    prtConsoleDisplayBufferEntry->prtConsoleDisplayBufferText = prtConsoleDisplayBufferText;
+    prtConsoleDisplayBufferEntry->_prtConsoleDisplayBufferTextLength = _prtConsoleDisplayBufferTextLength;
+    printer_mib_set_prtConsoleDisplayBufferEntry(s, prtConsoleDisplayBufferEntry, PRINTER_MIB_PRTCONSOLEDISPLAYBUFFERTEXT);
+    printer_mib_free_prtConsoleDisplayBufferEntry(prtConsoleDisplayBufferEntry);
+}
+
 printer_mib_prtConsoleLightEntry_t *
 printer_mib_new_prtConsoleLightEntry()
 {
@@ -3849,7 +4471,7 @@ printer_mib_new_prtConsoleLightEntry()
     return prtConsoleLightEntry;
 }
 
-static int
+static inline int
 unpack_prtConsoleLightEntry(GSnmpVarBind *vb, printer_mib_prtConsoleLightEntry_t *prtConsoleLightEntry)
 {
     guint8 idx = 11;
@@ -3862,7 +4484,7 @@ unpack_prtConsoleLightEntry(GSnmpVarBind *vb, printer_mib_prtConsoleLightEntry_t
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtConsoleLightEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtConsoleLightIndex)
 {
     guint8 idx = 11;
@@ -3872,7 +4494,7 @@ pack_prtConsoleLightEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtConsole
     return idx;
 }
 
-static printer_mib_prtConsoleLightEntry_t *
+static inline printer_mib_prtConsoleLightEntry_t *
 assign_prtConsoleLightEntry(GSList *vbl)
 {
     printer_mib_prtConsoleLightEntry_t *prtConsoleLightEntry;
@@ -4009,6 +4631,30 @@ printer_mib_free_prtConsoleLightTable(printer_mib_prtConsoleLightEntry_t **prtCo
     }
 }
 
+void
+printer_mib_set_prtConsoleOnTime(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtConsoleLightIndex, gint32 prtConsoleOnTime)
+{
+    printer_mib_prtConsoleLightEntry_t *prtConsoleLightEntry;
+
+    printer_mib_get_prtConsoleLightEntry(s, &prtConsoleLightEntry, hrDeviceIndex, prtConsoleLightIndex, PRINTER_MIB_PRTCONSOLEONTIME);
+    if (s->error_status || !prtConsoleLightEntry) return;
+    prtConsoleLightEntry->prtConsoleOnTime = &prtConsoleOnTime;
+    printer_mib_set_prtConsoleLightEntry(s, prtConsoleLightEntry, PRINTER_MIB_PRTCONSOLEONTIME);
+    printer_mib_free_prtConsoleLightEntry(prtConsoleLightEntry);
+}
+
+void
+printer_mib_set_prtConsoleOffTime(GSnmpSession *s, gint32 hrDeviceIndex, gint32 prtConsoleLightIndex, gint32 prtConsoleOffTime)
+{
+    printer_mib_prtConsoleLightEntry_t *prtConsoleLightEntry;
+
+    printer_mib_get_prtConsoleLightEntry(s, &prtConsoleLightEntry, hrDeviceIndex, prtConsoleLightIndex, PRINTER_MIB_PRTCONSOLEOFFTIME);
+    if (s->error_status || !prtConsoleLightEntry) return;
+    prtConsoleLightEntry->prtConsoleOffTime = &prtConsoleOffTime;
+    printer_mib_set_prtConsoleLightEntry(s, prtConsoleLightEntry, PRINTER_MIB_PRTCONSOLEOFFTIME);
+    printer_mib_free_prtConsoleLightEntry(prtConsoleLightEntry);
+}
+
 printer_mib_prtAlertEntry_t *
 printer_mib_new_prtAlertEntry()
 {
@@ -4018,7 +4664,7 @@ printer_mib_new_prtAlertEntry()
     return prtAlertEntry;
 }
 
-static int
+static inline int
 unpack_prtAlertEntry(GSnmpVarBind *vb, printer_mib_prtAlertEntry_t *prtAlertEntry)
 {
     guint8 idx = 11;
@@ -4031,7 +4677,7 @@ unpack_prtAlertEntry(GSnmpVarBind *vb, printer_mib_prtAlertEntry_t *prtAlertEntr
     return 0;
 }
 
-static int
+static inline gint8
 pack_prtAlertEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtAlertIndex)
 {
     guint8 idx = 11;
@@ -4041,7 +4687,7 @@ pack_prtAlertEntry(guint32 *base, gint32 hrDeviceIndex, gint32 prtAlertIndex)
     return idx;
 }
 
-static printer_mib_prtAlertEntry_t *
+static inline printer_mib_prtAlertEntry_t *
 assign_prtAlertEntry(GSList *vbl)
 {
     printer_mib_prtAlertEntry_t *prtAlertEntry;

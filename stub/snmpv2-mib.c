@@ -389,6 +389,45 @@ snmpv2_mib_free_system(snmpv2_mib_system_t *system)
     }
 }
 
+void
+snmpv2_mib_set_sysContact(GSnmpSession *s, guchar *sysContact, guint16 _sysContactLength)
+{
+    snmpv2_mib_system_t *system;
+
+    snmpv2_mib_get_system(s, &system, SNMPV2_MIB_SYSCONTACT);
+    if (s->error_status || !system) return;
+    system->sysContact = sysContact;
+    system->_sysContactLength = _sysContactLength;
+    snmpv2_mib_set_system(s, system, SNMPV2_MIB_SYSCONTACT);
+    snmpv2_mib_free_system(system);
+}
+
+void
+snmpv2_mib_set_sysName(GSnmpSession *s, guchar *sysName, guint16 _sysNameLength)
+{
+    snmpv2_mib_system_t *system;
+
+    snmpv2_mib_get_system(s, &system, SNMPV2_MIB_SYSNAME);
+    if (s->error_status || !system) return;
+    system->sysName = sysName;
+    system->_sysNameLength = _sysNameLength;
+    snmpv2_mib_set_system(s, system, SNMPV2_MIB_SYSNAME);
+    snmpv2_mib_free_system(system);
+}
+
+void
+snmpv2_mib_set_sysLocation(GSnmpSession *s, guchar *sysLocation, guint16 _sysLocationLength)
+{
+    snmpv2_mib_system_t *system;
+
+    snmpv2_mib_get_system(s, &system, SNMPV2_MIB_SYSLOCATION);
+    if (s->error_status || !system) return;
+    system->sysLocation = sysLocation;
+    system->_sysLocationLength = _sysLocationLength;
+    snmpv2_mib_set_system(s, system, SNMPV2_MIB_SYSLOCATION);
+    snmpv2_mib_free_system(system);
+}
+
 snmpv2_mib_sysOREntry_t *
 snmpv2_mib_new_sysOREntry()
 {
@@ -409,7 +448,7 @@ unpack_sysOREntry(GSnmpVarBind *vb, snmpv2_mib_sysOREntry_t *sysOREntry)
     return 0;
 }
 
-static inline int
+static inline gint8
 pack_sysOREntry(guint32 *base, gint32 sysORIndex)
 {
     guint8 idx = 10;
@@ -609,6 +648,18 @@ snmpv2_mib_free_snmp(snmpv2_mib_snmp_t *snmp)
     }
 }
 
+void
+snmpv2_mib_set_snmpEnableAuthenTraps(GSnmpSession *s, gint32 snmpEnableAuthenTraps)
+{
+    snmpv2_mib_snmp_t *snmp;
+
+    snmpv2_mib_get_snmp(s, &snmp, SNMPV2_MIB_SNMPENABLEAUTHENTRAPS);
+    if (s->error_status || !snmp) return;
+    snmp->snmpEnableAuthenTraps = &snmpEnableAuthenTraps;
+    snmpv2_mib_set_snmp(s, snmp, SNMPV2_MIB_SNMPENABLEAUTHENTRAPS);
+    snmpv2_mib_free_snmp(snmp);
+}
+
 snmpv2_mib_snmpSet_t *
 snmpv2_mib_new_snmpSet()
 {
@@ -686,6 +737,18 @@ snmpv2_mib_free_snmpSet(snmpv2_mib_snmpSet_t *snmpSet)
         g_snmp_vbl_free(vbl);
         g_free(snmpSet);
     }
+}
+
+void
+snmpv2_mib_set_snmpSetSerialNo(GSnmpSession *s, gint32 snmpSetSerialNo)
+{
+    snmpv2_mib_snmpSet_t *snmpSet;
+
+    snmpv2_mib_get_snmpSet(s, &snmpSet, SNMPV2_MIB_SNMPSETSERIALNO);
+    if (s->error_status || !snmpSet) return;
+    snmpSet->snmpSetSerialNo = &snmpSetSerialNo;
+    snmpv2_mib_set_snmpSet(s, snmpSet, SNMPV2_MIB_SNMPSETSERIALNO);
+    snmpv2_mib_free_snmpSet(snmpSet);
 }
 
 
