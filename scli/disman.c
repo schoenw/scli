@@ -191,9 +191,9 @@ static void
 fmt_row_status(GString *s, gint32 *status)
 {
     static GSnmpEnum const row_states[] = {
-	{ 1, "a" },	/* active */
-	{ 2, "s" },	/* notInService */
-	{ 3, "r" },	/* notReady */
+	{ 1, "A" },	/* active */
+	{ 2, "S" },	/* notInService */
+	{ 3, "R" },	/* notReady */
 	{ 0, NULL }
     };
 
