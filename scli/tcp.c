@@ -180,14 +180,15 @@ void
 scli_init_tcp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "tcp", 0, NULL, NULL },
-	{ "show tcp", "listener", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show tcp listener",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "existing tcp listener",
 	  cmd_tcp_listener },
-	{ "show tcp", "connections", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show tcp connections",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "existing tcp connections",
 	  cmd_tcp_connections },
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t tcp_mode = {

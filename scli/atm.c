@@ -88,11 +88,11 @@ void
 scli_init_atm_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "atm", 0, NULL, NULL },
-	{ "show atm", "interface", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show atm interface",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "atm interfaces",
 	  cmd_atm_interface },
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t atm_mode = {

@@ -642,32 +642,35 @@ void
 scli_init_disman_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "disman", 0, NULL, NULL },
-	{ "show disman", "languages", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show disman languages",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "languages supported by the distributed manager",
 	  cmd_languages },
-	{ "show disman", "script", 0, NULL, NULL },
-	{ "show disman script", "info", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show disman script info",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "script summary information",
 	  cmd_script_info },
-	{ "show disman script", "details", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show disman script details",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "scripts installed at the distributed manager",
 	  cmd_script_details },
-	{ "show disman", "launch", 0, NULL, NULL },
-	{ "show disman launch", "info", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show disman launch info",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "launch summary information",
 	  cmd_launch_info },
-	{ "show disman launch", "details", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show disman launch details",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "launch buttons installed on the distributed manager",
 	  cmd_launch_details },
-	{ "show disman", "runs", 0, NULL, NULL },
-	{ "show disman runs", "info", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show disman run info",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "summary information about running scripts",
 	  cmd_run_info },
-	{ "show disman run", "details", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show disman run details",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "running scripts on the distributed manager",
 	  cmd_run_details },
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t disman_mode = {

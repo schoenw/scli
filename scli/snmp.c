@@ -42,7 +42,7 @@ fmt_string(GString *s, char *label, int width, guchar *string, gsize len)
 
 
 static int
-cmd_snmp(scli_interp_t *interp, int argc, char **argv)
+cmd_snmp_engine(scli_interp_t *interp, int argc, char **argv)
 {
     snmpEngine_t *snmpEngine;
     sysOREntry_t **sysORTable;
@@ -95,10 +95,11 @@ void
 scli_init_snmp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "snmp", 0, NULL, NULL },
-	{ "show snmp", "engine", SCLI_CMD_FLAG_NEED_PEER,
-	  "information about the snmp engine", cmd_snmp },
-	{ NULL, NULL, 0, NULL, NULL }
+	{ "show snmp engine",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "information about the snmp engine",
+	  cmd_snmp_engine },
+	{ NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t snmp_mode = {

@@ -337,19 +337,21 @@ void
 scli_init_interface_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "interface", 0, NULL, NULL },
-	{ "show interface", "info", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show interface info",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "network interface summary information",
 	  cmd_if_info },
-	{ "show interface", "details", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show interface details",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "detailed information about the network interfaces",
 	  cmd_if_details },
 #if 0
-	{ "show interface", "stack", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show interface stack",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "interface stacking information",
 	  cmd_if_stack },
 #endif
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t if_mib_mode = {

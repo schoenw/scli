@@ -567,23 +567,27 @@ void
 scli_init_system_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "system", 0, NULL, NULL },
-	{ "show system", "info", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show system info",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "system summary information",
 	  cmd_system },
-	{ "show system", "devices", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show system devices",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "list of system devices",
 	  cmd_devices },
-	{ "show system", "storage", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show system storage",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "storage areas attached to the system",
 	  cmd_storage },
-	{ "show system", "mounts", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show system mounts",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "file systems mounted on the system",
 	  cmd_mounts },
-	{ "show system", "processes", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show system processes",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "processes running on the system",
 	  cmd_processes },
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t system_mode = {

@@ -87,11 +87,11 @@ void
 scli_init_udp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "udp", 0, NULL, NULL },
-	{ "show udp", "listener", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show udp listener",
+	  SCLI_CMD_FLAG_NEED_PEER,
 	  "existing udp listener",
 	  cmd_udp_listener },
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, 0, NULL, NULL }
     };
     
     static scli_mode_t udp_mode = {

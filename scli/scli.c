@@ -238,25 +238,31 @@ main(int argc, char **argv)
     int norc = 0, port = 161, delay = 5000, retries = 3, timeout = 500000;
 
     static scli_cmd_t cmds[] = {
-	{ NULL, "close", 0,
+	{ "close",
+	  0,
 	  "close the association to a remote SNMP agent",
 	  scli_cmd_close },
-	{ NULL, "exit", 0,
+	{ "exit",
+	  0,
 	  "exit the scli command line program",
 	  scli_cmd_exit },
-	{ NULL, "help", 0,
+	{ "help",
+	  0,
 	  "help about the current mode and commands",
 	  scli_cmd_help },
-	{ NULL, "history", 0,
+	{ "history",
+	  0,
 	  "display the command history list with line numbers",
 	  scli_cmd_history },
-	{ NULL, "open", 0,
+	{ "open",
+	  0,
 	  "open an association to a remote SNMP agent",
 	  scli_cmd_open },
-	{ NULL, "show", 0,
+	{ "show",
+	  0,
 	  "show information about a certain topic",
 	  NULL },
-	{ NULL, NULL, 0, NULL, NULL }
+	{ NULL, 0, NULL, NULL }
     };
 
     static struct option const long_options[] =
@@ -344,7 +350,7 @@ main(int argc, char **argv)
 
     interp = scli_interp_create();
 
-    for (i = 0; cmds[i].name; i++) {
+    for (i = 0; cmds[i].path; i++) {
 	scli_create_command(interp, cmds + i);
     }
 

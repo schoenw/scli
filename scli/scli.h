@@ -56,11 +56,11 @@ typedef struct scli_cmd		scli_cmd_t;
 
 struct scli_cmd {
     char *path;			/* path where the command is registered */
-    char *name;			/* name of the comand */
     int   flags;		/* command flags */
     char *desc;			/* description of the command */
     int (*func) (scli_interp_t *interp, int argc, char **argv);
 				/* function to implement the command */
+    char *name;			/* name of the command (last elem of path) */
 };
 
 struct scli_mode {

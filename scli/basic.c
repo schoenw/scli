@@ -124,7 +124,7 @@ scli_register_mode(scli_interp_t *interp, scli_mode_t *mode)
 	interp->mode_list = g_slist_append(interp->mode_list, mode);
     }
 
-    for (i = 0; mode->cmds[i].name; i++) {
+    for (i = 0; mode->cmds[i].path; i++) {
 	scli_create_command(interp, mode->cmds + i);
     }
 }
@@ -185,7 +185,7 @@ scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd)
 {
     int i, argc;
     char **argv;
-    GNode *node;
+    GNode *node, *child;
 
     if (! cmd->path) {
 	g_node_append(interp->cmd_root, g_node_new(cmd));
@@ -200,21 +200,26 @@ scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd)
 	g_node_append(interp->cmd_root, g_node_new(cmd));
 	return SCLI_OK;
     }
+
+    cmd->name = g_strdup(argv[argc-1]);
     
     node = interp->cmd_root;
-    for (i = 0; i < argc; i++) {
-	for (node = g_node_first_child(node);
-	     node;
-	     node = g_node_next_sibling(node)) {
-	    scli_cmd_t *this_cmd = (scli_cmd_t *) node->data;
+    for (i = 0; i < argc-1; i++) {
+	for (child = g_node_first_child(node);
+	     child;
+	     child = g_node_next_sibling(child)) {
+	    scli_cmd_t *this_cmd = (scli_cmd_t *) child->data;
 	    if (strcmp(this_cmd->name, argv[i]) == 0) {
 		break;
 	    }
 	}
-	if (! node) {
-	    g_free(argv);
-	    return SCLI_ERROR;
+	if (! child) {
+	    scli_cmd_t *newcmd;
+	    newcmd = (scli_cmd_t *) g_malloc0(sizeof(scli_cmd_t));
+	    newcmd->name = g_strdup(argv[i]);
+	    child = g_node_append(node, g_node_new(newcmd));
 	}
+	node = child;
     }
 
     if (node) {
@@ -232,6 +237,14 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
     scli_cmd_t *cmd = (scli_cmd_t *) node->data;
     int code = SCLI_OK;
    
+    extern char *g_snmp_msg;
+    if (g_snmp_msg) g_free(g_snmp_msg);
+    g_snmp_msg = g_malloc(strlen(cmd->name)
+			  + (cmd->path ? strlen(cmd->path) : 0) + 2);
+    strcpy(g_snmp_msg, cmd->path ? cmd->path : "");
+    strcat(g_snmp_msg, " ");
+    strcat(g_snmp_msg, cmd->name);
+    
     if (cmd->func) {
 	g_string_truncate(interp->result, 0);
 	if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER && ! interp->peer) {
