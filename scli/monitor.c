@@ -294,7 +294,11 @@ show_ip(GNetSnmp *peer, int flags)
     static guint32 ipOutSent = 0;
     static struct timeval last, now;
     double delta;
-    int mask = 0;
+    int mask = IP_MIB_IPFORWDATAGRAMS | IP_MIB_IPINRECEIVES |
+	    IP_MIB_IPOUTREQUESTS | IP_MIB_IPOUTDISCARDS |
+	    IP_MIB_IPOUTNOROUTES | IP_MIB_IPFRAGOKS |
+	    IP_MIB_IPFRAGFAILS | IP_MIB_IPFRAGCREATES |
+	    IP_MIB_IPREASMOKS;
 
     if (flags & STOP_FLAG_RESTART) {
         last.tv_sec = last.tv_usec = 0;
