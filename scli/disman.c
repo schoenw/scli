@@ -216,265 +216,265 @@ fmt_row_status(GString *s, gint32 *status)
 static void
 fmt_script_admin_status(GString *s, gint32 *status)
 {
-     static GSnmpEnum const script_admin_states[] = {
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_ENABLED,	"e" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_DISABLED,	"d" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_EDITING,	"t" },
-	 { 0, NULL }
-     };
-
-     xxx_enum(s, 1, script_admin_states, status);
- }
-
-
-
- static void
- fmt_script_oper_status(GString *s, gint32 *status)
- {
-     static GSnmpEnum const script_oper_states[] = {
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_ENABLED,		"e" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_DISABLED,	"d" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_EDITING,		"t" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_RETRIEVING,	"r" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_COMPILING,	"c" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_NOSUCHSCRIPT,	"n" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_ACCESSDENIED,	"a" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_WRONGLANGUAGE,	"w" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_WRONGVERSION,	"v" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_COMPILATIONFAILED, "f" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_NORESOURCESLEFT,	"o" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_UNKNOWNPROTOCOL,	"u" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_PROTOCOLFAILURE,	"p" },
-	 { DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_GENERICERROR,	"g" },
-	 { 0, NULL }
-     };
-
-     xxx_enum(s, 1, script_oper_states, status);
- }
+    static GSnmpEnum const script_admin_states[] = {
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_ENABLED,	"e" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_DISABLED,	"d" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTADMINSTATUS_EDITING,	"t" },
+	{ 0, NULL }
+    };
+    
+    xxx_enum(s, 1, script_admin_states, status);
+}
 
 
 
- static void
- fmt_launch_admin_status(GString *s, gint32 *status)
- {
-     static GSnmpEnum const launch_admin_states[] = {
-	 { DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_ENABLED,	"e" },
-	 { DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_DISABLED,	"d" },
-	 { DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_AUTOSTART,	"a" },
-	 { 0, NULL }
-     };
-
-     xxx_enum(s, 1, launch_admin_states, status);
- }
-
-
-
- static void
- fmt_launch_oper_status(GString *s, gint32 *status)
- {
-     static GSnmpEnum const launch_oper_states[] = {
-	 { DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_ENABLED,		"e" },
-	 { DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_DISABLED,	"d" },
-	 { DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_EXPIRED,		"x" },
-	 { 0, NULL }
-     };
-
-     xxx_enum(s, 1, launch_oper_states, status);
- }
+static void
+fmt_script_oper_status(GString *s, gint32 *status)
+{
+    static GSnmpEnum const script_oper_states[] = {
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_ENABLED,		"e" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_DISABLED,	"d" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_EDITING,		"t" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_RETRIEVING,	"r" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_COMPILING,	"c" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_NOSUCHSCRIPT,	"n" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_ACCESSDENIED,	"a" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_WRONGLANGUAGE,	"w" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_WRONGVERSION,	"v" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_COMPILATIONFAILED, "f" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_NORESOURCESLEFT,	"o" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_UNKNOWNPROTOCOL,	"u" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_PROTOCOLFAILURE,	"p" },
+	{ DISMAN_SCRIPT_MIB_SMSCRIPTOPERSTATUS_GENERICERROR,	"g" },
+	{ 0, NULL }
+    };
+    
+    xxx_enum(s, 1, script_oper_states, status);
+}
 
 
 
- static void
- fmt_run_state(GString *s, gint32 *state)
- {
-     char const *name;
-
-     static GSnmpEnum const run_states[] = {
-	 { DISMAN_SCRIPT_MIB_SMRUNSTATE_INITIALIZING,	"I" },
-	 { DISMAN_SCRIPT_MIB_SMRUNSTATE_EXECUTING,	"R" },
-	 { DISMAN_SCRIPT_MIB_SMRUNSTATE_SUSPENDING,	"U" },
-	 { DISMAN_SCRIPT_MIB_SMRUNSTATE_SUSPENDED,	"S" },
-	 { DISMAN_SCRIPT_MIB_SMRUNSTATE_RESUMING,	"R" },
-	 { DISMAN_SCRIPT_MIB_SMRUNSTATE_ABORTING,	"A" },
-	 { DISMAN_SCRIPT_MIB_SMRUNSTATE_TERMINATED,	"T" },
-	 { 0, NULL }
-     };
-
-     if (! state) {
-	 g_string_append(s, "-");
-	 return;
-     }
-
-     name = gsnmp_enum_get_label(run_states, *state);
-     if (name) {
-	 g_string_append(s, name);
-     } else {
-	 g_string_append(s, "?");
-     }
- }
-
-
- static void
- fmt_exit_code(GString *s, gint32 *code)
- {
-     char const *name;
-
-     static GSnmpEnum const exit_codes[] = {
-	 { DISMAN_SCRIPT_MIB_SMRUNEXITCODE_NOERROR,		"N" },
-	 { DISMAN_SCRIPT_MIB_SMRUNEXITCODE_HALTED,		"H" },
-	 { DISMAN_SCRIPT_MIB_SMRUNEXITCODE_LIFETIMEEXCEEDED,	"T" },
-	 { DISMAN_SCRIPT_MIB_SMRUNEXITCODE_NORESOURCESLEFT,	"O" },
-	 { DISMAN_SCRIPT_MIB_SMRUNEXITCODE_LANGUAGEERROR,	"L" },
-	 { DISMAN_SCRIPT_MIB_SMRUNEXITCODE_RUNTIMEERROR,		"R" },
-	 { DISMAN_SCRIPT_MIB_SMRUNEXITCODE_INVALIDARGUMENT,	"A" },
-	 { DISMAN_SCRIPT_MIB_SMRUNEXITCODE_SECURITYVIOLATION,	"S" },
-	 { DISMAN_SCRIPT_MIB_SMRUNEXITCODE_GENERICERROR,		"G" },
-	 { 0, NULL }
-     };
-
-     if (! code) {
-	 g_string_append(s, "-");
-	 return;
-     }
-
-     name = gsnmp_enum_get_label(exit_codes, *code);
-     if (name) {
-	 g_string_append(s, name);
-     } else {
-	 g_string_append(s, "?");
-     }
- }
+static void
+fmt_launch_admin_status(GString *s, gint32 *status)
+{
+    static GSnmpEnum const launch_admin_states[] = {
+	{ DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_ENABLED,	"e" },
+	{ DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_DISABLED,	"d" },
+	{ DISMAN_SCRIPT_MIB_SMLAUNCHADMINSTATUS_AUTOSTART,	"a" },
+	{ 0, NULL }
+    };
+    
+    xxx_enum(s, 1, launch_admin_states, status);
+}
 
 
 
- static void
- fmt_schedule_admin_status(GString *s, gint32 *status)
- {
-     static GSnmpEnum const schedule_admin_states[] = {
-	 { DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_ENABLED,		"e" },
-	 { DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_DISABLED,	"d" },
-	 { 0, NULL }
-     };
+static void
+fmt_launch_oper_status(GString *s, gint32 *status)
+{
+    static GSnmpEnum const launch_oper_states[] = {
+	{ DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_ENABLED,		"e" },
+	{ DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_DISABLED,	"d" },
+	{ DISMAN_SCRIPT_MIB_SMLAUNCHOPERSTATUS_EXPIRED,		"x" },
+	{ 0, NULL }
+    };
 
-     xxx_enum(s, 1, schedule_admin_states, status);
- }
-
-
-
- static void
- fmt_schedule_oper_status(GString *s, gint32 *status)
- {
-     static GSnmpEnum const schedule_oper_states[] = {
-	 { DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_ENABLED,	"e" },
-	 { DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_DISABLED,	"d" },
-	 { DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_FINISHED,	"f" },
-	 { 0, NULL }
-     };
-
-     xxx_enum(s, 1, schedule_oper_states, status);
- }
+    xxx_enum(s, 1, launch_oper_states, status);
+}
 
 
 
- static int
- fmt_item(GString *s, const char **labels, guchar *bits, gsize bits_len)
- {
-     int i, bit, start = -1;
-     int cnt = 0;
-
-     if (! bits) {
-	 return 0;
-     }
-
-     for (i = 0; labels[i]; i++) {
-	 bit = (i/8 < bits_len) ? bits[i/8] & 1 <<(7-(i%8)) : 0;
-	 if (bit) cnt++;
-     }
-     if (cnt == i) {
-	 return -1;
-     }
-
-     /* XXX should recognize / ranges (are they called ranges?) */
-
-     for (i = 0; labels[i]; i++) {
-	 bit = (i/8 < bits_len) ? bits[i/8] & 1 <<(7-(i%8)) : 0;
-	 if (bit) {
-	     if (start == -1) {
-		 g_string_sprintfa(s, "%s%s", s->len ? " " : "", labels[i]);
-		 start = i;
-	     }
-	 } else {
-	     if (start >= 0 && start != i-1) {
-		 g_string_sprintfa(s, "-%s", labels[i-1]);
-	     }
-	     start = -1;
-	 }
-     }
-     if (start >= 0 && start != i-1) {
-	 g_string_sprintfa(s, "-%s", labels[i-1]);
-     }
-
-     return cnt;
- }
+static void
+fmt_run_state(GString *s, gint32 *state)
+{
+    char const *name;
+    
+    static GSnmpEnum const run_states[] = {
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_INITIALIZING,	"I" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_EXECUTING,	"R" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_SUSPENDING,	"U" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_SUSPENDED,	"S" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_RESUMING,	"R" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_ABORTING,	"A" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_TERMINATED,	"T" },
+	{ 0, NULL }
+    };
+    
+    if (! state) {
+	g_string_append(s, "-");
+	return;
+    }
+    
+    name = gsnmp_enum_get_label(run_states, *state);
+    if (name) {
+	g_string_append(s, name);
+    } else {
+	g_string_append(s, "?");
+    }
+}
 
 
+static void
+fmt_exit_code(GString *s, gint32 *code)
+{
+    char const *name;
+    
+    static GSnmpEnum const exit_codes[] = {
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_NOERROR,		"N" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_HALTED,		"H" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_LIFETIMEEXCEEDED,	"T" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_NORESOURCESLEFT,	"O" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_LANGUAGEERROR,	"L" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_RUNTIMEERROR,		"R" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_INVALIDARGUMENT,	"A" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_SECURITYVIOLATION,	"S" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_GENERICERROR,		"G" },
+	{ 0, NULL }
+    };
+    
+    if (! code) {
+	g_string_append(s, "-");
+	return;
+    }
+    
+    name = gsnmp_enum_get_label(exit_codes, *code);
+    if (name) {
+	g_string_append(s, name);
+    } else {
+	g_string_append(s, "?");
+    }
+}
 
- static char*
- fmt_expression(disman_schedule_mib_schedEntry_t *schedEntry)
- {
-     static GString *s = NULL;
-     int w = 0, o = 0, d = 0, h = 0, m = 0;
 
-     if (!s) {
-	 s = g_string_new(NULL);
-     } else {
-	 s = g_string_truncate(s, 0);
-     }
 
-     if (! schedEntry->schedType) {
-	 return "?";
-     }
+static void
+fmt_schedule_admin_status(GString *s, gint32 *status)
+{
+    static GSnmpEnum const schedule_admin_states[] = {
+	{ DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_ENABLED,		"e" },
+	{ DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS_DISABLED,	"d" },
+	{ 0, NULL }
+    };
+    
+    xxx_enum(s, 1, schedule_admin_states, status);
+}
 
-     switch (*schedEntry->schedType) {
-     case DISMAN_SCHEDULE_MIB_SCHEDTYPE_PERIODIC:
+
+
+static void
+fmt_schedule_oper_status(GString *s, gint32 *status)
+{
+    static GSnmpEnum const schedule_oper_states[] = {
+	{ DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_ENABLED,	"e" },
+	{ DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_DISABLED,	"d" },
+	{ DISMAN_SCHEDULE_MIB_SCHEDOPERSTATUS_FINISHED,	"f" },
+	{ 0, NULL }
+    };
+    
+    xxx_enum(s, 1, schedule_oper_states, status);
+}
+
+
+
+static int
+fmt_item(GString *s, const char **labels, guchar *bits, gsize bits_len)
+{
+    int i, bit, start = -1;
+    int cnt = 0;
+    
+    if (! bits) {
+	return 0;
+    }
+    
+    for (i = 0; labels[i]; i++) {
+	bit = (i/8 < bits_len) ? bits[i/8] & 1 <<(7-(i%8)) : 0;
+	if (bit) cnt++;
+    }
+    if (cnt == i) {
+	return -1;
+    }
+    
+    /* XXX should recognize / ranges (are they called ranges?) */
+    
+    for (i = 0; labels[i]; i++) {
+	bit = (i/8 < bits_len) ? bits[i/8] & 1 <<(7-(i%8)) : 0;
+	if (bit) {
+	    if (start == -1) {
+		g_string_sprintfa(s, "%s%s", s->len ? " " : "", labels[i]);
+		start = i;
+	    }
+	} else {
+	    if (start >= 0 && start != i-1) {
+		g_string_sprintfa(s, "-%s", labels[i-1]);
+	    }
+	    start = -1;
+	}
+    }
+    if (start >= 0 && start != i-1) {
+	g_string_sprintfa(s, "-%s", labels[i-1]);
+    }
+    
+    return cnt;
+}
+
+
+
+static char*
+fmt_expression(disman_schedule_mib_schedEntry_t *schedEntry)
+{
+    static GString *s = NULL;
+    int w = 0, o = 0, d = 0, h = 0, m = 0;
+    
+    if (!s) {
+	s = g_string_new(NULL);
+    } else {
+	s = g_string_truncate(s, 0);
+    }
+    
+    if (! schedEntry->schedType) {
+	return "?";
+    }
+    
+    switch (*schedEntry->schedType) {
+    case DISMAN_SCHEDULE_MIB_SCHEDTYPE_PERIODIC:
 	 if (schedEntry->schedInterval) {
 	     g_string_sprintfa(s, "%u", *schedEntry->schedInterval);
 	 } else {
 	     g_string_append(s, "?");
 	 }
 	 break;
-     case DISMAN_SCHEDULE_MIB_SCHEDTYPE_CALENDAR:
-     case DISMAN_SCHEDULE_MIB_SCHEDTYPE_ONESHOT:
-	 w = fmt_item(s, weekdays,
-		      schedEntry->schedWeekDay, schedEntry->_schedWeekDayLength);
-	 o = fmt_item(s, months,
-		      schedEntry->schedMonth, schedEntry->_schedMonthLength);
-	 d = fmt_item(s, ddays,
-		      schedEntry->schedDay, schedEntry->_schedDayLength);
-	 h = fmt_item(s, hours,
-		      schedEntry->schedHour, schedEntry->_schedHourLength);
-	 m = fmt_item(s, minutes,
-		      schedEntry->schedMinute, schedEntry->_schedMinuteLength);
+    case DISMAN_SCHEDULE_MIB_SCHEDTYPE_CALENDAR:
+    case DISMAN_SCHEDULE_MIB_SCHEDTYPE_ONESHOT:
+	w = fmt_item(s, weekdays,
+		     schedEntry->schedWeekDay, schedEntry->_schedWeekDayLength);
+	o = fmt_item(s, months,
+		     schedEntry->schedMonth, schedEntry->_schedMonthLength);
+	d = fmt_item(s, ddays,
+		     schedEntry->schedDay, schedEntry->_schedDayLength);
+	h = fmt_item(s, hours,
+		     schedEntry->schedHour, schedEntry->_schedHourLength);
+	m = fmt_item(s, minutes,
+		     schedEntry->schedMinute, schedEntry->_schedMinuteLength);
+	
+	if (w == 0 || o == 0 || d == 0 || h == 0 || m == 0) {
+	    g_string_truncate(s, 0);
+	}
+	
+	if (w == -1 && o == -1 && d == -1 && h == -1 && m == -1) {
+	    g_string_append(s, "*");
+	}
+	break;
+    default:
+	g_string_append(s, "?");
+    }
+    return s->str;
+}
 
-	 if (w == 0 || o == 0 || d == 0 || h == 0 || m == 0) {
-	     g_string_truncate(s, 0);
-	 }
-
-	 if (w == -1 && o == -1 && d == -1 && h == -1 && m == -1) {
-	     g_string_append(s, "*");
-	 }
-	 break;
-     default:
-	 g_string_append(s, "?");
-     }
-     return s->str;
- }
 
 
-
- static char const *
- get_script_lang_name(disman_script_mib_smScriptEntry_t *smScriptEntry,
-		      disman_script_mib_smLangEntry_t **smLangTable)
+static char const *
+get_script_lang_name(disman_script_mib_smScriptEntry_t *smScriptEntry,
+		     disman_script_mib_smLangEntry_t **smLangTable)
 {
     int i;
     
