@@ -27,6 +27,8 @@
 #include "snmp-view-based-acm-mib.h"
 #include "snmp-user-based-sm-mib.h"
 
+#include "snmp-view-based-acm-mib-proc.h"
+
 
 static GSnmpEnum const security_model[] = {
     { 0,	"any" },
@@ -138,6 +140,46 @@ fmt_row_status(GString *s, gint32 *status)
     } else {
 	g_string_append(s, "-");
     }
+}
+
+
+
+static int
+create_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
+{
+    gint32 model = 0;	/* "any" */
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc < 3 || argc > 4) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (strlen(argv[1]) < 1 || strlen(argv[1]) > 32) {
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (strlen(argv[2]) < 1 || strlen(argv[2]) > 32) {
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (argc == 4) {
+	if (! gsnmp_enum_get_number(security_model, argv[3], &model)) {
+	    return SCLI_SYNTAX_VALUE;
+	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+    
+    snmp_view_based_acm_mib_proc_create_member(interp->peer,
+					       argv[1], argv[2], model);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+    
+    return SCLI_OK;
 }
 
 
@@ -714,6 +756,10 @@ dump_snmp(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
     
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     snmpv2_mib_get_snmp(interp->peer, &snmp, SNMPV2_MIB_SNMPENABLEAUTHENTRAPS);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -739,6 +785,14 @@ void
 scli_init_snmp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
+	{ "create snmp vacm member", "<name> <group> [<model>]",
+	  "The create snmp vacm member commands can be used to assign\n"
+	  "new members (security names) to vacm groups. New groups are\n"
+	  "created if they do not exist.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  create_snmp_vacm_member },
 
 	{ "set snmp authentication traps", "<status>",
 	  "The set snmp authentication traps command controls whether the\n"
