@@ -27,6 +27,7 @@
 #include "scli.h"
 
 #include "disman-script-mib.h"
+#include "disman-schedule-mib.h"
 
 
 static guint32 const oid_javabc[] = { 1, 3, 6, 1, 2, 1, 73, 1 };
@@ -656,15 +657,108 @@ cmd_launch_info(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+show_launch_details(GString *s, smLaunchEntry_t *smLaunchEntry)
+{
+    int const width = 20;
+
+    /* still need to do MaxRunning and MaxCompleted */
+
+    g_string_append(s, "Life Time:     ");
+    if (smLaunchEntry->smLaunchLifeTime) {
+	g_string_sprintfa(s, "%9s         ",
+			  fmt_seconds(*smLaunchEntry->smLaunchLifeTime/100));
+    } else {
+	g_string_sprintfa(s, "%9s         ", "");
+    }
+    g_string_append(s, "L-Owner:  ");
+    if (smLaunchEntry->smLaunchOwner) {
+	g_string_sprintfa(s, "%.*s",
+			  (int) smLaunchEntry->_smLaunchOwnerLength,
+			  smLaunchEntry->smLaunchOwner);
+    }
+    g_string_append(s, "\n");
+
+    g_string_append(s, "Expire Time:   ");
+    if (smLaunchEntry->smLaunchExpireTime) {
+	g_string_sprintfa(s, "%9s         ",
+			  fmt_seconds(*smLaunchEntry->smLaunchExpireTime/100));
+    } else {
+	g_string_sprintfa(s, "%9s         ", "");
+    }
+    g_string_append(s, "L-Name:   ");
+    if (smLaunchEntry->smLaunchName) {
+	g_string_sprintfa(s, "%.*s",
+			  (int) smLaunchEntry->_smLaunchNameLength,
+			  smLaunchEntry->smLaunchName);
+    }
+    g_string_append(s, "\n");
+        
+    g_string_append(s, "AdminStatus: ");
+    fmt_enum(s, width, disman_script_mib_enums_smLaunchAdminStatus,
+	     smLaunchEntry->smLaunchAdminStatus);
+    g_string_append(s, "S-Owner:  ");
+    if (smLaunchEntry->smLaunchScriptOwner) {
+	g_string_sprintfa(s, "%.*s ",
+			  (int) smLaunchEntry->_smLaunchScriptOwnerLength,
+			  smLaunchEntry->smLaunchScriptOwner);
+    }
+    g_string_append(s, "\n");
+
+    g_string_append(s, "OperStatus:  ");
+    fmt_enum(s, width, disman_script_mib_enums_smScriptOperStatus,
+	     smLaunchEntry->smLaunchOperStatus);
+    g_string_append(s, "S-Name:   ");
+    if (smLaunchEntry->smLaunchScriptName) {
+	g_string_sprintfa(s, "%.*s",
+			  (int) smLaunchEntry->_smLaunchScriptNameLength,
+			  smLaunchEntry->smLaunchScriptName);
+    }
+    g_string_append(s, "\n");
+    
+    g_string_append(s, "RowStatus:   ");
+    fmt_enum(s, width, disman_script_mib_enums_smLaunchRowStatus,
+	     smLaunchEntry->smLaunchRowStatus);
+    g_string_append(s, "Language: ");
+#if 0
+    if (smLaunchEntry->smScriptLanguage) {
+	if (language) {
+	    g_string_sprintfa(s, "%s", language);
+	} else {
+	    g_string_sprintfa(s, "%d",
+			      *(smLaunchEntry->smScriptLanguage));
+	}
+    }
+#endif
+    g_string_append(s, "\n");
+    
+    g_string_append(s, "Storage:     ");
+    fmt_enum(s, width, disman_script_mib_enums_smLaunchStorageType,
+	     smLaunchEntry->smLaunchStorageType);
+    g_string_append(s, "Change:   ");
+#if 0
+    if (smLaunchEntry->smLaunchLastChange) {
+	fmt_date_and_time(s, smLaunchEntry->smLaunchLastChange,
+			  smLaunchEntry->_smLaunchLastChangeLength);
+    }
+#endif
+    g_string_append(s, "\n");
+
+    if (smLaunchEntry->smLaunchArgument
+	&& smLaunchEntry->_smLaunchArgumentLength) {
+	g_string_sprintfa(s, "Argument:    %.*s\n",
+			  (int) smLaunchEntry->_smLaunchArgumentLength,
+			  smLaunchEntry->smLaunchArgument);
+    }
+}
+
+
+
 static int
 cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
 {
-#if 0
-    smScriptEntry_t **smScriptTable = NULL;
     smLaunchEntry_t **smLaunchTable = NULL;
-    smRunEntry_t **smRunTable = NULL;
     int i;
-    int owner_width = 8, lang_width = 8;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -672,28 +766,17 @@ cmd_launch_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_ERROR;
     }
 
-    (void) disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable);
-    (void) disman_script_mib_get_smRunTable(interp->peer, &smRunTable);
-
     if (smLaunchTable) {
 	for (i = 0; smLaunchTable[i]; i++) {
-	    if (smLaunchTable[i]->_smLaunchOwnerLength > owner_width) {
-		owner_width = smLaunchTable[i]->_smLaunchOwnerLength;
+	    if (i) {
+		g_string_append(interp->result, "\n");
 	    }
-	}
-	g_string_sprintfa(interp->result,
-			  "State  L %-*s %-*s Last Change  Name\n",
-			  owner_width, "Owner", lang_width, "Language");
-	for (i = 0; smLaunchTable[i]; i++) {
-	    show_launch_info(interp->result, smLaunchTable[i],
-			     owner_width);
+	    show_launch_details(interp->result, smLaunchTable[i]);
 	}
     }
 
-    if (smRunTable) disman_script_mib_free_smRunTable(smRunTable);
-    if (smScriptTable) disman_script_mib_free_smScriptTable(smScriptTable);
     if (smLaunchTable) disman_script_mib_free_smLaunchTable(smLaunchTable);
-#endif
+
     return SCLI_OK;
 }
 
@@ -841,12 +924,12 @@ show_run_details(GString *s, smRunEntry_t *smRunEntry,
     
     g_string_append(s, "Life Time:   ");
     if (smRunEntry->smRunLifeTime) {
-	g_string_sprintfa(s, "%9s",
+	g_string_sprintfa(s, "%9s         ",
 			  fmt_seconds(*smRunEntry->smRunLifeTime/100));
     } else {
-	g_string_sprintfa(s, "%9s", "");
+	g_string_sprintfa(s, "%9s         ", "");
     }
-    g_string_append(s, "           Error:   ");
+    g_string_append(s, "  Error:   ");
 #if 0
     if (smRunEntry->smRunErrorTime) {
 	fmt_date_and_time(s, smRunEntry->smRunErrorTime,
@@ -857,12 +940,12 @@ show_run_details(GString *s, smRunEntry_t *smRunEntry,
 
     g_string_append(s, "Expire Time: ");
     if (smRunEntry->smRunExpireTime) {
-	g_string_sprintfa(s, "%9s",
+	g_string_sprintfa(s, "%9s         ",
 			  fmt_seconds(*smRunEntry->smRunExpireTime/100));
     } else {
-	g_string_sprintfa(s, "%9s", "");
+	g_string_sprintfa(s, "%9s         ", "");
     }
-    g_string_append(s, "           End:      ");
+    g_string_append(s, "  End:      ");
     if (smRunEntry->smRunEndTime) {
 	fmt_date_and_time(s, smRunEntry->smRunEndTime,
 			  smRunEntry->_smRunEndTimeLength);
@@ -923,6 +1006,43 @@ cmd_run_details(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+cmd_scheduler_info(scli_interp_t *interp, int argc, char **argv)
+{
+    schedObjects_t *schedObjects = NULL;
+    schedEntry_t **schedTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (disman_schedule_mib_get_schedObjects(interp->peer, &schedObjects)) {
+	return SCLI_ERROR;
+    }
+
+    (void) disman_schedule_mib_get_schedTable(interp->peer, &schedTable);
+
+    if (schedObjects) {
+	if (schedObjects->schedLocalTime) {
+	    fmt_date_and_time(interp->result,
+			      schedObjects->schedLocalTime, 11);
+	}
+	g_string_append(interp->result, "\n");
+    }
+
+    if (schedTable) {
+	for (i = 0; schedTable[i]; i++) {
+	    g_string_append(interp->result, "**\n");
+	}
+    }
+
+    if (schedObjects) disman_schedule_mib_free_schedObjects(schedObjects);
+    if (schedTable) disman_schedule_mib_free_schedTable(schedTable);
+	
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_disman_mode(scli_interp_t *interp)
 {
@@ -955,6 +1075,10 @@ scli_init_disman_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "running scripts on the distributed manager",
 	  cmd_run_details },
+	{ "show disman scheduler info",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  "scheduler information",
+	  cmd_scheduler_info },
 	{ NULL, 0, NULL, NULL }
     };
     
