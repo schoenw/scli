@@ -1,3 +1,15 @@
+Changes in stools 0.1.19:
+
+- scli can now select interfaces based on extended regular expressions
+- scli now supports a new XML output format for some commands
+- scli supports a new "show printer console" command
+- scli supports a new "show printer lights" command
+- scli supports a new "show interface stats" command
+- scli supports a new "show interface stack" command
+- scli supports a new "show ether stats" command
+- scli supports a new "monitor" command which will replace stop
+- minor bug fixes
+
 Changes in stools 0.1.18:
 
 - scli supports a new ospf mode
