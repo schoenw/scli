@@ -467,18 +467,7 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 		    name = fmt_tcp_port(port, SCLI_FMT_NAME);
 		}
 		if (! name) {
-#if 1
-		    name = "-";
-#else
-		    gchar *x, *y;
-		    port = tcpConnTable[i]->tcpConnLocalPort;
-		    x = fmt_tcp_port(port, SCLI_FMT_NAME_OR_ADDR);
-		    y = g_strdup(x);
-		    port = tcpConnTable[i]->tcpConnRemPort;
-		    x = fmt_tcp_port(port, SCLI_FMT_NAME_OR_ADDR);
-		    name = g_strdup_printf("%s-%s", x, y);
-		    g_free(y);
-#endif
+		    name = "-?-";
 		    port = 0xffff;
 		}
 

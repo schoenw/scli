@@ -1131,7 +1131,7 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 	interp->peer->version = interp->snmp;
     } else {
 	if (verbose) {
-	    g_print("%3d-trying SNMPv2c ... ", SCLI_MSG);
+	    g_print("%3d-scli trying SNMPv2c ... ", SCLI_MSG);
 	}
 	interp->peer->version = G_SNMP_V2C;
 	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
@@ -1141,7 +1141,7 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 	    }
 	} else {
 	    if (verbose) {
-		g_print("timeout\n%3d-trying SNMPv1  ... ", SCLI_MSG);
+		g_print("timeout\n%3d-scli trying SNMPv1  ... ", SCLI_MSG);
 	    }
 	    interp->peer->version = G_SNMP_V1;
 	    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
