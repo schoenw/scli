@@ -101,19 +101,6 @@ strip_white(guchar *s, gsize *len)
 
 
 static void
-fmt_hsec32(GString *s, guint32 number)
-{
-    guint32 min, hour;
-
-    min  = (number / 100 / 60) % 60;
-    hour = (number / 100 / 60 / 60);
-
-    g_string_sprintfa(s, "%4.02d:%02d", hour, min);
-}
-
-
-
-static void
 fmt_run_state_and_type(GString *s, gint32 *state, gint32 *type)
 {
     if (state) {
@@ -234,8 +221,8 @@ show_system_process(GString *s, hrSWRunEntry_t *hrSWRunEntry,
     }
     if (hrSWRunPerfEntry && hrSWRunPerfEntry
 	&& hrSWRunPerfEntry->hrSWRunPerfCPU) {
-	g_string_append(s, " ");
-	fmt_hsec32(s, *(hrSWRunPerfEntry->hrSWRunPerfCPU));
+	g_string_sprintfa(s, " %s",
+		  fmt_seconds(*(hrSWRunPerfEntry->hrSWRunPerfCPU)/100));
     } else {
 	g_string_sprintfa(s, " %5s", "--:--");
     }
@@ -276,7 +263,7 @@ cmd_system_processes(scli_interp_t *interp, int argc, char **argv)
 						   &hrSWRunPerfTable);
 
     if (hrSWRunTable) {
-	g_string_append(interp->result, "  PID S T MEMORY    TIME COMMAND\n");
+	g_string_append(interp->result, "  PID S T MEMORY     TIME COMMAND\n");
 	for (i = 0; hrSWRunTable[i]; i++) {
 	    show_system_process(interp->result, hrSWRunTable[i],
 				hrSWRunPerfTable ? hrSWRunPerfTable[i] : NULL);
