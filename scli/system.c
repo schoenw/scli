@@ -66,6 +66,9 @@ static guint32 const oid_network_disk[]
     = { HOST_RESOURCES_TYPES_HRSTORAGENETWORKDISK };
 
 static GSnmpIdentity const storage_types[] = {
+    { oid_other,
+      sizeof(oid_other)/sizeof(guint32),
+      "other" },
     { oid_ram,
       sizeof(oid_ram)/sizeof(guint32),
       "ram" },
