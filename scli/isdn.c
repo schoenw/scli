@@ -97,7 +97,7 @@ scli_init_isdn_mode(scli_interp_t * interp)
     };
 
     static scli_mode_t isdn_mode = {
-	"printer",
+	"isdn",
 	"The scli isdn mode is based on the ISDN-MIB as published\n"
 	"in RFC 2127.",
 	cmds
