@@ -178,12 +178,6 @@ Toggle display of transport layer summary information.
 .TP
 .B w
 Freeze the screen until someone hits a key.
-.TP
-.B >
-Select next mode in the list of display modes.
-.TP
-.B <
-Select previous mode in the list of display modes.
 .SH UNITS
 \fBscli\fP displays numbers in a compact format. It uses several
 abbreviations to explain the units of the numbers. Here are some
