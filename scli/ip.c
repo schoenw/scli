@@ -30,6 +30,7 @@
 #include "ip-forward-mib.h"
 #include "tunnel-mib.h"
 #include "if-mib.h"
+#include "rfc1213-mib.h"
 
 
 
@@ -59,26 +60,98 @@ show_ip_forward(GString *s, ipCidrRouteEntry_t *ipCidrRouteEntry)
 
 
 
+static void
+show_ip_route(GString *s, rfc1213_mib_ipRouteEntry_t *ipRouteEntry,
+	      ifXEntry_t **ifXTable, ifEntry_t **ifTable)
+{
+    int i, pos;
+    
+    if (ipRouteEntry->ipRouteDest
+	&& ipRouteEntry->ipRouteNextHop
+	&& ipRouteEntry->ipRouteMask
+	&& ipRouteEntry->ipRouteIfIndex) {
+	g_string_sprintfa(s, "%s%s%n",
+			  fmt_ipv4_address(ipRouteEntry->ipRouteDest, 0),
+			  fmt_ipv4_mask(ipRouteEntry->ipRouteMask), &pos);
+	g_string_sprintfa(s, "%*s", MAX(20-pos, 1), "");
+	
+	g_string_sprintfa(s, "%-20s",
+			  fmt_ipv4_address(ipRouteEntry->ipRouteNextHop, 0));
+
+	g_string_sprintfa(s, "%d", *ipRouteEntry->ipRouteIfIndex);
+
+	if (ifXTable) {
+	    for (i = 0; ifXTable[i]; i++) {
+		if(ifXTable[i]->ifIndex == *ipRouteEntry->ipRouteIfIndex) {
+		    g_string_sprintfa(s, " (%.*s)",
+				      (int) ifXTable[i]->_ifNameLength,
+				      ifXTable[i]->ifName);
+		    break;
+		}
+	    }
+	} else if (ifTable) {
+	    for (i = 0; ifTable[i]; i++) {
+		if(ifTable[i]->ifIndex == *ipRouteEntry->ipRouteIfIndex) {
+		    g_string_sprintfa(s, " (%.*s)",
+				      (int) ifTable[i]->_ifDescrLength,
+				      ifTable[i]->ifDescr);
+		    break;
+		}
+	    }
+	}
+	g_string_append(s, "\n");
+    }
+}
+
+
+
 static int
 cmd_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 {
     ipCidrRouteEntry_t **ipCidrRouteTable = NULL;
+    rfc1213_mib_ipRouteEntry_t **ipRouteTable = NULL;
+    ifEntry_t **ifTable = NULL;
+    ifXEntry_t **ifXTable = NULL;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+#if 0
     if (ip_forward_mib_get_ipCidrRouteTable(interp->peer, &ipCidrRouteTable)) {
 	return SCLI_ERROR;
     }
+#endif
 
-    if (ipCidrRouteTable) {
-	g_string_sprintfa(interp->result, "%-32s%-32s%s\n",
-			  "Destination", "Next Hop", "Interface");
-	for (i = 0; ipCidrRouteTable[i]; i++) {
-	    show_ip_forward(interp->result, ipCidrRouteTable[i]);
+    if (!ipCidrRouteTable) {
+	if (rfc1213_mib_get_ipRouteTable(interp->peer, &ipRouteTable)) {
+	    return SCLI_ERROR;
 	}
-	ip_forward_mib_free_ipCidrRouteTable(ipCidrRouteTable);
     }
+
+    (void) if_mib_get_ifTable(interp->peer, &ifTable);
+    (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
+
+    if (ipCidrRouteTable || ipRouteTable) {
+	g_string_sprintfa(interp->result, "%-20s%-20s%s\n",
+			  "Destination", "Next Hop", "Interface");
+	if (ipCidrRouteTable) {
+	    for (i = 0; ipCidrRouteTable[i]; i++) {
+		show_ip_forward(interp->result, ipCidrRouteTable[i]);
+	    }
+	}
+	if (ipRouteTable) {
+	    for (i = 0; ipRouteTable[i]; i++) {
+		show_ip_route(interp->result, ipRouteTable[i],
+			      ifXTable, ifTable);
+	    }
+	}
+    }
+
+    if (ipCidrRouteTable)
+	ip_forward_mib_free_ipCidrRouteTable(ipCidrRouteTable);
+    if (ipRouteTable)
+	rfc1213_mib_free_ipRouteTable(ipRouteTable);
+
     return SCLI_OK;
 }
 
@@ -149,7 +222,8 @@ cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_ip_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry, ifXEntry_t **ifXTable, ifEntry_t **ifTable)
+show_ip_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry,
+	       ifXEntry_t **ifXTable, ifEntry_t **ifTable)
 {
     int i;
 
