@@ -927,7 +927,7 @@ xml_printer_console_light(xmlNodePtr root,
     e = fmt_enum(printer_mib_enums_prtConsoleColor,
 		 prtConsoleLightEntry->prtConsoleColor);
     if (e) {
-	xml_new_child(root, NULL, "color", e);
+	xml_new_child(tree, NULL, "color", e);
     }
 
     if (*prtConsoleLightEntry->prtConsoleOnTime
@@ -940,7 +940,7 @@ xml_printer_console_light(xmlNodePtr root,
 	       && *prtConsoleLightEntry->prtConsoleOffTime) {
 	state = "blink";
     }
-    xml_new_child(root, NULL, "status", state);
+    xml_new_child(tree, NULL, "status", state);
 }
 
 
