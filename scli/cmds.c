@@ -78,7 +78,7 @@ fmt_cmd_tree(GString *s, GNode *node, char *prefix)
     for (node = g_node_first_child(node);
 	 node; node = g_node_next_sibling(node)) {
 	char *new_prefix;
-	new_prefix = g_malloc(len + 3);
+	new_prefix = g_malloc(len + 4);
 	strcpy(new_prefix, prefix);
 	if (new_prefix[len-1] == '`') {
 	    new_prefix[len-1] = ' ';
@@ -96,7 +96,7 @@ fmt_cmd_tree(GString *s, GNode *node, char *prefix)
 
 
 static int
-show_scli_commands(scli_interp_t *interp, int argc, char **argv)
+show_scli_command_tree(scli_interp_t *interp, int argc, char **argv)
 {
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -107,6 +107,171 @@ show_scli_commands(scli_interp_t *interp, int argc, char **argv)
     if (interp->cmd_root) {
 	fmt_cmd_tree(interp->result, interp->cmd_root, "");
     }
+    return SCLI_OK;
+}
+
+
+
+struct show_scli_command_data {
+    scli_interp_t *interp;
+    regex_t *regex_cmd;
+    int width;
+    int cnt;
+};
+
+
+
+static void
+fmt_cmd_info(GString *s, scli_cmd_t *cmd, int width)
+{
+    g_string_sprintfa(s, " %c%c%c  ",
+		      cmd->flags & SCLI_CMD_FLAG_XML ? 'X' : '-',
+		      cmd->flags & SCLI_CMD_FLAG_NEED_PEER ? 'S' : '-',
+		      cmd->flags & SCLI_CMD_FLAG_NORECURSE ? '-' : 'R');
+    g_string_sprintfa(s, "%-*s %s\n", width, cmd->path, cmd->options ? cmd->options : "");
+}
+
+
+
+static gboolean
+show_scli_command_info_pass1(GNode *node, gpointer data)
+{
+    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
+    struct show_scli_command_data *x = (struct show_scli_command_data *) data;
+
+    if (! x->regex_cmd || regexec(x->regex_cmd, cmd->path, (size_t) 0, NULL, 0) == 0) {
+	if (strlen(cmd->path) > x->width) {
+	    x->width = strlen(cmd->path);
+	}
+    }
+
+    return false;
+}
+
+
+
+static gboolean
+show_scli_command_info_pass2(GNode *node, gpointer data)
+{
+    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
+    struct show_scli_command_data *x = (struct show_scli_command_data *) data;
+    
+    if (! x->regex_cmd || regexec(x->regex_cmd, cmd->path, (size_t) 0, NULL, 0) == 0) {
+	fmt_cmd_info(x->interp->result, cmd, x->width);
+    }
+
+    return false;
+}
+
+
+
+static int
+show_scli_command_info(scli_interp_t *interp, int argc, char **argv)
+{
+    regex_t _regex_cmd, *regex_cmd = NULL;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (argc == 2) {
+	regex_cmd = &_regex_cmd;
+	if (regcomp(regex_cmd, argv[1], interp->regex_flags) != 0) {
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
+    if (interp->cmd_root) {
+	struct show_scli_command_data x;
+	x.interp = interp;
+	x.width = 8;
+	x.regex_cmd = regex_cmd;
+	g_node_traverse(interp->cmd_root, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
+			show_scli_command_info_pass1, &x);
+	g_string_sprintfa(interp->header, "FLAGS %-*s ARGUMENTS", x.width, "COMMAND");
+	g_node_traverse(interp->cmd_root, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
+			show_scli_command_info_pass2, &x);
+    }
+
+    if (regex_cmd) regfree(regex_cmd);
+
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_cmd_details(GString *s, scli_cmd_t *cmd)
+{
+    const int indent = 14;
+    g_string_sprintfa(s, "%-*s%s\n", indent, "Command:", cmd->path);
+    if (cmd->options) {
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Arguments:", cmd->options);
+    }
+    g_string_sprintfa(s, "%-*sscli%s\n", indent, "Formats:",
+		      cmd->flags & SCLI_CMD_FLAG_XML ? ", xml" : "");
+    if (cmd->desc) {
+	fmt_indent_string(s, indent, "Description:", strlen(cmd->desc), cmd->desc);
+	//g_string_sprintfa(s, "Description:\n%s\n", cmd->desc);
+    }
+    if (cmd->xsd) {
+	fmt_indent_string(s, indent, "Schema:", strlen(cmd->xsd), cmd->xsd);
+    }
+}
+
+
+
+static gboolean
+show_scli_command_details_pass1(GNode *node, gpointer data)
+{
+    scli_cmd_t *cmd = (scli_cmd_t *) node->data;
+    struct show_scli_command_data *x = (struct show_scli_command_data *) data;
+    
+    if (! x->regex_cmd || regexec(x->regex_cmd, cmd->path, (size_t) 0, NULL, 0) == 0) {
+	if (x->cnt) {
+	    g_string_append(x->interp->result, "\n");
+	}
+	fmt_cmd_details(x->interp->result, cmd);
+	x->cnt++;
+    }
+
+    return false;
+}
+
+
+
+static int
+show_scli_command_details(scli_interp_t *interp, int argc, char **argv)
+{
+    regex_t _regex_cmd, *regex_cmd = NULL;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (argc == 2) {
+	regex_cmd = &_regex_cmd;
+	if (regcomp(regex_cmd, argv[1], interp->regex_flags) != 0) {
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
+    if (interp->cmd_root) {
+	struct show_scli_command_data x;
+	x.interp = interp;
+	x.width = 8;
+	x.regex_cmd = regex_cmd;
+	x.cnt = 0;
+	g_node_traverse(interp->cmd_root, G_IN_ORDER, G_TRAVERSE_LEAFS, -1,
+			show_scli_command_details_pass1, &x);
+    }
+
+    if (regex_cmd) regfree(regex_cmd);
+
     return SCLI_OK;
 }
 
@@ -506,6 +671,115 @@ show_scli_aliases(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
+create_scli_interp(scli_interp_t *interp, int argc, char **argv)
+{
+    GSList *elem;
+    scli_interp_t *slave = NULL;
+    scli_cmd_t *cmd;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    for (elem = interp->interp_list; elem; elem = g_slist_next(elem)) {
+	slave = (scli_interp_t *) elem->data;
+	if (strcmp(slave->name, argv[1]) == 0) {
+	    g_string_sprintfa(interp->result,
+			      "interp `%s' already exists", argv[1]);
+	    return SCLI_ERROR;
+	}
+    }
+
+    slave = scli_interp_create(argv[1]);
+    scli_interp_init(slave);
+    interp->interp_list = g_slist_append(interp->interp_list, slave);
+
+    cmd = g_new0(scli_cmd_t, 1);
+    cmd->path = g_strdup(argv[1]);
+    cmd->flags = SCLI_CMD_FLAG_DYNAMIC;
+    cmd->desc = g_strdup_printf("The `%s' command is used to invoke commands\n"
+				"in the scli interpreter named %s.",
+				argv[1], argv[1]);
+    scli_create_command(interp, cmd);
+    
+    return SCLI_OK;
+}
+
+
+
+static int
+delete_scli_interp(scli_interp_t *interp, int argc, char **argv)
+{
+    GSList *elem;
+    scli_interp_t *slave = NULL;
+    regex_t _regex_name, *regex_name = NULL;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    regex_name = &_regex_name;
+    if (regcomp(regex_name, argv[1], interp->regex_flags) != 0) {
+	return SCLI_SYNTAX_REGEXP;
+    }
+    
+ again:
+    for (elem = interp->interp_list; elem; elem = g_slist_next(elem)) {
+	slave = (scli_interp_t *) elem->data;
+	if (regexec(regex_name, slave->name, (size_t) 0, NULL, 0) == 0) {
+	    interp->interp_list = g_slist_remove(interp->interp_list,
+						 elem->data);
+	    scli_interp_delete(slave);
+	    goto again;
+	}
+    }
+
+    if (regex_name) regfree(regex_name);
+    
+    return SCLI_OK;
+}
+
+
+
+static int
+show_scli_interps(scli_interp_t *interp, int argc, char **argv)
+{
+    GSList *elem;
+    scli_interp_t *slave;
+    int name_width = 16;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (interp->interp_list) {
+	for (elem = interp->interp_list; elem; elem = g_slist_next(elem)) {
+	    slave = (scli_interp_t *) elem->data;
+	    if (strlen(slave->name) > name_width) {
+		name_width = strlen(slave->name);
+	    }
+	}
+	g_string_sprintfa(interp->header, "%-*s xxx",
+			  name_width, "NAME");
+	for (elem = interp->interp_list; elem; elem = g_slist_next(elem)) {
+	    slave = (scli_interp_t *) elem->data;
+	    g_string_sprintfa(interp->result, "%-*s\n",
+			      name_width, slave->name);
+	}
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
 show_scli_info(scli_interp_t *interp, int argc, char **argv)
 {
     int const indent = 18;
@@ -890,7 +1164,7 @@ scli_init_scli_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "open", "<nodename> [<community>]",
-	  "The open command establishes an association to a remote SNMP\n"
+	  "The `open' command establishes an association to a remote SNMP\n"
 	  "agent. The <nodename> argument is the DNS name or the IP\n"
 	  "address of the remote node. Scli will try to talk to the SNMP\n"
 	  "agent on this node by using the default port number (usually 161)\n"
@@ -907,7 +1181,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  scli_cmd_open },
 
 	{ "close", NULL,
-	  "The close command closes an established association to a remote\n"
+	  "The `close' command closes an established association to a remote\n"
 	  "SNMP agent. Invoking the close command when no association is\n"
 	  "established is not considered an error and will do just nothing.",
 	  SCLI_CMD_FLAG_XML,
@@ -921,7 +1195,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  cmd_scli_probe },
 
 	{ "walk", "<oid> [<oid> ...]",
-	  "The walk command is a low-level debugging utility which simply\n"
+	  "The `walk' command is a low-level debugging utility which simply\n"
 	  "performs a MIB walk. Note that scli does not have general MIB\n"
 	  "knowledge and hence the output requires some post-processing.",
 	  SCLI_CMD_FLAG_NEED_PEER,
@@ -929,7 +1203,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  cmd_scli_walk },
 #endif
 	{ "create scli plugin", "<module>",
-	  "The create scli plugin command dynamically loads an scli mode\n"
+	  "The `create scli plugin' command dynamically loads an scli mode\n"
 	  "into a running scli process. This can be used to dynamically\n"
 	  "extend scli with modules coming from other sources. Dynamic\n"
 	  "loadable modules also simplify the development and management\n"
@@ -939,14 +1213,14 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  cmd_scli_load },
 
 	{ "delete scli plugin", "<module>",
-	  "The delete scli plugin command removes a previously loaded\n"
+	  "The `delete scli plugin' command removes a previously loaded\n"
 	  "modules from a running scli process.",
 	  0,
 	  NULL, NULL,
 	  cmd_scli_unload },
 
 	{ "exit", NULL,
-	  "The exit command terminates the scli interpreter. An end of file\n"
+	  "The `exit' command terminates the scli interpreter. An end of file\n"
 	  "in the standard input stream will also terminate the the scli\n"
 	  "interpreter.",
 	  SCLI_CMD_FLAG_XML,
@@ -954,21 +1228,21 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  cmd_scli_exit },
 
 	{ "help", NULL,
-	  "The help command displays some help information including a list\n"
+	  "The `help' command displays some help information including a list\n"
 	  "of all top-level scli commands.",
 	  0,
 	  NULL, NULL,
 	  help },
 
 	{ "history", NULL,
-	  "The history command displays the scli command history list with\n"
+	  "The `history' command displays the scli command history list with\n"
 	  "line numbers.",
 	  0,
 	  NULL, NULL,
 	  history },
 
         { "create scli alias", "<name> <value>",
-	  "The create scli alias command creates the alias <name> for the\n"
+	  "The `create scli alias' command creates the alias <name> for the\n"
 	  "scli command (fragment) <value>. If the alias <name> already\n"
 	  "exists, then the new <value> will be assigned to the existing\n"
 	  "alias.",
@@ -977,7 +1251,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  create_scli_alias },
 	
 	{ "delete scli alias", "<regexp>",
-	  "The delete scli alias command removes previously defined\n"
+	  "The `delete scli alias' command removes previously defined\n"
 	  "aliases from the scli interpreter. The regular expression\n"
 	  "<regexp> is matched against all alias names in order to\n"
 	  "select the aliases that are deleted.",
@@ -985,8 +1259,24 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  delete_scli_alias },
 	
+        { "create scli interp", "<name>",
+	  "The `create scli interp' command creates a new internal scli\n"
+	  "interpreter with the name <name>.",
+	  0,
+	  NULL, NULL,
+	  create_scli_interp },
+	
+	{ "delete scli interp", "<regexp>",
+	  "The `delete scli interp' command deletes previously defined\n"
+	  "scli interpreters from the main scli interpreter. The regular\n"
+	  "expression <regexp> is matched against all alias names in order\n"
+	  "to select the interpreter(s) to be removed.",
+	  0,
+	  NULL, NULL,
+	  delete_scli_interp },
+	
 	{ "set scli regex", "[<regexp>]",
-	  "The set scli regex command controls how scli matches regular\n"
+	  "The `set scli regex' command controls how scli matches regular\n"
 	  "expressions. The optional regular expression <regexp> is\n"
 	  "matched against the regular expression options. A successful\n"
 	  "match turns a regular expression option on while an unsuccessful\n"
@@ -1000,7 +1290,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  set_scli_regex },
 	
 	{ "set scli debugging", "[<regexp>]",
-	  "The set scli debugging command sets the debugging level of\n"
+	  "The `set scli debugging' command sets the debugging level of\n"
 	  "the SNMP engine. The optional regular expression <regexp> is\n"
 	  "matched against the debugging levels. A successful match turns\n"
 	  "a debugging level on while an unsuccessful match turns a\n"
@@ -1015,7 +1305,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  set_scli_debugging },
 	
 	{ "set scli pager", "<pager>",
-	  "The set scli pager command defines the shell command which is\n"
+	  "The `set scli pager' command defines the shell command which is\n"
 	  "used as a pager if the output produced by an scli command does\n"
 	  "not fit on a single screen. The output is passed to the <pager>\n"
 	  "shell command via its standard input stream.",
@@ -1024,7 +1314,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  set_scli_pager },
 	
 	{ "set scli format", "<fmt>",
-	  "The set scli format command defines the output format used by\n"
+	  "The `set scli format' command defines the output format used by\n"
 	  "subsequent scli commands. The currently supported formats are\n"
 	  "\"scli\" and \"xml\". The \"scli\" format is the default output\n"
 	  "format and described in this documentation. The \"xml\" output\n"
@@ -1034,29 +1324,51 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  set_scli_format },
 	
 	{ "show scli info", NULL,
-	  "The show scli info command displays the current status of the\n"
+	  "The `show scli info' command displays the current status of the\n"
 	  "scli interpreter.",
 	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  show_scli_info },
 
-	{ "show scli commands", NULL,
-	  "The show scli commands command displays the scli command tree.\n"
-	  "The full command syntax is displayed for each leaf node.",
+	{ "show scli command info", "[<regex]",
+	  "The `show scli command info' command displays summary information\n"
+	  "about scli commands. The optional regular expression <regexp> is\n"
+	  "matched against the command names to select the scli commands.\n",
 	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
-	  show_scli_commands },
+	  show_scli_command_info },
+
+	{ "show scli command details", "[<regex]",
+	  "The `show scli command details' command displays detailed information\n"
+	  "about scli commands. The optional regular expression <regexp> is\n"
+	  "matched against the command names to select the scli commands.\n",
+	  SCLI_CMD_FLAG_NORECURSE,
+	  NULL, NULL,
+	  show_scli_command_details },
+
+	{ "show scli command tree", NULL,
+	  "The `show scli command tree' command displays the scli command\n"
+	  "tree. The full command syntax is displayed for each leaf node.",
+	  SCLI_CMD_FLAG_NORECURSE,
+	  NULL, NULL,
+	  show_scli_command_tree },
 
 	{ "show scli aliases", NULL,
-	  "The show scli aliases command lists all scli command aliases.\n"
+	  "The `show scli aliases' command lists all scli command aliases.\n"
 	  "The first column in the generated table lists the aliase names\n"
 	  "while the second column shows the alias values.",
 	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  show_scli_aliases },
 
+	{ "show scli interps", NULL,
+	  "The `show scli interps' command lists all scli interpreters.",
+	  SCLI_CMD_FLAG_NORECURSE,
+	  NULL, NULL,
+	  show_scli_interps },
+
 	{ "show scli modes", "[<regex>]",
-	  "The show scli modes command shows information about the scli\n"
+	  "The `show scli modes' command shows information about the scli\n"
 	  "modes. An scli mode is a logical grouping of related commands\n"
 	  "(e.g., all commands that deal with printers). The optional\n"
 	  "regular expression <regex> can be use to select a subset of\n"
@@ -1066,7 +1378,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  show_scli_modes },
 
 	{ "show scli schema", "[<regex>]",
-	  "The show scli schema command produces xml schema definitions for\n"
+	  "The `show scli schema' command produces xml schema definitions for\n"
 	  "the selected scli modes. An scli mode is a logical grouping of\n"
 	  "related commands (e.g., all commands that deal with printers).\n"
 	  "The optional regular expression <regex> can be use to select a\n"
@@ -1076,7 +1388,7 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  show_scli_schema },
 
 	{ "show scli alarm info", NULL,
-	  "The show scli alarm info command displays summary information\n"
+	  "The `show scli alarm info' command displays summary information\n"
 	  "about all known alarms.",
 	  0,
 	  NULL, NULL,
