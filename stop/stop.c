@@ -325,7 +325,7 @@ show_ip(host_snmp *peer, int flags)
         return;
     }
     
-    gettimeofday (&now, NULL);
+    gettimeofday(&now, NULL);
     delta = TV_DIFF(last, now);
     if (ip->ipInReceives && delta > TV_DELTA) {
         if (last.tv_sec && last.tv_usec) {
@@ -818,15 +818,7 @@ main(int argc, char **argv)
 	    exit(1);
 	}
     }
-
-    if (system && system->sysDescr) {
-	printf("\n%.*s\n", (int) system->_sysDescrLength, system->sysDescr);
-    }
-    
     snmpv2_mib_free_system(system);
-    printf("\n");
-    fflush(stdout);
-    sleep(1);
 
     /*
      * Now initialize the various modes. We must do it here and not
