@@ -1,7 +1,7 @@
 /* 
  * printer.c -- scli printer mode implementation
  *
- * Copyright (C) 2001 Oliver Wellnitz, Juergen Schoenwaelder
+ * Copyright (C) 2001-2002 Oliver Wellnitz, Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -150,6 +150,23 @@ fmt_subunit_status(gint32 *status)
 	a = labels[(*status >> 5) & 0x03];
     }
     return a;
+}
+
+
+
+static void
+fmt_subunit(GString *s, int indent, gint32 *status)
+{
+    if (! status) {
+	return;
+    }
+
+    g_string_sprintfa(s, "%-*s %s\n", indent, "Availability:",
+		      fmt_subunit_availability(status));
+    g_string_sprintfa(s, "%-*s %s\n", indent, "Alerts:",
+		      fmt_subunit_alerts(status));
+    g_string_sprintfa(s, "%-*s %s\n", indent, "Status:",
+		      fmt_subunit_status(status));
 }
 
 
@@ -651,14 +668,7 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 	g_string_append(s, "\n");
     }
 
-    if (prtInputEntry->prtInputStatus) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Availability:",
-		  fmt_subunit_availability(prtInputEntry->prtInputStatus));
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Alerts:",
-		  fmt_subunit_alerts(prtInputEntry->prtInputStatus));
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Status:",
-		  fmt_subunit_status(prtInputEntry->prtInputStatus));
-    }
+    fmt_subunit(s, indent, prtInputEntry->prtInputStatus);
     
     if (prtInputEntry->prtInputSerialNumber &&
 	prtInputEntry->_prtInputSerialNumberLength > 0) {
@@ -901,14 +911,7 @@ fmt_printer_outputs(GString *s, printer_mib_prtOutputEntry_t *prtOutputEntry)
 	g_string_append(s, "\n");
     }
 
-    if (prtOutputEntry->prtOutputStatus) {
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Availability:",
-		  fmt_subunit_availability(prtOutputEntry->prtOutputStatus));
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Alerts:",
-		  fmt_subunit_alerts(prtOutputEntry->prtOutputStatus));
-	g_string_sprintfa(s, "%-*s %s\n", indent, "Status:",
-		  fmt_subunit_status(prtOutputEntry->prtOutputStatus));
-    }
+    fmt_subunit(s, indent, prtOutputEntry->prtOutputStatus);
     
     if (prtOutputEntry->prtOutputSerialNumber &&
 	prtOutputEntry->_prtOutputSerialNumberLength > 0) {
@@ -1023,6 +1026,125 @@ show_printer_outputs(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (prtOutputTable) printer_mib_free_prtOutputTable(prtOutputTable);
+	
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_printer_marker(GString *s, printer_mib_prtMarkerEntry_t *prtMarkerEntry)
+{
+    int const indent = 18;
+    const char *e;
+
+    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+		      prtMarkerEntry->hrDeviceIndex);
+
+    g_string_sprintfa(s, "%-*s %u\n", indent, "Marker:",
+		      prtMarkerEntry->prtMarkerIndex);
+
+    e = fmt_enum(printer_mib_enums_prtMarkerMarkTech,
+		 prtMarkerEntry->prtMarkerMarkTech);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Technology:", e);
+    }
+
+    fmt_subunit(s, indent, prtMarkerEntry->prtMarkerStatus);
+}
+
+
+    
+static int
+show_printer_markers(scli_interp_t *interp, int argc, char **argv)
+{
+    printer_mib_prtMarkerEntry_t **prtMarkerTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    printer_mib_get_prtMarkerTable(interp->peer, &prtMarkerTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (prtMarkerTable) {
+	for (i = 0; prtMarkerTable[i]; i++) {
+	    if (i > 0) {
+		g_string_append(interp->result, "\n");
+	    }
+	    fmt_printer_marker(interp->result, prtMarkerTable[i]);
+	}
+    }
+
+    if (prtMarkerTable) printer_mib_free_prtMarkerTable(prtMarkerTable);
+	
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_printer_supplies(GString *s, printer_mib_prtMarkerSuppliesEntry_t *prtSuppliesEntry)
+{
+    int const indent = 18;
+
+    g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
+		      prtSuppliesEntry->hrDeviceIndex);
+
+    g_string_sprintfa(s, "%-*s %u\n", indent, "Marker:",
+		      prtSuppliesEntry->prtMarkerSuppliesIndex);
+
+    if (prtSuppliesEntry->prtMarkerSuppliesDescription &&
+	prtSuppliesEntry->_prtMarkerSuppliesDescriptionLength > 0) {
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
+			  (int) prtSuppliesEntry->_prtMarkerSuppliesDescriptionLength,
+			  prtSuppliesEntry->prtMarkerSuppliesDescription);
+    }
+}
+
+
+    
+static int
+show_printer_supplies(scli_interp_t *interp, int argc, char **argv)
+{
+    printer_mib_prtMarkerSuppliesEntry_t **prtMarkerSuppliesTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    printer_mib_get_prtMarkerSuppliesTable(interp->peer, &prtMarkerSuppliesTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (prtMarkerSuppliesTable) {
+	for (i = 0; prtMarkerSuppliesTable[i]; i++) {
+	    if (i > 0) {
+		g_string_append(interp->result, "\n");
+	    }
+	    fmt_printer_supplies(interp->result, prtMarkerSuppliesTable[i]);
+	}
+    }
+
+    if (prtMarkerSuppliesTable)
+	printer_mib_free_prtMarkerSuppliesTable(prtMarkerSuppliesTable);
 	
     return SCLI_OK;
 }
@@ -1496,6 +1618,22 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_outputs },
+
+	{ "show printer markers", NULL,
+	  "The show printer markers command shows information about the\n"
+	  "marker sub-units of a printer which produce marks on the print\n"
+	  "media.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_printer_markers },
+
+	{ "show printer supplies", NULL,
+	  "The show printer supplies command shows information about the\n"
+	  "supplies which are consumed and the waste produced by the\n"
+	  "markers of a printer.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_printer_supplies },
 
 	{ "show printer interpreter", NULL,
 	  "The show printer interpreter command shows information about\n"
