@@ -752,14 +752,17 @@ cmd_script_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SNMP;
     }
 
-    if (smScriptTable) {
+    if (smLangTable) {
 	disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable, 0);
-	for (i = 0; smScriptTable[i]; i++) {
-	    if (i) {
-		g_string_append(interp->result, "\n");
+	if (smScriptTable) {
+	    for (i = 0; smScriptTable[i]; i++) {
+		if (i) {
+		    g_string_append(interp->result, "\n");
+		}
+		show_script_details(interp->result, smScriptTable[i],
+				    get_script_lang_name(smScriptTable[i],
+							 smLangTable));
 	    }
-	    show_script_details(interp->result, smScriptTable[i],
-			get_script_lang_name(smScriptTable[i], smLangTable));
 	}
     }
 
@@ -855,22 +858,26 @@ cmd_script_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SNMP;
     }
 
-    if (smScriptTable) {
+    if (smLangTable) {
 	disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable, 0);
 	disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
-	for (i = 0; smScriptTable[i]; i++) {
-	    if (smScriptTable[i]->_smScriptOwnerLength > owner_width) {
-		owner_width = smScriptTable[i]->_smScriptOwnerLength;
+	if (smScriptTable) {
+	    for (i = 0; smScriptTable[i]; i++) {
+		if (smScriptTable[i]->_smScriptOwnerLength > owner_width) {
+		    owner_width = smScriptTable[i]->_smScriptOwnerLength;
+		}
 	    }
-	}
-	g_string_sprintfa(interp->header,
-			  "STATE  L %-*s %-*s LAST CHANGE  NAME",
-			  owner_width, "OWNER", lang_width, "LANGUAGE");
-	for (i = 0; smScriptTable[i]; i++) {
-	    show_script_info(interp->result, smScriptTable[i],
-		     get_script_lang_name(smScriptTable[i], smLangTable),
-			     count_launches(smScriptTable[i], smLaunchTable),
-			     owner_width, lang_width);
+	    g_string_sprintfa(interp->header,
+			      "STATE  L %-*s %-*s LAST CHANGE  NAME",
+			      owner_width, "OWNER", lang_width, "LANGUAGE");
+	    for (i = 0; smScriptTable[i]; i++) {
+		show_script_info(interp->result, smScriptTable[i],
+				 get_script_lang_name(smScriptTable[i],
+						      smLangTable),
+				 count_launches(smScriptTable[i],
+						smLaunchTable),
+				 owner_width, lang_width);
+	    }
 	}
     }
 
