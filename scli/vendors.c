@@ -24,7 +24,6 @@
 #include "config.h"
 #endif
 
-#include "stools.h"
 #include "scli.h"
 
 static scli_vendor_t vendor_table[] = {

@@ -24,8 +24,13 @@
 #include "config.h"
 #endif
 
-#include "stools.h"
 #include "scli.h"
+
+#include "host-resources-mib.h"
+#include "snmpv2-mib.h"
+#include "if-mib.h"
+#include "bridge-mib.h"
+#include "disman-script-mib.h"
 
 
 static void

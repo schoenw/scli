@@ -24,7 +24,6 @@
 #include "config.h"
 #endif
 
-#include "stools.h"
 #include "scli.h"
 
 #include <netdb.h>
@@ -86,7 +85,7 @@ fmt_kbytes(GString *s, guint32 kbytes)
 
 
 void
-fmt_enum(GString *s, int width, stls_table_t *table, gint32 *number)
+fmt_enum(GString *s, int width, stls_table_t const *table, gint32 *number)
 {
     gchar *name;
 

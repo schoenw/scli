@@ -24,7 +24,6 @@
 #include "config.h"
 #endif
 
-#include "stools.h"
 #include "scli.h"
 
 #include <readline/history.h>

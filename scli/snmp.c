@@ -24,10 +24,13 @@
 #include "config.h"
 #endif
 
-#include "stools.h"
 #include "scli.h"
 
+#include "snmpv2-mib.h"
+#include "snmp-framework-mib.h"
 
+
+#if 0
 static void
 fmt_string(GString *s, char *label, int width, guchar *string, gsize len)
 {
@@ -35,6 +38,7 @@ fmt_string(GString *s, char *label, int width, guchar *string, gsize len)
 	g_string_sprintfa(s, "%-*s %.*s", width, label, (int) len, string);
     }
 }
+#endif
 
 
 static int

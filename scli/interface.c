@@ -24,20 +24,170 @@
 #include "config.h"
 #endif
 
-#include "stools.h"
 #include "scli.h"
+
+#include "snmpv2-mib.h"
+#include "if-mib.h"
+#include "ip-mib.h"
+
+
+
+static char*
+get_if_name(ifEntry_t *ifEntry, ifXEntry_t *ifXEntry, int width)
+{
+    static char buffer[80];
+
+    buffer[0] = 0;
+    if (ifXEntry && ifXEntry->ifName && ifXEntry->_ifNameLength) {
+	g_snprintf(buffer, sizeof(buffer), "%.*s",
+		   (int) ifXEntry->_ifNameLength, ifXEntry->ifName);
+    } else if (ifEntry->ifDescr && ifEntry->_ifDescrLength
+	       && ifEntry->_ifDescrLength < width) {
+	g_snprintf(buffer, sizeof(buffer), "%.*s",
+		   (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);
+#if 0
+    } else {
+	g_snprintf(buffer, sizeof(buffer), "if#%-*d", width - 3,
+		   ifEntry->ifIndex);
+#endif
+    }
+
+    return buffer;
+}
+
+
+
+static void
+fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper)
+{
+    stls_table_t const admin_states[] = {
+	{ 1, "u" },	/* up */
+	{ 2, "d" },	/* down */
+	{ 3, "t" },	/* testing */
+	{ 0, NULL }
+    };
+
+    stls_table_t const oper_states[] = {
+	{ 1, "u" },	/* up */
+	{ 2, "d" },	/* down */
+	{ 3, "t" },	/* testing */
+	{ 4, "?" },	/* unknown */
+	{ 5, "o" },	/* dormant */
+	{ 6, "n" },	/* notPresent */
+	{ 7, "l" },	/* lowerLayerDown */
+	{ 0, NULL }
+    };
+    
+    g_string_append(s, " ");
+    fmt_enum(s, 1, admin_states, admin);
+    g_string_append(s, "/");
+    fmt_enum(s, 1, oper_states, oper);
+}
+    
+
+
+static void
+show_details(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
+	     system_t *system, ipAddrEntry_t **ipAddrTable)
+{
+    int j;
+    int const width = 20;
+
+    g_string_sprintfa(s, "Index:       %-*d", width,
+		      ifEntry->ifIndex);
+    g_string_sprintfa(s, " Name:    %-*s\n", width,
+		      get_if_name(ifEntry, ifXEntry, width));
+    
+    g_string_append(s, "OperStatus:  ");
+    fmt_enum(s, width, if_mib_enums_ifOperStatus, ifEntry->ifOperStatus);
+    if (ifEntry->ifPhysAddress && ifEntry->_ifPhysAddressLength) {
+	g_string_append(s, " Address: ");
+	for (j = 0; j < ifEntry->_ifPhysAddressLength; j++) {
+	    g_string_sprintfa(s, "%s%02X", (j == 0) ? "" : ":",
+			      ifEntry->ifPhysAddress[j]);
+	}
+	g_string_append(s, "\n");
+    } else {
+	g_string_append(s, " Address:\n");
+    }
+    
+    g_string_append(s, "AdminStatus: ");
+    fmt_enum(s, width, if_mib_enums_ifAdminStatus, ifEntry->ifAdminStatus);
+    g_string_append(s, " Type:    ");
+    fmt_enum(s, width, if_mib_enums_ifType, ifEntry->ifType);
+    g_string_append(s, "\n");
+    
+    g_string_append(s, "Traps:       ");
+    fmt_enum(s, width, if_mib_enums_ifLinkUpDownTrapEnable,
+	     (ifXEntry && ifXEntry) ? ifXEntry->ifLinkUpDownTrapEnable : NULL);
+    if (ifEntry->ifMtu) {
+	g_string_sprintfa(s, " MTU:     %d byte\n", *(ifEntry->ifMtu));
+    } else {
+	g_string_append(s, " MTU:\n");
+    }
+    
+    g_string_append(s, "Connector:   ");
+    fmt_enum(s, width, if_mib_enums_ifConnectorPresent,
+	     (ifXEntry && ifXEntry) ? ifXEntry->ifConnectorPresent : NULL);
+    if (ifEntry->ifSpeed) {
+	if (*(ifEntry->ifSpeed) == 0xffffffff
+	    && ifXEntry && ifXEntry->ifHighSpeed) {
+	    g_string_sprintfa(s, " Speed:   %s bps\n",
+			      fmt_gtp(*(ifXEntry->ifHighSpeed)));
+	} else {
+	    g_string_sprintfa(s, " Speed:   %s bps\n",
+			      fmt_kmg(*(ifEntry->ifSpeed)));
+	}
+    } else {
+	g_string_append(s, " Speed:\n");
+    }
+    
+    g_string_append(s, "Promiscuous: ");
+    fmt_enum(s, width, if_mib_enums_ifPromiscuousMode,
+	     (ifXEntry && ifXEntry) ? ifXEntry->ifPromiscuousMode : NULL);
+    if (ifEntry->ifLastChange && system && system->sysUpTime) {
+	guint32 dsecs = *(system->sysUpTime) - *(ifEntry->ifLastChange);
+	g_string_sprintfa(s, " Change:  ");
+	fmt_time_ticks(s, dsecs);
+	g_string_append(s, "\n");
+    } else {
+	g_string_append(s, " Change:\n");
+    }
+	    
+    for (j = 0; ipAddrTable[j]; j++) {
+	if (ipAddrTable[j]->ipAdEntIfIndex
+	    && (ifEntry->ifIndex == *(ipAddrTable[j]->ipAdEntIfIndex))) {
+	    g_string_sprintfa(s, "IP Address:  %-*s", width,
+		      fmt_ipv4_address(ipAddrTable[j]->ipAdEntAddr, 0));
+	    g_string_sprintfa(s, " Prefix:  %s\n",
+		      fmt_ipv4_mask(ipAddrTable[j]->ipAdEntNetMask));
+	}
+    }
+    
+    if (ifEntry->ifDescr && ifEntry->_ifDescrLength) {
+	g_string_sprintfa(s, "Description: %.*s\n",
+			  (int) ifEntry->_ifDescrLength,
+			  ifEntry->ifDescr);
+    }
+    
+    if (ifXEntry && ifXEntry
+	&& ifXEntry->ifAlias && ifXEntry->_ifAliasLength) {
+	g_string_sprintfa(s, "Alias:       %.*s\n",
+			  (int) ifXEntry->_ifAliasLength,
+			  ifXEntry->ifAlias);
+    }
+}
+
 
 
 static int
-cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
+cmd_details(scli_interp_t *interp, int argc, char **argv)
 {
     ifEntry_t **ifTable = NULL;
     ifXEntry_t **ifXTable = NULL;
     system_t *system = NULL;
     ipAddrEntry_t **ipAddrTable = NULL;
-    GString *s;
-    int i, j;
-    int const width = 20;
+    int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -48,123 +198,14 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
     (void) snmpv2_mib_get_system(interp->peer, &system);
     (void) ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable);
 
-    s = interp->result;
     if (ifTable) {
-
 	for (i = 0; ifTable[i]; i++) {
-
 	    if (i) {
-		g_string_append(s, "\n");
+		g_string_append(interp->result, "\n");
 	    }
-
-	    g_string_sprintfa(s, "Index:       %-*d", width,
-			      ifTable[i]->ifIndex);
-	    if (ifXTable && ifXTable[i]
-		&& ifXTable[i]->ifName && ifXTable[i]->_ifNameLength) {
-		g_string_sprintfa(s, " Name:    %.*s\n",
-			    (int) ifXTable[i]->_ifNameLength,
-				  ifXTable[i]->ifName);
-	    } else if (ifTable[i]->ifDescr && ifTable[i]->_ifDescrLength
-		&& ifTable[i]->_ifDescrLength < width) {
-		g_string_sprintfa(s, " Name:    %.*s\n",
-			    (int) ifTable[i]->_ifDescrLength,
-				  ifTable[i]->ifDescr);
-	    } else {
-		g_string_sprintfa(s, " Name:    if#%-17d\n",
-				  ifTable[i]->ifIndex);
-	    }
-
-	    g_string_append(s, "OperStatus:  ");
-	    fmt_enum(s, width, if_mib_enums_ifOperStatus,
-		     ifTable[i]->ifOperStatus);
-	    if (ifTable[i]->ifPhysAddress
-		&& ifTable[i]->_ifPhysAddressLength) {
-		g_string_append(s, " Address: ");
-		for (j = 0; j < ifTable[i]->_ifPhysAddressLength; j++) {
-		    g_string_sprintfa(s, "%s%02X",
-				      (j == 0) ? "" : ":",
-				      ifTable[i]->ifPhysAddress[j]);
-		}
-		g_string_append(s, "\n");
-	    } else {
-		g_string_append(s, " Address:\n");
-	    }
-
-	    g_string_append(s, "AdminStatus: ");
-	    fmt_enum(s, width, if_mib_enums_ifAdminStatus,
-		     ifTable[i]->ifAdminStatus);
-	    g_string_append(s, " Type:    ");
-	    fmt_enum(s, width, if_mib_enums_ifType,
-		     ifTable[i]->ifType);
-	    g_string_append(s, "\n");
-
-	    g_string_append(s, "Traps:       ");
-	    fmt_enum(s, width, if_mib_enums_ifLinkUpDownTrapEnable,
-		     (ifXTable && ifXTable[i]) ?
-		     ifXTable[i]->ifLinkUpDownTrapEnable : NULL);
-	    if (ifTable[i]->ifMtu) {
-		g_string_sprintfa(s, " MTU:     %d byte\n",
-				  *(ifTable[i]->ifMtu));
-	    } else {
-		g_string_append(s, " MTU:\n");
-	    }
-
-	    g_string_append(s, "Connector:   ");
-	    fmt_enum(s, width, if_mib_enums_ifConnectorPresent,
-		     (ifXTable && ifXTable[i]) ?
-		     ifXTable[i]->ifConnectorPresent : NULL);
-	    if (ifTable[i]->ifSpeed) {
-		if (*(ifTable[i]->ifSpeed) == 0xffffffff
-		    && ifXTable && ifXTable[i]->ifHighSpeed) {
-		    g_string_sprintfa(s, " Speed:   %s bps\n",
-				      fmt_gtp(*(ifXTable[i]->ifHighSpeed)));
-		} else {
-		    g_string_sprintfa(s, " Speed:   %s bps\n",
-				      fmt_kmg(*(ifTable[i]->ifSpeed)));
-		}
-	    } else {
-		g_string_append(s, " Speed:\n");
-	    }
-	    
-	    g_string_append(s, "Promiscuous: ");
-	    fmt_enum(s, width, if_mib_enums_ifPromiscuousMode,
-		     (ifXTable && ifXTable[i]) ?
-		     ifXTable[i]->ifPromiscuousMode : NULL);
-	    if (ifTable[i]->ifLastChange && system && system->sysUpTime) {
-		guint32 dsecs =
-		    *(system->sysUpTime) - *(ifTable[i]->ifLastChange);
-		g_string_sprintfa(s, " Change:  ");
-		fmt_time_ticks(s, dsecs);
-		g_string_append(s, "\n");
-	    } else {
-		g_string_append(s, " Change:\n");
-	    }
-	    
-	    for (j = 0; ipAddrTable[j]; j++) {
-		if (ipAddrTable[j]->ipAdEntIfIndex
-		    && (ifTable[i]->ifIndex
-			== *(ipAddrTable[j]->ipAdEntIfIndex))) {
-		    g_string_sprintfa(s, "IP Address:  %-*s", width,
-				      fmt_ipv4_address(
-					  ipAddrTable[j]->ipAdEntAddr, 0));
-		    g_string_sprintfa(s, " Prefix:  %s\n",
-				      fmt_ipv4_mask(
-					  ipAddrTable[j]->ipAdEntNetMask));
-		}
-	    }
-	    	    
-	    if (ifTable[i]->ifDescr && ifTable[i]->_ifDescrLength) {
-		g_string_sprintfa(s, "Description: %.*s\n",
-			    (int) ifTable[i]->_ifDescrLength,
-				  ifTable[i]->ifDescr);
-	    }
-
-	    if (ifXTable && ifXTable[i]
-		&& ifXTable[i]->ifAlias && ifXTable[i]->_ifAliasLength) {
-		g_string_sprintfa(s, "Alias:       %.*s\n",
-			    (int) ifXTable[i]->_ifAliasLength,
-				  ifXTable[i]->ifAlias);
-	    }
+	    show_details(interp->result, ifTable[i],
+			 ifXTable ? ifXTable[i] : NULL,
+			 system, ipAddrTable);
 	}
     }
 
@@ -173,104 +214,110 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
     if (system) snmpv2_mib_free_system(system);
     if (ipAddrTable) ip_mib_free_ipAddrTable(ipAddrTable);
 
-    interp->result = s;
     return SCLI_OK;
 }
 
 
 
 static void
-show_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry)
+show_info(GString *s, ifEntry_t *ifEntry, ifXEntry_t *ifXEntry,
+	  int name_width)
 {
-    g_return_if_fail(tunnelIfEntry);
+    int j;
 
-    if (tunnelIfEntry->ifIndex) {
-	g_string_sprintfa(s, "%2d   ", tunnelIfEntry->ifIndex);
+    g_string_sprintfa(s, "%5u ", ifEntry->ifIndex);
+    g_string_sprintfa(s, "%-*s ", name_width,
+		      get_if_name(ifEntry, ifXEntry, 12));
+    fmt_ifStatus(s, ifEntry->ifAdminStatus, ifEntry->ifOperStatus);
+
+    if (ifEntry->ifMtu) {
+	g_string_sprintfa(s, " %6d", *(ifEntry->ifMtu));
     } else {
-	g_string_sprintfa(s, "%2s   ", "--");
+	g_string_append(s, "       ");
     }
 
-    if (tunnelIfEntry->tunnelIfLocalAddress) {
-	g_string_sprintfa(s, "%-15s  ",
-		  fmt_ipv4_address(tunnelIfEntry->tunnelIfLocalAddress, 0));
-    } else {
-	g_string_sprintfa(s, "%-15s  ", "-");
-    }
-
-    if (tunnelIfEntry->tunnelIfRemoteAddress) {
-	g_string_sprintfa(s, "%-15s  ",
-		  fmt_ipv4_address(tunnelIfEntry->tunnelIfRemoteAddress, 0));
-    } else {
-	g_string_sprintfa(s, "%-15s  ", "-");
-    }
-
-    if (tunnelIfEntry->tunnelIfEncapsMethod) {
-	fmt_enum(s, 8, tunnel_mib_enums_tunnelIfEncapsMethod,
-		 tunnelIfEntry->tunnelIfEncapsMethod);
-    } else {
-	g_string_sprintfa(s, "%-6s  ", "-");
-    }
-
-    if (tunnelIfEntry->tunnelIfSecurity) {
-	fmt_enum(s, 9, tunnel_mib_enums_tunnelIfSecurity,
-		 tunnelIfEntry->tunnelIfSecurity);
-    } else {
-	g_string_sprintfa(s, "%-7s  ", "-");
-    }
-
-    if (tunnelIfEntry->tunnelIfHopLimit) {
-	g_string_sprintfa(s, "%3d  ", *tunnelIfEntry->tunnelIfHopLimit);
-    } else {
-	g_string_sprintfa(s, "%3s  ", "---");
-    }
-    
-    if (tunnelIfEntry->tunnelIfTOS) {
-	switch (*tunnelIfEntry->tunnelIfTOS) {
-	case -1:
-	    /* A value of -1 indicates that the bits are copied from the
-	     * payload's header. */
-	    g_string_append(s, "CP");
-	    break;
-	case -2:
-	    /* A value of -2 indicates that a traffic conditioner is
-	     * invoked and more information may be available in a traffic
-	     * conditioner MIB. */
-	    g_string_append(s, "TC");
-	    break;
-        default:
-	    g_string_sprintfa(s, "%2d", *tunnelIfEntry->tunnelIfTOS);
-	    break;
+    if (ifEntry->ifSpeed) {
+	if (*(ifEntry->ifSpeed) == 0xffffffff
+	    && ifXEntry && ifXEntry->ifHighSpeed) {
+	    g_string_sprintfa(s, "  %4s ",
+			      fmt_gtp(*(ifXEntry->ifHighSpeed)));
+	} else {
+	    g_string_sprintfa(s, "  %4s ",
+			      fmt_kmg(*(ifEntry->ifSpeed)));
 	}
     } else {
-	g_string_append(s, "--");
+	g_string_append(s, "       ");
     }
-    
+
+    fmt_enum(s, 20, if_mib_enums_ifType, ifEntry->ifType);
+    g_string_append(s, " ");
+
+    if (ifEntry->ifPhysAddress && ifEntry->_ifPhysAddressLength) {
+	for (j = 0; j < ifEntry->_ifPhysAddressLength; j++) {
+	    g_string_sprintfa(s, "%s%02X", (j == 0) ? "" : ":",
+			      ifEntry->ifPhysAddress[j]);
+	}
+    }
+
     g_string_append(s, "\n");
 }
 
 
 
 static int
-cmd_tunnel(scli_interp_t *interp, int argc, char **argv)
+cmd_info(scli_interp_t *interp, int argc, char **argv)
 {
-    tunnelIfEntry_t **tunnelIfTable = NULL;
+    ifEntry_t **ifTable = NULL;
+    ifXEntry_t **ifXTable = NULL;
     int i;
+    int name_width = 12;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (tunnel_mib_get_tunnelIfTable(interp->peer, &tunnelIfTable)) {
+    if (if_mib_get_ifTable(interp->peer, &ifTable)) {
 	return SCLI_ERROR;
     }
+    (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
 
-    if (tunnelIfTable) {
-	g_string_append(interp->result,
-	"IF   Local Address    Remote Address   Type    Security  TTL TOS\n");
-	for (i = 0; tunnelIfTable[i]; i++) {
-	    show_tunnel(interp->result, tunnelIfTable[i]);
+    if (ifTable) {
+	for (i = 0; ifTable[i]; i++) {
+	    char *x = get_if_name(ifTable[i], ifXTable ? ifXTable[i] : NULL, 12);
+	    if (x && strlen(x) > name_width) {
+		name_width = strlen(x);
+	    }
 	}
-	tunnel_mib_free_tunnelIfTable(tunnelIfTable);
+	g_string_sprintfa(interp->result,
+			  "Index %-*s Status  MTU Speed Type"
+			  "                 Address\n",
+			  name_width, "Name");
+	for (i = 0; ifTable[i]; i++) {
+	    show_info(interp->result, ifTable[i],
+		      ifXTable ? ifXTable[i] : NULL,
+		      name_width);
+	}
     }
 
+    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifXTable) if_mib_free_ifXTable(ifXTable);
+
+    return SCLI_OK;
+}
+
+
+
+static int
+cmd_stack(scli_interp_t *interp, int argc, char **argv)
+{
+    /*
+     *      ,-- if2 
+     * if1 -+-- if3
+     *      `-- if4
+     *
+     * if5 -,
+     * if6 -+-- if8
+     * if7 -'
+     */
+    
     return SCLI_OK;
 }
 
@@ -281,12 +328,15 @@ scli_init_interface_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 	{ "show", "interface", NULL, NULL },
+	{ "show interface", "details",
+	  "show detailed information about the network interfaces",
+	  cmd_details },
 	{ "show interface", "info",
-	  "show information about the network interfaces",
-	  cmd_interfaces },
-	{ "show interface", "tunnel",
-	  "show interface tunnel summary information",
-	  cmd_tunnel },
+	  "show network interface summary information",
+	  cmd_info },
+	{ "show interface", "stack",
+	  "show interface stacking information",
+	  cmd_stack },
 	{ NULL, NULL, NULL, NULL }
     };
     

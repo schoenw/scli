@@ -27,8 +27,9 @@
 #include "config.h"
 #endif
 
-#include "stools.h"
 #include "scli.h"
+
+#include "snmpv2-mib.h"
 
 #include <getopt.h>
 #include <string.h>

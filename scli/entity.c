@@ -24,8 +24,9 @@
 #include "config.h"
 #endif
 
-#include "stools.h"
 #include "scli.h"
+
+#include "entity-mib.h"
 
 
 static void

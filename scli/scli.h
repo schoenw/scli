@@ -36,6 +36,8 @@
 #endif
 #include <time.h>
 
+#include "stools.h"
+
 
 extern char const scli_copyright[];
 
@@ -161,7 +163,7 @@ extern void
 fmt_kbytes(GString *s, guint32 kbytes);
 
 extern void
-fmt_enum(GString *s, int width, stls_table_t *table, gint32 *number);
+fmt_enum(GString *s, int width, stls_table_t const *table, gint32 *number);
 
 extern char*
 fmt_kmg(guint32 number);
