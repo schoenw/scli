@@ -520,6 +520,27 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 			  prtInputEntry->prtInputModel);
     }
 
+    if (prtInputEntry->prtInputMaxCapacity) {
+	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
+	switch (*prtInputEntry->prtInputMaxCapacity) {
+	case -1:
+	    g_string_append(s, "other ");
+	    break;
+	case -2:
+	    g_string_append(s, "unknown ");
+	    break;
+	default:
+	    g_string_sprintfa(s, "%u ",
+			      *prtInputEntry->prtInputMaxCapacity);
+	}
+	e = fmt_enum(printer_mib_enums_prtInputCapacityUnit,
+		     prtInputEntry->prtInputCapacityUnit);
+	if (e) {
+	    g_string_append(s, e);
+	}
+	g_string_append(s, "\n");
+    }
+
     if (prtInputEntry->prtInputCurrentLevel) {
 	g_string_sprintfa(s, "%-*s ", indent, "Level:");
 	switch (*prtInputEntry->prtInputCurrentLevel) {
@@ -534,28 +555,6 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 	    break;
 	default:
 	    g_string_sprintfa(s, "%u ", *prtInputEntry->prtInputCurrentLevel);
-	}
-	e = fmt_enum(printer_mib_enums_prtInputCapacityUnit,
-		     prtInputEntry->prtInputCapacityUnit);
-	if (e) {
-	    g_string_append(s, e);
-	}
-	g_string_append(s, "\n");
-    }
-
-
-    if (prtInputEntry->prtInputMaxCapacity) {
-	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
-	switch (*prtInputEntry->prtInputMaxCapacity) {
-	case -1:
-	    g_string_append(s, "other");
-	    break;
-	case -2:
-	    g_string_append(s, "unknown");
-	    break;
-	default:
-	    g_string_sprintfa(s, "%u ",
-			      *prtInputEntry->prtInputMaxCapacity);
 	}
 	e = fmt_enum(printer_mib_enums_prtInputCapacityUnit,
 		     prtInputEntry->prtInputCapacityUnit);
@@ -791,6 +790,27 @@ fmt_printer_outputs(GString *s, printer_mib_prtOutputEntry_t *prtOutputEntry)
 			  prtOutputEntry->prtOutputModel);
     }
 
+    if (prtOutputEntry->prtOutputMaxCapacity) {
+	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
+	switch (*prtOutputEntry->prtOutputMaxCapacity) {
+	case -1:
+	    g_string_append(s, "other ");
+	    break;
+	case -2:
+	    g_string_append(s, "unknown ");
+	    break;
+	default:
+	    g_string_sprintfa(s, "%u ",
+			      *prtOutputEntry->prtOutputMaxCapacity);
+	}
+	e = fmt_enum(printer_mib_enums_prtOutputCapacityUnit,
+		     prtOutputEntry->prtOutputCapacityUnit);
+	if (e) {
+	    g_string_append(s, e);
+	}
+	g_string_append(s, "\n");
+    }
+
     if (prtOutputEntry->prtOutputRemainingCapacity) {
 	g_string_sprintfa(s, "%-*s ", indent, "Remaining:");
 	switch (*prtOutputEntry->prtOutputRemainingCapacity) {
@@ -805,27 +825,6 @@ fmt_printer_outputs(GString *s, printer_mib_prtOutputEntry_t *prtOutputEntry)
 	    break;
 	default:
 	    g_string_sprintfa(s, "%u ", *prtOutputEntry->prtOutputRemainingCapacity);
-	}
-	e = fmt_enum(printer_mib_enums_prtOutputCapacityUnit,
-		     prtOutputEntry->prtOutputCapacityUnit);
-	if (e) {
-	    g_string_append(s, e);
-	}
-	g_string_append(s, "\n");
-    }
-
-    if (prtOutputEntry->prtOutputMaxCapacity) {
-	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
-	switch (*prtOutputEntry->prtOutputMaxCapacity) {
-	case -1:
-	    g_string_append(s, "other");
-	    break;
-	case -2:
-	    g_string_append(s, "unknown");
-	    break;
-	default:
-	    g_string_sprintfa(s, "%u ",
-			      *prtOutputEntry->prtOutputMaxCapacity);
 	}
 	e = fmt_enum(printer_mib_enums_prtOutputCapacityUnit,
 		     prtOutputEntry->prtOutputCapacityUnit);
