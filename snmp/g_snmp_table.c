@@ -1,7 +1,8 @@
 /*
- * $Id$
- * GXSNMP -- An snmp management application
- * Copyright (C) 1998 Gregory McLean & Jochen Friedrich
+ * g_snmp_table.c -- table layer of the glib based snmp library
+ *
+ * Copyright (c) 1998 Gregory McLean & Jochen Friedrich
+ * Copyright (c) 2001 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,  59 Temple Place - Suite 330, Cambridge, MA 02139, USA.
+ *
+ * $Id$
  */
 
 #include "g_snmp.h"
@@ -24,19 +27,25 @@ static gboolean
 g_snmp_table_done_callback(GSnmpSession *session, gpointer data, 
                            GSnmpPdu *spdu, GSList *objs)
 {
-  Gsnmp_table  * table;
-  GSList       * nobjs; /* New list of objects for next query */
-  GSnmpVarBind * cobj;  /* Current object being processed */
-  GSnmpVarBind * obj;   /* Base object being processed */
-  GSnmpVarBind * nobj;  /* New NULL object for next query */
-  GHashTable   * otable;
-  int           rows;
-  int           i,j, *p;
-  guint         index[SNMP_SIZE_OBJECTID];
-  int           index_len;
-
-  table = (Gsnmp_table *) data;
-  table->request = 0;
+    GSnmpTable   *table;
+    GSList       *nobjs; /* New list of objects for next query */
+    GSnmpVarBind *cobj;  /* Current object being processed */
+    GSnmpVarBind *obj;   /* Base object being processed */
+    GSnmpVarBind *nobj;  /* New NULL object for next query */
+    GHashTable   *otable;
+    int           rows;
+    int           i,j, *p;
+    guint32       index[SNMP_SIZE_OBJECTID];
+    int           index_len;
+    
+    if (g_snmp_debug_flags & G_SNMP_DEBUG_SESSION) {
+	g_printerr("session %p: error-status = %d, error-index = %d\n",
+		   session, session->error_status, session->error_index);
+    }
+    
+    table = (GSnmpTable *) data;
+    table->request = 0;
+    
   rows = g_slist_length(table->objs);
 /* We got error back. */
   if (spdu->request.error_status)
@@ -141,48 +150,39 @@ g_snmp_table_done_callback(GSnmpSession *session, gpointer data,
 static void
 g_snmp_table_time_callback(GSnmpSession *session, gpointer data)
 {
-    Gsnmp_table * table;
+    GSnmpTable *table;
     
-    table = (Gsnmp_table *) data;
+    table = (GSnmpTable *) data;
     table->request = 0;
     if (table->cb_error) {
 	table->cb_error(table->data);
     } else {
 	g_snmp_table_destroy(table);
     }
+
+    session->error_index = 0;
+    session->error_status = G_SNMP_ERR_NORESPONSE;
 }
 
 
-Gsnmp_table *
+GSnmpTable *
 g_snmp_table_new(GSnmpSession *session, GSList *objs, 
 		 void (* cb_error)(), void (* cb_row)(), void (* cb_finish)(),
 		 gpointer data)
 {
     GSList *elem;
-    Gsnmp_table *table;
+    GSnmpTable *table;
 
-    table          = g_malloc0(sizeof(Gsnmp_table));
-    table->session = g_malloc0(sizeof(GSnmpSession));
-    
-    table->session->domain  = session->domain;
-    table->session->rcomm   = session->rcomm;
-    table->session->wcomm   = session->wcomm;
-    table->session->retries = session->retries;
-    table->session->name    = session->name;
-    table->session->error_status  = 0;
-    table->session->port    = session->port;
-    table->session->timeout = session->timeout;
-    table->session->version = session->version;
-    table->session->magic   = table;
-    
+    table          = g_malloc0(sizeof(GSnmpTable));
+
+    table->session = g_snmp_session_clone(session);
+    table->session->magic = table;
     table->session->done_callback = g_snmp_table_done_callback;
     table->session->time_callback = g_snmp_table_time_callback;
     
     for (elem = objs; elem; elem = g_slist_next(elem)) {
-	GSnmpVarBind *obj, *nobj;
-	obj  = (GSnmpVarBind *) elem->data;
-	nobj = g_snmp_varbind_new(obj->id, obj->id_len, G_SNMP_NULL, NULL, 0);
-	table->objs = g_slist_append(table->objs, nobj);
+	GSnmpVarBind *obj = (GSnmpVarBind *) elem->data;
+	g_snmp_vbl_add_null(&table->objs, obj->id, obj->id_len);
     }
     table->data = data;
     
@@ -195,26 +195,21 @@ g_snmp_table_new(GSnmpSession *session, GSList *objs,
 
 
 void
-g_snmp_table_get(Gsnmp_table *table)
+g_snmp_table_get(GSnmpTable *table)
 {
     table->request = g_snmp_session_async_getnext(table->session, table->objs);
 }
 
 
 void
-g_snmp_table_destroy(Gsnmp_table *table)
+g_snmp_table_destroy(GSnmpTable *table)
 {
-    GSList *elem;
-    
     if (table->request) {
 	g_snmp_request_dequeue(table->request);
 	g_snmp_request_destroy(table->request);
     }
-    for (elem = table->objs; elem; elem = g_slist_next(elem)) {
-	g_snmp_varbind_free((GSnmpVarBind *) elem->data);
-    }
-    g_slist_free(table->objs);
-    g_free(table->session);
+    g_snmp_vbl_free(table->objs);
+    g_snmp_session_destroy(table->session);
     g_free(table);
 }
 
@@ -269,7 +264,7 @@ cb_row(GHashTable *table, int index_len, gpointer *data)
 GSList *
 gsnmp_gettable(GSnmpSession *s, GSList *in)
 {
-    Gsnmp_table *table;
+    GSnmpTable *table;
     GSList *tablelist = NULL;
 
     table = g_snmp_table_new(s, in, cb_error, cb_row, cb_finish, &tablelist);
