@@ -1271,6 +1271,156 @@ fmt_printer_outputs(GString *s, printer_mib_prtOutputEntry_t *prtOutputEntry)
 
 
 
+static void
+xml_printer_outputs(xmlNodePtr root,
+		    printer_mib_prtOutputEntry_t *prtOutputEntry)
+{
+    xmlNodePtr tree, node;
+    const char *e;
+
+    tree = xmlNewChild(root, NULL, "output", NULL);
+    xml_set_prop(tree, "number", "%d",
+		 prtOutputEntry->prtOutputIndex);
+
+    if (prtOutputEntry->prtOutputName) {
+        (void) xml_new_child(tree, NULL, "name", "%.*s",
+			     (int) prtOutputEntry->_prtOutputNameLength,
+			     prtOutputEntry->prtOutputName);
+    }
+
+    if (prtOutputEntry->prtOutputDescription) {
+        (void) xml_new_child(tree, NULL, "description", "%.*s",
+			     (int) prtOutputEntry->_prtOutputDescriptionLength,
+			     prtOutputEntry->prtOutputDescription);
+    }
+
+    if (prtOutputEntry->prtOutputVendorName) {
+        (void) xml_new_child(tree, NULL, "vendor", "%.*s",
+			     (int) prtOutputEntry->_prtOutputVendorNameLength,
+			     prtOutputEntry->prtOutputVendorName);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputType,
+		 prtOutputEntry->prtOutputType);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "type", "%s", e);
+    }
+    
+    if (prtOutputEntry->prtOutputModel) {
+        (void) xml_new_child(tree, NULL, "model", "%.*s",
+			     (int) prtOutputEntry->_prtOutputModelLength,
+			     prtOutputEntry->prtOutputModel);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputCapacityUnit,
+		 prtOutputEntry->prtOutputCapacityUnit);
+
+    if (prtOutputEntry->prtOutputMaxCapacity) {
+	switch (*prtOutputEntry->prtOutputMaxCapacity) {
+	case -1:
+	    node = xml_new_child(tree, NULL, "capacity", "unlimited");
+	    break;
+	case -2:
+	    node = xml_new_child(tree, NULL, "capacity", "unknown");
+	    break;
+	default:
+	    node = xml_new_child(tree, NULL, "capacity", "%d",
+				 *prtOutputEntry->prtOutputMaxCapacity);
+	}
+	xml_set_prop(node, "unit", "%s", e);
+    }
+
+    if (prtOutputEntry->prtOutputRemainingCapacity) {
+	switch (*prtOutputEntry->prtOutputRemainingCapacity) {
+	case -1:
+	    node = xml_new_child(tree, NULL, "level", "unlimited");
+	    break;
+	case -2:
+	    node = xml_new_child(tree, NULL, "level", "unknown");
+	    break;
+	case -3:
+	    node = xml_new_child(tree, NULL, "level", ">0");
+	    break;
+	default:
+	    node = xml_new_child(tree, NULL, "level", "%d",
+				 *prtOutputEntry->prtOutputRemainingCapacity);
+	}
+	xml_set_prop(node, "unit", "%s", e);
+    }
+
+    xml_subunit(tree, prtOutputEntry->prtOutputStatus);
+
+    if (prtOutputEntry->prtOutputSerialNumber) {
+	(void) xml_new_child(tree, NULL, "serial", "%.*s",
+			     (int) prtOutputEntry->_prtOutputSerialNumberLength,
+			     prtOutputEntry->prtOutputSerialNumber);
+    }
+    
+    if (prtOutputEntry->prtOutputVersion) {
+	(void) xml_new_child(tree, NULL, "version", "%.*s",
+			     (int) prtOutputEntry->_prtOutputVersionLength,
+			     prtOutputEntry->prtOutputVersion);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputSecurity,
+		 prtOutputEntry->prtOutputSecurity);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "security", "%s", e);
+    }
+
+    /* ...media specific stuff begins here... */
+
+    xml_media_dimensions(tree, "min-dimensions:",
+			 prtOutputEntry->prtOutputMinDimFeedDir,
+			 prtOutputEntry->prtOutputMinDimXFeedDir,
+			 prtOutputEntry->prtOutputDimUnit,
+			 printer_mib_enums_prtOutputDimUnit);
+
+    xml_media_dimensions(tree, "max-dimensions:",
+			 prtOutputEntry->prtOutputMaxDimFeedDir,
+			 prtOutputEntry->prtOutputMaxDimXFeedDir,
+			 prtOutputEntry->prtOutputDimUnit,
+			 printer_mib_enums_prtOutputDimUnit);
+
+    e = fmt_enum(printer_mib_enums_prtOutputStackingOrder,
+		 prtOutputEntry->prtOutputStackingOrder);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "stacking-order", "%s", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputPageDeliveryOrientation,
+		 prtOutputEntry->prtOutputPageDeliveryOrientation);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "orientation", "%s", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputBursting,
+		 prtOutputEntry->prtOutputBursting);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "bursting", "%s", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputDecollating,
+		 prtOutputEntry->prtOutputDecollating);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "decollating", "%s", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputPageCollated,
+		 prtOutputEntry->prtOutputPageCollated);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "collation", "%s", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtOutputOffsetStacking,
+		 prtOutputEntry->prtOutputOffsetStacking);
+    if (e) {
+	(void) xml_new_child(tree, NULL, "offset-stacking", "%s", e);
+    }
+}
+
+
+
 static int
 show_printer_outputs(scli_interp_t *interp, int argc, char **argv)
 {
@@ -1294,10 +1444,17 @@ show_printer_outputs(scli_interp_t *interp, int argc, char **argv)
 
     if (prtOutputTable) {
 	for (i = 0; prtOutputTable[i]; i++) {
-	    if (i > 0) {
-		g_string_append(interp->result, "\n");
+	    if (scli_interp_xml(interp)) {
+		xmlNodePtr node = get_printer_node(interp->xml_node,
+					   prtOutputTable[i]->hrDeviceIndex,
+						   "outputs");
+		xml_printer_outputs(node, prtOutputTable[i]);
+	    } else {
+		if (i > 0) {
+		    g_string_append(interp->result, "\n");
+		}
+		fmt_printer_outputs(interp->result, prtOutputTable[i]);
 	    }
-	    fmt_printer_outputs(interp->result, prtOutputTable[i]);
 	}
     }
 
@@ -2147,8 +2304,8 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "The `show printer output' command shows information about the\n"
 	  "output sub-units of a printer capable of receiving media\n"
 	  "delivered from the printing process.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "devices", NULL,
 	  show_printer_outputs },
 
 	{ "show printer markers", NULL,
