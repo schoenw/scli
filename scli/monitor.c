@@ -621,6 +621,7 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
             break;
         case 'q':
 	case 'Q':
+	    code = SCLI_OK;
             flags |= STOP_FLAG_DONE;
             break;
 	case 'x':
