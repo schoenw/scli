@@ -1,3 +1,197 @@
+2002-02-18 15:19  schoenw
+
+	* configure.in: Updates for release 0.2.7.
+
+2002-02-18 15:12  schoenw
+
+	* scli/interface.c: Minor code cleanups.
+
+2002-02-18 15:06  schoenw
+
+	* stub/: snmp-framework-mib.c, snmp-framework-mib.h: Regenerated
+        stubs to improve the error handling.
+
+2002-02-15 15:08  schoenw
+
+	* proc/: snmp-view-based-acm-mib-proc.c,
+	snmp-view-based-acm-mib-proc.h: Updated the proc interface to be
+        more consistent with how an automatic interface would look like.
+
+2002-02-15 15:07  schoenw
+
+	* stub/: snmp-notification-mib.c, snmp-notification-mib.h: Added
+        stubs for the SNMP-NOTIFICATION-MIB.
+
+2002-02-15 15:05  schoenw
+
+	* scli/snmp.c: Added new commands: delete snmp vacm member, show
+	snmp target addresses, show snmp target parameters, show snmp
+	notification targets. Renamed show snmp vacm groups to show snmp
+        vacm member.
+
+2002-02-15 15:03  schoenw
+
+	* scli/: fmt.c, scli.h: Added fmt_tdomain() and fmt_taddress().
+
+2002-02-15 15:01  schoenw
+
+	* stub/Makefile.am: Added stubs for the SNMP-NOTIFICATION-MIB.
+
+2002-02-13 16:03  schoenw
+
+	* proc/: snmp-view-based-acm-mib-proc.c,
+	snmp-view-based-acm-mib-proc.h: Added
+        snmp_view_based_acm_mib_proc_delete_member().
+
+2002-02-13 16:02  schoenw
+
+	* stub/: Makefile.am, snmpv2-tm.c, snmpv2-tm.h: Added stubs for the
+        SNMPv2-TM module.
+
+2002-02-11 14:35  schoenw
+
+	* scli/entity.c: Handle physical entities wich are not contained
+        anywhere.
+
+2002-02-11 14:18  schoenw
+
+	* scli/basic.c: Added date and peer attributes to the XML output.
+
+2002-02-11 14:18  schoenw
+
+	* scli/interface.c: Added code to show the physical entities which
+        contain interfaces in the "show interface details" command.
+
+2002-02-07 11:35  schoenw
+
+	* scli/cmds.c: Added the show scli alarm info command to display
+        alarm information.
+
+2002-02-07 11:34  schoenw
+
+	* scli/: basic.c, scli.h: Added a data structure for alarms.
+
+2002-02-07 11:16  schoenw
+
+	* scli/snmp.c: Added the create snmp vacm member command.
+
+2002-02-07 11:14  schoenw
+
+	* proc/: Makefile.am, snmp-view-based-acm-mib-proc.c,
+	snmp-view-based-acm-mib-proc.h, udp-mib-proc.c, udp-mib-proc.h:
+	Added procedure files for the UDP-MIB and the
+        SNMP-VIEW-BASED-ACM-MIB.
+
+2002-02-07 11:13  schoenw
+
+	* snmp/: g_snmp_table.c, g_snmp_walk.c: Propagate the error
+        information back into the calling session.
+
+2002-01-30 13:57  schoenw
+
+	* scli/interface.c: Implemented an experimental "alert interface
+        status" command.
+
+2002-01-25 10:33  schoenw
+
+	* scli/basic.c: Experimental code to cleanup the error message
+        handling.
+
+2002-01-25 10:32  schoenw
+
+	* scli/: atm.c, cmds.c, interface.c, nortel.c, scli.h, system.c:
+        Regular expression matching options are now configurable.
+
+2002-01-20 23:10  schoenw
+
+	* README: Updated mailing list information.
+
+2002-01-18 10:45  schoenw
+
+	* scli/disman.c: Updated to the MIB version in RFC RFC 3231.
+
+2002-01-18 10:44  schoenw
+
+	* stub/: disman-schedule-mib.c, disman-schedule-mib.h: Updated to
+        the RFC 3231 version of the MIB.
+
+2002-01-18 10:40  schoenw
+
+	* scli/cmds.c: Allow the set scli debugging command in xml mode.
+
+2002-01-18 10:39  schoenw
+
+	* scli/scli.c: Fixed a command parsing bug.
+
+2002-01-18 10:38  schoenw
+
+	* scli/system.c: The show system processes and monitor system
+        processes now accept regexp's to select a subset of all processes.
+
+2002-01-10 11:12  schoenw
+
+	* scli/atm.c: Show the interface description in the "show atm
+        interface" commands.
+
+2002-01-10 11:02  schoenw
+
+	* scli/fmt.c: Better line wrapping for fmt_display_string().
+
+2002-01-10 11:01  schoenw
+
+	* scli/atm.c: Implemented regex matching for ATM interfaces.
+
+2002-01-09 16:16  schoenw
+
+	* scli/netsnmp.c: Improved the display of the load values.
+
+2002-01-08 20:02  schoenw
+
+	* scli/bridge.c: Improved the display of spanning tree information.
+
+2002-01-08 12:08  schoenw
+
+	* scli/atm.c: Split the show atm interface command into two new
+        commands: show atm interface info and show atm interface details
+
+2002-01-08 12:07  schoenw
+
+	* scli/netsnmp.c: New commands: show netsnmp load, set netsnmp
+        restart, show netsnmp exec, show netsnmp proc, dump netsnmp.
+
+2002-01-08 12:05  schoenw
+
+	* scli/entity.c: Improved the documentation.
+
+2002-01-07 16:32  schoenw
+
+	* scli/ospf.c: Fixed a formatting bug.
+
+2002-01-07 16:28  schoenw
+
+	* scli/: entity.c, fmt.c: Fixed a bug where the string len check
+        was out of order. Fixed the entity details layout.
+
+2002-01-05 17:15  schoenw
+
+	* scli/: bridge.c, cmds.c: Fixed some typos.
+
+2002-01-05 17:13  schoenw
+
+	* scli/: Makefile.am, netsnmp.c, scli.c, scli.h: Added a netsnmp
+        mode.
+
+2002-01-05 17:11  schoenw
+
+	* stub/: Makefile.am, snmp-view-based-acm-mib.c,
+	snmp-view-based-acm-mib.h, ucd-snmp-mib.c, ucd-snmp-mib.h: Added
+        stubs for the ucd-snmp/net-snmp private MIB.
+
+2001-12-19 13:23  schoenw
+
+	* ChangeLog, NEWS, config.h.in, configure.in: Updates for release
+        0.2.6.
+
 2001-12-19 12:33  schoenw
 
 	* scli/: cmds.c, scli.h: Made scli_cmd_open() unvisible across

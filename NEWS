@@ -1,3 +1,19 @@
+Changes in scli 0.2.7:
+
+- new "delete snmp vacm member" command
+- new "show snmp target addresses" command
+- new "show snmp target parameters" command
+- new "show snmp notification targets" command
+- renamed "show snmp vacm groups" to "show snmp vacm member"
+- extended "show interface details" output (physical entities)
+- allow regexps for "show system processes" and "monitor system processes"
+- new "show netsnmp load" command
+- new "set netsnmp restart" command
+- new "show netsnmp exec" command
+- new "show netsnmp proc" command
+- new "dump netsnmp" command
+- minor bug fixes
+
 Changes in scli 0.2.6:
 
 - new "show snmp usm users" command
