@@ -191,7 +191,7 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	show_interface_summary(peer);
 	wattron(win, A_REVERSE);
 	mvwprintw(win, 0, 0, "%-*s",
-		  COLS, "  IF STAT   MTU SPEED  BPS IN   OUT  PPS IN   OUT  DESCR ...");
+		  COLS, "  IF STAT   MTU SPEED I-BPS O-BPS I-PPS O-PPS  DESCR ...");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
 	sleep(1);
@@ -246,14 +246,14 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	    if (ifEntry[i]->ifInOctets && delta > TV_DELTA) {
 		if (last.tv_sec && last.tv_usec) {
 		    double f_val = (*(ifEntry[i]->ifInOctets) - stats[i].inOctets) / delta;
-		    g_string_sprintfa(s, "   %5s",
+		    g_string_sprintfa(s, " %5s",
 				      fmt_kmg((guint32) f_val));
 		} else {
-		    g_string_sprintfa(s, "    ----");
+		    g_string_sprintfa(s, "  ----");
 		}
 		stats[i].inOctets = *(ifEntry[i]->ifInOctets);
 	    } else {
-		g_string_sprintfa(s, "    ----");
+		g_string_sprintfa(s, "  ----");
 	    }
 	    
 	    if (ifEntry[i]->ifOutOctets && delta > TV_DELTA) {
@@ -283,14 +283,14 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 		}
 		if (last.tv_sec && last.tv_usec) {
 		    double f_val = (pkts - stats[i].inPkts) / delta;
-		    g_string_sprintfa(s, "   %5s",
+		    g_string_sprintfa(s, " %5s",
 				      fmt_kmg((guint32) f_val));
 		} else {
-		    g_string_sprintfa(s, "    ----");
+		    g_string_sprintfa(s, "  ----");
 		}
 		stats[i].inPkts = pkts;
 	    } else {
-		g_string_sprintfa(s, "    ----");
+		g_string_sprintfa(s, "  ----");
 	    }
 	    
 	    if (ifEntry[i]->ifOutUcastPkts && delta > TV_DELTA) {
