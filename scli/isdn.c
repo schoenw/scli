@@ -223,11 +223,13 @@ static void
 fmt_isdn_endpoint(GString *s, isdn_mib_isdnEndpointEntry_t *endpointEntry)
 {
     int const indent = 18;
+#if 0
     const char *e;
+#endif
 
     if (endpointEntry->isdnEndpointIfIndex) {
 	g_string_sprintfa(s, "%-*s %d\n", indent, "Interface:",
-			  endpointEntry->isdnEndpointIfIndex);
+			  *endpointEntry->isdnEndpointIfIndex);
     }
 
 #if 0
