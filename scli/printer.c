@@ -544,18 +544,18 @@ fmt_printer_info(GString *s,
 	e = fmt_enum(host_resources_mib_enums_hrDeviceStatus,
 		     hrDeviceEntry->hrDeviceStatus);
 	if (e) {
-	    g_string_sprintfa(s, "%-*s%s\n", indent, "Device Status:", e);
+	    g_string_sprintfa(s, "%-*s%s\n", indent, "Device-Status:", e);
 	}
     }
 
     e = fmt_enum(host_resources_mib_enums_hrPrinterStatus,
 		 hrPrinterEntry->hrPrinterStatus);
     if (e) {
-	g_string_sprintfa(s, "%-*s%s\n", indent, "Printer Status:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "Printer-Status:", e);
     }
 
     if (hrPrinterEntry->hrPrinterDetectedErrorState) {
-	g_string_sprintfa(s, "%-*s", indent, "Error State:");
+	g_string_sprintfa(s, "%-*s", indent, "Error-State:");
 	fmt_bits(s, error_states,
 		 hrPrinterEntry->hrPrinterDetectedErrorState,
 		 hrPrinterEntry->_hrPrinterDetectedErrorStateLength);
@@ -606,7 +606,7 @@ xml_printer_info(xmlNodePtr tree,
     fmt_bits(s, error_states,
 	     hrPrinterEntry->hrPrinterDetectedErrorState,
 	     hrPrinterEntry->_hrPrinterDetectedErrorStateLength);
-    (void) xml_new_child(tree, NULL, "error-states", "%s", s->str);
+    (void) xml_new_child(tree, NULL, "error-state", "%s", s->str);
     g_string_free(s, 1);
 }
 

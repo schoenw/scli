@@ -1132,7 +1132,7 @@ fmt_system_info(GString *s, scli_interp_t *interp,
 	uri = gnet_snmp_get_uri(interp->peer);
 	if (uri) {
 	    gchar *name = gnet_uri_get_string(uri);
-	    g_string_sprintfa(s, "%-*s%s\n", indent, "Agent URI:", name);
+	    g_string_sprintfa(s, "%-*s%s\n", indent, "SNMP-URI:", name);
 	    g_free(name);
 	}
 	if (system->sysDescr && system->_sysDescrLength) {
@@ -1243,7 +1243,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 			     xml_date_and_time(hrSystem->hrSystemDate,
 					       hrSystem->_hrSystemDateLength));
 	    } else {
-		g_string_sprintfa(s, "%-*s", indent, "Current Time:");
+		g_string_sprintfa(s, "%-*s", indent, "Current-Time:");
 		g_string_append(s, fmt_date_and_time(hrSystem->hrSystemDate,
 						     hrSystem->_hrSystemDateLength));
 		g_string_append_c(s, '\n');
@@ -1258,7 +1258,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 				     "agent-boot-time", "%s",
 				     xml_timeticks(*(system->sysUpTime)));
 	    } else {
-		g_string_sprintfa(s, "%-*s", indent, "Agent Boot Time:");
+		g_string_sprintfa(s, "%-*s", indent, "Agent-Boot-Time:");
 		g_string_append(s, fmt_timeticks(*(system->sysUpTime)));
 		g_string_append_c(s, '\n');
 	    }
@@ -1272,7 +1272,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 				     "system-boot-time", "%s",
 				     xml_timeticks(*(hrSystem->hrSystemUptime)));
 	    } else {
-	    g_string_sprintfa(s, "%-*s", indent, "System Boot Time:");
+	    g_string_sprintfa(s, "%-*s", indent, "System-Boot-Time:");
 	    g_string_append(s, fmt_timeticks(*(hrSystem->hrSystemUptime)));
 	    g_string_append_c(s, '\n');
 	}
@@ -1288,7 +1288,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 					 (int) dev->_hrDeviceDescrLength,
 					 dev->hrDeviceDescr);
 		} else {
-		fmt_display_string(s, indent, "System Boot Dev:",
+		fmt_display_string(s, indent, "System-Boot-Dev:",
 				   (int) dev->_hrDeviceDescrLength,
 				   dev->hrDeviceDescr);
 	    }
@@ -1302,7 +1302,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 				     xml_display_string((int) hrSystem->_hrSystemInitialLoadParametersLength,
 							hrSystem->hrSystemInitialLoadParameters));
 	    } else {
-	    fmt_display_string(s, indent, "System Boot Args:",
+	    fmt_display_string(s, indent, "System-Boot-Args:",
 			       (int) hrSystem->_hrSystemInitialLoadParametersLength,
 			       hrSystem->hrSystemInitialLoadParameters);
 	}

@@ -630,12 +630,12 @@ fmt_ip_info(GString *s, ip_mib_ip_t *ip)
     }
 
     if (ip->ipDefaultTTL) {
-	g_string_sprintfa(s, "%-*s%d hops\n", indent, "Default TTL:",
+	g_string_sprintfa(s, "%-*s%d hops\n", indent, "Default-TTL:",
 			  *ip->ipDefaultTTL);
     }
 
     if (ip->ipReasmTimeout) {
-	g_string_sprintfa(s, "%-*s%d seconds\n", indent, "Reasm Timeout:",
+	g_string_sprintfa(s, "%-*s%d seconds\n", indent, "Reasm-Timeout:",
 			  *ip->ipReasmTimeout);
     }
 }

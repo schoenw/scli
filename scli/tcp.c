@@ -526,22 +526,22 @@ fmt_tcp_info(GString *s, tcp_mib_tcp_t *tcp)
 
     e = fmt_enum(tcp_mib_enums_tcpRtoAlgorithm, tcp->tcpRtoAlgorithm);
     if (e) {
-	g_string_sprintfa(s, "%-*s%s\n", indent, "RTO Algorithm:", e);
+	g_string_sprintfa(s, "%-*s%s\n", indent, "RTO-Algorithm:", e);
     }
     if (tcp->tcpRtoMin) {
 	g_string_sprintfa(s, "%-*s%d milliseconds\n",
-			  indent, "RTO Minimum:", *tcp->tcpRtoMin);
+			  indent, "RTO-Minimum:", *tcp->tcpRtoMin);
     }
     if (tcp->tcpRtoMax) {
 	g_string_sprintfa(s, "%-*s%d milliseconds\n",
-			  indent, "RTO Maximum:", *tcp->tcpRtoMax);
+			  indent, "RTO-Maximum:", *tcp->tcpRtoMax);
     }
     if (tcp->tcpMaxConn && *tcp->tcpMaxConn) {
 	if (*tcp->tcpMaxConn < 0) {
-	    g_string_sprintfa(s, "%-*sdynamic\n", indent, "TCB Limit:");
+	    g_string_sprintfa(s, "%-*sdynamic\n", indent, "TCB-Limit:");
 	} else {
 	    g_string_sprintfa(s, "%-*s%d connections\n",
-			      indent, "TCB Limit:", *tcp->tcpMaxConn);
+			      indent, "TCB-Limit:", *tcp->tcpMaxConn);
 	}
     }
     if (tcp->tcpCurrEstab) {
