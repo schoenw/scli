@@ -42,7 +42,8 @@ if_mib_proc_set_interface_status(GSnmpSession *s,
 extern void
 if_mib_proc_set_interface_alias(GSnmpSession *s,
 				gint32 ifIndex,
-				char *alias);
+				guchar *alias,
+				gsize alias_len);
 
 extern void
 if_mib_proc_set_interface_promiscuous(GSnmpSession *s,

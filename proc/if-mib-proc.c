@@ -40,14 +40,15 @@ if_mib_proc_set_interface_status(GSnmpSession *s,
 void
 if_mib_proc_set_interface_alias(GSnmpSession *s,
 				gint32 ifIndex,
-				char *alias)
+				guchar *alias,
+				gsize alias_len)
 {
     if_mib_ifXEntry_t *ifXEntry;
 
     if_mib_get_ifXEntry(s, &ifXEntry, ifIndex, IF_MIB_IFALIAS);
     if (s->error_status || !ifXEntry) return;
     ifXEntry->ifAlias = alias;
-    ifXEntry->_ifAliasLength = strlen(alias);
+    ifXEntry->_ifAliasLength = alias_len;
     if_mib_set_ifXEntry(s, ifXEntry, IF_MIB_IFALIAS);
     if_mib_free_ifXEntry(ifXEntry);
 }
