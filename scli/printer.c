@@ -431,6 +431,10 @@ show_printer_info(scli_interp_t * interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     host_resources_mib_get_hrPrinterTable(interp->peer, &hrPrinterTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -511,6 +515,10 @@ show_printer_covers(scli_interp_t * interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     printer_mib_get_prtCoverTable(interp->peer, &prtCoverTable, 0);
@@ -778,6 +786,10 @@ show_printer_inputs(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     printer_mib_get_prtInputTable(interp->peer, &prtInputTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -992,6 +1004,10 @@ show_printer_outputs(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     printer_mib_get_prtOutputTable(interp->peer, &prtOutputTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -1053,6 +1069,10 @@ show_printer_interpreter(scli_interp_t * interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     printer_mib_get_prtInterpreterTable(interp->peer, &interpTable, 0);
@@ -1124,6 +1144,10 @@ show_printer_console_display(scli_interp_t * interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     printer_mib_get_prtConsoleDisplayBufferTable(interp->peer,
@@ -1243,6 +1267,10 @@ show_printer_console_lights(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     printer_mib_get_prtConsoleLightTable(interp->peer,
@@ -1405,6 +1433,10 @@ show_printer_alert(scli_interp_t * interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     printer_mib_get_prtAlertTable(interp->peer, &alertTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -1438,14 +1470,14 @@ scli_init_printer_mode(scli_interp_t * interp)
 	{ "show printer info", NULL,
 	  "The show printer info command shows general information about\n"
 	  "the printer including global status information.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_info },
 
 	{ "show printer covers", NULL,
 	  "The show printer covers command shows information about the\n"
 	  "covers of a printer.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_covers },
 
@@ -1453,7 +1485,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "The show printer inputs command shows information about the\n"
 	  "input sub-units of a printer which provide media for input to\n"
 	  "the printing process.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_inputs },
 
@@ -1461,7 +1493,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "The show printer output command shows information about the\n"
 	  "output sub-units of a printer capable of receiving media\n"
 	  "delivered from the printing process.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_outputs },
 
@@ -1469,7 +1501,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "The show printer interpreter command shows information about\n"
 	  "the page description language and control language interpreters\n"
 	  "supported by the printer.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_interpreter },
 
@@ -1481,7 +1513,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "  PRINTER logical printer number\n"
 	  "  LINE    display line number\n"
 	  "  TEXT    contents of the display line",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "printer console",
 	  NULL,
 	  show_printer_console_display },
@@ -1496,7 +1528,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "  DESCRIPTION description of the light/led\n"
 	  "  STATUS      current status (on, off, blink)\n"
 	  "  COLOR       current color of the light",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "printer console",
 	  "<xsd:simpleType name=\"PrinterLightColor\">\n"
 	  "  <xsd:restriction base=\"xsd:string\">\n"
@@ -1537,7 +1569,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "printer alerts including the alert code, the alert severity,\n"
 	  "the alert description, the alert time, the alert location and\n"
 	  "the personel required to handle the alert.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "printer",
 	  "<xsd:simpleType name=\"PrinterAlertSeverity\">\n"
 	  "  <xsd:restriction base=\"xsd:string\">\n"
@@ -1578,7 +1610,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "The monitor printer console display command shows the same\n"
           "information as the show printer console display command. The\n"
 	  "information is updated periodically.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_console_display },
 
@@ -1586,7 +1618,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "The monitor printer console lights command shows the same\n"
 	  "information as the show printer console lights command. The\n"
 	  "information is updated periodically.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_console_lights },
 
@@ -1594,7 +1626,7 @@ scli_init_printer_mode(scli_interp_t * interp)
 	  "The monitor printer alerts command shows the same information\n"
 	  "as the show printer alerts command. The information is updated\n"
 	  "periodically.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_printer_alert },
 

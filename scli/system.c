@@ -366,6 +366,10 @@ show_system_devices(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -506,6 +510,10 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     host_resources_mib_get_hrSWRunTable(interp->peer, &hrSWRunTable, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -642,6 +650,10 @@ show_system_mounts(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     host_resources_mib_get_hrFSTable(interp->peer, &hrFSTable, 0);
@@ -808,6 +820,10 @@ show_system_storage(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
     
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     host_resources_mib_get_hrStorageTable(interp->peer,
 					  &hrStorageTable, 0);
     if (interp->peer->error_status) {
@@ -1000,6 +1016,10 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     snmpv2_mib_get_system(interp->peer, &system, 0);
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
@@ -1135,6 +1155,10 @@ set_system_contact(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     system = snmpv2_mib_new_system();
     system->sysContact = argv[1];
     system->_sysContactLength = strlen(system->sysContact);
@@ -1159,6 +1183,10 @@ set_system_name(scli_interp_t *interp, int argc, char **argv)
 
     if (argc != 2) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     system = snmpv2_mib_new_system();
@@ -1187,6 +1215,10 @@ set_system_location(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
     system = snmpv2_mib_new_system();
     system->sysLocation = argv[1];
     system->_sysLocationLength = strlen(system->sysLocation);
@@ -1211,6 +1243,10 @@ dump_system(scli_interp_t *interp, int argc, char **argv)
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
     }
 
     snmpv2_mib_get_system(interp->peer, &system, 0);
@@ -1297,28 +1333,28 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "The set system contact command configures the system's contact\n"
 	  "information. The <string> argument should include information\n"
 	  "on how to contact a person who is responsible for this system.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_system_contact },
 
 	{ "set system name", "<string>",
 	  "The set system name command configures the systems's name. By\n"
 	  "convention, this is the system's fully-qualified domain name.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_system_name },
 
 	{ "set system location", "<string>",
 	  "The set system location command configures the system's physical\n"
 	  "location.",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_system_location },
 
 	{ "show system info", NULL,
 	  "The show system info command shows general information about the\n"
 	  "system.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "system info", NULL,
 	  show_system_info },
 
@@ -1329,7 +1365,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "  INDEX       device number\n"
 	  "  STATUS      current status of the device\n"
 	  "  DESCRIPTION description of the device",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "system devices", NULL,
 	  show_system_devices },
 
@@ -1345,7 +1381,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "  USED        amount of storage in use\n"
 	  "  FREE        amount of storage available\n"
 	  "  USE%        used storage in percent",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "system storage", NULL,
 	  show_system_storage },
 
@@ -1359,7 +1395,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "  REMOTE  remote server and root path name (if any)\n"
 	  "  TYPE    filesytem type (if known)\n"
 	  "  OPTIONS access mode (ro/rw) and boot flag",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "system mounts", NULL,
 	  show_system_mounts },
 
@@ -1378,7 +1414,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "The process status values are C=running, R=runnable,\n"
 	  "S=not runnable, and Z=invalid. The process types values are\n"
 	  "?=unknown, O=operating system, D=device driver, and A=application.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "system processes", NULL,
 	  show_system_processes },
 
@@ -1386,7 +1422,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "The monitor system storage command shows the same\n"
 	  "information as the show system storage command. The\n"
 	  "information is updated periodically.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_system_storage },
 #if 0
@@ -1416,7 +1452,7 @@ scli_init_system_mode(scli_interp_t *interp)
 	{ "dump system", NULL,
 	  "The dump system command generates a sequence of scli commands\n"
 	  "which can be used to restore the system configuration.\n",
-	  SCLI_CMD_FLAG_NEED_PEER,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  dump_system },
 
