@@ -22,9 +22,104 @@
 
 #include "scli.h"
 
+#include "snmpv2-tc.h"
 #include "ip-mib.h"
 #include "if-mib.h"
 #include "ospf-mib.h"
+
+
+
+static void
+fmt_ospf_info(GString *s, ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup)
+{
+    const char *e;
+    int const indent = 20;
+
+    if (ospfGeneralGroup->ospfRouterId) {
+	g_string_sprintfa(s, "%-*s", indent, "OSPF Router-ID:");
+	g_string_sprintfa(s, "%s\n",
+			  fmt_ipv4_address(ospfGeneralGroup->ospfRouterId,
+					   SCLI_FMT_NAME_OR_ADDR));
+    }
+    
+    if (ospfGeneralGroup->ospfAdminStat) {
+	e = fmt_enum(ospf_mib_enums_Status,
+		     ospfGeneralGroup->ospfAdminStat);
+	g_string_sprintfa(s, "%-*s", indent, "OSPF Status:");
+	g_string_sprintfa(s, "%s\n", e ? e : "");
+    }
+    
+    if (ospfGeneralGroup->ospfVersionNumber) {
+	g_string_sprintfa(s, "%-*s", indent, "OSPF Version:");
+	g_string_sprintfa(s, "%u\n", *ospfGeneralGroup->ospfVersionNumber);
+    }
+	
+    if (ospfGeneralGroup->ospfAreaBdrRtrStatus && 
+	*ospfGeneralGroup->ospfAreaBdrRtrStatus == 1) {
+	g_string_sprintfa(s, "%-*s", indent, "OSPF Router Type:");
+	g_string_sprintfa(s, "Area Border Router (ABR)\n");
+    }
+    if (ospfGeneralGroup->ospfASBdrRtrStatus &&
+	*ospfGeneralGroup->ospfASBdrRtrStatus == 1) {
+	g_string_sprintfa(s, "%-*s", indent, "OSPF Router Type:");
+	g_string_sprintfa(s, "Autonomous System Border Router (ASBR)\n");
+    }
+	
+    if (ospfGeneralGroup->ospfTOSSupport && 
+	(*ospfGeneralGroup->ospfTOSSupport == 1)) {
+	g_string_sprintfa(s,
+			  "This router supports TOS routing.\n");
+    }
+    
+    if (ospfGeneralGroup->ospfDemandExtensions &&
+	*ospfGeneralGroup->ospfDemandExtensions == 1) {
+	g_string_sprintfa(s,"This router supports demand routing.\n");
+    }
+
+    if (ospfGeneralGroup->ospfExternLsaCount) {
+	g_string_sprintfa(s, "%-*s", indent, "Ext. LSAs:");
+	g_string_sprintfa(s, "%u\n", *ospfGeneralGroup->ospfExternLsaCount);
+    }
+    
+    if (ospfGeneralGroup->ospfExternLsaCksumSum) {
+	g_string_sprintfa(s, "%-*s", indent, "Ext. LSA Checksum:");
+	g_string_sprintfa(s, "%u\n", *ospfGeneralGroup->ospfExternLsaCksumSum);
+    }
+    
+    if (ospfGeneralGroup->ospfOriginateNewLsas) {
+	g_string_sprintfa(s, "%-*s", indent, "Advertised LSAs:");
+	g_string_sprintfa(s, "%u\n", *ospfGeneralGroup->ospfOriginateNewLsas);
+    }
+	
+    if (ospfGeneralGroup->ospfRxNewLsas) {
+	g_string_sprintfa(s, "%-*s", indent, "Received LSAs:");
+	g_string_sprintfa(s, "%u\n", *ospfGeneralGroup->ospfRxNewLsas);
+    }
+    
+    if (ospfGeneralGroup->ospfExtLsdbLimit) {
+	g_string_append(s, 
+			"Maximum number of AS-external-LSAs entries: ");
+	if (*ospfGeneralGroup->ospfExtLsdbLimit == -1) {
+	    g_string_append(s, "unlimited\n");
+	} else {
+	    g_string_sprintfa(s, "%u\n", 
+			      *ospfGeneralGroup->ospfExtLsdbLimit);
+	}
+    }
+    
+    /* MISSING: ospfMulticastExtensions ::= { ospfGeneralGroup 12 } */
+    
+    if (ospfGeneralGroup->ospfExitOverflowInterval) { 
+	g_string_append(s, "Leave Overflow state: "); 
+	if (*ospfGeneralGroup->ospfExitOverflowInterval > 0) { 
+	    g_string_sprintfa(s, "after %u sec.\n", 
+			      *ospfGeneralGroup->ospfExitOverflowInterval);
+	} else {
+	    g_string_append(s, "never\n");
+	}
+    }
+    
+}
 
 
 
@@ -32,7 +127,6 @@ static int
 show_ospf_info(scli_interp_t *interp, int argc, char **argv)
 {
     ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup = NULL;
-    const char *e;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -50,92 +144,7 @@ show_ospf_info(scli_interp_t *interp, int argc, char **argv)
     }
     
     if (ospfGeneralGroup) {
-	if (ospfGeneralGroup->ospfRouterId) {
-	    g_string_sprintfa(interp->result, "Router-ID: %s\n",
-			      fmt_ipv4_address(ospfGeneralGroup->ospfRouterId,
-					       SCLI_FMT_NAME_OR_ADDR));
-	}
-	
-	if (ospfGeneralGroup->ospfAdminStat) {
-	    e = fmt_enum(ospf_mib_enums_ospfAdminStat,
-			 ospfGeneralGroup->ospfAdminStat);
-	    g_string_sprintfa(interp->result, "AdminStatus: %-*s\n",
-			      8, e ? e : "");
-	}
-	
-	if (ospfGeneralGroup->ospfVersionNumber) {
-	    g_string_sprintfa(interp->result, "OSPF protocol version: %u\n", 
-			      *ospfGeneralGroup->ospfVersionNumber);
-	}
-	
-	if (ospfGeneralGroup->ospfAreaBdrRtrStatus && 
-	    *ospfGeneralGroup->ospfAreaBdrRtrStatus == 1) {
-	    g_string_sprintfa(interp->result,
-			      "This router is an ABR (area border router).\n");
-	}
-	if (ospfGeneralGroup->ospfASBdrRtrStatus &&
-	    *ospfGeneralGroup->ospfASBdrRtrStatus == 1) {
-	    g_string_sprintfa(interp->result,
-			      "This router is an ASBR (Autonomous System border router).\n");
-	}
-	
-	if (ospfGeneralGroup->ospfExternLsaCount) {
-	    g_string_sprintfa(interp->result,
-			      "Number of external link-state advertisements: %u\n", 
-			      *ospfGeneralGroup->ospfExternLsaCount);
-	}
-	
-	if (ospfGeneralGroup->ospfExternLsaCksumSum) {
-	    g_string_sprintfa(interp->result,
-			      "Sum of Link-state checksum: %u\n", 
-			      *ospfGeneralGroup->ospfExternLsaCksumSum);
-	}
-	
-	if (ospfGeneralGroup->ospfTOSSupport && 
-	    (*ospfGeneralGroup->ospfTOSSupport == 1)) {
-	    g_string_sprintfa(interp->result,
-			      "This router supports TOS routing.\n");
-	}
-	
-	if (ospfGeneralGroup->ospfOriginateNewLsas) {
-	    g_string_sprintfa(interp->result,
-			      "Number of advertised LSAs: %u\n", 
-			      *ospfGeneralGroup->ospfOriginateNewLsas);
-	}
-	
-	if (ospfGeneralGroup->ospfRxNewLsas) {
-	    g_string_sprintfa(interp->result,
-			      "Number of received LSAs: %u\n", 
-			      *ospfGeneralGroup->ospfRxNewLsas);
-	}
-	
-	if (ospfGeneralGroup->ospfExtLsdbLimit) {
-	    g_string_append(interp->result, 
-			    "Maximum number of AS-external-LSAs entries: ");
-	    if (*ospfGeneralGroup->ospfExtLsdbLimit == -1) {
-		g_string_append(interp->result, "unlimited\n");
-	    } else {
-		g_string_sprintfa(interp->result, "%u\n", 
-				  *ospfGeneralGroup->ospfExtLsdbLimit);
-	    }
-	}
-	
-	/* MISSING: ospfMulticastExtensions ::= { ospfGeneralGroup 12 } */
-	
-	if (ospfGeneralGroup->ospfExitOverflowInterval) { 
-	    g_string_append(interp->result, "Leave Overflow state: "); 
-	    if (*ospfGeneralGroup->ospfExitOverflowInterval > 0) { 
-		g_string_sprintfa(interp->result, "after %u sec.\n", 
-				  *ospfGeneralGroup->ospfExitOverflowInterval);
-	    } else {
-		g_string_append(interp->result, "never\n");
-	    }
-	}
-	
-	if (ospfGeneralGroup->ospfDemandExtensions &&
-	    *ospfGeneralGroup->ospfDemandExtensions == 1) {
-	    g_string_sprintfa(interp->result,"This router supports demand routing.\n");
-	}
+	fmt_ospf_info(interp->result, ospfGeneralGroup);
     }
     
     if (ospfGeneralGroup) ospf_mib_free_ospfGeneralGroup(ospfGeneralGroup);
@@ -150,7 +159,7 @@ fmt_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
 {
     const char *e;
     
-    g_string_append(s, "\nArea: ");
+    g_string_append(s, "Area: ");
     if (ospfAreaEntry->ospfAreaId) {
 	g_string_sprintfa(s,"             %-15s", 
 			  fmt_ipv4_address(ospfAreaEntry->ospfAreaId,
@@ -160,7 +169,7 @@ fmt_ospf_area(GString *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry)
     }
     g_string_append(s, "\n");
 
-    e = fmt_enum(ospf_mib_enums_ospfAreaStatus,
+    e = fmt_enum(snmpv2_tc_enums_RowStatus,
 		 ospfAreaEntry->ospfAreaStatus);
     if (e) {
 	g_string_sprintfa(s, "Area status:       %s\n", e);
@@ -349,7 +358,7 @@ fmt_ospf_interfaces(GString *s,
     }
 
     if (ospfIfEntry->ospfIfAdminStat) {
-	e = fmt_enum(ospf_mib_enums_ospfIfAdminStat,
+	e = fmt_enum(ospf_mib_enums_Status,
 		     ospfIfEntry->ospfIfAdminStat);
 	g_string_sprintfa(s, "%-*s %s\n",
 			  indent, "AdminStatus:", e ? e : "");
