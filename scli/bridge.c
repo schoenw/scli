@@ -588,8 +588,7 @@ static void
 xml_bridge_stp_port(xmlNodePtr root,
 		    bridge_mib_dot1dStpPortEntry_t *dot1dStpPortEntry)
 {
-    xmlNodePtr tree, node;
-    const char *s;
+    xmlNodePtr tree;
     const char *e;
 
     tree = xmlNewChild(root, NULL, "port", NULL);
@@ -730,7 +729,6 @@ xml_bridge_forwarding(xmlNodePtr root,
 		      ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry)
 {
     xmlNodePtr tree, node;
-    const char *s;
     const scli_vendor_t *vendor;
     guint32 prefix;
     char *name;
