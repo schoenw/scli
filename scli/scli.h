@@ -115,6 +115,9 @@ scli_init_interface_mode(scli_interp_t *interp);
 extern void
 scli_init_disman_mode(scli_interp_t *interp);
 
+extern void
+scli_init_snmp_mode(scli_interp_t *interp);
+
 extern int
 scli_cmd_exit(scli_interp_t *interp, int argc, char **argv);
 
