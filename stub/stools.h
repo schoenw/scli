@@ -45,8 +45,8 @@ typedef struct {
     gchar  *str;
 } stls_table_t;
 
-gchar * stls_table_get_value(stls_table_t *table, gint32 id);
-gint32 stls_table_get_id(stls_table_t *table, gchar *str);
+gchar * stls_table_get_value(stls_table_t const *table, gint32 const id);
+gint32 stls_table_get_id(stls_table_t const *table, gchar const *str);
 
 
 /*

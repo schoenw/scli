@@ -216,13 +216,13 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 	g_string_sprintfa(s, " %7s", 
 			  fmt_hsec32(*hrSWRunPerfEntry[i]->hrSWRunPerfCPU));
 
-	strncpy (tmp, hrSWRunEntry[i]->hrSWRunName, 
+	strncpy (tmp, (char *) hrSWRunEntry[i]->hrSWRunName, 
 		 MIN(hrSWRunEntry[i]->_hrSWRunNameLength, 
 		     MIN(COLS - 10, sizeof (tmp))));
 	/* XXX fix format */
 	tmp [MIN(hrSWRunEntry[i]->_hrSWRunNameLength, COLS - 10)] = 0;
 	g_string_sprintfa(s, " %s", tmp);
-	strncpy (tmp, hrSWRunEntry[i]->hrSWRunParameters, 
+	strncpy (tmp, (char *) hrSWRunEntry[i]->hrSWRunParameters, 
 		 MIN(hrSWRunEntry[i]->_hrSWRunParametersLength, 
 			MIN(COLS - 10, sizeof (tmp))));
 	/* XXX fix format */

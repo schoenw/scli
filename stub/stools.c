@@ -69,7 +69,7 @@ cb_row(GHashTable *table, int index_len, gpointer *data)
 
 
 char *
-stls_table_get_value(stls_table_t *table, gint32 id)
+stls_table_get_value(stls_table_t const *table, gint32 const id)
 {
     int i;
 
@@ -83,7 +83,7 @@ stls_table_get_value(stls_table_t *table, gint32 id)
 }
 
 gint32
-stls_table_get_id(stls_table_t *table, char *str)
+stls_table_get_id(stls_table_t const *table, char const *str)
 {
     int i;
 
