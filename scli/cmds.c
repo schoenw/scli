@@ -61,7 +61,7 @@ print_cmd(GNode *node, gpointer data)
 	    len += 2;
 	}
 	g_string_sprintfa(s, "%-*s %s\n", (20-len > 0) ? 20-len : 0,
-			  cmd->name, cmd->desc);
+			  cmd->name, cmd->desc ? cmd->desc : "");
     }
     return FALSE;
 }
