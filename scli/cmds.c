@@ -110,7 +110,7 @@ show_scli_modes(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
     scli_mode_t *mode;
-    char *s, *cmd;
+    char *s;
     int i, c;
     regex_t _regex_mode, *regex_mode = NULL;
 
@@ -142,11 +142,9 @@ show_scli_modes(scli_interp_t *interp, int argc, char **argv)
 	g_string_sprintfa(interp->result, "%s\n\n%s\n \n", s, mode->desc);
 	g_free(s);
 	for (i = 0; mode->cmds[i].path; i++) {
-	    cmd = g_strdup_printf("%s %s",
-			  mode->cmds[i].path,
-			  mode->cmds[i].options ? mode->cmds[i].options : "");
-	    g_string_sprintfa(interp->result, "    %s\n", cmd);
-	    g_free(cmd);
+	    g_string_sprintfa(interp->result, "    %s %s\n", 
+			      mode->cmds[i].path,
+			      mode->cmds[i].options ? mode->cmds[i].options : "");
 	}
 	for (i = 0; mode->cmds[i].path; i++) {
 	    g_string_sprintfa(interp->result, "\n%s\n", mode->cmds[i].desc);
@@ -158,6 +156,64 @@ show_scli_modes(scli_interp_t *interp, int argc, char **argv)
     
     return SCLI_OK;
 }
+
+
+
+static int
+show_scli_schema(scli_interp_t *interp, int argc, char **argv)
+{
+    GSList *elem;
+    scli_mode_t *mode;
+    int i, c;
+    regex_t _regex_mode, *regex_mode = NULL;
+
+    if (argc > 2) {
+	return SCLI_SYNTAX;
+    }
+
+    if (argc == 2) {
+	regex_mode = &_regex_mode;
+	if (regcomp(regex_mode, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
+    g_string_append(interp->result,
+		    "<xsd:schema xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n"
+		    "\n"
+		    "<xsd:annotation>\n"
+		    "  <xsd:documentation xml:lang=\"en\">\n"
+		    "    XML schema definition for the output produced by scli version " VERSION ".\n"
+		    "  </xsd:documentation>\n"
+		    "</xsd:annotation>\n"
+		    "\n");
+
+    for (elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
+	mode = (scli_mode_t *) elem->data;
+	if (regex_mode) {
+	    if (regexec(regex_mode, mode->name, (size_t) 0, NULL, 0) != 0) {
+		continue;
+	    }
+	}
+
+	g_string_sprintfa(interp->result, "<!-- %s mode -->\n\n", mode->name);
+	
+	for (i = 0, c = 0; mode->cmds[i].path; i++) {
+	    if (mode->cmds[i].xsd) {
+		if (c) g_string_append(interp->result, "\n");
+		g_string_sprintfa(interp->result, "%s\n", mode->cmds[i].xsd);
+		c++;
+	    }
+	}
+    }
+
+    g_string_append(interp->result, "\n</xsd:schema>\n");
+    
+    if (regex_mode) regfree(regex_mode); 
+    
+    return SCLI_OK;
+}
+
 
 
 static int
@@ -652,6 +708,16 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  NULL, NULL,
 	  show_scli_modes },
+
+	{ "show scli schema", "[<regex>]",
+	  "The show scli schema command produces xml schema definitions for\n"
+	  "the selected scli modes. An scli mode is a logical grouping of\n"
+	  "related commands (e.g., all commands that deal with printers).\n"
+	  "The optional regular expression <regex> can be use to select a\n"
+	  "subset of the available scli modes.",
+	  0,
+	  NULL, NULL,
+	  show_scli_schema },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };

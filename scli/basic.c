@@ -618,6 +618,9 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 	    }
 	    page(interp, interp->result);
 	}
+	if (code == SCLI_EXIT) {
+	    interp->flags &= ~SCLI_INTERP_FLAG_RECURSIVE;
+	}
 	break;
     }
 
@@ -635,7 +638,8 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
     root_cmd = node->data;
     
     for (node = g_node_first_child(node);
-	 node; node = g_node_next_sibling(node)) {
+	 node && scli_interp_recursive(interp);
+	 node = g_node_next_sibling(node)) {
 	cmd = node->data;
 	if (G_NODE_IS_LEAF(node)) {
 	    scli_cmd_t *cmd = node->data;
@@ -661,9 +665,15 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 			g_string_append(s, interp->result->str);
 		    }
 		}
+		if (code == SCLI_EXIT) {
+		    return code;
+		}
 	    }
 	} else {
-	    eval_all_cmd_node(interp, node, s);
+	    code = eval_all_cmd_node(interp, node, s);
+	    if (code == SCLI_EXIT) {
+		return code;
+	    }
 	}
     }
 
