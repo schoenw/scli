@@ -37,6 +37,7 @@ cb_finish(gpointer *data)
 static void
 cb_error(gpointer *data)
 {
+    if (loop) g_main_quit(loop);
 }
 
 static void

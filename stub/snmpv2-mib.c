@@ -172,6 +172,44 @@ snmpv2_mib_get_system(GSnmpSession *s, snmpv2_mib_system_t **system)
     return 0;
 }
 
+int
+snmpv2_mib_set_system(GSnmpSession *s, snmpv2_mib_system_t *system)
+{
+    GSList *in = NULL, *out = NULL;
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 1, 0, 0};
+
+    if (system->sysContact) {
+        base[7] = 4;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_OCTET_STRING,
+                       system->sysContact,
+                       system->_sysContactLength);
+    }
+    if (system->sysName) {
+        base[7] = 5;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_OCTET_STRING,
+                       system->sysName,
+                       system->_sysNameLength);
+    }
+    if (system->sysLocation) {
+        base[7] = 6;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_OCTET_STRING,
+                       system->sysLocation,
+                       system->_sysLocationLength);
+    }
+
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (! out) {
+        return -2;
+    }
+    g_snmp_vbl_free(out);
+
+    return 0;
+}
+
 void
 snmpv2_mib_free_system(snmpv2_mib_system_t *system)
 {
@@ -460,6 +498,30 @@ snmpv2_mib_get_snmp(GSnmpSession *s, snmpv2_mib_snmp_t **snmp)
     return 0;
 }
 
+int
+snmpv2_mib_set_snmp(GSnmpSession *s, snmpv2_mib_snmp_t *snmp)
+{
+    GSList *in = NULL, *out = NULL;
+    static guint32 base[] = {1, 3, 6, 1, 2, 1, 11, 0, 0};
+
+    if (snmp->snmpEnableAuthenTraps) {
+        base[7] = 30;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       snmp->snmpEnableAuthenTraps,
+                       0);
+    }
+
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (! out) {
+        return -2;
+    }
+    g_snmp_vbl_free(out);
+
+    return 0;
+}
+
 void
 snmpv2_mib_free_snmp(snmpv2_mib_snmp_t *snmp)
 {
@@ -533,6 +595,30 @@ snmpv2_mib_get_snmpSet(GSnmpSession *s, snmpv2_mib_snmpSet_t **snmpSet)
     }
 
     *snmpSet = assign_snmpSet(out);
+
+    return 0;
+}
+
+int
+snmpv2_mib_set_snmpSet(GSnmpSession *s, snmpv2_mib_snmpSet_t *snmpSet)
+{
+    GSList *in = NULL, *out = NULL;
+    static guint32 base[] = {1, 3, 6, 1, 6, 3, 1, 1, 6, 0, 0};
+
+    if (snmpSet->snmpSetSerialNo) {
+        base[9] = 1;
+        g_snmp_vbl_add(&in, base, sizeof(base)/sizeof(guint32),
+                       G_SNMP_INTEGER32,
+                       snmpSet->snmpSetSerialNo,
+                       0);
+    }
+
+    out = g_snmp_session_sync_set(s, in);
+    g_snmp_vbl_free(in);
+    if (! out) {
+        return -2;
+    }
+    g_snmp_vbl_free(out);
 
     return 0;
 }
