@@ -408,18 +408,25 @@ fmt_display_string(GString *s, int indent, char *label, int len, char *string)
     
     for (i = 0; i < len; i++) {
 	if (string[i] == '\r') continue;
-	if (pos > 70 && isspace(string[i])) {
-	    g_string_sprintfa(s, "\n%*s", indent, "");
-	    pos = indent;
-	    continue;
+	if (isspace(string[i])) {
+	    int j, p;
+	    for (j = i+1, p = pos; p < 80 && j < len; p++, j++) {
+		if (string[j] != '\r' && isspace(string[j])) break;
+	    }
+	    if (p == 80) {
+		g_string_sprintfa(s, "\n%*s", indent, "");
+		pos = indent;
+		continue;
+	    }
 	}
 	if (string[i] != '\n') {
 	    if (isprint(string[i])) {
 		g_string_append_c(s, string[i]);
+		pos++;
 	    } else {
 		g_string_sprintfa(s, "\\%o", string[i]);
+		pos += 4;
 	    }
-	    pos++;
 	}
     }
     g_string_append_c(s, '\n');
