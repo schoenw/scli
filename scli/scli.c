@@ -1,5 +1,5 @@
 /* 
- * scli.c -- emulate a command line interface via SNMP
+ * scli.c -- emulate a command line interface on top of SNMP
  *
  *       After more than 10 years of SNMP, I felt it is time for the
  *       first really useful command line SNMP management tool. ;-)
@@ -281,7 +281,7 @@ usage()
 	"  -c, --command     process the given command and exit\n"
 	"  -d, --delay       delay in seconds between screen updates (default 5)\n"
 	"  -f, --file        process commands from a file and exit\n"
-	"  -i, --inet        execute in inet protocol mode\n"
+	"  -i, --inet        execute in netconf protocol mode\n"
 	"  -h, --help        display this help and exit\n"
 	"  -n, --norc        do not evaluate ~/.sclirc on startup\n"
 	"  -p, --port        port number of the SNMP agent (default 161)\n"
@@ -306,8 +306,10 @@ main(int argc, char **argv)
     char *cmd = NULL;
     int c;
     
-    int norc = 0, port = 161, delay = 5000, retries = 3, timeout = 500000;
-    int xml = 0, dry = 0, proto = 0, quiet = 0;
+    int norc = 0, port = 161, delay = 5000;
+    int retries = GNET_SNMP_DEFAULT_RETRIES;
+    int timeout = GNET_SNMP_DEFAULT_TIMEOUT;
+    int xml = 0, dry = 0, netconf = 0, quiet = 0;
     int snmp = -1;
 
     static struct option const long_options[] =
@@ -326,6 +328,7 @@ main(int argc, char **argv)
 	{ "timeout", required_argument, 0, 't' },
 	{ "snmp",    required_argument, 0, 'v' },
 	{ "xml",     no_argument,	0, 'x' },
+	{ "netconf", no_argument,	0, 'X' },
         { NULL, 0, NULL, 0}
     };
 
@@ -354,7 +357,7 @@ main(int argc, char **argv)
             usage();
             exit(0);
 	case 'i':
-	    proto = 1;
+	    netconf = 1;
 	    norc = 1;
 	    xml = 1;
 	    quiet = 1;
@@ -379,19 +382,17 @@ main(int argc, char **argv)
 	    dry = 1;
 	    break;
 	case 't':
-	    if (atoi(optarg) < 50) {
-		timeout = 50 * 1000;
-	    } else {
-		timeout = atoi(optarg) * 1000;
+	    if (atoi(optarg) > 0) {
+		timeout = atoi(optarg);
 	    }
 	    break;
 	case 'v':
 	    if (strcmp(optarg, "1") == 0) {
-		snmp = G_SNMP_V1;
+		snmp = GNET_SNMP_V1;
 	    } else if (strcmp(optarg, "2c") == 0) {
-		snmp = G_SNMP_V2C;
+		snmp = GNET_SNMP_V2C;
 	    } else if (strcmp(optarg, "3") == 0) {
-		snmp = G_SNMP_V3;
+		snmp = GNET_SNMP_V3;
 	    } else {
 		g_printerr("scli: unknown protocol version \"%s\"\n",
 			   optarg);
@@ -426,7 +427,7 @@ main(int argc, char **argv)
      * Initialize the g_snmp library.
      */
 
-    if (! g_snmp_init(FALSE)) {
+    if (! gnet_snmp_init(FALSE)) {
 	g_error("scli: initialization of SNMP library failed");
         exit(1);
     }
@@ -441,7 +442,7 @@ main(int argc, char **argv)
     signal(SIGHUP, onsignal);
     signal(SIGQUIT, onsignal);
     signal(SIGWINCH, onwinch);
-    if (! proto) {
+    if (! netconf) {
 	signal(SIGPIPE, SIG_IGN);
     }
 
@@ -456,15 +457,18 @@ main(int argc, char **argv)
     }
 
     interp->delay = delay;
-    interp->port = port;
+    gnet_inetaddr_set_port(interp->taddress, port);
     interp->snmp = snmp;
 
-    if (proto) {
+    if (netconf) {
 	interp->flags |= SCLI_INTERP_FLAG_PROTO;
     }
 
     if (xml) {
 	interp->flags |= SCLI_INTERP_FLAG_XML;
+#if 0
+	xmlXPathInit();
+#endif
     }
 
     if (dry) {
@@ -494,12 +498,20 @@ main(int argc, char **argv)
 	(void) scli_eval_argc_argv(interp, argc-optind+1, margv);
     }
 
+    scli_set_retries(interp, retries);
+    scli_set_timeout(interp, timeout);
+
     if (! norc) {
 	(void) scli_eval_init_file(interp);
     }
 
+    if (netconf) {
+	c = scli_netconf_mainloop(interp, stdin);
+	return (c == SCLI_OK) ? 0 : 1;
+    }
+
     if (scli_interp_interactive(interp)) {
-        gchar *home = g_get_home_dir();
+        const gchar *home = g_get_home_dir();
 	gchar *path = NULL;
 	readline_init();
 	using_history();
