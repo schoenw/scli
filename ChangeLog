@@ -1,3 +1,61 @@
+2001-03-01 08:57  schoenw
+
+	* Makefile.in, NEWS, configure, configure.in: Prepare for the
+        0.1.12 snapshot.
+
+2001-03-01 08:55  schoenw
+
+	* scli/: fmt.c, interface.c, scli.h, tcp.c: Improved the formatting
+        of IPv4 addresses and port numbers.
+
+2001-03-01 08:54  schoenw
+
+	* scli/system.c: The "show system info" now shows dates in a
+        logical order.
+
+2001-02-28 17:38  schoenw
+
+	* stub/: bridge-mib.c, bridge-mib.h, disman-schedule-mib.c,
+	disman-schedule-mib.h, disman-script-mib.c, disman-script-mib.h,
+	entity-mib.c, entity-mib.h, host-resources-mib.c,
+	host-resources-mib.h, if-mib.c, if-mib.h, ip-mib.c, ip-mib.h,
+	snmp-community-mib.c, snmp-community-mib.h, snmp-framework-mib.c,
+	snmp-framework-mib.h, snmp-mpd-mib.c, snmp-mpd-mib.h,
+	snmp-target-mib.c, snmp-target-mib.h, snmp-user-based-sm-mib.c,
+	snmp-user-based-sm-mib.h, snmp-view-based-acm-mib.c,
+	snmp-view-based-acm-mib.h, snmpv2-mib.c, snmpv2-mib.h, tcp-mib.c,
+	tcp-mib.h, udp-mib.c, udp-mib.h: Improved the instance identifier
+        unpacking to handle some more cases.
+
+2001-02-28 17:37  schoenw
+
+	* stop/: interface.c, process.c: Updated the code to use the new
+        stub interface.
+
+2001-02-28 17:37  schoenw
+
+	* scli/: disman.c, entity.c, interface.c, snmp.c, system.c:
+	Improvements of the "show disman language" and "show interface
+	info" commands. Added a new "show disman scripts" command. Updated
+        the code to use the new stubs interface.
+
+2001-02-28 17:26  schoenw
+
+	* scli/: Makefile.am, Makefile.in, scli.c, scli.h, tcp.c: Added the
+        tcp mode which displays existing tcp connections.
+
+2001-02-27 12:15  schoenw
+
+	* stop/interface.c: Handle 3com's big (5 digit) interface numbers.
+
+2001-02-27 11:33  schoenw
+
+	* stop/interface.c: Check availability of ifXEntry before using it.
+
+2001-02-27 11:07  schoenw
+
+	* ChangeLog: Generated the ChangeLog via cvs2cl.
+
 2001-02-27 11:06  schoenw
 
 	* NEWS, TODO: Updates for the 0.1.11 release.
