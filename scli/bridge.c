@@ -31,7 +31,7 @@
 
 
 static void
-show_port(GString *s, dot1dBasePortEntry_t *dot1dBasePortEntry,
+show_bridge_port(GString *s, dot1dBasePortEntry_t *dot1dBasePortEntry,
 	  ifEntry_t *ifEntry, ifXEntry_t *ifXEntry)
 {
     int i;
@@ -79,8 +79,8 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 		    }
 		}
 	    }
-	    show_port(interp->result, dot1dBasePortTable[i],
-		      ifTable[j], ifXTable ? ifXTable[j] : NULL);
+	    show_bridge_port(interp->result, dot1dBasePortTable[i],
+			     ifTable[j], ifXTable ? ifXTable[j] : NULL);
 	}
     }
 
@@ -95,7 +95,7 @@ cmd_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_forward(GString *s, dot1dTpFdbEntry_t *dot1dTpFdbEntry)
+show_bridge_forwarding(GString *s, dot1dTpFdbEntry_t *dot1dTpFdbEntry)
 {
     scli_vendor_t *vendor;
     guint32 prefix;
@@ -152,7 +152,7 @@ cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 	    for (i = 0; dot1dTpFdbTable[i]; i++) {
 		if (dot1dTpFdbTable[i]->dot1dTpFdbPort
 		    && *dot1dTpFdbTable[i]->dot1dTpFdbPort == p) {
-		    show_forward(interp->result, dot1dTpFdbTable[i]);
+		    show_bridge_forwarding(interp->result, dot1dTpFdbTable[i]);
 		}
 	    }
 	}
@@ -166,7 +166,7 @@ cmd_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_filter(GString *s, dot1dStaticEntry_t *dot1dStaticEntry)
+show_bridge_filter(GString *s, dot1dStaticEntry_t *dot1dStaticEntry)
 {
     int i;
     
@@ -213,7 +213,7 @@ cmd_bridge_filter(scli_interp_t *interp, int argc, char **argv)
 
     if (dot1dStaticTable) {
 	for (i = 0; dot1dStaticTable[i]; i++) {
-	    show_filter(interp->result, dot1dStaticTable[i]);
+	    show_bridge_filter(interp->result, dot1dStaticTable[i]);
 	}
     }
 

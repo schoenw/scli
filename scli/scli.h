@@ -115,6 +115,9 @@ scli_cmd_help(scli_interp_t *interp, int argc, char **argv);
 extern int
 scli_cmd_history(scli_interp_t *interp, int argc, char **argv);
 
+extern int
+scli_cmd_exit(scli_interp_t *interp, int argc, char **argv);
+
 /*
  * Initialization functions for the various scli modes.
  */
@@ -143,8 +146,8 @@ scli_init_tcp_mode(scli_interp_t *interp);
 extern void
 scli_init_bridge_mode(scli_interp_t *interp);
 
-extern int
-scli_cmd_exit(scli_interp_t *interp, int argc, char **argv);
+extern void
+scli_init_atm_mode(scli_interp_t *interp);
 
 /* 
  * A data structure used to obtain vendor information from the
