@@ -1,3 +1,10 @@
+Changes in stools 0.1.9:
+
+- added the -c command line option to scli
+- added history expansions to scli based on the GNU history library
+- rewrote the scli modes so that they not directly write to stdout
+- scli supports a new "show system mounts" command
+
 Changes in stools 0.1.8:
 
 - scli supports a new "show system storage" command

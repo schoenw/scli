@@ -10,8 +10,6 @@
 
 - Enhance the stub generator to properly decode INDEX elements.
 
-- Fix at least the biggest memory leaks in the SNMP code.
-
 - Add a mechanism (perhaps based on fd_sets) to tell the stubs to retrieve
   only a subset of the members of a data structure. This would be more
   friendly to the network - but why should be friendly? ;-)
@@ -19,8 +17,8 @@
 - Write some more substantial documentation including a cookbook on how
   to extend the stools.
 
-- Change the scli code to build results in the interpreter instead of
-  writing directly to the output stream.
+- Create some sort of a test suite (which is not that easy for highly
+  interactive programs).
 
 ==== GXSNMP specific things ====
 
