@@ -18,8 +18,13 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  */
+
 #ifndef _G_SNMP_H_
 #define _G_SNMP_H_
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #ifdef HAVE_DMALLOC_H
 #include <dmalloc.h>
@@ -178,6 +183,7 @@ union _GSnmpPdu			/* xxx are three structures really needed */
 #include "g_session.h"
 #include "g_transport.h"
 #include "g_dispatch.h"
+#include "g_utils.h"
 #include "g_snmp_table.h"
 
 /* SNMP V1 trap names */

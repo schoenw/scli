@@ -1,8 +1,8 @@
 INCLUDES = $(GLIB_CFLAGS) -I$(top_srcdir)/app -DHAVE_INET
 
-noinst_LIBRARIES = libsnmp.a
+noinst_LIBRARIES = libgsnmp.a
 
-libsnmp_a_SOURCES =	\
+libgsnmp_a_SOURCES =	\
 	g_asn1.c	\
 	g_asn1.h	\
 	g_dispatch.c	\
@@ -22,4 +22,6 @@ libsnmp_a_SOURCES =	\
 	g_snmp_table.c	\
 	g_snmp_table.h	\
 	g_transport.c	\
-	g_transport.h
+	g_transport.h	\
+	g_utils.c	\
+	g_utils,h

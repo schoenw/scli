@@ -20,9 +20,9 @@
  * Implementation of a SNMP dispatcher as of RFC2271
  */
 
-#include "config.h"
-#include <stdio.h>	/* for printf */
 #include "g_snmp.h"
+
+#include <stdio.h>	/* for printf */
 
 /* This module defines the API to the SNMP RFC layer. Requests are routed
  * to the appropriate transport (e.g. IPv4 or IPv6 or IPX) by using the

@@ -23,4 +23,11 @@ Gsnmp_table * g_snmp_table_new (GSnmpSession *session, GSList *objs,
 void g_snmp_table_get(Gsnmp_table *table);
 void g_snmp_table_destroy(Gsnmp_table *table);
 
+/*
+ * Another entry point which is used by the scli package.
+ */
+
+GSList *
+gsnmp_gettable(GSnmpSession *s, GSList *vbl);
+
 #endif /* __G_SNMP_TABLE_H__ */

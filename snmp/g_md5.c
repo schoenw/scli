@@ -15,12 +15,10 @@
  * will fill a supplied 16-byte array with the digest.
  */
 
-#include "config.h"
+#include "g_snmp.h"
+#include "g_md5.h"
 
-#include <glib.h>		/* for g_memmove() */
 #include <string.h>
-#include <g_md5.h>
-
 
 /*
  * Note: this code is harmless on little-endian machines.

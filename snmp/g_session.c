@@ -18,14 +18,8 @@
  * Foundation, Inc.,  59 Temple Place - Suite 330, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static char const copyright[] =
-"@(#) Copyright (c) 1998 Gregory McLean & Jochen Friedrich";
-#endif
-static char const rcsid[] =
-"$Id$";
-
 #include "g_snmp.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>

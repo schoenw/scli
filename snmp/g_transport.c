@@ -18,14 +18,8 @@
  * Foundation, Inc.,  59 Temple Place - Suite 330, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static char const copyright[] =
-"@(#) Copyright (c) 1998 Gregory McLean & Jochen Friedrich";
-#endif
-static char const rcsid[] =
-"$Id$";
-#include "config.h"
-#include <g_snmp.h>
+#include "g_snmp.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -47,7 +41,10 @@ dump_packet(guchar *data, guint len)
     if (g_snmp_debug_flags & G_SNMP_DEBUG_TRANSPORT) {
 	guint i;
 	for (i = 0; i < len; i++) {
-	    g_printerr("%2.2x%c", data[i], (i % 16 == 15) ? '\n' : ':');
+	    g_printerr("%2.2x", data[i]);
+	    if (i+1 < len) {
+		g_printerr("%c", (i % 16 == 15) ? '\n' : ':');
+	    }
 	}
 	if (i % 16 != 15) g_printerr("\n");
     }

@@ -33,6 +33,7 @@ effort (for example the reengineering of a great many Capstone chips).
 
 
 #include "g_sha.h"
+
 #include <string.h>
 
 /* The SHA f()-functions.  The f1 and f3 functions can be optimized to

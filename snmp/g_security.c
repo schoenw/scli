@@ -20,11 +20,9 @@
  * Implementation of a SNMP security module as of RFC2271
  */
 
-#include <config.h>               /* pull in the autoconf detected stuff */
 #include "g_snmp.h"
-#ifdef HAVE_STRING_H
+
 #include <string.h>
-#endif
 
 /* This module defines the API to the SNMP RFC layer. Requests are routed
  * to the appropriate transport (e.g. IPv4 or IPv6 or IPX) by using the

@@ -1,5 +1,23 @@
-#include "config.h"
-#include <glib.h>
+/*
+ * $Id$
+ * GXSNMP -- An snmp management application
+ * Copyright (C) 1998 Gregory McLean & Jochen Friedrich
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc.,  59 Temple Place - Suite 330, Cambridge, MA 02139, USA.
+ */
+
 #include "g_snmp.h"
 
 static gboolean
@@ -199,3 +217,74 @@ g_snmp_table_destroy(Gsnmp_table *table)
     g_free(table->session);
     g_free(table);
 }
+
+/*
+ * Another entry point which is used by the scli package.
+ */
+
+static GMainLoop *loop = NULL;
+
+
+static void
+cb_finish(gpointer *data)
+{
+    if (loop) g_main_quit(loop);
+}
+
+static void
+cb_error(gpointer *data)
+{
+    if (loop) g_main_quit(loop);
+}
+
+static void
+append_elem(gpointer key, gpointer value, gpointer user_data)
+{
+    GSList **list = (GSList **) user_data;
+    
+    GSnmpVarBind *obj = (GSnmpVarBind *) value;
+
+    *list = g_slist_append(*list, obj);
+
+    if (obj->type == G_SNMP_ENDOFMIBVIEW) {
+	cb_finish(user_data);
+	return;
+    }
+}
+
+
+
+static void
+cb_row(GHashTable *table, int index_len, gpointer *data)
+{
+    GSList *rowlist = NULL;
+    GSList **tablelist = (GSList **) data;
+
+    g_hash_table_foreach(table, append_elem, &rowlist);
+
+    *tablelist = g_slist_append(*tablelist, rowlist);
+}
+
+
+GSList *
+gsnmp_gettable(GSnmpSession *s, GSList *in)
+{
+    Gsnmp_table *table;
+    GSList *tablelist = NULL;
+
+    table = g_snmp_table_new(s, in, cb_error, cb_row, cb_finish, &tablelist);
+
+    g_snmp_table_get(table);
+
+    loop = g_main_new(TRUE);
+    while (loop && g_main_is_running(loop)) {
+	g_main_run(loop);
+    }
+    g_main_destroy(loop);
+    loop = NULL;
+
+    g_snmp_table_destroy(table);
+    
+    return tablelist;
+}
+
