@@ -3,6 +3,10 @@
 /* Define if your struct tm has tm_zone.  */
 #undef HAVE_TM_ZONE
 
+/* Define if you don't have tm_zone but do have the external array
+   tzname.  */
+#undef HAVE_TZNAME
+
 /* Define if you have the ANSI C header files.  */
 #undef STDC_HEADERS
 
