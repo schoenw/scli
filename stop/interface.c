@@ -73,7 +73,7 @@ fmt_ifStatus(gint32 *admin, gint32 *oper)
 	default: strcpy(buffer, "?"); break;
 	}
     } else {
-	strcpy(buffer, " ");
+	strcpy(buffer, "-");
     }
     strcat(buffer, "/");
     if (oper) {
@@ -88,7 +88,7 @@ fmt_ifStatus(gint32 *admin, gint32 *oper)
 	default: strcat(buffer, "?"); break;
 	}
     } else {
-	strcat(buffer,"?");
+	strcat(buffer,"-");
     }
 
     return buffer;
@@ -215,7 +215,11 @@ show_interfaces(WINDOW *win, host_snmp *peer, int flags)
 	for (i = 0; ifEntry[i]; i++) {
 	    GString *s;
 	    s = g_string_new(NULL);
-	    g_string_sprintfa(s, " %3d", i+1);
+	    if (ifEntry[i]->ifIndex) {
+		g_string_sprintfa(s, "%4u", *(ifEntry[i]->ifIndex));
+	    } else {
+		g_string_sprintfa(s, "%4u", i+1);
+	    }
 	    g_string_sprintfa(s, " %4s",
 			      fmt_ifStatus(ifEntry[i]->ifAdminStatus,
 					   ifEntry[i]->ifOperStatus));
