@@ -158,6 +158,7 @@ show_interfaces(WINDOW *win, GSnmpSession *peer, int flags)
 	    g_free(stats);
 	    stats = NULL;
 	}
+	last.tv_sec = last.tv_usec = 0;
     }
 
     if (if_mib_get_ifTable(peer, &ifTable) == 0) {

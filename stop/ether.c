@@ -81,6 +81,7 @@ show_ethers(WINDOW *win, GSnmpSession *peer, int flags)
 	    g_free(stats);
 	    stats = NULL;
 	}
+	last.tv_sec = last.tv_usec = 0;
     }
     
     if (etherlike_mib_get_dot3StatsTable(peer, &dot3StatsTable)
