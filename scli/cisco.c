@@ -20,10 +20,22 @@
  * @(#) $Id$
  */
 
+/*
+ * TODO:
+ *
+ * - document the commands
+ * - show the serial number in the checkpoints
+ * - add some xml support
+ * - add raw data support for the current accounting table
+ * - finalize the show cisco processes command
+ */
+
 #include "scli.h"
 
-#include "old-cisco-ip-mib.h"
 #include "snmpv2-mib.h"
+
+#include "old-cisco-ip-mib.h"
+#include "cisco-process-mib.h"
 
 
 typedef struct {
@@ -89,8 +101,8 @@ fmt_cisco_ip_accounting(GString *s, act_stats_t *statEntry)
 
 static void
 fmt_cisco_ip_accounting_current(GString *s,
-				old_cisco_ip_mib_lipAccountEntry_t *srcActEntry,
-				old_cisco_ip_mib_lipAccountEntry_t *dstActEntry)
+			old_cisco_ip_mib_lipAccountEntry_t *srcActEntry,
+			old_cisco_ip_mib_lipAccountEntry_t *dstActEntry)
 {
     guint32 total_byts = 0;
     guint32 total_pkts = 0;
@@ -144,9 +156,33 @@ fmt_cisco_ip_accounting_current(GString *s,
 }
 
 
+static void
+fmt_cisco_ip_accounting_current_raw(GString *s,
+			    old_cisco_ip_mib_lipAccountEntry_t *ActEntry)
+{
+    g_string_sprintfa(s, "%-16s ",
+	      fmt_ipv4_address(ActEntry->actSrc, SCLI_FMT_ADDR));
+    g_string_sprintfa(s, "%-16s ",
+	      fmt_ipv4_address(ActEntry->actDst, SCLI_FMT_ADDR));
+
+    if (ActEntry->actPkts) {
+	g_string_sprintfa(s, "%12u ", *ActEntry->actPkts);
+    } else {
+	g_string_sprintfa(s, "%12u ", 0);
+    }
+
+    if (ActEntry->actByts) {
+	g_string_sprintfa(s, "%12u ", *ActEntry->actByts);
+    } else {
+	g_string_sprintfa(s, "%12u ", 0);
+    }
+
+    g_string_append(s, "\n");
+}
+
 
 static int
-show_cisco_ip_accounting_current(scli_interp_t *interp, int argc, char **argv)
+show_cisco_ip_accounting_current_sorted(scli_interp_t *interp, int argc, char **argv)
 {
     old_cisco_ip_mib_lipAccountEntry_t **lipAccountTable = NULL;
     int i, j, n;
@@ -216,7 +252,46 @@ show_cisco_ip_accounting_current(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-show_cisco_ip_accounting_snapshot(scli_interp_t *interp, int argc, char **argv)
+show_cisco_ip_accounting_current_raw(scli_interp_t *interp, int argc, char **argv)
+{
+    old_cisco_ip_mib_lipAccountEntry_t **lipAccountTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    old_cisco_ip_mib_get_lipAccountingTable(interp->peer,
+					    &lipAccountTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (lipAccountTable) {
+	g_string_sprintfa(interp->header,
+			  "SOURCE           DESTINATION           PACKETS        BYTES");
+	for (i = 0; lipAccountTable[i]; i++) {
+	    fmt_cisco_ip_accounting_current_raw(interp->result,
+						lipAccountTable[i]);
+	}
+    }
+
+    if (lipAccountTable)
+	old_cisco_ip_mib_free_lipAccountingTable(lipAccountTable);
+
+    return SCLI_OK;
+}
+
+
+
+static int
+show_cisco_ip_accounting_snapshot_sorted(scli_interp_t *interp, int argc, char **argv)
 {
     old_cisco_ip_mib_lipCkAccountEntry_t **lipCkAccountTable = NULL;
     int i, j;
@@ -264,13 +339,51 @@ show_cisco_ip_accounting_snapshot(scli_interp_t *interp, int argc, char **argv)
 }
 
 
+static int
+show_cisco_ip_accounting_snapshot_raw(scli_interp_t *interp, int argc, char **argv)
+{
+    old_cisco_ip_mib_lipCkAccountEntry_t **lipCkAccountTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    old_cisco_ip_mib_get_lipCkAccountingTable(interp->peer,
+					      &lipCkAccountTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (lipCkAccountTable) {
+	g_string_sprintfa(interp->header,
+			  "SOURCE           DESTINATION           PACKETS        BYTES");
+	for (i = 0; lipCkAccountTable[i]; i++) {
+	    fmt_cisco_ip_accounting_current_raw(interp->result,
+						(old_cisco_ip_mib_lipAccountEntry_t *) lipCkAccountTable[i]);
+	}
+    }
+
+    if (lipCkAccountTable)
+	old_cisco_ip_mib_free_lipCkAccountingTable(lipCkAccountTable);
+
+    return SCLI_OK;
+}
+
+
 
 static void
 fmt_cisco_ip_accounting_info(GString *s,
 			     old_cisco_ip_mib_lip_t *lip)
 {
     if (lip->actThresh) {
-	g_string_sprintfa(s, "Threshold:    %10d", *lip->actThresh);
+	g_string_sprintfa(s, "Max. Records: %10d", *lip->actThresh);
     }
 
     if (lip->ckactAge) {
@@ -332,40 +445,253 @@ show_cisco_ip_accounting_info(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+fmt_x_kbytes(GString *s, guint32 bytes)
+{
+    if (bytes > 9999999) {
+	g_string_sprintfa(s, "%5uG", bytes / 1024 / 1024);
+    } else if (bytes > 9999) {
+	g_string_sprintfa(s, "%5uM", bytes / 1024);
+    } else {
+	g_string_sprintfa(s, "%5uK", bytes);
+    }
+}
+
+
+
+static void
+fmt_cisco_processes(GString *s,
+		    cisco_process_mib_cpmProcessEntry_t *procEntry,
+		    cisco_process_mib_cpmProcessExtEntry_t *extEntry,
+		    cisco_process_mib_cpmProcessExtRevEntry_t *extRevEntry)
+{
+    guint32 usecs = 0;
+    
+    g_string_sprintfa(s, "%5u ", procEntry->cpmCPUTotalIndex);
+
+    g_string_sprintfa(s, "%5u ", procEntry->cpmProcessPID);
+
+    if (extEntry && extEntry->cpmProcExtPriority) {
+	g_string_sprintfa(s, "%d ", *extEntry->cpmProcExtPriority);
+    }
+
+    if (extEntry
+	&& extEntry->cpmProcExtMemAllocated
+	&& extEntry->cpmProcExtMemFreed) {
+	guint32 bytes = *extEntry->cpmProcExtMemAllocated
+	    - *extEntry->cpmProcExtMemFreed;
+	fmt_x_kbytes(s, bytes/1024);
+    }
+
+    /*
+     * xxx This seems to be broken. I think we have to look at
+     * extRevEntry->cpmProcExtRuntimeRev to get useful data on boxes
+     * that support this or extEntry->cpmProcExtRuntime.
+     */
+
+#if 1
+    if (extRevEntry && extRevEntry->cpmProcExtRuntimeRev) {
+	usecs = *extRevEntry->cpmProcExtRuntimeRev;
+    } else if (extEntry && extEntry->cpmProcExtRuntime) {
+        usecs = *extEntry->cpmProcExtRuntime;
+    } else {
+	usecs = 0;
+    }
+#else
+    if (procEntry->cpmProcessAverageUSecs) {
+	usecs = *procEntry->cpmProcessAverageUSecs;
+    } else if (procEntry->cpmProcessuSecs) {
+	usecs = *procEntry->cpmProcessuSecs;
+    }
+#endif
+    g_string_sprintfa(s, " %s ",
+		      fmt_seconds(usecs/1000));
+
+    if (procEntry->cpmProcessName && procEntry->_cpmProcessNameLength) {
+	g_string_sprintfa(s, "%.*s", procEntry->_cpmProcessNameLength,
+			  procEntry->cpmProcessName);
+    }
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_cisco_processes(scli_interp_t *interp, int argc, char **argv)
+{
+    cisco_process_mib_cpmProcessEntry_t **procTable = NULL;
+    cisco_process_mib_cpmProcessExtEntry_t **extTable = NULL;
+    cisco_process_mib_cpmProcessExtRevEntry_t **extRevTable = NULL;
+    int i;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    cisco_process_mib_get_cpmProcessTable(interp->peer,
+					  &procTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (procTable) {
+	cisco_process_mib_get_cpmProcessExtTable(interp->peer,
+						 &extTable, 0);
+	cisco_process_mib_get_cpmProcessExtRevTable(interp->peer,
+						    &extRevTable, 0);
+	g_string_sprintfa(interp->header,
+			  "  CPU   PID P MEMORY      TIME COMMAND");
+	for (i = 0; procTable[i]; i++) {
+	    fmt_cisco_processes(interp->result, procTable[i],
+				extTable ? extTable[i] : NULL,
+				extRevTable ? extRevTable[i] : NULL);
+	}
+    }
+
+    if (procTable)
+	cisco_process_mib_free_cpmProcessTable(procTable);
+    if (extTable)
+	cisco_process_mib_free_cpmProcessExtTable(extTable);
+    if (extRevTable)
+	cisco_process_mib_free_cpmProcessExtRevTable(extRevTable);
+    
+    return SCLI_OK;
+}
+
+
+static int
+set_cisco_ip_accounting_checkpoint(scli_interp_t *interp, int argc, char **argv)
+{
+    old_cisco_ip_mib_lip_t *lip;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    old_cisco_ip_mib_get_lip(interp->peer, &lip, OLD_CISCO_IP_MIB_ACTCHECKPOINT);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (lip) {
+        old_cisco_ip_mib_set_lip(interp->peer, lip, OLD_CISCO_IP_MIB_ACTCHECKPOINT);
+        if (interp->peer->error_status) {
+	    return SCLI_SNMP;
+        }
+    }
+
+    if (lip->actCheckPoint) {
+        g_string_sprintfa(interp->result, "%d\n", *lip->actCheckPoint);
+    }
+
+    if (lip) old_cisco_ip_mib_free_lip(lip);
+
+    return SCLI_OK;
+}
+
+
 void
 scli_init_cisco_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 	
+	{ "show cisco processes", NULL,
+	  "The `show cisco processes' command displays information about\n"
+	  "all processes running on a CISCO device. The command generates\n"
+	  "a table with the following columns:\n"
+	  "\n"
+	  "  CPU     processor executing a given process\n"
+	  "  PID     process indentification number on a CPU\n"
+	  "  P       priority of the process\n"
+	  "  MEMORY  memory used by the process\n"
+	  "  TIME    CPU time used by the process\n"
+	  "  COMMAND command executed by the process",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_cisco_processes },
+
 	{ "show cisco ip accounting info", NULL,
-	  "cisco IP accounting info",
+	  "The `show cisco ip accounting info' command displays general\n"
+	  "status information concerning the simple cisco IPv4 accounting\n"
+	  "mechanism supported by many older cisco devices. In particular,\n"
+	  "it displays the starting point of the current and snapshot data\n"
+	  "tables, information about the available accounting capacity,\n"
+	  "and statistics about lost bytes and packets.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_cisco_ip_accounting_info },
 
-	{ "show cisco ip accounting current", NULL,
+	{ "show cisco ip accounting current sorted", NULL,
 	  "cisco IP current accounting data",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  show_cisco_ip_accounting_current },
+	  show_cisco_ip_accounting_current_sorted },
 
-	{ "show cisco ip accounting snapshot", NULL,
+	{ "show cisco ip accounting current raw", NULL,
+	  "The `show cisco ip accounting current raw' command displays\n"
+	  "the raw accounting data retrieved from the current table. The\n"
+	  "command generates a table with the following columns:\n"
+	  "\n"
+	  "  SOURCE      source IPv4 address in dotted notation \n"
+	  "  DESTINATION destination IPv4 address in dotted notation\n"
+	  "  PACKETS     packets sent from source to destination\n"
+	  "  BYTES       bytes sent from source to destination",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_cisco_ip_accounting_current_raw },
+
+	{ "show cisco ip accounting snapshot sorted", NULL,
 	  "cisco IP snapshot accounting data",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  show_cisco_ip_accounting_snapshot },
+	  show_cisco_ip_accounting_snapshot_sorted },
+
+	{ "show cisco ip accounting snapshot raw", NULL,
+	  "The `show cisco ip accounting snapshot raw' command displays\n"
+	  "the raw accounting data retrieved from the snapshot table. The\n"
+	  "command generates a table with the following columns:\n"
+	  "\n"
+	  "  SOURCE      source IPv4 address in dotted notation \n"
+	  "  DESTINATION destination IPv4 address in dotted notation\n"
+	  "  PACKETS     packets sent from source to destination\n"
+	  "  BYTES       bytes sent from source to destination",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_cisco_ip_accounting_snapshot_raw },
 
 	{ "monitor cisco ip accounting current", NULL,
 	  "cisco IP current accounting data",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  show_cisco_ip_accounting_current },
+	  show_cisco_ip_accounting_current_sorted },
 
-	{ "monitor cisco ip accounting snapshot", NULL,
+	{ "monitor cisco ip accounting snapshot sorted", NULL,
 	  "cisco IP snapshot accounting data",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  show_cisco_ip_accounting_snapshot },
+	  show_cisco_ip_accounting_snapshot_sorted },
+
+	{ "set cisco ip accounting checkpoint", NULL,
+	  "The `set cisco ip accounting checkpoint' command takes a\n"
+	  "snapshot of the current accounting table by copying it to\n"
+	  "the snapshot accounting table. The current accounting table\n"
+	  "is reinitialized before it is updated again. The command\n"
+	  "returns the serial number of the snapshot.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  set_cisco_ip_accounting_checkpoint },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
@@ -373,7 +699,9 @@ scli_init_cisco_mode(scli_interp_t *interp)
     static scli_mode_t cisco_mode = {
 	"cisco",
 	"The cisco scli mode is used to display and configure cisco\n"
-	"parameters.",
+	"parameters. It also supports retrieval of accounting data\n"
+	"from devices that support the old cisco accounting mib. This\n"
+	"mode is based on the OLD-CISCO-IP-MIB published in May 1994.",
 	cmds
     };
 
