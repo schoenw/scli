@@ -27,6 +27,7 @@ MIBS			= IF-MIB \
 			  MAU-MIB \
 			  OSPF-MIB \
 			  Printer-MIB \
+			  ISDN-MIB \
 			  OLD-CISCO-IP-MIB \
 			  RAPID-CITY \
 			  UCD-SNMP-MIB
@@ -60,6 +61,7 @@ STUBS			= if-mib.h if-mib.c \
 			  rfc1213-mib.h rfc1213-mib.c \
 			  ospf-mib.h ospf-mib.c \
 			  printer-mib.h printer-mib.c \
+			  isdn-mib.h isdn-mib.c \
 			  old-cisco-ip-mib.h old-cisco-ip-mib.c \
 			  rapid-city.h rapid-city.c \
 			  ucd-snmp-mib.h ucd-snmp-mib.c
