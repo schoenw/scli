@@ -258,10 +258,10 @@ main(int argc, char **argv)
 	  0,
 	  "open an association to a remote SNMP agent",
 	  scli_cmd_open },
-	{ "show",
+	{ "show scli",
 	  0,
-	  "show information about a certain topic",
-	  NULL },
+	  "scli internal information",
+	  scli_cmd_show },
 	{ NULL, 0, NULL, NULL }
     };
 
@@ -356,6 +356,13 @@ main(int argc, char **argv)
 
     if (file == NULL && cmd == NULL && isatty(0)) {
 	interp->flags |= SCLI_INTERP_FLAG_INTERACTIVE;
+    }
+
+    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+	char *pager = getenv("PAGER");
+	if (pager) {
+	    interp->pager = g_strdup(pager);
+	}
     }
 
     if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
