@@ -28,6 +28,9 @@
 /* Define if you have the <ncurses.h> header file.  */
 #undef HAVE_NCURSES_H
 
+/* Define if you have the <netinet/ether.h> header file.  */
+#undef HAVE_NETINET_ETHER_H
+
 /* Define if you have the <netinet/if_ether.h> header file.  */
 #undef HAVE_NETINET_IF_ETHER_H
 
