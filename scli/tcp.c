@@ -42,7 +42,7 @@ xml_tcp_listener(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry, int width)
 
 
 static void
-show_tcp_listener(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry, int width)
+fmt_tcp_listener(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry, int width)
 {
     int pos;
     
@@ -63,7 +63,7 @@ show_tcp_listener(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry, int width)
 
 
 static int
-cmd_tcp_listener(scli_interp_t *interp, int argc, char **argv)
+show_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 {
     tcp_mib_tcpConnEntry_t **tcpConnTable = NULL;
     int width = 20;
@@ -112,8 +112,8 @@ cmd_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 			xml_tcp_listener(interp->result,
 					 tcpConnTable[i], width);
 		    } else {
-			show_tcp_listener(interp->result,
-					  tcpConnTable[i], width);
+			fmt_tcp_listener(interp->result,
+					 tcpConnTable[i], width);
 		    }
 		}
 	    }
@@ -154,7 +154,7 @@ xml_tcp_connection(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry,
 
 
 static void
-show_tcp_connection(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry,
+fmt_tcp_connection(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry,
 		    int local_width, int remote_width)
 {
     int pos;
@@ -183,7 +183,7 @@ show_tcp_connection(GString *s, tcp_mib_tcpConnEntry_t *tcpConnEntry,
 
 
 static int
-cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
+show_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 {
     tcp_mib_tcpConnEntry_t **tcpConnTable = NULL;
     int local_width = 20;
@@ -242,8 +242,8 @@ cmd_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 			xml_tcp_connection(interp->result, tcpConnTable[i],
 					   local_width, remote_width);
 		    } else {
-			show_tcp_connection(interp->result, tcpConnTable[i],
-					    local_width, remote_width);
+			fmt_tcp_connection(interp->result, tcpConnTable[i],
+					   local_width, remote_width);
 		    }
 		}
 	    }
@@ -266,15 +266,15 @@ scli_init_tcp_mode(scli_interp_t *interp)
 	{ "show tcp listener", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "existing tcp listener",
-	  cmd_tcp_listener },
+	  show_tcp_listener },
 	{ "show tcp connections", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "existing tcp connections",
-	  cmd_tcp_connections },
+	  show_tcp_connections },
 	{ "monitor tcp connections", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR,
 	  "existing tcp connections",
-	  cmd_tcp_connections },
+	  show_tcp_connections },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     

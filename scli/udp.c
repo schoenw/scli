@@ -43,7 +43,7 @@ xml_udp_listener(GString *s, udp_mib_udpEntry_t *udpEntry, int width)
 
 
 static void
-show_udp_listener(GString *s, udp_mib_udpEntry_t *udpEntry, int width)
+fmt_udp_listener(GString *s, udp_mib_udpEntry_t *udpEntry, int width)
 {
     int pos;
     
@@ -60,7 +60,7 @@ show_udp_listener(GString *s, udp_mib_udpEntry_t *udpEntry, int width)
 
 
 static int
-cmd_udp_listener(scli_interp_t *interp, int argc, char **argv)
+show_udp_listener(scli_interp_t *interp, int argc, char **argv)
 {
     udp_mib_udpEntry_t **udpTable = NULL;
     int width = 20;
@@ -98,7 +98,7 @@ cmd_udp_listener(scli_interp_t *interp, int argc, char **argv)
 	    if (scli_interp_xml(interp)) {
 		xml_udp_listener(interp->result, udpTable[i], width);
 	    } else {
-		show_udp_listener(interp->result, udpTable[i], width);
+		fmt_udp_listener(interp->result, udpTable[i], width);
 	    }
 	}
 	if (scli_interp_xml(interp)) {
@@ -120,7 +120,7 @@ scli_init_udp_mode(scli_interp_t *interp)
 	{ "show udp listener", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "existing udp listener",
-	  cmd_udp_listener },
+	  show_udp_listener },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     

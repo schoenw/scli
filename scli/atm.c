@@ -52,10 +52,10 @@ xml_atm_interface(GString *s,
 
 
 static void
-show_atm_interface(GString *s,
-		   atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry,
-		   if_mib_ifEntry_t *ifEntry,
-		   if_mib_ifXEntry_t *ifXEntry)
+fmt_atm_interface(GString *s,
+		  atm_mib_atmInterfaceConfEntry_t *atmInterfaceConfEntry,
+		  if_mib_ifEntry_t *ifEntry,
+		  if_mib_ifXEntry_t *ifXEntry)
 {
     g_string_sprintfa(s, "%6u     ", atmInterfaceConfEntry->ifIndex);
 
@@ -75,7 +75,7 @@ show_atm_interface(GString *s,
 
 
 static int
-cmd_atm_interface(scli_interp_t *interp, int argc, char **argv)
+show_atm_interface(scli_interp_t *interp, int argc, char **argv)
 {
     atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfTable = NULL;
     if_mib_ifEntry_t **ifTable = NULL;
@@ -106,8 +106,8 @@ cmd_atm_interface(scli_interp_t *interp, int argc, char **argv)
 		xml_atm_interface(interp->result, atmInterfaceConfTable[i],
 				  NULL, NULL);
 	    } else {
-		show_atm_interface(interp->result, atmInterfaceConfTable[i],
-				   NULL, NULL);
+		fmt_atm_interface(interp->result, atmInterfaceConfTable[i],
+				  NULL, NULL);
 	    }
 	}
 	if (scli_interp_xml(interp)) {
@@ -132,7 +132,7 @@ scli_init_atm_mode(scli_interp_t *interp)
 	{ "show atm interface", NULL,
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  "atm interfaces",
-	  cmd_atm_interface },
+	  show_atm_interface },
 	{ NULL, NULL, 0, NULL, NULL }
     };
     
