@@ -733,6 +733,60 @@ delete_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
+set_nortel_bridge_vlan_name(scli_interp_t *interp, int argc, char **argv)
+{
+    rapid_city_rcVlanEntry_t *vlanEntry = NULL;
+    gint32 vlanId;
+    char *end, *name;
+    size_t name_len;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 3) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    vlanId = strtol(argv[1], &end, 0);
+    if (*end) {
+	return SCLI_SYNTAX_NUMBER;
+    }
+
+    name = argv[2];
+    name_len = strlen(name);
+    if (name_len < RAPID_CITY_RCVLANNAMEMINLENGTH
+	|| name_len > RAPID_CITY_RCVLANNAMEMAXLENGTH) {
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    rapid_city_get_rcVlanEntry(interp->peer, &vlanEntry, vlanId,
+			       RAPID_CITY_RCVLANNAME);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (vlanEntry) {
+	vlanEntry->rcVlanName = name;
+	vlanEntry->_rcVlanNameLength = name_len;
+	rapid_city_set_rcVlanEntry(interp->peer, vlanEntry,
+				   RAPID_CITY_RCVLANNAME);
+	if (interp->peer->error_status) {
+	    rapid_city_free_rcVlanEntry(vlanEntry);
+	    return SCLI_SNMP;
+	}
+    }
+
+    if (vlanEntry) rapid_city_free_rcVlanEntry(vlanEntry);
+
+    return SCLI_OK;
+}
+
+
+
+static int
 set_nortel_bridge_vlan_ports(scli_interp_t *interp, int argc, char **argv)
 {
     rapid_city_rcVlanEntry_t **vlanTable = NULL;
@@ -925,6 +979,13 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  delete_nortel_bridge_vlan },
+
+	{ "set nortel bridge vlan name", "<vlanid> <name>",
+	  "The `set nortel bridge vlan name' command changes the name of\n"
+	  "a virtual LAN.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  set_nortel_bridge_vlan_name },
 
 	{ "set nortel bridge vlan ports", "<regexp> <ports>",
 	  "The `set nortel bridge vlan ports' command allows to assign\n"
