@@ -195,6 +195,8 @@ udp_mib_get_udpTable(host_snmp *s, udpEntry_t ***udpEntry)
 
     *udpEntry = NULL;
 
+    base[9] = 1; stls_vbl_add_null(&in, base, 10);
+    base[9] = 2; stls_vbl_add_null(&in, base, 10);
 
     out = stls_snmp_gettable(s, in);
     /* stls_vbl_free(in); */
