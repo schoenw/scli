@@ -24,6 +24,8 @@
 
 #include "udp-mib.h"
 
+#include "udp-mib-proc.h"
+
 
 
 static void
@@ -111,17 +113,48 @@ show_udp_listener(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+show_udp_stats(scli_interp_t *interp, int argc, char **argv)
+{
+    udp_mib_proc_stats_t _udpStats, *udpStats = &_udpStats;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    udp_mib_proc_get_stats(interp->peer, &udpStats);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (udpStats) {
+	g_string_sprintfa(interp->result, "in %u datagrams\n", udpStats->udpInDatagrams);
+    }
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_udp_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 
 	{ "show udp listener", NULL,
-	  "The show udp listener command displays the listening UDP\n"
+	  "The `show udp listener' command displays the listening UDP\n"
 	  "endpoints.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "udp", NULL,
 	  show_udp_listener },
+	
+	{ "show udp stats", NULL,
+	  "The `show udp statistics' about datagrams received or sent.",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  show_udp_stats },
 	
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
