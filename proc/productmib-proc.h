@@ -34,10 +34,8 @@ productmib_proc_create_vlan(GSnmpSession *s, gint32 vlanid,
 extern void
 productmib_proc_delete_vlan(GSnmpSession *s, gint32 ifIndex);
 
-#if 0
 extern void
-rapid_city_proc_set_vlan_port_member(GSnmpSession *s, gint32 vlanid,
-				     guchar *ports);
-#endif
+productmib_proc_set_vlan_port_member(GSnmpSession *s, gint32 ifIndex,
+				     guchar *ports, gsize ports_len);
     
 #endif /* _PRODUCTMIB_PROC_H_ */
