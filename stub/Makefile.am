@@ -1,10 +1,12 @@
-INCLUDES		= $(GLIB_CFLAGS) -I$(top_srcdir)/snmp
+INCLUDES		= $(GSNMP_CFLAGS) $(GNET_CFLAGS)
 
 MIBS			= IF-MIB \
+			  IANAifType-MIB \
 			  IP-MIB \
 			  IP-FORWARD-MIB \
 			  UDP-MIB \
 			  TCP-MIB \
+			  SNMPv2-TC \
 			  SNMPv2-MIB \
 			  SNMPv2-TM \
 			  HOST-RESOURCES-MIB \
@@ -28,6 +30,8 @@ MIBS			= IF-MIB \
 			  MAU-MIB \
 			  RFC1213-MIB \
 			  OSPF-MIB \
+			  IANA-CHARSET-MIB \
+			  IANA-PRINTER-MIB \
 			  Printer-MIB \
 			  ISDN-MIB \
 			  RS-232-MIB \
@@ -38,17 +42,19 @@ MIBS			= IF-MIB \
 			  PRODUCTMIB
 
 STUBS			= if-mib.h if-mib.c \
-			  ip-mib.h ip-mib.c \
-			  ip-forward-mib.h ip-forward-mib.c \
-			  udp-mib.h udp-mib.c \
-			  tcp-mib.h tcp-mib.c \
-			  snmpv2-mib.h snmpv2-mib.c \
-			  snmpv2-tm.h snmpv2-tm.c \
-			  host-resources-mib.h host-resources-mib.c \
-			  host-resources-types.h host-resources-types.c \
-			  entity-mib.h entity-mib.c \
-			  bridge-mib.h bridge-mib.c \
-			  iana-language-mib.h iana-language-mib.c \
+			  ianaiftype-mib.h ianaiftype-mib.c \
+                          ip-mib.h ip-mib.c \
+                          ip-forward-mib.h ip-forward-mib.c \
+                          udp-mib.h udp-mib.c \
+                          tcp-mib.h tcp-mib.c \
+			  snmpv2-tc.h snmpv2-tc.c \
+                          snmpv2-mib.h snmpv2-mib.c \
+                          snmpv2-tm.h snmpv2-tm.c \
+                          host-resources-mib.h host-resources-mib.c \
+                          host-resources-types.h host-resources-types.c \
+                          entity-mib.h entity-mib.c \
+                          bridge-mib.h bridge-mib.c \
+                          iana-language-mib.h iana-language-mib.c \
 			  disman-script-mib.h disman-script-mib.c \
 			  disman-schedule-mib.h disman-schedule-mib.c \
 			  snmp-framework-mib.h snmp-framework-mib.c \
@@ -61,35 +67,45 @@ STUBS			= if-mib.h if-mib.c \
 			  notification-log-mib.h notification-log-mib.c \
 			  tunnel-mib.h tunnel-mib.c \
 			  atm-mib.h atm-mib.c \
-			  etherlike-mib.h etherlike-mib.c \
-			  mau-mib.h mau-mib.c \
-			  rfc1213-mib.h rfc1213-mib.c \
-			  ospf-mib.h ospf-mib.c \
-			  printer-mib.h printer-mib.c \
-			  isdn-mib.h isdn-mib.c \
-			  rs-232-mib.h rs-232-mib.c \
-			  sonet-mib.h sonet-mib.c \
+                          etherlike-mib.h etherlike-mib.c \
+                          mau-mib.h mau-mib.c \
+                          rfc1213-mib.h rfc1213-mib.c \
+                          ospf-mib.h ospf-mib.c \
+                          printer-mib.h printer-mib.c \
+                          isdn-mib.h isdn-mib.c \
+                          rs-232-mib.h rs-232-mib.c \
+                          sonet-mib.h sonet-mib.c \
 			  old-cisco-ip-mib.h old-cisco-ip-mib.c \
 			  rapid-city.h rapid-city.c \
 			  ucd-snmp-mib.h ucd-snmp-mib.c \
-			  productmib.h productmib.c
+			  productmib.h productmib.c \
+			  printer-mib.h printer-mib.c \
+			  iana-charset-mib.h iana-charset-mib.c \
+			  iana-printer-mib.h iana-printer-mib.c \
+			  cisco-process-mib.h cisco-process-mib.c
 
 noinst_LIBRARIES	= libstub.a
 libstub_a_SOURCES	= $(STUBS)
 
 SMIDUMP			= ../../libsmi/tools/smidump
+SMIPATH			= $(HOME)/mibs/cisco:$(HOME)/mibs/3com:$(HOME)/mibs/nortel:$(HOME)/mibs:/usr/local/share/mibs/ietf:/usr/share/snmp/mibs
+
+export SMIPATH
 
 rmstubs:
 	rm -f $(STUBS)
 
 if-mib.h if-mib.c:
-	$(SMIDUMP) -f scli --scli-exclude='ifTestEntry' IF-MIB
+	$(SMIDUMP) -f scli --scli-set --scli-create --scli-delete --scli-exclude='ifTestEntry' IF-MIB
+
+ianaiftype-mib.h ianaiftype-mib.c:
+	$(SMIDUMP) -f scli IANAifType-MIB
 
 ip-mib.h ip-mib.c:
 	$(SMIDUMP) -f scli --scli-exclude='icmp' IP-MIB
 
 ip-forward-mib.h ip-forward-mib.c:
-	$(SMIDUMP) -f scli --scli-exclude='ipForwardEntry' IF-FORWARD-MIB
+	$(SMIDUMP) -f scli --scli-exclude='ipForwardEntry' IP-FORWARD-MIB
 
 udp-mib.h udp-mib.c:
 	$(SMIDUMP) -f scli UDP-MIB
@@ -97,8 +113,11 @@ udp-mib.h udp-mib.c:
 tcp-mib.h tcp-mib.c:
 	$(SMIDUMP) -f scli TCP-MIB
 
+snmpv2-tc.h snmpv2-tc.c:
+	$(SMIDUMP) -f scli SNMPv2-TC
+
 snmpv2-mib.h snmpv2-mib.c:
-	$(SMIDUMP) -f scli SNMPv2-MIB
+	$(SMIDUMP) -f scli --scli-set SNMPv2-MIB
 
 snmpv2-tm.h snmpv2-tm.c:
 	$(SMIDUMP) -f scli SNMPv2-TM
@@ -166,8 +185,14 @@ rfc1213-mib.h rfc1213-mib.c:
 ospf-mib.h ospf-mib.c:
 	$(SMIDUMP) -f scli --scli-include='ospfGeneralGroup|ospfAreaEntry|ospfIfEntry' OSPF-MIB
 
+iana-charset-mib.h iana-charset-mib.c:
+	$(SMIDUMP) -f scli IANA-CHARSET-MIB
+
+iana-printer-mib.h iana-printer-mib.c:
+	$(SMIDUMP) -f scli IANA-PRINTER-MIB
+
 printer-mib.h printer-mib.c:
-	$(SMIDUMP) -f scli Printer-MIB
+	$(SMIDUMP) -f scli --scli-set Printer-MIB
 
 isdn-mib.h isdn-mib.c:
 	$(SMIDUMP) -f scli --scli-include='isdnBasicRateEntry|isdnBearerEntry|isdnEndpointEntry' ISDN-MIB
@@ -181,11 +206,14 @@ sonet-mib.h sonet-mib.c:
 old-cisco-ip-mib.h old-cisco-ip-mib.c:
 	$(SMIDUMP) -f scli OLD-CISCO-IP-MIB
 
+cisco-process-mib.h cisco-process-mib.c:
+	$(SMIDUMP) -f scli CISCO-PROCESS-MIB
+
 rapid-city.h rapid-city.c:
-	$(SMIDUMP) -f scli --scli-include='vlanEntry|vlanPortEntry' RAPID-CITY
+	$(SMIDUMP) -f scli --scli-include='rcVlanEntry|rcVlanPortEntry' RAPID-CITY
 
 ucd-snmp-mib.h ucd-snmp-mib.c:
-	$(SMIDUMP) -f scli --scli-include='version|extEntry|prEntry|laEntry' UCD-SNMP-MIB
+	$(SMIDUMP) -f scli --scli-set UCD-SNMP-MIB
 
 productmib.h productmib.c:
 	$(SMIDUMP) -f scli --scli-include='a3ComVlanIfEntry|a3ComVirtualGroup' PRODUCTMIB
