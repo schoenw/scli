@@ -76,20 +76,33 @@ fmt_kbytes(guint32 bytes)
 
 
 
-static char *
-fmt_hrSWRunStatus(gint32 st)
+static void
+fmt_run_state_and_type(GString *s, gint32 *state, gint32 *type)
 {
-    return stls_table_get_value(host_resources_mib_enums_hrSWRunStatus, st);
+    if (state) {
+	switch (*state) {
+	case 1:  g_string_append(s, "C "); break;
+	case 2:  g_string_append(s, "R "); break;
+	case 3:  g_string_append(s, "S "); break;
+	case 4:  g_string_append(s, "Z "); break;
+	default: g_string_append(s, "- "); break;
+	}
+    } else {
+	g_string_append(s, "- ");
+    }
+
+    if (type) {
+	switch (*type) {
+	case 1:  g_string_append(s, "? "); break;
+	case 2:  g_string_append(s, "O "); break;
+	case 3:  g_string_append(s, "D "); break;
+	case 4:  g_string_append(s, "A "); break;
+	default: g_string_append(s, "- "); break;
+	}
+    } else {
+	g_string_append(s, "- ");
+    }
 }
-
-
-
-static char *
-fmt_hrSWRunType(gint32 st)
-{
-    return stls_table_get_value(host_resources_mib_enums_hrSWRunType, st);
-}
-
 
 
 typedef struct {
@@ -166,7 +179,7 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 {
     hrSWRunEntry_t **hrSWRunEntry = NULL;
     hrSWRunPerfEntry_t **hrSWRunPerfEntry = NULL;
-    char tmp [256];
+    char tmp[256];
     int j, i;
     int n_idx;
     hr_sort_t *s_arr;
@@ -175,7 +188,7 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 	show_process_summary(peer);
 	wattron(win, A_REVERSE);
 	mvwprintw(win, 0, 0, "%-*s", COLS, 
-		  " IDX   STAT     MEM    TIME COMMAND ...");
+		  "  PID S T    MEM    TIME COMMAND");
 	wattroff(win, A_REVERSE);
 	wrefresh(win);
 	sleep(1);
@@ -206,11 +219,14 @@ show_processes(WINDOW *win, host_snmp *peer, int flags)
 	GString *s;
         i = s_arr [j].idx;
 	s = g_string_new(NULL);
-	g_string_sprintf(s, " %3d", i);
-	/** g_string_sprintfa(s, " %5d", *hrSWRunEntry[i]->hrSWRunID); **/
-	g_string_sprintfa(s, " %8s",
-		  fmt_hrSWRunStatus(*(hrSWRunEntry[i]->hrSWRunStatus)));
-
+	if (hrSWRunEntry[i]->hrSWRunIndex) {
+	    g_string_sprintfa(s, "%5d ", *(hrSWRunEntry[i]->hrSWRunIndex));
+	} else {
+	    g_string_append(s, "----- ");
+	}
+	fmt_run_state_and_type(s,
+			       hrSWRunEntry[i]->hrSWRunStatus,
+			       hrSWRunEntry[i]->hrSWRunType);
 	g_string_sprintfa(s, " %5s", 
 			  fmt_kbytes(*hrSWRunPerfEntry[i]->hrSWRunPerfMem));
 	g_string_sprintfa(s, " %7s", 
