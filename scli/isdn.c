@@ -22,7 +22,79 @@
 
 #include "scli.h"
 
+#include "if-mib.h"
 #include "isdn-mib.h"
+
+
+static void
+fmt_isdn_bri(GString *s, isdn_mib_isdnBasicRateEntry_t *briEntry,
+	     if_mib_ifEntry_t *ifEntry)
+{
+    g_string_sprintfa(s, "%9u ", briEntry->ifIndex);
+
+    if (ifEntry && ifEntry->ifDescr) {
+	g_string_sprintfa(s, "%.*s",
+			  (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);
+    }
+
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_isdn_bri(scli_interp_t * interp, int argc, char **argv)
+{
+    isdn_mib_isdnBasicRateEntry_t **briTable = NULL;
+    regex_t _regex_iface, *regex_iface = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (argc == 2) {
+	regex_iface = &_regex_iface;
+	if (regcomp(regex_iface, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_iface) regfree(regex_iface);
+	return SCLI_OK;
+    }
+
+    isdn_mib_get_isdnBasicRateTable(interp->peer, &briTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (briTable) {
+	g_string_sprintfa(interp->header,
+			  "INTERFACE TYPE TOPOLOGY MODE SIGNAL DESCRIPTION");
+	for (i = 0; briTable[i]; i++) {
+	    if_mib_ifEntry_t *ifEntry;
+	    if_mib_get_ifEntry(interp->peer, &ifEntry,
+			       briTable[i]->ifIndex, IF_MIB_IFDESCR);
+	    if (interface_match(regex_iface, ifEntry)) {
+		fmt_isdn_bri(interp->result, briTable[i], ifEntry);
+	    }
+	    if (ifEntry) if_mib_free_ifEntry(ifEntry);
+	}
+    }
+    
+    if (briTable)
+	isdn_mib_free_isdnBasicRateTable(briTable);
+
+    if (regex_iface) regfree(regex_iface);
+
+    return SCLI_OK;
+}
+
 
 
 static void
@@ -85,6 +157,21 @@ void
 scli_init_isdn_mode(scli_interp_t * interp)
 {
     static scli_cmd_t cmds[] = {
+
+	{ "show isdn bri", "[<regexp>]",
+	  "The `show isdn bri' command shows information about\n"
+	  "the ISDN basic rate interfaces. The command outputs\n"
+	  "a table which has the following columns:\n"
+	  "\n"
+	  "  INTERFACE   network interface number\n"
+	  "  TYPE        type of the ISDN interface\n"
+	  "  TOPOLOGY    line topology\n"
+	  "  MODE        interface mode (te/nt)\n"
+	  "  SIGNALING   signaling mode (active/inactive)\n"
+	  "  DESCRIPTION description of the network interface",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_isdn_bri },
 
 	{ "show isdn bearer", NULL,
 	  "The `show isdn bearer' command shows information about\n"
