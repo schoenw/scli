@@ -102,6 +102,11 @@ show_ip_address(GString *s, ipAddrEntry_t *ipAddrEntry)
 	}
     }
 	      
+    if (ipAddrEntry->ipAdEntIfIndex) {
+	g_string_sprintfa(s, "%6u    ", *(ipAddrEntry->ipAdEntIfIndex));
+    } else {
+	g_string_sprintfa(s, "%6s    ", "");
+    }
     g_string_sprintfa(s, "%-16s ",
 		      fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, 0));
     if (ipAddrEntry->ipAdEntNetMask) {
@@ -109,11 +114,6 @@ show_ip_address(GString *s, ipAddrEntry_t *ipAddrEntry)
 			  fmt_ipv4_mask(ipAddrEntry->ipAdEntNetMask));;
     } else {
 	g_string_sprintfa(s, "%-6s", "");
-    }
-    if (ipAddrEntry->ipAdEntIfIndex) {
-	g_string_sprintfa(s, "%6u      ", *(ipAddrEntry->ipAdEntIfIndex));
-    } else {
-	g_string_sprintfa(s, "%6s      ", "");
     }
     g_string_sprintfa(s, "%s",
 		      fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, 1));
@@ -136,7 +136,7 @@ cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 
     if (ipAddrTable) {
 	g_string_sprintfa(interp->result,
-			  "Address         Prefix  Interface  Name\n");
+			  "Interface IP Address     Prefix  Name\n");
 	for (i = 0; ipAddrTable[i]; i++) {
 	    show_ip_address(interp->result, ipAddrTable[i]);
 	}
@@ -148,7 +148,7 @@ cmd_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-show_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry)
+show_ip_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry)
 {
     g_return_if_fail(tunnelIfEntry);
 
@@ -219,7 +219,7 @@ show_tunnel(GString *s, tunnelIfEntry_t *tunnelIfEntry)
 
 
 static int
-cmd_tunnel(scli_interp_t *interp, int argc, char **argv)
+cmd_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 {
     tunnelIfEntry_t **tunnelIfTable = NULL;
     int i;
@@ -234,11 +234,67 @@ cmd_tunnel(scli_interp_t *interp, int argc, char **argv)
 	g_string_append(interp->result,
 	"Local Address    Remote Address   Type    Sec.  TTL TOS    IF\n");
 	for (i = 0; tunnelIfTable[i]; i++) {
-	    show_tunnel(interp->result, tunnelIfTable[i]);
+	    show_ip_tunnel(interp->result, tunnelIfTable[i]);
 	}
-	tunnel_mib_free_tunnelIfTable(tunnelIfTable);
     }
 
+    if (tunnelIfTable) tunnel_mib_free_tunnelIfTable(tunnelIfTable);
+
+    return SCLI_OK;
+}
+
+
+
+static void
+show_ip_arp(GString *s, ipNetToMediaEntry_t *ipNetToMediaEntry)
+{
+    int i;
+
+    g_string_sprintfa(s, "%6u    ",
+		      ipNetToMediaEntry->ipNetToMediaIfIndex);
+    
+    fmt_enum(s, 8, ip_mib_enums_ipNetToMediaType,
+	     ipNetToMediaEntry->ipNetToMediaType);
+    
+    g_string_sprintfa(s, " %-16s ",
+	      fmt_ipv4_address(ipNetToMediaEntry->ipNetToMediaNetAddress, 0));
+
+    if (ipNetToMediaEntry->ipNetToMediaPhysAddress) {
+	for (i = 0;
+	     i < ipNetToMediaEntry->_ipNetToMediaPhysAddressLength; i++) {
+	    g_string_sprintfa(s, "%s%02x", i ? ":" : "",
+			      ipNetToMediaEntry->ipNetToMediaPhysAddress[i]);
+	}
+    }
+    
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+cmd_ip_media_mapping(scli_interp_t *interp, int argc, char **argv)
+{
+    ipNetToMediaEntry_t **ipNetToMediaTable = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (ip_mib_get_ipNetToMediaTable(interp->peer, &ipNetToMediaTable)) {
+	return SCLI_ERROR;
+    }
+
+    if (ipNetToMediaTable) {
+	g_string_append(interp->result,
+	"Interface Type     IP Address       Physical Address\n");
+	for (i = 0; ipNetToMediaTable[i]; i++) {
+	    show_ip_arp(interp->result, ipNetToMediaTable[i]);
+	}
+    }
+
+
+    if (ipNetToMediaTable) ip_mib_free_ipNetToMediaTable(ipNetToMediaTable);
+    
     return SCLI_OK;
 }
 
@@ -257,7 +313,10 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  cmd_ip_addresses },
 	{ "show ip", "tunnel",
 	  "show list of IP tunnels",
-	  cmd_tunnel },
+	  cmd_ip_tunnel },
+	{ "show ip", "mapping",
+	  "show list of IP to media mappings",
+	  cmd_ip_media_mapping },
 	{ NULL, NULL, NULL, NULL }
     };
     
