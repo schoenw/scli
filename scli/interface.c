@@ -649,7 +649,6 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
     if (ifTable) {
 	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS);
 	if_mib_get_ifRcvAddressTable(interp->peer, &ifRcvAddrTable, 0);
-	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
 	ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0);
 	
 	entity_mib_get_entAliasMappingTable(interp->peer,
@@ -658,6 +657,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 	    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable,
 					    ENTITY_MIB_ENTPHYSICAL_MASK);
 	}
+ 	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
 	for (i = 0, c = 0; ifTable[i]; i++) {
 	    if (interface_match(regex_iface, ifTable[i])) {
 		if_mib_ifXEntry_t *ifXEntry;
