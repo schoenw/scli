@@ -1,3 +1,11 @@
+Changes in scli 0.2.5:
+
+- new "show printer covers" command
+- XML support for "show ip addresses"
+- display the port description in the "show bridge stats" command
+- incomplete support for dynamic loadable plugins
+- minor bug fixes
+
 Changes in scli 0.2.4:
 
 - added a new "dump" toplevel command to generate scli scripts
@@ -11,11 +19,11 @@ Changes in scli 0.2.4:
 
 Changes in scli 0.2.3:
 
+- new "show scli schema" command
 - new "set nortel bridge vlan default" command
 - XML support for "show printer console lights"
 - XML support for "show printer console display"
 - XML support for "show printer alerts"
-- new "show scli schema" command
 - regenerated stubs to remove unneeded code
 - minor bug fixes
 
