@@ -1,7 +1,7 @@
 /* 
  * snmp.c -- scli snmp mode implementation
  *
- * Copyright (C) 2001 Juergen Schoenwaelder
+ * Copyright (C) 2001-2002 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,20 @@
 #include "snmp-framework-mib.h"
 #include "snmp-view-based-acm-mib.h"
 #include "snmp-user-based-sm-mib.h"
+#include "snmp-target-mib.h"
+#include "snmp-notification-mib.h"
 
 #include "snmp-view-based-acm-mib-proc.h"
+
+
+static GSnmpEnum const mp_model[] = {
+    { 0,	"SNMPv1" },
+    { 1,	"SNMPv2c" },
+    { 2,	"SNMPv2u/*" },
+    { 3,	"SNMPv3" },
+    { 0, NULL }
+};
+
 
 
 static GSnmpEnum const security_model[] = {
@@ -86,6 +98,16 @@ GSnmpIdentity const sec_proto_identities[] = {
       "DES" },
     { 0, 0, NULL }
 };
+
+
+
+static int
+creatable(gint32 *storage)
+{
+    /* check whether a row is actually creatable */
+    return (storage && (*storage != 4) && (*storage != 5));
+}
+
 
 
 static void
@@ -178,6 +200,98 @@ create_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
     if (interp->peer->error_status) {
 	return SCLI_SNMP;
     }
+    
+    return SCLI_OK;
+}
+
+
+
+static int
+delete_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
+{
+    snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t **vacmGroupTable;
+    regex_t _regex_group, *regex_group = NULL;
+    regex_t _regex_name, *regex_name = NULL;
+    gint32 model = 0;	/* "any" */
+    int i, status;
+    char *s;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc < 3 || argc > 4) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    regex_name = &_regex_name;
+    if (regcomp(regex_name, argv[1], interp->regex_flags) != 0) {
+	return SCLI_SYNTAX_REGEXP;
+    }
+
+    regex_group = &_regex_group;
+    if (regcomp(regex_group, argv[2], interp->regex_flags) != 0) {
+	if (regex_name) regfree(regex_name);
+	return SCLI_SYNTAX_REGEXP;
+    }
+
+    if (argc == 4) {
+	if (! gsnmp_enum_get_number(security_model, argv[3], &model)) {
+	    if (regex_name) regfree(regex_name);
+	    if (regex_group) regfree(regex_group);
+	    return SCLI_SYNTAX_VALUE;
+	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_name) regfree(regex_name);
+	if (regex_group) regfree(regex_group);
+	return SCLI_OK;
+    }
+
+    snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(interp->peer,
+							 &vacmGroupTable, 0);
+    if (interp->peer->error_status) {
+	if (regex_name) regfree(regex_name);
+	if (regex_group) regfree(regex_group);
+	return SCLI_SNMP;
+    }
+
+    if (vacmGroupTable) {
+	for (i = 0; vacmGroupTable[i]; i++) {
+	    if (! vacmGroupTable[i]->vacmGroupName) {
+		continue;
+	    }
+	    if (model && (vacmGroupTable[i]->vacmSecurityModel != model)) {
+		continue;
+	    }
+	    s = g_strdup_printf("%.*s",
+				vacmGroupTable[i]->_vacmSecurityNameLength,
+				vacmGroupTable[i]->vacmSecurityName);
+	    status = regexec(regex_name, s, (size_t) 0, NULL, 0);
+	    g_free(s);
+	    if (status != 0) continue;
+	    s = g_strdup_printf("%.*s",
+				vacmGroupTable[i]->_vacmGroupNameLength,
+				vacmGroupTable[i]->vacmGroupName);
+	    status = regexec(regex_group, s, (size_t) 0, NULL, 0);
+	    g_free(s);
+	    if (status != 0) continue;
+	    snmp_view_based_acm_mib_proc_delete_member(interp->peer,
+			       vacmGroupTable[i]->vacmSecurityName,
+			       vacmGroupTable[i]->_vacmSecurityNameLength,
+			       vacmGroupTable[i]->vacmGroupName,
+			       vacmGroupTable[i]->_vacmGroupNameLength, model);
+	}
+    }
+    
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+    
+    if (vacmGroupTable)
+	snmp_view_based_acm_mib_free_vacmSecurityToGroupTable(vacmGroupTable);
+    
+    if (regex_name) regfree(regex_name);
+    if (regex_group) regfree(regex_group);
     
     return SCLI_OK;
 }
@@ -350,7 +464,7 @@ show_snmp_resources(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-fmt_snmp_vacm_group(GString *s,
+fmt_snmp_vacm_member(GString *s,
      snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t *vacmGroupEntry,
 		    int sec_name_width, int sec_group_width)
 {
@@ -373,7 +487,7 @@ fmt_snmp_vacm_group(GString *s,
 
 
 static int
-show_snmp_vacm_groups(scli_interp_t *interp, int argc, char **argv)
+show_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t **vacmGroupTable;
     int sec_name_width = 8;
@@ -406,8 +520,8 @@ show_snmp_vacm_groups(scli_interp_t *interp, int argc, char **argv)
 	g_string_sprintfa(interp->header, "ROW MOD %-*s GROUP",
 			  sec_name_width, "NAME");
 	for (i = 0; vacmGroupTable[i]; i++) {
-	    fmt_snmp_vacm_group(interp->result, vacmGroupTable[i],
-				sec_name_width, sec_group_width);
+	    fmt_snmp_vacm_member(interp->result, vacmGroupTable[i],
+				 sec_name_width, sec_group_width);
 	}
     }
 
@@ -709,6 +823,288 @@ show_snmp_usm_users(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+fmt_snmp_target_address(GString *s,
+			snmp_target_mib_snmpTargetAddrEntry_t *snmpTargetEntry,
+		int name_width, int tag_width, int addr_width, int para_width)
+{
+    const char *e;
+    
+    fmt_storage_type(s, snmpTargetEntry->snmpTargetAddrStorageType);
+    fmt_row_status(s, snmpTargetEntry->snmpTargetAddrRowStatus);
+
+    g_string_sprintfa(s, "  %-*.*s", name_width,
+		      (int) snmpTargetEntry->_snmpTargetAddrNameLength,
+		      snmpTargetEntry->snmpTargetAddrName);
+
+    e = fmt_tdomain(snmpTargetEntry->snmpTargetAddrTDomain,
+		    snmpTargetEntry->_snmpTargetAddrTDomainLength);
+    g_string_sprintfa(s, " %-6s", e ? e : "?");
+
+    e = fmt_taddress(snmpTargetEntry->snmpTargetAddrTDomain,
+		     snmpTargetEntry->_snmpTargetAddrTDomainLength,
+		     snmpTargetEntry->snmpTargetAddrTAddress,
+		     snmpTargetEntry->_snmpTargetAddrTAddressLength);
+    g_string_sprintfa(s, " %-*s", addr_width, e ? e : "?");
+
+    if (snmpTargetEntry->snmpTargetAddrTimeout) {
+	g_string_sprintfa(s, "%6d",
+			  *snmpTargetEntry->snmpTargetAddrTimeout * 10);
+    } else {
+	g_string_sprintfa(s, "%6s", "");
+    }
+
+    if (snmpTargetEntry->snmpTargetAddrRetryCount) {
+	g_string_sprintfa(s, "%6d",
+			  *snmpTargetEntry->snmpTargetAddrRetryCount);
+    } else {
+	g_string_sprintfa(s, "%6s", "");
+    }
+    
+    if (snmpTargetEntry->snmpTargetAddrParams) {
+	g_string_sprintfa(s, " %-*.*s", para_width,
+			  (int) snmpTargetEntry->_snmpTargetAddrParamsLength,
+			  snmpTargetEntry->snmpTargetAddrParams);
+    } else {
+	g_string_sprintfa(s, " %*s", para_width, "");
+    }
+
+    if (snmpTargetEntry->snmpTargetAddrTagList) {
+	g_string_sprintfa(s, " %-*.*s", tag_width,
+			  (int) snmpTargetEntry->_snmpTargetAddrTagListLength,
+			  snmpTargetEntry->snmpTargetAddrTagList);
+    } else {
+	g_string_sprintfa(s, " %*s", tag_width, "");
+    }
+
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_snmp_target_addresses(scli_interp_t *interp, int argc, char **argv)
+{
+    snmp_target_mib_snmpTargetAddrEntry_t **snmpTargetTable = NULL;
+    int name_width = 8, tag_width = 8, addr_width = 8, para_width = 8;
+    const char *e;
+    int i;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    snmp_target_mib_get_snmpTargetAddrTable(interp->peer, &snmpTargetTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (snmpTargetTable) {
+	for (i = 0; snmpTargetTable[i]; i++) {
+	    if (snmpTargetTable[i]->_snmpTargetAddrNameLength > name_width) {
+		name_width = snmpTargetTable[i]->_snmpTargetAddrNameLength;
+	    }
+	    if (snmpTargetTable[i]->_snmpTargetAddrTagListLength > tag_width) {
+		tag_width = snmpTargetTable[i]->_snmpTargetAddrTagListLength;
+	    }
+	    if (snmpTargetTable[i]->_snmpTargetAddrParamsLength > para_width) {
+		para_width = snmpTargetTable[i]->_snmpTargetAddrParamsLength;
+	    }
+	    e = fmt_taddress(snmpTargetTable[i]->snmpTargetAddrTDomain,
+			     snmpTargetTable[i]->_snmpTargetAddrTDomainLength,
+			     snmpTargetTable[i]->snmpTargetAddrTAddress,
+			     snmpTargetTable[i]->_snmpTargetAddrTAddressLength);
+	    if (strlen(e) > addr_width) {
+		addr_width = strlen(e);
+	    }
+	}
+	g_string_sprintfa(interp->header,
+			  "ROW %-*s DOMAIN %-*s TMOUT RETRY %-*s %-*s",
+			  name_width, "TARGET",
+			  addr_width, "ADDRESS",
+			  para_width, "PARAMS",
+			  tag_width, "TAGS");
+	for (i = 0; snmpTargetTable[i]; i++) {
+	    fmt_snmp_target_address(interp->result, snmpTargetTable[i],
+			    name_width, tag_width, addr_width, para_width);
+	}
+    }
+
+    if (snmpTargetTable) {
+	snmp_target_mib_free_snmpTargetAddrTable(snmpTargetTable);
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_snmp_target_parameter(GString *s,
+			  snmp_target_mib_snmpTargetParamsEntry_t *snmpParamsEntry,
+			  int para_width, int name_width)
+{
+    const char *e;
+    
+    fmt_storage_type(s, snmpParamsEntry->snmpTargetParamsStorageType);
+    fmt_row_status(s, snmpParamsEntry->snmpTargetParamsRowStatus);
+
+    g_string_sprintfa(s, "  %-*.*s", para_width,
+		      (int) snmpParamsEntry->_snmpTargetParamsNameLength,
+		      snmpParamsEntry->snmpTargetParamsName);
+
+    if (snmpParamsEntry->snmpTargetParamsSecurityName) {
+	g_string_sprintfa(s, " %-*.*s", name_width,
+			  (int) snmpParamsEntry->_snmpTargetParamsSecurityNameLength,
+			  snmpParamsEntry->snmpTargetParamsSecurityName);
+    } else {
+	g_string_sprintfa(s, " %*s", name_width, "");
+    }
+
+    e = fmt_enum(security_model, snmpParamsEntry->snmpTargetParamsSecurityModel);
+    g_string_sprintfa(s, " %-3s", e ? e : "");
+
+    e = fmt_enum(security_level, snmpParamsEntry->snmpTargetParamsSecurityLevel);
+    g_string_sprintfa(s, " %-3s", e ? e : "");
+
+    e = fmt_enum(mp_model, snmpParamsEntry->snmpTargetParamsMPModel);
+    g_string_sprintfa(s, " %s", e ? e : "");
+
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_snmp_target_parameters(scli_interp_t *interp, int argc, char **argv)
+{
+    snmp_target_mib_snmpTargetParamsEntry_t **snmpParamsTable = NULL;
+    int name_width = 8, para_width = 8;
+    int i;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    snmp_target_mib_get_snmpTargetParamsTable(interp->peer, &snmpParamsTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (snmpParamsTable) {
+	for (i = 0; snmpParamsTable[i]; i++) {
+	    if (snmpParamsTable[i]->_snmpTargetParamsNameLength > para_width) {
+		para_width = snmpParamsTable[i]->_snmpTargetParamsNameLength;
+	    }
+	    if (snmpParamsTable[i]->_snmpTargetParamsSecurityNameLength > name_width) {
+		name_width = snmpParamsTable[i]->_snmpTargetParamsSecurityNameLength;
+	    }
+	}
+	g_string_sprintfa(interp->header,
+			  "ROW %-*s %-*s MOD LVL MP",
+			  para_width, "PARAMS",
+			  name_width, "NAME");
+	for (i = 0; snmpParamsTable[i]; i++) {
+	    fmt_snmp_target_parameter(interp->result, snmpParamsTable[i],
+				      para_width, name_width);
+	}
+    }
+
+    if (snmpParamsTable) {
+	snmp_target_mib_free_snmpTargetParamsTable(snmpParamsTable);
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_snmp_notification_target(GString *s,
+		       snmp_notification_mib_snmpNotifyEntry_t *snmpNotifyEntry,
+		       int name_width)
+{
+    const char *e;
+    
+    fmt_storage_type(s, snmpNotifyEntry->snmpNotifyStorageType);
+    fmt_row_status(s, snmpNotifyEntry->snmpNotifyRowStatus);
+
+    g_string_sprintfa(s, "  %-*.*s", name_width,
+		      (int) snmpNotifyEntry->_snmpNotifyNameLength,
+		      snmpNotifyEntry->snmpNotifyName);
+
+    e = fmt_enum(snmp_notification_mib_enums_snmpNotifyType, snmpNotifyEntry->snmpNotifyType);
+    g_string_sprintfa(s, " %-6s", e ? e : "");
+
+    if (snmpNotifyEntry->snmpNotifyTag) {
+	g_string_sprintfa(s, " %.*s",
+			  snmpNotifyEntry->_snmpNotifyTagLength,
+			  snmpNotifyEntry->snmpNotifyTag);
+    }
+
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_snmp_notification_targets(scli_interp_t *interp, int argc, char **argv)
+{
+    snmp_notification_mib_snmpNotifyEntry_t **snmpNotifyTable = NULL;
+    int name_width = 8;
+    int i;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    snmp_notification_mib_get_snmpNotifyTable(interp->peer, &snmpNotifyTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (snmpNotifyTable) {
+	for (i = 0; snmpNotifyTable[i]; i++) {
+	    if (snmpNotifyTable[i]->_snmpNotifyNameLength > name_width) {
+		name_width = snmpNotifyTable[i]->_snmpNotifyNameLength;
+	    }
+	}
+	g_string_sprintfa(interp->header,
+			  "ROW %-*s TYPE   TAG",
+			  name_width, "NAME");
+	for (i = 0; snmpNotifyTable[i]; i++) {
+	    fmt_snmp_notification_target(interp->result, snmpNotifyTable[i],
+					 name_width);
+	}
+    }
+
+    if (snmpNotifyTable) {
+	snmp_notification_mib_free_snmpNotifyTable(snmpNotifyTable);
+    }
+
+    return SCLI_OK;
+}
+
+
+
 static int
 set_snmp_authentication_traps(scli_interp_t *interp, int argc, char **argv)
 {
@@ -748,7 +1144,9 @@ static int
 dump_snmp(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_snmp_t *snmp;
+    snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t **vacmGroupTable;
     const char *e;
+    int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -774,8 +1172,35 @@ dump_snmp(scli_interp_t *interp, int argc, char **argv)
 	}
     }
 
+    snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(interp->peer,
+							 &vacmGroupTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (vacmGroupTable) {
+	g_string_sprintfa(interp->result, "delete snmp vacm member . .\n");
+	for (i = 0; vacmGroupTable[i]; i++) {
+	    if (! creatable(vacmGroupTable[i]->vacmSecurityToGroupStorageType)) {
+		continue;
+	    }
+	    e  = gsnmp_enum_get_label(security_model,
+				      vacmGroupTable[i]->vacmSecurityModel);
+	    g_string_sprintfa(interp->result,
+		      "create snmp vacm member \"%.*s\" \"%.*s\" \"%s\"\n",
+			      vacmGroupTable[i]->_vacmSecurityNameLength,
+			      vacmGroupTable[i]->vacmSecurityName,
+			      vacmGroupTable[i]->_vacmSecurityNameLength,
+			      vacmGroupTable[i]->vacmSecurityName,
+			      e ? e : "");
+	}
+    }
+
     if (snmp) snmpv2_mib_free_snmp(snmp);
 
+    if (vacmGroupTable)
+	snmp_view_based_acm_mib_free_vacmSecurityToGroupTable(vacmGroupTable);
+    
     return SCLI_OK;
 }
 
@@ -793,6 +1218,14 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  create_snmp_vacm_member },
+
+	{ "delete snmp vacm member", "<regex-name> <regex-group> [<model>]",
+	  "The delete snmp vacm member commands can be used to delete\n"
+	  "members (security names) from vacm groups. Groups are deleted\n"
+	  "if the last member is deleted.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  delete_snmp_vacm_member },
 
 	{ "set snmp authentication traps", "<status>",
 	  "The set snmp authentication traps command controls whether the\n"
@@ -818,18 +1251,18 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_snmp_resources },
 
-	{ "show snmp vacm groups", NULL,
-	  "The show snmp vacm groups command displays the mapping of\n"
+	{ "show snmp vacm member", NULL,
+	  "The show snmp vacm member command displays the mapping of\n"
 	  "security names to group names. The command generates a table\n"
 	  "with the following columns:\n"
 	  "\n"
 	  "  ROW    row storage type and status\n"
 	  "  MOD    security model\n"
-	  "  NAME   security name\n"
-	  "  GROUP  security group name",
+	  "  NAME   member name (security name)\n"
+	  "  GROUP  name of the vacm group",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  show_snmp_vacm_groups },
+	  show_snmp_vacm_member },
 
 	{ "show snmp vacm access", NULL,
 	  "The show snmp vacm access command display the access control\n"
@@ -874,6 +1307,48 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_snmp_usm_users },
 
+	{ "show snmp target addresses", NULL,
+	  "The show snmp target addresses command displays information\n"
+	  "about the configured SNMP target addresses. The command\n"
+	  "generates a table with the following columns:\n"
+	  "\n"
+	  "  ROW      row storage type and status\n"
+	  "  TARGET   target name\n"
+	  "  DOMAIN   transport domain\n"
+	  "  ADDRESS  transport address\n"
+	  "  TMOUT    timeout value in ms\n"
+	  "  RETRY    number of retries\n"
+	  "  PARAMS   associated parameters\n"
+	  "  TAGS     tag list",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_snmp_target_addresses },
+
+	{ "show snmp target parameters", NULL,
+	  "The show snmp target parameters command displays information\n"
+	  "about the configured SNMP target parameters. The command\n"
+	  "generates a table with the following columns:\n"
+	  "\n"
+	  "  ROW      row storage type and status\n"
+	  "  PARAMS   parameter name\n"
+	  "  NAME     security name",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_snmp_target_parameters },
+
+	{ "show snmp notification targets", NULL,
+	  "The show snmp notification targets command displays information\n"
+	  "about the configured SNMP notification targets. The command\n"
+	  "generates a table with the following columns:\n"
+	  "\n"
+	  "  ROW      row storage type and status\n"
+	  "  NAME     notification target name\n"
+	  "  TYPE     notification type\n"
+	  "  TAG      tag reference to targets",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_snmp_notification_targets },
+
 	{ "dump snmp", NULL,
 	  "The dump snmp command generates a sequence of scli commands\n"
 	  "which can be used to restore the engine configuration.\n",
@@ -889,8 +1364,10 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	
 	"The snmp scli mode is based on the SNMPv2-MIB as published\n"
 	"in RFC 1907, the SNMP-FRAMEWORK-MIB as published in RFC 2571,\n"
-	"the SNMP-USER-BASED-SM-MIB as published in RFC 2574, and the\n"
-	"SNMP-VIEW-BASED-ACM-MIB as published in RFC 2575.",
+	"the SNMP-USER-BASED-SM-MIB as published in RFC 2574, the\n"
+	"SNMP-VIEW-BASED-ACM-MIB as published in RFC 2575, the\n"
+	"SNMP-TARGET-MIB as published in RFC 2573, and the\n"
+	"SNMP-NOTIFICATION-MIB as published in RFC 2573.",
 	cmds
     };
     
