@@ -54,29 +54,17 @@ static void
 onsignal(int n)
 {
     scli_curses_off();
-    exit(0);
+    exit(n);
 }
 
 /*
  * Track window change events using whatever mechanism is available.
  */
 
-static int interrupted = 0;
-
 static void
 onwinch(int n)
 {
-#ifdef HAVE_RESIZETERM
-    struct winsize size;
-
-    if (ioctl(fileno(stdout), TIOCGWINSZ, &size) == 0) {
-	resizeterm(size.ws_row, size.ws_col);
-	wrefresh(curscr);		/* Linux needs this */
-	interrupted = 0;
-    } else {
-	interrupted = 1;
-    }
-#endif
+    scli_get_screen(NULL, NULL);
     (void) signal(SIGWINCH, onwinch);	/* some systems need this */
 }
 

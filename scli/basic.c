@@ -68,23 +68,30 @@ scli_curses_off()
 void
 scli_get_screen(int *lines, int *columns)
 {
+    int rows = 24, cols = 80;	/* best guess defaults */
+    
 #ifdef HAVE_RESIZETERM
     struct winsize size;
     
     do {
+	errno = 0;
 	if (ioctl(fileno(stdout), TIOCGWINSZ, &size) < 0 && errno != EINTR) {
 	    goto failure;
 	}
     } while (errno == EINTR);
 
-    *lines = size.ws_row;
-    *columns = size.ws_col;
-    return;
+    if (scli_curses_running) {
+	resizeterm(size.ws_row, size.ws_col);
+	wrefresh(curscr);			/* Linux needs this */
+    }
+
+    rows = size.ws_row;
+    cols = size.ws_col;
 #endif
 
  failure:
-    *lines = 24;	/* best guess */
-    *columns = 80;	/* best guess */
+    if (lines) *lines = rows;
+    if (columns) *columns = cols;
 }
 
 
