@@ -34,16 +34,16 @@
 static void
 fmt_run_state(GString *s, gint32 *state)
 {
-    char *name;
+    char const *name;
 
-    static stls_table_t const run_states[] = {
-	{ 1, "I" },	/* initializing */
-	{ 2, "R" },	/* executing */
-	{ 3, "U" },	/* suspending */
-	{ 4, "S" },	/* suspended */
-	{ 5, "R" },	/* resuming */
-	{ 6, "A" },	/* aborting */
-	{ 7, "T" },	/* terminated */
+    static stls_enum_t const run_states[] = {
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_INITIALIZING,	"I" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_EXECUTING,	"R" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_SUSPENDING,	"U" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_SUSPENDED,	"S" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_RESUMING,	"R" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_ABORTING,	"A" },
+	{ DISMAN_SCRIPT_MIB_SMRUNSTATE_TERMINATED,	"T" },
 	{ 0, NULL }
     };
     
@@ -52,7 +52,7 @@ fmt_run_state(GString *s, gint32 *state)
 	return;
     }
     
-    name = stls_table_get_value(run_states, *state);
+    name = stls_enum_get_label(run_states, *state);
     if (name) {
 	g_string_append(s, name);
     } else {
@@ -64,18 +64,18 @@ fmt_run_state(GString *s, gint32 *state)
 static void
 fmt_exit_code(GString *s, gint32 *code)
 {
-    char *name;
+    char const *name;
 
-    static stls_table_t const exit_codes[] = {
-	{ 1, "N" },	/* noError */
-	{ 2, "H" },	/* halted */
-	{ 3, "T" },	/* lifeTimeExceeded */
-	{ 4, "O" },	/* noResourcesLeft */
-	{ 5, "L" },	/* languageError */
-	{ 6, "R" },	/* runtimeError */
-	{ 7, "A" },	/* invalidArgument */
-	{ 8, "S" },	/* securityViolation */
-	{ 9, "G" },	/* genericError */
+    static stls_enum_t const exit_codes[] = {
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_NOERROR,		"N" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_HALTED,		"H" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_LIFETIMEEXCEEDED,	"T" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_NORESOURCESLEFT,	"O" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_LANGUAGEERROR,	"L" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_RUNTIMEERROR,		"R" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_INVALIDARGUMENT,	"A" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_SECURITYVIOLATION,	"S" },
+	{ DISMAN_SCRIPT_MIB_SMRUNEXITCODE_GENERICERROR,		"G" },
 	{ 0, NULL }
     };
     
@@ -84,7 +84,7 @@ fmt_exit_code(GString *s, gint32 *code)
 	return;
     }
     
-    name = stls_table_get_value(exit_codes, *code);
+    name = stls_enum_get_label(exit_codes, *code);
     if (name) {
 	g_string_append(s, name);
     } else {
