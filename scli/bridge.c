@@ -1078,11 +1078,18 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
     delta = TV_DIFF(last, now);
 
     if (portTable) {
-	g_string_append(interp->header, " PORT  I-FPS O-FPS D-FPS DESCRIPTION");
+	g_string_append(interp->header, " PORT  MAX-INFO  I-FPS O-FPS D-FPS DESCRIPTION");
 	for (i = 0; portTable[i]; i++) {
 
 	    g_string_sprintfa(interp->result, "%5u ",
 			      portTable[i]->dot1dTpPort);
+
+	    if (portTable[i]->dot1dTpPortMaxInfo) {
+		g_string_sprintfa(interp->result, "%9d ",
+				  portTable[i]->dot1dTpPortMaxInfo);
+	    } else {
+		g_string_sprintfa(interp->result, "%9s ", "");
+	    }
 	    
 	    fmt_counter_dt(interp->result, portTable[i]->dot1dTpPortInFrames,
 			   &(stats[i].inFrames),
