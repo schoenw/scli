@@ -589,48 +589,40 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 			  prtInputEntry->prtInputModel);
     }
 
+    e = fmt_enum(printer_mib_enums_prtInputCapacityUnit,
+		 prtInputEntry->prtInputCapacityUnit);
     if (prtInputEntry->prtInputMaxCapacity) {
 	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
 	switch (*prtInputEntry->prtInputMaxCapacity) {
 	case -1:
-	    g_string_append(s, "other ");
+	    g_string_append(s, "unlimited");
 	    break;
 	case -2:
-	    g_string_append(s, "unknown ");
+	    g_string_append(s, "unknown");
 	    break;
 	default:
-	    g_string_sprintfa(s, "%u ",
+	    g_string_sprintfa(s, "%d",
 			      *prtInputEntry->prtInputMaxCapacity);
 	}
-	e = fmt_enum(printer_mib_enums_prtInputCapacityUnit,
-		     prtInputEntry->prtInputCapacityUnit);
-	if (e) {
-	    g_string_append(s, e);
-	}
-	g_string_append(s, "\n");
+	g_string_sprintfa(s, " %s\n", e ? e : "");
     }
 
     if (prtInputEntry->prtInputCurrentLevel) {
 	g_string_sprintfa(s, "%-*s ", indent, "Level:");
 	switch (*prtInputEntry->prtInputCurrentLevel) {
 	case -1:
-	    g_string_append(s, "other ");
+	    g_string_append(s, "unlimited");
 	    break;
 	case -2:
-	    g_string_append(s, "unknown ");
+	    g_string_append(s, "unknown");
 	    break;
 	case -3:
-	    g_string_append(s, ">0 ");
+	    g_string_append(s, ">0");
 	    break;
 	default:
-	    g_string_sprintfa(s, "%u ", *prtInputEntry->prtInputCurrentLevel);
+	    g_string_sprintfa(s, "%d", *prtInputEntry->prtInputCurrentLevel);
 	}
-	e = fmt_enum(printer_mib_enums_prtInputCapacityUnit,
-		     prtInputEntry->prtInputCapacityUnit);
-	if (e) {
-	    g_string_append(s, e);
-	}
-	g_string_append(s, "\n");
+	g_string_sprintfa(s, " %s\n", e ? e : "");
     }
 
     if (prtInputEntry->prtInputNextIndex) {
@@ -854,48 +846,41 @@ fmt_printer_outputs(GString *s, printer_mib_prtOutputEntry_t *prtOutputEntry)
 			  prtOutputEntry->prtOutputModel);
     }
 
+    e = fmt_enum(printer_mib_enums_prtOutputCapacityUnit,
+		 prtOutputEntry->prtOutputCapacityUnit);
+    
     if (prtOutputEntry->prtOutputMaxCapacity) {
 	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
 	switch (*prtOutputEntry->prtOutputMaxCapacity) {
 	case -1:
-	    g_string_append(s, "other ");
+	    g_string_append(s, "unlimited");
 	    break;
 	case -2:
-	    g_string_append(s, "unknown ");
+	    g_string_append(s, "unknown");
 	    break;
 	default:
-	    g_string_sprintfa(s, "%u ",
+	    g_string_sprintfa(s, "%d",
 			      *prtOutputEntry->prtOutputMaxCapacity);
 	}
-	e = fmt_enum(printer_mib_enums_prtOutputCapacityUnit,
-		     prtOutputEntry->prtOutputCapacityUnit);
-	if (e) {
-	    g_string_append(s, e);
-	}
-	g_string_append(s, "\n");
+	g_string_sprintfa(s, " %s\n", e ? e : "");
     }
 
     if (prtOutputEntry->prtOutputRemainingCapacity) {
 	g_string_sprintfa(s, "%-*s ", indent, "Remaining:");
 	switch (*prtOutputEntry->prtOutputRemainingCapacity) {
 	case -1:
-	    g_string_append(s, "other ");
+	    g_string_append(s, "unlimited");
 	    break;
 	case -2:
-	    g_string_append(s, "unknown ");
+	    g_string_append(s, "unknown");
 	    break;
 	case -3:
-	    g_string_append(s, ">0 ");
+	    g_string_append(s, ">0");
 	    break;
 	default:
-	    g_string_sprintfa(s, "%u ", *prtOutputEntry->prtOutputRemainingCapacity);
+	    g_string_sprintfa(s, "%d", *prtOutputEntry->prtOutputRemainingCapacity);
 	}
-	e = fmt_enum(printer_mib_enums_prtOutputCapacityUnit,
-		     prtOutputEntry->prtOutputCapacityUnit);
-	if (e) {
-	    g_string_append(s, e);
-	}
-	g_string_append(s, "\n");
+	g_string_sprintfa(s, " %s\n", e ? e : "");
     }
 
     fmt_subunit(s, indent, prtOutputEntry->prtOutputStatus);
@@ -1083,6 +1068,7 @@ static void
 fmt_printer_supplies(GString *s, printer_mib_prtMarkerSuppliesEntry_t *prtSuppliesEntry)
 {
     int const indent = 18;
+    const char *e;
 
     g_string_sprintfa(s, "%-*s %d\n", indent, "Printer:",
 		      prtSuppliesEntry->hrDeviceIndex);
@@ -1090,11 +1076,71 @@ fmt_printer_supplies(GString *s, printer_mib_prtMarkerSuppliesEntry_t *prtSuppli
     g_string_sprintfa(s, "%-*s %u\n", indent, "Supply:",
 		      prtSuppliesEntry->prtMarkerSuppliesIndex);
 
+    if (prtSuppliesEntry->prtMarkerSuppliesMarkerIndex
+	&& *prtSuppliesEntry->prtMarkerSuppliesMarkerIndex) {
+	g_string_sprintfa(s, "%-*s marker #%u\n", indent, "Marker:",
+			  *prtSuppliesEntry->prtMarkerSuppliesMarkerIndex);
+    }
+
+    if (prtSuppliesEntry->prtMarkerSuppliesColorantIndex
+	&& *prtSuppliesEntry->prtMarkerSuppliesColorantIndex) {
+	g_string_sprintfa(s, "%-*s colorant #%u\n", indent, "Colorant:",
+			  *prtSuppliesEntry->prtMarkerSuppliesColorantIndex);
+    }
+
     if (prtSuppliesEntry->prtMarkerSuppliesDescription &&
 	prtSuppliesEntry->_prtMarkerSuppliesDescriptionLength > 0) {
 	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Description:",
 			  (int) prtSuppliesEntry->_prtMarkerSuppliesDescriptionLength,
 			  prtSuppliesEntry->prtMarkerSuppliesDescription);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtMarkerSuppliesType,
+		 prtSuppliesEntry->prtMarkerSuppliesType);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Type:", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtMarkerSuppliesClass,
+		 prtSuppliesEntry->prtMarkerSuppliesClass);
+    if (e) {
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Class:", e);
+    }
+
+    e = fmt_enum(printer_mib_enums_prtMarkerSuppliesSupplyUnit,
+		 prtSuppliesEntry->prtMarkerSuppliesSupplyUnit);
+
+    if (prtSuppliesEntry->prtMarkerSuppliesMaxCapacity) {
+	g_string_sprintfa(s, "%-*s ", indent, "Capacity:");
+	switch (*prtSuppliesEntry->prtMarkerSuppliesMaxCapacity) {
+	case -1:
+	    g_string_append(s, "unlimited");
+	    break;
+	case -2:
+	    g_string_append(s, "unknown");
+	    break;
+	default:
+	    g_string_sprintfa(s, "%d", *prtSuppliesEntry->prtMarkerSuppliesMaxCapacity);
+	}
+	g_string_sprintfa(s, " %s\n", e ? e : "");
+    }
+
+    if (prtSuppliesEntry->prtMarkerSuppliesLevel) {
+	g_string_sprintfa(s, "%-*s ", indent, "Level:");
+	switch (*prtSuppliesEntry->prtMarkerSuppliesLevel) {
+	case -1:
+	    g_string_append(s, "unlimited");
+	    break;
+	case -2:
+	    g_string_append(s, "unknown");
+	    break;
+	case -3:
+	    g_string_append(s, ">0");
+	    break;
+	default:
+	    g_string_sprintfa(s, "%d", *prtSuppliesEntry->prtMarkerSuppliesLevel);
+	}
+	g_string_sprintfa(s, " %s\n", e ? e : "");
     }
 }
 
