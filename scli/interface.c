@@ -33,6 +33,9 @@
 #define IF_MIB_IFENTRY_CONFIG \
 	( IF_MIB_IFDESCR | IF_MIB_IFADMINSTATUS )
 
+#define IF_MIB_IFENTRY_STATUS \
+	( IF_MIB_IFDESCR | IF_MIB_IFOPERSTATUS )
+
 #define IF_MIB_IFENTRY_PARAMS \
 	( IF_MIB_IFDESCR | IF_MIB_IFTYPE | IF_MIB_IFMTU | IF_MIB_IFSPEED \
 	  | IF_MIB_IFPHYSADDRESS | IF_MIB_IFADMINSTATUS | IF_MIB_IFOPERSTATUS \
@@ -1264,6 +1267,76 @@ dump_interface(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+alert_interface_status(scli_interp_t *interp, int argc, char **argv)
+{
+    if_mib_ifEntry_t **ifTable = NULL;
+    regex_t _regex_iface, *regex_iface = NULL;
+    regex_t _regex_status, *regex_status = NULL;
+    const char *e;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc < 2 || argc > 3) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    regex_status = &_regex_status;
+    if (regcomp(regex_status, argv[1], interp->regex_flags) != 0) {
+	return SCLI_SYNTAX_REGEXP;
+    }
+
+    if (argc == 3) {
+	regex_iface = &_regex_iface;
+	if (regcomp(regex_iface, argv[2], interp->regex_flags) != 0) {
+	    if (regex_status) regfree(regex_status);
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_status) regfree(regex_status);
+	if (regex_iface) regfree(regex_iface);
+	return SCLI_OK;
+    }
+    
+    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_STATUS);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (ifTable) {
+	for (i = 0; ifTable[i]; i++) {
+	    if (match_interface(regex_iface, ifTable[i])) {
+		e = fmt_enum(if_mib_enums_ifOperStatus,
+			     ifTable[i]->ifOperStatus);
+		if (e) {
+		    int status = regexec(regex_status, e, (size_t) 0, NULL, 0);
+		    if (status == 0) {
+			g_string_sprintfa(interp->result, "interface %d %s",
+					  i, e ? e : "");
+			if (ifTable[i]->ifDescr && ifTable[i]->_ifDescrLength) {
+			    g_string_sprintfa(interp->result, " (%.*s)",
+		      (int) ifTable[i]->_ifDescrLength, ifTable[i]->ifDescr);
+			}
+			g_string_append(interp->result, "\n");
+		    }
+		}
+	    }
+	}
+    }
+
+    if (ifTable) if_mib_free_ifTable(ifTable);
+
+    if (regex_status) regfree(regex_status);
+    if (regex_iface) regfree(regex_iface);
+    
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_interface_mode(scli_interp_t *interp)
 {
@@ -1381,6 +1454,13 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_interface_stats },
+
+	{ "alert interface status", "<regexp> [<regexp>]",
+	  "The alarm interface status command generates alerts for\n"
+	  "interfaces that are in given status.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  alert_interface_status },
 	
 	{ "dump interface", NULL,
 	  "The dump interface command generates a sequence of scli commands\n"
