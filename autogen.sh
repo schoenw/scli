@@ -38,25 +38,7 @@ _EOF_
 esac
 
 
-VER=`libtool --version | grep ' libtool)' | \
-sed 's/.*) \([0-9][0-9.]*\) .*/\1/' `
-case "$VER" in
-0* | 1\.[0-2] | 1\.[0-2][a-z]* | \
-1\.3\.[0-2] | 1\.3\.[0-2][a-z]* )
-
-  cat >&2 <<_EOF_
-
-	You must have libtool 1.3.3 or later installed to compile $PROJECT.
-	Download the appropriate package for your distribution/OS,
-	or get the source tarball at ftp://ftp.gnu.org/pub/gnu/libtool/
-_EOF_
-  DIE="exit 1"
-  ;;
-esac
-
 $DIE
-
-libtoolize --copy --force || exit 1
 
 if test -z "$*"; then
 	echo "Running ./configure with no arguments. If you wish to pass any,"
