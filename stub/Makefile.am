@@ -17,7 +17,8 @@ MIBS			= IF-MIB \
 			  SNMP-COMMUNITY-MIB \
 			  SNMP-VIEW-BASED-ACM-MIB \
 			  SNMP-TARGET-MIB \
-			  TUNNEL-MIB
+			  TUNNEL-MIB \
+			  ATM-MIB
 
 STUBS			= if-mib.h if-mib.c \
 			  ip-mib.h ip-mib.c \
@@ -36,7 +37,8 @@ STUBS			= if-mib.h if-mib.c \
 			  snmp-community-mib.h snmp-community-mib.c \
 			  snmp-view-based-acm-mib.h snmp-view-based-acm-mib.c \
 			  snmp-target-mib.h snmp-target-mib.c \
-			  tunnel-mib.c tunnel-mib.h
+			  tunnel-mib.c tunnel-mib.h \
+			  atm-mib.c atm-mib.h
 
 noinst_LIBRARIES	= libstub.a
 libstub_a_SOURCES	= stools.h stools.c $(STUBS)
