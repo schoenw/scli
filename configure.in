@@ -81,4 +81,4 @@ AC_ARG_ENABLE(dmalloc,
 
 dnl Create all the Makefiles we need and we are done.
 
-AC_OUTPUT(Makefile stub/Makefile proc/Makefile lib/Makefile scli/Makefile doc/Makefile)
+AC_OUTPUT(Makefile stub/Makefile proc/Makefile scli/Makefile doc/Makefile)

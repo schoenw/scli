@@ -1,3 +1,3 @@
 EXTRA_DIST	= TODO PORTING doc/gpl.texinfo doc/scli.info doc/scli.ps
 
-SUBDIRS		= stub proc lib scli doc
+SUBDIRS		= stub proc scli doc
