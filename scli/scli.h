@@ -68,17 +68,28 @@ extern char const scli_copyright[];	/* copyright message (surprise) */
 
 /*
  * The return codes used by the scli commands functions.
+ *
+ * Theory of scli return codes:
+ *
+ * 1xy - transient messages
+ * 2xy - positive completion
+ * 3xy - generic error codes
+ * 4xy - errors detected before command processing
+ * 5xy - communication failure
  */
 
-#define SCLI_OK			0	/* normal return code */
-#define SCLI_ERROR		1	/* generic error return code */
-#define SCLI_EXIT		2	/* return and exit the command loop */
-#define SCLI_SNMP		3	/* snmp error return code */
-#define SCLI_SYNTAX		4	/* generic syntax error */
-#define SCLI_SYNTAX_NUMARGS	5	/* syntax error in number of args */
-#define SCLI_SYNTAX_REGEXP	6	/* syntax error in regexp */
-#define SCLI_SYNTAX_NUMBER	7	/* syntax error in number */
-#define SCLI_SYNTAX_VALUE	8	/* syntax error in value */
+#define SCLI_MSG		100	/* arbitrary message */
+#define SCLI_OK			200	/* normal return code */
+#define SCLI_EXIT		201	/* return and exit the command loop */
+#define SCLI_ERROR		300	/* generic error return code */
+#define SCLI_SYNTAX		400	/* generic syntax error */
+#define SCLI_SYNTAX_NUMARGS	401	/* syntax error in number of args */
+#define SCLI_SYNTAX_REGEXP	402	/* syntax error in regexp */
+#define SCLI_SYNTAX_NUMBER	403	/* syntax error in number */
+#define SCLI_SYNTAX_VALUE	404	/* syntax error in value */
+#define SCLI_SYNTAX_TOKENIZER	405	/* syntax error in tokenizer */
+#define SCLI_SYNTAX_COMMAND	406	/* syntax error unknown command */
+#define SCLI_SNMP		500	/* snmp error return code */
 
 
 typedef struct scli_interp	scli_interp_t;

@@ -63,7 +63,8 @@ static void
 interface_error(scli_interp_t *interp,
 		if_mib_ifEntry_t *ifEntry)
 {
-    g_string_sprintfa(interp->result, "interface %d: ", ifEntry->ifIndex);
+    g_string_sprintfa(interp->result, "%3d interface %d: ",
+		      SCLI_SNMP, ifEntry->ifIndex);
     if (ifEntry->ifDescr && ifEntry->_ifDescrLength) {
 	g_string_sprintfa(interp->result, "%.*s: ",
 			  (int) ifEntry->_ifDescrLength, ifEntry->ifDescr);

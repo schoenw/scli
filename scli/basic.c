@@ -622,13 +622,14 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
     g_string_truncate(interp->header, 0);
     if (! scli_interp_dry(interp)
 	&& cmd->flags & SCLI_CMD_FLAG_NEED_PEER && ! interp->peer) {
-	g_printerr("error: no association to a remote SNMP agent\n");
+	g_print("%3d no association to a remote SNMP agent\n", SCLI_ERROR);
 	return SCLI_ERROR;
     }
 
     if (scli_interp_xml(interp) && ! (cmd->flags & SCLI_CMD_FLAG_XML)) {
 	if (! scli_interp_recursive(interp)) {
-	    g_printerr("error: command does not support xml\n");
+	    g_print("%3d command \"%s\" does not support xml\n", SCLI_ERROR,
+		    cmd->path);
 	    return SCLI_ERROR;
 	} else {
 	    return SCLI_OK;
@@ -658,38 +659,40 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 
     switch (code) {
     case SCLI_SYNTAX_VALUE:
-	g_printerr("syntax error: invalid value\n");
+	g_print("%3d invalid value\n", code);
 	break;
     case SCLI_SYNTAX_NUMBER:
-	g_printerr("syntax error: invalid number\n");
+	g_print("%3d invalid number\n", code);
 	break;
     case SCLI_SYNTAX_REGEXP:
-	g_printerr("syntax error: invalid regular expression\n");
+	g_print("%3d invalid regular expression\n", code);
 	break;
     case SCLI_SYNTAX_NUMARGS:
-	g_printerr("syntax error: wrong number of arguments: %s %s\n",
-		   cmd->path, cmd->options ? cmd->options : "");
+	g_print("%3d wrong number of arguments: should be \"%s%s%s\"\n", code,
+		cmd->path,
+		cmd->options ? " " : "",
+		cmd->options ? cmd->options : "");
 	break;
     case SCLI_SYNTAX:
-	g_printerr("syntax error: usage: %s %s\n", cmd->path,
-		   cmd->options ? cmd->options : "");
+	g_print("%3d usage: %s %s\n", code, cmd->path,
+		cmd->options ? cmd->options : "");
 	break;
     case SCLI_SNMP:
-	g_printerr("snmp error:");
+	g_print("%3d", code);
 	if (interp->peer) {
 	    const char *error;
 	    error = gsnmp_enum_get_label(gsnmp_error_status_table,
 					 interp->peer->error_status);
-	    g_printerr(" %s", error ? error : "internalError");
+	    g_print(" %s", error ? error : "internalError");
 	    if ((int) (interp->peer->error_status) > 0) {
-		g_printerr("@%d", interp->peer->error_index);
+		g_print("@%d", interp->peer->error_index);
 	    }
 	}
-	g_printerr("\n");
+	g_print("\n");
 	break;
     case SCLI_ERROR:
-	g_printerr("error: %s\n",
-		   interp->result->str ? interp->result->str : "");
+	g_print("%3d %s\n", code,
+		interp->result->str ? interp->result->str : "");
 	break;
     case SCLI_OK:
     case SCLI_EXIT:
@@ -698,6 +701,7 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 	    if (scli_interp_xml(interp)) {
 		xmlChar *buffer;
 		int len;
+		g_print("%3d xml document follows\n", code);
 		xmlDocDumpFormatMemory(interp->xml_doc, &buffer, &len, 1);
 		g_string_truncate(interp->header, 0);
 		g_string_assign(interp->result, buffer);
@@ -746,7 +750,7 @@ scli_eval_string(scli_interp_t *interp, char *cmd)
     }
 
     if (code != SCLI_OK) {
-	g_printerr("syntax error: failed to tokenize input\n");
+	g_print("%3d failed to tokenize input\n", SCLI_SYNTAX_TOKENIZER);
 	return SCLI_ERROR;
     }
 
@@ -808,11 +812,11 @@ scli_eval_string(scli_interp_t *interp, char *cmd)
 
     if (! done) {
 	int j;
-	g_printerr("syntax error: invalid command name \"");
+	g_print("%3d invalid command name \"", SCLI_SYNTAX_COMMAND);
 	for (j = 0; j <= i; j++) {
-	    g_printerr("%s%s", j ? " ": "", argv[j]);
+	    g_print("%s%s", j ? " ": "", argv[j]);
 	}
-	g_printerr("\"\n");
+	g_print("\"\n");
 	code = SCLI_SYNTAX;
     }
 
@@ -871,8 +875,8 @@ scli_eval_file(scli_interp_t *interp, char *path)
 
     stream = fopen(path, "r");
     if (! stream) {
-	g_printerr("error: failed to open file \"%s\": %s\n", path,
-		   g_strerror(errno));
+	g_print("%3d failed to open file \"%s\": %s\n", SCLI_ERROR,
+		path, g_strerror(errno));
 	return SCLI_ERROR;
     }
     code = scli_eval_file_stream(interp, stream);
@@ -936,7 +940,7 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
     g_snmp_list_decode_hook = NULL;
 
     if (scli_interp_interactive(interp)) {
-	g_print("Trying SNMPv2c ... ");
+	g_print("%3d Trying SNMPv2c ... ", SCLI_MSG);
     }
     snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
     if (interp->peer->error_status == 0) {
@@ -945,7 +949,7 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 	}
     } else {
 	if (scli_interp_interactive(interp)) {
-	    g_print("timeout.\nTrying SNMPv1  ... ");
+	    g_print("timeout.\n%d Trying SNMPv1  ... ", SCLI_MSG);
 	}
 	interp->peer->version = G_SNMP_V1;
 	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
@@ -955,7 +959,7 @@ scli_open_community(scli_interp_t *interp, char *host, int port,
 	    }
 	} else {
 	    if (scli_interp_interactive(interp)) {
-		g_print("timeout.\nGiving up!\n");
+		g_print("timeout.\n%3d Giving up!\n", SCLI_SNMP);
 	    }
 	    scli_close(interp);
 	}
