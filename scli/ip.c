@@ -44,9 +44,65 @@ GSnmpEnum const forwarding[] = {
 
 static void
 fmt_ip_forward(GString *s,
-	       ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry)
+	       ip_forward_mib_ipCidrRouteEntry_t *ipCidrRouteEntry,
+	       if_mib_ifXEntry_t **ifXTable,
+	       if_mib_ifEntry_t **ifTable)
 {
-    g_string_append(s, "\n");
+    const char *label;
+    int i, pos;
+    
+    if (ipCidrRouteEntry->ipCidrRouteIfIndex) {
+	g_string_append(s, "\n");
+	g_string_sprintfa(s, "%s/%s%n",
+			  fmt_ipv4_address(ipCidrRouteEntry->ipCidrRouteDest,
+					   SCLI_FMT_ADDR),
+			  fmt_ipv4_mask(ipCidrRouteEntry->ipCidrRouteMask), &pos);
+	g_string_sprintfa(s, "%*s", MAX(20-pos, 1), "");
+	
+	g_string_sprintfa(s, "  %2d ", ipCidrRouteEntry->ipCidrRouteTos);
+	
+	g_string_sprintfa(s, "%-16s",
+			  fmt_ipv4_address(ipCidrRouteEntry->ipCidrRouteNextHop,
+					   SCLI_FMT_ADDR));
+
+	label = NULL;
+	if (ipCidrRouteEntry->ipCidrRouteType) {
+	    label = gsnmp_enum_get_label(ip_forward_mib_enums_ipCidrRouteType,
+					 *ipCidrRouteEntry->ipCidrRouteType);
+	}
+	g_string_sprintfa(s, "%-10s", label ? label : "");
+
+	label = NULL;
+	if (ipCidrRouteEntry->ipCidrRouteProto) {
+	    label = gsnmp_enum_get_label(ip_forward_mib_enums_ipCidrRouteProto,
+					*ipCidrRouteEntry->ipCidrRouteProto);
+	}
+	g_string_sprintfa(s, "%-10s", label ? label : "");
+
+	g_string_sprintfa(s, "%2d", *ipCidrRouteEntry->ipCidrRouteIfIndex);
+
+	if (ifXTable) {
+	    for (i = 0; ifXTable[i]; i++) {
+		if (ifXTable[i]->ifIndex == *ipCidrRouteEntry->ipCidrRouteIfIndex
+		    && ifXTable[i]->ifName) {
+		    g_string_sprintfa(s, " (%.*s)",
+				      (int) ifXTable[i]->_ifNameLength,
+				      ifXTable[i]->ifName);
+		    break;
+		}
+	    }
+	} else if (ifTable) {
+	    for (i = 0; ifTable[i]; i++) {
+		if (ifTable[i]->ifIndex == *ipCidrRouteEntry->ipCidrRouteIfIndex
+		    && ifTable[i]->ifDescr) {
+		    g_string_sprintfa(s, " (%.*s)",
+				      (int) ifTable[i]->_ifDescrLength,
+				      ifTable[i]->ifDescr);
+		    break;
+		}
+	    }
+	}
+    }
 }
 
 
@@ -69,6 +125,8 @@ fmt_ip_route(GString *s,
 					   SCLI_FMT_ADDR),
 			  fmt_ipv4_mask(ipRouteEntry->ipRouteMask), &pos);
 	g_string_sprintfa(s, "%*s", MAX(20-pos, 1), "");
+
+	g_string_sprintfa(s, "   - ");
 	
 	g_string_sprintfa(s, "%-16s",
 			  fmt_ipv4_address(ipRouteEntry->ipRouteNextHop,
@@ -147,11 +205,12 @@ show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
     if (ipCidrRouteTable || ipRouteTable) {
 	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR);
 	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFNAME);
-	g_string_sprintfa(interp->header, "%-20s%-16s%-10s%-10s%s",
-		  "DESTINATION", "NEXT HOP", "TYPE", "PROTO", "INTERFACE");
+	g_string_sprintfa(interp->header, "%-20s TOS %-16s%-10s%-10s%s",
+		  "DESTINATION", "NEXT-HOP", "TYPE", "PROTO", "INTERFACE");
 	if (ipCidrRouteTable) {
 	    for (i = 0; ipCidrRouteTable[i]; i++) {
-		fmt_ip_forward(interp->result, ipCidrRouteTable[i]);
+		fmt_ip_forward(interp->result, ipCidrRouteTable[i],
+			       ifXTable, ifTable);
 	    }
 	} else if (ipRouteTable) {
 	    for (i = 0; ipRouteTable[i]; i++) {
@@ -741,7 +800,8 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  "base. The command generates a table with the following columns:\n"
 	  "\n"
 	  "  DESTINATION destination address and prefix\n"
-	  "  NEXT HOP    next hop towards the destination\n"
+	  "  NEXT-HOP    next hop towards the destination\n"
+	  "  TOS         type of service selector\n"
 	  "  TYPE        type (direct/indirect) of the entry\n"
 	  "  PROTO       protocol which created the entry\n"
 	  "  INTERFACE   interface used for forwarding",
