@@ -1,18 +1,19 @@
 Primary scli author:
 
-- Juergen Schoenwaelder <schoenw@ibr.cs.tu-bs.de>
+- Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 Many people contributed to the scli package by reporting problems,
 suggesting various improvements or submitting actual code:
 
-- Erik Schoenfelder <schoenfr@gaertner.de>
-- Frank Strauss <strauss@ibr.cs.tu-bs.de>
+- Erik Schönfelder <schoenfr@gaertner.de>
+- Frank Strauß <strauss@ibr.cs.tu-bs.de>
 - Oliver Wellnitz <wellnitz@ibr.cs.tu-bs.de>
 - John Sellens <jsellens@generalconcepts.com>
-- Urs Thuermann <thuerman@ibr.cs.tu-bs.de>
+- Urs Thürmann <thuerman@ibr.cs.tu-bs.de>
 - Marcin Cieslak <saper@system.pl>
 - Tomasz Kloczko <kloczek@pld.org.pl>
 - Olivier Montanuy <olivier.montanuy@rd.francetelecom.com>
+- Stefan Petri <petri@panmedium.de>
 
 The SNMP engine was originally written by gxsnmp folks:
 
