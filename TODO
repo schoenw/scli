@@ -1,6 +1,5 @@
 Before LISA '2001:
 
-o fix expansion of aliases
 o improve the SNMP version autoprobe feature
 o implement XML output for most commands
 o plug the table retrieval memory leaks
@@ -8,8 +7,6 @@ o complete support for the whole printer MIB
 o add more set commands
 o implement a real curses top command (with sorting)
 o change the monitor command to a simple loop
-o reorganize package scli (gsnmp, stubs, scli, doc)
-o work on gscli GUI
 
 +++++++++++++++++++++++++++++++
 
