@@ -94,16 +94,16 @@ typedef struct {
 } GSnmpAttribute;
 
 extern int gsnmp_attr_assign(GSList *vbl,
-			     guint32 const *base, guint8 const len,
+			     guint32 const *base, size_t const len,
 			     const GSnmpAttribute *attributes,
 			     const gpointer p);
 
 extern void gsnmp_attr_get(const GSnmpSession *s, GSList **vbl,
-			   guint32 *base, guint8 const len, guint const idx,
+			   guint32 *base, size_t const len, guint const idx,
 			   const GSnmpAttribute *attributes, const gint mask);
 
 extern void gsnmp_attr_set(const GSnmpSession *s, GSList **vbl,
-			   guint32 *base, guint8 const len, guint const idx,
+			   guint32 *base, size_t len, guint const idx,
 			   const GSnmpAttribute *attributes, const gint mask,
 			   const gpointer p);
 
