@@ -1166,6 +1166,72 @@ set_interface_notifications(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+dump_interface(scli_interp_t *interp, int argc, char **argv)
+{
+    if_mib_ifEntry_t **ifTable = NULL;
+    if_mib_ifXEntry_t **ifXTable = NULL;
+    const char *e;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
+    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_PARAMS);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (ifTable) {
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS);
+	for (i = 0; ifTable[i]; i++) {
+	    if_mib_ifXEntry_t *ifXEntry;
+	    ifXEntry = get_ifXEntry(ifXTable, ifTable[i]->ifIndex);
+	    e = fmt_enum(if_mib_enums_ifAdminStatus, ifTable[i]->ifAdminStatus);
+	    if (e) {
+		g_string_sprintfa(interp->result,
+				  "set interface status \"^%.*s$\" \"%s\"\n",
+				  (int) ifTable[i]->_ifDescrLength,
+				  ifTable[i]->ifDescr, e);
+	    }
+	    if (ifXEntry) {
+		if (ifXEntry->ifAlias) {
+		    g_string_sprintfa(interp->result,
+				      "set interface status \"^%.*s$\" \"%.*s\"\n",
+				      (int) ifTable[i]->_ifDescrLength,
+				      ifTable[i]->ifDescr,
+				      (int) ifXEntry->_ifAliasLength,
+				      ifXEntry->ifAlias);
+		}
+		e = fmt_enum(if_mib_enums_ifLinkUpDownTrapEnable, ifXEntry->ifLinkUpDownTrapEnable);
+		if (e) {
+		    g_string_sprintfa(interp->result,
+				      "set interface notifications \"^%.*s$\" \"%s\"\n",
+				      (int) ifTable[i]->_ifDescrLength,
+				      ifTable[i]->ifDescr, e);
+		}
+		e = fmt_enum(if_mib_enums_ifPromiscuousMode, ifXEntry->ifPromiscuousMode);
+		if (e) {
+		    g_string_sprintfa(interp->result,
+				      "set interface promiscuous \"^%.*s$\" \"%s\"\n",
+				      (int) ifTable[i]->_ifDescrLength,
+				      ifTable[i]->ifDescr, e);
+		}
+	    }
+	}
+    }
+
+    if (ifTable) if_mib_free_ifTable(ifTable);
+    if (ifXTable) if_mib_free_ifXTable(ifXTable);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_interface_mode(scli_interp_t *interp)
 {
@@ -1284,6 +1350,13 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_interface_stats },
 	
+	{ "dump interface", NULL,
+	  "The dump interface command generates a sequence of scli commands\n"
+	  "which can be used to restore the interface configuration.\n",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  dump_interface },
+
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     

@@ -1194,6 +1194,51 @@ set_system_location(scli_interp_t *interp, int argc, char **argv)
 }
 
 
+
+static int
+dump_system(scli_interp_t *interp, int argc, char **argv)
+{
+    snmpv2_mib_system_t *system = NULL;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
+    snmpv2_mib_get_system(interp->peer, &system, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (system) {
+	if (system->sysName) {
+	    g_string_sprintfa(interp->result,
+			     "set system name \"%.*s\"\n",
+			      (int) system->_sysNameLength,
+			      system->sysName);
+	}
+	if (system->sysContact) {
+	    g_string_sprintfa(interp->result,
+			     "set system contact \"%.*s\"\n",
+			      (int) system->_sysContactLength,
+			      system->sysContact);
+	}
+	if (system->sysLocation) {
+	    g_string_sprintfa(interp->result,
+			     "set system contact \"%.*s\"\n",
+			      (int) system->_sysLocationLength,
+			      system->sysLocation);
+	}
+    }
+
+    if (system) snmpv2_mib_free_system(system);
+
+    return SCLI_OK;
+}
+
+
+
 #ifdef MEM_DEBUG
 static int
 cmd_xxx(scli_interp_t *interp, int argc, char **argv)
@@ -1356,6 +1401,12 @@ scli_init_system_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  cmd_xxx },
 #endif
+	{ "dump system", NULL,
+	  "The dump system command generates a sequence of scli commands\n"
+	  "which can be used to restore the system configuration.\n",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  dump_system },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };

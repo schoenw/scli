@@ -487,6 +487,7 @@ static int
 show_ip_info(scli_interp_t *interp, int argc, char **argv)
 {
     ip_mib_ip_t *ip;
+
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc > 1) {
@@ -531,8 +532,7 @@ set_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
     ip_mib_free_ip(ip);
 
     if (interp->peer->error_status) {
-	scli_snmp_error(interp);
-	return SCLI_ERROR;
+	return SCLI_SNMP;
     }
 
     return SCLI_OK;
@@ -541,7 +541,7 @@ set_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-set_ip_default_ttl(scli_interp_t *interp, int argc, char **argv)
+set_ip_ttl(scli_interp_t *interp, int argc, char **argv)
 {
     ip_mib_ip_t *ip;
     gint32 value;
@@ -563,9 +563,45 @@ set_ip_default_ttl(scli_interp_t *interp, int argc, char **argv)
     ip_mib_free_ip(ip);
 
     if (interp->peer->error_status) {
-	scli_snmp_error(interp);
-	return SCLI_ERROR;
+	return SCLI_SNMP;
     }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+dump_ip(scli_interp_t *interp, int argc, char **argv)
+{
+    ip_mib_ip_t *ip;
+    const char *e;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
+    ip_mib_get_ip(interp->peer, &ip, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (ip) {
+	e = fmt_enum(forwarding, ip->ipForwarding);
+	if (e) {
+	    g_string_sprintfa(interp->result,
+			      "set ip forwarding \"%s\"\n", e);
+	}
+	if (ip->ipDefaultTTL) {
+	    g_string_sprintfa(interp->result,
+			      "set ip ttl \"%d\"\n",
+			      *ip->ipDefaultTTL);
+	}
+    }
+
+    if (ip) ip_mib_free_ip(ip);
 
     return SCLI_OK;
 }
@@ -585,13 +621,13 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  set_ip_forwarding },
 	
-	{ "set ip default ttl", "<number>",
-	  "The set ip default ttl command can be used to change the default\n"
+	{ "set ip ttl", "<number>",
+	  "The set ip ttl command can be used to change the default\n"
 	  "time to live (TTL) value used by the IP protocol engine. The\n"
 	  "<number> parameter must be a number between 1 and 255 inclusive.",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
-	  set_ip_default_ttl },
+	  set_ip_ttl },
 	
 	{ "show ip info", NULL,
 	  "The show ip info command displays paramters of the IP\n"
@@ -639,6 +675,13 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_ip_media_mapping },
 	
+	{ "dump ip", NULL,
+	  "The dump ip command generates a sequence of scli commands\n"
+	  "which can be used to restore the IP configuration.\n",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  dump_ip },
+
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
