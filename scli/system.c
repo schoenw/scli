@@ -158,7 +158,7 @@ cmd_mounts(scli_interp_t *interp, int argc, char **argv)
 {
     hrFSEntry_t **hrFSEntry = NULL;
     GString *s;
-    int i, loc_len = 0, rem_len = 0;
+    int i, loc_len = 20, rem_len = 20;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -462,7 +462,8 @@ void
 scli_init_system_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "system",
+	{ "show", "system", NULL, NULL },
+	{ "show system", "info",
 	  "show generic system information", cmd_system },
 	{ "show system", "storage",
 	  "show storage areas attached to the system", cmd_storage },
