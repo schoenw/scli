@@ -1048,7 +1048,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	    host_resources_mib_free_hrDeviceEntry(dev);
 	}
 	if (hrSystem->hrSystemInitialLoadParameters) {
-	    g_string_sprintfa(s, "%-*s%.*s", indent, "System Boot Args:",
+	    g_string_sprintfa(s, "%-*s%.*s\n", indent, "System Boot Args:",
 		      (int) hrSystem->_hrSystemInitialLoadParametersLength,
 			      hrSystem->hrSystemInitialLoadParameters);
 	}
