@@ -168,3 +168,174 @@ gsnmp_identity_get_label(GSnmpIdentity const *table,
 
     return NULL;
 }
+
+
+
+int
+gsnmp_attr_assign(GSList *vbl,
+		  guint32 const *base, guint8 const len,
+		  const GSnmpAttribute *attributes, const gpointer p)
+{
+    GSList *elem;
+    int i, n = 0;
+    gpointer **gp;
+
+    if (!p) {
+	return 0;
+    }
+
+    for (elem = vbl; elem; elem = g_slist_next(elem)) {
+	 GSnmpVarBind *vb = (GSnmpVarBind *) elem->data;
+
+	 if (vb->type == G_SNMP_ENDOFMIBVIEW
+	     || (vb->type == G_SNMP_NOSUCHOBJECT)
+	     || (vb->type == G_SNMP_NOSUCHINSTANCE)) {
+	      continue;
+	 }
+    
+	 if (memcmp(vb->id, base, len * sizeof(guint32)) != 0) {
+	      continue;
+	 }
+
+	 for (i = 0; attributes[i].label; i++) {
+	      if (vb->id_len > len && vb->id[len] == attributes[i].subid) {
+		   break;
+	      }
+	 }
+
+	 if (! attributes[i].label) {
+	      continue;
+	 }
+    
+	 if (vb->type != attributes[i].type) {
+	      const char *a = gsnmp_enum_get_label(gsnmp_enum_type_table, vb->type);
+	      const char *b = gsnmp_enum_get_label(gsnmp_enum_type_table, attributes[i].type);
+	      g_warning("%s: type mismatch: %s%s%s", attributes[i].label,
+			(a) ? a : "", (a || b) ? " != " : "", (b) ? b : "");
+	      continue;
+	 }
+
+	 gp = G_STRUCT_MEMBER_P(p, attributes[i].val_offset);
+	 switch (vb->type) {
+	 case G_SNMP_INTEGER32:
+	     if (attributes[i].constraints) {
+		 gint32 *range = (gint32 *) attributes[i].constraints;
+		 while (range[0] != 0 || range[1] != 0) {
+		     if (vb->syntax.i32[0] < range[0]
+			 || vb->syntax.i32[0] > range[1]) {
+			 g_warning("%s: value not within range contraints",
+				   attributes[i].label);
+			 gp = NULL;
+		     }
+		     range += 2;
+		 }
+	     }
+	     if (gp) *gp = (gpointer) &(vb->syntax.i32[0]);
+	     break;
+	 case G_SNMP_UNSIGNED32:
+	 case G_SNMP_COUNTER32:
+	 case G_SNMP_TIMETICKS:
+	     if (attributes[i].constraints) {
+		 guint32 *range = (guint32 *) attributes[i].constraints;
+		 while (range[0] != 0 || range[1] != 0) {
+		     if (vb->syntax.i32[0] < range[0]
+			 || vb->syntax.i32[0] > range[1]) {
+			 g_warning("%s: value not within range contraints",
+				   attributes[i].label);
+			 gp = NULL;
+		     }
+		     range += 2;
+		 }
+	     }
+	     if (gp) *gp = (gpointer) &(vb->syntax.ui32[0]);
+	     break;
+	 case G_SNMP_OCTETSTRING:
+	     if (attributes[i].constraints) {
+		 guint16 *size = (guint16 *) attributes[i].constraints;
+		 while (size[0] != 0 || size[1] != 0) {
+		     if (vb->syntax_len < size[0]
+			 || vb->syntax_len > size[1]) {
+			 g_warning("%s: value not within size contraints",
+				   attributes[i].label);
+			 gp = NULL;
+		     }
+		     size += 2;
+		 }
+	     }
+	     if (gp) *gp = (gpointer) vb->syntax.uc;
+	     break;
+	 case G_SNMP_OBJECTID:
+	     *gp = (gpointer) vb->syntax.ui32;
+	     break;
+	 default:
+	     break;
+	 }
+	 if (attributes[i].len_offset) {
+	     guint16 *lp;
+	     lp = (guint16 *) G_STRUCT_MEMBER_P(p, attributes[i].len_offset);
+	     *lp = vb->syntax_len;
+	 }
+	 n++;
+    }
+
+    return n;
+}
+
+
+
+void
+gsnmp_attr_get(const GSnmpSession *s, GSList **vbl,
+	       guint32 *base, guint8 const len, guint const idx,
+	       const GSnmpAttribute *attributes, const gint mask)
+{
+    int i;
+    
+    for (i = 0; attributes[i].label; i++) {
+	 if (! mask || (mask & attributes[i].tag)) {
+	      if (attributes[i].type != G_SNMP_COUNTER64
+		  || s->version > G_SNMP_V1) {
+		   base[idx] = attributes[i].subid;
+		   g_snmp_vbl_add_null(vbl, base, len);
+	      }
+	 }
+    }
+}
+
+
+
+void
+gsnmp_attr_set(const GSnmpSession *s, GSList **vbl,
+	       guint32 *base, guint8 const len, guint const idx,
+	       const GSnmpAttribute *attributes, const gint mask,
+	       const gpointer p)
+{
+    int i;
+    gpointer **gp;
+    guint16 *lp;
+
+    if (!p) {
+	return;
+    }
+
+    for (i = 0; attributes[i].label; i++) {
+	if (mask && !(mask & attributes[i].tag)) {
+	    continue;
+	}
+	if ((attributes[i].type == G_SNMP_COUNTER64 && s->version == G_SNMP_V1)) {
+	    continue;
+	}
+	if (! (attributes[i].flags & GSNMP_ATTR_FLAG_WRITABLE)) {
+	    continue;
+	}
+	gp = G_STRUCT_MEMBER_P(p, attributes[i].val_offset);
+	if (attributes[i].len_offset) {
+	    lp = (guint16 *) G_STRUCT_MEMBER_P(p, attributes[i].len_offset);
+	} else {
+	    lp = 0;
+	}
+	base[idx] = attributes[i].subid;
+	g_snmp_vbl_add(vbl, base, len, attributes[i].type,
+		       *gp, lp ? *lp : 0);
+    }
+}
+
