@@ -53,10 +53,8 @@ show_containment(GString *s, char *prefix,
 		}
 	    }
 	    
-	    if (entPhysicalEntry[i]->entPhysicalIndex) {
-		g_string_sprintfa(s, "%5d:",
-				  *(entPhysicalEntry[i]->entPhysicalIndex));
-	    }
+	    g_string_sprintfa(s, "%5d:",
+			      entPhysicalEntry[i]->entPhysicalIndex);
 	    if (len) {
 		g_string_sprintfa(s, "%s  %c- ", prefix, next ? '|' : '`');
 	    } else {
@@ -76,7 +74,7 @@ show_containment(GString *s, char *prefix,
 		    strcat(new_prefix, len ? "   " : " ");
 		}
 		show_containment(s, new_prefix, entPhysicalEntry,
-				 *(entPhysicalEntry[i]->entPhysicalIndex));
+				 entPhysicalEntry[i]->entPhysicalIndex);
 		g_free(new_prefix);
 	    }
 	}

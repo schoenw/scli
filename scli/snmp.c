@@ -76,7 +76,7 @@ cmd_snmp(scli_interp_t *interp, int argc, char **argv)
     if (sysOREntry) {
 	for (i = 0; sysOREntry[i]; i++) {
 	    g_string_sprintfa(s, "%3d: %.*s\n",
-			      *(sysOREntry[i]->sysORIndex),
+			      sysOREntry[i]->sysORIndex,
 			      (int) sysOREntry[i]->_sysORDescrLength,
 			      sysOREntry[i]->sysORDescr);
 	}

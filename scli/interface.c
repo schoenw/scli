@@ -34,6 +34,7 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
     ifEntry_t **ifEntry = NULL;
     ifXEntry_t **ifXEntry = NULL;
     system_t *system = NULL;
+    ipAddrEntry_t **ipAddrEntry = NULL;
     GString *s;
     int i, j;
     int const width = 20;
@@ -46,18 +47,24 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
      * - Show IPv4 addresses based on the IP-MIB::ipAddrTable.
      */
 
-    if (if_mib_get_ifEntry(interp->peer, &ifEntry) == 0) {
-	(void) if_mib_get_ifXEntry(interp->peer, &ifXEntry);
-	(void) snmpv2_mib_get_system(interp->peer, &system);
+    if (if_mib_get_ifEntry(interp->peer, &ifEntry)) {
+	return SCLI_ERROR;
     }
+    (void) if_mib_get_ifXEntry(interp->peer, &ifXEntry);
+    (void) snmpv2_mib_get_system(interp->peer, &system);
+    (void) ip_mib_get_ipAddrEntry(interp->peer, &ipAddrEntry);
 
     s = interp->result;
     if (ifEntry) {
 
 	for (i = 0; ifEntry[i]; i++) {
 
+	    if (i) {
+		g_string_append(s, "\n");
+	    }
+
 	    g_string_sprintfa(s, "Index:       %-*d", width,
-		      (ifEntry[i]->ifIndex) ? *(ifEntry[i]->ifIndex) : i+1);
+			      ifEntry[i]->ifIndex);
 	    if (ifXEntry && ifXEntry[i]
 		&& ifXEntry[i]->ifName && ifXEntry[i]->_ifNameLength) {
 		g_string_sprintfa(s, " Name:    %.*s\n",
@@ -70,7 +77,7 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
 				  ifEntry[i]->ifDescr);
 	    } else {
 		g_string_sprintfa(s, " Name:    if#%-17d\n",
-		  (ifEntry[i]->ifIndex) ? *(ifEntry[i]->ifIndex) : i+1);
+				  ifEntry[i]->ifIndex);
 	    }
 
 	    g_string_append(s, "OperStatus:  ");
@@ -152,8 +159,18 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
 				  ifXEntry[i]->ifAlias);
 	    }
 	    
-	    if (ifEntry[i+1]) {
-		g_string_append(s, "\n");
+	    for (j = 0; ipAddrEntry[j]; j++) {
+		if (ipAddrEntry[j]->ipAdEntIfIndex
+		    && (ifEntry[i]->ifIndex
+			== *(ipAddrEntry[j]->ipAdEntIfIndex))) {
+		    int k;
+		    g_string_append(s, "IP Address:  ");
+		    for (k = 0; k < 4; k++) {
+			g_string_sprintfa(s, "%s%d", k ? "." : "",
+					  ipAddrEntry[j]->ipAdEntAddr[k]);
+		    }
+		    g_string_append(s, "\n");
+		}
 	    }
 	}
     }
@@ -161,6 +178,7 @@ cmd_interfaces(scli_interp_t *interp, int argc, char **argv)
     if (ifEntry) if_mib_free_ifEntry(ifEntry);
     if (ifXEntry) if_mib_free_ifXEntry(ifXEntry);
     if (system) snmpv2_mib_free_system(system);
+    if (ipAddrEntry) ip_mib_free_ipAddrEntry(ipAddrEntry);
 
     interp->result = s;
     return SCLI_OK;

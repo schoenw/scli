@@ -90,11 +90,7 @@ show_device(GString *s, hrDeviceEntry_t *hrDeviceEntry)
 {
     g_return_if_fail(hrDeviceEntry);
 
-    if (hrDeviceEntry->hrDeviceIndex) {
-	g_string_sprintfa(s, "%5d: ", *(hrDeviceEntry->hrDeviceIndex));
-    } else {
-	g_string_append(s, "     : ");
-    }
+    g_string_sprintfa(s, "%5d: ", hrDeviceEntry->hrDeviceIndex);
     
     if (hrDeviceEntry->hrDeviceDescr) {
 	g_string_sprintfa(s, "%.*s\n",
@@ -149,11 +145,7 @@ cmd_processes(scli_interp_t *interp, int argc, char **argv)
     if (hrSWRunEntry) {
 	g_string_append(s, "  PID S T MEMORY    TIME COMMAND\n");
 	for (i = 0; hrSWRunEntry[i]; i++) {
-	    if (hrSWRunEntry[i]->hrSWRunIndex) {
-		g_string_sprintfa(s, "%5d ", *(hrSWRunEntry[i]->hrSWRunIndex));
-	    } else {
-		g_string_append(s, "----- ");
-	    }
+	    g_string_sprintfa(s, "%5d ", hrSWRunEntry[i]->hrSWRunIndex);
 	    fmt_run_state_and_type(s,
 				   hrSWRunEntry[i]->hrSWRunStatus,
 				   hrSWRunEntry[i]->hrSWRunType);

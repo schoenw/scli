@@ -29,57 +29,172 @@
 
 
 
+static void
+show_extension(GString *s, smExtsnEntry_t *smExtsnEntry)
+{
+    int const indent = 12;
+    if (smExtsnEntry->smExtsnDescr) {
+	g_string_sprintfa(s, "%-*s ", indent, "  Extension:");
+	g_string_sprintfa(s, " %.*s\n",
+			  (int) smExtsnEntry->_smExtsnDescrLength,
+			  smExtsnEntry->smExtsnDescr);
+	
+    }
+    if (smExtsnEntry->smExtsnVersion) {
+	g_string_sprintfa(s, "%-*s ", indent, "  Version:");
+	g_string_sprintfa(s, " %.*s\n",
+			  (int) smExtsnEntry->_smExtsnVersionLength,
+			  smExtsnEntry->smExtsnVersion);
+    }
+    if (smExtsnEntry->smExtsnRevision && smExtsnEntry->_smExtsnRevisionLength) {
+	g_string_sprintfa(s, "%-*s ", indent, "  Revision:");
+	g_string_sprintfa(s, " %.*s\n",
+			  (int) smExtsnEntry->_smExtsnRevisionLength,
+			  smExtsnEntry->smExtsnRevision);
+    }
+}
+
+
+
+static void
+show_langauge(GString *s, smLangEntry_t *smLangEntry,
+	      smExtsnEntry_t **smExtsnEntry)
+{
+    int i;
+    int const indent = 12;
+
+    if (smLangEntry->smLangDescr) {
+	g_string_sprintfa(s, "%-*s ", indent, "Descr:");
+	g_string_sprintfa(s, " %.*s\n",
+			  (int) smLangEntry->_smLangDescrLength,
+			  smLangEntry->smLangDescr);
+    }
+    if (smLangEntry->smLangVersion) {
+	g_string_sprintfa(s, "%-*s ", indent, "Version:");
+	g_string_sprintfa(s, " %.*s\n",
+			  (int) smLangEntry->_smLangVersionLength,
+			  smLangEntry->smLangVersion);
+    }
+    if (smLangEntry->smLangRevision && smLangEntry->_smLangRevisionLength) {
+	g_string_sprintfa(s, "%-*s ", indent, "Revision:");
+	g_string_sprintfa(s, " %.*s\n",
+			  (int) smLangEntry->_smLangRevisionLength,
+			  smLangEntry->smLangRevision);
+    }
+
+    if (smExtsnEntry) {
+	for (i = 0; smExtsnEntry[i]; i++) {
+	    if (smExtsnEntry[i]->smLangIndex != smLangEntry->smLangIndex) {
+		continue;
+	    }
+	    show_extension(s, smExtsnEntry[i]);
+	}
+    }
+}
+
+
+
 static int
 cmd_languages(scli_interp_t *interp, int argc, char **argv)
 {
     smLangEntry_t **smLangEntry = NULL;
     smExtsnEntry_t **smExtsnEntry = NULL;
-    GString *s;
     int i;
-    int const indent = 18;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-    if (disman_script_mib_get_smLangEntry(interp->peer, &smLangEntry) == 0) {
-	(void) disman_script_mib_get_smExtsnEntry(interp->peer, &smExtsnEntry);
+    if (disman_script_mib_get_smLangEntry(interp->peer, &smLangEntry)) {
+	return SCLI_ERROR;
     }
+    (void) disman_script_mib_get_smExtsnEntry(interp->peer, &smExtsnEntry);
 
-    s = interp->result;
     if (smLangEntry) {
 	for (i = 0; smLangEntry[i]; i++) {
-	    if (smLangEntry[i]->smLangIndex) {
-		g_string_sprintfa(s, "%-*s ", indent, "Index:"),
-		g_string_sprintfa(s, " %-5u\n", *(smLangEntry[i]->smLangIndex));
+	    if (i) {
+		g_string_append(interp->result, "\n");
 	    }
-	    if (smLangEntry[i]->smLangVersion) {
-		g_string_sprintfa(s, "%-*s ", indent, "Version:"),
-		g_string_sprintfa(s, " %.*s\n",
-			    (int) smLangEntry[i]->_smLangVersionLength,
-				  smLangEntry[i]->smLangVersion);
-	    }
-	    if (smLangEntry[i]->smLangRevision) {
-		g_string_sprintfa(s, "%-*s ", indent, "Revision:"),
-		g_string_sprintfa(s, " %.*s\n",
-			    (int) smLangEntry[i]->_smLangRevisionLength,
-				  smLangEntry[i]->smLangRevision);
-	    }
-	    if (smLangEntry[i]->smLangDescr) {
-		g_string_sprintfa(s, "%-*s ", indent, "Descr:"),
-		g_string_sprintfa(s, " %.*s\n",
-			    (int) smLangEntry[i]->_smLangDescrLength,
-				  smLangEntry[i]->smLangDescr);
-	    }
-
-	    if (smLangEntry[i+1]) {
-		g_string_append(s, "\n");
-	    }
+	    show_langauge(interp->result, smLangEntry[i], smExtsnEntry);
 	}
     }
 
     if (smLangEntry) disman_script_mib_free_smLangEntry(smLangEntry);
     if (smExtsnEntry) disman_script_mib_free_smExtsnEntry(smExtsnEntry);
     
-    interp->result = s;
+    return SCLI_OK;
+}
+
+
+
+static void
+show_script(GString *s, smScriptEntry_t *smScriptEntry)
+{
+    int const width = 20;
+    
+    g_string_append(s, "Owner:       ");
+    g_string_sprintfa(s, "%-*.*s", width,
+		      (int) smScriptEntry->_smScriptOwnerLength,
+		      smScriptEntry->smScriptOwner);
+    g_string_append(s, "Name:     ");
+    g_string_sprintfa(s, "%-*.*s\n", width,
+		      (int) smScriptEntry->_smScriptNameLength,
+		      smScriptEntry->smScriptName);
+
+    g_string_append(s, "AdminStatus: ");
+    fmt_enum(s, width, disman_script_mib_enums_smScriptAdminStatus,
+	     smScriptEntry->smScriptAdminStatus);
+    g_string_append(s, "Language: ");
+    if (smScriptEntry->smScriptLanguage) {
+	g_string_sprintfa(s, "%d (xxx)\n",
+			  *(smScriptEntry->smScriptLanguage));
+    } else {
+	g_string_append(s, "\n");
+    }
+
+    g_string_append(s, "OperStatus:  ");
+    fmt_enum(s, width, disman_script_mib_enums_smScriptOperStatus,
+	     smScriptEntry->smScriptOperStatus);
+    g_string_append(s, "Storage:  ");
+    fmt_enum(s, width, disman_script_mib_enums_smScriptStorageType,
+	     smScriptEntry->smScriptStorageType);
+    g_string_append(s, "\n");
+    
+    if (smScriptEntry->smScriptSource) {
+	g_string_sprintfa(s, "Source:      %.*s\n",
+			  (int) smScriptEntry->_smScriptSourceLength,
+			  smScriptEntry->smScriptSource);
+    }
+
+    if (smScriptEntry->smScriptDescr) {
+	g_string_sprintfa(s, "Description: %.*s\n",
+			  (int) smScriptEntry->_smScriptDescrLength,
+			  smScriptEntry->smScriptDescr);
+    }
+}
+
+
+
+static int
+cmd_scripts(scli_interp_t *interp, int argc, char **argv)
+{
+    smScriptEntry_t **smScriptEntry = NULL;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (disman_script_mib_get_smScriptEntry(interp->peer, &smScriptEntry)) {
+	return SCLI_ERROR;
+    }
+
+    if (smScriptEntry) {
+	for (i = 0; smScriptEntry[i]; i++) {
+	    if (i) {
+		g_string_append(interp->result, "\n");
+	    }
+	    show_script(interp->result, smScriptEntry[i]);
+	}
+	disman_script_mib_free_smScriptEntry(smScriptEntry);
+    }
+
     return SCLI_OK;
 }
 
@@ -93,6 +208,9 @@ scli_init_disman_mode(scli_interp_t *interp)
 	{ "show disman", "languages",
 	  "show languages supported by the distributed manager",
 	  cmd_languages },
+	{ "show disman", "scripts",
+	  "show scripts installed at the distributed manager",
+	  cmd_scripts },
 	{ NULL, NULL, NULL, NULL }
     };
     
