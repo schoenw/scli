@@ -10,6 +10,7 @@ MIBS			= IF-MIB \
 			  HOST-RESOURCES-TYPES \
 			  ENTITY-MIB \
 			  BRIDGE-MIB \
+			  IANA-LANGUAGE-MIB \
 			  DISMAN-SCRIPT-MIB \
 			  DISMAN-SCHEDULE-MIB \
 			  SNMP-FRAMEWORK-MIB \
@@ -31,6 +32,7 @@ STUBS			= if-mib.h if-mib.c \
 			  host-resources-types.h host-resources-types.c \
 			  entity-mib.h entity-mib.c \
 			  bridge-mib.h bridge-mib.c \
+			  iana-language-mib.h iana-language-mib.c \
 			  disman-script-mib.h disman-script-mib.c \
 			  disman-schedule-mib.h disman-schedule-mib.c \
 			  snmp-framework-mib.h snmp-framework-mib.c \
