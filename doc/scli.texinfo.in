@@ -1,0 +1,443 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@setfilename scli.info
+@settitle SNMP Command Line Interface
+@finalout
+@setchapternewpage odd
+@c %**end of header
+
+@set VERSION 0.2.12
+
+@ifinfo
+
+@format
+@dircategory Net Utilities:
+@direntry
+* scli: (scli).                                SNMP Command Line Interface
+@end direntry
+@end format
+
+This file documents the @code{scli} SNMP command line interface.
+
+Copyright (C) 2001-2002 J@"urgen Sch@"onw@"alder
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+@ignore
+Permission is granted to process this file through TeX and print the
+results, provided the printed document carries copying permission
+notice identical to this one except for the removal of this paragraph
+(this paragraph not being relevant to the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation approved
+by the Foundation.
+@end ifinfo
+
+@titlepage
+@title SNMP Command Line Interface
+@subtitle for @code{scli} Version @value{VERSION}
+@author by J@"urgen Sch@"onw@"alder
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2002 J@"urgen Sch@"onw@"alder
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation approved
+by the Foundation.
+@end titlepage
+
+@c All the nodes can be updated using the EMACS command
+@c texinfo-every-node-update, which is normally bound to C-c C-u C-e.
+@node Top, Instructions, (dir), (dir)
+
+@c  node-name,  next,      previous,  up
+
+@ifinfo
+This file documents the @code{scli} SNMP command line interface.
+@end ifinfo
+
+@c All the menus can be updated with the EMACS command
+@c texinfo-all-menus-update, which is normally bound to C-c C-u C-a.
+@menu
+* Instructions::                How to read this manual. 
+* Copying::                     The GNU General Public License.
+* Overview::                    Overview, history and software design.
+* Modes and Commands::          SCLI modes and their commands.
+* Extending::                   Extending SCLI with new modes and commands.
+* Problems::                    Reporting bugs.
+* Concept Index::               Index of concepts.
+@end menu
+
+@node Instructions, Copying, Top, Top
+@chapter How to Read This Manual
+
+@cindex reading
+@cindex manual, how to read
+@cindex how to read
+This document contains two parts. The first part explains the design
+and the history of the @code{scli} tool. The second part provides a
+description of the modes and commands provided by @code{scli}. The
+third part contains a step by step instructions how @code{scli} can be
+extended with new modes and commands
+
+@node Copying, Overview, Instructions, Top
+@include gpl.texinfo
+
+@node Overview, Modes and Commands, Copying, Top
+@chapter Overview
+@cindex greetings
+@cindex overview
+
+The GNU @code{scli} program implements a network management program
+that provides a command line interface to browse, monitor, and
+configure network devices. It uses the Simple Network Management
+Protocol (SNMP) to communicate with the devices and supports several
+standardized and some proprietary Management Information Base (MIB)
+modules.
+
+Most SNMP management tools try to be very generic and they often fail
+to be useful. A good example are generic MIB browsers that display raw
+MIB data structures. These browsers tend to be of little use for
+actual management because MIB data structures are designed to be read
+and undertstood by programs rather than humans and thus difficult to
+deal with. Furthermore, the SNMP way of accessing MIB data is often
+simplistic and not optimized for humans. For example, humans usually
+prefer to refer to access objects via names rather than numbers while
+a machine oriented protocol such as SNMP generally prefers numbers
+over names.
+
+The SNMP command line interface (@code{scli}) was designed to be
+specific rather than generic. In particular, @code{scli} understands
+the data it manipulates and it presents data in a way which is
+optimized for a human interface. It is not uncommon that @code{scli}
+uses information from different MIB modules in order to display data
+in a format which is easy to understand for human beings.
+
+@section History
+@cindex history
+
+The @code{scli} package was written because of continued frustration
+how complex it is to configure and troubleshoot SNMP manageable
+devices with commonly used SNMP tools. The observation that better
+tools are needed to support SNMP management is nothing new. The author
+tried several approaches to tackle this problem before. In the 1990's,
+work was done on scripting language API extensions to simplify the
+interaction with networked devices. The result of these efforts was
+the Tnm [] extension for Tcl [], which is widely deployed these days,
+especially for testing and device emulation purposes.
+
+In the 1990's, the author also experimented with concepts of network
+management platform, which resulted in @code{tkined}, a kind of a
+light-weight management platform. The @code{tkined} platform provides
+generic services and is highly extensible. In order to extend
+@code{tkined} with new management functionalities, all you need to do
+is to write a Tcl script. Although this sounds nice in theory, the
+reality is that most people who were interested in @code{tkined} did
+not want to write management scripts.  Although the package has been
+openly available for many years, only few script contributions went
+back into the source distribution.
+
+The author also wrote several generic MIB browsers. A very old one is
+still running on our Web server and being used regularly by people to
+browse MIBs and agents. But such Web-based solutions do not fit into
+into the preferred work style of the author. Firing up a complex Web
+browser just to retrieve and display a (potentially big) HTML page
+which shows management data at the abstraction level of an API between
+network elements in a distributed system just does not seem to be
+right and efficient.
+
+In recent years, the @code{scli} author was involved in the
+specification and implementation of MIBs for the delegation of
+management functions. Very early in the project, it became clear that
+we need to have a good front-end. Again, we tried several
+approaches. The first one was a Java based applet running in a Web
+browser. This was usable for demos, but nothing for everyday work. The
+second front-end was a Java stand-alone program. It provides a better
+user interface, but it eats up so many resources (and refuses to run
+on my 256 color display) so that people again used the old Web-based
+MIB browser which was written several years ago.
+
+The conclusion one can derive from all these observations is that the
+approach to build generic tools is fundamentally flawed. Instead, it
+is necessary to build very specific tools which understand the
+management data they manipulate and which generate output which is
+optimized for humans. Furthermore, many people accept command line
+interface as a natural human interface for interacting with network
+elements.
+
+@section Project Design
+@cindex invoking
+@cindex version
+@cindex options
+@cindex usage
+@cindex help
+@cindex getting help
+
+It is time consuming to build specific tools rather than generic
+tools. Someone who understands specific MIBs must design easy to use
+human management interfaces on top of them. The only reasonable way to
+tackle this problem with limited resources is to start an open source
+project and to get lots of programmers involved. This leads to the
+requirement that the source code must be modular so that specific
+extensions for e.g. modem management can be easily integrated.
+
+The experience with past projects shows that the number of SNMP
+programmers is really not that huge. So this leads to another
+important requirement: It must be possible to invoke SNMP operations
+without any intimidate knowledge of the SNMP protocol and SNMP
+specific APIs. The technical mechanism to address this requirement is
+to use a MIB compiler which generates stub code for management
+applications from MIB modules. The stub code should export simple C
+structures that every programmer can easily understand and handle.
+
+@section Software Architecture
+
+@c I started to work on the framework of two tools. The first program
+@c called stop displays monitoring data on a character terminal which is
+@c regularly updated, similar to the well known Unix top. The second
+@c program called scli provides an SNMP based command line interface.
+@c stop is based on curses/ncurses while scli uses the GNU readline
+@c library to provide command line editing and history capabilities.
+@c 
+@c 
+@c - why gxsnmp and not netsnmp?
+@c 
+@c - why glib?
+@c 
+@c - why not tcl?
+@c 
+@c 
+@c MIB Stub Generator
+
+
+@node Modes and Commands, Extending, Overview, Top
+@chapter Modes and Commands
+
+The following sections describe the @code{scli} modes together with
+their commands.
+
+m4_include(modes.texinfo)m4_dnl
+
+@node Extending, Problems, Modes and Commands, Top
+@chapter Writing Extensions
+
+This chapter describes the process of extending scli with new
+commands.  This is relatively straight-forward and does not require
+any SNMP programming skills. All you need is to be able to read and
+understand MIB definitions and some C programming skills.
+
+The first thing you need to do in order to extend scli is to select
+the set of MIBs needed to implement the new commands. Once you know
+the list of required MIBs, you need to check whether there are already
+stubs for these MIBs in the @code{stub} directory. If some are
+missing, you have to create them.
+
+Once you have all the MIB stubs, you need to decide which scli mode
+should contain your new commands. An scli mode is simply a logical
+grouping of related commands (e.g. all commands that deal with layer 2
+bridges). A mode is usually implemented by a single C file in the
+@code{scli} directory which is named like the mode itself.
+
+Now that you know the mode for you commands, you can start writing
+commands. Every command is implemented by a C function which basically
+has three parts: command syntax parsing, executing the command
+(usually this requires calls to other internal functions), and finally
+cleanup.
+
+@section Creating Stubs
+
+Compiler generated MIB stubs are used to do all the low-level SNMP
+work for you. To generate MIB stubs, you need to install the
+@code{smidump} MIB compiler which comes with the @code{libsmi}
+distribution. You need to make sure that the @code{smidump} compiler
+version fits with the @code{scli} version since there are sometimes
+changes between the stub interface and the SNMP engine interface. The
+easiest way to ensure that you have a suitable compiler is to check
+that the compiler version number matches the scli version number
+contained in comments in the stub files contained in the @code{scli}
+distribution.
+
+
+@section Implementing Modes
+
+Every scli mode implementation has only one externally visible entry
+point which is used to initialize the mode. This name of the entry
+point is by convention derived from the mode name. If we want to
+implement a mode "example", the function would look like this:
+
+@example
+void scli_init_example_mode(scli_interp_t *@var{interp})
+@end example
+
+The declaration of the function prototype goes into the file
+@file{scli.h} and a call of the initialization function must be added
+in the file @file{scli.c}.
+
+The main purpose of the entry point is to register the mode. This is
+accomplished by filling out an instance of type @code{scli_mode_t}
+which describes the mode. The first member of the structure is the
+unique name of the mode. The second member is a string describing the
+purpose of the mode and which standards or proprietary MIB modules are
+relevant for it. The third parameter is a NULL-terminated vector of
+@code{scli_cmd_t} structures, one structure for each command.
+
+@verbatim
+void
+scli_init_example_mode(scli_interp_t *interp)
+{
+    static scli_mode_t example_mode = {
+	"example",
+	"The scli example mode is only used to demontrate how you can\n"
+        "extend the scli interpreter with new modes and commands.",
+	NULL
+    };
+
+    scli_register_mode(interp, &printer_mode);
+}
+@end verbatim
+
+@c [xxx]
+
+@section Implementing Commands
+
+The function below implements a @command{show hello world} command.  A
+function implementing an @code{scli} command is usually referred to as
+a @dfn{command procedure}.  Every command procedure is called with three
+arguments:
+
+@example
+int (*@var{func}) (scli_interp_t *@var{interp}, int @var{argc}, char **@var{argv});
+@end example
+
+@enumerate
+@item A pointer to the scli interpreter in @var{interp}.
+@item The number of arguments in @var{argc}.
+@item The command arguments as a vector of C strings in @var{argv}.
+@end enumerate
+Command procedures return an @code{scli} status code. See the file
+@file{scli.h} for a description of the various error codes supported
+by the @code{scli} interpreter. Below is an example which implements a
+@command{show hello world} command.
+
+@verbatim
+static int
+show_hello_world(scli_interp_t *interp, int argc, char **argv)
+{
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    g_string_sprintfa(interp->result, "hello world");
+
+    return SCLI_OK;
+}
+@end verbatim
+
+The first thing we have to do in a command procedure is syntax
+parsing. This is important to get this right to ensure stability. In
+the example above, we simply check that no arguments are present. If
+there are any arguments, the command procedure returns the @code{scli}
+error code @code{SCLI_SYNTAX_NUMARGS}.
+
+Once we have successfully parsed the command, we have to decide
+whether we really have to execute it. If the interpreter is running in
+dry mode, we just parse the commands but do not execute them. This is
+a handy tool for validating the syntax of an @code{scli} script file
+without actually touching any devices and can be used to test that
+your syntax parsing code really works as it should.
+
+The next part of every command procedure implements the functionality.
+In this case, we just copy the string @code{"hello world"} into the
+interpreter's result string. The result string is a @code{glib}
+@code{GString} which can dynamically grow. You should study the
+@code{glib} documentation on how to use @code{GString}s effectively.
+
+The last part in our command procedure is responsible for freeing any
+resources and to return the status code. Since the @command{show hello
+world} command always succeeds, we simple return @code{SCLI_OK}.
+
+Once we have written a command procedure, we need to register the
+command in the interpreter. This is done by filling out a data
+structure which describes our command and registering this data
+structure as part of the mode registration.
+
+@c [xxx]
+
+@section Adding MIB Stubs
+
+I might be necessary to add stubs for additional MIB modules. This
+process is very straightforward. 
+
+@enumerate
+@item
+Edit @code{stubs/Makefile.am}
+
+@item
+Run @code{make stubs} in the @code{stubs} directory. Note that you need
+a version of @code{smidump} which is compatible with the @code{scli}
+release you are using.
+
+@item
+Edit @file{scli/scli.h} by adding the new header file(s) to the
+includes at the end of the file.
+@end enumerate
+
+
+@section Dynamic Loading (Plugins)
+
+@c [xxx]
+This chapter explains how you can add functionality to @code{scli}
+programs.
+
+@c Guidelines:
+@c - carefully validate user data before sending SNMP sets
+@c - avoid sending SNMP sets if the desired state is already there
+
+@node Problems, Concept Index, Extending, Top
+@chapter Problems
+
+If you find a bug in @code{scli}, please send electronic mail to
+@w{@samp{scli@@ibr.cs.tu-bs.de}}.  Include the version number, which
+you can find by running @w{@samp{scli --version}}. Also include in
+your message the output that the program produced and the output you
+expected.@refill
+
+If you have other questions, comments or suggestions about
+@code{scli}, contact the author via electronic mail to
+@w{@samp{schoenw@@ibr.cs.tu-bs.de}}.  The author will try to help you
+out, although he may not have time to fix your problems.
+
+@node Concept Index, , Problems, Top
+@unnumbered Concept Index
+
+@cindex tail recursion
+@printindex cp
+
+@shortcontents
+@contents
+@bye
