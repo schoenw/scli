@@ -393,6 +393,18 @@ fmt_display_string(GString *s, int indent, char *label, int len, char *string)
     g_string_sprintfa(s, "%-*s", indent, label);
     pos = indent;
 
+    /* Remove leading and trailing white-space characters first. */
+
+    while (isspace(string[0]) && len) {
+	string++, len--;
+    }
+    while (len && isspace(string[len-1])) {
+	len--;
+    }
+
+    /* Split long strings into chunks so that the text fits on
+       a 80 column display. */
+    
     for (i = 0; i < len; i++) {
 	if (string[i] == '\r') continue;
 	if (pos > 70 && isspace(string[i])) {
