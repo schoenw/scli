@@ -71,7 +71,7 @@ static WINDOW *mode_win = NULL;
 
 
 static void
-fix_string(guchar *s, gsize *len)
+fix_string(guchar *s, guint16 *len)
 {
     int i;
 

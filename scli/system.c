@@ -243,7 +243,7 @@ GSnmpEnum const hrFSAccess[] = {
 
 
 static void
-strip_white(guchar *s, gsize *len)
+strip_white(guchar *s, guint16 *len)
 {
     while (*len && isspace(s[(*len)-1])) {
 	(*len)--;
