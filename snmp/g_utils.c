@@ -222,11 +222,11 @@ gsnmp_attr_assign(GSList *vbl,
 		      || (CLASS_STRING(vb->type)
 			  && CLASS_STRING(attributes[i].type)))) {
 		  g_warning("%s: type mismatch: converting %s to %s",
-			    attributes[i].label, b, a);
+			    attributes[i].label, a, b);
 	      } else {
 		  if (a && b) {
-		      g_warning("%s: type mismatch: got %s, expected %s",
-				attributes[i].label, b, a);
+		      g_warning("%s: type mismatch: cannot convert %s to %s",
+				attributes[i].label, a, b);
 		  } else {
 		      g_warning("%s: type mismatch", attributes[i].label);
 		  }
