@@ -50,6 +50,14 @@ static stls_enum_t const security_level[] = {
 
 
 
+static stls_enum_t const view_tree_family_type[] = {
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE_INCLUDED,	"incl" },
+    { SNMP_VIEW_BASED_ACM_MIB_VACMVIEWTREEFAMILYTYPE_EXCLUDED,	"excl" },
+    { 0, NULL }
+};
+
+
+
 static void
 fmt_storage_type(GString *s, gint32 *storage)
 {
@@ -86,7 +94,7 @@ static int
 cmd_snmp_engine(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_framework_mib_snmpEngine_t *snmpEngine;
-    GString *s;
+    int const indent = 18;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -94,22 +102,28 @@ cmd_snmp_engine(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_ERROR;
     }
 
-    s = interp->result;
     if (snmpEngine) {
 	if (snmpEngine->snmpEngineBoots) {
-	    g_string_sprintfa(s, "Boots: %u times\n",
+	    g_string_sprintfa(interp->result,
+			      "%-*s %u times\n",
+			      indent, "Boots:",
 			      *(snmpEngine->snmpEngineBoots));
 	}
 	if (snmpEngine->snmpEngineTime) {
-	    g_string_sprintfa(s, "Time: %u seconds since last change of boots\n",
+	    g_string_sprintfa(interp->result,
+			      "%-*s %u seconds since last boot\n",
+			      indent, "Time:",
 			      *(snmpEngine->snmpEngineTime));
 	}
 	if (snmpEngine->snmpEngineMaxMessageSize) {
-	    g_string_sprintfa(s, "MMSZ: %u byte\n",
+	    g_string_sprintfa(interp->result,
+			      "%-*s %u byte\n",
+			      indent, "MMSZ:",
 			      *(snmpEngine->snmpEngineMaxMessageSize));
 	}
-	snmp_framework_mib_free_snmpEngine(snmpEngine);
     }
+
+    if (snmpEngine) snmp_framework_mib_free_snmpEngine(snmpEngine);
     
     return SCLI_OK;
 }
@@ -173,7 +187,7 @@ show_snmp_vacm_group(GString *s,
 
     model = stls_enum_get_label(security_model,
 				vacmGroupEntry->vacmSecurityModel);
-    g_string_sprintfa(s, " %-3s %-*.*s",
+    g_string_sprintfa(s, "  %-3s %-*.*s",
 		      model ? model : "", sec_name_width,
 		      (int) vacmGroupEntry->_vacmSecurityNameLength,
 		      vacmGroupEntry->vacmSecurityName);
@@ -207,7 +221,7 @@ cmd_snmp_vacm_groups(scli_interp_t *interp, int argc, char **argv)
 		sec_group_width = vacmGroupTable[i]->_vacmGroupNameLength;
 	}
 	g_string_sprintfa(interp->result,
-			  "XX Mod %-*s -> Group\n",
+			  "Row Mod %-*s -> Group\n",
 			  sec_name_width, "Name");
 	for (i = 0; vacmGroupTable[i]; i++) {
 	    show_snmp_vacm_group(interp->result, vacmGroupTable[i],
@@ -243,11 +257,11 @@ show_snmp_vacm_access(GString *s,
 				    *vacmAccessEntry->vacmAccessContextMatch);
     }
         
-    g_string_sprintfa(s, " %-*.*s", group_width,
+    g_string_sprintfa(s, "  %-*.*s", group_width,
 		      (int) vacmAccessEntry->_vacmGroupNameLength,
 		      vacmAccessEntry->vacmGroupName);
 
-    g_string_sprintfa(s, " %-3s %-2s",
+    g_string_sprintfa(s, " %-3s %-3s",
 		      model ? model : "", level ? level : "");
     
     g_string_sprintfa(s, " %-*.*s", cntxt_width,
@@ -308,7 +322,7 @@ cmd_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
 		notify_width = vacmAccessTable[i]->_vacmAccessNotifyViewNameLength;
 	}
 	g_string_sprintfa(interp->result,
-			  "XX %-*s Mod Le %-*s %-8s %-*s %-*s %-*s\n",
+			  "Row %-*s Mod Sec %-*s %-8s %-*s %-*s %-*s\n",
 			  group_width, "Group",
 			  cntxt_width, "Ctx",
 			  "Match",
@@ -333,27 +347,44 @@ cmd_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
 static void
 show_snmp_vacm_view(GString *s,
 	      snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t *vacmViewEntry,
-		      int view_width)
+		    int new, int last)
 {
     char const *type = NULL;
-    
-    fmt_storage_type(s, vacmViewEntry->vacmViewTreeFamilyStorageType);
-    fmt_row_status(s, vacmViewEntry->vacmViewTreeFamilyStatus);
+    int i;
 
-    g_string_sprintfa(s, " %-*.*s", view_width,
-		      (int) vacmViewEntry->_vacmViewTreeFamilyViewNameLength,
-		      vacmViewEntry->vacmViewTreeFamilyViewName);
+    if (vacmViewEntry->vacmViewTreeFamilySubtree
+	&& vacmViewEntry->vacmViewTreeFamilyMask
+	&& vacmViewEntry->vacmViewTreeFamilyType) {
 
-    if (vacmViewEntry->vacmViewTreeFamilyType) {
-	type = stls_enum_get_label(snmp_view_based_acm_mib_enums_vacmViewTreeFamilyType,
+	if (new) {
+	    g_string_sprintfa(s, "%*s\n",
+			      (int) vacmViewEntry->_vacmViewTreeFamilyViewNameLength,
+			      vacmViewEntry->vacmViewTreeFamilyViewName);
+	}
+
+	g_string_sprintfa(s, "%c- ", last ? '`' : '|');
+	fmt_storage_type(s, vacmViewEntry->vacmViewTreeFamilyStorageType);
+	fmt_row_status(s, vacmViewEntry->vacmViewTreeFamilyStatus);
+	type = stls_enum_get_label(view_tree_family_type,
 				   *vacmViewEntry->vacmViewTreeFamilyType);
+	g_string_sprintfa(s, " %-4s ", type ? type : "");
+
+	if (vacmViewEntry->vacmViewTreeFamilySubtree && vacmViewEntry->vacmViewTreeFamilyMask) {
+	    for (i = 0; i < vacmViewEntry->_vacmViewTreeFamilySubtreeLength; i++) {
+		int w = 0;
+		if (i/8 < vacmViewEntry->_vacmViewTreeFamilyMaskLength) {
+		    w = (vacmViewEntry->vacmViewTreeFamilyMask[i/8] & 1<<(7-(i%8))) ? 0 : 1;
+		}
+		if (w) {
+		    g_string_sprintfa(s, "%s*", i ? "." : "");
+		} else {
+		    g_string_sprintfa(s, "%s%u", i ? "." : "",
+				      vacmViewEntry->vacmViewTreeFamilySubtree[i]);
+		}
+	    }
+	}   
+	g_string_append(s, "\n");
     }
-
-    g_string_sprintfa(s, " %-8s ", type ? type : "");
-
-    /* XXX display the OID pattern string */
-    
-    g_string_append(s, "\n");
 }
 
 
@@ -362,7 +393,8 @@ static int
 cmd_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t **vacmViewTable;
-    int view_width = 5;
+    int new;
+    int last;
     int i;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -374,16 +406,23 @@ cmd_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
 
     if (vacmViewTable) {
 	for (i = 0; vacmViewTable[i]; i++) {
-	    if (vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength
-		> view_width)
-		view_width
-		    = vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength;
-	}
-	g_string_sprintfa(interp->result,
-			  "XX %-*s Type     Tree Family\n",
-			  view_width, "View");
-	for (i = 0; vacmViewTable[i]; i++) {
-	    show_snmp_vacm_view(interp->result, vacmViewTable[i], view_width);
+	    new = 1;
+	    last = !vacmViewTable[i+1];
+	    if (i > 0) {
+		new = (vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength
+		       != vacmViewTable[i-1]->_vacmViewTreeFamilyViewNameLength)
+		    || (memcmp(vacmViewTable[i]->vacmViewTreeFamilyViewName,
+			       vacmViewTable[i-1]->vacmViewTreeFamilyViewName,
+			       vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength) != 0);
+	    }
+	    if (vacmViewTable[i+1]) {
+		last = (vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength
+			!= vacmViewTable[i+1]->_vacmViewTreeFamilyViewNameLength)
+		    || (memcmp(vacmViewTable[i]->vacmViewTreeFamilyViewName,
+			       vacmViewTable[i+1]->vacmViewTreeFamilyViewName,
+			       vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength) != 0);
+	    }
+	    show_snmp_vacm_view(interp->result, vacmViewTable[i], new, last);
 	}
     }
 
