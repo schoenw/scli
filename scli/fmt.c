@@ -151,7 +151,28 @@ fmt_gtp(guint32 number)
 
 
 char*
-fmt_port(int port, int name)
+fmt_udp_port(int port, int name)
+{
+    struct servent *s;
+    static char buffer[12];
+
+    if (name) {
+	if (! port) {
+	    return "*";
+	}
+	s = getservbyport(htons(port), "udp");
+	if (s) {
+	    return s->s_name;
+	}
+    }
+    sprintf(buffer, "%d", port);
+    return buffer;
+}
+
+
+
+char*
+fmt_tcp_port(int port, int name)
 {
     struct servent *s;
     static char buffer[12];
@@ -189,6 +210,7 @@ fmt_ipv4_address(guchar *addr, int name)
     sprintf(buffer, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
     return buffer;
 }
+
 
 
 char *

@@ -162,6 +162,9 @@ extern void
 scli_init_ip_mode(scli_interp_t *interp);
 
 extern void
+scli_init_udp_mode(scli_interp_t *interp);
+
+extern void
 scli_init_tcp_mode(scli_interp_t *interp);
 
 extern void
@@ -210,7 +213,10 @@ extern char*
 fmt_gtp(guint32 number);
 
 extern char*
-fmt_port(int port, int name);
+fmt_udp_port(int port, int name);
+
+extern char*
+fmt_tcp_port(int port, int name);
 
 extern char*
 fmt_ipv4_address(guchar *addr, int name);

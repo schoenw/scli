@@ -367,6 +367,7 @@ main(int argc, char **argv)
     scli_init_disman_mode(interp);
     scli_init_snmp_mode(interp);
     scli_init_ip_mode(interp);
+    scli_init_udp_mode(interp);
     scli_init_tcp_mode(interp);
     scli_init_interface_mode(interp);
     scli_init_bridge_mode(interp);

@@ -225,11 +225,10 @@ void
 scli_init_entity_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
-	{ "show", "physical", 0, NULL, NULL },
-	{ "show physical", "components", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show system", "components", SCLI_CMD_FLAG_NEED_PEER,
 	  "physical components of the system",
 	  cmd_components },
-	{ "show physical", "containment", SCLI_CMD_FLAG_NEED_PEER,
+	{ "show system", "containment", SCLI_CMD_FLAG_NEED_PEER,
 	  "physical component's containment hierarchy",
 	  cmd_containment },
 	{ NULL, NULL, 0, NULL, NULL }
