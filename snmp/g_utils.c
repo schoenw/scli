@@ -215,19 +215,25 @@ gsnmp_attr_assign(GSList *vbl,
 	      continue;
 	 }
 
+	 if (attributes[i].val_offset < 0) {
+	     continue;
+	 }
 	 gp = G_STRUCT_MEMBER_P(p, attributes[i].val_offset);
 	 switch (vb->type) {
 	 case G_SNMP_INTEGER32:
 	     if (attributes[i].constraints) {
 		 gint32 *range = (gint32 *) attributes[i].constraints;
 		 while (range[0] != 0 || range[1] != 0) {
-		     if (vb->syntax.i32[0] < range[0]
-			 || vb->syntax.i32[0] > range[1]) {
-			 g_warning("%s: value not within range contraints",
-				   attributes[i].label);
-			 gp = NULL;
+		     if (vb->syntax.i32[0] >= range[0]
+			 && vb->syntax.i32[0] <= range[1]) {
+			 break;
 		     }
 		     range += 2;
+		 }
+		 if (range[0] == 0 && range[1] == 0) {
+		     g_warning("%s: value not within range contraints",
+			       attributes[i].label);
+		     gp = NULL;
 		 }
 	     }
 	     if (gp) *gp = (gpointer) &(vb->syntax.i32[0]);
@@ -238,13 +244,16 @@ gsnmp_attr_assign(GSList *vbl,
 	     if (attributes[i].constraints) {
 		 guint32 *range = (guint32 *) attributes[i].constraints;
 		 while (range[0] != 0 || range[1] != 0) {
-		     if (vb->syntax.i32[0] < range[0]
-			 || vb->syntax.i32[0] > range[1]) {
-			 g_warning("%s: value not within range contraints",
-				   attributes[i].label);
-			 gp = NULL;
+		     if (vb->syntax.i32[0] >= range[0]
+			 && vb->syntax.i32[0] <= range[1]) {
+			 break;
 		     }
 		     range += 2;
+		 }
+		 if (range[0] == 0 && range[1] == 0) {
+		     g_warning("%s: value not within range contraints",
+			       attributes[i].label);
+		     gp = NULL;
 		 }
 	     }
 	     if (gp) *gp = (gpointer) &(vb->syntax.ui32[0]);
@@ -253,19 +262,27 @@ gsnmp_attr_assign(GSList *vbl,
 	     if (attributes[i].constraints) {
 		 guint16 *size = (guint16 *) attributes[i].constraints;
 		 while (size[0] != 0 || size[1] != 0) {
-		     if (vb->syntax_len < size[0]
-			 || vb->syntax_len > size[1]) {
-			 g_warning("%s: value not within size contraints",
-				   attributes[i].label);
-			 gp = NULL;
+		     if (vb->syntax_len >= size[0]
+			 && vb->syntax_len <= size[1]) {
+			 break;
 		     }
 		     size += 2;
+		 }
+		 if (size[0] == 0 && size[1] == 0) {
+		     g_warning("%s: value not within size contraints",
+			       attributes[i].label);
+		     gp = NULL;
 		 }
 	     }
 	     if (gp) *gp = (gpointer) vb->syntax.uc;
 	     break;
 	 case G_SNMP_OBJECTID:
+	 case G_SNMP_IPADDRESS:
+	 case G_SNMP_OPAQUE:
 	     *gp = (gpointer) vb->syntax.ui32;
+	     break;
+	 case G_SNMP_COUNTER64:
+	     if (gp) *gp = (gpointer) &(vb->syntax.ui64[0]);
 	     break;
 	 default:
 	     break;
@@ -274,6 +291,9 @@ gsnmp_attr_assign(GSList *vbl,
 	     guint16 *lp;
 	     lp = (guint16 *) G_STRUCT_MEMBER_P(p, attributes[i].len_offset);
 	     *lp = vb->syntax_len;
+	     if (vb->type == G_SNMP_OBJECTID) {
+		 *lp = *lp / sizeof(guint32);
+	     }
 	 }
 	 n++;
     }
