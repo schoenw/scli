@@ -679,14 +679,14 @@ fmt_printer_inputs(GString *s, printer_mib_prtInputEntry_t *prtInputEntry)
 
     if (prtInputEntry->prtInputMediaName &&
 	prtInputEntry->_prtInputMediaNameLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Media Name",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Media Name:",
 			  (int) prtInputEntry->_prtInputMediaNameLength,
 			  prtInputEntry->prtInputMediaName);
     }
     
     if (prtInputEntry->prtInputMediaType &&
 	prtInputEntry->_prtInputMediaTypeLength > 0) {
-	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Media Type",
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Media Type:",
 			  (int) prtInputEntry->_prtInputMediaTypeLength,
 			  prtInputEntry->prtInputMediaType);
     }
