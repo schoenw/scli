@@ -43,7 +43,7 @@ GSnmpEnum const dot1dStpProtocolSpecification[] = {
 };
 
 
-char *
+static char*
 fmt_bridgeid(guchar *addr)
 {
     static char buffer[256];
