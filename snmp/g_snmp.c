@@ -262,6 +262,50 @@ g_snmp_varbind_free(GSnmpVarBind *vb)
 }
 
 /*
+ * NAME:        g_snmp_vbl_add_null
+ * SYNOPSIS:    void g_snmp_vbl_add_null
+ *                  (
+ *                      GSnmpVarBind *vb,
+ *			guint32 const *oid,
+ *			gsize const len
+ *                  )
+ * DESCRIPTION: Adds a NULL PDU to a varbind list.
+ * RETURNS:     none
+ */
+
+void
+g_snmp_vbl_add_null(GSList **vbl, guint32 const *oid, gsize const len)
+{
+    GSnmpVarBind *vb;
+
+    vb = g_snmp_varbind_new(oid, len, G_SNMP_NULL, NULL, 0);
+    *vbl = g_slist_append(*vbl, vb);
+}
+
+/*
+ * NAME:        g_snmp_vbl_free
+ * SYNOPSIS:    void g_snmp_vbl_free
+ *                  (
+ *                      GSnmpVarBind *vb
+ *                  )
+ * DESCRIPTION: Frees a complete varbind list.
+ * RETURNS:     none
+ */
+
+void
+g_snmp_vbl_free(GSList *vbl)
+{
+    GSList *elem;
+
+    if (vbl) {
+	for (elem = vbl; elem; elem = g_slist_next(elem)) {
+	    g_snmp_varbind_free((GSnmpVarBind *) elem->data);
+	}
+	g_slist_free(vbl);
+    }
+}
+
+/*
  * NAME:        g_snmp_object_encode
  * SYNOPSIS:    gboolean g_snmp_object_encode
  *                  (
@@ -540,7 +584,6 @@ g_snmp_list_decode (ASN1_SCK *asn1, GSList **list)
     guint cls, con, tag;
     guchar *eoc;
     GSnmpVarBind *obj;
-    GSList *elem;
 
     *list = NULL;
     if (!g_asn1_header_decode (asn1, &eoc, &cls, &con, &tag))
@@ -551,10 +594,7 @@ g_snmp_list_decode (ASN1_SCK *asn1, GSList **list)
     {
         if (!g_snmp_object_decode (asn1, &obj))
 	{
-	    for (elem = *list; elem; elem = g_slist_next(elem)) {
-		g_snmp_varbind_free((GSnmpVarBind *) elem->data);
-	    }
-	    g_slist_free(*list);
+	    g_snmp_vbl_free(*list);
 	    *list = NULL;
             return FALSE;
 	}
@@ -562,10 +602,7 @@ g_snmp_list_decode (ASN1_SCK *asn1, GSList **list)
     }
     if (!g_asn1_eoc_decode (asn1, eoc))
     {
-	for (elem = *list; elem; elem = g_slist_next(elem)) {
-	    g_snmp_varbind_free((GSnmpVarBind *) elem->data);
-	}
-	g_slist_free(*list);
+	g_snmp_vbl_free(*list);
 	*list = NULL;
         return FALSE;
     }

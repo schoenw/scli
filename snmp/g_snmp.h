@@ -200,12 +200,17 @@ gboolean g_snmp_pdu_v3_decode ( ASN1_SCK *asn1, GSnmpPdu *pdu,
 void (*g_snmp_list_decode_hook)(GSList *list);
 void (*g_snmp_list_encode_hook)(GSList *list);
 
-/* SNMP varbind management */
+/* SNMP varbind and varbind list management */
 
-GSnmpVarBind* g_snmp_varbind_new  ( guint32 const *oid, gsize oid_len,
-				    GSnmpVarBindType type,
-				    gpointer value, gsize value_len);
-void          g_snmp_varbind_free ( GSnmpVarBind *vb);
+GSnmpVarBind* g_snmp_varbind_new(guint32 const *oid, gsize oid_len,
+				 GSnmpVarBindType type,
+				 gpointer value, gsize value_len);
+void          g_snmp_varbind_free(GSnmpVarBind *vb);
+
+
+void	      g_snmp_vbl_add_null(GSList **vbl,
+				  guint32 const *oid, gsize const len);
+void	      g_snmp_vbl_free(GSList *vbl);
 
 #endif
 /* EOF */
