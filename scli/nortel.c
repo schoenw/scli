@@ -874,6 +874,54 @@ set_nortel_bridge_vlan_default(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+dump_nortel_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
+{
+    rapid_city_rcVlanEntry_t **vlanTable = NULL;
+    int i;
+    const int mask = (RAPID_CITY_RCVLANNAME
+		      | RAPID_CITY_RCVLANTYPE
+		      | RAPID_CITY_RCVLANPORTMEMBERS);
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX;
+    }
+
+    rapid_city_get_rcVlanTable(interp->peer, &vlanTable, mask);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (vlanTable) {
+	for (i = 0; vlanTable[i]; i++) {
+	    if (! vlanTable[i]->rcVlanName) {
+		continue;
+	    }
+	    g_string_sprintfa(interp->result,
+			      "create nortel bridge vlan \"%u\" \"%.*s\"\n",
+			      vlanTable[i]->rcVlanId,
+			      (int) vlanTable[i]->_rcVlanNameLength,
+			      vlanTable[i]->rcVlanName);
+	    if (vlanTable[i]->rcVlanPortMembers) {
+		g_string_sprintfa(interp->result,
+				  "set nortel bridge vlan ports \"%.*s\" \"",
+				  (int) vlanTable[i]->_rcVlanNameLength,
+				  vlanTable[i]->rcVlanName);
+		fmt_port_set(interp->result, vlanTable[i]->rcVlanPortMembers, 32);
+		g_string_sprintfa(interp->result, "\"\n");
+	    }
+	}
+    }
+
+    if (vlanTable) rapid_city_free_rcVlanTable(vlanTable);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_nortel_mode(scli_interp_t *interp)
 {
@@ -966,6 +1014,13 @@ scli_init_nortel_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_nortel_bridge_vlan_ports },
 
+	{ "dump nortel bridge vlan", NULL,
+	  "The dump nortel bridge vlan command generates a sequence of scli\n"
+	  "commands which can be used to restore the vlan configuration.\n",
+	  SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  dump_nortel_bridge_vlan },
+	
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
     
