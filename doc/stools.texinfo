@@ -76,8 +76,9 @@ management tools.
 * Instructions::                How to read this manual. 
 * Copying::                     How you can copy and share @code{stools}.
 * Overview::                    Preliminary information.
-* Sample::                      Sample output from @code{stools}.
-* Invoking stools::             How to run @code{stools}.
+* History::                     History.
+* Project Design::              Project Design.
+* Software Aspects::            Software Aspects.
 * Problems::                    Reporting bugs.
 * Concept Index::               Index of concepts.
 @end menu
@@ -88,51 +89,87 @@ management tools.
 @cindex reading
 @cindex manual, how to read
 @cindex how to read
-To read this manual, begin at the beginning, reading from left to right
-and top to bottom, until you get to the end.  Then stop.  You may pause
-for a beer anywhere in the middle as well, if you wish.  (Please note,
-however, that The King strongly advises against heavy use of
-prescription pharmaceuticals, based on his extensive personal and
-professional experience.)
+This document contains two parts. The first part explains the design and
+the history of the @code{stools} package. The second part provides step
+by step instructions how the @code{stools} package can be extended.
+
+This memo does not provide a detailed description of the various tools
+and their command line options. The reader is referred to the manual
+pages for these details.
 
 @node Copying, Overview, Instructions, Top
 @include gpl.texinfo
 
-@node Overview, Sample, Copying, Top
+@node Overview, History, Copying, Top
 @chapter Overview
 @cindex greetings
 @cindex overview
 
-The GNU @code{stools} program produces a familiar, friendly greeting.
-It allows nonprogrammers to use a classic computer science tool which
-would otherwise be unavailable to them.  Because it is protected by the
-GNU General Public License, users are free to share and change it.
+The GNU @code{stools} package contains a collection of SNMP command line
+management tools. Most SNMP management tools try to be very generic and
+they often fail to be useful. A good example are generic MIB browsers
+that display raw MIB data structures. These browsers tend to be of
+little use for actual management because MIB data structures are
+designed to be read by programs rather than humans.
+
+The tools contained in the @code{stools} package are designed to be
+specific rather than generic. In other words, the tools are designed to
+understand the data they are manipulated. It is not uncommon that the
+tools use information from different MIB modules in order to display
+data in a format which is easy to understand for human beings.
 
 GNU @code{stools} was written by Juergen Schoenwaelder.
 
-@node Sample, Invoking stools, Overview, Top
-@chapter Sample Output
-@cindex sample
+@node History, Project Design, Overview, Top
+@chapter History
+@cindex history
 
-Here are some realistic examples of running @code{stools}.
+The @code{stools} package was written because of the author's continued
+frustration about how complex it is to configure and troubleshoot SNMP
+manageable devices. In fact, the author tried several approaches to
+tackle this problem before. In the 1990's, I did some work on scripting
+language API extensions do simplify the interaction with networked
+devices. The result of these efforts was the Tnm extension for Tcl [],
+which is been widely deployed these days, especially for testing and
+device emulation purposes.
 
-This is the output of the command @samp{stools}:
+In the 1990's, I also followed the network management platform idea
+and wrote tkined, which is some kind of a light-weight management
+platform. It provides generic services and is highly extensible. All
+you need to do is to write a Tcl script in order to implement new
+management functionailies. Although this sounds nice in principle, the
+reality is that most people do not want to write management scripts.
+Although the package has been openly available for many years, only
+few script contributions went back into the source distribution.
 
-@example
-hello, world!
-@end example
+I also wrote several generic MIB browsers. A very old one is still
+running on our Web server and being used regularly by people to
+browser MIBs and agents. But even with this Web-based solution, I an
+personally not very happy. I just do not want to fire up a complex Web
+browser just to look at (potentially big) HTML page which display data
+at the abstraction level of an API between elements in a distributed
+system. Nobody would like to look at raw data in a CORBA based
+environment - except people who need to debug such systems.
 
-This is the output of the command @samp{stools --help}:
+In the last years, I was involved in the specification and
+implementation of MIBs for the delegation of management
+functions. Very early in the project, it became clear that we need to
+have a good front-end. Again, we tried several approaches. The first
+one was a Java based applet running in a Web browser. This was usable
+for demos, but nothing for everyday work. The second front-end was a
+Java stand-alone program. It provides a better user interface. But it
+eats up so many resources (and refuses to run on my 256 color display)
+so that people again used the old Web-based solution I wrote years
+ago.
 
-@example
-nothing
-Usage: stools [options]
-  -h, --help                    Print a summary of the options
-  -V, --version                 Print the version number
-@end example
+So I started to think what is wrong with all this and I came to the
+conclusion that the approach to build generic tools is fundamentally
+flawed. Instead, it is necessary to build very specific tools and
+representations. But how can this be done efficiently if the available
+resources are limited?
 
-@node Invoking stools, Problems, Sample, Top
-@chapter Invoking @code{stools}
+@node Project Design, Software Aspects, History, Top
+@chapter Project Design
 @cindex invoking
 @cindex version
 @cindex options
@@ -140,32 +177,49 @@ Usage: stools [options]
 @cindex help
 @cindex getting help
 
-The format for running the @code{stools} program is:
+It is only possible to build specific tools rather than generic tools
+by investing lots of time. Someone who understand specific MIBs must
+design highly usable management interfaces on top of them. The only
+reasonable way to tackle this is to start an open source project and
+to get lots of programmers involved. This leads to the requirement
+that the source code must be modular so that specific extension for
+e.g. modem management can be easily integrated.
 
-@example
-stools @var{option} @dots{}
-@end example
+However, my experience with past projects shows that the number of
+SNMP programmers is really not that huge. So this leads to another
+important requirement: It must be possible to perform SNMP operations
+without any intimidate knowledge of the SNMP protocol. To technical
+mechanism to address this requirement is to use a MIB compiler which
+generates stub code for management applications from MIB modules. The
+stub code should export simple C structures that every programmer can
+easily understand and handle.
 
-@code{stools} supports the following options:
+@node Software Aspects, Problems, Project Design, Top
+@chapter Software Aspects
 
-@table @samp
-@item --help
-@itemx -h
-Print an informative help message describing the options and then exit.
+I started to work on the framework of two tools. The first program
+called stop displays monitoring data on a character terminal which is
+regularly updated, similar to the well known Unix top. The second
+program called scli provides an SNMP based command line interface.
+stop is based on curses/ncurses while scli uses the GNU readline
+library to provide command line editing and history capabilities.
 
-@item --version
-@itemx -v
-Print the version number of @code{stools} on the standard error output
-and then exit.
-@end table
 
-@node Problems, Concept Index, Invoking stools, Top
-@chapter Reporting Bugs
-@cindex bugs
-@cindex problems
+- why gxsnmp and not netsnmp?
+
+- why glib?
+
+- why not tcl?
+
+
+MIB Stub Generator
+
+
+@node Problems, Concept Index, Software Aspects, Top
+@chapter Problems
 
 If you find a bug in @code{stools}, please send electronic mail to
-@w{@samp{schoenw@@ibr.cs.tu-bs.de}}.  Include the version number, which
+@w{@samp{stools@@ibr.cs.tu-bs.de}}.  Include the version number, which
 you can find by running @w{@samp{stools --version}}.  Also include in your
 message the output that the program produced and the output you
 expected.@refill
