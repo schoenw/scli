@@ -614,7 +614,7 @@ g_session_response_pdu(guint messageProcessingModel,
 
     g_snmp_request_dequeue(request);
     request->session->error_status = PDU->request.error_status;
-    /* XXX what about the error index? */
+    request->session->error_index = PDU->request.error_index;
     if (! request->callback) {
 	g_snmp_vbl_free(vbl);
 	g_snmp_request_destroy(request);
