@@ -58,11 +58,11 @@ static void
 fmt_storage_type(GString *s, gint32 *storage)
 {
     static GSnmpEnum const storage_types[] = {
-	{ 1, "o" },	/* other */
-	{ 2, "v" },	/* volatile */
-	{ 3, "n" },	/* nonVolatile */
-	{ 4, "p" },	/* permanent */
-	{ 5, "r" },	/* readOnly */
+	{ 1, "O" },	/* other */
+	{ 2, "V" },	/* volatile */
+	{ 3, "N" },	/* nonVolatile */
+	{ 4, "P" },	/* permanent */
+	{ 5, "R" },	/* readOnly */
 	{ 0, NULL }
     };
     
@@ -87,9 +87,9 @@ static void
 fmt_row_status(GString *s, gint32 *status)
 {
     static GSnmpEnum const row_states[] = {
-	{ 1, "a" },	/* active */
-	{ 2, "s" },	/* notInService */
-	{ 3, "r" },	/* notReady */
+	{ 1, "A" },	/* active */
+	{ 2, "S" },	/* notInService */
+	{ 3, "R" },	/* notReady */
 	{ 0, NULL }
     };
     
@@ -393,7 +393,7 @@ show_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
 		notify_width = vacmAccessTable[i]->_vacmAccessNotifyViewNameLength;
 	}
 	g_string_sprintfa(interp->header,
-			  "ROW %-*s MOD SEC %-*s %-8s %-*s %-*s %-*s",
+			  "ROW %-*s MOD LVL %-*s %-8s %-*s %-*s %-*s",
 			  group_width, "GROUP",
 			  cntxt_width, "CTX",
 			  "MATCH",
