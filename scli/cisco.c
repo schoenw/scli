@@ -191,7 +191,7 @@ cmd_cisco_ip_accounting_current(scli_interp_t *interp, int argc, char **argv)
 	    }
 	}
 
-	qsort((void *) stats, n, sizeof(act_stats_t), stats_sort);
+	qsort((void *) stats, (size_t) n, sizeof(act_stats_t), stats_sort);
 
 	for (i = 0; i < n; i++) {
 	    show_cisco_ip_accounting(interp->result, stats+i);

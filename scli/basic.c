@@ -890,9 +890,7 @@ scli_eval_init_file(scli_interp_t *interp)
 	return SCLI_ERROR;
     }
 
-    path = g_malloc(strlen(home) + 20);
-    strcpy(path, home);
-    strcat(path, "/.sclirc");
+    path = g_strdup_printf("%s/.sclirc", home);
     if (access(path, R_OK) == 0) {
 	code = scli_eval_file(interp, path);
     }

@@ -30,7 +30,8 @@ fmt_containment(GString *s, char *prefix,
 		entity_mib_entPhysicalEntry_t **entPhysicalEntry,
 		gint32 parent, int class_width)
 {
-    int i, j, len;
+    int i, j;
+    size_t len;
     const char *class;
 
     if (! entPhysicalEntry) {
@@ -209,10 +210,10 @@ fmt_entity_details(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
     }
     
     fmt_display_string(s, 7, "Alias:",
-		       entPhysicalEntry->_entPhysicalAliasLength,
+		       (int) entPhysicalEntry->_entPhysicalAliasLength,
 		       entPhysicalEntry->entPhysicalAlias);
     fmt_display_string(s, 7, "Descr:",
-		       entPhysicalEntry->_entPhysicalDescrLength,
+		       (int) entPhysicalEntry->_entPhysicalDescrLength,
 		       entPhysicalEntry->entPhysicalDescr);
 }
 

@@ -461,14 +461,14 @@ fmt_system_process(GString *s,
 
     if (hrSWRunPerfEntry
 	&& hrSWRunPerfEntry->hrSWRunPerfMem) {
-	fmt_x_kbytes(s, *(hrSWRunPerfEntry->hrSWRunPerfMem));
+	fmt_x_kbytes(s, (guint32) *(hrSWRunPerfEntry->hrSWRunPerfMem));
     } else {
 	g_string_sprintfa(s, " %5s", "-----");
     }
     if (hrSWRunPerfEntry
 	&& hrSWRunPerfEntry->hrSWRunPerfCPU) {
 	g_string_sprintfa(s, " %s",
-		  fmt_seconds(*(hrSWRunPerfEntry->hrSWRunPerfCPU)/100));
+		  fmt_seconds((guint32) *(hrSWRunPerfEntry->hrSWRunPerfCPU)/100));
     } else {
 	g_string_sprintfa(s, " %5s", "--:--");
     }
@@ -778,9 +778,13 @@ fmt_system_storage(GString *s,
 	storage_used *= *(hrStorageEntry->hrStorageAllocationUnits);
 	storage_used /= scale;
 
-	fmt_x_kbytes(s, storage_size);
-	fmt_x_kbytes(s, storage_used);
-	fmt_x_kbytes(s, storage_size - storage_used);
+	fmt_x_kbytes(s, (guint32) storage_size);
+	fmt_x_kbytes(s, (guint32) storage_used);
+	if (storage_size > storage_used) {
+	    fmt_x_kbytes(s, (guint32) (storage_size - storage_used));
+	} else {
+	    g_string_sprintfa(s, " %5s", "-----");
+	}
 	g_string_sprintfa(s, " %3u",
 			  (guint32) (storage_size
 				     ? storage_used * 100 / storage_size : 0));
@@ -1072,7 +1076,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     if (hrStorage) {
 	if (hrStorage->hrMemorySize) {
 	    g_string_sprintfa(s, "%-*s", indent, "Memory:");
-	    fmt_kbytes(s, *(hrStorage->hrMemorySize));
+	    fmt_kbytes(s, (guint32) *(hrStorage->hrMemorySize));
 	    g_string_append_c(s, '\n');
 	}
     }

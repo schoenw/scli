@@ -723,7 +723,7 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  "  I-FPS       input frames per second\n"
 	  "  O-FPS       output frames per second\n"
 	  "  D-FPS       discarded frames per second\n"
-	  "  DESCRIPTION",
+	  "  DESCRIPTION description of the port",
 	  SCLI_CMD_FLAG_NEED_PEER,
 	  NULL, NULL,
 	  show_bridge_stats },

@@ -391,7 +391,7 @@ xml_interface_details(xmlNodePtr root,
 
     if (ifEntry->ifPhysAddress && ifEntry->_ifPhysAddressLength) {
 	char *a, *b;
-	a = g_malloc(ifEntry->_ifPhysAddressLength * 3);
+	a = g_malloc((size_t) (ifEntry->_ifPhysAddressLength * 3));
 	for (j = 0, b = a; j < ifEntry->_ifPhysAddressLength; j++) {
 	    sprintf(b, "%s%02X", (j == 0) ? "" : ":",
 		    ifEntry->ifPhysAddress[j]);

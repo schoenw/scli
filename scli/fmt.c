@@ -250,7 +250,7 @@ fmt_gtp(guint32 number)
 
 
 char*
-fmt_udp_port(int port, int flags)
+fmt_udp_port(unsigned short int port, int flags)
 {
     struct servent *s;
     static char buffer[12];
@@ -274,7 +274,7 @@ fmt_udp_port(int port, int flags)
 
 
 char*
-fmt_tcp_port(int port, int flags)
+fmt_tcp_port(unsigned short int port, int flags)
 {
     struct servent *s;
     static char buffer[12];

@@ -213,10 +213,10 @@ show_system(GSnmpSession *peer, int flags)
         clrtoeol();
         mvprintw(0, 10, "%s:%d", peer->name, peer->port);
         attron(A_BOLD);
-        mvprintw(0, 10 + strlen(peer->name) + 8,
+        mvprintw(0, (int) (10 + strlen(peer->name) + 8),
 		 error ? error : "internalError");
         attroff(A_BOLD);
-        mvaddstr(0, COLS-strlen(timestr)-1, timestr);
+        mvaddstr(0, (int) (COLS-strlen(timestr)-1), timestr);
         return STOP_FLAG_SNMP_FAILURE;
     }
 
@@ -270,7 +270,7 @@ show_system(GSnmpSession *peer, int flags)
     
     last = now;
     if (system) snmpv2_mib_free_system(system);
-    mvaddstr(0, COLS-strlen(timestr)-1, timestr);
+    mvaddstr(0, (int) (COLS-strlen(timestr)-1), timestr);
     return 0;
 }
 

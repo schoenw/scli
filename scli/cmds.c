@@ -56,7 +56,7 @@ static void
 fmt_cmd_tree(GString *s, GNode *node, char *prefix)
 {
     scli_cmd_t *cmd = (scli_cmd_t *) node->data;
-    int len;
+    size_t len;
     const int width = 24;
 
     len = strlen(prefix);
@@ -311,6 +311,81 @@ cmd_scli_close(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
+cmd_scli_load(scli_interp_t *interp, int argc, char **argv)
+{
+    GModule *module;
+    gpointer pointer;
+    gchar *path;
+    GString *symbol;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    path = g_module_build_path(SCLI_PLUGIN_PATH, argv[1]);
+    module = g_module_open(path, 0);
+    if (! module) {
+	g_string_sprintfa(interp->result, "%s", g_module_error());
+	g_free(path);
+	return SCLI_ERROR;
+    }
+    g_free(path);
+
+    symbol = g_string_new(NULL);
+    g_string_sprintfa(symbol, "scli_init_%s_mode", argv[1]);
+    if (! g_module_symbol(module, symbol->str, &pointer)) {
+	g_string_sprintfa(interp->result, "%s", g_module_error());
+	g_module_close(module);
+	g_string_free(symbol, 1);
+	return SCLI_ERROR;
+    }
+    g_string_free(symbol, 1);
+
+    /*
+     * Call the init function and save the module pointer,
+     * lookup the new mode data structure and save the module
+     * pointer in there. xxx
+     */
+
+    return SCLI_OK;
+}
+
+
+
+static int
+cmd_scli_unload(scli_interp_t *interp, int argc, char **argv)
+{
+    GSList *elem;
+    scli_mode_t *mode = NULL;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    for (elem = interp->mode_list; elem; elem = g_slist_next(elem)) {
+	mode = (scli_mode_t *) elem->data;
+	if (strcmp(mode->name, argv[1]) == 0 && mode->module) {
+	    break;
+	}
+    }
+
+    if (elem && mode) {
+	if (! g_module_close(mode->module)) {
+	    g_string_sprintfa(interp->result, "%s", g_module_error());
+	    return SCLI_ERROR;
+	}
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
 create_scli_alias(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
@@ -480,7 +555,7 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
 			  "Community:", interp->peer->rcomm);
 	label = gsnmp_enum_get_label(gsnmp_enum_version_table,
-				     interp->peer->version);
+				     (gint32) interp->peer->version);
 	if (label) {
 	    g_string_sprintfa(interp->result, "%-*s %s\n", indent,
 			      "Protocol:", label);
@@ -606,6 +681,23 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  NULL, NULL,
 	  cmd_scli_close },
+
+	{ "create scli plugin", "<module>",
+	  "The create scli plugin command dynamically loads an scli mode\n"
+	  "into a running scli process. This can be used to dynamically\n"
+	  "extend scli with modules coming from other sources. Dynamic\n"
+	  "loadable modules also simplify the development and management\n"
+	  "of site-specific modules.",
+	  0,
+	  NULL, NULL,
+	  cmd_scli_load },
+
+	{ "delete scli plugin", "<module>",
+	  "The delete scli plugin command removes a previously loaded\n"
+	  "modules from a running scli process.",
+	  0,
+	  NULL, NULL,
+	  cmd_scli_unload },
 
 	{ "exit", NULL,
 	  "The exit command terminates the scli interpreter. An end of file\n"

@@ -358,7 +358,7 @@ xml_nortel_bridge_vlan_details(xmlNodePtr root,
 	guchar bits[32];
 	memset(bits, 0, sizeof(bits));
 	get_default_port_set(bits, sizeof(bits),
-			     vlanPortTable, vlanEntry->rcVlanId);
+			     vlanPortTable, (guint32) vlanEntry->rcVlanId);
 	node = xmlNewChild(tree, NULL, "default", NULL);
 	xml_port_set(node, bits, sizeof(bits));
     }
@@ -434,7 +434,7 @@ fmt_nortel_bridge_vlan_details(GString *s,
 	guchar bits[32];
 	memset(bits, 0, sizeof(bits));
 	get_default_port_set(bits, sizeof(bits),
-			     vlanPortTable, vlanEntry->rcVlanId);
+			     vlanPortTable, (guint32) vlanEntry->rcVlanId);
 	g_string_append(s, "Default:     ");
 	fmt_port_set(s, bits, sizeof(bits));
 	g_string_append(s, "\n");
@@ -842,7 +842,7 @@ set_nortel_bridge_vlan_default(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (vlanTable) {
-	int len = strlen(argv[1]);
+	size_t len = strlen(argv[1]);
 	for (i = 0; vlanTable[i]; i++) {
 	    if (vlanTable[i]->rcVlanName
 		&& vlanTable[i]->_rcVlanNameLength == len
