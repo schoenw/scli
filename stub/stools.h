@@ -85,6 +85,12 @@ stls_snmp_gettable(host_snmp *s, GSList *vbl);
 #include "bridge-mib.h"
 #include "disman-script-mib.h"
 #include "disman-schedule-mib.h"
+#include "snmp-framework-mib.h"
+#include "snmp-mpd-mib.h"
+#include "snmp-user-based-sm-mib.h"
+#include "snmp-community-mib.h"
+#include "snmp-view-based-acm-mib.h"
+#include "snmp-target-mib.h"
 
 #endif
 
