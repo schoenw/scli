@@ -109,6 +109,7 @@ typedef struct scli_alarm	scli_alarm_t;
 #define SCLI_CMD_FLAG_XML	(1 << 3)
 #define SCLI_CMD_FLAG_DRY	(1 << 4)
 #define SCLI_CMD_FLAG_NORECURSE	(1 << 5)
+#define SCLI_CMD_FLAG_DYNAMIC	(1 << 6)
 
 struct scli_cmd {
     char *path;			/* absolute command name */
@@ -417,6 +418,9 @@ fmt_ether_address(guchar *addr, int flags);
 extern void
 fmt_counter_dt(GString *s, guint32 *new_counter, guint32 *old_counter,
 	       struct timeval *last, double delta);
+extern void
+fmt_indent_string(GString *s, int indent, char *label, int len, char *string);
+
 extern void
 fmt_display_string(GString *s, int indent, char *label, int len, char *string);
 

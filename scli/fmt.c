@@ -427,6 +427,29 @@ fmt_counter_dt(GString *s, guint32 *new_counter, guint32 *old_counter,
 
 
 void
+fmt_indent_string(GString *s, int indent, char *label, int len, char *string)
+{
+    int i;
+    
+    g_string_sprintfa(s, "%-*s", indent, label);
+
+    for (i = 0; i < len; i++) {
+	if (string[i] == '\r') continue;
+	if (string[i] == '\n') {
+	    g_string_sprintfa(s, "\n%*s", indent, "");
+	} else {
+	    if (isprint(string[i])) {
+		g_string_append_c(s, string[i]);
+	    } else {
+		g_string_sprintfa(s, "\\%o", string[i]);
+	    }
+	}
+    }
+    g_string_append_c(s, '\n');
+}
+
+
+void
 fmt_display_string(GString *s, int indent, char *label, int len, char *string)
 {
     int i, pos;
