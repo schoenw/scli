@@ -6,7 +6,7 @@
 @setchapternewpage odd
 @c %**end of header
 
-@set VERSION 0.2.8
+@set VERSION 0.2.10
 
 @ifinfo
 This file documents the @code{scli} SNMP command line interface.
