@@ -181,7 +181,7 @@ scli_init_3com_mode(scli_interp_t *interp)
 	"3com",
 	"The 3com scli mode allows to manipulate virtual lans (vlans)\n"
 	"on 3com bridges. It is based on the PRODUCTMIB which is\n"
-	"implemented at least on 3Com SSII 3300 switches.",
+	"implemented at least on 3Com SuperStack II switches.",
 	cmds
     };
 

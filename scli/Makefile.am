@@ -25,7 +25,7 @@ man_MANS	= scli.1
 scli.1:
 	$(top_builddir)/scli/scli -n -c "show scli modes" | \
 	awk '/^$$/		{ printf(".PP\n"); next } \
-	     /^[A-Z][A-Z  ]*$$/	{ printf(".SH %s\n", $$0); next } \
+	     /^[A-Z,0-9][A-Z  ]*$$/	{ printf(".SH %s\n", $$0); next } \
 	     /^    /		{ printf(".TP\n.B %s\n", $$0); next } \
 	     /^ $$/		{ next } \
 	     //			{ printf("%s\n", $$0) }' | \
