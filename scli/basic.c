@@ -236,7 +236,8 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
 {
     scli_cmd_t *cmd = (scli_cmd_t *) node->data;
     int code = SCLI_OK;
-   
+
+#if 0
     extern char *g_snmp_msg;
     if (g_snmp_msg) g_free(g_snmp_msg);
     g_snmp_msg = g_malloc(strlen(cmd->name)
@@ -244,6 +245,7 @@ eval_cmd_node(scli_interp_t *interp, GNode *node, int argc, char **argv)
     strcpy(g_snmp_msg, cmd->path ? cmd->path : "");
     strcat(g_snmp_msg, " ");
     strcat(g_snmp_msg, cmd->name);
+#endif
     
     if (cmd->func) {
 	g_string_truncate(interp->result, 0);
@@ -344,7 +346,11 @@ scli_eval(scli_interp_t *interp, char *cmd)
 	    interp->flags |= SCLI_INTERP_FLAG_RECURSIVE;
 	    s = g_string_new(NULL);
 	    code = eval_all_cmd_node(interp, node, s);
-	    page(s);
+	    if (interp->flags & SCLI_INTERP_FLAG_INTERACTIVE) {
+		page(s);
+	    } else {
+		fputs(s->str, stdout);
+	    }
 	    g_string_free(s, 1);
 	    g_string_truncate(interp->result, 0);
 	    interp->flags &= ~SCLI_INTERP_FLAG_RECURSIVE;
