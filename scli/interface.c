@@ -78,39 +78,17 @@ fmt_ifStatus(GString *s, gint32 *admin, gint32 *oper,
 
 static int
 match_interface(regex_t *regex_iface,
-		if_mib_ifEntry_t *ifEntry, if_mib_ifXEntry_t *ifXEntry)
+		if_mib_ifEntry_t *ifEntry)
 {
-#if 0
-    long l;
-    char *end;
-#endif
     int status;
     
     if (! regex_iface) {
 	return 1;
     }
 
-#if 0
-    l = strtol(iface, &end, 0);
-    if (end != iface) {
-	return (ifEntry->ifIndex == l);
-    }
-#endif
-
-    if (ifXEntry && ifXEntry->ifName) {
-	char *string = g_malloc0(ifXEntry->_ifNameLength + 1);
-	memcpy(string, ifXEntry->ifName, ifXEntry->_ifNameLength);
-	status = regexec(regex_iface, string, (size_t) 0, NULL, 0);
-	g_free(string);
-	if (status == 0) {
-	    return 1;
-	}
-    }
-
     /*
-     * Does it really make sense to filter on the description?
-     * If yes, then it should be obvious (which implies another
-     * option).
+     * Does it really make sense to filter only on the description?
+     * This way, we do not need to read the ifXTable at all...
      */
 
     if (ifEntry->ifDescr) {
@@ -125,7 +103,63 @@ match_interface(regex_t *regex_iface,
 
     return 0;
 }
+
+
+
+static if_mib_ifEntry_t *
+get_if_entry(if_mib_ifEntry_t **ifTable, gint32 ifIndex)
+{
+    int i;
     
+    if (ifTable) {
+	for (i = 0; ifTable[i]; i++) {
+	    if (ifTable[i]->ifIndex == ifIndex) {
+		return ifTable[i];
+	    }
+	}
+    }
+    return NULL;
+}
+    
+
+
+static int
+get_if_type_width(if_mib_ifEntry_t **ifTable)
+{
+    int i, type_width = 6;
+
+    if (ifTable) {
+	for (i = 0; ifTable[i]; i++) {
+	    if (ifTable[i]->ifType) {
+		char const *label;
+		label = stls_enum_get_label(if_mib_enums_ifType,
+					    *ifTable[i]->ifType);
+		if (label && strlen(label) > type_width) {
+		    type_width = strlen(label);
+		}
+	    }
+	}
+    }
+    return type_width;
+}
+
+
+
+static int
+get_if_name_width(if_mib_ifXEntry_t **ifXTable)
+{
+    int i, name_width = 6;
+    
+    if (ifXTable) {
+	for (i = 0; ifXTable[i]; i++) {
+	    if (ifXTable[i]->_ifNameLength > name_width) {
+		name_width = ifXTable[i]->_ifNameLength;
+	    }
+	}
+    }
+    return name_width;
+}
+
 
 
 static void
@@ -278,8 +312,7 @@ cmd_if_details(scli_interp_t *interp, int argc, char **argv)
 
     if (ifTable) {
 	for (i = 0, c = 0; ifTable[i]; i++) {
-	    if (match_interface(regex_iface, ifTable[i],
-				ifXTable ? ifXTable[i] : NULL)) {
+	    if (match_interface(regex_iface, ifTable[i])) {
 		if (c) {
 		    g_string_append(interp->result, "\n");
 		}
@@ -363,8 +396,7 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
 {
     if_mib_ifEntry_t **ifTable = NULL;
     if_mib_ifXEntry_t **ifXTable = NULL;
-    int name_width = 6;
-    int type_width = 6;
+    int name_width, type_width;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
 
@@ -383,29 +415,16 @@ cmd_if_info(scli_interp_t *interp, int argc, char **argv)
     }
     (void) if_mib_get_ifXTable(interp->peer, &ifXTable);
 
+    type_width = get_if_type_width(ifTable);
+    name_width = get_if_name_width(ifXTable);
+
     if (ifTable) {
-	for (i = 0; ifTable[i]; i++) {
-	    if (ifXTable && ifXTable[i]) {
-		if (ifXTable[i]->_ifNameLength > name_width) {
-		    name_width = ifXTable[i]->_ifNameLength;
-		}
-	    }
-	    if (ifTable[i]->ifType) {
-		char const *label;
-		label = stls_enum_get_label(if_mib_enums_ifType,
-					*ifTable[i]->ifType);
-		if (label && strlen(label) > type_width) {
-		    type_width = strlen(label);
-		}
-	    }
-	}
 	g_string_sprintfa(interp->header,
 		  "INTERFACE STATUS  MTU %-*s  SPEED %-*s DESCRIPTION",
 			  type_width, "TYPE",
 			  name_width, "NAME");
 	for (i = 0; ifTable[i]; i++) {
-	    if (match_interface(regex_iface, ifTable[i],
-				ifXTable ? ifXTable[i] : NULL)) {
+	    if (match_interface(regex_iface, ifTable[i])) {
 		show_if_info(interp->result, ifTable[i],
 			     ifXTable ? ifXTable[i] : NULL,
 			     type_width, name_width);
@@ -428,7 +447,7 @@ show_if_stack(GString *s,
 	      if_mib_ifStackEntry_t *ifStackEntry,
 	      if_mib_ifStackEntry_t **ifStackTable,
 	      if_mib_ifEntry_t **ifTable,
-	      int level)
+	      int level, int type_width)
 {
     /*
      *      ,-- if2 
@@ -443,32 +462,32 @@ show_if_stack(GString *s,
     int i = 0;
     char *ifDescr = NULL;
     int ifDescrLength = 0;
+    if_mib_ifEntry_t *ifEntry = NULL;
 
     if (! ifStackEntry->ifStackStatus
 	|| *ifStackEntry->ifStackStatus != IF_MIB_IFSTACKSTATUS_ACTIVE) {
 	return;
     }
+    
+    ifEntry = get_if_entry(ifTable, ifStackEntry->ifStackHigherLayer);
 
-    if (ifTable) {
-	for (i = 0; ifTable[i]; i++) {
-	    if (ifTable[i]->ifIndex == ifStackEntry->ifStackHigherLayer) break;
-	}
-	if (ifTable[i]) {
-	    ifDescr = ifTable[i]->ifDescr;
-	    ifDescrLength = ifTable[i]->_ifDescrLength;
-	}
+    if (ifEntry->ifDescr) {
+	ifDescr = ifEntry->ifDescr;
+	ifDescrLength = ifEntry->_ifDescrLength;
     }
 
-    g_string_sprintfa(s, "%*s%s %.*s (%d)\n", level*4, "",
-		      level ? "`- " : "-  ",
-		      ifDescrLength, ifDescr ? ifDescr : "",
-		      ifStackEntry->ifStackHigherLayer);
+    g_string_sprintfa(s, "%9d ", ifStackEntry->ifStackHigherLayer);
+    fmt_enum(s, type_width, if_mib_enums_ifType, ifEntry->ifType);
+    g_string_sprintfa(s, " %*s%s %.*s\n",
+		      level*4, "", level ? "`-" : " -",
+		      ifDescrLength, ifDescr ? ifDescr : "");
 
     for (i = 0; ifStackTable[i]; i++) {
 	if ((ifStackTable[i]->ifStackLowerLayer
 	     == ifStackEntry->ifStackHigherLayer)
 	    && ifStackTable[i]->ifStackHigherLayer) {
-	    show_if_stack(s, ifStackTable[i], ifStackTable, ifTable, level+1);
+	    show_if_stack(s, ifStackTable[i], ifStackTable, ifTable,
+			  level+1, type_width);
 	    if (ifStackTable[i]->ifStackStatus) {
 		*ifStackTable[i]->ifStackStatus = 0;
 	    }
@@ -483,18 +502,42 @@ cmd_if_stack(scli_interp_t *interp, int argc, char **argv)
 {
     if_mib_ifStackEntry_t **ifStackTable = NULL;
     if_mib_ifEntry_t **ifTable = NULL;
-    int i;
+    if_mib_ifEntry_t *ifEntry = NULL;
+    regex_t _regex_iface, *regex_iface = NULL;
+    int i, type_width;
+
+    if (argc > 1) {
+	regex_iface = &_regex_iface;
+	if (regcomp(regex_iface, argv[1], REG_EXTENDED|REG_NOSUB) != 0) {
+	    return SCLI_ERROR;	/* xxx report error */
+	}
+    }
 
     if (if_mib_get_ifStackTable(interp->peer, &ifStackTable)) {
+	if (regex_iface) regfree(regex_iface);
 	return SCLI_ERROR;
     }
     (void) if_mib_get_ifTable(interp->peer, &ifTable);
-    
+
+    type_width = get_if_type_width(ifTable);
+
     if (ifStackTable) {
+	g_string_sprintfa(interp->header, "INTERFACE %-*s    STACKING ORDER",
+			  type_width, "TYPE");
 	for (i = 0; ifStackTable[i]; i++) {
-	    if (ifStackTable[i]->ifStackLowerLayer == 0) {	
-		show_if_stack(interp->result,
-			      ifStackTable[i], ifStackTable, ifTable, 0);
+	    if (ifStackTable[i]->ifStackLowerLayer == 0) {
+		ifEntry = get_if_entry(ifTable,
+				       ifStackTable[i]->ifStackHigherLayer);
+		if (! ifEntry) {
+		    g_warning("stacked interface %d does not exist "
+			      "in the ifTable",
+			      ifStackTable[i]->ifStackHigherLayer);
+		    continue;
+		}
+		if (match_interface(regex_iface, ifEntry)) {
+		    show_if_stack(interp->result, ifStackTable[i],
+				  ifStackTable, ifTable, 0, type_width);
+		}
 	    }
 	}
     }
@@ -502,6 +545,8 @@ cmd_if_stack(scli_interp_t *interp, int argc, char **argv)
     if (ifStackTable) if_mib_free_ifStackTable(ifStackTable);
     if (ifTable) if_mib_free_ifTable(ifTable);
     
+    if (regex_iface) regfree(regex_iface);
+
     return SCLI_OK;
 }
 
@@ -563,8 +608,7 @@ cmd_if_stats(scli_interp_t *interp, int argc, char **argv)
 			"I-BPS O-BPS I-PPS O-PPS I-ERR O-ERR  DESCRIPTION");
 	for (i = 0; ifTable[i]; i++) {
 	    GString *s;
-	    if (! match_interface(regex_iface, ifTable[i],
-				  ifXTable ? ifXTable[i] : NULL)) {
+	    if (! match_interface(regex_iface, ifTable[i])) {
 		continue;
 	    }
 	    s = interp->result;
