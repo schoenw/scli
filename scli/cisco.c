@@ -187,11 +187,15 @@ show_cisco_ip_accounting_current(scli_interp_t *interp, int argc, char **argv)
 	    }
 	    memcpy(stats[i].src, lipAccountTable[i]->actSrc, 4);
 	    memcpy(stats[i].dst, lipAccountTable[i]->actDst, 4);
-	    stats[i].inByts = *lipAccountTable[i]->actByts;
-	    stats[i].inPkts = *lipAccountTable[i]->actPkts;
+	    stats[i].inByts = lipAccountTable[i]->actByts ?
+		*lipAccountTable[i]->actByts : 0;
+	    stats[i].inPkts = lipAccountTable[i]->actPkts ?
+		*lipAccountTable[i]->actPkts : 0;
 	    if (lipAccountTable[j]) {
-		stats[i].outByts = *lipAccountTable[j]->actByts;
-		stats[i].outPkts = *lipAccountTable[j]->actPkts;
+		stats[i].outByts = lipAccountTable[j]->actByts ?
+		    *lipAccountTable[j]->actByts : 0;
+		stats[i].outPkts = lipAccountTable[j]->actPkts ?
+		    *lipAccountTable[j]->actPkts : 0;
 	    }
 	}
 
