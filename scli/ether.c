@@ -25,6 +25,7 @@
 #include "snmpv2-tc.h"
 #include "mau-mib.h"
 #include "etherlike-mib.h"
+#include "rmon-mib.h" 
 
 
 
@@ -89,7 +90,7 @@ static guint32 const dot3MauType1000BaseTHD[]
 static guint32 const dot3MauType1000BaseTFD[]
 	= { MAU_MIB_DOT3MAUTYPE1000BASETFD };
 
-GSnmpIdentity const mau_type_identities[] = {
+GNetSnmpIdentity const mau_type_identities[] = {
     { dot3MauTypeAUI,
       sizeof(dot3MauTypeAUI)/sizeof(guint32),
       "AUI" },
@@ -386,6 +387,56 @@ show_ether_stats(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+fmt_ether_history(GString *s, rmon_mib_historyControlEntry_t *ctrlEntry)
+{
+    g_string_sprintfa(s, "%9u |",
+		      ctrlEntry->historyControlIndex);
+    
+    g_string_sprintfa(s, " (%.*s)",
+		      ctrlEntry->_historyControlOwnerLength,
+		      ctrlEntry->historyControlOwner);
+    
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_ether_history(scli_interp_t *interp, int argc, char **argv)
+{
+    rmon_mib_historyControlEntry_t **ctrlTable = NULL;
+    int i;
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    rmon_mib_get_historyControlTable(interp->peer, &ctrlTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (ctrlTable) {
+	g_string_append(interp->header,
+			"INTERFACE | ALIGN   FCS   RCV  LONG | "
+			"DEFER  SCOL  MCOL  XCOL  LCOL  XMIT  CARR");
+	for (i = 0; ctrlTable[i]; i++) {
+	    fmt_ether_history(interp->result, ctrlTable[i]);
+	}
+    }
+
+    if (ctrlTable) rmon_mib_free_historyControlTable(ctrlTable);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_ether_mode(scli_interp_t *interp)
 {
@@ -427,6 +478,12 @@ scli_init_ether_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_ether_stats },
+
+	{ "show ethernet history", NULL,
+	  "...",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_ether_history },
 
 	{ "monitor ethernet stats", NULL,
 	  "The `monitor ethernet stats' command shows the same information\n"
