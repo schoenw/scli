@@ -669,7 +669,7 @@ scli_init_ip_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "set ip forwarding", "<value>",
-	  "The set ip forwarding command controls whether the IP protocol\n"
+	  "The `set ip forwarding' command controls whether the IP protocol\n"
 	  "engine forwards IP datagrams or not. The <value> parameter must\n"
 	  "be one of the strings \"enabled\" or \"disabled\".",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
@@ -677,7 +677,7 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  set_ip_forwarding },
 	
 	{ "set ip ttl", "<number>",
-	  "The set ip ttl command can be used to change the default\n"
+	  "The `set ip ttl' command can be used to change the default\n"
 	  "time to live (TTL) value used by the IP protocol engine. The\n"
 	  "<number> parameter must be a number between 1 and 255 inclusive.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY | SCLI_CMD_FLAG_NORECURSE,
@@ -685,7 +685,7 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  set_ip_ttl },
 	
 	{ "show ip info", NULL,
-	  "The show ip info command displays paramters of the IP\n"
+	  "The `show ip info' command displays parameters of the IP\n"
 	  "protocol engine, such as the default TTL or whether the\n"
 	  "node is forwarding IP packets.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
@@ -693,7 +693,7 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  show_ip_info },
 	
 	{ "show ip forwarding", NULL,
-	  "The show ip forwarding command displays the IP forwarding data\n"
+	  "The `show ip forwarding' command displays the IP forwarding data\n"
 	  "base. The command generates a table with the following columns:\n"
 	  "\n"
 	  "  DESTINATION\n"
@@ -706,9 +706,9 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  show_ip_forwarding },
 	
 	{ "show ip addresses", NULL,
-	  "The show ip addresses command displays the IP addresses assigned\n"
-	  "to network interfaces. The command generates a table with the\n"
-	  "following columns:\n"
+	  "The `show ip addresses' command displays the IP addresses\n"
+	  "assigned to network interfaces. The command generates a table\n"
+	  "with the following columns:\n"
 	  "\n"
 	  "  INTERFACE network interface number\n"
 	  "  ADDRESS   IP address\n"
@@ -719,14 +719,14 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  show_ip_addresses },
 	
 	{ "show ip tunnel", NULL,
-	  "The show ip tunnel command displays information about existing\n"
+	  "The `show ip tunnel' command displays information about existing\n"
 	  "IP tunnels.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_ip_tunnel },
 	
 	{ "show ip mapping", NULL,
-	  "The show ip mapping command displays the mapping of IP address\n"
+	  "The `show ip mapping' command displays the mapping of IP address\n"
 	  "to lower layer address (e.g., IEEE 802 addresses). The command\n"
 	  "generates a table with the following columns:\n"
 	  "\n"
@@ -739,7 +739,7 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  show_ip_mapping },
 	
 	{ "dump ip", NULL,
-	  "The dump ip command generates a sequence of scli commands\n"
+	  "The `dump ip' command generates a sequence of scli commands\n"
 	  "which can be used to restore the IP configuration.\n",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
