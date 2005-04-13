@@ -40,6 +40,7 @@ static scli_vendor_t iana_vendor_table[] = {
     {  762,	"Karlnet",		"http://www.karlnet.com/" },
     {  915,	"SerComm",		"http://www.sercomm.com/" },
     {  937,	"Netgear",		"http://www.netgear.com/" },
+    { 1347,	"Kyocera Corporation",	"http://www.kyocera.com/" },
     { 1575,	"TU Braunschweig",	"http://www.tu-braunschweig.de/" },
     { 1602,	"Canon",		"http://www.canon.com/" },
     { 1751,	"Lucent Technologies",	"http://www.lucent.com/" },
