@@ -41,7 +41,9 @@ MIBS			= IF-MIB \
 			  OLD-CISCO-IP-MIB \
 			  RAPID-CITY \
 			  UCD-SNMP-MIB \
-			  PRODUCTMIB
+			  PRODUCTMIB \
+			  CISCO-DOT11-ASSOCIATION-MIB \
+			  INET-ADDRESS-MIB
 
 STUBS			= if-mib.h if-mib.c \
 			  ianaiftype-mib.h ianaiftype-mib.c \
@@ -86,13 +88,15 @@ STUBS			= if-mib.h if-mib.c \
 			  printer-mib.h printer-mib.c \
 			  iana-charset-mib.h iana-charset-mib.c \
 			  iana-printer-mib.h iana-printer-mib.c \
-			  cisco-process-mib.h cisco-process-mib.c
+			  cisco-process-mib.h cisco-process-mib.c \
+			  cisco-dot11-association-mib.h cisco-dot11-association-mib.c \
+			  inet-address-mib.h inet-address-mib.c
 
 noinst_LIBRARIES	= libstub.a
 libstub_a_SOURCES	= $(STUBS)
 
-SMIDUMP			= ../../libsmi/trunk/tools/smidump
-SMIPATH			= $(HOME)/mibs/cisco:$(HOME)/mibs/3com:$(HOME)/mibs/nortel:$(HOME)/mibs:/usr/local/share/mibs/ietf:/usr/local/share/mibs/iana:/usr/share/snmp/mibs
+SMIDUMP			= ../../../libsmi/trunk/tools/smidump
+SMIPATH			= $(HOME)/mibs/cisco:$(HOME)/mibs/3com:$(HOME)/mibs/nortel:$(HOME)/mibs:/usr/local/share/mibs/site:/usr/local/share/mibs/ietf:/usr/local/share/mibs/iana:/usr/share/snmp/mibs
 
 export SMIPATH
 
@@ -227,3 +231,10 @@ ucd-snmp-mib.h ucd-snmp-mib.c:
 
 productmib.h productmib.c:
 	$(SMIDUMP) -f scli --scli-include='a3ComVlanIfEntry|a3ComVirtualGroup' PRODUCTMIB
+
+cisco-dot11-association-mib.h cisco-dot11-association-mib.c:
+	$(SMIDUMP) -f scli CISCO-DOT11-ASSOCIATION-MIB
+
+inet-address-mib.h inet-address-mib.c:
+	$(SMIDUMP) -f scli INET-ADDRESS-MIB
+

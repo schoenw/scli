@@ -390,15 +390,15 @@ structure as part of the mode registration.
 
 @section Adding MIB Stubs
 
-I might be necessary to add stubs for additional MIB modules. This
+It might be necessary to add stubs for additional MIB modules. This
 process is very straightforward. 
 
 @enumerate
 @item
-Edit @code{stubs/Makefile.am}
+Edit @code{stub/Makefile.am}
 
 @item
-Run @code{make stubs} in the @code{stubs} directory. Note that you need
+Run @code{make} in the @code{stub} directory. Note that you need
 a version of @code{smidump} which is compatible with the @code{scli}
 release you are using.
 

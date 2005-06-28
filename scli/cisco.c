@@ -2,6 +2,7 @@
  * cisco.c -- scli cisco mode implementation
  *
  * Copyright (C) 2001 Juergen Schoenwaelder
+ *           (C) 2005 Frank Strauss
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +37,18 @@
 
 #include "old-cisco-ip-mib.h"
 #include "cisco-process-mib.h"
+#include "cisco-dot11-association-mib.h"
+#include "inet-address-mib.h"
+#include "if-mib.h"
+
+
+#define IF_MIB_IFENTRY_PARAMS \
+	( IF_MIB_IFDESCR | IF_MIB_IFSPEED | IF_MIB_IFPHYSADDRESS \
+	  | IF_MIB_IFADMINSTATUS | IF_MIB_IFOPERSTATUS )
+
+#define IF_MIB_IFXENTRY_PARAMS \
+	( IF_MIB_IFNAME | IF_MIB_IFLINKUPDOWNTRAPENABLE | IF_MIB_IFHIGHSPEED \
+	  | IF_MIB_IFPROMISCUOUSMODE | IF_MIB_IFCONNECTORPRESENT | IF_MIB_IFALIAS)
 
 
 typedef struct {
@@ -602,6 +615,419 @@ set_cisco_ip_accounting_checkpoint(scli_interp_t *interp, int argc, char **argv)
 }
 
 
+
+static if_mib_ifEntry_t *
+get_ifEntry(if_mib_ifEntry_t **ifTable, gint32 ifIndex)
+{
+    int i;
+    
+    if (ifTable) {
+	for (i = 0; ifTable[i]; i++) {
+	    if (ifTable[i]->ifIndex == ifIndex) {
+		return ifTable[i];
+	    }
+	}
+    }
+    return NULL;
+}
+    
+
+
+static if_mib_ifXEntry_t *
+get_ifXEntry(if_mib_ifXEntry_t **ifXTable, gint32 ifIndex)
+{
+    int i;
+
+    if (ifXTable) {
+	for (i = 0; ifXTable[i]; i++) {
+	    if (ifXTable[i]->ifIndex == ifIndex) {
+		return ifXTable[i];
+	    }
+	}
+    }
+    return NULL;
+}
+
+
+
+static cisco_dot11_association_mib_cDot11AssociationStatsEntry_t *
+get_assStatsEntry(cisco_dot11_association_mib_cDot11AssociationStatsEntry_t **assStatsTable, gint32 ifIndex)
+{
+    int i;
+
+    if (assStatsTable) {
+	for (i = 0; assStatsTable[i]; i++) {
+	    if (assStatsTable[i]->ifIndex == ifIndex) {
+		return assStatsTable[i];
+	    }
+	}
+    }
+    return NULL;
+}
+
+
+
+static cisco_dot11_association_mib_cDot11ClientStatisticEntry_t *
+get_client_statsEntry(cisco_dot11_association_mib_cDot11ClientStatisticEntry_t **statsTable, gint32 ifIndex, guint16 ssidLength, guchar *ssid, guchar *address)
+{
+    int i;
+
+    if (statsTable) {
+	for (i = 0; statsTable[i]; i++) {
+	    if ((statsTable[i]->ifIndex == ifIndex) &&
+		(statsTable[i]->_cd11IfAuxSsidLength == ssidLength) &&
+		(!memcmp(statsTable[i]->cd11IfAuxSsid, ssid, ssidLength)) &&
+		(!memcmp(statsTable[i]->cDot11ClientAddress, address, 6))) {
+		return statsTable[i];
+	    }
+	}
+    }
+    return NULL;
+}
+
+
+
+static int
+get_if_name_width(if_mib_ifXEntry_t **ifXTable)
+{
+    int i, name_width = 4;
+    
+    if (ifXTable) {
+	for (i = 0; ifXTable[i]; i++) {
+	    if (ifXTable[i]->_ifNameLength > name_width) {
+		name_width = ifXTable[i]->_ifNameLength;
+	    }
+	}
+    }
+    return name_width;
+}
+
+
+
+static void
+fmt_interface_info(GString *s,
+	     cisco_dot11_association_mib_cDot11ActiveDevicesEntry_t *deviceEntry,
+	     cisco_dot11_association_mib_cDot11AssociationStatsEntry_t *assStatsEntry,
+	     if_mib_ifEntry_t *ifEntry,
+	     if_mib_ifXEntry_t *ifXEntry,
+	     int name_width)
+{
+    const char *e;
+    
+    g_string_sprintfa(s, "%5u ", deviceEntry->ifIndex);
+
+    if (ifEntry->ifSpeed) {
+	if (*(ifEntry->ifSpeed) == 0xffffffff
+	    && ifXEntry && ifXEntry->ifHighSpeed) {
+	    g_string_sprintfa(s, "%5s ",
+			      fmt_gtp(*(ifXEntry->ifHighSpeed)));
+	} else {
+	    g_string_sprintfa(s, "%5s ",
+			      fmt_kmg(*(ifEntry->ifSpeed)));
+	}
+    } else {
+	g_string_append(s, "      ");
+    }
+
+    if (ifXEntry && ifXEntry->ifName) {
+	g_string_sprintfa(s, "%-*.*s ", name_width,
+			  (int) ifXEntry->_ifNameLength,
+			  ifXEntry->ifName);
+    } else {
+	g_string_sprintfa(s, "%*s ", name_width, "");
+    }
+
+    if (deviceEntry->cDot11ActiveWirelessClients)
+	g_string_sprintfa(s, "%4d ", *deviceEntry->cDot11ActiveWirelessClients);
+    else
+	g_string_append(s, "     ");
+	
+    if (deviceEntry->cDot11ActiveBridges)
+	g_string_sprintfa(s, "%4d ", *deviceEntry->cDot11ActiveBridges);
+    else
+	g_string_append(s, "     ");
+	
+    if (deviceEntry->cDot11ActiveRepeaters)
+	g_string_sprintfa(s, "%4d ", *deviceEntry->cDot11ActiveRepeaters);
+    else
+	g_string_append(s, "     ");
+	
+    if (assStatsEntry->cDot11AssStatsAssociated)
+	g_string_sprintfa(s, "%5d ", *assStatsEntry->cDot11AssStatsAssociated);
+    else
+	g_string_append(s, "      ");
+	
+    if (assStatsEntry->cDot11AssStatsDisassociated)
+	g_string_sprintfa(s, "%5d ", *assStatsEntry->cDot11AssStatsDisassociated);
+    else
+	g_string_append(s, "      ");
+	
+    if (assStatsEntry->cDot11AssStatsRoamedIn)
+	g_string_sprintfa(s, "%5d ", *assStatsEntry->cDot11AssStatsRoamedIn);
+    else
+	g_string_append(s, "      ");
+	
+    if (assStatsEntry->cDot11AssStatsRoamedAway)
+	g_string_sprintfa(s, "%5d ", *assStatsEntry->cDot11AssStatsRoamedAway);
+    else
+	g_string_append(s, "      ");
+	
+    if (assStatsEntry->cDot11AssStatsAuthenticated)
+	g_string_sprintfa(s, "%5d ", *assStatsEntry->cDot11AssStatsAuthenticated);
+    else
+	g_string_append(s, "      ");
+	
+    if (assStatsEntry->cDot11AssStatsDeauthenticated)
+	g_string_sprintfa(s, "%5d ", *assStatsEntry->cDot11AssStatsDeauthenticated);
+    else
+	g_string_append(s, "      ");
+	
+    g_string_append(s, "\n");
+}
+
+
+
+static int
+show_cisco_dot11_interface_info(scli_interp_t *interp, int argc, char **argv)
+{
+    cisco_dot11_association_mib_cDot11ActiveDevicesEntry_t **deviceTable = NULL;
+    cisco_dot11_association_mib_cDot11AssociationStatsEntry_t **assStatsTable = NULL;
+    if_mib_ifEntry_t **ifTable = NULL;
+    if_mib_ifXEntry_t **ifXTable = NULL;
+    int name_width;
+    int i;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    cisco_dot11_association_mib_get_cDot11ActiveDevicesTable(interp->peer,
+					  &deviceTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (deviceTable) {
+	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_PARAMS);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS);
+	cisco_dot11_association_mib_get_cDot11AssociationStatsTable(interp->peer, &assStatsTable, 0);
+	name_width = get_if_name_width(ifXTable);
+	g_string_sprintfa(interp->header,
+			  "IFACE SPEED %-*s CLNT BRDG RPTR ASSCI ASSCO ROAMI ROAMO AUTHI AUTHO",
+			  name_width, "NAME");
+	for (i = 0; deviceTable[i]; i++) {
+	    if_mib_ifEntry_t *ifEntry;
+	    if_mib_ifXEntry_t *ifXEntry;
+	    cisco_dot11_association_mib_cDot11AssociationStatsEntry_t *assStatsEntry;
+	    ifEntry = get_ifEntry(ifTable, deviceTable[i]->ifIndex);
+	    ifXEntry = get_ifXEntry(ifXTable, deviceTable[i]->ifIndex);
+	    assStatsEntry = get_assStatsEntry(assStatsTable, deviceTable[i]->ifIndex);
+	    fmt_interface_info(interp->result, deviceTable[i], assStatsEntry,
+			       ifEntry, ifXEntry, name_width);
+	}
+	
+    }
+
+    if (deviceTable) cisco_dot11_association_mib_free_cDot11ActiveDevicesTable(deviceTable);
+    if (assStatsTable) cisco_dot11_association_mib_free_cDot11AssociationStatsTable(assStatsTable);
+    if (ifXTable) if_mib_free_ifXTable(ifXTable);
+    if (ifTable) if_mib_free_ifTable(ifTable);
+	
+    return SCLI_OK;
+}
+
+
+
+static int
+get_client_ssid_width(cisco_dot11_association_mib_cDot11ClientConfigInfoEntry_t **configTable)
+{
+    int i, width = 4;
+    
+    if (configTable) {
+	for (i = 0; configTable[i]; i++) {
+	    if (configTable[i]->_cd11IfAuxSsidLength > width) {
+		width = configTable[i]->_cd11IfAuxSsidLength;
+	    }
+	}
+    }
+    return width;
+}
+
+
+
+static void
+fmt_client_info(GString *s,
+		cisco_dot11_association_mib_cDot11ClientConfigInfoEntry_t *configEntry,
+		cisco_dot11_association_mib_cDot11ClientStatisticEntry_t *statsEntry,
+		int ssid_width)
+{
+    const char *e;
+    
+    g_string_sprintfa(s, "%2u ", configEntry->ifIndex);
+
+    if (configEntry && configEntry->cd11IfAuxSsid) {
+	g_string_sprintfa(s, "%-*.*s ", ssid_width,
+			  (int) configEntry->_cd11IfAuxSsidLength,
+			  configEntry->cd11IfAuxSsid);
+    } else {
+	g_string_sprintfa(s, "%*s ", ssid_width, "");
+    }
+
+    if (configEntry && configEntry->cDot11ClientAddress) {
+	g_string_sprintfa(s, "%s ",
+			  fmt_ether_address(configEntry->cDot11ClientAddress,
+					    SCLI_FMT_ADDR));
+    } else {
+	g_string_append(s, "                  ");
+    }
+	
+    if (configEntry && configEntry->cDot11ClientIpAddressType &&
+	configEntry->cDot11ClientIpAddress &&
+	(*configEntry->cDot11ClientIpAddressType == INET_ADDRESS_MIB_INETADDRESSTYPE_IPV4)) {
+	// XXX: support other inet address types
+	g_string_sprintfa(s, "%-15s ",
+			  fmt_ipv4_address(configEntry->cDot11ClientIpAddress,
+					   SCLI_FMT_ADDR));
+    } else {
+	g_string_append(s, "                ");
+    }
+	
+    if (statsEntry && statsEntry->cDot11ClientSignalStrength) {
+	g_string_sprintfa(s, "%4d ", *statsEntry->cDot11ClientSignalStrength);
+    } else {
+	g_string_append(s, "     ");
+    }
+	
+    if (statsEntry && statsEntry->cDot11ClientUpTime) {
+	g_string_sprintfa(s, "%s",
+			  fmt_seconds(*statsEntry->cDot11ClientUpTime));
+    } else {
+	g_string_append(s, "          ");
+    }
+}
+
+
+
+typedef struct {
+    guint32 inOctets;
+    guint32 outOctets;
+    guint32 errors;
+} client_stats_t;
+
+
+
+static int
+show_cisco_dot11_clients_stats(scli_interp_t *interp, int argc, char **argv)
+{
+    cisco_dot11_association_mib_cDot11ClientConfigInfoEntry_t **configTable = NULL;
+    cisco_dot11_association_mib_cDot11ClientStatisticEntry_t **statsTable = NULL;
+    int ssid_width;
+    int i;
+    static struct timeval last, now;
+    double delta;
+    static client_stats_t *stats = NULL;
+    static time_t epoch = 0;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    cisco_dot11_association_mib_get_cDot11ClientConfigInfoTable(interp->peer,
+					  &configTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (epoch < interp->epoch) {
+	if (stats) g_free(stats);
+	stats = NULL;
+	last.tv_sec = last.tv_usec = 0;
+    }
+
+    if (! stats && configTable) {
+	for (i = 0; configTable[i]; i++) ;
+	stats = g_new0(client_stats_t, i);
+    }
+
+    epoch = time(NULL);
+    gettimeofday(&now, NULL);
+    delta = TV_DIFF(last, now);
+
+    if (configTable) {
+	cisco_dot11_association_mib_get_cDot11ClientStatisticTable(interp->peer, &statsTable, 0);
+	ssid_width = get_client_ssid_width(configTable);
+	g_string_sprintfa(interp->header,
+			  "IF %-*s ADDRESS           IPv4-ADDRESS    SGNL     UPTIME I-BPS O-BPS   ERR",
+			  ssid_width, "SSID");
+	for (i = 0; configTable[i]; i++) {
+	    cisco_dot11_association_mib_cDot11ClientStatisticEntry_t *statsEntry;
+	    statsEntry = get_client_statsEntry(statsTable,
+					       configTable[i]->ifIndex,
+					       configTable[i]->_cd11IfAuxSsidLength,
+					       configTable[i]->cd11IfAuxSsid,
+					       configTable[i]->cDot11ClientAddress);
+	    fmt_client_info(interp->result, configTable[i], statsEntry,
+			    ssid_width);
+
+	    fmt_counter_dt(interp->result,
+			   statsEntry->cDot11ClientBytesReceived,
+			   &(stats[i].inOctets), &last, delta);
+
+	    fmt_counter_dt(interp->result,
+			   statsEntry->cDot11ClientBytesSent,
+			   &(stats[i].outOctets), &last, delta);
+
+	    if (statsEntry->cDot11ClientDuplicates &&
+		statsEntry->cDot11ClientMsduRetries &&
+		statsEntry->cDot11ClientMsduFails &&
+		statsEntry->cDot11ClientWepErrors &&
+		statsEntry->cDot11ClientMicErrors &&
+		statsEntry->cDot11ClientMicMissingFrames &&
+		delta > TV_DELTA) {
+		guint32 err = *statsEntry->cDot11ClientDuplicates +
+		    *statsEntry->cDot11ClientMsduRetries +
+		    *statsEntry->cDot11ClientMsduFails +
+		    *statsEntry->cDot11ClientWepErrors +
+		    *statsEntry->cDot11ClientMicErrors +
+		    *statsEntry->cDot11ClientMicMissingFrames;
+		if (last.tv_sec && last.tv_usec) {
+		    double f_val = (err - stats[i].errors) / delta;
+		    g_string_sprintfa(interp->result, " %5s",
+				      fmt_kmg((guint32) f_val));
+		} else {
+		    g_string_sprintfa(interp->result, "  ----");
+		}
+		stats[i].errors = err;
+	    } else {
+		g_string_sprintfa(interp->result, "  ----");
+	    }
+		    
+	    g_string_append(interp->result, "\n");
+	}
+	
+    }
+
+    last = now;
+    if (configTable) cisco_dot11_association_mib_free_cDot11ClientConfigInfoTable(configTable);
+    if (statsTable) cisco_dot11_association_mib_free_cDot11ClientStatisticTable(statsTable);
+	
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_cisco_mode(scli_interp_t *interp)
 {
@@ -692,6 +1118,53 @@ scli_init_cisco_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  set_cisco_ip_accounting_checkpoint },
+
+	{ "show cisco dot11 interface info", NULL,
+	  "The `show cisco dot11 interface info' command displays information\n"
+	  "about all IEEE 802.11 interfaces on a CISCO device. The command\n"
+	  "generates a table with the following columns:\n"
+	  "\n"
+	  "  IFACE  network interface number\n"
+	  "  SPEED  speed in bits per second\n"
+	  "  NAME   name of the network interface\n"
+	  "  CLNT   number of associated clients\n"
+	  "  BRDG   number of assiciated bridges\n"
+	  "  RPRT   number of assiciated repeaters\n"
+	  "  ASSCI  total number of associated stations\n"
+	  "  ASSCO  total number of deassociated stations\n"
+	  "  ROAMI  total number of roamed-in stations\n"
+	  "  ROAMO  total number of roamed-away stations\n"
+	  "  AUTHI  total number of authenticated stations\n"
+	  "  AUTHO  total number of deauthenticated stations",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_cisco_dot11_interface_info },
+
+	{ "show cisco dot11 clients stats", NULL,
+	  "The `show cisco dot11 clients stats' command displays information\n"
+	  "about all IEEE 802.11 clients associated with a CISCO device. The\n"
+	  "command generates a table with the following columns:\n"
+	  "\n"
+	  "  IF      	   network interface number\n"
+	  "  SSID    	   SSID to which client is associated\n"
+	  "  ADDRESS 	   client MAC address\n"
+	  "  IPv4-ADDRESS  client's IPv4 address (if supplied)\n"
+	  "  SGNL          client's signal strength\n"
+	  "  UPTIME        lifetime of client's association\n"
+	  "  I-BPS         input bytes per second\n"
+	  "  O-BPS         output bytes per second\n"
+	  "  ERR           errors per second",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_cisco_dot11_clients_stats },
+
+	{ "monitor cisco dot11 clients stats", NULL,
+	  "The `monitor cisco dot11 clients stats' command shows the same\n"
+	  "information as the show cisco dot11 clients stats command. The\n"
+	  "information is updated periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_cisco_dot11_clients_stats },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
