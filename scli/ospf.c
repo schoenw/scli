@@ -421,6 +421,58 @@ show_ospf_interfaces(scli_interp_t *interp, int argc, char **argv)
     if (ifXTable) if_mib_free_ifXTable(ifXTable);
     if (ifTable) if_mib_free_ifTable(ifTable);
     if (ipAddrTable) ip_mib_free_ipAddrTable(ipAddrTable);
+    if (ospfIfTable) ospf_mib_free_ospfIfTable(ospfIfTable);
+    
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_ospf_lsdb(GString *s, ospf_mib_ospfLsdbEntry_t *ospfLsdbEntry)
+{
+    int const indent = 18;
+
+    if (ospfLsdbEntry->ospfLsdbSequence) {
+	g_string_sprintfa(s, "Sequence:   %d\n",
+			  *ospfLsdbEntry->ospfLsdbSequence);
+    }
+    
+}
+
+
+
+static int
+show_ospf_lsdb(scli_interp_t *interp, int argc, char **argv)
+{
+    ospf_mib_ospfLsdbEntry_t **ospfLsdbTable = NULL;
+    int i;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+    
+    ospf_mib_get_ospfLsdbTable(interp->peer, &ospfLsdbTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+    
+    if (ospfLsdbTable) {
+	for (i = 0; ospfLsdbTable[i]; i++) {
+	    if (i) {
+		g_string_append(interp->result, "\n");
+	    }
+	    fmt_ospf_lsdb(interp->result, ospfLsdbTable[i]);
+	}
+    }
+
+    if (ospfLsdbTable) ospf_mib_free_ospfLsdbTable(ospfLsdbTable);
     
     return SCLI_OK;
 }
@@ -449,6 +501,12 @@ scli_init_ospf_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_ospf_interfaces },
+
+	{ "show ospf lsdb", NULL,
+	  "show OSPF lsdb",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_ospf_lsdb },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
