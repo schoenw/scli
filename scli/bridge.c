@@ -23,6 +23,7 @@
 #include "scli.h"
 
 #include "bridge-mib.h"
+#include "q-bridge-mib.h"
 #include "if-mib-proc.h"
 #if 1
 #include "ip-mib.h"
@@ -98,21 +99,23 @@ xml_bridge_stp_info(xmlNodePtr root,
     const char *e;
     xmlNodePtr node;
 
+    root = xml_new_child(root, NULL, "stp", NULL);
+
     if (dot1dStp->dot1dStpProtocolSpecification) {
 	e = fmt_enum(bridge_mib_enums_dot1dStpProtocolSpecification,
 		     dot1dStp->dot1dStpProtocolSpecification);
 	if (e) {
-	    (void) xml_new_child(root, NULL, "stp-type", "%s", e);
+	    (void) xml_new_child(root, NULL, "type", "%s", e);
 	}
     }
     
     if (dot1dStp->dot1dStpPriority) {
-	(void) xml_new_child(root, NULL, "stp-priority", "%d",
+	(void) xml_new_child(root, NULL, "priority", "%d",
 			     *dot1dStp->dot1dStpPriority);
     }
 
     if (dot1dStp->dot1dStpPriority && dot1dBase->dot1dBaseBridgeAddress) {
-	(void) xml_new_child(root, NULL, "stp-bridge-id",
+	(void) xml_new_child(root, NULL, "bridge-id",
 			     "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
 			     (*dot1dStp->dot1dStpPriority >> 8) & 0xff,
 			     (*dot1dStp->dot1dStpPriority) & 0xff,
@@ -125,54 +128,81 @@ xml_bridge_stp_info(xmlNodePtr root,
     }
     
     if (dot1dStp->dot1dStpDesignatedRoot) {
-	(void) xml_new_child(root, NULL, "stp-root-id", "%s",
+	(void) xml_new_child(root, NULL, "root-id", "%s",
 			     fmt_bridgeid(dot1dStp->dot1dStpDesignatedRoot));
     }
 
     if (dot1dStp->dot1dStpRootCost) {
-	(void) xml_new_child(root, NULL, "stp-root-cost", "%d",
+	(void) xml_new_child(root, NULL, "root-cost", "%d",
 			     *dot1dStp->dot1dStpRootCost);
     }
 
     if (dot1dStp->dot1dStpRootPort) {
-	(void) xml_new_child(root, NULL, "stp-root-port", "%d",
+	(void) xml_new_child(root, NULL, "root-port", "%d",
 			     *dot1dStp->dot1dStpRootPort);
     }
 
     if (dot1dStp->dot1dStpMaxAge) {
-	node = xml_new_child(root, NULL, "stp-aging-time", "%d",
+	node = xml_new_child(root, NULL, "aging-time", "%d",
 			     *dot1dStp->dot1dStpMaxAge * 10);
 	xml_set_prop(node, "unit", "milliseconds");
     }
 
     if (dot1dStp->dot1dStpHelloTime) {
-	node = xml_new_child(root, NULL, "stp-hello-time", "%d",
+	node = xml_new_child(root, NULL, "hello-time", "%d",
 			     *dot1dStp->dot1dStpHelloTime * 10);
 	xml_set_prop(node, "unit", "milliseconds");
     }
 
     if (dot1dStp->dot1dStpHoldTime) {
-	node = xml_new_child(root, NULL, "stp-hold-time", "%d",
+	node = xml_new_child(root, NULL, "hold-time", "%d",
 			     *dot1dStp->dot1dStpHoldTime * 10);
 	xml_set_prop(node, "unit", "milliseconds");
     }
 
     if (dot1dStp->dot1dStpForwardDelay) {
-	node = xml_new_child(root, NULL, "stp-forward-delay", "%d",
+	node = xml_new_child(root, NULL, "forward-delay", "%d",
 			     *dot1dStp->dot1dStpForwardDelay * 10);
 	xml_set_prop(node, "unit", "milliseconds");
     }
 
     if (dot1dStp->dot1dStpTimeSinceTopologyChange) {
-	node = xml_new_child(root, NULL, "stp-topology-change", "%s",
+	node = xml_new_child(root, NULL, "topology-change", "%s",
 			     xml_timeticks(*(dot1dStp->dot1dStpTimeSinceTopologyChange)));
     }
     
     if (dot1dStp->dot1dStpTopChanges) {
-	node = xml_new_child(root, NULL, "stp-topology-changes", "%u",
+	node = xml_new_child(root, NULL, "topology-changes", "%u",
 			     *dot1dStp->dot1dStpTopChanges);
     }
     
+}
+
+
+
+static void
+xml_bridge_vlan_info(xmlNodePtr root,
+		    bridge_mib_dot1dBase_t *dot1dBase,
+		    q_bridge_mib_dot1qBase_t *dot1qBase)
+{
+    root = xml_new_child(root, NULL, "vlan", NULL);
+
+    if (dot1qBase->dot1qVlanVersionNumber) {
+	(void) xml_new_child(root, NULL, "version", "%d",
+			     *(dot1qBase->dot1qVlanVersionNumber));
+    }
+    if (dot1qBase->dot1qNumVlans) {
+	(void) xml_new_child(root, NULL, "current", "%d",
+			     *(dot1qBase->dot1qNumVlans));
+    }
+    if (dot1qBase->dot1qMaxSupportedVlans) {
+	(void) xml_new_child(root, NULL, "capacity", "%d",
+			     *(dot1qBase->dot1qMaxSupportedVlans));
+    }
+    if (dot1qBase->dot1qMaxVlanId) {
+	(void) xml_new_child(root, NULL, "max-vlanid", "%d",
+			     *(dot1qBase->dot1qMaxVlanId));
+    }
 }
 
 
@@ -267,7 +297,8 @@ static void
 xml_bridge_info(xmlNodePtr root,
 		bridge_mib_dot1dBase_t *dot1dBase,
 		bridge_mib_dot1dTp_t *dot1dTp,
-		bridge_mib_dot1dStp_t *dot1dStp)
+		bridge_mib_dot1dStp_t *dot1dStp,
+		q_bridge_mib_dot1qBase_t *dot1qBase)
 {
     const char *e;
     xmlNodePtr node;
@@ -296,8 +327,13 @@ xml_bridge_info(xmlNodePtr root,
 	    }
 	}
     }
+
     if (dot1dStp) {
 	xml_bridge_stp_info(root, dot1dBase, dot1dStp);
+    }
+
+    if (dot1qBase) {
+	xml_bridge_vlan_info(root, dot1dBase, dot1qBase);
     }
 }
 
@@ -307,7 +343,8 @@ static void
 fmt_bridge_info(GString *s,
 		bridge_mib_dot1dBase_t *dot1dBase,
 		bridge_mib_dot1dTp_t *dot1dTp,
-		bridge_mib_dot1dStp_t *dot1dStp)
+		bridge_mib_dot1dStp_t *dot1dStp,
+		q_bridge_mib_dot1qBase_t *dot1qBase)
 {
     int const indent = 18;
     const char *e;
@@ -346,6 +383,25 @@ fmt_bridge_info(GString *s,
     if (dot1dStp) {
 	fmt_bridge_stp_info(s, dot1dBase, dot1dStp);
     }
+
+    if (dot1qBase) {
+	if (dot1qBase->dot1qVlanVersionNumber) {
+	    g_string_sprintfa(s, "%-*s%d\n", indent, "Vlan Version",
+			      *dot1qBase->dot1qVlanVersionNumber);
+	}
+	if (dot1qBase->dot1qNumVlans) {
+	    g_string_sprintfa(s, "%-*s%d\n", indent, "Vlan Current",
+			      *dot1qBase->dot1qNumVlans);
+	}
+	if (dot1qBase->dot1qMaxSupportedVlans) {
+	    g_string_sprintfa(s, "%-*s%d\n", indent, "Vlan Capacity",
+			      *dot1qBase->dot1qMaxSupportedVlans);
+	}
+	if (dot1qBase->dot1qMaxVlanId) {
+	    g_string_sprintfa(s, "%-*s%d\n", indent, "Vlan Max VlanId",
+			      *dot1qBase->dot1qMaxVlanId);
+	}
+    }
 }
 
 
@@ -356,6 +412,7 @@ show_bridge_info(scli_interp_t *interp, int argc, char **argv)
     bridge_mib_dot1dBase_t *dot1dBase = NULL;
     bridge_mib_dot1dTp_t *dot1dTp = NULL;
     bridge_mib_dot1dStp_t *dot1dStp = NULL;
+    q_bridge_mib_dot1qBase_t *dot1qBase = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -378,11 +435,15 @@ show_bridge_info(scli_interp_t *interp, int argc, char **argv)
 	bridge_mib_get_dot1dTp(interp->peer, &dot1dTp, 0);
 	bridge_mib_get_dot1dStp(interp->peer, &dot1dStp, 0);
 
+	q_bridge_mib_get_dot1qBase(interp->peer, &dot1qBase, 0);
+
 	if (scli_interp_xml(interp)) {
-	    xml_bridge_info(interp->xml_node, dot1dBase, dot1dTp, dot1dStp);
+	    xml_bridge_info(interp->xml_node, 
+			    dot1dBase, dot1dTp, dot1dStp, dot1qBase);
 	} else {
-	fmt_bridge_info(interp->result, dot1dBase, dot1dTp, dot1dStp);
-    }
+	    fmt_bridge_info(interp->result, 
+			    dot1dBase, dot1dTp, dot1dStp, dot1qBase);
+	}
     }
 
     if (dot1dBase)
@@ -391,6 +452,8 @@ show_bridge_info(scli_interp_t *interp, int argc, char **argv)
 	bridge_mib_free_dot1dTp(dot1dTp);
     if (dot1dStp)
 	bridge_mib_free_dot1dStp(dot1dStp);
+    if (dot1qBase)
+	q_bridge_mib_free_dot1qBase(dot1qBase);
     
     return SCLI_OK;
 }
