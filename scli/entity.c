@@ -254,7 +254,8 @@ fmt_entity_details(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
     if (class) {
 	g_string_sprintfa(s, "Class:  %s", class);
 	if (entPhysicalEntry->entPhysicalIsFRU) {
-	    if (*entPhysicalEntry->entPhysicalIsFRU == 2) {
+	    if (*entPhysicalEntry->entPhysicalIsFRU
+		== SNMPV2_TC_TRUTHVALUE_TRUE) {
 		g_string_append(s, " (replaceable)");
 	    }
 	}
