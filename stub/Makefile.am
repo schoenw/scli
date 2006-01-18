@@ -38,6 +38,8 @@ MIBS			= IF-MIB \
 			  RS-232-MIB \
 			  SONET-MIB \
 			  RMON-MIB \
+			  Q-BRIDGE-MIB \
+			  INET-ADDRESS-MIB \
 			  OLD-CISCO-IP-MIB \
 			  RAPID-CITY \
 			  UCD-SNMP-MIB \
@@ -81,6 +83,8 @@ STUBS			= if-mib.h if-mib.c \
                           rs-232-mib.h rs-232-mib.c \
                           sonet-mib.h sonet-mib.c \
 			  rmon-mib.h rmon-mib.c \
+			  q-bridge-mib.h q-bridge-mib.c \
+			  inet-address-mib.h inet-address-mib.c \
 			  old-cisco-ip-mib.h old-cisco-ip-mib.c \
 			  rapid-city.h rapid-city.c \
 			  ucd-snmp-mib.h ucd-snmp-mib.c \
@@ -194,7 +198,7 @@ rfc1213-mib.h rfc1213-mib.c:
 	$(SMIDUMP) -f scli --scli-include='ipRouteEntry' RFC1213-MIB
 
 ospf-mib.h ospf-mib.c:
-	$(SMIDUMP) -f scli --scli-include='ospfGeneralGroup|ospfAreaEntry|ospfIfEntry' OSPF-MIB
+	$(SMIDUMP) -f scli --scli-include='ospfGeneralGroup|ospfAreaEntry|ospfIfEntry|ospfLsdbEntry' OSPF-MIB
 
 iana-charset-mib.h iana-charset-mib.c:
 	$(SMIDUMP) -f scli IANA-CHARSET-MIB
@@ -216,6 +220,12 @@ sonet-mib.h sonet-mib.c:
 
 rmon-mib.h rmon-mib.c:
 	$(SMIDUMP) -f scli --scli-include='historyControlEntry' RMON-MIB
+
+q-bridge-mib.h q-bridge-mib.c:
+	$(SMIDUMP) -f scli --scli-include='dot1qBase' Q-BRIDGE-MIB
+
+inet-address-mib.h inet-address-mib.c:
+	$(SMIDUMP) -f scli INET-ADDRESS-MIB
 
 old-cisco-ip-mib.h old-cisco-ip-mib.c:
 	$(SMIDUMP) -f scli OLD-CISCO-IP-MIB
