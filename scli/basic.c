@@ -731,16 +731,50 @@ xml_filter(xmlDocPtr xml_doc, const char *filter)
 
 
 static void
+render(GString *s, xmlNodePtr top, int indent)
+{
+    xmlNodePtr cur_node;
+
+    /* xxx need to render attributes xxx */
+
+    for (cur_node = top; cur_node; cur_node = cur_node->next) {
+
+	if (cur_node->type != XML_ATTRIBUTE_NODE
+	    && cur_node->type != XML_ELEMENT_NODE) {
+	    continue;
+	}
+
+	/* recurse down the tree if we are not at a leaf */
+
+	if (cur_node->children && cur_node->children->children) {
+	    g_string_sprintfa(s, "%*s%s {\n", indent, "", cur_node->name);
+	    render(s, cur_node->children, indent+2);
+	    g_string_sprintfa(s, "%*s}\n", indent, "");
+	    continue;
+	}
+
+	/* print a leaf node xxx check that it is a text node ? */
+
+	if (cur_node->children) {
+	    g_string_sprintfa(s, "%*s%s \"%s\";\n", indent, " ",
+			      cur_node->name, cur_node->children->content);
+	}
+    }
+}
+
+
+static void
 show_result(scli_interp_t *interp, int code)
 {
     xmlChar *buffer;
     int len;
 
-    if (scli_interp_xml(interp)) {
-#if 0
-	const char *filter = "//scli/system/mounts/filesystem[@index=3]";
-	xml_filter(interp->xml_doc, filter);
-#endif
+    if (scli_interp_xml(interp) && interp->flags & SCLI_INTERP_FLAG_FMT) {
+	g_string_truncate(interp->header, 0);
+	render(interp->result, interp->xml_doc->children, 0);
+    }
+
+    if (scli_interp_xml(interp) && !(interp->flags & SCLI_INTERP_FLAG_FMT)) {
 	xmlDocDumpFormatMemory(interp->xml_doc, &buffer, &len, 1);
 	g_string_truncate(interp->header, 0);
 	g_string_assign(interp->result, buffer);
@@ -836,10 +870,13 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 	    }
 #endif
 	    if (interp->peer) {
-		gchar *name;
-		name = gnet_inetaddr_get_canonical_name(interp->peer->taddress);
-		xml_set_prop(top, "peer", name ? name : "?");
-		g_free(name);
+		GURI *uri;
+		uri = gnet_snmp_get_uri(interp->peer);
+		if (uri) {
+		    gchar *name = gnet_uri_get_string(uri);
+		    xml_set_prop(top, "uri", name ? name : "?");
+		    g_free(name);
+		}
 	    }
 	    xml_set_prop(top, "date", "%s", xml_timeticks(0));
 	}
@@ -1308,7 +1345,7 @@ scli_open_community(scli_interp_t *interp, GNetSnmpTDomain tdomain,
     snmpv2_mib_get_snmpSet(interp->peer, &serial, SNMPV2_MIB_SNMPSETSERIALNO);
     if (interp->peer->error_status == 0 && serial && serial->snmpSetSerialNo) {
 	if (verbose) {
-	    g_print("good\n");
+	    g_print("good (%d)\n", *serial->snmpSetSerialNo);
 	}
     } else {
 	if (verbose) {

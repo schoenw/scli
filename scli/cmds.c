@@ -841,6 +841,7 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
     int rows, cols, c;
     GNetSnmpEnum const *dft;
     char const *label;
+    char const *fmt;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -854,8 +855,11 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
     g_string_sprintfa(interp->result, "%-*s %lu\n", indent, "Epoch:",
 		      interp->epoch);
 
-    g_string_sprintfa(interp->result, "%-*s %s\n", indent, "Format:",
-		      scli_interp_xml(interp) ? "xml" : "scli");
+    fmt = "scli";
+    if (scli_interp_xml(interp)) {
+	fmt = interp->flags & SCLI_INTERP_FLAG_FMT ? "fxml" : "xml";
+    }
+    g_string_sprintfa(interp->result, "%-*s %s\n", indent, "Format:", fmt);
 
     g_string_sprintfa(interp->result, "%-*s %s\n", indent, "Interactive:",
 		      scli_interp_interactive(interp) ? "true" : "false");
@@ -1123,8 +1127,13 @@ set_scli_format(scli_interp_t *interp, int argc, char **argv)
 
     if (strcmp(argv[1], "xml") == 0) {
 	interp->flags |= SCLI_INTERP_FLAG_XML;
+	interp->flags &= ~SCLI_INTERP_FLAG_FMT;
+    } else if (strcmp(argv[1], "fxml") == 0) {
+	interp->flags |= SCLI_INTERP_FLAG_XML;
+	interp->flags |= SCLI_INTERP_FLAG_FMT;
     } else if (strcmp(argv[1], "scli") == 0) {
 	interp->flags &= ~SCLI_INTERP_FLAG_XML;
+	interp->flags &= ~SCLI_INTERP_FLAG_FMT;
     } else {
 	g_string_assign(interp->result, argv[1]);
 	return SCLI_SYNTAX_VALUE;	

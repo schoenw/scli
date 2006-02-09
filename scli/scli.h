@@ -57,6 +57,8 @@
 
 extern char const scli_copyright[];	/* copyright message (surprise) */
 
+#define	VERSION PACKAGE_VERSION
+
 
 /*
  * Some defines used internally to compute time differences and
@@ -174,10 +176,11 @@ struct scli_alarm {
 #define SCLI_INTERP_FLAG_MONITOR	0x004
 #define SCLI_INTERP_FLAG_LOOP		0x008
 #define SCLI_INTERP_FLAG_XML		0x010
-#define SCLI_INTERP_FLAG_DRY		0x020
-#define SCLI_INTERP_FLAG_PROTO		0x040
-#define SCLI_INTERP_FLAG_QUIET		0x080
-#define SCLI_INTERP_FLAG_NOLOOKUP	0x100
+#define SCLI_INTERP_FLAG_FMT		0x020
+#define SCLI_INTERP_FLAG_DRY		0x040
+#define SCLI_INTERP_FLAG_PROTO		0x080
+#define SCLI_INTERP_FLAG_QUIET		0x100
+#define SCLI_INTERP_FLAG_NOLOOKUP	0x200
 
 struct scli_interp {
     char *name;			/* name of the interpreter */
