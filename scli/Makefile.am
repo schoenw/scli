@@ -14,7 +14,7 @@ scli_SOURCES	= scli.c scli.h scli.1 vendors.c \
 
 scli_LDADD	= $(top_builddir)/proc/libproc.a \
 		  $(top_builddir)/stub/libstub.a \
-		  $(GSNMP_LIBS) $(GNET_LIBS) -lgmodule $(XML_LIBS)
+		  $(GSNMP_LIBS) $(GNET_LIBS) $(GLIB_LIBS) $(XML_LIBS)
 
 #gscli_SOURCES	= gscli.c scli.h scli.1 vendors.c \
 #		  getopt.h getopt.c getopt1.c basic.c monitor.c cmds.c \
