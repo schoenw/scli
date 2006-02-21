@@ -100,7 +100,7 @@ q_bridge_mib_get_dot1qBase(GNetSnmp *s, q_bridge_mib_dot1qBase_t **dot1qBase, gi
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;

@@ -428,7 +428,7 @@ ospf_mib_get_ospfGeneralGroup(GNetSnmp *s, ospf_mib_ospfGeneralGroup_t **ospfGen
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -564,7 +564,7 @@ ospf_mib_get_ospfAreaEntry(GNetSnmp *s, ospf_mib_ospfAreaEntry_t **ospfAreaEntry
     len = pack_ospfAreaEntry(base, ospfAreaId);
     if (len < 0) {
         g_warning("%s: invalid index values", "ospfAreaEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -576,7 +576,7 @@ ospf_mib_get_ospfAreaEntry(GNetSnmp *s, ospf_mib_ospfAreaEntry_t **ospfAreaEntry
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -596,7 +596,7 @@ ospf_mib_set_ospfAreaEntry(GNetSnmp *s, ospf_mib_ospfAreaEntry_t *ospfAreaEntry,
     len = pack_ospfAreaEntry(base, ospfAreaEntry->ospfAreaId);
     if (len < 0) {
         g_warning("%s: invalid index values", "ospfAreaEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -759,7 +759,7 @@ ospf_mib_get_ospfLsdbEntry(GNetSnmp *s, ospf_mib_ospfLsdbEntry_t **ospfLsdbEntry
     len = pack_ospfLsdbEntry(base, ospfLsdbAreaId, ospfLsdbType, ospfLsdbLsid, ospfLsdbRouterId);
     if (len < 0) {
         g_warning("%s: invalid index values", "ospfLsdbEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -771,7 +771,7 @@ ospf_mib_get_ospfLsdbEntry(GNetSnmp *s, ospf_mib_ospfLsdbEntry_t **ospfLsdbEntry
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -906,7 +906,7 @@ ospf_mib_get_ospfIfEntry(GNetSnmp *s, ospf_mib_ospfIfEntry_t **ospfIfEntry, guch
     len = pack_ospfIfEntry(base, ospfIfIpAddress, ospfAddressLessIf);
     if (len < 0) {
         g_warning("%s: invalid index values", "ospfIfEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -918,7 +918,7 @@ ospf_mib_get_ospfIfEntry(GNetSnmp *s, ospf_mib_ospfIfEntry_t **ospfIfEntry, guch
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -938,7 +938,7 @@ ospf_mib_set_ospfIfEntry(GNetSnmp *s, ospf_mib_ospfIfEntry_t *ospfIfEntry, gint6
     len = pack_ospfIfEntry(base, ospfIfEntry->ospfIfIpAddress, ospfIfEntry->ospfAddressLessIf);
     if (len < 0) {
         g_warning("%s: invalid index values", "ospfIfEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 

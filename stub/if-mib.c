@@ -430,7 +430,7 @@ if_mib_get_interfaces(GNetSnmp *s, if_mib_interfaces_t **interfaces, gint64 mask
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -542,7 +542,7 @@ if_mib_get_ifEntry(GNetSnmp *s, if_mib_ifEntry_t **ifEntry, gint32 ifIndex, gint
     len = pack_ifEntry(base, ifIndex);
     if (len < 0) {
         g_warning("%s: invalid index values", "ifEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -554,7 +554,7 @@ if_mib_get_ifEntry(GNetSnmp *s, if_mib_ifEntry_t **ifEntry, gint32 ifIndex, gint
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -574,7 +574,7 @@ if_mib_set_ifEntry(GNetSnmp *s, if_mib_ifEntry_t *ifEntry, gint64 mask)
     len = pack_ifEntry(base, ifEntry->ifIndex);
     if (len < 0) {
         g_warning("%s: invalid index values", "ifEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -668,7 +668,7 @@ if_mib_get_ifMIBObjects(GNetSnmp *s, if_mib_ifMIBObjects_t **ifMIBObjects, gint6
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -780,7 +780,7 @@ if_mib_get_ifXEntry(GNetSnmp *s, if_mib_ifXEntry_t **ifXEntry, gint32 ifIndex, g
     len = pack_ifXEntry(base, ifIndex);
     if (len < 0) {
         g_warning("%s: invalid index values", "ifXEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -792,7 +792,7 @@ if_mib_get_ifXEntry(GNetSnmp *s, if_mib_ifXEntry_t **ifXEntry, gint32 ifIndex, g
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -812,7 +812,7 @@ if_mib_set_ifXEntry(GNetSnmp *s, if_mib_ifXEntry_t *ifXEntry, gint64 mask)
     len = pack_ifXEntry(base, ifXEntry->ifIndex);
     if (len < 0) {
         g_warning("%s: invalid index values", "ifXEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -986,7 +986,7 @@ if_mib_get_ifStackEntry(GNetSnmp *s, if_mib_ifStackEntry_t **ifStackEntry, gint3
     len = pack_ifStackEntry(base, ifStackHigherLayer, ifStackLowerLayer);
     if (len < 0) {
         g_warning("%s: invalid index values", "ifStackEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -998,7 +998,7 @@ if_mib_get_ifStackEntry(GNetSnmp *s, if_mib_ifStackEntry_t **ifStackEntry, gint3
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -1018,7 +1018,7 @@ if_mib_set_ifStackEntry(GNetSnmp *s, if_mib_ifStackEntry_t *ifStackEntry, gint64
     len = pack_ifStackEntry(base, ifStackEntry->ifStackHigherLayer, ifStackEntry->ifStackLowerLayer);
     if (len < 0) {
         g_warning("%s: invalid index values", "ifStackEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -1193,7 +1193,7 @@ if_mib_get_ifRcvAddressEntry(GNetSnmp *s, if_mib_ifRcvAddressEntry_t **ifRcvAddr
     len = pack_ifRcvAddressEntry(base, ifIndex, ifRcvAddressAddress, _ifRcvAddressAddressLength);
     if (len < 0) {
         g_warning("%s: invalid index values", "ifRcvAddressEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -1205,7 +1205,7 @@ if_mib_get_ifRcvAddressEntry(GNetSnmp *s, if_mib_ifRcvAddressEntry_t **ifRcvAddr
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -1225,7 +1225,7 @@ if_mib_set_ifRcvAddressEntry(GNetSnmp *s, if_mib_ifRcvAddressEntry_t *ifRcvAddre
     len = pack_ifRcvAddressEntry(base, ifRcvAddressEntry->ifIndex, ifRcvAddressEntry->ifRcvAddressAddress, ifRcvAddressEntry->_ifRcvAddressAddressLength);
     if (len < 0) {
         g_warning("%s: invalid index values", "ifRcvAddressEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
