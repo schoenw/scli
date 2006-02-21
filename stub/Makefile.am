@@ -44,8 +44,7 @@ MIBS			= IF-MIB \
 			  RAPID-CITY \
 			  UCD-SNMP-MIB \
 			  PRODUCTMIB \
-			  CISCO-DOT11-ASSOCIATION-MIB \
-			  INET-ADDRESS-MIB
+			  CISCO-DOT11-ASSOCIATION-MIB
 
 STUBS			= if-mib.h if-mib.c \
 			  ianaiftype-mib.h ianaiftype-mib.c \
@@ -93,19 +92,18 @@ STUBS			= if-mib.h if-mib.c \
 			  iana-charset-mib.h iana-charset-mib.c \
 			  iana-printer-mib.h iana-printer-mib.c \
 			  cisco-process-mib.h cisco-process-mib.c \
-			  cisco-dot11-association-mib.h cisco-dot11-association-mib.c \
-			  inet-address-mib.h inet-address-mib.c
+			  cisco-dot11-association-mib.h cisco-dot11-association-mib.c
+
+MAINTAINERCLEANFILES	= $(STUBS)
 
 noinst_LIBRARIES	= libstub.a
 libstub_a_SOURCES	= $(STUBS)
 
-SMIDUMP			= ../../../libsmi/trunk/tools/smidump
+#SMIDUMP			= ../../libsmi/trunk/tools/smidump
+SMIDUMP			= $(bindir)/smidump
 SMIPATH			= $(HOME)/mibs/cisco:$(HOME)/mibs/3com:$(HOME)/mibs/nortel:$(HOME)/mibs:/usr/local/share/mibs/site:/usr/local/share/mibs/ietf:/usr/local/share/mibs/iana:/usr/share/snmp/mibs
 
 export SMIPATH
-
-rmstubs:
-	rm -f $(STUBS)
 
 if-mib.h if-mib.c:
 	$(SMIDUMP) -f scli --scli-set --scli-create --scli-delete --scli-exclude='ifTestEntry' IF-MIB
@@ -244,7 +242,3 @@ productmib.h productmib.c:
 
 cisco-dot11-association-mib.h cisco-dot11-association-mib.c:
 	$(SMIDUMP) -f scli CISCO-DOT11-ASSOCIATION-MIB
-
-inet-address-mib.h inet-address-mib.c:
-	$(SMIDUMP) -f scli INET-ADDRESS-MIB
-
