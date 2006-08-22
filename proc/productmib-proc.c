@@ -38,7 +38,7 @@ productmib_proc_create_vlan(GNetSnmp *s, gint32 vlanId,
     if (! vlanEntry) return;
     if (!vg->a3ComNextAvailableVirtIfIndex
 	|| vg->a3ComNextAvailableVirtIfIndex == 0) {
-	s->error_status = GNET_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_PDU_ERR_PROCEDURE;
 	return;
     }
     vlanEntry->a3ComVlanIfIndex = *vg->a3ComNextAvailableVirtIfIndex;

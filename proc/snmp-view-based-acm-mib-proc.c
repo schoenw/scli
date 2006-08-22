@@ -35,7 +35,7 @@ snmp_view_based_acm_mib_proc_create_member(GNetSnmp *s,
 
     vacmGroupEntry = snmp_view_based_acm_mib_new_vacmSecurityToGroupEntry();
     if (! vacmGroupEntry) {
-	s->error_status = GNET_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_PDU_ERR_PROCEDURE;
 	return;
     }
     vacmGroupEntry->_vacmSecurityNameLength = strlen(name);
@@ -60,7 +60,7 @@ snmp_view_based_acm_mib_proc_delete_member(GNetSnmp *s,
 
     vacmGroupEntry = snmp_view_based_acm_mib_new_vacmSecurityToGroupEntry();
     if (! vacmGroupEntry) {
-	s->error_status = GNET_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_PDU_ERR_PROCEDURE;
 	return;
     }
     vacmGroupEntry->_vacmSecurityNameLength = name_len;

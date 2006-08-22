@@ -39,7 +39,7 @@ snmp_user_based_sm_mib_proc_clone_user(GNetSnmp *s,
     usmUser = snmp_user_based_sm_mib_new_usmUserEntry();
     if (! usmUser) {
       proc_error:
-	s->error_status = GNET_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_PDU_ERR_PROCEDURE;
 	return;
     }
 

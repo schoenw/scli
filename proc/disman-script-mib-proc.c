@@ -35,7 +35,7 @@ disman_script_mib_proc_create_script(GNetSnmp *s,
     
     smScriptEntry = disman_script_mib_new_smScriptEntry();
     if (! smScriptEntry) {
-	s->error_status = GNET_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_PDU_ERR_PROCEDURE;
 	return;
     }
     strcpy(smScriptEntry->smScriptOwner, owner);
@@ -72,7 +72,7 @@ disman_script_mib_proc_create_run(GNetSnmp *s,
     if (s->error_status) return;
     if (!smLaunchEntry || !smLaunchEntry->smLaunchRunIndexNext) {
     proc_error:
-	s->error_status = GNET_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_PDU_ERR_PROCEDURE;
 	return;
     }
     smRunIndex = *smLaunchEntry->smLaunchRunIndexNext;
