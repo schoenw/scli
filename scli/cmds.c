@@ -1400,7 +1400,7 @@ scan_one_done(GNetSnmp *s, GNetSnmpPdu *pdu, GList *vbl, gpointer magic)
     
     sm->count--;
     if (sm->count <= 0) g_main_quit(sm->loop);
-    if (s->error_status == GNET_SNMP_ERR_NOERROR && vbl) {
+    if (s->error_status == GNET_SNMP_PDU_ERR_NOERROR && vbl) {
 	struct scan_elem *p;
 	p = g_new0(struct scan_elem, 1);
 	p->tdomain = s->tdomain;

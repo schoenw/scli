@@ -1626,7 +1626,7 @@ create_schedule(GNetSnmp *s, const char *owner, const char *name)
     
     schedEntry = disman_schedule_mib_new_schedEntry();
     if (! schedEntry) {
-	s->error_status = GNET_SNMP_ERR_PROCEDURE;
+	s->error_status = GNET_SNMP_PDU_ERR_PROCEDURE;
 	return;
     }
     strcpy(schedEntry->schedOwner, owner);

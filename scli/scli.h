@@ -57,8 +57,6 @@
 
 extern char const scli_copyright[];	/* copyright message (surprise) */
 
-#define	VERSION PACKAGE_VERSION
-
 
 /*
  * Some defines used internally to compute time differences and
@@ -372,6 +370,9 @@ scli_init_netsnmp_mode(scli_interp_t *interp);
 
 extern void
 scli_init_3com_mode(scli_interp_t *interp);
+
+extern void
+scli_init_hp_mode(scli_interp_t *interp);
 
 /* 
  * A data structure used to obtain vendor information from the

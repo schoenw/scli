@@ -24,6 +24,7 @@
 
 #include "ip-mib.h"
 #include "ip-forward-mib.h"
+#include "ianaiftype-mib.h"
 #include "tunnel-mib.h"
 #include "if-mib.h"
 #include "rfc1213-mib.h"
@@ -422,7 +423,7 @@ fmt_ip_tunnel(GString *s,
 	g_string_sprintfa(s, "%-15s  ", "-");
     }
 
-    e = fmt_enum(tunnel_mib_enums_tunnelIfEncapsMethod,
+    e = fmt_enum(ianaiftype_mib_enums_IANAtunnelType,
 		 tunnelIfEntry->tunnelIfEncapsMethod);
     g_string_sprintfa(s, "%-8s", e ? e : "-");
 

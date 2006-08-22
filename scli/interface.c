@@ -1114,6 +1114,12 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 	    if (! interface_match(regex_iface, ifTable[i])) {
 		continue;
 	    }
+#if 0
+	    if (ifTable[i]->ifOperStatus &&
+		*ifTable[i]->ifOperStatus == IF_MIB_IFOPERSTATUS_DOWN) {
+		continue;
+	    }
+#endif
 	    s = interp->result;
 	    g_string_sprintfa(s, "%9u  ", ifTable[i]->ifIndex);
 	    ifXEntry = get_ifXEntry(ifXTable, ifTable[i]->ifIndex);
