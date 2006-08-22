@@ -197,7 +197,7 @@ productmib_get_a3ComVlanIfEntry(GNetSnmp *s, productmib_a3ComVlanIfEntry_t **a3C
     len = pack_a3ComVlanIfEntry(base, a3ComVlanIfIndex);
     if (len < 0) {
         g_warning("%s: invalid index values", "a3ComVlanIfEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -209,7 +209,7 @@ productmib_get_a3ComVlanIfEntry(GNetSnmp *s, productmib_a3ComVlanIfEntry_t **a3C
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -229,7 +229,7 @@ productmib_set_a3ComVlanIfEntry(GNetSnmp *s, productmib_a3ComVlanIfEntry_t *a3Co
     len = pack_a3ComVlanIfEntry(base, a3ComVlanIfEntry->a3ComVlanIfIndex);
     if (len < 0) {
         g_warning("%s: invalid index values", "a3ComVlanIfEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -311,7 +311,7 @@ productmib_get_a3ComVirtualGroup(GNetSnmp *s, productmib_a3ComVirtualGroup_t **a
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;

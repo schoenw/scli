@@ -415,7 +415,7 @@ rapid_city_get_rcVlanEntry(GNetSnmp *s, rapid_city_rcVlanEntry_t **rcVlanEntry, 
     len = pack_rcVlanEntry(base, rcVlanId);
     if (len < 0) {
         g_warning("%s: invalid index values", "rcVlanEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -427,7 +427,7 @@ rapid_city_get_rcVlanEntry(GNetSnmp *s, rapid_city_rcVlanEntry_t **rcVlanEntry, 
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -447,7 +447,7 @@ rapid_city_set_rcVlanEntry(GNetSnmp *s, rapid_city_rcVlanEntry_t *rcVlanEntry, g
     len = pack_rcVlanEntry(base, rcVlanEntry->rcVlanId);
     if (len < 0) {
         g_warning("%s: invalid index values", "rcVlanEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -575,7 +575,7 @@ rapid_city_get_rcVlanPortEntry(GNetSnmp *s, rapid_city_rcVlanPortEntry_t **rcVla
     len = pack_rcVlanPortEntry(base, rcVlanPortIndex);
     if (len < 0) {
         g_warning("%s: invalid index values", "rcVlanPortEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -587,7 +587,7 @@ rapid_city_get_rcVlanPortEntry(GNetSnmp *s, rapid_city_rcVlanPortEntry_t **rcVla
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -607,7 +607,7 @@ rapid_city_set_rcVlanPortEntry(GNetSnmp *s, rapid_city_rcVlanPortEntry_t *rcVlan
     len = pack_rcVlanPortEntry(base, rcVlanPortEntry->rcVlanPortIndex);
     if (len < 0) {
         g_warning("%s: invalid index values", "rcVlanPortEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 

@@ -92,7 +92,8 @@ STUBS			= if-mib.h if-mib.c \
 			  iana-charset-mib.h iana-charset-mib.c \
 			  iana-printer-mib.h iana-printer-mib.c \
 			  cisco-process-mib.h cisco-process-mib.c \
-			  cisco-dot11-association-mib.h cisco-dot11-association-mib.c
+			  cisco-dot11-association-mib.h cisco-dot11-association-mib.c \
+			  hp-icf-fault-finder-mib.h hp-icf-fault-finder-mib.c
 
 MAINTAINERCLEANFILES	= $(STUBS)
 

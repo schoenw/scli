@@ -336,7 +336,7 @@ cisco_process_mib_get_cpmCPUTotalEntry(GNetSnmp *s, cisco_process_mib_cpmCPUTota
     len = pack_cpmCPUTotalEntry(base, cpmCPUTotalIndex);
     if (len < 0) {
         g_warning("%s: invalid index values", "cpmCPUTotalEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -348,7 +348,7 @@ cisco_process_mib_get_cpmCPUTotalEntry(GNetSnmp *s, cisco_process_mib_cpmCPUTota
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -476,7 +476,7 @@ cisco_process_mib_get_cpmProcessEntry(GNetSnmp *s, cisco_process_mib_cpmProcessE
     len = pack_cpmProcessEntry(base, cpmCPUTotalIndex, cpmProcessPID);
     if (len < 0) {
         g_warning("%s: invalid index values", "cpmProcessEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -488,7 +488,7 @@ cisco_process_mib_get_cpmProcessEntry(GNetSnmp *s, cisco_process_mib_cpmProcessE
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -616,7 +616,7 @@ cisco_process_mib_get_cpmProcessExtEntry(GNetSnmp *s, cisco_process_mib_cpmProce
     len = pack_cpmProcessExtEntry(base, cpmCPUTotalIndex, cpmProcessPID);
     if (len < 0) {
         g_warning("%s: invalid index values", "cpmProcessExtEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -628,7 +628,7 @@ cisco_process_mib_get_cpmProcessExtEntry(GNetSnmp *s, cisco_process_mib_cpmProce
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -648,7 +648,7 @@ cisco_process_mib_set_cpmProcessExtEntry(GNetSnmp *s, cisco_process_mib_cpmProce
     len = pack_cpmProcessExtEntry(base, cpmProcessExtEntry->cpmCPUTotalIndex, cpmProcessExtEntry->cpmProcessPID);
     if (len < 0) {
         g_warning("%s: invalid index values", "cpmProcessExtEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -782,7 +782,7 @@ cisco_process_mib_get_cpmProcessExtRevEntry(GNetSnmp *s, cisco_process_mib_cpmPr
     len = pack_cpmProcessExtRevEntry(base, cpmCPUTotalIndex, cpmProcessPID);
     if (len < 0) {
         g_warning("%s: invalid index values", "cpmProcessExtRevEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -794,7 +794,7 @@ cisco_process_mib_get_cpmProcessExtRevEntry(GNetSnmp *s, cisco_process_mib_cpmPr
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;

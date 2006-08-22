@@ -539,7 +539,7 @@ cisco_dot11_association_mib_get_cDot11AssociationGlobal(GNetSnmp *s, cisco_dot11
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -651,7 +651,7 @@ cisco_dot11_association_mib_get_cDot11ActiveDevicesEntry(GNetSnmp *s, cisco_dot1
     len = pack_cDot11ActiveDevicesEntry(base, ifIndex);
     if (len < 0) {
         g_warning("%s: invalid index values", "cDot11ActiveDevicesEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -663,7 +663,7 @@ cisco_dot11_association_mib_get_cDot11ActiveDevicesEntry(GNetSnmp *s, cisco_dot1
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -788,7 +788,7 @@ cisco_dot11_association_mib_get_cDot11AssociationStatsEntry(GNetSnmp *s, cisco_d
     len = pack_cDot11AssociationStatsEntry(base, ifIndex);
     if (len < 0) {
         g_warning("%s: invalid index values", "cDot11AssociationStatsEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -800,7 +800,7 @@ cisco_dot11_association_mib_get_cDot11AssociationStatsEntry(GNetSnmp *s, cisco_d
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -953,7 +953,7 @@ cisco_dot11_association_mib_get_cDot11ClientConfigInfoEntry(GNetSnmp *s, cisco_d
     len = pack_cDot11ClientConfigInfoEntry(base, ifIndex, cd11IfAuxSsid, _cd11IfAuxSsidLength, cDot11ClientAddress);
     if (len < 0) {
         g_warning("%s: invalid index values", "cDot11ClientConfigInfoEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -965,7 +965,7 @@ cisco_dot11_association_mib_get_cDot11ClientConfigInfoEntry(GNetSnmp *s, cisco_d
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -1118,7 +1118,7 @@ cisco_dot11_association_mib_get_cDot11ClientStatisticEntry(GNetSnmp *s, cisco_do
     len = pack_cDot11ClientStatisticEntry(base, ifIndex, cd11IfAuxSsid, _cd11IfAuxSsidLength, cDot11ClientAddress);
     if (len < 0) {
         g_warning("%s: invalid index values", "cDot11ClientStatisticEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -1130,7 +1130,7 @@ cisco_dot11_association_mib_get_cDot11ClientStatisticEntry(GNetSnmp *s, cisco_do
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;

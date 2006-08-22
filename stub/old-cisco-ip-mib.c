@@ -216,7 +216,7 @@ old_cisco_ip_mib_get_lip(GNetSnmp *s, old_cisco_ip_mib_lip_t **lip, gint64 mask)
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -352,7 +352,7 @@ old_cisco_ip_mib_get_lipAddrEntry(GNetSnmp *s, old_cisco_ip_mib_lipAddrEntry_t *
     len = pack_lipAddrEntry(base, ipAdEntAddr);
     if (len < 0) {
         g_warning("%s: invalid index values", "lipAddrEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -364,7 +364,7 @@ old_cisco_ip_mib_get_lipAddrEntry(GNetSnmp *s, old_cisco_ip_mib_lipAddrEntry_t *
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -496,7 +496,7 @@ old_cisco_ip_mib_get_lipRouteEntry(GNetSnmp *s, old_cisco_ip_mib_lipRouteEntry_t
     len = pack_lipRouteEntry(base, ipRouteDest);
     if (len < 0) {
         g_warning("%s: invalid index values", "lipRouteEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -508,7 +508,7 @@ old_cisco_ip_mib_get_lipRouteEntry(GNetSnmp *s, old_cisco_ip_mib_lipRouteEntry_t
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -651,7 +651,7 @@ old_cisco_ip_mib_get_lipAccountEntry(GNetSnmp *s, old_cisco_ip_mib_lipAccountEnt
     len = pack_lipAccountEntry(base, actSrc, actDst);
     if (len < 0) {
         g_warning("%s: invalid index values", "lipAccountEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -663,7 +663,7 @@ old_cisco_ip_mib_get_lipAccountEntry(GNetSnmp *s, old_cisco_ip_mib_lipAccountEnt
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
@@ -806,7 +806,7 @@ old_cisco_ip_mib_get_lipCkAccountEntry(GNetSnmp *s, old_cisco_ip_mib_lipCkAccoun
     len = pack_lipCkAccountEntry(base, ckactSrc, ckactDst);
     if (len < 0) {
         g_warning("%s: invalid index values", "lipCkAccountEntry");
-        s->error_status = GNET_SNMP_ERR_INTERNAL;
+        s->error_status = GNET_SNMP_PDU_ERR_INTERNAL;
         return;
     }
 
@@ -818,7 +818,7 @@ old_cisco_ip_mib_get_lipCkAccountEntry(GNetSnmp *s, old_cisco_ip_mib_lipCkAccoun
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
     if (out) {
-        if (s->error_status != GNET_SNMP_ERR_NOERROR) {
+        if (s->error_status != GNET_SNMP_PDU_ERR_NOERROR) {
             g_list_foreach(out, (GFunc) gnet_snmp_varbind_delete, NULL);
             g_list_free(out);
             return;
