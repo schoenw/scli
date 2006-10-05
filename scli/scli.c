@@ -336,7 +336,7 @@ main(int argc, char **argv)
                             (int *) 0)) != EOF) {
         switch (c) {
         case 'V':
-	    g_print("scli version %s\n", VERSION);
+	    g_print("scli version %s\n", PACKAGE_VERSION);
 	    g_print("Copyright %s\n", scli_copyright);
 	    g_print("scli comes with ABSOLUTELY NO WARRANTY.\n"
 		    "You may redistribute copies of scli under\n"
@@ -423,6 +423,7 @@ main(int argc, char **argv)
 	(void) localtime(&t);
     }
 
+#if 0
     /*
      * Initialize the g_snmp library.
      */
@@ -431,6 +432,7 @@ main(int argc, char **argv)
 	g_error("scli: initialization of SNMP library failed");
         exit(1);
     }
+#endif
 
     /*
      * Setting up curses in such a way that we are sure to restore

@@ -778,6 +778,9 @@ create_scli_interp(scli_interp_t *interp, int argc, char **argv)
 
     slave = scli_interp_create(argv[1]);
     scli_interp_init(slave);
+    if (scli_interp_proto(interp)) {
+	slave->flags |= SCLI_INTERP_FLAG_PROTO;
+    }
     interp->interp_list = g_slist_append(interp->interp_list, slave);
 
     cmd = g_new0(scli_cmd_t, 1);
@@ -882,7 +885,7 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
     }
 
     g_string_sprintfa(interp->result, "%-*s %s\n", indent, "Version:",
-		      VERSION);
+		      PACKAGE_VERSION);
     
     g_string_sprintfa(interp->result, "%-*s %lu\n", indent, "Epoch:",
 		      interp->epoch);
