@@ -725,6 +725,36 @@ show_scli_aliases(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
+scli_interp_eval(scli_interp_t *interp, int argc, char **argv)
+{
+    GSList *elem;
+    scli_interp_t *slave = NULL;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc < 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    fprintf(stderr, "** looking for interpreter %s\n", argv[0]);
+
+    for (elem = interp->interp_list; elem; elem = g_slist_next(elem)) {
+	slave = (scli_interp_t *) elem->data;
+	if (strcmp(slave->name, argv[0]) == 0) {
+	    break;
+	}
+    }
+
+    if (! elem || !slave) {
+	return SCLI_ERROR;
+    }
+
+    return scli_eval_argc_argv(slave, argc-1, argv+1);
+}
+
+
+
+static int
 create_scli_interp(scli_interp_t *interp, int argc, char **argv)
 {
     GSList *elem;
@@ -752,12 +782,14 @@ create_scli_interp(scli_interp_t *interp, int argc, char **argv)
 
     cmd = g_new0(scli_cmd_t, 1);
     cmd->path = g_strdup(argv[1]);
+    cmd->options = "command arg1 arg2 ...";
     cmd->flags = SCLI_CMD_FLAG_DYNAMIC;
     cmd->desc = g_strdup_printf("The `%s' command is used to invoke commands\n"
 				"in the scli interpreter named %s.",
 				argv[1], argv[1]);
+    cmd->func = scli_interp_eval;
     scli_create_command(interp, cmd);
-    
+
     return SCLI_OK;
 }
 

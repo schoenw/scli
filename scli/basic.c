@@ -46,8 +46,8 @@ struct error_info {
 
 static const struct error_info error_infos[] = {
     { SCLI_MSG,			"%s" },
-    { SCLI_OK,			"ok; scli " VERSION " ready" },
-    { SCLI_EXIT,		"ok; scli " VERSION " exiting" },
+    { SCLI_OK,			"ok; scli " PACKAGE_VERSION " ready" },
+    { SCLI_EXIT,		"ok; scli " PACKAGE_VERSION " exiting" },
     { SCLI_ERROR,		"%s" },
     { SCLI_ERROR_NOPEER,	"no association to a remote SNMP agent" },
     { SCLI_ERROR_NOXML,		"command `%s' does not support xml" },
@@ -216,10 +216,22 @@ page(scli_interp_t *interp, GString *s)
 	}
     } else {
     nopager:
-	g_print("%s", s->str);
+	if (scli_interp_proto(interp)) {
+	    char *l = s->str;
+	    for (i = 0, cnt = 0; s->str[i]; i++) {
+		if (s->str[i] == '\n') {
+		    g_print("200-%.*s\n", s->str+i-l, l);
+		    l = s->str+i+1;
+		}
+	    }
+	    if (l && *l) {
+		g_print("200-%s\n", l);
+	    }
+	} else {
+	    g_print("%s", s->str);
+	}
 	return;
     }
-
     
     if (! interp->pager) {
 	goto nopager;
@@ -343,7 +355,7 @@ scli_interp_reset(scli_interp_t *interp)
     interp->xml_doc->children = xmlNewDocNode(interp->xml_doc, NULL,
 					      "scli", NULL);
     interp->xml_node = interp->xml_doc->children;
-    xmlSetProp(interp->xml_node, "version", VERSION);
+    xmlSetProp(interp->xml_node, "version", PACKAGE_VERSION);
 }
 
 
@@ -385,7 +397,7 @@ scli_alarm_create(scli_interp_t *interp, char *desc)
 void
 scli_alarm_delete(scli_interp_t *interp, scli_alarm_t *alarm)
 {
-    g_slist_remove(interp->alias_list, alarm);
+    interp->alias_list = g_slist_remove(interp->alias_list, alarm);
     
     if (alarm->desc) g_free(alarm->desc);
     g_free(alarm);

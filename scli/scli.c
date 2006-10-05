@@ -479,8 +479,9 @@ main(int argc, char **argv)
 	interp->flags |= SCLI_INTERP_FLAG_QUIET;
     }
 
-    if (scli_interp_interactive(interp) && !scli_interp_quiet(interp)) {
-	g_print("%3d-scli version %s %s\n", SCLI_MSG, VERSION, scli_copyright);
+    if (!scli_interp_quiet(interp)) {
+	g_print("%3d-scli version %s %s\n",
+		SCLI_MSG, PACKAGE_VERSION, scli_copyright);
     }
 
     if (scli_interp_interactive(interp) && ! scli_interp_proto(interp)) {
@@ -548,6 +549,7 @@ main(int argc, char **argv)
     } else if (cmd) {
 	(void) scli_eval_string(interp, cmd);
     } else {
+	interp->flags |= SCLI_INTERP_FLAG_PROTO;
 	(void) scli_eval_file_stream(interp, stdin);
     }
 
