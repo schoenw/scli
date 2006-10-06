@@ -835,40 +835,6 @@ delete_scli_interp(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-show_scli_interps(scli_interp_t *interp, int argc, char **argv)
-{
-    GSList *elem;
-    scli_interp_t *slave;
-    int name_width = 16;
-
-    g_return_val_if_fail(interp, SCLI_ERROR);
-
-    if (argc > 1) {
-	return SCLI_SYNTAX_NUMARGS;
-    }
-
-    if (interp->slave_list) {
-	for (elem = interp->slave_list; elem; elem = g_slist_next(elem)) {
-	    slave = (scli_interp_t *) elem->data;
-	    if (strlen(slave->name) > name_width) {
-		name_width = strlen(slave->name);
-	    }
-	}
-	g_string_sprintfa(interp->header, "%-*s xxx",
-			  name_width, "NAME");
-	for (elem = interp->slave_list; elem; elem = g_slist_next(elem)) {
-	    slave = (scli_interp_t *) elem->data;
-	    g_string_sprintfa(interp->result, "%-*s\n",
-			      name_width, slave->name);
-	}
-    }
-
-    return SCLI_OK;
-}
-
-
-
-static int
 show_scli_info(scli_interp_t *interp, int argc, char **argv)
 {
     int const indent = 18;
@@ -876,6 +842,7 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
     GNetSnmpEnum const *dft;
     char const *label;
     char const *fmt;
+    GSList *elem;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -951,6 +918,15 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 	    g_string_sprintfa(interp->result, "%-*s %d\n", indent,
 			      "Protocol:", gnet_snmp_get_version(interp->peer));
 	}
+    }
+
+    if (interp->slave_list) {
+	g_string_sprintfa(interp->result, "%-*s", indent, "Interpreters:");
+	for (elem = interp->slave_list; elem; elem = g_slist_next(elem)) {
+	    scli_interp_t *slave = (scli_interp_t *) elem->data;
+	    g_string_sprintfa(interp->result, " %s", slave->name);
+	}
+	g_string_sprintfa(interp->result, "\n");
     }
 
     return SCLI_OK;
@@ -1830,12 +1806,6 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  show_scli_aliases },
-
-	{ "show scli interps", NULL,
-	  "The `show scli interps' command lists all scli interpreters.",
-	  SCLI_CMD_FLAG_NORECURSE,
-	  NULL, NULL,
-	  show_scli_interps },
 
 	{ "show scli modes", "[<regex>]",
 	  "The `show scli modes' command shows information about the scli\n"
