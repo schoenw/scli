@@ -736,9 +736,7 @@ scli_interp_eval(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    fprintf(stderr, "** looking for interpreter %s\n", argv[0]);
-
-    for (elem = interp->interp_list; elem; elem = g_slist_next(elem)) {
+    for (elem = interp->slave_list; elem; elem = g_slist_next(elem)) {
 	slave = (scli_interp_t *) elem->data;
 	if (strcmp(slave->name, argv[0]) == 0) {
 	    break;
@@ -767,7 +765,7 @@ create_scli_interp(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    for (elem = interp->interp_list; elem; elem = g_slist_next(elem)) {
+    for (elem = interp->slave_list; elem; elem = g_slist_next(elem)) {
 	slave = (scli_interp_t *) elem->data;
 	if (strcmp(slave->name, argv[1]) == 0) {
 	    g_string_sprintfa(interp->result,
@@ -781,7 +779,8 @@ create_scli_interp(scli_interp_t *interp, int argc, char **argv)
     if (scli_interp_proto(interp)) {
 	slave->flags |= SCLI_INTERP_FLAG_PROTO;
     }
-    interp->interp_list = g_slist_append(interp->interp_list, slave);
+    slave->master = interp;
+    interp->slave_list = g_slist_append(interp->slave_list, slave);
 
     cmd = g_new0(scli_cmd_t, 1);
     cmd->path = g_strdup(argv[1]);
@@ -818,11 +817,11 @@ delete_scli_interp(scli_interp_t *interp, int argc, char **argv)
     }
     
  again:
-    for (elem = interp->interp_list; elem; elem = g_slist_next(elem)) {
+    for (elem = interp->slave_list; elem; elem = g_slist_next(elem)) {
 	slave = (scli_interp_t *) elem->data;
 	if (regexec(regex_name, slave->name, (size_t) 0, NULL, 0) == 0) {
-	    interp->interp_list = g_slist_remove(interp->interp_list,
-						 elem->data);
+	    interp->slave_list = g_slist_remove(interp->slave_list,
+						elem->data);
 	    scli_interp_delete(slave);
 	    goto again;
 	}
@@ -848,8 +847,8 @@ show_scli_interps(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    if (interp->interp_list) {
-	for (elem = interp->interp_list; elem; elem = g_slist_next(elem)) {
+    if (interp->slave_list) {
+	for (elem = interp->slave_list; elem; elem = g_slist_next(elem)) {
 	    slave = (scli_interp_t *) elem->data;
 	    if (strlen(slave->name) > name_width) {
 		name_width = strlen(slave->name);
@@ -857,7 +856,7 @@ show_scli_interps(scli_interp_t *interp, int argc, char **argv)
 	}
 	g_string_sprintfa(interp->header, "%-*s xxx",
 			  name_width, "NAME");
-	for (elem = interp->interp_list; elem; elem = g_slist_next(elem)) {
+	for (elem = interp->slave_list; elem; elem = g_slist_next(elem)) {
 	    slave = (scli_interp_t *) elem->data;
 	    g_string_sprintfa(interp->result, "%-*s\n",
 			      name_width, slave->name);

@@ -220,11 +220,17 @@ page(scli_interp_t *interp, GString *s)
 	    char *l = s->str;
 	    for (i = 0, cnt = 0; s->str[i]; i++) {
 		if (s->str[i] == '\n') {
+		    if (interp->master && interp->name) {
+			g_print("%s ", interp->name);
+		    }
 		    g_print("200-%.*s\n", s->str+i-l, l);
 		    l = s->str+i+1;
 		}
 	    }
 	    if (l && *l) {
+		if (interp->master && interp->name) {
+		    g_print("%s ", interp->name);
+		}
 		g_print("200-%s\n", l);
 	    }
 	} else {
@@ -899,7 +905,10 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 		show_result(interp, code);
 	    }
 	    if (scli_interp_proto(interp)) {
-		g_printerr("%3d %s\n", code, reason);
+		if (interp->master && interp->name) {
+		    g_print("%s ", interp->name);
+		}
+		g_print("%3d %s\n", code, reason);
 	    }
 	}
     } else {
@@ -908,7 +917,10 @@ show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 		&& ! (cmd->flags & SCLI_CMD_FLAG_MONITOR)) {
 		show_result(interp, code);
 		if (scli_interp_proto(interp)) {
-		    g_printerr("%3d %s\n", code, reason);
+		    if (interp->master && interp->name) {
+			g_print("%s ", interp->name);
+		    }
+		    g_print("%3d %s\n", code, reason);
 		}
 	    }
 	} else {

@@ -185,7 +185,8 @@ struct scli_interp {
     GNode *cmd_root;		/* root of the command tree */
     GSList *mode_list;		/* list of registered modes */
     GSList *alias_list;		/* list of command aliases */
-    GSList *interp_list;	/* list of slave interpreters */
+    GSList *slave_list;		/* list of slave interpreters */
+    struct scli_interp *master;	/* master interpreter (if any) */
     GSList *alarm_list;		/* list of detected alarms */
     int	flags;			/* interpreter flags */
     GString *result;		/* string result buffer */
