@@ -221,7 +221,7 @@ rmon-mib.h rmon-mib.c:
 	$(SMIDUMP) -f scli --scli-include='historyControlEntry' RMON-MIB
 
 q-bridge-mib.h q-bridge-mib.c:
-	$(SMIDUMP) -f scli --scli-include='dot1qBase' Q-BRIDGE-MIB
+	$(SMIDUMP) -f scli --scli-include='dot1qBase|dot1qVlanStaticEntry' Q-BRIDGE-MIB
 
 inet-address-mib.h inet-address-mib.c:
 	$(SMIDUMP) -f scli INET-ADDRESS-MIB
