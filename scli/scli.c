@@ -25,7 +25,6 @@
 
 #include "scli.h"
 
-#include <getopt.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -267,33 +266,6 @@ readline_init()
 }
 
 /*
- * Print some usage information if the user fails to call the
- * program correctly.
- */
-
-static void
-usage()
-{
-    g_print("Usage: scli [OPTION] [hostname [community]]\n");
-    g_print(
-	"Options:\n"
-	"  -V, --version     show version information and exit\n"
-	"  -c, --command     process the given command and exit\n"
-	"  -d, --delay       delay in seconds between screen updates (default 5)\n"
-	"  -f, --file        process commands from a file and exit\n"
-	"  -i, --inet        execute in netconf protocol mode\n"
-	"  -h, --help        display this help and exit\n"
-	"  -n, --norc        do not evaluate ~/.sclirc on startup\n"
-	"  -p, --port        port number of the SNMP agent (default 161)\n"
-	"  -r, --retries     number of retries (default 3)\n"
-	"  -s, --dry-run     parse commands but do not execute them\n"
-	"  -t, --timeout     timeout between retries in milliseconds (default 500)\n"
-	"  -v, --snmp        version of the SNMP protocol (1, 2c, 3)\n"
-	"  -x, --xml         produce machine readable XML output\n"
-	);
-}
-
-/*
  * The main of scli. Parse arguments, initialize the SNMP session and
  * fall into the mainloop() until we are done.
  */
@@ -302,114 +274,92 @@ int
 main(int argc, char **argv)
 {
     scli_interp_t *interp;
-    char *file = NULL;
-    char *cmd = NULL;
-    int c;
-    
-    int norc = 0, port = 161, delay = 5000;
-    int retries = GNET_SNMP_DEFAULT_RETRIES;
-    int timeout = GNET_SNMP_DEFAULT_TIMEOUT;
-    int xml = 0, dry = 0, netconf = 0, quiet = 0;
-    int snmp = -1;
+    int i, c;
+    gint args = 0;
 
-    static struct option const long_options[] =
-    {
-        { "version", no_argument,       0, 'V' },
-	{ "command", required_argument, 0, 'c' },
-        { "delay",   required_argument, 0, 'd' },
-	{ "dry-run", required_argument, 0, 's' },
-        { "file",    required_argument, 0, 'f' },
-        { "help",    no_argument,       0, 'h' },
-        { "inet",    no_argument,       0, 'i' },
-        { "norc",    no_argument,       0, 'n' },
-        { "port",    required_argument, 0, 'p' },
-        { "quiet",   required_argument, 0, 'q' },
-	{ "retries", required_argument, 0, 'r' },
-	{ "timeout", required_argument, 0, 't' },
-	{ "snmp",    required_argument, 0, 'v' },
-	{ "xml",     no_argument,	0, 'x' },
-	{ "netconf", no_argument,	0, 'X' },
-        { NULL, 0, NULL, 0}
+    GError *error = NULL;
+    GOptionContext *context;
+    static gboolean opt_bool_version = FALSE;
+    static gchar *opt_string_cmd = NULL;
+    static gchar *opt_string_file = NULL;
+    static gboolean opt_bool_dry = FALSE;
+    static gboolean opt_bool_quiet = FALSE;
+    static gboolean opt_bool_norc = FALSE;
+    static gint opt_int_delay = 5000;
+    static gchar **opt_string_array_args = NULL;
+
+    static gboolean opt_bool_xml = FALSE;
+    static gboolean opt_bool_inet = FALSE;
+
+    static GOptionEntry entries[] = {
+	{ "version", 'V', 0, G_OPTION_ARG_NONE, &opt_bool_version,
+	  "Show version information and exit", NULL },
+	{ "command", 'c', 0, G_OPTION_ARG_STRING, &opt_string_cmd,
+	  "Process the scli command C and exit", "C" },
+	{ "file", 'f', 0, G_OPTION_ARG_FILENAME, &opt_string_file,
+	  "Process scli commands from file F and exit", "F" },
+	{ "delay", 'd', 0, G_OPTION_ARG_INT, &opt_int_delay,
+	  "Set the delay between screen to D seconds (default 5)", "D" },
+	{ "dry", 's', 0, G_OPTION_ARG_NONE, &opt_bool_dry,
+	  "Parse commands but do not execute them", NULL },
+	{ "norc", 'n', 0, G_OPTION_ARG_NONE, &opt_bool_norc,
+	  "Do not evaluate ~/.sclirc on startup", NULL },
+	{ "quiet", 'q', 0, G_OPTION_ARG_NONE, &opt_bool_quiet,
+	  "Suppress informational messages", NULL },
+
+	{ "xml", 'x', 0, G_OPTION_ARG_NONE, &opt_bool_xml,
+	  "Produce machine readable XML output", NULL },
+	{ "inet", 'i', 0, G_OPTION_ARG_NONE, &opt_bool_inet,
+	  "Execute in 'inet/netconf' protocol mode (experimental)", NULL },
+
+	{ G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_STRING_ARRAY,
+	  &opt_string_array_args, NULL, NULL },
+	{ NULL }
     };
 
-    while ((c = getopt_long(argc, argv, "Vc:d:f:hinp:qr:st:v:x", long_options,
-                            (int *) 0)) != EOF) {
-        switch (c) {
-        case 'V':
-	    g_print("scli version %s\n", PACKAGE_VERSION);
-	    g_print("Copyright %s\n", scli_copyright);
-	    g_print("scli comes with ABSOLUTELY NO WARRANTY.\n"
-		    "You may redistribute copies of scli under\n"
-		    "the terms of the GNU General Public License.\n");
-	    exit(0);
-	case 'c':
-	    cmd = optarg;
-	    break;
-        case 'd':
-            if (atoi(optarg) > 0) {
-                delay = atoi(optarg) * 1000;
-            }
-            break;
-	case 'f':
-	    file = optarg;
-	    break;
-        case 'h':
-            usage();
-            exit(0);
-	case 'i':
-	    netconf = 1;
-	    norc = 1;
-	    xml = 1;
-	    quiet = 1;
-	    break;
-	case 'n':
-	    norc = 1;
-	    break;
-        case 'p':
-            if (atoi(optarg) > 0 || atoi(optarg) < 65535) {
-                port = atoi(optarg);
-	    }
-            break;
-	case 'q':
-	    quiet = 1;
-	    break;
-	case 'r':
-	    if (atoi(optarg) > 0) {
-		retries = atoi(optarg);
-	    }
-	    break;
-	case 's':
-	    dry = 1;
-	    break;
-	case 't':
-	    if (atoi(optarg) > 0) {
-		timeout = atoi(optarg);
-	    }
-	    break;
-	case 'v':
-	    if (strcmp(optarg, "1") == 0) {
-		snmp = GNET_SNMP_V1;
-	    } else if (strcmp(optarg, "2c") == 0) {
-		snmp = GNET_SNMP_V2C;
-	    } else if (strcmp(optarg, "3") == 0) {
-		snmp = GNET_SNMP_V3;
-	    } else {
-		g_printerr("scli: unknown protocol version \"%s\"\n",
-			   optarg);
-	    }
-	    break;
-	case 'x':
-	    xml = 1;
-	    break;
-        default:
-            usage();
-            exit(1);
-        }
+    context = g_option_context_new("[hostname [community]]");
+    g_option_context_add_main_entries(context, entries, NULL);
+    g_option_context_add_group (context, gnet_snmp_get_option_group());
+    if (! g_option_context_parse(context, &argc, &argv, &error)) {
+	g_printerr("%s: %s\n", g_get_prgname(),
+		   (error && error->message) ? error->message
+		   : "option parsing failed");
+	return 1;
     }
 
-    if (argc-optind > 2) {
-        usage();
+    /*
+     * Check the number of optional paramters we received.
+     */
+
+    for (args = 0;
+	 opt_string_array_args && opt_string_array_args[args]; args++) ;
+    if (args > 2) {
+	g_printerr("%s: illegal number of arguments; use --help for help\n",
+		   g_get_prgname());
         exit(1);
+    }
+
+    /*
+     * Handle simple requests first...
+     */
+
+    if (opt_bool_version) {
+	g_print("scli version %s\n", PACKAGE_VERSION);
+	g_print("Copyright %s\n", scli_copyright);
+	g_print("scli comes with ABSOLUTELY NO WARRANTY.\n"
+		"You may redistribute copies of scli under\n"
+		"the terms of the GNU General Public License.\n");
+	exit(0);
+    }
+
+    /*
+     * Inet/netconf protocol mode implies some other settings.
+     */
+
+    if (opt_bool_inet) {
+	opt_bool_norc = TRUE;
+	opt_bool_xml = TRUE;
+	opt_bool_quiet = TRUE;
     }
 
     /*
@@ -444,7 +394,7 @@ main(int argc, char **argv)
     signal(SIGHUP, onsignal);
     signal(SIGQUIT, onsignal);
     signal(SIGWINCH, onwinch);
-    if (! netconf) {
+    if (! opt_bool_inet) {
 	signal(SIGPIPE, SIG_IGN);
     }
 
@@ -454,30 +404,28 @@ main(int argc, char **argv)
 
     interp = scli_interp_create(NULL);
 
-    if (file == NULL && cmd == NULL && isatty(0)) {
+    if (opt_string_file == NULL && opt_string_cmd == NULL && isatty(0)) {
 	interp->flags |= SCLI_INTERP_FLAG_INTERACTIVE;
     }
 
-    interp->delay = delay;
-    gnet_inetaddr_set_port(interp->taddress, port);
-    interp->snmp = snmp;
+    interp->delay = opt_int_delay;
 
-    if (netconf) {
+    if (opt_bool_inet) {
 	interp->flags |= SCLI_INTERP_FLAG_PROTO;
     }
 
-    if (xml) {
+    if (opt_bool_xml) {
 	interp->flags |= SCLI_INTERP_FLAG_XML;
 #if 0
 	xmlXPathInit();
 #endif
     }
 
-    if (dry) {
+    if (opt_bool_dry) {
 	interp->flags |= SCLI_INTERP_FLAG_DRY;
     }
 
-    if (quiet) {
+    if (opt_bool_quiet) {
 	interp->flags |= SCLI_INTERP_FLAG_QUIET;
     }
 
@@ -494,21 +442,21 @@ main(int argc, char **argv)
 
     scli_interp_init(interp);
 
-    if (optind < argc) {
+    if (args) {
 	char *margv[] = { "open", NULL, NULL, NULL };
-	margv[1] = argv[optind];
-	margv[2] = argv[optind+1];
-	(void) scli_eval_argc_argv(interp, argc-optind+1, margv);
+	int i;
+	for (i = 0; opt_string_array_args[i]
+		 && i < sizeof(margv)/sizeof(margv[0]); i++) {
+	    margv[i+1] = opt_string_array_args[i];
+	}
+	(void) scli_eval_argc_argv(interp, i+1, margv);
     }
 
-    scli_set_retries(interp, retries);
-    scli_set_timeout(interp, timeout);
-
-    if (! norc) {
+    if (!opt_bool_norc) {
 	(void) scli_eval_init_file(interp);
     }
 
-    if (netconf) {
+    if (opt_bool_inet) {
 	c = scli_netconf_mainloop(interp, stdin);
 	return (c == SCLI_OK) ? 0 : 1;
     }
@@ -546,10 +494,10 @@ main(int argc, char **argv)
 	    }
 	    g_free(path);
 	}
-    } else if (file) {
-	(void) scli_eval_file(interp, file);
-    } else if (cmd) {
-	(void) scli_eval_string(interp, cmd);
+    } else if (opt_string_file) {
+	(void) scli_eval_file(interp, opt_string_file);
+    } else if (opt_string_cmd) {
+	(void) scli_eval_string(interp, opt_string_cmd);
     } else {
 	interp->flags |= SCLI_INTERP_FLAG_PROTO;
 	(void) scli_eval_file_stream(interp, stdin);

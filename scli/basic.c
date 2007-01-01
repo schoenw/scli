@@ -285,8 +285,12 @@ scli_interp_create(char *name)
     interp->regex_flags = REG_EXTENDED|REG_NOSUB;
     interp->tdomain = GNET_SNMP_TDOMAIN_UDP_IPV4;
     interp->taddress = gnet_inetaddr_new("localhost", 161);
-    interp->retries = GNET_SNMP_DEFAULT_RETRIES;
-    interp->timeout = GNET_SNMP_DEFAULT_TIMEOUT;
+    interp->retries = gnet_snmp_retries;
+    interp->timeout = gnet_snmp_timeout;
+    interp->snmp = gnet_snmp_version;
+#if 0
+    interp->tdomain = gnet_snmp_transport; /* ?? */
+#endif
 
     return interp;
 }

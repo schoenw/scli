@@ -3,7 +3,7 @@ INCLUDES	= -I$(top_srcdir)/stub -I$(top_srcdir)/proc $(GSNMP_CFLAGS) $(GNET_CFLA
 bin_PROGRAMS	= scli # gscli
 
 scli_SOURCES	= scli.c scli.h scli.1 vendors.c \
-		  getopt.h getopt.c getopt1.c basic.c monitor.c cmds.c \
+		  basic.c monitor.c cmds.c \
 		  fmt.c xml.c netconf.c \
 		  system.c entity.c interface.c disman.c snmp.c \
 		  ip.c udp.c tcp.c \
