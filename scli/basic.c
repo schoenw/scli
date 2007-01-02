@@ -34,7 +34,7 @@
 #endif
 
 
-char const scli_copyright[] = "(c) 2001-2002 Juergen Schoenwaelder";
+char const scli_copyright[] = "(c) 2001-2007 Juergen Schoenwaelder";
 
 static int scli_curses_running = 0;
 
@@ -812,8 +812,8 @@ show_result(scli_interp_t *interp, int code)
 
 
 
-static void
-show_xxx(scli_interp_t *interp, scli_cmd_t *cmd, int code)
+void
+scli_show_results(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 {
     int i;
     gchar *reason = NULL;
@@ -1030,7 +1030,11 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 
     if (cmd->flags & SCLI_CMD_FLAG_MONITOR) {
 	interp->flags |= SCLI_INTERP_FLAG_MONITOR;
-	code = scli_monitor(interp, cmd, argc, argv);
+	if (scli_interp_proto(interp)) {
+	    code = scli_monitor_proto(interp, cmd, argc, argv);
+	} else {
+	    code = scli_monitor_curses(interp, cmd, argc, argv);
+	}
 	interp->flags &= ~SCLI_INTERP_FLAG_MONITOR;
     } else if (cmd->flags & SCLI_CMD_FLAG_LOOP) {
 	interp->flags |= SCLI_INTERP_FLAG_LOOP;
@@ -1046,7 +1050,7 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
     }
 
  done:
-    show_xxx(interp, cmd, code);
+    scli_show_results(interp, cmd, code);
     return code;
 }
 
