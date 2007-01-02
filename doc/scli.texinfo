@@ -237,6 +237,7 @@ structures that every programmer can easily understand and handle.
 The following sections describe the @code{scli} modes together with
 their commands.
 
+100-scli version  (c) 2001-2007 Juergen Schoenwaelder
 3COM MODE
 
 The 3com scli mode allows to manipulate virtual lans (vlans)
@@ -319,8 +320,9 @@ select the interfaces of interest.
 @section BRIDGE MODE
 
 The scli bridge mode is based on the BRIDGE-MIB as published in
-RFC 1493. It provides commands to browse information specific
-to LAN bridges (also known as layer two switches).
+RFC 4188 and the Q-BRIDGE-MIB as published in RFC 4363.
+It provides commands to browse information specific
+to IEEE 802.1 LAN bridges (also known as layer two switches).
 
 @example
 @command{show bridge info}
@@ -330,18 +332,20 @@ to LAN bridges (also known as layer two switches).
 @command{show bridge filter}
 @command{show bridge stats}
 @command{monitor bridge stats}
+@command{show bridge vlan info [<regexp>]}
+@command{show bridge vlan details [<regexp>]}
 @end example
 
-The show bridge info command displays summary information about
+The @command{show bridge info} command displays summary information about
 a bridge, such as the number of ports and the supported bridging
 functions and associated parameters.
 
-The show bridge ports command displays information about the
+The @command{show bridge ports} command displays information about the
 bridge ports.
 
-The show bridge stp ports command displays information about the
-bridge ports which participate in the spanning tree protocol. The
-command generates a table with the following columns:
+The @command{show bridge stp ports} command displays information about
+the bridge ports which participate in the spanning tree protocol.
+The command generates a table with the following columns:
 
 @verbatim
   PORT     port number
@@ -360,7 +364,7 @@ indicates whether STP on the port is enabled (E) or disabled
 (D=disabled, B=blocking, I=listening, L=learning, F=forwarding,
 X=broken).
 
-The show bridge forwarding command displays the forwarding
+The @command{show bridge forwarding} command displays the forwarding
 data base used by transparent bridges. The command generates
 a table with the following columns:
 
@@ -372,9 +376,9 @@ a table with the following columns:
   VENDOR  vendor info derived from the address
 @end verbatim
 
-The show bridge filter command shows filtering information.
+The @command{show bridge filter} command shows filtering information.
 
-The show bridge stats command displays per port statistics for
+The @command{show bridge stats} command displays per port statistics for
 transparent bridges. The command generates a table with the
 following columns:
 
@@ -386,8 +390,25 @@ following columns:
   DESCRIPTION description of the port
 @end verbatim
 
-The monitor bridge stats command shows the same
-information as the show bridge stats command. Theinformation is updated periodically.
+The @command{monitor bridge stats} command shows the same
+information as the show bridge stats command. The
+information is updated periodically.
+
+The @command{show bridge vlan info} command shows summary information
+about configured VLANs. The command generates a
+table with the following columns:
+
+@verbatim
+  VLAN        VLAN number (between 1 and 4094)
+  STATUS	 status of the VLAN
+  NAME        name of the VLAN
+  PORTS       ports assigned the the VLAN
+@end verbatim
+
+The @command{show bridge vlan details} command describes the selected
+VLANs in detail. The optional regular expression <regexp>
+is matched against the VLAN names to select the VLANs
+of interest.
 @section CISCO MODE
 
 The cisco scli mode is used to display and configure cisco
@@ -405,6 +426,9 @@ mode is based on the OLD-CISCO-IP-MIB published in May 1994.
 @command{monitor cisco ip accounting current}
 @command{monitor cisco ip accounting snapshot sorted}
 @command{set cisco ip accounting checkpoint}
+@command{show cisco dot11 interface info}
+@command{show cisco dot11 clients stats}
+@command{monitor cisco dot11 clients stats}
 @end example
 
 The @command{show cisco processes} command displays information about
@@ -462,6 +486,45 @@ snapshot of the current accounting table by copying it to
 the snapshot accounting table. The current accounting table
 is reinitialized before it is updated again. The command
 returns the serial number of the snapshot.
+
+The @command{show cisco dot11 interface info} command displays information
+about all IEEE 802.11 interfaces on a CISCO device. The command
+generates a table with the following columns:
+
+@verbatim
+  IFACE  network interface number
+  SPEED  speed in bits per second
+  NAME   name of the network interface
+  CLNT   number of associated clients
+  BRDG   number of assiciated bridges
+  RPRT   number of assiciated repeaters
+  ASSCI  total number of associated stations
+  ASSCO  total number of deassociated stations
+  ROAMI  total number of roamed-in stations
+  ROAMO  total number of roamed-away stations
+  AUTHI  total number of authenticated stations
+  AUTHO  total number of deauthenticated stations
+@end verbatim
+
+The @command{show cisco dot11 clients stats} command displays information
+about all IEEE 802.11 clients associated with a CISCO device. The
+command generates a table with the following columns:
+
+@verbatim
+  IF      	   network interface number
+  SSID    	   SSID to which client is associated
+  ADDRESS 	   client MAC address
+  IPv4-ADDRESS  client}s IPv4 address (if supplied)
+  SGNL          client}s signal strength
+  UPTIME        lifetime of client}s association
+  I-BPS         input bytes per second
+  O-BPS         output bytes per second
+  ERR           errors per second
+@end verbatim
+
+The @command{monitor cisco dot11 clients stats} command shows the same
+information as the show cisco dot11 clients stats command. The
+information is updated periodically.
 @section DISMAN MODE
 
 The scli disman mode is based on the DISMAN-SCRIPT-MIB as
@@ -603,6 +666,16 @@ a table which has the following columns:
 The @command{monitor ethernet stats} command shows the same information
 as the show ethernet stats command. The information is updated
 periodically.
+@section HP MODE
+
+The hp scli mode is used to display and configure hp
+parameters.
+
+@example
+@command{show hp fault log}
+@end example
+
+@section XXX
 @section INTERFACE MODE
 
 The scli interface mode is based on the IF-MIB as published in
@@ -621,6 +694,7 @@ arbitrary network interfaces.
 @command{show interface stack [<regexp>]}
 @command{show interface stats [<regexp>]}
 @command{monitor interface stats [<regexp>]}
+@command{loop interface stats [<regexp>]}
 @command{check interface status [<regexp>]}
 @command{dump interface}
 @end example
@@ -718,6 +792,10 @@ the following columns:
 @end verbatim
 
 The @command{monitor interface stats} command shows the same
+information as the show interface stats command. The
+information is updated periodically.
+
+The @command{loop interface stats} command shows the same
 information as the show interface stats command. The
 information is updated periodically.
 
@@ -968,6 +1046,7 @@ parameters.
 @command{show ospf area}
 @command{show ospf info}
 @command{show ospf interface}
+@command{show ospf lsdb}
 @end example
 
 show OSPF areas
@@ -975,6 +1054,8 @@ show OSPF areas
 general OSPF information
 
 show OSPF interfaces
+
+show OSPF lsdb
 @section PRINTER MODE
 
 The scli printer mode is based on the Printer-MIB as published
@@ -1125,7 +1206,6 @@ manipulate the internal state of the scli interpreter.
 @command{show scli command details [<regex]}
 @command{show scli command tree}
 @command{show scli aliases}
-@command{show scli interps}
 @command{show scli modes [<regex>]}
 @command{show scli schema [<regex>]}
 @command{show scli alarm info}
@@ -1258,8 +1338,6 @@ The @command{show scli aliases} command lists all scli command aliases.
 The first column in the generated table lists the aliase names
 while the second column shows the alias values.
 
-The @command{show scli interps} command lists all scli interpreters.
-
 The @command{show scli modes} command shows information about the scli
 modes. An scli mode is a logical grouping of related commands
 (e.g., all commands that deal with printers). The optional
@@ -1277,11 +1355,11 @@ about all known alarms.
 @section SNMP MODE
 
 The snmp scli mode is based on the SNMPv2-MIB as published
-in RFC 1907, the SNMP-FRAMEWORK-MIB as published in RFC 2571,
-the SNMP-USER-BASED-SM-MIB as published in RFC 2574, the
-SNMP-VIEW-BASED-ACM-MIB as published in RFC 2575, the
-SNMP-TARGET-MIB as published in RFC 2573, and the
-SNMP-NOTIFICATION-MIB as published in RFC 2573.
+in RFC 1907, the SNMP-FRAMEWORK-MIB as published in RFC 3411,
+the SNMP-USER-BASED-SM-MIB as published in RFC 3414, the
+SNMP-VIEW-BASED-ACM-MIB as published in RFC 3415, the
+SNMP-TARGET-MIB as published in RFC 3413, the
+SNMP-NOTIFICATION-MIB as published in RFC 3413, and theNOTIFICATION-LOG-MIB as published in RFC 3014.
 
 @example
 @command{create snmp vacm member <name> <group> [<model>]}
@@ -1299,6 +1377,9 @@ SNMP-NOTIFICATION-MIB as published in RFC 2573.
 @command{show snmp notification targets}
 @command{show snmp contexts}
 @command{show snmp csm}
+@command{show snmp notification log details}
+@command{show snmp notification log info}
+@command{monitor snmp notification log info}
 @command{dump snmp}
 @end example
 
@@ -1415,6 +1496,15 @@ about the available SNMP contexts.
 The @command{show snmp csm communities} command displays information
 about the configured SNMP communities.
 
+The @command{show snmp notification log details} command displays
+detailed information about logged SNMP notifications.
+
+The @command{show snmp notification log info} command displays
+summary information about logged SNMP notifications.
+
+The @command{monitor snmp notification log info} command displays
+summary information about logged SNMP notifications.
+
 The @command{dump snmp} command generates a sequence of scli commands
 which can be used to restore the engine configuration.
 
@@ -1493,6 +1583,7 @@ parameters and characteristics.
 @command{show system processes [<regexp>]}
 @command{show system software [<regexp>]}
 @command{monitor system storage}
+@command{loop system storage}
 @command{monitor system processes [<regexp>]}
 @command{check system contact}
 @command{check system storage}
@@ -1583,6 +1674,10 @@ The software type values are ?=unknown, O=operating system,
 D=device driver, and A=application.
 
 The @command{monitor system storage} command shows the same
+information as the show system storage command. The
+information is updated periodically.
+
+The @command{loop system storage} command shows the same
 information as the show system storage command. The
 information is updated periodically.
 
@@ -1835,15 +1930,15 @@ structure as part of the mode registration.
 
 @section Adding MIB Stubs
 
-I might be necessary to add stubs for additional MIB modules. This
+It might be necessary to add stubs for additional MIB modules. This
 process is very straightforward. 
 
 @enumerate
 @item
-Edit @code{stubs/Makefile.am}
+Edit @code{stub/Makefile.am}
 
 @item
-Run @code{make stubs} in the @code{stubs} directory. Note that you need
+Run @code{make} in the @code{stub} directory. Note that you need
 a version of @code{smidump} which is compatible with the @code{scli}
 release you are using.
 
@@ -1874,7 +1969,7 @@ expected.@refill
 
 If you have other questions, comments or suggestions about
 @code{scli}, contact the author via electronic mail to
-@w{@samp{j.schoenwaelder@@iu-bremen.de}}.  The author will try to help you
+@w{@samp{schoenw@@ibr.cs.tu-bs.de}}.  The author will try to help you
 out, although he may not have time to fix your problems.
 
 @node Concept Index, , Problems, Top
