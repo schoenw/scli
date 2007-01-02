@@ -1874,7 +1874,7 @@ expected.@refill
 
 If you have other questions, comments or suggestions about
 @code{scli}, contact the author via electronic mail to
-@w{@samp{schoenw@@ibr.cs.tu-bs.de}}.  The author will try to help you
+@w{@samp{j.schoenwaelder@@iu-bremen.de}}.  The author will try to help you
 out, although he may not have time to fix your problems.
 
 @node Concept Index, , Problems, Top
