@@ -75,29 +75,12 @@ Execute in inet mode. This option implies -q, -n and -x.
 .B \-n, \-\-norc
 Do not evaluate ~/.sclirc on startup.
 .TP
-.B \-p number, \-\-port=number
-Set the SNMP port number. The default port number is 161.
-.TP
 .B \-q, \-\-quiet
 This flag causes scli to supress some informational messages.
-.TP
-.B \-r count, \-\-retries=count
-The number of SNMP retransmissions before we give up. The default
-number of retries is 3.
 .TP
 .B \-s, \-\-dry-run
 Parse scli commands but do not actually execute them. This allows to
 perform syntax checking on scli scripts.
-.TP
-.B \-t msec, \-\-timeout=msec
-The initial timeout in milli-seconds before an SNMP request is
-transmitted. The default initial timeout interval is 200 milli-seconds.
-.TP
-.B \-v version, \-\-snmp=version
-The SNMP protocol version to use. Recognized values are 1 (SNMPv1 as
-defined in RFC 1157), 2c (SNMPv2c as defined in RFC 1901, RFC 1905),
-or 3 (SNMPv3 as defined in RFC 2571-2574). Without this option, scli
-will probe for an appropriate SNMP version.
 .TP
 .B \-x, \-\-xml
 Generate XML output instead of the default output which is optimized
