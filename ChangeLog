@@ -1,173 +1,349 @@
-2005-04-13 22:20  schoenw
+2006-10-23 16:50  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* stub/Makefile.am, stub/hp-icf-fault-finder-mib.c,
+	  stub/hp-icf-fault-finder-mib.h, stub/q-bridge-mib.c,
+	  stub/q-bridge-mib.h: Added some HP stuff and the bridging
+	  extension for VLANs.
+
+2006-10-06 10:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* scli/cmds.c: Dropped the 'show scli interps' command; the list of
+	  interpreters is now shown as part of the 'show scli info'
+	  command.
+
+2006-10-06 10:23  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* scli/basic.c, scli/cmds.c, scli/scli.h: A slave interpreter now
+	  keeps a pointer to its master; changed the protocol mode output
+	  such that slave output is prefixed by the name of the slave
+	  interpreter.
+
+2006-10-05 21:03  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* scli/cmds.c, scli/scli.c: Inherit the protocol mode flag to slave
+	  interpreters; use PACKAGE_VERSION in more places.
+
+2006-10-05 20:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* scli/basic.c, scli/cmds.c, scli/scli.c: Prepend all output line
+	  with an error code and a continuation indicator if the
+	  interpreter has the protocol mode flag set. Enhanced the 'create
+	  scli interp' command to produce a more usable command handle.
+	  Started to use PACKAGE_VERSION instead of VERSION to obtain the
+	  version number.
+
+2006-08-22 22:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* scli/Makefile.am, scli/basic.c, scli/cmds.c, scli/disman.c,
+	  scli/hp.c, scli/interface.c, scli/ip.c, scli/scli.h,
+	  stub/ianaiftype-mib.c, stub/ianaiftype-mib.h, stub/tunnel-mib.c,
+	  stub/tunnel-mib.h: Added hp mode, updated TUNNEL-MIB related
+	  definitions.
+
+2006-08-22 21:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* proc/disman-script-mib-proc.c, proc/productmib-proc.c,
+	  proc/snmp-user-based-sm-mib-proc.c,
+	  proc/snmp-view-based-acm-mib-proc.c: Renamed error code constants
+	  to match latest gsnmp versions.
+
+2006-08-22 21:57  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* stub/Makefile.am, stub/cisco-dot11-association-mib.c,
+	  stub/cisco-process-mib.c, stub/old-cisco-ip-mib.c,
+	  stub/productmib.c, stub/rapid-city.c: Added hp mode, renamed
+	  error code constants to match latest gsnmp versions.
+
+2006-02-21 20:47  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* stub/atm-mib.c, stub/bridge-mib.c, stub/disman-schedule-mib.c,
+	  stub/disman-script-mib.c, stub/entity-mib.c,
+	  stub/entity-sensor-mib.c, stub/etherlike-mib.c,
+	  stub/host-resources-mib.c, stub/host-resources-types.c,
+	  stub/iana-charset-mib.c, stub/iana-language-mib.c,
+	  stub/iana-printer-mib.c, stub/ianaiftype-mib.c, stub/if-mib.c,
+	  stub/ip-forward-mib.c, stub/ip-mib.c, stub/isdn-mib.c,
+	  stub/mau-mib.c, stub/notification-log-mib.c, stub/ospf-mib.c,
+	  stub/printer-mib.c, stub/q-bridge-mib.c, stub/rfc1213-mib.c,
+	  stub/rmon-mib.c, stub/rs-232-mib.c, stub/snmp-community-mib.c,
+	  stub/snmp-framework-mib.c, stub/snmp-mpd-mib.c,
+	  stub/snmp-notification-mib.c, stub/snmp-target-mib.c,
+	  stub/snmp-user-based-sm-mib.c, stub/snmp-view-based-acm-mib.c,
+	  stub/snmpv2-mib.c, stub/snmpv2-tc.c, stub/snmpv2-tm.c,
+	  stub/sonet-mib.c, stub/tcp-mib.c, stub/tunnel-mib.c,
+	  stub/ucd-snmp-mib.c, stub/udp-mib.c: Regenerated MIB modules to
+	  track changes in the gsnmp API.
+
+2006-02-21 20:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* stub/atm-mib.h, stub/bridge-mib.h, stub/disman-schedule-mib.h,
+	  stub/disman-script-mib.h, stub/entity-mib.h,
+	  stub/entity-sensor-mib.h, stub/etherlike-mib.h,
+	  stub/host-resources-mib.h, stub/host-resources-types.h,
+	  stub/iana-charset-mib.h, stub/iana-language-mib.h,
+	  stub/iana-printer-mib.h, stub/ianaiftype-mib.h,
+	  stub/ip-forward-mib.h, stub/ip-mib.h, stub/isdn-mib.h,
+	  stub/mau-mib.h, stub/notification-log-mib.h, stub/printer-mib.h,
+	  stub/rfc1213-mib.h, stub/rmon-mib.h, stub/rs-232-mib.h,
+	  stub/snmp-community-mib.h, stub/snmp-framework-mib.h,
+	  stub/snmp-mpd-mib.h, stub/snmp-notification-mib.h,
+	  stub/snmp-target-mib.h, stub/snmp-user-based-sm-mib.h,
+	  stub/snmp-view-based-acm-mib.h, stub/snmpv2-tc.h,
+	  stub/snmpv2-tm.h, stub/sonet-mib.h, stub/tcp-mib.h,
+	  stub/tunnel-mib.h, stub/ucd-snmp-mib.h, stub/udp-mib.h:
+	  Regenerated MIB modules to track changes in the gsnmp API.
+
+2006-02-21 16:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* stub/Makefile.am: Added MAINTAINERCLEANFILES and cleaned up some
+	  duplicate definitions.
+
+2006-02-09 00:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* snmp: The SNMP layer has been moved into the gsnmp package.
+
+2006-02-09 00:47  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* config.h.in: Updated config.h.in for completeness.
+
+2006-02-09 00:46  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* scli/basic.c, scli/cmds.c, scli/scli.h: Some experimental patches
+	  to pretty-print XML output.
+
+2006-02-09 00:43  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* configure.in: Included a patch from Jasper Wallace
+	  <jasper@pointless.net> to deal with include dependencies on some
+	  systems.
+
+2006-02-09 00:42  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* scli/Makefile.am: Do not hard code -lgmodule; use $(GLIB_LIBS)
+	  instead which should provide the right thing.
+
+2006-01-18 09:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* stub/cisco-dot11-association-mib.c,
+	  stub/cisco-dot11-association-mib.h, stub/inet-address-mib.c,
+	  stub/inet-address-mib.h, stub/q-bridge-mib.c,
+	  stub/q-bridge-mib.h: Turn $Id$ explansion on (can this be done
+	  automatically for all additions?).
+
+2006-01-18 09:36  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* scli/ospf.c: Totally unfinished code to show the link state
+	  database.
+
+2006-01-18 09:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* stub/Makefile.am: Stubs for the INET-ADDRESS-MIB and the
+	  Q-BRIDGE-MIB.
+
+2006-01-18 09:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* stub/ospf-mib.c, stub/ospf-mib.h: Generate some more stub
+	  functions for the OSPF-MIB.
+
+2006-01-18 09:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* stub/q-bridge-mib.c, stub/q-bridge-mib.h: Added stubs for the
+	  Q-BRIDGE-MIB.
+
+2006-01-18 09:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* scli/bridge.c: Render vlan summary information in xml.
+
+2006-01-18 09:25  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* scli/entity.c: Fixed constant (see what happens if you don't use
+	  symbolic constants).
+
+2005-06-28 09:45  strauss
+
+	* doc/scli.texinfo.in, scli/cisco.c, scli/oui.c, stub/Makefile.am,
+	  stub/cisco-dot11-association-mib.c,
+	  stub/cisco-dot11-association-mib.h, stub/inet-address-mib.c,
+	  stub/inet-address-mib.h: Added oui.c to the repository. Fixed
+	  some minor info on stub creation in scli.texinfo.in. Added MIBs:
+	  INET-ADDRESS-MIB, CISCO-DOT11-ASSOCIATION-MIB. Added three
+	  commands for 802.11 CISCO devices to the "cisco" mode.
+
+2005-06-13 00:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
+
+	* ChangeLog: regenerated changelog (using svn2cl)
+
+2005-04-13 22:20  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/vendors.c: Added Kyocera.
 
-2005-01-26 22:38  schoenw
+2005-01-26 22:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Treat ifMtu = 0x7fffffff as a null value, even
 	  though the RFC 2863 does not assign this special value and
 	  suggests in section 3.1.18 that the ifMtu should not exist until
 	  it is known.
 
-2005-01-26 22:28  schoenw
+2005-01-26 22:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/ip.c, scli/system.c, scli/vendors.c: Fix minor bugs uncovered
-	  by talking to Juniper boxes.
+	* scli/ip.c, scli/system.c, scli/vendors.c: Fix minor bugs
+	  uncovered by talking to Juniper boxes.
 
-2004-11-08 21:04  schoenw
+2004-11-08 21:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/snmp.c: Show global notification log parameters as part of
 	  the "show snmp engine" command.
 
-2004-11-08 20:04  schoenw
+2004-11-08 20:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Remove some unused variables and such things.
 
-2004-11-08 20:04  schoenw
+2004-11-08 20:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/monitor.c: Be nice and avoid to retrieve unneeded
 	  information.
 
-2004-11-08 20:03  schoenw
+2004-11-08 20:03  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Changed the field containing the URI again...
 
-2004-11-05 09:24  schoenw
+2004-11-05 09:24  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/snmp.c: Added commands new "show snmp notification log info"
 	  and "show snmp notification log details".
 
-2004-11-05 09:23  schoenw
+2004-11-05 09:23  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c: Break lines earlier, fixes a bug in the
 	  tdomain/taddress formatter.
 
-2004-11-05 09:22  schoenw
+2004-11-05 09:22  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c, scli/printer.c, scli/system.c, scli/tcp.c: Keywords
 	  which include white space are now deprecated.
 
-2004-11-05 09:21  schoenw
+2004-11-05 09:21  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* stub/Makefile.am, stub/if-mib.c, stub/if-mib.h, stub/snmpv2-mib.c,
-	  stub/snmpv2-mib.h: Regenerated some files to include notification
-	  information (but more work is needed like real stubs).
+	* stub/Makefile.am, stub/if-mib.c, stub/if-mib.h,
+	  stub/snmpv2-mib.c, stub/snmpv2-mib.h: Regenerated some files to
+	  include notification information (but more work is needed like
+	  real stubs).
 
-2004-10-25 12:05  schoenw
+2004-10-25 12:05  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Print dot1dTpPortMaxInfo as part of the "show
 	  bridge stats" output.
 
-2004-10-22 22:03  schoenw
+2004-10-22 22:03  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/basic.c, scli/bridge.c, scli/entity.c,
 	  scli/fmt.c, scli/interface.c, scli/ip.c, scli/printer.c,
 	  scli/scli.h, scli/system.c: More XML output contributed by Frank
 	  Strauss.
 
-2004-10-15 15:26  schoenw
+2004-10-15 15:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* Makefile.am, configure.in: Removed the bogus reference to the lib
 	  subdirectory.
 
-2004-10-14 21:57  schoenw
+2004-10-14 21:57  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, Makefile.am, NEWS, PORTING, README, TODO, autogen.sh,
 	  config.h.in, configure.in: Preparing for the next release.
 
-2004-10-14 21:43  schoenw
+2004-10-14 21:43  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* doc/scli.texinfo, doc/scli.texinfo.in, doc/texinfo.tex: Preparing
 	  for the next release.
 
-2004-10-14 21:36  schoenw
+2004-10-14 21:36  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/netconf.c: Added a basically empty netconf
 	  protocol interface and makefile magic to generate oui.c from a
 	  page of the IEEE web site.
 
-2004-10-14 21:34  schoenw
+2004-10-14 21:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c: Tracking changes in the lower layer APIs. Added new
-	  commands such as "set scli retries", "set scli timeout", "run scli
-	  scan", "run scli walk"
+	  commands such as "set scli retries", "set scli timeout", "run
+	  scli scan", "run scli walk"
 
-2004-10-14 21:30  schoenw
+2004-10-14 21:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.1.in: Minor corrections.
 
-2004-10-14 21:30  schoenw
+2004-10-14 21:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Tracking changes in the lower layer APIs. New
 	  commands: "show system software", "check system contact", "check
 	  system storage", "check system process"
 
-2004-10-14 21:28  schoenw
+2004-10-14 21:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/fmt.c, scli/monitor.c: Tracking changes in the
 	  lower layer APIs.
 
-2004-10-14 21:27  schoenw
+2004-10-14 21:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/snmp.c: Tracking changes in the lower layer APIs. Added some
 	  initial versions of "show snmp contexts" and "show snmp csm".
 
-2004-10-14 21:24  schoenw
+2004-10-14 21:24  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.c: Tracking changes in the lower layer APIs. Fixed the
 	  timeout/retry options.
 
-2004-10-14 21:21  schoenw
+2004-10-14 21:21  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Tracking changes in the lower layer APIs and MIB
 	  modules.
 
-2004-10-14 21:18  schoenw
+2004-10-14 21:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/entity.c: First fragments for a "show entity sensors" command
-	  - unfortunately I do not have a box which already supports the
-	  standards-track sensor MIB.
+	* scli/entity.c: First fragments for a "show entity sensors"
+	  command - unfortunately I do not have a box which already
+	  supports the standards-track sensor MIB.
 
-2004-10-14 21:16  schoenw
+2004-10-14 21:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/3com.c, scli/bridge.c, scli/interface.c, scli/ip.c,
-	  scli/netsnmp.c, scli/scli.h, scli/sonet.c: Tracking changes in the
-	  lower layer APIs.
+	  scli/netsnmp.c, scli/scli.h, scli/sonet.c: Tracking changes in
+	  the lower layer APIs.
 
-2004-10-14 21:07  schoenw
+2004-10-14 21:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ether.c: First fragments of a "show ethernet history"
 	  command.
 
-2004-10-14 21:06  schoenw
+2004-10-14 21:06  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Added half finished "create schedule", "delete
 	  schedule", "dump schedule", "monitor schedule info".
 
-2004-10-14 21:00  schoenw
+2004-10-14 21:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cisco.c: Added "show cisco processes" and improved the cisco
 	  accounting commands.
 
-2004-10-14 20:58  schoenw
+2004-10-14 20:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Tracking changes in the lower layer APIs.
 
-2004-10-14 20:51  schoenw
+2004-10-14 20:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/udp.c: Incomplete code for the "show udp stats" command.
 
-2004-10-14 20:50  schoenw
+2004-10-14 20:50  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/vendors.c: Added Karlnet and Netgear. The OUI list is not
 	  used anymore. Frank contributed a script to generate a list from
 	  the official IEEE web pages.
 
-2004-10-14 20:46  schoenw
+2004-10-14 20:46  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/xml.c: Do not use xmlNodeSetContent().
 
-2004-10-14 20:11  schoenw
+2004-10-14 20:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/disman-script-mib-proc.c, proc/disman-script-mib-proc.h,
 	  proc/if-mib-proc.c, proc/if-mib-proc.h, proc/productmib-proc.c,
@@ -178,7 +354,7 @@
 	  proc/snmp-view-based-acm-mib-proc.h, proc/udp-mib-proc.c,
 	  proc/udp-mib-proc.h: Adapt to changes in the gsnmp API.
 
-2004-10-14 19:56  schoenw
+2004-10-14 19:56  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/atm-mib.c, stub/atm-mib.h, stub/bridge-mib.c,
 	  stub/bridge-mib.h, stub/cisco-process-mib.c,
@@ -215,10 +391,10 @@
 	  stub/tcp-mib.h, stub/tunnel-mib.c, stub/tunnel-mib.h,
 	  stub/ucd-snmp-mib.c, stub/ucd-snmp-mib.h, stub/udp-mib.c,
 	  stub/udp-mib.h: Added entity-sensor-mib.c, entity-sensor-mib.h,
-	  rmon-mib.c, rmon-mib.h. Regenerated all stubs to follow changes in
-	  the gsnmp API.
+	  rmon-mib.c, rmon-mib.h. Regenerated all stubs to follow changes
+	  in the gsnmp API.
 
-2004-07-11 22:59  schoenw
+2004-07-11 22:59  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/atm-mib.c, stub/atm-mib.h,
 	  stub/bridge-mib.c, stub/bridge-mib.h, stub/cisco-process-mib.c,
@@ -255,40 +431,40 @@
 	  stub/ucd-snmp-mib.h, stub/udp-mib.c, stub/udp-mib.h: Regenerated
 	  all stubs to follow changes in the gsnmp API.
 
-2004-06-24 23:12  schoenw
+2004-06-24 23:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/vendors.c: Added Microsoft and SerComm.
 
-2004-04-21 15:29  schoenw
+2004-04-21 15:29  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/sonet.c: Minor cleanups to adapt to changes in the stub
 	  compiler.
 
-2004-04-21 15:15  schoenw
+2004-04-21 15:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ospf.c: Minor cleanups to adapt to changes in the stub
 	  compiler.
 
-2004-04-21 15:12  schoenw
+2004-04-21 15:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/rs232.c: Finalized the "show rs232 details" command.
 
-2004-04-21 14:45  schoenw
+2004-04-21 14:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/3com.c, scli/ether.c: Minor cleanups to adapt to changes in
 	  the stub compiler.
 
-2004-04-21 14:44  schoenw
+2004-04-21 14:44  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/entity.c: Minor cleanups to adapt to changes in the stub
 	  compiler plus some minor layout improvements.
 
-2004-04-21 14:32  schoenw
+2004-04-21 14:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/vendors.c: Added IBM, D-Link Systems, Lexmark, Canon, and
 	  Riverstone Networks.
 
-2004-04-19 15:33  schoenw
+2004-04-19 15:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/Makefile.am, proc/disman-script-mib-proc.c,
 	  proc/disman-script-mib-proc.h, proc/ianaiftype-mib-proc.c,
@@ -299,10 +475,10 @@
 	  proc/snmp-user-based-sm-mib-proc.h,
 	  proc/snmp-view-based-acm-mib-proc.c,
 	  proc/snmp-view-based-acm-mib-proc.h, proc/udp-mib-proc.h: Added
-	  ianaiftype-mib-proc.c ianaiftype-mib-proc.h. Several minor changes
-	  to adapt to changes of the gsnmp API.
+	  ianaiftype-mib-proc.c ianaiftype-mib-proc.h. Several minor
+	  changes to adapt to changes of the gsnmp API.
 
-2004-04-19 15:28  schoenw
+2004-04-19 15:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/atm-mib.c, stub/atm-mib.h,
 	  stub/bridge-mib.c, stub/bridge-mib.h, stub/cisco-process-mib.c,
@@ -342,94 +518,95 @@
 	  ianaiftype-mib.c ianaiftype-mib.h snmpv2-tc.c snmpv2-tc.h.
 	  Regenerated all stubs to follow changes in the gsnmp API.
 
-2003-11-06 17:16  schoenw
+2003-11-06 17:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* AUTHORS: Added Stefan Petri.
 
-2003-05-20 14:35  schoenw
+2003-05-20 14:35  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stamp-h.in: Removed this file since it does not belong into CVS.
 	  Thansk to Wolfgang Fritz <wolfgang.fritz@keymile.com> for
 	  reporting this.
 
-2003-05-09 07:49  schoenw
+2003-05-09 07:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_dispatch.c: Changed some printf()s to g_warning()s.
 
-2003-05-09 07:48  schoenw
+2003-05-09 07:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* doc/scli.texinfo: Added a directory entry definition.
 
-2002-10-18 14:26  schoenw
+2002-10-18 14:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/vendors.c: Added an entry for Nortel Networks (which was
 	  formerly Rapid City Communication).
 
-2002-10-18 13:51  schoenw
+2002-10-18 13:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Minor improvements to "show ip addresses".
 
-2002-10-02 13:52  schoenw
+2002-10-02 13:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/fmt.c: Better rounding in fmt_timeticks. Some code cosmetics.
+	* scli/fmt.c: Better rounding in fmt_timeticks. Some code
+	  cosmetics.
 
-2002-09-20 20:52  schoenw
+2002-09-20 20:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Bug fixes submitted by Michael Goffioul
 	  <goffioul@imec.be>.
 
-2002-09-20 10:49  schoenw
+2002-09-20 10:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Documented why some code is still uncommented.
 
-2002-09-20 09:50  schoenw
+2002-09-20 09:50  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Many additions and updates inspired by Michael
 	  Goffioul <goffioul@imec.be>.
 
-2002-09-20 09:49  schoenw
+2002-09-20 09:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* stub/printer-mib.c, stub/printer-mib.h: Regenerated stubs from the
-	  latest Printer-MIB drafts.
+	* stub/printer-mib.c, stub/printer-mib.h: Regenerated stubs from
+	  the latest Printer-MIB drafts.
 
-2002-09-17 15:55  schoenw
+2002-09-17 15:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Fixed a spelling error.
 
-2002-09-16 21:20  schoenw
+2002-09-16 21:20  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added some north-american paper sizes.
 
-2002-09-16 21:12  schoenw
+2002-09-16 21:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Several fixes suggested by Michael Goffioul
 	  <goffioul@imec.be>.
 
-2002-09-14 12:56  schoenw
+2002-09-14 12:56  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Fixed a few quirks in the new code.
 
-2002-09-14 12:13  schoenw
+2002-09-14 12:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added the "show printer paths" command. Generate
 	  more human friendly paper size names if possible.
 
-2002-09-13 17:56  schoenw
+2002-09-13 17:56  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/disman.c, scli/entity.c, scli/ether.c,
 	  scli/fmt.c, scli/printer.c, scli/scli.h, scli/snmp.c,
 	  scli/system.c: Introduced fmt_identity() and changed modes to use
 	  it. Some incomplete XML support for show printer info.
 
-2002-09-10 19:13  schoenw
+2002-09-10 19:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/vendors.c: dded 1stWave.
 
-2002-09-10 10:25  schoenw
+2002-09-10 10:25  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Renamed an element from version to information.
 
-2002-09-10 10:19  schoenw
+2002-09-10 10:19  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added the show printer colorants command. Added
 	  XML support for the show printer interpreter and the show printer
@@ -437,217 +614,217 @@
 	  printer display and show printer console lights to show printer
 	  lights.
 
-2002-09-10 10:18  schoenw
+2002-09-10 10:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.c: Explain the -i option in the help message.
 
-2002-09-10 10:15  schoenw
+2002-09-10 10:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ospf.c: Replaced the calls to xxx_enum().
 
-2002-09-09 12:51  schoenw
+2002-09-09 12:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added XML support for the show printer supplies
 	  command.
 
-2002-09-09 12:27  schoenw
+2002-09-09 12:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added XML support for the show printer outputs
 	  command.
 
-2002-09-09 11:08  schoenw
+2002-09-09 11:08  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/isdn.c: Fixed a pointer deref error.
 
-2002-09-09 11:06  schoenw
+2002-09-09 11:06  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Fixed the XML containment. Added XML support for
 	  the show printer covers command.
 
-2002-09-09 09:49  schoenw
+2002-09-09 09:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Make all information about a single printer
 	  contained in a printer element for this printer.
 
-2002-09-06 13:25  schoenw
+2002-09-06 13:25  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added xml support for "show printer inputs".
 
-2002-09-04 11:28  schoenw
+2002-09-04 11:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_session.c, snmp/g_session.h, snmp/g_snmp.c, snmp/g_snmp.h,
 	  snmp/g_snmp_table.c, snmp/g_snmp_table.h, snmp/g_snmp_walk.c:
 	  Started to rework the walk and table session API to reduce
 	  overhead and memory leaks. More work needed.
 
-2002-09-04 11:25  schoenw
+2002-09-04 11:25  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_dispatch.c: Minor code cleanup.
 
-2002-09-03 15:32  schoenw
+2002-09-03 15:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure.in: More cleanups submitted by Tomasz Kloczko
 	  <kloczek@pld.org.pl>.
 
-2002-09-03 15:29  schoenw
+2002-09-03 15:29  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* AUTHORS: Fixed Tomasz Kloczko's name and email address.
 
-2002-09-03 15:27  schoenw
+2002-09-03 15:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am: Patch from Tomasz Kloczko <kloczek@pld.org.pl>
 	  to use $(top_builddir) and $(top_srcdir) rather than hard
 	  constants.
 
-2002-09-03 15:20  schoenw
+2002-09-03 15:20  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* doc/scli.texinfo.in: Added the scli.texinfo.in file which is used
 	  to actually create the scli.texinfo file. Added a fix to
-	  automatically include the scli into the info directory provided by
-	  Tomasz Kloczko.
+	  automatically include the scli into the info directory provided
+	  by Tomasz Kloczko.
 
-2002-09-02 09:36  schoenw
+2002-09-02 09:36  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* AUTHORS, ChangeLog, NEWS, configure.in, doc/scli.texinfo,
 	  doc/texinfo.tex: Updates for release 0.2.12.
 
-2002-09-02 09:21  schoenw
+2002-09-02 09:21  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Added some untested code to handle the
 	  ipCidrRouteTable.
 
-2002-09-02 09:02  schoenw
+2002-09-02 09:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Removed dead code.
 
-2002-08-30 18:54  schoenw
+2002-08-30 18:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure.in: Patches to keep autoconf happy submitted by Tomasz
 	  Kloczko <kloczek@pld.org.pl>.
 
-2002-08-14 08:28  schoenw
+2002-08-14 08:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Revised the output format of "show ip addresses".
 
-2002-08-14 08:28  schoenw
+2002-08-14 08:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Move the retrieval of sysUpTime closer to the
 	  formatting function to reduce clock screws. This is not a real
 	  solution but hopefully better than what we had before.
 
-2002-08-13 09:30  schoenw
+2002-08-13 09:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure.in: Patch from Andrew Hood
 	  <mithrandir@alwaysonline.net.au> to make autoconf 2.53 happy.
 
-2002-07-25 14:00  schoenw
+2002-07-25 14:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c: Added the new set scli mode command.
 
-2002-07-24 14:27  schoenw
+2002-07-24 14:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/isdn.c: Some more ISDN specific updates.
 
-2002-07-24 14:19  schoenw
+2002-07-24 14:19  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/isdn-mib.c, stub/isdn-mib.h: Added stubs
 	  for the isdnEndpointEntry.
 
-2002-07-24 07:20  schoenw
+2002-07-24 07:20  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/isdn.c: Finalized the show isdn bri command.
 
-2002-07-24 06:55  schoenw
+2002-07-24 06:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/isdn.c: Started a new show isdn bri command.
 
-2002-07-24 06:55  schoenw
+2002-07-24 06:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c: Code and documentation cleanups.
 
-2002-07-24 06:54  schoenw
+2002-07-24 06:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c, scli/entity.c: Documentation cosmetics.
 
-2002-07-24 06:53  schoenw
+2002-07-24 06:53  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/isdn-mib.c, stub/isdn-mib.h: Regenerated
 	  stubs to remove unused code.
 
-2002-07-23 16:32  schoenw
+2002-07-23 16:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/sonet.c: Added show sonet section history and monitor sonet
 	  section stats commands and fixed a few bugs. Changed the output
 	  format slightly.
 
-2002-07-23 13:18  schoenw
+2002-07-23 13:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_utils.c, snmp/g_utils.h: Changed some prototypes to use
 	  size_t.
 
-2002-07-23 09:50  schoenw
+2002-07-23 09:50  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/sonet.c: Minor fixes and better documentation.
 
-2002-07-23 09:21  schoenw
+2002-07-23 09:21  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/sonet.c: Added the "show sonet section stats" command.
 
-2002-07-23 09:11  schoenw
+2002-07-23 09:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/etherlike-mib.c, stub/etherlike-mib.h,
 	  stub/mau-mib.c, stub/mau-mib.h, stub/sonet-mib.c,
 	  stub/sonet-mib.h: Regenerated stubs to include/exclude objects.
 
-2002-07-22 19:44  schoenw
+2002-07-22 19:44  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c, scli/scli.h, scli/sonet.c: The show sonet media
 	  command now accepts regular expressions and does some smarter
 	  formatting.
 
-2002-07-22 19:43  schoenw
+2002-07-22 19:43  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/vendors.c: Added ceragon.
 
-2002-07-22 16:52  schoenw
+2002-07-22 16:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* stub/disman-script-mib.c, stub/disman-script-mib.h, stub/if-mib.c,
-	  stub/if-mib.h: Regenerated stubs to include new/fixed
-	  create/delete/set methods.
+	* stub/disman-script-mib.c, stub/disman-script-mib.h,
+	  stub/if-mib.c, stub/if-mib.h: Regenerated stubs to include
+	  new/fixed create/delete/set methods.
 
-2002-07-19 12:16  schoenw
+2002-07-19 12:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ether.c, scli/sonet.c: Some documentation cleanup.
 
-2002-07-19 12:02  schoenw
+2002-07-19 12:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/basic.c, scli/scli.h, scli/sonet.c: Added
 	  some rudimentary support for SONET interfaces.
 
-2002-07-19 11:31  schoenw
+2002-07-19 11:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/sonet-mib.c, stub/sonet-mib.h: Added some
 	  stubs for the SONET-MIB.
 
-2002-07-19 09:17  schoenw
+2002-07-19 09:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added a new "set printer operator" command.
 
-2002-07-19 09:17  schoenw
+2002-07-19 09:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c, scli/netsnmp.c, scli/snmp.c, scli/system.c:
 	  Changes to use the new stub methods.
 
-2002-07-19 09:16  schoenw
+2002-07-19 09:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/tcp.c: Minor changes to the xml format produced by show tcp
 	  states.
 
-2002-07-19 09:15  schoenw
+2002-07-19 09:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am: Fixed the currently unused rules for gscli.
 
-2002-07-19 09:13  schoenw
+2002-07-19 09:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/if-mib.c, stub/if-mib.h, stub/printer-mib.c,
 	  stub/printer-mib.h, stub/snmpv2-mib.c, stub/snmpv2-mib.h,
@@ -655,17 +832,17 @@
 	  in order to use the new compiler generated create/delete/set
 	  methods.
 
-2002-07-19 09:11  schoenw
+2002-07-19 09:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am: Generate less unused stub code.
 
-2002-07-19 09:11  schoenw
+2002-07-19 09:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/if-mib-proc.c, proc/if-mib-proc.h, proc/productmib-proc.c,
 	  proc/snmp-view-based-acm-mib-proc.c: Removed several proc
 	  functions that are now part of the stubs.
 
-2002-07-04 07:46  schoenw
+2002-07-04 07:46  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/ip-mib.c, stub/ip-mib.h, stub/ospf-mib.c,
 	  stub/ospf-mib.h, stub/rfc1213-mib.c, stub/rfc1213-mib.h,
@@ -674,150 +851,151 @@
 	  stubs to reduce the amount of unused code and to remove redundant
 	  length checks in some unpack functions.
 
-2002-07-04 07:44  schoenw
+2002-07-04 07:44  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ospf.c: Fixed another usage of a wrong enumeration.
 
-2002-07-03 18:48  schoenw
+2002-07-03 18:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* AUTHORS, ChangeLog, NEWS: Updates for release 0.2.11.
 
-2002-07-03 18:43  schoenw
+2002-07-03 18:43  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* doc/scli.texinfo: Regenerated the file for the next release.
 
-2002-07-03 18:41  schoenw
+2002-07-03 18:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Some layout fixes.
 
-2002-07-03 18:40  schoenw
+2002-07-03 18:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure.in: Bumped the version number.
 
-2002-07-03 18:38  schoenw
+2002-07-03 18:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/basic.c, scli/tcp.c: Some minor changes to fix some oddities.
+	* scli/basic.c, scli/tcp.c: Some minor changes to fix some
+	  oddities.
 
-2002-07-03 18:36  schoenw
+2002-07-03 18:36  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_asn1.c, snmp/g_asn1.h: Some code cleanup. Made some of the
-	  internal functions invisible to the outside world and inlined them
-	  to make things even faster...
+	  internal functions invisible to the outside world and inlined
+	  them to make things even faster...
 
-2002-07-03 08:18  schoenw
+2002-07-03 08:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Changed the registration of the xml output.
 
-2002-07-03 07:40  schoenw
+2002-07-03 07:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Some more xml support.
 
-2002-07-03 06:52  schoenw
+2002-07-03 06:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/atm-mib.c, stub/atm-mib.h,
 	  stub/host-resources-mib.c, stub/host-resources-mib.h,
 	  stub/ip-mib.c, stub/ip-mib.h, stub/snmpv2-mib.c,
-	  stub/snmpv2-mib.h: Started to add explicit makefile rules for each
-	  MIB module. Added specific smidump flags to reduce the stubs to
-	  the subset which is actually needed.
+	  stub/snmpv2-mib.h: Started to add explicit makefile rules for
+	  each MIB module. Added specific smidump flags to reduce the stubs
+	  to the subset which is actually needed.
 
-2002-07-03 06:49  schoenw
+2002-07-03 06:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Use hrSWRunType instead of hrSWInstalledType for
 	  running software.
 
-2002-07-02 14:17  schoenw
+2002-07-02 14:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/monitor.c: Improved SNMP error message display in monitor
 	  mode.
 
-2002-07-02 10:31  schoenw
+2002-07-02 10:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/if-mib.c, stub/if-mib.h,
 	  stub/ip-forward-mib.c, stub/ip-forward-mib.h: Regenerated stubs
 	  for the IP-FORWARDING-MIB and the IF-MIB to exclude unused
 	  deprecated definitions.
 
-2002-07-02 08:37  schoenw
+2002-07-02 08:37  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/bridge.c, scli/cisco.c, scli/cmds.c,
-	  scli/ether.c, scli/interface.c: Commands are now case insensitive,
-	  support for SMTP style reply codes, generally prefer g_new0 over
-	  g_malloc0.
+	  scli/ether.c, scli/interface.c: Commands are now case
+	  insensitive, support for SMTP style reply codes, generally prefer
+	  g_new0 over g_malloc0.
 
-2002-07-02 08:32  schoenw
+2002-07-02 08:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.1.in, scli/scli.c, scli/scli.h: Added the new option -q
 	  and documented -i.
 
-2002-07-02 08:21  schoenw
+2002-07-02 08:21  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Minor edits of the command documentation.
 
-2002-07-01 12:59  schoenw
+2002-07-01 12:59  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/tcp.c: Added more detailed documentation for the "show tcp
 	  states" command.
 
-2002-07-01 12:35  schoenw
+2002-07-01 12:35  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/tcp.c: Assume all connections where the local port matches a
 	  local listening port are local services.
 
-2002-07-01 08:18  schoenw
+2002-07-01 08:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/tcp.c: Improved the layout to avoid empty lines.
 
-2002-07-01 08:13  schoenw
+2002-07-01 08:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/tcp.c: Added the "show tcp info" command and improved the
 	  documentation.
 
-2002-07-01 08:12  schoenw
+2002-07-01 08:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/isdn.c: The idsn mode is called isdn mode of course.
 
-2002-06-29 21:18  schoenw
+2002-06-29 21:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/tcp.c: Added xml support for show tcp states and improved the
-	  layout a bit.
+	* scli/tcp.c: Added xml support for show tcp states and improved
+	  the layout a bit.
 
-2002-06-28 15:58  schoenw
+2002-06-28 15:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.c: Produce consistent error messages please.
 
-2002-06-28 15:43  schoenw
+2002-06-28 15:43  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/tcp.c: Added new commands show tcp states and monitor tcp
 	  states.
 
-2002-06-26 17:40  schoenw
+2002-06-26 17:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Fixed an error return in "create nortel bridge
 	  vlan".
 
-2002-06-26 17:33  schoenw
+2002-06-26 17:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Improved the "show interface stack" command. It
 	  does first check whether there are any stacked interfaces before
 	  fetching more data and printing the header.
 
-2002-06-26 13:06  schoenw
+2002-06-26 13:06  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/bridge.c: Do not output stupid 00 numbers when bridges report
-	  0 time values (which is not legal according to the MIB but does
-	  happen).
+	* scli/bridge.c: Do not output stupid 00 numbers when bridges
+	  report 0 time values (which is not legal according to the MIB but
+	  does happen).
 
-2002-06-26 13:05  schoenw
+2002-06-26 13:05  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/vendors.c: Added Avaya.
 
-2002-06-26 09:25  schoenw
+2002-06-26 09:25  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c: The help text now points to the new "show scli
 	  command tree" command.
 
-2002-06-26 09:20  schoenw
+2002-06-26 09:20  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/3com.c, scli/cmds.c, scli/disman.c, scli/interface.c,
 	  scli/ip.c, scli/netsnmp.c, scli/nortel.c, scli/snmp.c,
@@ -826,366 +1004,369 @@
 	  set/create/delete command recursively does not really make sense.
 	  All such commands are now flagged as non-recursive.
 
-2002-06-26 06:39  schoenw
+2002-06-26 06:39  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/3com.c, scli/atm.c, scli/basic.c, scli/cmds.c, scli/disman.c,
-	  scli/interface.c, scli/ip.c, scli/netsnmp.c, scli/nortel.c,
-	  scli/snmp.c, scli/system.c: Improved syntax error handling.
+	* scli/3com.c, scli/atm.c, scli/basic.c, scli/cmds.c,
+	  scli/disman.c, scli/interface.c, scli/ip.c, scli/netsnmp.c,
+	  scli/nortel.c, scli/snmp.c, scli/system.c: Improved syntax error
+	  handling.
 
-2002-06-25 15:06  schoenw
+2002-06-25 15:06  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* doc/Makefile.am: Fixed Makefile.am again...
 
-2002-06-25 15:03  schoenw
+2002-06-25 15:03  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, NEWS, TODO: Updates for release 0.2.10.
 
-2002-06-25 14:55  schoenw
+2002-06-25 14:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* doc/Makefile.am, doc/scli.texinfo: Updated the version number and
 	  again the Makefile.am.
 
-2002-06-25 14:54  schoenw
+2002-06-25 14:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* doc/Makefile.am, doc/scli.texinfo: Fixed Makefile and regenerated
 	  the mode descriptions.
 
-2002-06-25 14:52  schoenw
+2002-06-25 14:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure.in: Bumped the version number.
 
-2002-06-25 14:42  schoenw
+2002-06-25 14:42  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Added the set nortel bridge vlan ports command.
 
-2002-06-25 14:33  schoenw
+2002-06-25 14:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/3com.c, scli/nortel.c: Added the set 3com bridge vlan name
 	  command. Check vlan name length restrictions before actually
 	  trying to set names.
 
-2002-06-25 14:31  schoenw
+2002-06-25 14:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/productmib-proc.c, proc/productmib-proc.h,
 	  proc/rapid-city-proc.c, proc/rapid-city-proc.h: Pass the name
 	  length as a parameter to the vlan creation procedures.
 
-2002-06-25 07:56  schoenw
+2002-06-25 07:56  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/productmib-proc.c: Assignment of port members now actually
 	  works.
 
-2002-06-25 07:55  schoenw
+2002-06-25 07:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/3com.c: Fixed calls to the wrong free function.
 
-2002-06-25 07:46  schoenw
+2002-06-25 07:46  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/3com.c: Added `set 3com bridge vlan ports' and implemented
 	  `dump 3com bridge vlan'.
 
-2002-06-25 07:45  schoenw
+2002-06-25 07:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Some improvements for the server mode.
 
-2002-06-25 07:44  schoenw
+2002-06-25 07:44  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c, scli/nortel.c: Moved scan_port_set() to fmt.c
 
-2002-06-25 07:43  schoenw
+2002-06-25 07:43  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.c, scli/scli.h: Added SCLI_INTERP_FLAG_PROTO which is
 	  set if scli is running as a network service (a somewhat real
 	  command line interface ;-).
 
-2002-06-25 07:41  schoenw
+2002-06-25 07:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/productmib-proc.c, proc/productmib-proc.h: Added
 	  productmib_proc_set_vlan_port_member().
 
-2002-06-25 07:41  schoenw
+2002-06-25 07:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/if-mib-proc.c, proc/if-mib-proc.h: Added
-	  if_mib_proc_stack_interface() and if_mib_proc_unstack_interface().
+	  if_mib_proc_stack_interface() and
+	  if_mib_proc_unstack_interface().
 
-2002-06-25 07:38  schoenw
+2002-06-25 07:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_asn1.c: Added debugging output for the ASN.1/BER.
 
-2002-06-25 07:35  schoenw
+2002-06-25 07:35  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/3com.c: Fixed an error code.
 
-2002-06-25 07:34  schoenw
+2002-06-25 07:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Code cosmetic.
 
-2002-06-19 15:32  schoenw
+2002-06-19 15:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/3com.c: The create 3com bridge vlan and the delete 3com
 	  bridge vlan now seem to work. Added an INTERFACE column to the
 	  show 3com bridge vlan info command.
 
-2002-06-19 15:30  schoenw
+2002-06-19 15:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/productmib-proc.c, proc/productmib-proc.h: Updated the
 	  create/delete procs so that they work with my test bridge.
 
-2002-06-18 09:29  schoenw
+2002-06-18 09:29  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/snmp-user-based-sm-mib-proc.c,
 	  proc/snmp-user-based-sm-mib-proc.h: Added proc for the
 	  SNMP-USER-BASED-SM-MIB.
 
-2002-06-18 09:27  schoenw
+2002-06-18 09:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Treat the filename - specially to refer to stdin.
 
-2002-06-18 09:26  schoenw
+2002-06-18 09:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/3com.c: Added some not yet completed commands to
 	  create/delete vlans.
 
-2002-06-18 09:26  schoenw
+2002-06-18 09:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/productmib.c, stub/productmib.h:
 	  Regenerated PRODUCTMIB stubs to include a3ComVirtualGroup.
 
-2002-06-18 09:25  schoenw
+2002-06-18 09:25  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/Makefile.am, proc/productmib-proc.c, proc/productmib-proc.h:
 	  Added proc files for 3com's PRODUCTMIB.
 
-2002-06-17 09:11  schoenw
+2002-06-17 09:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Removed definition of fmt_port_set() since this is
 	  now in fmt.c.
 
-2002-06-17 09:09  schoenw
+2002-06-17 09:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Code and documentation cleanup.
 
-2002-06-17 09:03  schoenw
+2002-06-17 09:03  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/3com.c, scli/fmt.c, scli/nortel.c, scli/scli.h: Moved
 	  fmt_port_set() into fmt.c and added code to compute port sets for
 	  3com vlans based on the ifStackTable.
 
-2002-06-11 11:54  schoenw
+2002-06-11 11:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Changed format produced by the show interface
 	  stack command slightly based on Frank's feedback.
 
-2002-06-10 13:58  schoenw
+2002-06-10 13:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Rewrote the 'show interface stack' command. It
 	  should now show some useful information.
 
-2002-06-07 14:15  schoenw
+2002-06-07 14:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c: Fixed the boolean constants.
 
-2002-06-07 14:04  schoenw
+2002-06-07 14:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* AUTHORS: Added Urs Thuerman who provided date and time related
 	  fixes.
 
-2002-06-07 13:24  schoenw
+2002-06-07 13:24  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c: Added "create scli interp", "delete scli interp",
 	  "show scli interps", "show scli command info", "show scli command
 	  details". Renamed "show scli commands" to "show scli command
 	  tree".
 
-2002-06-07 13:22  schoenw
+2002-06-07 13:22  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Fixed the error reporting even more.
 
-2002-06-07 13:08  schoenw
+2002-06-07 13:08  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c, scli/scli.h: Added fmt_indent_string().
 
-2002-06-07 13:07  schoenw
+2002-06-07 13:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/snmp.c: Updates to the documentation.
 
-2002-06-07 13:06  schoenw
+2002-06-07 13:06  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/3com.c: Align with updated stubs.
 
-2002-06-06 19:08  schoenw
+2002-06-06 19:08  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/scli.c, scli/scli.h: More numeric error codes.
 	  Interpreter now support slaves. Moved the initialization into a
 	  special function.
 
-2002-06-05 16:36  schoenw
+2002-06-05 16:36  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/productmib.c, stub/productmib.h: Regenerated the stubs now
 	  that Frank has fixed the libsmi parser.
 
-2002-06-05 14:27  schoenw
+2002-06-05 14:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/scli.1.in, scli/scli.c, scli/scli.h: Added a
 	  command line option to specify the SNMP version which turns off
 	  auto-probing.
 
-2002-05-27 18:53  schoenw
+2002-05-27 18:53  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: The "show interface details" command now also
 	  displays the physical receive addresses.
 
-2002-05-27 18:41  schoenw
+2002-05-27 18:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c, scli/fmt.c, scli/scli.h, scli/snmp.c: Moved
 	  fmt_row_status() and fmt_storage_type() into fmt.c to reuse them.
 
-2002-05-27 17:00  schoenw
+2002-05-27 17:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/3com.c, scli/Makefile.am: Minor updates to better handle 3com
-	  boxes.
+	* scli/3com.c, scli/Makefile.am: Minor updates to better handle
+	  3com boxes.
 
-2002-05-27 08:57  schoenw
+2002-05-27 08:57  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, Makefile.am, NEWS, configure.in: Updates for release
 	  0.2.9.
 
-2002-05-27 08:55  schoenw
+2002-05-27 08:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/3com.c: Indicate the vlan entry status.
 
-2002-05-27 08:14  schoenw
+2002-05-27 08:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* doc/Makefile.am: Added modes.texinfo to the dependencies.
 
-2002-05-24 09:36  schoenw
+2002-05-24 09:36  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/3com.c, scli/Makefile.am, scli/scli.c, scli/scli.h: Added the
-	  3com mode to scli.
+	* scli/3com.c, scli/Makefile.am, scli/scli.c, scli/scli.h: Added
+	  the 3com mode to scli.
 
-2002-05-24 09:36  schoenw
+2002-05-24 09:36  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/productmib.c, stub/productmib.h: Added
 	  stubs for the productmib to manage 3com vlans.
 
-2002-05-06 19:21  schoenw
+2002-05-06 19:21  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* snmp/g_utils.c: Fixed the order of the type names in type mismatch
-	  warnings.
+	* snmp/g_utils.c: Fixed the order of the type names in type
+	  mismatch warnings.
 
-2002-05-06 19:16  schoenw
+2002-05-06 19:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_utils.c: Be liberal on type mismatches if the types are of
 	  the same "class".
 
-2002-05-02 10:00  schoenw
+2002-05-02 10:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c: Fix by Urs to calculate correct timezone offsets.
 
-2002-04-30 15:41  schoenw
+2002-04-30 15:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/Makefile.am, scli/rs232.c, scli/scli.c, scli/scli.h: Added an
-	  RS 232 mode which allows to configure RS 232 serial lines.
+	* scli/Makefile.am, scli/rs232.c, scli/scli.c, scli/scli.h: Added
+	  an RS 232 mode which allows to configure RS 232 serial lines.
 
-2002-04-30 15:40  schoenw
+2002-04-30 15:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Fixed an off by one formatting bug.
 
-2002-04-30 15:39  schoenw
+2002-04-30 15:39  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/rs-232-mib.c, stub/rs-232-mib.h: Added
 	  stubs for the RS-232-MIB.
 
-2002-04-25 18:49  schoenw
+2002-04-25 18:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: show bridge filter now does something more useful.
 
-2002-04-25 18:30  schoenw
+2002-04-25 18:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ether.c: Some cleanup to produce nicer output.
 
-2002-04-25 18:15  schoenw
+2002-04-25 18:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Display more information about the spanning tree
 	  parameters.
 
-2002-04-10 15:12  schoenw
+2002-04-10 15:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.h: Added a transaction id counter to the scli_interp_t.
 
-2002-04-10 15:10  schoenw
+2002-04-10 15:10  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Increment the transaction id for each command
 	  processed.
 
-2002-04-10 15:09  schoenw
+2002-04-10 15:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/vendors.c: Added Elsa GmbH to the vendors we recognize.
 
-2002-04-03 18:40  schoenw
+2002-04-03 18:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Use the caching procs for the ifTable.
 
-2002-04-03 18:40  schoenw
+2002-04-03 18:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/if-mib-proc.c, proc/if-mib-proc.h: Some experimental proc's
 	  to cache ifTable data.
 
-2002-04-02 10:26  schoenw
+2002-04-02 10:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c, scli/scli.h: Introduced
 	  SCLI_CMD_FLAG_NORECURSE which can be used to have commands that
 	  are skipped during recursive command evaluation.
 
-2002-03-29 23:07  schoenw
+2002-03-29 23:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/isdn.c: Minor cleanups.
 
-2002-03-29 23:01  schoenw
+2002-03-29 23:01  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/isdn.c, scli/scli.c, scli/scli.h: Added a
 	  very rudimentary isdn mode.
 
-2002-03-29 23:00  schoenw
+2002-03-29 23:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/isdn-mib.c, stub/isdn-mib.h: Added stubs
 	  for the ISDN-MIB.
 
-2002-03-29 22:39  schoenw
+2002-03-29 22:39  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_utils.c: Do not set the length if the value is considered
 	  invalid.
 
-2002-03-29 22:38  schoenw
+2002-03-29 22:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c, scli/ip.c, scli/system.c: Various minor bug fixes.
 
-2002-03-28 13:17  schoenw
+2002-03-28 13:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added the "show printer channels" command.
 
-2002-03-28 13:00  schoenw
+2002-03-28 13:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am: Added support for magic quotes in the
 	  documentation.
 
-2002-03-28 13:00  schoenw
+2002-03-28 13:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c, scli/interface.c, scli/netsnmp.c, scli/printer.c,
 	  scli/system.c: *** empty log message ***
 
-2002-03-27 15:34  schoenw
+2002-03-27 15:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, NEWS, TODO, config.h.in, configure.in: Updates for
 	  release 0.2.8.
 
-2002-03-27 13:48  schoenw
+2002-03-27 13:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/atm-mib.c, stub/bridge-mib.c, stub/disman-schedule-mib.c,
-	  stub/disman-script-mib.c, stub/entity-mib.c, stub/etherlike-mib.c,
-	  stub/host-resources-mib.c, stub/host-resources-types.c,
-	  stub/iana-language-mib.c, stub/if-mib.c, stub/ip-forward-mib.c,
-	  stub/ip-mib.c, stub/mau-mib.c, stub/notification-log-mib.c,
+	  stub/disman-script-mib.c, stub/entity-mib.c,
+	  stub/etherlike-mib.c, stub/host-resources-mib.c,
+	  stub/host-resources-types.c, stub/iana-language-mib.c,
+	  stub/if-mib.c, stub/ip-forward-mib.c, stub/ip-mib.c,
+	  stub/mau-mib.c, stub/notification-log-mib.c,
 	  stub/old-cisco-ip-mib.c, stub/ospf-mib.c, stub/printer-mib.c,
 	  stub/rapid-city.c, stub/rfc1213-mib.c, stub/snmp-community-mib.c,
 	  stub/snmp-framework-mib.c, stub/snmp-mpd-mib.c,
@@ -1193,29 +1374,30 @@
 	  stub/snmp-user-based-sm-mib.c, stub/snmp-view-based-acm-mib.c,
 	  stub/snmpv2-mib.c, stub/snmpv2-tm.c, stub/tcp-mib.c,
 	  stub/tunnel-mib.c, stub/ucd-snmp-mib.c, stub/udp-mib.c:
-	  Regenerated stubs to incorporate fixes in the smidump scli driver.
+	  Regenerated stubs to incorporate fixes in the smidump scli
+	  driver.
 
-2002-03-27 13:42  schoenw
+2002-03-27 13:42  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_utils.c: Fixed the size/range checking code to do and OR
 	  rather than an AND. Added missing copy operations for some SNMP
 	  data types.
 
-2002-03-27 13:41  schoenw
+2002-03-27 13:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/fmt.c: Display TAddress values with an unknown TDomain in hex
-	  rather than just ignoring it.
+	* scli/fmt.c: Display TAddress values with an unknown TDomain in
+	  hex rather than just ignoring it.
 
-2002-03-27 13:40  schoenw
+2002-03-27 13:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Display the storage type "other".
 
-2002-03-26 16:52  schoenw
+2002-03-26 16:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c, scli/snmp.c: Gracefully handle unknown transport
 	  domains.
 
-2002-03-26 16:26  schoenw
+2002-03-26 16:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/atm-mib.c, stub/atm-mib.h, stub/bridge-mib.c,
 	  stub/bridge-mib.h, stub/disman-schedule-mib.c,
@@ -1224,100 +1406,100 @@
 	  stub/etherlike-mib.c, stub/etherlike-mib.h,
 	  stub/host-resources-mib.c, stub/host-resources-mib.h,
 	  stub/host-resources-types.c, stub/host-resources-types.h,
-	  stub/iana-language-mib.c, stub/iana-language-mib.h, stub/if-mib.c,
-	  stub/if-mib.h, stub/ip-forward-mib.c, stub/ip-forward-mib.h,
-	  stub/ip-mib.c, stub/ip-mib.h, stub/mau-mib.c, stub/mau-mib.h,
-	  stub/old-cisco-ip-mib.c, stub/old-cisco-ip-mib.h, stub/ospf-mib.c,
-	  stub/ospf-mib.h, stub/printer-mib.c, stub/printer-mib.h,
-	  stub/rapid-city.c, stub/rapid-city.h, stub/rfc1213-mib.c,
-	  stub/rfc1213-mib.h, stub/snmp-community-mib.c,
-	  stub/snmp-community-mib.h, stub/snmp-framework-mib.c,
-	  stub/snmp-framework-mib.h, stub/snmp-mpd-mib.c,
-	  stub/snmp-mpd-mib.h, stub/snmp-notification-mib.c,
-	  stub/snmp-notification-mib.h, stub/snmp-target-mib.c,
-	  stub/snmp-target-mib.h, stub/snmp-user-based-sm-mib.c,
-	  stub/snmp-user-based-sm-mib.h, stub/snmp-view-based-acm-mib.c,
-	  stub/snmp-view-based-acm-mib.h, stub/snmpv2-mib.c,
-	  stub/snmpv2-mib.h, stub/snmpv2-tm.c, stub/snmpv2-tm.h,
-	  stub/tcp-mib.c, stub/tcp-mib.h, stub/tunnel-mib.c,
-	  stub/tunnel-mib.h, stub/ucd-snmp-mib.c, stub/ucd-snmp-mib.h,
-	  stub/udp-mib.c, stub/udp-mib.h: Regenerated all stubs to take
-	  advantage of the new compiler backend which generates much smaller
-	  stubs.
+	  stub/iana-language-mib.c, stub/iana-language-mib.h,
+	  stub/if-mib.c, stub/if-mib.h, stub/ip-forward-mib.c,
+	  stub/ip-forward-mib.h, stub/ip-mib.c, stub/ip-mib.h,
+	  stub/mau-mib.c, stub/mau-mib.h, stub/old-cisco-ip-mib.c,
+	  stub/old-cisco-ip-mib.h, stub/ospf-mib.c, stub/ospf-mib.h,
+	  stub/printer-mib.c, stub/printer-mib.h, stub/rapid-city.c,
+	  stub/rapid-city.h, stub/rfc1213-mib.c, stub/rfc1213-mib.h,
+	  stub/snmp-community-mib.c, stub/snmp-community-mib.h,
+	  stub/snmp-framework-mib.c, stub/snmp-framework-mib.h,
+	  stub/snmp-mpd-mib.c, stub/snmp-mpd-mib.h,
+	  stub/snmp-notification-mib.c, stub/snmp-notification-mib.h,
+	  stub/snmp-target-mib.c, stub/snmp-target-mib.h,
+	  stub/snmp-user-based-sm-mib.c, stub/snmp-user-based-sm-mib.h,
+	  stub/snmp-view-based-acm-mib.c, stub/snmp-view-based-acm-mib.h,
+	  stub/snmpv2-mib.c, stub/snmpv2-mib.h, stub/snmpv2-tm.c,
+	  stub/snmpv2-tm.h, stub/tcp-mib.c, stub/tcp-mib.h,
+	  stub/tunnel-mib.c, stub/tunnel-mib.h, stub/ucd-snmp-mib.c,
+	  stub/ucd-snmp-mib.h, stub/udp-mib.c, stub/udp-mib.h: Regenerated
+	  all stubs to take advantage of the new compiler backend which
+	  generates much smaller stubs.
 
-2002-03-26 16:24  schoenw
+2002-03-26 16:24  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/notification-log-mib.c,
 	  stub/notification-log-mib.h: Added stubs for the
 	  NOTIFICATION-LOG-MIB.
 
-2002-03-26 16:19  schoenw
+2002-03-26 16:19  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* snmp/g_utils.c, snmp/g_utils.h: Added functions that are called by
-	  the stub code.
+	* snmp/g_utils.c, snmp/g_utils.h: Added functions that are called
+	  by the stub code.
 
-2002-03-26 16:16  schoenw
+2002-03-26 16:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c: Fixed a typo.
 
-2002-03-25 17:20  schoenw
+2002-03-25 17:20  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Check whether entLastChangeTime is really
 	  available.
 
-2002-03-25 15:22  schoenw
+2002-03-25 15:22  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/system.c: Show last add/remove event times for interfaces and
-	  physical entities.
+	* scli/system.c: Show last add/remove event times for interfaces
+	  and physical entities.
 
-2002-03-22 16:33  schoenw
+2002-03-22 16:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_transport.c: Added an additional parameter for the port
 	  number.
 
-2002-03-22 16:19  schoenw
+2002-03-22 16:19  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_transport.h: Added an additional parameter for the port
 	  number.
 
-2002-03-22 16:18  schoenw
+2002-03-22 16:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* README: Updated the copyright years.
 
-2002-03-22 16:17  schoenw
+2002-03-22 16:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* doc/Makefile.am, doc/scli.texinfo, doc/texinfo.tex: Started to
 	  describe how one can extend scli. Added magic to include the
 	  mode/command description from the scli "show scli mode" command.
 
-2002-03-22 16:15  schoenw
+2002-03-22 16:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_dispatch.c, snmp/g_dispatch.h, snmp/g_session.c,
 	  snmp/g_session.h: Changes to pass the port number around.
 
-2002-03-22 16:13  schoenw
+2002-03-22 16:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c, scli/scli.c: Added code to pass the
 	  port number around.
 
-2002-03-19 20:51  schoenw
+2002-03-19 20:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/monitor.c, scli/system.c, scli/vendors.c: Fixed int size
 	  problems and added Lucent to the vendors we recognize.
 
-2002-03-06 16:55  schoenw
+2002-03-06 16:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cisco.c: Added a check for non-existing variables which
 	  caused core dumps on some CISCO boxes.
 
-2002-03-05 12:07  schoenw
+2002-03-05 12:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/disman-script-mib.c, stub/entity-mib.c,
 	  stub/host-resources-mib.c, stub/if-mib.c, stub/printer-mib.c,
 	  stub/snmpv2-mib.c, stub/ucd-snmp-mib.c: Regenerated stubs to
 	  include size and range checking code.
 
-2002-02-21 08:56  schoenw
+2002-02-21 08:56  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/atm-mib.c, stub/atm-mib.h, stub/bridge-mib.c,
 	  stub/bridge-mib.h, stub/disman-schedule-mib.c,
@@ -1326,287 +1508,288 @@
 	  stub/etherlike-mib.c, stub/etherlike-mib.h,
 	  stub/host-resources-mib.c, stub/host-resources-mib.h,
 	  stub/host-resources-types.c, stub/host-resources-types.h,
-	  stub/iana-language-mib.c, stub/iana-language-mib.h, stub/if-mib.c,
-	  stub/if-mib.h, stub/ip-forward-mib.c, stub/ip-forward-mib.h,
-	  stub/ip-mib.c, stub/ip-mib.h, stub/mau-mib.c, stub/mau-mib.h,
-	  stub/old-cisco-ip-mib.c, stub/old-cisco-ip-mib.h, stub/ospf-mib.c,
-	  stub/ospf-mib.h, stub/printer-mib.c, stub/printer-mib.h,
-	  stub/rapid-city.c, stub/rapid-city.h, stub/rfc1213-mib.c,
-	  stub/rfc1213-mib.h, stub/snmp-community-mib.c,
-	  stub/snmp-community-mib.h, stub/snmp-framework-mib.c,
-	  stub/snmp-framework-mib.h, stub/snmp-mpd-mib.c,
-	  stub/snmp-mpd-mib.h, stub/snmp-notification-mib.c,
-	  stub/snmp-notification-mib.h, stub/snmp-target-mib.c,
-	  stub/snmp-target-mib.h, stub/snmp-user-based-sm-mib.c,
-	  stub/snmp-user-based-sm-mib.h, stub/snmp-view-based-acm-mib.c,
-	  stub/snmp-view-based-acm-mib.h, stub/snmpv2-mib.c,
-	  stub/snmpv2-mib.h, stub/snmpv2-tm.c, stub/snmpv2-tm.h,
-	  stub/tcp-mib.c, stub/tcp-mib.h, stub/tunnel-mib.c,
-	  stub/tunnel-mib.h, stub/ucd-snmp-mib.c, stub/ucd-snmp-mib.h,
-	  stub/udp-mib.c, stub/udp-mib.h: Regenerated all the stubs with the
-	  current stub generator.
+	  stub/iana-language-mib.c, stub/iana-language-mib.h,
+	  stub/if-mib.c, stub/if-mib.h, stub/ip-forward-mib.c,
+	  stub/ip-forward-mib.h, stub/ip-mib.c, stub/ip-mib.h,
+	  stub/mau-mib.c, stub/mau-mib.h, stub/old-cisco-ip-mib.c,
+	  stub/old-cisco-ip-mib.h, stub/ospf-mib.c, stub/ospf-mib.h,
+	  stub/printer-mib.c, stub/printer-mib.h, stub/rapid-city.c,
+	  stub/rapid-city.h, stub/rfc1213-mib.c, stub/rfc1213-mib.h,
+	  stub/snmp-community-mib.c, stub/snmp-community-mib.h,
+	  stub/snmp-framework-mib.c, stub/snmp-framework-mib.h,
+	  stub/snmp-mpd-mib.c, stub/snmp-mpd-mib.h,
+	  stub/snmp-notification-mib.c, stub/snmp-notification-mib.h,
+	  stub/snmp-target-mib.c, stub/snmp-target-mib.h,
+	  stub/snmp-user-based-sm-mib.c, stub/snmp-user-based-sm-mib.h,
+	  stub/snmp-view-based-acm-mib.c, stub/snmp-view-based-acm-mib.h,
+	  stub/snmpv2-mib.c, stub/snmpv2-mib.h, stub/snmpv2-tm.c,
+	  stub/snmpv2-tm.h, stub/tcp-mib.c, stub/tcp-mib.h,
+	  stub/tunnel-mib.c, stub/tunnel-mib.h, stub/ucd-snmp-mib.c,
+	  stub/ucd-snmp-mib.h, stub/udp-mib.c, stub/udp-mib.h: Regenerated
+	  all the stubs with the current stub generator.
 
-2002-02-21 08:54  schoenw
+2002-02-21 08:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c, scli/monitor.c, scli/scli.c,
 	  scli/scli.h: Updates to reflect changes in the SNMP API and minor
 	  cleanups.
 
-2002-02-21 08:52  schoenw
+2002-02-21 08:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_snmp.c, snmp/g_snmp.h, snmp/g_utils.c, snmp/g_utils.h:
 	  Added some string conversion tables and normalized type defines.
 
-2002-02-20 11:14  schoenw
+2002-02-20 11:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Display zero-based counters for the markers.
 
-2002-02-20 10:02  schoenw
+2002-02-20 10:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added code to display supply capacity and current
 	  level.
 
-2002-02-19 10:46  schoenw
+2002-02-19 10:46  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Cosmetic fixes from Oliver.
 
-2002-02-19 08:54  schoenw
+2002-02-19 08:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Minor cleanups for more consistency.
 
-2002-02-19 07:45  schoenw
+2002-02-19 07:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/if-mib-proc.c, proc/if-mib-proc.h: Changed the function
 	  prototype to allow machine generation.
 
-2002-02-19 07:42  schoenw
+2002-02-19 07:42  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Started work on "show printer markers" and "show
 	  printer supplies".
 
-2002-02-19 07:37  schoenw
+2002-02-19 07:37  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Some minor speed improvements.
 
-2002-02-18 15:09  schoenw
+2002-02-18 15:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/Makefile.am: Added missing snmp-view-based-acm-mib-proc.h.
 
-2002-02-18 14:26  schoenw
+2002-02-18 14:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, NEWS: Updates for release 0.2.7.
 
-2002-02-18 14:19  schoenw
+2002-02-18 14:19  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure.in: Updates for release 0.2.7.
 
-2002-02-18 14:12  schoenw
+2002-02-18 14:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Minor code cleanups.
 
-2002-02-18 14:06  schoenw
+2002-02-18 14:06  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/snmp-framework-mib.c, stub/snmp-framework-mib.h: Regenerated
 	  stubs to improve the error handling.
 
-2002-02-15 14:08  schoenw
+2002-02-15 14:08  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/snmp-view-based-acm-mib-proc.c,
-	  proc/snmp-view-based-acm-mib-proc.h: Updated the proc interface to
-	  be more consistent with how an automatic interface would look
+	  proc/snmp-view-based-acm-mib-proc.h: Updated the proc interface
+	  to be more consistent with how an automatic interface would look
 	  like.
 
-2002-02-15 14:07  schoenw
+2002-02-15 14:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/snmp-notification-mib.c, stub/snmp-notification-mib.h: Added
 	  stubs for the SNMP-NOTIFICATION-MIB.
 
-2002-02-15 14:05  schoenw
+2002-02-15 14:05  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/snmp.c: Added new commands: delete snmp vacm member, show
 	  snmp target addresses, show snmp target parameters, show snmp
 	  notification targets. Renamed show snmp vacm groups to show snmp
 	  vacm member.
 
-2002-02-15 14:03  schoenw
+2002-02-15 14:03  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c, scli/scli.h: Added fmt_tdomain() and fmt_taddress().
 
-2002-02-15 14:01  schoenw
+2002-02-15 14:01  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am: Added stubs for the SNMP-NOTIFICATION-MIB.
 
-2002-02-13 15:03  schoenw
+2002-02-13 15:03  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/snmp-view-based-acm-mib-proc.c,
 	  proc/snmp-view-based-acm-mib-proc.h: Added
 	  snmp_view_based_acm_mib_proc_delete_member().
 
-2002-02-13 15:02  schoenw
+2002-02-13 15:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/snmpv2-tm.c, stub/snmpv2-tm.h: Added stubs
 	  for the SNMPv2-TM module.
 
-2002-02-11 13:35  schoenw
+2002-02-11 13:35  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/entity.c: Handle physical entities wich are not contained
 	  anywhere.
 
-2002-02-11 13:18  schoenw
+2002-02-11 13:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Added date and peer attributes to the XML output.
 
-2002-02-11 13:18  schoenw
+2002-02-11 13:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Added code to show the physical entities which
 	  contain interfaces in the "show interface details" command.
 
-2002-02-07 10:35  schoenw
+2002-02-07 10:35  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c: Added the show scli alarm info command to display
 	  alarm information.
 
-2002-02-07 10:34  schoenw
+2002-02-07 10:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/scli.h: Added a data structure for alarms.
 
-2002-02-07 10:16  schoenw
+2002-02-07 10:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/snmp.c: Added the create snmp vacm member command.
 
-2002-02-07 10:14  schoenw
+2002-02-07 10:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/Makefile.am, proc/snmp-view-based-acm-mib-proc.c,
 	  proc/snmp-view-based-acm-mib-proc.h, proc/udp-mib-proc.c,
-	  proc/udp-mib-proc.h: Added procedure files for the UDP-MIB and the
-	  SNMP-VIEW-BASED-ACM-MIB.
+	  proc/udp-mib-proc.h: Added procedure files for the UDP-MIB and
+	  the SNMP-VIEW-BASED-ACM-MIB.
 
-2002-02-07 10:13  schoenw
+2002-02-07 10:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_snmp_table.c, snmp/g_snmp_walk.c: Propagate the error
 	  information back into the calling session.
 
-2002-01-30 12:57  schoenw
+2002-01-30 12:57  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Implemented an experimental "alert interface
 	  status" command.
 
-2002-01-25 09:33  schoenw
+2002-01-25 09:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Experimental code to cleanup the error message
 	  handling.
 
-2002-01-25 09:32  schoenw
+2002-01-25 09:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/cmds.c, scli/interface.c, scli/nortel.c,
 	  scli/scli.h, scli/system.c: Regular expression matching options
 	  are now configurable.
 
-2002-01-20 22:10  schoenw
+2002-01-20 22:10  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* README: Updated mailing list information.
 
-2002-01-18 09:45  schoenw
+2002-01-18 09:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Updated to the MIB version in RFC RFC 3231.
 
-2002-01-18 09:44  schoenw
+2002-01-18 09:44  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* stub/disman-schedule-mib.c, stub/disman-schedule-mib.h: Updated to
-	  the RFC 3231 version of the MIB.
+	* stub/disman-schedule-mib.c, stub/disman-schedule-mib.h: Updated
+	  to the RFC 3231 version of the MIB.
 
-2002-01-18 09:40  schoenw
+2002-01-18 09:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c: Allow the set scli debugging command in xml mode.
 
-2002-01-18 09:39  schoenw
+2002-01-18 09:39  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.c: Fixed a command parsing bug.
 
-2002-01-18 09:38  schoenw
+2002-01-18 09:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: The show system processes and monitor system
-	  processes now accept regexp's to select a subset of all processes.
+	  processes now accept regexp's to select a subset of all
+	  processes.
 
-2002-01-10 10:12  schoenw
+2002-01-10 10:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c: Show the interface description in the "show atm
 	  interface" commands.
 
-2002-01-10 10:02  schoenw
+2002-01-10 10:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c: Better line wrapping for fmt_display_string().
 
-2002-01-10 10:01  schoenw
+2002-01-10 10:01  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c: Implemented regex matching for ATM interfaces.
 
-2002-01-09 15:16  schoenw
+2002-01-09 15:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/netsnmp.c: Improved the display of the load values.
 
-2002-01-08 19:02  schoenw
+2002-01-08 19:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Improved the display of spanning tree information.
 
-2002-01-08 11:08  schoenw
+2002-01-08 11:08  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c: Split the show atm interface command into two new
 	  commands: show atm interface info and show atm interface details
 
-2002-01-08 11:07  schoenw
+2002-01-08 11:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/netsnmp.c: New commands: show netsnmp load, set netsnmp
 	  restart, show netsnmp exec, show netsnmp proc, dump netsnmp.
 
-2002-01-08 11:05  schoenw
+2002-01-08 11:05  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/entity.c: Improved the documentation.
 
-2002-01-07 15:32  schoenw
+2002-01-07 15:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ospf.c: Fixed a formatting bug.
 
-2002-01-07 15:28  schoenw
+2002-01-07 15:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/entity.c, scli/fmt.c: Fixed a bug where the string len check
 	  was out of order. Fixed the entity details layout.
 
-2002-01-05 16:15  schoenw
+2002-01-05 16:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c, scli/cmds.c: Fixed some typos.
 
-2002-01-05 16:13  schoenw
+2002-01-05 16:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/netsnmp.c, scli/scli.c, scli/scli.h: Added
 	  a netsnmp mode.
 
-2002-01-05 16:11  schoenw
+2002-01-05 16:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/snmp-view-based-acm-mib.c,
 	  stub/snmp-view-based-acm-mib.h, stub/ucd-snmp-mib.c,
-	  stub/ucd-snmp-mib.h: Added stubs for the ucd-snmp/net-snmp private
-	  MIB.
+	  stub/ucd-snmp-mib.h: Added stubs for the ucd-snmp/net-snmp
+	  private MIB.
 
-2001-12-19 12:23  schoenw
+2001-12-19 12:23  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, NEWS, config.h.in, configure.in: Updates for release
 	  0.2.6.
 
-2001-12-19 11:33  schoenw
+2001-12-19 11:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c, scli/scli.h: Made scli_cmd_open() unvisible across
 	  modules.
 
-2001-12-19 11:30  schoenw
+2001-12-19 11:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c, scli/monitor.c, scli/scli.c,
 	  scli/scli.h, scli/system.c: Adapted the code to recent changes in
 	  the gsnmp API. Improved the handling of scli command line
-	  arguments by letting the interpreter handle an open command rather
-	  than calling the command directly.
+	  arguments by letting the interpreter handle an open command
+	  rather than calling the command directly.
 
-2001-12-19 11:27  schoenw
+2001-12-19 11:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/Makefile.am, snmp/g_dispatch.c, snmp/g_dispatch.h,
 	  snmp/g_session.c, snmp/g_session.h, snmp/g_snmp.c, snmp/g_snmp.h,
@@ -1617,164 +1800,164 @@
 	  service name "snmp" defined. Added a new module that implements
 	  walks.
 
-2001-12-19 11:25  schoenw
+2001-12-19 11:25  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c: Added code to handle unprintable characters in
 	  fmt_display_string().
 
-2001-12-17 18:11  schoenw
+2001-12-17 18:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c, scli/cmds.c: Minor code cleanups.
 
-2001-12-17 18:10  schoenw
+2001-12-17 18:10  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/snmp.c: Reworked the whole mode. Added 'show snmp usm users',
-	  'dump snmp' and 'set snmp authentication traps' commands.
+	* scli/snmp.c: Reworked the whole mode. Added 'show snmp usm
+	  users', 'dump snmp' and 'set snmp authentication traps' commands.
 
-2001-12-17 18:08  schoenw
+2001-12-17 18:08  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Print the current time in recursive command mode.
 
-2001-12-17 18:07  schoenw
+2001-12-17 18:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/disman.c, scli/scli.h, scli/system.c, scli/vendors.c: Changed
-	  the API to lookup vendor information.
+	* scli/disman.c, scli/scli.h, scli/system.c, scli/vendors.c:
+	  Changed the API to lookup vendor information.
 
-2001-12-17 18:06  schoenw
+2001-12-17 18:06  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c, scli/ip.c: Some speed improvements.
 
-2001-12-12 18:31  schoenw
+2001-12-12 18:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/interface.c, scli/scli.h: Sitched to numeric
 	  error codes as this is what operators want.
 
-2001-12-12 18:30  schoenw
+2001-12-12 18:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Use strtol instead of sscanf.
 
-2001-12-11 20:49  schoenw
+2001-12-11 20:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Added support for dry mode.
 
-2001-12-11 20:30  schoenw
+2001-12-11 20:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c, scli/system.c: Added support for the dry mode.
 
-2001-12-11 16:54  schoenw
+2001-12-11 16:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c, scli/ether.c: Added support for the dry run mode.
 
-2001-12-11 16:44  schoenw
+2001-12-11 16:44  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/scli.1.in: Fixed minor nits.
 
-2001-12-11 16:40  schoenw
+2001-12-11 16:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ospf.c: Added support for the dry run mode.
 
-2001-12-11 16:39  schoenw
+2001-12-11 16:39  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cisco.c, scli/nortel.c, scli/ospf.c: Added support for the
 
-2001-12-11 04:14  schoenw
+2001-12-11 04:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/monitor.c, scli/system.c: Use strtol instead of atoi.
 
-2001-12-11 04:13  schoenw
+2001-12-11 04:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/entity.c, scli/snmp.c: Added support for dry runs.
 
-2001-12-11 03:17  schoenw
+2001-12-11 03:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/ip.c: Added support for dry runs.
 
-2001-12-11 02:57  schoenw
+2001-12-11 02:57  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c, scli/tcp.c, scli/udp.c: Added support of the
 	  dry-run mode.
 
-2001-12-11 02:50  schoenw
+2001-12-11 02:50  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/scli.h: Introduces the scli_interp_dry macro.
 
-2001-12-11 02:40  schoenw
+2001-12-11 02:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.c: Changed the name of the command line option.
 
-2001-12-10 22:58  schoenw
+2001-12-10 22:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/interface.c, scli/monitor.c, scli/scli.c,
 	  scli/scli.h: Implemented a dry mode where we check the syntax of
 	  commands but do not actually execute them.
 
-2001-12-10 18:50  schoenw
+2001-12-10 18:50  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_snmp_table.c: Finish the table retrieval if we get a
 	  noSuchName error.
 
-2001-12-09 21:35  schoenw
+2001-12-09 21:35  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_snmp.c, snmp/g_snmp.h: Editorial cleanups.
 
-2001-12-09 21:34  schoenw
+2001-12-09 21:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_snmp_table.c, snmp/g_snmp_table.h: Started to cleanup the
 	  g_snmp_table module.
 
-2001-12-09 21:33  schoenw
+2001-12-09 21:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_session.c, snmp/g_session.h: Added g_snmp_session_clone()
 	  and changed the deallocation of community strings to be
 	  consistent.
 
-2001-12-09 21:30  schoenw
+2001-12-09 21:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: The SNMP library now deallocates the community
 	  strings.
 
-2001-12-09 21:30  schoenw
+2001-12-09 21:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c, scli/system.c: Generally strip leading/trailing white
 	  space from display strings.
 
-2001-12-09 21:29  schoenw
+2001-12-09 21:29  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c, scli/ip.c: Some performance improvements.
 
-2001-12-07 00:45  schoenw
+2001-12-07 00:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, NEWS: Updates for release 0.2.5.
 
-2001-12-07 00:43  schoenw
+2001-12-07 00:43  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* README, TODO: Updated the support files.
 
-2001-12-07 00:05  schoenw
+2001-12-07 00:05  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/fmt.c, scli/interface.c, scli/ip.c: Added XML support for the
-	  "show ip addresses" command.
+	* scli/fmt.c, scli/interface.c, scli/ip.c: Added XML support for
+	  the "show ip addresses" command.
 
-2001-12-06 22:28  schoenw
+2001-12-06 22:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* Makefile.am, PORTING: Started a PORTING file where I collect
 	  porting notes submitted by users.
 
-2001-12-06 05:48  schoenw
+2001-12-06 05:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Strip more white spaces around strings to make UCD
 	  SNMP output look nice.
 
-2001-12-06 01:28  schoenw
+2001-12-06 01:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.h: Fixed a number of conversion problems. Added still
 	  somewhat incomplete code to support dynamic loadable plugins.
 
-2001-12-06 01:16  schoenw
+2001-12-06 01:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* acconfig.h: Added acconfig.h to define locally used parameters.
 
-2001-12-06 01:09  schoenw
+2001-12-06 01:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/bridge.c, scli/cisco.c, scli/cmds.c,
 	  scli/entity.c, scli/fmt.c, scli/interface.c, scli/monitor.c,
@@ -1782,72 +1965,73 @@
 	  problems. Added still somewhat incomplete code to support dynamic
 	  loadable plugins.
 
-2001-12-06 01:06  schoenw
+2001-12-06 01:06  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* config.h.in, configure.in: Bumped version number to 0.2.5. Added
 	  checks for dynamic loadable modules.
 
-2001-12-06 00:56  schoenw
+2001-12-06 00:56  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_session.h, snmp/g_snmp.h: Changed a few data members to
 	  better reflect the actual sizes.
 
-2001-12-06 00:38  schoenw
+2001-12-06 00:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/disman-schedule-mib.c, stub/disman-schedule-mib.h,
-	  stub/disman-script-mib.c, stub/disman-script-mib.h, stub/if-mib.c,
-	  stub/if-mib.h: Regenerated stubs using smidump version 0.3.0.
+	  stub/disman-script-mib.c, stub/disman-script-mib.h,
+	  stub/if-mib.c, stub/if-mib.h: Regenerated stubs using smidump
+	  version 0.3.0.
 
-2001-12-06 00:29  schoenw
+2001-12-06 00:29  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Added code to display the port description in the
 	  "show bridge stats" command.
 
-2001-11-23 07:48  schoenw
+2001-11-23 07:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Implemented the "show printer covers" command.
 
-2001-11-22 08:30  schoenw
+2001-11-22 08:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, NEWS: Updates for release 0.2.4.
 
-2001-11-22 08:29  schoenw
+2001-11-22 08:29  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Added a missing line break.
 
-2001-11-22 08:22  schoenw
+2001-11-22 08:22  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Reordered the output generated by the dump nortel
 	  command.
 
-2001-11-22 08:21  schoenw
+2001-11-22 08:21  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Minor bug fixes.
 
-2001-11-22 08:00  schoenw
+2001-11-22 08:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ether.c, scli/scli.1.in, scli/system.c: Fixed several minor
 	  typos.
 
-2001-11-22 07:59  schoenw
+2001-11-22 07:59  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Implemented the "show printer outputs" command.
 
-2001-11-21 17:28  schoenw
+2001-11-21 17:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Some refactoring to simplify the code.
 
-2001-11-21 15:58  schoenw
+2001-11-21 15:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/printer.c: Better decode the subunit status value and general
-	  code cleanup.
+	* scli/printer.c: Better decode the subunit status value and
+	  general code cleanup.
 
-2001-11-15 17:29  schoenw
+2001-11-15 17:29  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c, scli/scli.c: Minor cleanups and better
 	  error messages.
 
-2001-10-11 09:01  schoenw
+2001-10-11 09:01  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/basic.c, scli/bridge.c, scli/cisco.c,
 	  scli/cmds.c, scli/disman.c, scli/entity.c, scli/ether.c,
@@ -1857,62 +2041,63 @@
 	  SCLI_SYNTAX_NUMARGS. Reorganized the family of scli_eval
 	  functions. Some code cleanup in various modes.
 
-2001-10-05 16:00  schoenw
+2001-10-05 16:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure.in: Bumped the version number.
 
-2001-10-05 13:54  schoenw
+2001-10-05 13:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Started an implementation of the "dump nortel
 	  bridge vlan" command.
 
-2001-10-05 13:52  schoenw
+2001-10-05 13:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Show RowStatus states in uppercase.
 
-2001-10-05 13:51  schoenw
+2001-10-05 13:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/basic.c, scli/scli.c: Handle backslashes as one might expect.
+	* scli/basic.c, scli/scli.c: Handle backslashes as one might
+	  expect.
 
-2001-10-05 13:50  schoenw
+2001-10-05 13:50  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/snmp.c: Minor updates to produces less irritating output.
 
-2001-10-05 13:33  schoenw
+2001-10-05 13:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Fixed the "show disman script" commands again.
 
-2001-10-04 15:27  schoenw
+2001-10-04 15:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/scli.c: Started to implement backslash
 	  processing as one expects under Unix.
 
-2001-10-02 13:24  schoenw
+2001-10-02 13:24  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c, scli/system.c: Minor documentation fixes.
 
-2001-09-30 20:51  schoenw
+2001-09-30 20:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Added an experimental "create disman run" command.
 
-2001-09-30 20:49  schoenw
+2001-09-30 20:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c, scli/nortel.c, scli/printer.c: Moved some code
 	  into reusable procedures and cleaned up some stuff.
 
-2001-09-30 20:40  schoenw
+2001-09-30 20:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c, scli/ip.c, scli/system.c: Added "dump system",
 	  "dump ip" and "dump interface" commands.
 
-2001-09-30 20:33  schoenw
+2001-09-30 20:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc/Makefile.am, proc/disman-script-mib-proc.c,
 	  proc/disman-script-mib-proc.h, proc/if-mib-proc.c,
 	  proc/rapid-city-proc.c, proc/rapid-city-proc.h: Added some more
 	  procedures - mostly extracted from the scli command code.
 
-2001-09-30 20:16  schoenw
+2001-09-30 20:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/atm-mib.c, stub/atm-mib.h,
 	  stub/bridge-mib.h, stub/disman-script-mib.c,
@@ -1920,157 +2105,158 @@
 	  stub/rapid-city.h, stub/snmp-community-mib.h, stub/tcp-mib.h:
 	  Regenerated some stubs to test the new index size checking code.
 
-2001-09-30 20:08  schoenw
+2001-09-30 20:08  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_snmp.h, snmp/g_utils.c: Added an experimental
 	  G_SNMP_ERR_PROCEDURE error code.
 
-2001-09-30 20:04  schoenw
+2001-09-30 20:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c, scli/scli.1.in: Added a dump branch to the command
 	  tree.
 
-2001-09-30 20:03  schoenw
+2001-09-30 20:03  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Avoid compiler warnings.
 
-2001-09-28 18:51  schoenw
+2001-09-28 18:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, NEWS: Updates for release 0.2.3.
 
-2001-09-28 18:46  schoenw
+2001-09-28 18:46  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added missing syntax checks and cleaned up the
 	  code.
 
-2001-09-28 11:36  schoenw
+2001-09-28 11:36  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/nortel.c: Added the "set nortel bridge vlan default" command.
+	* scli/nortel.c: Added the "set nortel bridge vlan default"
+	  command.
 
-2001-09-28 11:09  schoenw
+2001-09-28 11:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: The show nortel bridge vlan details command now
 	  also shows that ports that use a vlan as their default.
 
-2001-09-27 13:02  schoenw
+2001-09-27 13:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Some more output for printer interpreters.
 
-2001-09-27 11:33  schoenw
+2001-09-27 11:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Fixed the xml format of "show printer console
 	  lights".
 
-2001-09-27 08:07  schoenw
+2001-09-27 08:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added XML support to the show printer console and
 	  show printer alerts commands. Started work on a show printer
 	  interpreter command.
 
-2001-09-27 08:02  schoenw
+2001-09-27 08:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/monitor.c: Explicitely set the return code when processing
 	  'q'.
 
-2001-09-27 08:01  schoenw
+2001-09-27 08:01  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c: Added a "show scli schema" command and
 	  fixed the propagation of SCLI_EXIT.
 
-2001-09-27 08:00  schoenw
+2001-09-27 08:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.1.in: Removed documentation for interactive commands
 	  that are not available (although it would be nice to have them
 	  implemented).
 
-2001-09-27 07:59  schoenw
+2001-09-27 07:59  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c, scli/system.c: Do not rely on table
 	  augmentations coming out 1:1.
 
-2001-09-27 07:57  schoenw
+2001-09-27 07:57  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* doc/Makefile.am, doc/scli.texinfo, doc/stools.texinfo: Renamed
 	  stools.texinfo to scli.texinfo.
 
-2001-09-27 07:54  schoenw
+2001-09-27 07:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/rapid-city.c, stub/rapid-city.h,
 	  stub/rfc1213-mib.c, stub/rfc1213-mib.h: Regenerated some stubs to
 	  remove code that is not currently being used by scli.
 
-2001-09-26 09:59  schoenw
+2001-09-26 09:59  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure.in: Bumped the version number.
 
-2001-09-26 09:58  schoenw
+2001-09-26 09:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Reworked the "show printer display|lights|alerts"
 	  commands to produce better output. Added documentation for these
 	  commands.
 
-2001-09-26 09:02  schoenw
+2001-09-26 09:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Fixed a bug in the formatting of IdLists.
 
-2001-09-26 08:35  schoenw
+2001-09-26 08:35  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c, scli/ip.c: Minor cosmetic changes.
 
-2001-09-25 14:11  schoenw
+2001-09-25 14:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, NEWS: Updates for release 0.2.2.
 
-2001-09-25 13:59  schoenw
+2001-09-25 13:59  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Finished the implementation of the "show nortel
 	  bridge vlan ports" command.
 
-2001-09-25 12:28  schoenw
+2001-09-25 12:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added more monitoring commands.
 
-2001-09-25 09:47  schoenw
+2001-09-25 09:47  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Show the list of port members in the "show nortel
 	  bridge vlan info" command.
 
-2001-09-25 08:16  schoenw
+2001-09-25 08:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Bug fixes.
 
-2001-09-25 08:07  schoenw
+2001-09-25 08:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c, scli/system.c: More human friendly output, added a
 	  show bridge stp ports command.
 
-2001-09-25 08:02  schoenw
+2001-09-25 08:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* Makefile.am, TODO, configure.in: Updated to reflect the addition
 	  of the proc subdirectory.
 
-2001-09-25 07:48  schoenw
+2001-09-25 07:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/atm.c, scli/basic.c, scli/bridge.c,
 	  scli/cisco.c, scli/disman.c, scli/entity.c, scli/ether.c,
 	  scli/interface.c, scli/ip.c, scli/monitor.c, scli/nortel.c,
 	  scli/ospf.c, scli/printer.c, scli/scli.h, scli/snmp.c,
-	  scli/system.c, scli/tcp.c, scli/udp.c: Many updates to reflect the
-	  recent changes of the stub generator.
+	  scli/system.c, scli/tcp.c, scli/udp.c: Many updates to reflect
+	  the recent changes of the stub generator.
 
-2001-09-25 07:47  schoenw
+2001-09-25 07:47  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* proc, proc/Makefile.am, proc/disman-script-mib-proc.c,
 	  proc/disman-script-mib-proc.h, proc/if-mib-proc.c,
 	  proc/if-mib-proc.h: Added first bits of the procedures software
 	  layer.
 
-2001-09-25 07:46  schoenw
+2001-09-25 07:46  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_dispatch.c, snmp/g_session.c, snmp/g_session.h,
 	  snmp/g_sha.h, snmp/g_snmp.h, snmp/g_utils.c: Minor code cleanups.
 
-2001-09-25 07:44  schoenw
+2001-09-25 07:44  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/atm-mib.c, stub/atm-mib.h,
 	  stub/bridge-mib.c, stub/bridge-mib.h, stub/disman-schedule-mib.c,
@@ -2079,71 +2265,73 @@
 	  stub/etherlike-mib.c, stub/etherlike-mib.h,
 	  stub/host-resources-mib.c, stub/host-resources-mib.h,
 	  stub/host-resources-types.c, stub/host-resources-types.h,
-	  stub/iana-language-mib.c, stub/iana-language-mib.h, stub/if-mib.c,
-	  stub/if-mib.h, stub/ip-forward-mib.c, stub/ip-forward-mib.h,
-	  stub/ip-mib.c, stub/ip-mib.h, stub/mau-mib.c, stub/mau-mib.h,
-	  stub/old-cisco-ip-mib.c, stub/old-cisco-ip-mib.h, stub/ospf-mib.c,
-	  stub/ospf-mib.h, stub/printer-mib.c, stub/printer-mib.h,
-	  stub/rapid-city.c, stub/rapid-city.h, stub/rapidcity-vlan-mib.c,
-	  stub/rapidcity-vlan-mib.h, stub/rfc1213-mib.c, stub/rfc1213-mib.h,
-	  stub/snmp-community-mib.c, stub/snmp-community-mib.h,
-	  stub/snmp-framework-mib.c, stub/snmp-framework-mib.h,
-	  stub/snmp-mpd-mib.c, stub/snmp-mpd-mib.h, stub/snmp-target-mib.c,
+	  stub/iana-language-mib.c, stub/iana-language-mib.h,
+	  stub/if-mib.c, stub/if-mib.h, stub/ip-forward-mib.c,
+	  stub/ip-forward-mib.h, stub/ip-mib.c, stub/ip-mib.h,
+	  stub/mau-mib.c, stub/mau-mib.h, stub/old-cisco-ip-mib.c,
+	  stub/old-cisco-ip-mib.h, stub/ospf-mib.c, stub/ospf-mib.h,
+	  stub/printer-mib.c, stub/printer-mib.h, stub/rapid-city.c,
+	  stub/rapid-city.h, stub/rapidcity-vlan-mib.c,
+	  stub/rapidcity-vlan-mib.h, stub/rfc1213-mib.c,
+	  stub/rfc1213-mib.h, stub/snmp-community-mib.c,
+	  stub/snmp-community-mib.h, stub/snmp-framework-mib.c,
+	  stub/snmp-framework-mib.h, stub/snmp-mpd-mib.c,
+	  stub/snmp-mpd-mib.h, stub/snmp-target-mib.c,
 	  stub/snmp-target-mib.h, stub/snmp-user-based-sm-mib.c,
 	  stub/snmp-user-based-sm-mib.h, stub/snmp-view-based-acm-mib.c,
 	  stub/snmp-view-based-acm-mib.h, stub/snmpv2-mib.c,
 	  stub/snmpv2-mib.h, stub/tcp-mib.c, stub/tcp-mib.h,
 	  stub/tunnel-mib.c, stub/tunnel-mib.h, stub/udp-mib.c,
-	  stub/udp-mib.h: Regenerated stubs to reflect recent changes in the
-	  stub generator. Replaced the RAPIDCITY-VLAN-MIB module with the
-	  RAPID-CITY module.
+	  stub/udp-mib.h: Regenerated stubs to reflect recent changes in
+	  the stub generator. Replaced the RAPIDCITY-VLAN-MIB module with
+	  the RAPID-CITY module.
 
-2001-09-20 14:35  schoenw
+2001-09-20 14:35  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c, scli/ip.c, scli/ospf.c: Replaced some more
 	  xxx_enum() functions.
 
-2001-09-17 08:07  schoenw
+2001-09-17 08:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/fmt.c, scli/interface.c, scli/ip.c,
 	  scli/scli.h, scli/snmp.c, scli/system.c: Introduced new syntax
 	  error return codes. Improved the ip mode implementation and its
 	  documentation.
 
-2001-09-13 18:04  schoenw
+2001-09-13 18:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/snmp.c: Documentation updates and minor improvements.
 
-2001-09-13 17:42  schoenw
+2001-09-13 17:42  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure.in: Bumped the version number.
 
-2001-09-11 12:54  schoenw
+2001-09-11 12:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/entity.c: Improved the formatting of "show entity details".
 
-2001-09-11 12:54  schoenw
+2001-09-11 12:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Improved XML support.
 
-2001-09-11 08:05  schoenw
+2001-09-11 08:05  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am: Removed dependencies so that source
 	  distributions will not try to build scli.1.
 
-2001-09-10 15:09  schoenw
+2001-09-10 15:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* TODO: Minor housekeeping.
 
-2001-09-10 15:08  schoenw
+2001-09-10 15:08  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, NEWS: Updates for release 0.2.1.
 
-2001-09-10 14:58  schoenw
+2001-09-10 14:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/monitor.c: Use strchr() instead of index().
 
-2001-09-10 14:54  schoenw
+2001-09-10 14:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/cmds.c, scli/entity.c, scli/interface.c,
 	  scli/monitor.c, scli/nortel.c, scli/system.c, scli/tcp.c,
@@ -2151,290 +2339,291 @@
 	  Implemented three more interface commands: set interface
 	  [alias|promiscuous|notifications].
 
-2001-09-10 13:40  schoenw
+2001-09-10 13:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Use the xpath element of the command data structure
 	  to generate the root for XML formatted output.
 
-2001-09-10 13:33  schoenw
+2001-09-10 13:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am: Changed the manual target back to scli.1 but
 	  removed the dependencies that tried to build it everytime.
 
-2001-09-07 16:39  schoenw
+2001-09-07 16:39  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure.in: Bumped the version number.
 
-2001-09-07 16:31  schoenw
+2001-09-07 16:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/Makefile.am: Renamed the scli.1 target so that this rule does
-	  not cause problems in a distribution.
+	* scli/Makefile.am: Renamed the scli.1 target so that this rule
+	  does not cause problems in a distribution.
 
-2001-09-07 15:52  schoenw
+2001-09-07 15:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Added the "monitor printer console" command.
 
-2001-09-07 15:48  schoenw
+2001-09-07 15:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/bridge.c, scli/cisco.c, scli/cmds.c,
 	  scli/disman.c, scli/entity.c, scli/ether.c, scli/interface.c,
 	  scli/ip.c, scli/nortel.c, scli/ospf.c, scli/printer.c,
 	  scli/scli.h, scli/snmp.c, scli/system.c, scli/tcp.c, scli/udp.c:
-	  Changed the struct scli_cmd so that it can contain additional data
-	  for the XML output format driver.
+	  Changed the struct scli_cmd so that it can contain additional
+	  data for the XML output format driver.
 
-2001-09-07 15:47  schoenw
+2001-09-07 15:47  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_utils.c: Added a sanity check.
 
-2001-09-05 07:42  schoenw
+2001-09-05 07:42  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Reworked some commands, added better XML support,
 	  updated the documentation.
 
-2001-09-05 07:41  schoenw
+2001-09-05 07:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ether.c, scli/interface.c: Code cleanup.
 
-2001-09-05 07:41  schoenw
+2001-09-05 07:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c, scli/scli.h: Removed fmt_kbytes() as it is not
 	  generally useful.
 
-2001-09-03 11:41  schoenw
+2001-09-03 11:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Better XML support and some code reorganization.
 
-2001-09-03 11:40  schoenw
+2001-09-03 11:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c, scli/scli.h: Added fmt_display_string().
 
-2001-09-03 10:31  schoenw
+2001-09-03 10:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Display more information in "show nortel bridge
 	  vlan details". Better support for XML output.
 
-2001-08-31 08:55  schoenw
+2001-08-31 08:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/atm.c, scli/basic.c, scli/cmds.c,
 	  scli/interface.c, scli/nortel.c, scli/scli.h: Added a specific
 	  regex error code, removed unneeded commands and added even more
 	  documentation.
 
-2001-08-31 08:54  schoenw
+2001-08-31 08:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_utils.c, snmp/g_utils.h: Added a table to convert debug
 	  levels to strings and vice versa.
 
-2001-08-30 10:12  schoenw
+2001-08-30 10:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* stub/disman-script-mib.c, stub/disman-script-mib.h: Updated to the
-	  RFC 3165 version.
+	* stub/disman-script-mib.c, stub/disman-script-mib.h: Updated to
+	  the RFC 3165 version.
 
-2001-08-30 10:11  schoenw
+2001-08-30 10:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c, scli/ether.c, scli/interface.c, scli/system.c,
 	  scli/tcp.c: More documentation updates.
 
-2001-08-29 16:12  schoenw
+2001-08-29 16:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ether.c: More documentation updates.
 
-2001-08-29 09:27  schoenw
+2001-08-29 09:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/entity.c, scli/ether.c, scli/interface.c, scli/monitor.c,
 	  scli/nortel.c, scli/printer.c, scli/tcp.c, scli/udp.c:
 	  Documentation updates.
 
-2001-08-29 08:53  schoenw
+2001-08-29 08:53  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.c: Fixed the completion of command aliases.
 
-2001-08-29 08:53  schoenw
+2001-08-29 08:53  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/cmds.c, scli/scli.1, scli/scli.1.in:
 	  Extract the mode descriptions in scli.1 from the scli program
 	  itself.
 
-2001-08-29 08:51  schoenw
+2001-08-29 08:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Started to work on a "show bridge stats" command.
 
-2001-08-29 08:51  schoenw
+2001-08-29 08:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Improved error messages.
 
-2001-08-29 08:50  schoenw
+2001-08-29 08:50  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Started to add XML support for "show interface
 	  details".
 
-2001-08-28 13:31  schoenw
+2001-08-28 13:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c, scli/disman.c, scli/entity.c,
 	  scli/interface.c, scli/nortel.c, scli/system.c, scli/tcp.c,
 	  scli/udp.c: Several changes to improve the online help system and
 	  to generate documentation from the source code.
 
-2001-08-27 13:15  schoenw
+2001-08-27 13:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, NEWS: Updates for release 0.2.0.
 
-2001-08-27 13:09  schoenw
+2001-08-27 13:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* autogen.sh: Replaced stools with scli.
 
-2001-08-27 12:54  schoenw
+2001-08-27 12:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop: Removed stop completely from the CVS.
 
-2001-08-27 12:52  schoenw
+2001-08-27 12:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/Makefile.am, stop/disman.c, stop/ether.c, stop/fmt.c,
 	  stop/getopt.c, stop/getopt.h, stop/interface.c, stop/process.c,
 	  stop/stop.1, stop/stop.c, stop/stop.h, stop/tcp.c: Removed stop
 	  from the scli package.
 
-2001-08-27 11:45  schoenw
+2001-08-27 11:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.1: Updated the pointer to the web site.
 
-2001-08-27 10:57  schoenw
+2001-08-27 10:57  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* AUTHORS, Makefile.am, NEWS, README, TODO, configure.in: The
 	  package stools is now called scli and stop is gone.
 
-2001-08-27 10:56  schoenw
+2001-08-27 10:56  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c, scli/scli.1: More documentation updates, make core
 	  set commands work in XML mode.
 
-2001-08-27 10:54  schoenw
+2001-08-27 10:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.in: Removed Makefile.in from the CVS - autogen.sh
 	  regenerates it.
 
-2001-08-27 09:52  schoenw
+2001-08-27 09:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/basic.c, scli/entity.c, scli/nortel.c,
 	  scli/scli.h, scli/system.c, scli/tcp.c, scli/udp.c, scli/xml.c:
 	  Commands must use SCLI_CMD_FLAG_XML if they are XML capable.
 	  Improved some of the XML formatters.
 
-2001-08-27 08:37  schoenw
+2001-08-27 08:37  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.1: Added some more documentation.
 
-2001-08-27 08:12  schoenw
+2001-08-27 08:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Implemented a command to assign ports to vlans.
 	  Added xml output format.
 
-2001-08-27 08:11  schoenw
+2001-08-27 08:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/system.c: Fixed some minor errors, updated the xml formatting
-	  code.
+	* scli/system.c: Fixed some minor errors, updated the xml
+	  formatting code.
 
-2001-08-27 08:10  schoenw
+2001-08-27 08:10  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Code cleanup.
 
-2001-08-27 08:09  schoenw
+2001-08-27 08:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/atm.c, scli/scli.h, scli/xml.c: Added xml
 	  formatting utility functions.
 
-2001-08-27 07:52  schoenw
+2001-08-27 07:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_asn1.c, snmp/g_asn1.h, snmp/g_session.c: Code cleanup.
 
-2001-08-27 07:51  schoenw
+2001-08-27 07:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/basic.c, scli/interface.c, scli/nortel.c, scli/scli.1: Accept
-	  comments anywhere in a command string. Started to document the
-	  scli commands in the manual page.
+	* scli/basic.c, scli/interface.c, scli/nortel.c, scli/scli.1:
+	  Accept comments anywhere in a command string. Started to document
+	  the scli commands in the manual page.
 
-2001-08-24 14:01  schoenw
+2001-08-24 14:01  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* doc/stools.info: Removed stools.info from the CVS.
 
-2001-08-24 13:59  schoenw
+2001-08-24 13:59  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_session.c: Pass the error-index to the session which
 	  invoked the request.
 
-2001-08-23 15:32  schoenw
+2001-08-23 15:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/nortel.c: Added a command to create vlans on nortel baystack
 	  bridges.
 
-2001-08-23 09:18  schoenw
+2001-08-23 09:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cisco.c, scli/cmds.c, scli/entity.c,
-	  scli/interface.c, scli/nortel.c, scli/scli.h, scli/system.c: Fixed
-	  several minor errors. Implemented a "set interface status"
+	  scli/interface.c, scli/nortel.c, scli/scli.h, scli/system.c:
+	  Fixed several minor errors. Implemented a "set interface status"
 	  command.
 
-2001-08-23 09:16  schoenw
+2001-08-23 09:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/if-mib.c, stub/if-mib.h, stub/rapidcity-vlan-mib.c,
 	  stub/rapidcity-vlan-mib.h: Regenerated some modules in order to
 	  get table write stubs.
 
-2001-08-23 09:15  schoenw
+2001-08-23 09:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_utils.c, snmp/g_utils.h: Added more generally useful stuff
 	  to the gsnmp library.
 
-2001-08-22 15:42  schoenw
+2001-08-22 15:42  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/Makefile.am: Fixed a stupid typo.
 
-2001-08-22 15:40  schoenw
+2001-08-22 15:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* TODO: Minor housekeeping.
 
-2001-08-22 15:39  schoenw
+2001-08-22 15:39  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog, NEWS: Updates for release 0.1.20.
 
-2001-08-22 15:35  schoenw
+2001-08-22 15:35  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* TODO: Minor housekeeping.
 
-2001-08-22 15:33  schoenw
+2001-08-22 15:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.c: Make sure scli can be compiled with older readline
 	  libraries.
 
-2001-08-22 15:07  schoenw
+2001-08-22 15:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/cisco.c, scli/cmds.c, scli/nortel.c,
 	  scli/scli.c, scli/scli.h: Added modes for our CISCO and Nortel
 	  boxes.
 
-2001-08-22 15:04  schoenw
+2001-08-22 15:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/old-cisco-ip-mib.c,
 	  stub/old-cisco-ip-mib.h, stub/rapidcity-vlan-mib.c,
 	  stub/rapidcity-vlan-mib.h: Added some more stubs for things we
 	  need at the Technical University of Braunschweig.
 
-2001-08-22 14:51  schoenw
+2001-08-22 14:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* README: Note that we now require libxml2.
 
-2001-08-22 14:51  schoenw
+2001-08-22 14:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* autogen.sh: Removed libtool stuff we do not really need right now.
+	* autogen.sh: Removed libtool stuff we do not really need right
+	  now.
 
-2001-08-22 13:05  schoenw
+2001-08-22 13:05  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/host-resources-types.c, stub/host-resources-types.h,
 	  stub/iana-language-mib.c, stub/iana-language-mib.h: Regenerated
 	  stubs after fixing smidump to not generate dead code.
 
-2001-08-22 12:59  schoenw
+2001-08-22 12:59  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/atm-mib.c, stub/atm-mib.h,
 	  stub/bridge-mib.c, stub/bridge-mib.h, stub/disman-schedule-mib.c,
@@ -2443,14 +2632,15 @@
 	  stub/etherlike-mib.c, stub/etherlike-mib.h,
 	  stub/host-resources-mib.c, stub/host-resources-mib.h,
 	  stub/host-resources-types.c, stub/host-resources-types.h,
-	  stub/iana-language-mib.c, stub/iana-language-mib.h, stub/if-mib.c,
-	  stub/if-mib.h, stub/ip-forward-mib.c, stub/ip-forward-mib.h,
-	  stub/ip-mib.c, stub/ip-mib.h, stub/mau-mib.c, stub/mau-mib.h,
-	  stub/ospf-mib.c, stub/ospf-mib.h, stub/printer-mib.c,
-	  stub/printer-mib.h, stub/rfc1213-mib.c, stub/rfc1213-mib.h,
-	  stub/snmp-community-mib.c, stub/snmp-community-mib.h,
-	  stub/snmp-framework-mib.c, stub/snmp-framework-mib.h,
-	  stub/snmp-mpd-mib.c, stub/snmp-mpd-mib.h, stub/snmp-target-mib.c,
+	  stub/iana-language-mib.c, stub/iana-language-mib.h,
+	  stub/if-mib.c, stub/if-mib.h, stub/ip-forward-mib.c,
+	  stub/ip-forward-mib.h, stub/ip-mib.c, stub/ip-mib.h,
+	  stub/mau-mib.c, stub/mau-mib.h, stub/ospf-mib.c, stub/ospf-mib.h,
+	  stub/printer-mib.c, stub/printer-mib.h, stub/rfc1213-mib.c,
+	  stub/rfc1213-mib.h, stub/snmp-community-mib.c,
+	  stub/snmp-community-mib.h, stub/snmp-framework-mib.c,
+	  stub/snmp-framework-mib.h, stub/snmp-mpd-mib.c,
+	  stub/snmp-mpd-mib.h, stub/snmp-target-mib.c,
 	  stub/snmp-target-mib.h, stub/snmp-user-based-sm-mib.c,
 	  stub/snmp-user-based-sm-mib.h, stub/snmp-view-based-acm-mib.c,
 	  stub/snmp-view-based-acm-mib.h, stub/snmpv2-mib.c,
@@ -2459,7 +2649,7 @@
 	  stub/udp-mib.c, stub/udp-mib.h: Several changes to get rid of the
 	  stools.h module.
 
-2001-08-22 12:55  schoenw
+2001-08-22 12:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/Makefile.am, snmp/g_dispatch.c, snmp/g_md5.c,
 	  snmp/g_security.c, snmp/g_session.c, snmp/g_sha.c, snmp/g_snmp.h,
@@ -2467,11 +2657,11 @@
 	  snmp/g_utils.c, snmp/g_utils.h: Added some stubs/stools.[ch]
 	  functionality to the gsnmp engine.
 
-2001-08-22 12:54  schoenw
+2001-08-22 12:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/vendors.c: Do not mention stools anymore.
 
-2001-08-22 12:53  schoenw
+2001-08-22 12:53  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/atm.c, scli/basic.c, scli/bridge.c,
 	  scli/cmds.c, scli/disman.c, scli/entity.c, scli/ether.c,
@@ -2482,182 +2672,182 @@
 	  stop/interface.c, stop/stop.h, stop/tcp.c: Several changes to get
 	  rid of the stools.h module.
 
-2001-08-21 16:48  schoenw
+2001-08-21 16:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Code cleanup to keep the compiler happy.
 
-2001-08-21 16:45  schoenw
+2001-08-21 16:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c, scli/scli.1, scli/scli.c, scli/scli.h:
 	  The tokenizer now accepts quoted strings and aliases should work
 	  now.
 
-2001-08-16 15:42  schoenw
+2001-08-16 15:42  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* autogen.sh: Added the autogen.sh script which should be used to
 	  create the build environment from CVS.
 
-2001-08-16 15:40  schoenw
+2001-08-16 15:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* aclocal.m4, config.guess, config.sub: Removed files that do not
 	  belong into the CVS.
 
-2001-08-16 15:38  schoenw
+2001-08-16 15:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* Makefile.in, configure, doc/Makefile.in, install-sh, missing,
 	  mkinstalldirs, scli/Makefile.in, snmp/Makefile.in,
 	  stop/Makefile.in, stub/Makefile.in: Removed files that are
 	  auto-generated. Use autogen.sh instead.
 
-2001-08-16 14:17  schoenw
+2001-08-16 14:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c: Fixed a bug that caused 1g switches to appear as 1t
 	  switches.
 
-2001-08-16 12:25  schoenw
+2001-08-16 12:25  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am: Uncommented gscli rules since this is not yet
 	  part of the CVS tree.
 
-2001-08-16 07:57  schoenw
+2001-08-16 07:57  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* Makefile.in, aclocal.m4, config.h.in, configure, configure.in:
 	  Added configure checks for libxml2 and gtk.
 
-2001-08-16 07:55  schoenw
+2001-08-16 07:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/atm.c, scli/basic.c,
 	  scli/bridge.c, scli/cmds.c, scli/disman.c, scli/entity.c,
 	  scli/ether.c, scli/fmt.c, scli/interface.c, scli/ip.c,
 	  scli/ospf.c, scli/printer.c, scli/scli.h, scli/snmp.c,
-	  scli/system.c, scli/tcp.c, scli/udp.c: Use libxml2 to generate XML
-	  output.
+	  scli/system.c, scli/tcp.c, scli/udp.c: Use libxml2 to generate
+	  XML output.
 
-2001-08-16 07:50  schoenw
+2001-08-16 07:50  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/stools.h: Removed obsolete struct definition.
 
-2001-08-15 10:51  schoenw
+2001-08-15 10:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Use putenv() instead of setenv() to be more
 	  portable.
 
-2001-08-15 10:01  schoenw
+2001-08-15 10:01  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Added more characters we do not allow in a pager
 	  value.
 
-2001-08-15 10:00  schoenw
+2001-08-15 10:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c, scli/scli.c, scli/scli.h: Use a pipe
 	  instead of a temporary file for the external pager. Validate the
 	  pager value so that it does not contain magic shell characters.
 	  Added an scli command to configure the pager.
 
-2001-08-14 14:00  schoenw
+2001-08-14 14:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Do not mis-use the string value as a format string.
 
-2001-08-14 13:52  schoenw
+2001-08-14 13:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/entity.c: Renamed "show system components" to "show system
 	  entities" and wrote some XML formatting routines.
 
-2001-08-14 13:51  schoenw
+2001-08-14 13:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Some experimental code to retrieve the physical
 	  entity which implements a certain logical network interface.
 
-2001-08-14 13:48  schoenw
+2001-08-14 13:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure.in: Check for <termios.h> since it defines TIOCGWINSZ
 	  under Solaris.
 
-2001-08-14 12:45  schoenw
+2001-08-14 12:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/basic.c, stop/stop.c: Conditionally include <termios.h> which
-	  is needed on Solaris machines that have resizeterm (probably
-	  ncurses) in order to get a definition of TIOCGWINSZ.
+	* scli/basic.c, stop/stop.c: Conditionally include <termios.h>
+	  which is needed on Solaris machines that have resizeterm
+	  (probably ncurses) in order to get a definition of TIOCGWINSZ.
 
-2001-07-31 12:38  schoenw
+2001-07-31 12:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/scli.c, scli/scli.h: The --version option now better conforms
-	  to GNU standards.
+	* scli/scli.c, scli/scli.h: The --version option now better
+	  conforms to GNU standards.
 
-2001-07-31 12:38  schoenw
+2001-07-31 12:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Removed dead code.
 
-2001-07-31 12:37  schoenw
+2001-07-31 12:37  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/tcp.c, scli/udp.c: Minor code cleanup.
 
-2001-07-11 10:49  schoenw
+2001-07-11 10:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/snmpv2-mib.c, stub/snmpv2-mib.h, stub/stools.c: Regenerated
 	  stubs so that we can use the write stub.
 
-2001-07-11 10:48  schoenw
+2001-07-11 10:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* snmp/g_session.c, snmp/g_snmp.c, snmp/g_snmp.h: Improved debugging
-	  support, added g_snmp_vbl_add() to the API.
+	* snmp/g_session.c, snmp/g_snmp.c, snmp/g_snmp.h: Improved
+	  debugging support, added g_snmp_vbl_add() to the API.
 
-2001-07-11 10:47  schoenw
+2001-07-11 10:47  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c, scli/scli.c, scli/system.c: Added code to configure
 	  SNMPv2-MIB::system variables.
 
-2001-06-29 13:07  schoenw
+2001-06-29 13:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure, configure.in: Bumped version number and added
 	  --enable-warnings configure option.
 
-2001-06-29 08:26  schoenw
+2001-06-29 08:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_session.c: Added a missing argument.
 
-2001-06-29 08:22  schoenw
+2001-06-29 08:22  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, snmp/g_dispatch.c, snmp/g_dispatch.h,
 	  snmp/g_session.c, snmp/g_session.h, snmp/g_snmp.h,
 	  snmp/g_snmp_table.c, snmp/g_transport.c, snmp/g_transport.h,
 	  stop/stop.c: Cleaned up the SNMP transport implementation.
 
-2001-06-28 07:50  schoenw
+2001-06-28 07:50  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c, scli/scli.c: Updates to reflect recent
 	  gsnmp API improvements.
 
-2001-06-28 07:49  schoenw
+2001-06-28 07:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_session.c, snmp/g_session.h, snmp/g_snmp.c, snmp/g_snmp.h,
 	  snmp/g_snmp_table.c, snmp/g_transport.h: Fixed some more memory
-	  leaks, reworked the session API, added debugging flags which allow
-	  to enable/disable debugging output at runtime.
+	  leaks, reworked the session API, added debugging flags which
+	  allow to enable/disable debugging output at runtime.
 
-2001-06-28 07:46  schoenw
+2001-06-28 07:46  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/atm-mib.c, stub/bridge-mib.c, stub/disman-schedule-mib.c,
-	  stub/disman-script-mib.c, stub/entity-mib.c, stub/etherlike-mib.c,
-	  stub/host-resources-mib.c, stub/if-mib.c, stub/ip-forward-mib.c,
-	  stub/ip-mib.c, stub/mau-mib.c, stub/ospf-mib.c,
-	  stub/printer-mib.c, stub/rfc1213-mib.c, stub/snmp-community-mib.c,
-	  stub/snmp-framework-mib.c, stub/snmp-mpd-mib.c,
-	  stub/snmp-target-mib.c, stub/snmp-user-based-sm-mib.c,
-	  stub/snmp-view-based-acm-mib.c, stub/snmpv2-mib.c, stub/stools.c,
-	  stub/stools.h, stub/tcp-mib.c, stub/tunnel-mib.c, stub/udp-mib.c:
-	  Replaced some stls wrappers with the original entry point into
-	  gsnmp.
+	  stub/disman-script-mib.c, stub/entity-mib.c,
+	  stub/etherlike-mib.c, stub/host-resources-mib.c, stub/if-mib.c,
+	  stub/ip-forward-mib.c, stub/ip-mib.c, stub/mau-mib.c,
+	  stub/ospf-mib.c, stub/printer-mib.c, stub/rfc1213-mib.c,
+	  stub/snmp-community-mib.c, stub/snmp-framework-mib.c,
+	  stub/snmp-mpd-mib.c, stub/snmp-target-mib.c,
+	  stub/snmp-user-based-sm-mib.c, stub/snmp-view-based-acm-mib.c,
+	  stub/snmpv2-mib.c, stub/stools.c, stub/stools.h, stub/tcp-mib.c,
+	  stub/tunnel-mib.c, stub/udp-mib.c: Replaced some stls wrappers
+	  with the original entry point into gsnmp.
 
-2001-06-27 15:12  schoenw
+2001-06-27 15:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_session.c: Fixed another memory leak.
 
-2001-06-26 15:08  schoenw
+2001-06-26 15:08  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_dispatch.c, snmp/g_session.c: Fixed two more memory leaks.
 
-2001-06-22 07:41  schoenw
+2001-06-22 07:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/basic.c, scli/bridge.c, scli/cmds.c,
 	  scli/disman.c, scli/entity.c, scli/ether.c, scli/interface.c,
@@ -2665,85 +2855,85 @@
 	  scli/scli.h, scli/snmp.c, scli/system.c, scli/tcp.c, scli/udp.c:
 	  Added code to properly handle syntax errors.
 
-2001-06-20 15:12  schoenw
+2001-06-20 15:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* NEWS: Updates for release 0.1.19.
 
-2001-06-20 15:11  schoenw
+2001-06-20 15:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl.
 
-2001-06-20 15:06  schoenw
+2001-06-20 15:06  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Rewrote the interface stack display function.
 	  The regex now only matches the ifDescr value.
 
-2001-06-20 13:03  schoenw
+2001-06-20 13:03  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/scli.c: Minor readline cleanups.
 
-2001-06-20 12:34  schoenw
+2001-06-20 12:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.c: Use rl_completion_matches() instead of
 	  completion_matches() where available.
 
-2001-06-20 12:34  schoenw
+2001-06-20 12:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* config.h.in, configure, configure.in: Added a test to handle
 	  readline version differences.
 
-2001-06-20 12:28  schoenw
+2001-06-20 12:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/scli.c: Fixed the handling of SIGWINCH.
 
-2001-06-20 10:28  schoenw
+2001-06-20 10:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c, scli/ether.c, scli/interface.c: Support larger
 	  interface numbers. Added an initial version of the show interface
 	  stack command implementation.
 
-2001-06-20 09:08  schoenw
+2001-06-20 09:08  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ospf.c: Minor layout updates.
 
-2001-06-19 16:18  schoenw
+2001-06-19 16:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Use regular expressions to identify interfaces.
 
-2001-06-19 10:41  schoenw
+2001-06-19 10:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Some more work on interface stacks. Still more
 	  work needed to display interface stacks in a nice human friendly
 	  way.
 
-2001-06-19 09:45  schoenw
+2001-06-19 09:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/basic.c, scli/monitor.c, scli/scli.c, scli/scli.h: Provided a
-	  wrapper for curses [de]initialization since some curses
+	* scli/basic.c, scli/monitor.c, scli/scli.c, scli/scli.h: Provided
+	  a wrapper for curses [de]initialization since some curses
 	  implementations do not tolerate calls to endwin() if curses has
 	  not been initialized before.
 
-2001-06-19 06:48  schoenw
+2001-06-19 06:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c, scli/monitor.c, scli/scli.c, scli/tcp.c: Ported
 	  monitor summary information over from the stop implementation.
 
-2001-06-18 14:26  schoenw
+2001-06-18 14:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/disman.c, scli/ip.c: Changes to make headers more consistent.
-	  Support DISMAN run and scheduler monitors.
+	* scli/disman.c, scli/ip.c: Changes to make headers more
+	  consistent. Support DISMAN run and scheduler monitors.
 
-2001-06-18 11:10  schoenw
+2001-06-18 11:10  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/ether.c, stop/interface.c: Fixed a bug where the cache was
 	  not properly invalidated.
 
-2001-06-18 11:09  schoenw
+2001-06-18 11:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/monitor.c: The monitor.c module contains the code which
 	  evaluates scli commands in monitor mode.
 
-2001-06-18 11:07  schoenw
+2001-06-18 11:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/atm.c, scli/basic.c,
 	  scli/bridge.c, scli/cmds.c, scli/ether.c, scli/fmt.c,
@@ -2752,75 +2942,75 @@
 	  most of the stop functionality into scli. Started to use g_print
 	  and friends to allow for a future GUI for scli.
 
-2001-06-15 14:32  schoenw
+2001-06-15 14:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c, scli/scli.c, scli/scli.h: Made the scli core command
 	  implementations static.
 
-2001-06-15 14:31  schoenw
+2001-06-15 14:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Register scli modes in alphabetical order.
 
-2001-06-15 14:10  schoenw
+2001-06-15 14:10  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Added some xml output functions. More work needed.
 
-2001-06-14 11:24  schoenw
+2001-06-14 11:24  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c: Added xml support (which is easy since this mode does
 	  basically nothing).
 
-2001-06-14 11:14  schoenw
+2001-06-14 11:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/disman.c, scli/fmt.c, scli/scli.h, scli/system.c: Changed the
-	  signature of some formatting functions.
+	* scli/disman.c, scli/fmt.c, scli/scli.h, scli/system.c: Changed
+	  the signature of some formatting functions.
 
-2001-06-14 09:51  schoenw
+2001-06-14 09:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/tcp.c: Fixed inconsistencies in the XML output format.
 
-2001-06-14 08:02  schoenw
+2001-06-14 08:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/udp.c: Use plain addresses and port numbers rather than names
-	  in XML mode.
+	* scli/udp.c: Use plain addresses and port numbers rather than
+	  names in XML mode.
 
-2001-06-14 08:00  schoenw
+2001-06-14 08:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: More formatting updates.
 
-2001-06-14 07:55  schoenw
+2001-06-14 07:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/scli.1, scli/scli.c, scli/scli.h, scli/tcp.c,
 	  scli/udp.c: Added a command line option to produce XML output.
-	  Modified the udp and tcp modes to actually generate XML. More work
-	  needed.
+	  Modified the udp and tcp modes to actually generate XML. More
+	  work needed.
 
-2001-06-13 15:52  schoenw
+2001-06-13 15:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: And yet more updates. Enough for today I would
 	  say.
 
-2001-06-13 15:15  schoenw
+2001-06-13 15:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: More code updates to handle multiple printers
 	  better.
 
-2001-06-13 12:53  schoenw
+2001-06-13 12:53  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Some more code to display console messages and
 	  lights (!).
 
-2001-06-13 10:26  schoenw
+2001-06-13 10:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/printer.c: Some more features that definately need even more
 	  work.
 
-2001-06-13 08:20  schoenw
+2001-06-13 08:20  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/iana-language-mib.c, stub/iana-language-mib.h: Regenerated
 	  stubs for the IANA-LANGUAGE-MIB.
 
-2001-06-13 07:47  schoenw
+2001-06-13 07:47  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/scli.h, snmp/g_session.c, snmp/g_session.h,
 	  snmp/g_snmp_table.c, snmp/g_snmp_table.h, stop/disman.c,
@@ -2847,62 +3037,63 @@
 	  stub/udp-mib.c, stub/udp-mib.h: Replaced host_snmp with
 	  GSnmpSession.
 
-2001-06-13 07:17  schoenw
+2001-06-13 07:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure, configure.in: Bumped the version number to 0.1.19
 	  again.
 
-2001-06-13 07:14  schoenw
+2001-06-13 07:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ospf.c: Some minor layout patches from Oliver Wellnitz.
 
-2001-06-13 07:14  schoenw
+2001-06-13 07:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/bridge.c, scli/disman.c, scli/printer.c: Minor code cleanups.
+	* scli/bridge.c, scli/disman.c, scli/printer.c: Minor code
+	  cleanups.
 
-2001-06-12 15:30  schoenw
+2001-06-12 15:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl.
 
-2001-06-12 15:15  schoenw
+2001-06-12 15:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/printer.c: Fixed a bug where unterminated strings were passed
-	  to snprintf().
+	* scli/printer.c: Fixed a bug where unterminated strings were
+	  passed to snprintf().
 
-2001-06-12 15:05  schoenw
+2001-06-12 15:05  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* NEWS, configure, configure.in: Downgraded the version number to
 	  0.1.18 since this was never released.
 
-2001-06-12 14:45  schoenw
+2001-06-12 14:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c, scli/scli.c, scli/scli.h: Added some experimental
 	  code to create, delete and show command aliases. Aliases are not
 	  yet used by the interpreter.
 
-2001-06-12 12:27  schoenw
+2001-06-12 12:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* NEWS, configure, configure.in, snmp/Makefile.in: Bumped the
 	  version number and updated the NEWS file.
 
-2001-06-12 12:21  schoenw
+2001-06-12 12:21  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/printer.c, scli/scli.c,
 	  scli/scli.h: Added the scli printer mode contributed by Oliver
 	  Wellnitz.
 
-2001-06-12 12:19  schoenw
+2001-06-12 12:19  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/ether.c: Updated the type names used from the EtherLike-MIB.
 
-2001-06-12 12:18  schoenw
+2001-06-12 12:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/etherlike-mib.c,
 	  stub/etherlike-mib.h, stub/printer-mib.c, stub/printer-mib.h:
 	  Added stubs for the Printer-MIB and regenerated the EtherLike-MIB
 	  stubs.
 
-2001-06-12 10:48  schoenw
+2001-06-12 10:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/basic.c, scli/bridge.c, scli/cmds.c,
 	  scli/disman.c, scli/entity.c, scli/ether.c, scli/interface.c,
@@ -2911,7 +3102,7 @@
 	  stop/process.c, stop/stop.c, stop/tcp.c: Updated code to use type
 	  names which include module names.
 
-2001-06-12 10:46  schoenw
+2001-06-12 10:46  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/atm-mib.c, stub/atm-mib.h, stub/bridge-mib.c,
 	  stub/bridge-mib.h, stub/disman-schedule-mib.c,
@@ -2926,152 +3117,152 @@
 	  stub/udp-mib.h: Regenerated stubs to include module names in the
 	  typedefs.
 
-2001-06-12 10:06  schoenw
+2001-06-12 10:06  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c, scli/scli.c, scli/scli.h, scli/snmp.c:
-	  Split the "show scli" command into multiple sub-commands. Added an
-	  exported function to retrieve the rows/cols of the terminal.
+	  Split the "show scli" command into multiple sub-commands. Added
+	  an exported function to retrieve the rows/cols of the terminal.
 
-2001-06-07 10:57  schoenw
+2001-06-07 10:57  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Implemented an optional argument to select
 	  interfaces by index or name.
 
-2001-06-07 10:56  schoenw
+2001-06-07 10:56  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_snmp.c, snmp/g_snmp.h: Added utility functions to
 	  manipulate varbind lists.
 
-2001-06-07 10:53  schoenw
+2001-06-07 10:53  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/stools.c: Cleaned up a warning message.
 
-2001-05-23 08:37  schoenw
+2001-05-23 08:37  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/vendors.c: Added NCD and Microsoft.
 
-2001-05-23 08:37  schoenw
+2001-05-23 08:37  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ether.c: Show the actual type for the MAUs.
 
-2001-05-09 16:17  schoenw
+2001-05-09 16:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* NEWS, configure, configure.in: Bumped the version number to
 	  0.1.18.
 
-2001-05-09 16:12  schoenw
+2001-05-09 16:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c, scli/ip.c, scli/scli.c, scli/scli.h:
 	  Added a "show scli" command to display the current interpreter
 	  state.
 
-2001-05-09 16:09  schoenw
+2001-05-09 16:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/scli.c: Initialize the interpreter's pager attribute from the
-	  environement.
+	* scli/scli.c: Initialize the interpreter's pager attribute from
+	  the environement.
 
-2001-05-09 16:05  schoenw
+2001-05-09 16:05  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Minor cleanup of the pager implementation.
 
-2001-05-03 07:43  schoenw
+2001-05-03 07:43  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Display more interface information in the port
 	  table.
 
-2001-04-27 13:59  schoenw
+2001-04-27 13:59  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Fixed even more address formatting bugs.
 
-2001-04-27 13:51  schoenw
+2001-04-27 13:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c, scli/ip.c: Fixed two formatting bugs just
 	  introduced in the rewrite.
 
-2001-04-27 13:42  schoenw
+2001-04-27 13:42  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* config.h.in, configure, configure.in: Added more tests for headers
-	  which might define ether_ntohost().
+	* config.h.in, configure, configure.in: Added more tests for
+	  headers which might define ether_ntohost().
 
-2001-04-27 13:41  schoenw
+2001-04-27 13:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c, scli/fmt.c, scli/interface.c, scli/ip.c,
 	  scli/ospf.c, scli/scli.h, scli/tcp.c, scli/udp.c: Rewrote the
-	  address formating code. The "show interface details" and the "show
-	  ip mapping" commands now also report ethernet names.
+	  address formating code. The "show interface details" and the
+	  "show ip mapping" commands now also report ethernet names.
 
-2001-04-27 11:45  schoenw
+2001-04-27 11:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* config.h.in, configure, configure.in: Added some tests for
 	  ethernet name lookup functions.
 
-2001-04-27 11:44  schoenw
+2001-04-27 11:44  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Updated some command descriptions.
 
-2001-04-27 11:43  schoenw
+2001-04-27 11:43  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/bridge.c, scli/fmt.c, scli/scli.h: Added a function to format
-	  ethernet addresses.
+	* scli/bridge.c, scli/fmt.c, scli/scli.h: Added a function to
+	  format ethernet addresses.
 
-2001-04-17 09:47  schoenw
+2001-04-17 09:47  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_snmp_table.c: Some fixes - I guess this really needs a
 	  rewrite. Thanks Erik.
 
-2001-04-17 09:40  schoenw
+2001-04-17 09:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/disman.c, stop/ether.c, stop/interface.c, stop/process.c,
 	  stop/tcp.c: Work around from Erik for glib's broken
 	  g_string_truncate().
 
-2001-04-14 15:51  schoenw
+2001-04-14 15:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/ospf.c, scli/scli.c,
 	  scli/scli.h: Added the ospf scli mode implementation contributed
 	  by Oliver Wellnitz.
 
-2001-04-14 15:48  schoenw
+2001-04-14 15:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/ospf-mib.c,
 	  stub/ospf-mib.h: Added stubs for the OSPF-MIB.
 
-2001-04-12 14:53  schoenw
+2001-04-12 14:53  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl.
 
-2001-04-12 14:52  schoenw
+2001-04-12 14:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* NEWS: Updates for release 0.1.17.
 
-2001-04-12 14:46  schoenw
+2001-04-12 14:46  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_snmp_table.c: Got rid of a nasty warning message.
 
-2001-04-12 14:32  schoenw
+2001-04-12 14:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Added support for smLaunchMaxRunning and
 	  smLaunchMaxCompleted.
 
-2001-04-12 14:14  schoenw
+2001-04-12 14:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Improved the "show disman scheduler info" command
 	  and added a new "show disman scheduler details" command.
 
-2001-04-11 13:58  schoenw
+2001-04-11 13:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/snmp.c: Improved the display of VACM information.
 
-2001-04-11 13:44  schoenw
+2001-04-11 13:44  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/snmp-view-based-acm-mib.c: Fixed the OID instance identifier
 	  unpacking code.
 
-2001-04-11 11:15  schoenw
+2001-04-11 11:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure, configure.in: Bumped the version number.
 
-2001-04-11 11:14  schoenw
+2001-04-11 11:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/snmp-community-mib.c, stub/snmp-community-mib.h,
 	  stub/snmp-framework-mib.c, stub/snmp-framework-mib.h,
@@ -3081,157 +3272,158 @@
 	  stub/snmp-view-based-acm-mib.h: Regenerated stubs to take
 	  advantage of the new type names.
 
-2001-04-11 11:13  schoenw
+2001-04-11 11:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/snmp.c: Many updates to support the VACM MIB.
 
-2001-04-11 11:12  schoenw
+2001-04-11 11:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Use fmt_seconds() instead of fmt_hsec32().
 
-2001-04-11 08:58  schoenw
+2001-04-11 08:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Implemented "show ip forwarding" based on the old RFC
 	  1213 ipRouteTable.
 
-2001-04-10 16:12  schoenw
+2001-04-10 16:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Added code to display the broken RFC 1213 routing
 	  table.
 
-2001-04-10 16:11  schoenw
+2001-04-10 16:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/rfc1213-mib.c,
 	  stub/rfc1213-mib.h: Added stubs for the RFC1213-MIB (since this
 	  MIB defines the routing table that most devices still support
 	  these days).
 
-2001-04-10 09:20  schoenw
+2001-04-10 09:20  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Cleanup garbage left from the progress hooks.
 
-2001-04-10 08:27  schoenw
+2001-04-10 08:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl.
 
-2001-04-10 08:26  schoenw
+2001-04-10 08:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* NEWS, TODO: Updates for release 0.1.16.
 
-2001-04-10 08:24  schoenw
+2001-04-10 08:24  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/basic.c: Added hooks which indicate how fast we retrieve SNMP
-	  variables.
+	* scli/basic.c: Added hooks which indicate how fast we retrieve
+	  SNMP variables.
 
-2001-04-10 08:23  schoenw
+2001-04-10 08:23  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/scli.c: Stifle the history file to contain only $HISTFILESIZE
-	  entries.
+	* scli/scli.c: Stifle the history file to contain only
+	  $HISTFILESIZE entries.
 
-2001-04-10 08:15  schoenw
+2001-04-10 08:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* stop/stop.c: Added a hook to indicate when stop is busy retrieving
-	  data.
+	* stop/stop.c: Added a hook to indicate when stop is busy
+	  retrieving data.
 
-2001-04-10 08:14  schoenw
+2001-04-10 08:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/interface.c: Removed an unnecessary delay.
 
-2001-04-10 08:14  schoenw
+2001-04-10 08:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/ether.c: Discard any old statistics if the ether mode is
 	  restarted.
 
-2001-04-10 08:13  schoenw
+2001-04-10 08:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_snmp.c, snmp/g_snmp.h: Added hooks which are called when a
 	  varbind list is decoded/encoded.
 
-2001-04-09 10:58  schoenw
+2001-04-09 10:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: The "show ip tunnel" command now shows interface names
 	  (patch provided by Oliver Wellnitz <wellnitz@ibr.cs.tu-bs.de>).
 
-2001-04-09 09:23  schoenw
+2001-04-09 09:23  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c, scli/entity.c, scli/interface.c, scli/system.c:
 	  Minor code cleanups.
 
-2001-04-09 09:02  schoenw
+2001-04-09 09:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/host-resources-types.h, stub/stools.c, stub/stools.h:
 	  Implemented stls_identity_get_label().
 
-2001-04-06 15:47  schoenw
+2001-04-06 15:47  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Even nicer output for "show disman languages".
 
-2001-04-06 15:05  schoenw
+2001-04-06 15:05  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: More updates to support the RFC 2592 revision.
 
-2001-04-06 13:48  schoenw
+2001-04-06 13:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/atm-mib.c,
 	  stub/bridge-mib.c, stub/disman-schedule-mib.c,
 	  stub/disman-schedule-mib.h, stub/disman-script-mib.c,
-	  stub/disman-script-mib.h, stub/entity-mib.c, stub/etherlike-mib.c,
-	  stub/host-resources-mib.c, stub/host-resources-types.c,
-	  stub/iana-language-mib.c, stub/if-mib.c, stub/ip-forward-mib.c,
-	  stub/ip-mib.c, stub/mau-mib.c, stub/snmp-community-mib.c,
+	  stub/disman-script-mib.h, stub/entity-mib.c,
+	  stub/etherlike-mib.c, stub/host-resources-mib.c,
+	  stub/host-resources-types.c, stub/iana-language-mib.c,
+	  stub/if-mib.c, stub/ip-forward-mib.c, stub/ip-mib.c,
+	  stub/mau-mib.c, stub/snmp-community-mib.c,
 	  stub/snmp-framework-mib.c, stub/snmp-mpd-mib.c,
 	  stub/snmp-target-mib.c, stub/snmp-user-based-sm-mib.c,
 	  stub/snmp-view-based-acm-mib.c, stub/snmpv2-mib.c, stub/stools.c,
 	  stub/stools.h, stub/tcp-mib.c, stub/tunnel-mib.c, stub/udp-mib.c:
 	  Regenerated stubs to make the resulting C code more compact.
 
-2001-04-06 13:45  schoenw
+2001-04-06 13:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Updates to support the upcoming RFC 2592 revision.
 
-2001-04-04 21:32  schoenw
+2001-04-04 21:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/stools.c: Use mktime() to get the gmt offset computation
 	  right.
 
-2001-04-03 08:12  schoenw
+2001-04-03 08:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/disman.c, stop/ether.c, stop/fmt.c, stop/interface.c,
 	  stop/stop.h: Completed the stop ether mode and moved some common
 	  formatting utilities into the fmt.c module. Added ifInErrors and
 	  ifOutErrors to the interface display mode.
 
-2001-04-03 08:11  schoenw
+2001-04-03 08:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/stop.1, stop/stop.c: Added support for moving forward and
 	  backward in the list of display modes.
 
-2001-03-30 13:38  schoenw
+2001-03-30 13:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c, scli/interface.c, scli/system.c, stop/interface.c,
 	  stub/stools.c, stub/stools.h: Reworked the timeticks formatting
-	  code and started to move it into the stools library so that it can
-	  be reused easily.
+	  code and started to move it into the stools library so that it
+	  can be reused easily.
 
-2001-03-30 08:47  schoenw
+2001-03-30 08:47  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/stop.1: Removed some garbage characters at the end.
 
-2001-03-30 08:43  schoenw
+2001-03-30 08:43  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/atm.c, scli/bridge.c,
 	  scli/disman.c, scli/entity.c, scli/ether.c, scli/fmt.c,
-	  scli/interface.c, scli/ip.c, scli/mau.c, scli/scli.c, scli/scli.h,
-	  scli/snmp.c, scli/system.c, scli/tcp.c, scli/udp.c: Renamed mau.c
-	  to ether.c and updated various modules to reflect internal API
-	  changes.
+	  scli/interface.c, scli/ip.c, scli/mau.c, scli/scli.c,
+	  scli/scli.h, scli/snmp.c, scli/system.c, scli/tcp.c, scli/udp.c:
+	  Renamed mau.c to ether.c and updated various modules to reflect
+	  internal API changes.
 
-2001-03-30 08:21  schoenw
+2001-03-30 08:21  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/disman.c, stop/tcp.c: Updates to reflect changes in the
 	  stools API.
 
-2001-03-30 08:21  schoenw
+2001-03-30 08:21  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/atm-mib.c, stub/atm-mib.h, stub/bridge-mib.c,
 	  stub/bridge-mib.h, stub/disman-schedule-mib.c,
@@ -3250,92 +3442,93 @@
 	  stub/tcp-mib.h, stub/tunnel-mib.c, stub/tunnel-mib.h: Regenerated
 	  stubs to reflect changes in the stls API.
 
-2001-03-30 08:17  schoenw
+2001-03-30 08:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/Makefile.am, stop/Makefile.in, stop/ether.c, stop/stop.c,
 	  stop/stop.h: Added a new ether stop mode to display ethernet
 	  specific statistics.
 
-2001-03-30 08:16  schoenw
+2001-03-30 08:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/interface.c: Added code to handle daylight saving times.
 
-2001-03-29 15:47  schoenw
+2001-03-29 15:47  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/mau.c, scli/scli.c,
 	  scli/scli.h: Added a media attachement (mau) mode. This probably
 	  needs all to be merged at some time into an IEEE 802.3 mode which
 	  does all of this.
 
-2001-03-29 14:46  schoenw
+2001-03-29 14:46  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/etherlike-mib.c,
 	  stub/etherlike-mib.h, stub/mau-mib.c, stub/mau-mib.h: Added stubs
 	  for the MAU-MIB and the EtherLike-MIB.
 
-2001-03-29 12:45  schoenw
+2001-03-29 12:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Import the IANA language OIDs from the
 	  iana-language-mib.h stub.
 
-2001-03-29 12:44  schoenw
+2001-03-29 12:44  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/fmt.c: Fixed again some time formatting/computation problems.
+	* scli/fmt.c: Fixed again some time formatting/computation
+	  problems.
 
-2001-03-29 12:41  schoenw
+2001-03-29 12:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/iana-language-mib.c,
 	  stub/iana-language-mib.h: Added stubs for the IANA-LANGUAGE-MIB.
 
-2001-03-29 12:35  schoenw
+2001-03-29 12:35  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Many improvements to produce more useful output.
 
-2001-03-29 12:34  schoenw
+2001-03-29 12:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/disman.c, stop/fmt.c, stop/stop.h: Added code to display the
 	  time a script is/was running.
 
-2001-03-29 12:33  schoenw
+2001-03-29 12:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/stop.1: Added text to briefly describe the stop modes.
 
-2001-03-29 10:33  schoenw
+2001-03-29 10:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.1: Added some more documentation to bring new users up
 	  to speed.
 
-2001-03-29 08:51  schoenw
+2001-03-29 08:51  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* config.h.in, configure, configure.in: Added a check for
 	  getaddrinfo().
 
-2001-03-29 08:49  schoenw
+2001-03-29 08:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/tcp.c: Show tcp connections in a more reasonable order
 	  (sorted by state).
 
-2001-03-28 10:58  schoenw
+2001-03-28 10:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.1: Documented the way scli interprets the PAGER
 	  environment variable.
 
-2001-03-28 10:12  schoenw
+2001-03-28 10:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.c: Call scli_cmd_open() to handle arguments so that we
 	  can benefit from any error handling in scli_cmd_open().
 
-2001-03-28 10:11  schoenw
+2001-03-28 10:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/tcp.c: Use #defines rather than numbers for enumerated
 	  values.
 
-2001-03-28 10:10  schoenw
+2001-03-28 10:10  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/tcp.c: Use #defines rather than numbers to identify
 	  enumerated values.
 
-2001-03-28 10:08  schoenw
+2001-03-28 10:08  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/atm-mib.c,
 	  stub/atm-mib.h, stub/bridge-mib.c, stub/bridge-mib.h,
@@ -3355,45 +3548,45 @@
 	  stubs to include #defines for enumerations and identities. Added
 	  the host-resources-types stubs.
 
-2001-03-28 08:18  schoenw
+2001-03-28 08:18  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Improved the "show system devices" command.
 
-2001-03-28 07:39  schoenw
+2001-03-28 07:39  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_session.c: Do not lookup the address with each and every
 	  request.
 
-2001-03-27 15:26  schoenw
+2001-03-27 15:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Some portability fixes. I am sure this is not the
 	  right solution. Need to study the POSIX termios specification to
 	  get it "right".
 
-2001-03-27 15:17  schoenw
+2001-03-27 15:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/disman.c, stop/fmt.c, stop/tcp.c: Minor bug fixes.
 
-2001-03-27 15:16  schoenw
+2001-03-27 15:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* configure, configure.in: Bumped the version number.
 
-2001-03-27 15:14  schoenw
+2001-03-27 15:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c, scli/fmt.c, scli/scli.h: Added code to display
 	  information about running disman scripts.
 
-2001-03-27 15:14  schoenw
+2001-03-27 15:14  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Added code to get the number of columns on the
 	  terminal.
 
-2001-03-27 08:55  schoenw
+2001-03-27 08:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Make sure we use the pager only if we are
 	  interactive.
 
-2001-03-27 08:48  schoenw
+2001-03-27 08:48  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/basic.c, scli/bridge.c, scli/disman.c,
 	  scli/entity.c, scli/interface.c, scli/ip.c, scli/scli.c,
@@ -3401,64 +3594,64 @@
 	  Reworked the command creation interface. Intermediate nodes are
 	  now created automatically.
 
-2001-03-26 13:41  schoenw
+2001-03-26 13:41  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl.
 
-2001-03-26 13:35  schoenw
+2001-03-26 13:35  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* NEWS, TODO: Updates for release 0.1.15.
 
-2001-03-26 13:33  schoenw
+2001-03-26 13:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_snmp_table.c: General cleanup and fixed a memory leak.
 
-2001-03-26 13:04  schoenw
+2001-03-26 13:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/udp-mib.c: Updated to handle tables which only have
 	  auxilliary columns.
 
-2001-03-26 13:02  schoenw
+2001-03-26 13:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/entity.c, scli/fmt.c,
 	  scli/scli.c, scli/scli.h, scli/tcp.c, scli/udp.c: Added new "show
 	  tcp listener" and "show udp listener" commands.
 
-2001-03-26 12:59  schoenw
+2001-03-26 12:59  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/Makefile.am, stop/Makefile.in, stop/disman.c, stop/stop.c,
 	  stop/stop.h, stop/tcp.c: Added a tcp mode to view the list of
 	  current tcp connections.
 
-2001-03-23 03:27  schoenw
+2001-03-23 03:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/bridge-mib.c: Regenerated stubs to get the RFC 1155 counters
 	  right.
 
-2001-03-23 03:09  schoenw
+2001-03-23 03:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/bridge.c, scli/cmds.c, scli/disman.c,
 	  scli/entity.c, scli/interface.c, scli/ip.c, scli/scli.c,
-	  scli/snmp.c, scli/system.c, scli/tcp.c: Cleaned up the code in the
-	  help command which displays the command tree. Shortened the
+	  scli/snmp.c, scli/system.c, scli/tcp.c: Cleaned up the code in
+	  the help command which displays the command tree. Shortened the
 	  command descriptions so that they can be used as headers in
 	  recursive command evaluations.
 
-2001-03-21 17:39  schoenw
+2001-03-21 17:39  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Added simple $PAGER support. Improved the output
 	  format produced by recursive command invocations.
 
-2001-03-20 15:17  schoenw
+2001-03-20 15:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* config.h.in: Regenerated.
 
-2001-03-20 15:15  schoenw
+2001-03-20 15:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Added a missing check whether the IP address
 	  entries are really valid.
 
-2001-03-19 20:45  schoenw
+2001-03-19 20:45  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/atm-mib.c, stub/bridge-mib.c, stub/disman-schedule-mib.c,
 	  stub/disman-script-mib.c, stub/entity-mib.c,
@@ -3466,55 +3659,55 @@
 	  stub/ip-mib.c, stub/snmp-community-mib.c,
 	  stub/snmp-framework-mib.c, stub/snmp-mpd-mib.c,
 	  stub/snmp-target-mib.c, stub/snmp-user-based-sm-mib.c,
-	  stub/snmp-view-based-acm-mib.c, stub/snmpv2-mib.c, stub/tcp-mib.c,
-	  stub/tunnel-mib.c, stub/udp-mib.c: Regenerated the stubs to
-	  include type checking code.
+	  stub/snmp-view-based-acm-mib.c, stub/snmpv2-mib.c,
+	  stub/tcp-mib.c, stub/tunnel-mib.c, stub/udp-mib.c: Regenerated
+	  the stubs to include type checking code.
 
-2001-03-19 16:57  schoenw
+2001-03-19 16:57  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* AUTHORS, README: Updated the list of contributors and clarified
 	  the pronounciation of the package name.
 
-2001-03-19 16:55  schoenw
+2001-03-19 16:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* config.h.in, configure, configure.in, scli/fmt.c,
 	  stop/interface.c: Integrated a freebsd patch from John Sellens
 	  <jsellens@generalconcepts.com>.
 
-2001-03-16 16:01  schoenw
+2001-03-16 16:01  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/tcp.c: Dynamically adjust the width of the columns.
 
-2001-03-16 15:31  schoenw
+2001-03-16 15:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Do not try to guess interface names since this
 	  can lead to confusion.
 
-2001-03-16 15:30  schoenw
+2001-03-16 15:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Fixed a bug in the "show bridge ports" command.
 
-2001-03-16 09:11  schoenw
+2001-03-16 09:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/stop.1: Improved some wordings.
 
-2001-03-16 09:10  schoenw
+2001-03-16 09:10  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* NEWS, TODO, configure, configure.in: Bumped version number to
 	  0.1.15.
 
-2001-03-16 09:04  schoenw
+2001-03-16 09:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/atm.c, scli/basic.c, scli/bridge.c, scli/cmds.c,
 	  scli/disman.c, scli/entity.c, scli/interface.c, scli/ip.c,
-	  scli/scli.1, scli/scli.c, scli/scli.h, scli/snmp.c, scli/system.c,
-	  scli/tcp.c: Added "open" and "close" commands. Changed the command
-	  registration so that modes can pass command specific flags. Moved
-	  the peer initialization code to the basic.c module and made the
-	  host scli argument optional. Changed the scli prompt to show the
-	  name of the remote peer.
+	  scli/scli.1, scli/scli.c, scli/scli.h, scli/snmp.c,
+	  scli/system.c, scli/tcp.c: Added "open" and "close" commands.
+	  Changed the command registration so that modes can pass command
+	  specific flags. Moved the peer initialization code to the basic.c
+	  module and made the host scli argument optional. Changed the scli
+	  prompt to show the name of the remote peer.
 
-2001-03-15 17:04  schoenw
+2001-03-15 17:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Dynamically adjust the width of the "Storage Area"
 	  column in the "show system storage" command. Strip trailing white
@@ -3522,62 +3715,62 @@
 	  invent a generic mechanism to validate printable strings before
 	  they are actuall passed to the screen).
 
-2001-03-15 13:29  schoenw
+2001-03-15 13:29  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl.
 
-2001-03-15 13:27  schoenw
+2001-03-15 13:27  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* NEWS, aclocal.m4, configure, configure.in: Preparing for the
 	  0.1.14 release of stools.
 
-2001-03-15 13:22  schoenw
+2001-03-15 13:22  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/atm-mib.c,
 	  stub/atm-mib.h: Added stubs for the ATM-MIB.
 
-2001-03-15 13:21  schoenw
+2001-03-15 13:21  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/bridge.c: Added a "show bridge info" command (which needs
 	  more work for spanning tree bridges).
 
-2001-03-15 13:19  schoenw
+2001-03-15 13:19  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Suppress bridge summary information if the device
 	  reports 0 ports.
 
-2001-03-14 21:25  schoenw
+2001-03-14 21:25  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/atm.c, scli/bridge.c,
 	  scli/scli.c, scli/scli.h: Started work on an ATM mode. Minor
 	  cleanups of the bridge mode.
 
-2001-03-14 20:52  schoenw
+2001-03-14 20:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Fixed a bug where the code assumed that an
 	  ipAddrTable is always present. Enhanced the "show interface info"
 	  command to adjust the width of the "Type" column dynamically.
 
-2001-03-14 17:34  schoenw
+2001-03-14 17:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Added the "show ip media" command.
 
-2001-03-14 13:33  schoenw
+2001-03-14 13:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/interface.c: Updated the output format generated by the "show
-	  interface info" command.
+	* scli/interface.c: Updated the output format generated by the
+	  "show interface info" command.
 
-2001-03-14 13:32  schoenw
+2001-03-14 13:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/bridge.c: Updated the "show bridge ports" command and added a
-	  new "show bridge filter" command (which I could not yet test in
+	* scli/bridge.c: Updated the "show bridge ports" command and added
+	  a new "show bridge filter" command (which I could not yet test in
 	  practice).
 
-2001-03-14 13:31  schoenw
+2001-03-14 13:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/vendors.c: Updated the vendor code tables.
 
-2001-03-14 09:52  schoenw
+2001-03-14 09:52  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/bridge.c,
 	  scli/interface.c, scli/scli.c, scli/scli.h, scli/system.c,
@@ -3585,43 +3778,44 @@
 	  bridge forwarding"). Incorporated a list of ieee vendor codes to
 	  show vendors for MAC addresses.
 
-2001-03-13 16:16  schoenw
+2001-03-13 16:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/ip.c: Prepared the "show ip tunnel" command to eventually
 	  show the interface name.
 
-2001-03-13 16:09  schoenw
+2001-03-13 16:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c, scli/vendors.c: Display unknown vendors to
 	  encourage people to update the vendor list.
 
-2001-03-13 15:46  schoenw
+2001-03-13 15:46  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/Makefile.am, stop/Makefile.in, stop/disman.c, stop/fmt.c,
 	  stop/process.c, stop/stop.h: Added the fmt.c module to collect
 	  formatting utilities. Updated the disman stop mode.
 
-2001-03-13 15:44  schoenw
+2001-03-13 15:44  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Added a "show disman launch info" command and some
 	  general cleanups.
 
-2001-03-13 11:25  schoenw
+2001-03-13 11:25  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/Makefile.am, stop/Makefile.in, stop/disman.c,
 	  stop/interface.c, stop/stop.c, stop/stop.h: Added an initial
 	  version of the stop disman mode.
 
-2001-03-12 14:05  schoenw
+2001-03-12 14:05  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c, scli/cmds.c, scli/disman.c, scli/entity.c,
-	  scli/fmt.c, scli/interface.c, scli/ip.c, scli/scli.c, scli/scli.h,
-	  scli/snmp.c, scli/system.c, scli/tcp.c, scli/vendors.c: Include
-	  only those MIB stubs that are actually needed. Renamed the "show
-	  interface tunnel" command to "show ip tunnel". Added new "show
-	  interface info" and "show disman script info" commands.
+	  scli/fmt.c, scli/interface.c, scli/ip.c, scli/scli.c,
+	  scli/scli.h, scli/snmp.c, scli/system.c, scli/tcp.c,
+	  scli/vendors.c: Include only those MIB stubs that are actually
+	  needed. Renamed the "show interface tunnel" command to "show ip
+	  tunnel". Added new "show interface info" and "show disman script
+	  info" commands.
 
-2001-03-12 14:00  schoenw
+2001-03-12 14:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/bridge-mib.c, stub/bridge-mib.h, stub/disman-schedule-mib.c,
 	  stub/disman-schedule-mib.h, stub/disman-script-mib.c,
@@ -3641,35 +3835,36 @@
 	  history. Removed the default include of all MIB stub headers from
 	  stools.h.
 
-2001-03-12 13:58  schoenw
+2001-03-12 13:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/interface.c, stop/process.c, stop/stop.c, stop/stop.h:
 	  Include only those MIB stubs that are actually needed.
 
-2001-03-09 15:12  schoenw
+2001-03-09 15:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Minor formatting cleanup of the "show interface
 	  tunnel" command.
 
-2001-03-09 15:06  schoenw
+2001-03-09 15:06  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl.
 
-2001-03-09 15:04  schoenw
+2001-03-09 15:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* NEWS, TODO, configure, configure.in: Preparing for the next
 	  release.
 
-2001-03-08 14:40  schoenw
+2001-03-08 14:40  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* snmp/g_asn1.c: Fixed a sign decoding bug in g_asn1_int32_decode().
+	* snmp/g_asn1.c: Fixed a sign decoding bug in
+	  g_asn1_int32_decode().
 
-2001-03-08 10:57  schoenw
+2001-03-08 10:57  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c, scli/ip.c: Oliver Wellnitz contributed a patch
 	  to display tunnel information.
 
-2001-03-08 10:56  schoenw
+2001-03-08 10:56  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/bridge-mib.c,
 	  stub/bridge-mib.h, stub/disman-schedule-mib.c,
@@ -3689,7 +3884,7 @@
 	  stub/udp-mib.h: Added stubs for the TUNNEL-MIB and regenerated
 	  stubs with the released smidump version 0.2.14.
 
-2001-03-05 14:31  schoenw
+2001-03-05 14:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c, scli/entity.c, scli/interface.c, scli/ip.c,
 	  scli/snmp.c, scli/system.c, scli/tcp.c, stop/interface.c,
@@ -3706,10 +3901,11 @@
 	  stub/snmp-target-mib.h, stub/snmp-user-based-sm-mib.c,
 	  stub/snmp-user-based-sm-mib.h, stub/snmp-view-based-acm-mib.c,
 	  stub/snmp-view-based-acm-mib.h, stub/snmpv2-mib.c,
-	  stub/snmpv2-mib.h, stub/tcp-mib.c, stub/tcp-mib.h, stub/udp-mib.c,
-	  stub/udp-mib.h: Many updates to support an improved stub API.
+	  stub/snmpv2-mib.h, stub/tcp-mib.c, stub/tcp-mib.h,
+	  stub/udp-mib.c, stub/udp-mib.h: Many updates to support an
+	  improved stub API.
 
-2001-03-02 09:32  schoenw
+2001-03-02 09:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/bridge-mib.c,
 	  stub/disman-schedule-mib.c, stub/disman-script-mib.c,
@@ -3722,58 +3918,58 @@
 	  Added the IP-FORWARD-MIB and regenerated the stubs to take
 	  advantage of some improvements in the smidump stools driver.
 
-2001-03-02 09:28  schoenw
+2001-03-02 09:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/ip.c, scli/scli.c,
 	  scli/scli.h, scli/tcp.c: Added an initial IP mode for scli.
 
-2001-03-02 09:20  schoenw
+2001-03-02 09:20  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/process.c: Display CPU time in seconds rather than minutes.
 	  Made sure that the process descriptions clear to the end of the
 	  line.
 
-2001-03-02 09:17  schoenw
+2001-03-02 09:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/fmt.c, scli/interface.c, scli/scli.h: Added a fmt function to
-	  convert IPv4 masks into a printable address prefix length. The
+	* scli/fmt.c, scli/interface.c, scli/scli.h: Added a fmt function
+	  to convert IPv4 masks into a printable address prefix length. The
 	  "show interface info" command now displays the prefix length
 	  rather than the DNS name for each associated IP address.
 
-2001-03-02 09:10  schoenw
+2001-03-02 09:10  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/fmt.c: Check for the unspecified case first before doing host
-	  or service name lookups.
+	* scli/fmt.c: Check for the unspecified case first before doing
+	  host or service name lookups.
 
-2001-03-02 09:10  schoenw
+2001-03-02 09:10  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.c: Integrated a patch from Frank Strauss
 	  <strauss@ibr.cs.tu-bs.de> to turn off filename completion.
 
-2001-03-01 08:44  schoenw
+2001-03-01 08:44  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/tcp.c: Fixed a formatting bug with long host names.
 
-2001-03-01 08:17  schoenw
+2001-03-01 08:17  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl.
 
-2001-03-01 07:57  schoenw
+2001-03-01 07:57  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* Makefile.in, NEWS, configure, configure.in: Prepare for the 0.1.12
-	  snapshot.
+	* Makefile.in, NEWS, configure, configure.in: Prepare for the
+	  0.1.12 snapshot.
 
-2001-03-01 07:55  schoenw
+2001-03-01 07:55  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/fmt.c, scli/interface.c, scli/scli.h, scli/tcp.c: Improved
 	  the formatting of IPv4 addresses and port numbers.
 
-2001-03-01 07:54  schoenw
+2001-03-01 07:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* scli/system.c: The "show system info" now shows dates in a logical
-	  order.
+	* scli/system.c: The "show system info" now shows dates in a
+	  logical order.
 
-2001-02-28 16:38  schoenw
+2001-02-28 16:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/bridge-mib.c, stub/bridge-mib.h, stub/disman-schedule-mib.c,
 	  stub/disman-schedule-mib.h, stub/disman-script-mib.c,
@@ -3786,120 +3982,120 @@
 	  stub/snmp-target-mib.h, stub/snmp-user-based-sm-mib.c,
 	  stub/snmp-user-based-sm-mib.h, stub/snmp-view-based-acm-mib.c,
 	  stub/snmp-view-based-acm-mib.h, stub/snmpv2-mib.c,
-	  stub/snmpv2-mib.h, stub/tcp-mib.c, stub/tcp-mib.h, stub/udp-mib.c,
-	  stub/udp-mib.h: Improved the instance identifier unpacking to
-	  handle some more cases.
+	  stub/snmpv2-mib.h, stub/tcp-mib.c, stub/tcp-mib.h,
+	  stub/udp-mib.c, stub/udp-mib.h: Improved the instance identifier
+	  unpacking to handle some more cases.
 
-2001-02-28 16:37  schoenw
+2001-02-28 16:37  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/interface.c, stop/process.c: Updated the code to use the new
 	  stub interface.
 
-2001-02-28 16:37  schoenw
+2001-02-28 16:37  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c, scli/entity.c, scli/interface.c, scli/snmp.c,
 	  scli/system.c: Improvements of the "show disman language" and
 	  "show interface info" commands. Added a new "show disman scripts"
 	  command. Updated the code to use the new stubs interface.
 
-2001-02-28 16:26  schoenw
+2001-02-28 16:26  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/scli.c, scli/scli.h,
 	  scli/tcp.c: Added the tcp mode which displays existing tcp
 	  connections.
 
-2001-02-27 11:15  schoenw
+2001-02-27 11:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/interface.c: Handle 3com's big (5 digit) interface numbers.
 
-2001-02-27 10:33  schoenw
+2001-02-27 10:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/interface.c: Check availability of ifXEntry before using it.
 
-2001-02-27 10:07  schoenw
+2001-02-27 10:07  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl.
 
-2001-02-27 10:06  schoenw
+2001-02-27 10:06  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* NEWS, TODO: Updates for the 0.1.11 release.
 
-2001-02-27 10:04  schoenw
+2001-02-27 10:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/disman.c: Fixes some descriptive texts.
 
-2001-02-27 10:01  schoenw
+2001-02-27 10:01  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/entity.c: Implementation of the "show physical components"
 	  and the "show physical containment" command (which replace the
 	  "show system entities" command).
 
-2001-02-27 10:00  schoenw
+2001-02-27 10:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Cleanup and some initial "show system devices"
 	  command code.
 
-2001-02-27 09:58  schoenw
+2001-02-27 09:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Renames "show interfaces" to "show interface
 	  info" since we are going to add a "show interface stack" command
 	  soon.
 
-2001-02-27 09:54  schoenw
+2001-02-27 09:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/stop.c: Do not display the system description during startup
 	  to reduce latency.
 
-2001-02-27 09:54  schoenw
+2001-02-27 09:54  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/interface.c: Updates to better display byte and packet
 	  counters.
 
-2001-02-27 07:49  schoenw
+2001-02-27 07:49  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/interface.c: Work better if some deprecated objects are not
 	  present.
 
-2001-02-26 15:32  schoenw
+2001-02-26 15:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl.
 
-2001-02-26 15:20  schoenw
+2001-02-26 15:20  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* README, configure, configure.in: Prepare for release 0.1.11.
 
-2001-02-26 15:13  schoenw
+2001-02-26 15:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/scli.c, scli/scli.h,
-	  scli/snmp.c: Added an initial snmp mode which needs much more work
-	  to be useful.
+	  scli/snmp.c: Added an initial snmp mode which needs much more
+	  work to be useful.
 
-2001-02-26 15:12  schoenw
+2001-02-26 15:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/basic.c: Evaluate commands recursively on non-leaf nodes in
 	  the command tree. (Not sure yet whether this is always a feature
 	  or sometimes a bug.)
 
-2001-02-26 15:11  schoenw
+2001-02-26 15:11  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Renamed "show system" to "show system info". Set
 	  the minimum column width to 20 in the "show system mounts"
 	  command.
 
-2001-02-26 15:09  schoenw
+2001-02-26 15:09  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Renamed "show interface" to "show interfaces".
 
-2001-02-26 15:08  schoenw
+2001-02-26 15:08  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/interface.c: Updates to display byte and packet counters.
 
-2001-02-26 15:03  schoenw
+2001-02-26 15:03  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/snmp-framework-mib.c, stub/snmp-mpd-mib.h: Forgot two files
 	  in the last commit...
 
-2001-02-26 15:02  schoenw
+2001-02-26 15:02  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/snmp-community-mib.c,
 	  stub/snmp-community-mib.h, stub/snmp-framework-mib.h,
@@ -3909,12 +4105,12 @@
 	  stub/snmp-view-based-acm-mib.h, stub/stools.h: Added the standard
 	  SNMPv3 remote administration MIBs to eventually support them. ;-)
 
-2001-02-23 15:04  schoenw
+2001-02-23 15:04  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Supress newlines if the sysDescr value is a zero
 	  length string.
 
-2001-02-23 14:59  schoenw
+2001-02-23 14:59  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/bridge-mib.c, stub/disman-schedule-mib.c,
 	  stub/disman-script-mib.c, stub/entity-mib.c,
@@ -3922,45 +4118,46 @@
 	  stub/snmpv2-mib.c, stub/tcp-mib.c, stub/udp-mib.c: The stub code
 	  now checks the complete OID in the response again.
 
-2001-02-21 16:38  schoenw
+2001-02-21 16:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* ChangeLog: Generated the ChangeLog via cvs2cl. (This should
 	  probably be automated.)
 
-2001-02-21 16:34  schoenw
+2001-02-21 16:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* TODO: Updated the ever growing TODO list.
 
-2001-02-21 16:33  schoenw
+2001-02-21 16:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/entity.c: Added very experimental code to display the
 	  containment hierarchy.
 
-2001-02-21 16:31  schoenw
+2001-02-21 16:31  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Replaced hrSWRunName with hrSWRunPath.
 
-2001-02-21 16:30  schoenw
+2001-02-21 16:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* doc/stools.texinfo: Some grammar/wording fixed from Frank Strauss.
+	* doc/stools.texinfo: Some grammar/wording fixed from Frank
+	  Strauss.
 
-2001-02-21 16:29  schoenw
+2001-02-21 16:29  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.1, stop/stop.1: Frank Strauss fixed the numbers in the
 	  manual pages.
 
-2001-02-21 16:29  schoenw
+2001-02-21 16:29  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
-	* stop/process.c: Use hrSWRunPath instead of hrSWRunName. Cleaned up
-	  the line truncation code.
+	* stop/process.c: Use hrSWRunPath instead of hrSWRunName. Cleaned
+	  up the line truncation code.
 
-2001-02-20 14:38  schoenw
+2001-02-20 14:38  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* NEWS, TODO, configure, configure.in, doc/stools.info,
 	  doc/stools.texinfo: Updated for version 0.1.10 of the stools
 	  package.
 
-2001-02-20 14:37  schoenw
+2001-02-20 14:37  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/bridge-mib.c, stub/disman-schedule-mib.c,
 	  stub/disman-script-mib.c, stub/entity-mib.c,
@@ -3968,53 +4165,53 @@
 	  stub/snmpv2-mib.c, stub/tcp-mib.c, stub/udp-mib.c: More compact
 	  stubs generated by an improved stools smidump driver.
 
-2001-02-20 14:34  schoenw
+2001-02-20 14:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/stop.1, stop/stop.c: Updated documentation of the `T' toggle
 	  command.
 
-2001-02-20 14:34  schoenw
+2001-02-20 14:34  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/process.c: More compact display of process states and types.
 
-2001-02-20 14:33  schoenw
+2001-02-20 14:33  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/interface.c: Minor cleanup of the interface mode.
 
-2001-02-20 14:32  schoenw
+2001-02-20 14:32  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/disman.c, scli/scli.c,
 	  scli/scli.h: Added a disman mode which needs much more work.
 
-2001-02-20 14:30  schoenw
+2001-02-20 14:30  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/cmds.c: Fixed the help output for intermediate command nodes
 	  without a description.
 
-2001-02-20 14:29  schoenw
+2001-02-20 14:29  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Added the "show system processes" command.
 
-2001-02-20 14:28  schoenw
+2001-02-20 14:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/interface.c: Minor bug fixes to produce even nicer output.
 	  ;-)
 
-2001-02-16 14:43  schoenw
+2001-02-16 14:43  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Fixed the output of "show system storage".
 
-2001-02-16 14:21  schoenw
+2001-02-16 14:21  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/scli.1: Fixed a typo.
 
-2001-02-16 14:15  schoenw
+2001-02-16 14:15  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* Makefile.in, NEWS, TODO, aclocal.m4, configure, configure.in,
 	  doc/Makefile.in, snmp/Makefile.in, stop/Makefile.in: Updates for
 	  version 0.1.9 of the stools package.
 
-2001-02-16 14:13  schoenw
+2001-02-16 14:13  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/Makefile.am, scli/Makefile.in, scli/basic.c, scli/cmds.c,
 	  scli/entity.c, scli/fmt.c, scli/interface.c, scli/scli.1,
@@ -4022,7 +4219,7 @@
 	  New "show system mount" command and many minor command
 	  improvements.
 
-2001-02-16 14:12  schoenw
+2001-02-16 14:12  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stub/Makefile.am, stub/Makefile.in, stub/bridge-mib.c,
 	  stub/bridge-mib.h, stub/disman-schedule-mib.c,
@@ -4030,49 +4227,49 @@
 	  stub/disman-script-mib.h, stub/stools.h: Added the BRIDGE-MIB,
 	  DISMAN-SCRIPT-MIB and DISMAN-SCHEDULE-MIB.
 
-2001-02-15 17:03  schoenw
+2001-02-15 17:03  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Some more code to display a list of mounted
 	  filesystems. Needs more work.
 
-2001-02-15 12:00  schoenw
+2001-02-15 12:00  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* Makefile.in, NEWS, config.h.in, configure, configure.in,
 	  doc/Makefile.in, scli/Makefile.in, snmp/Makefile.in,
 	  stop/Makefile.in, stop/stop.h, stub/Makefile.in: Added a few more
 	  configure checks and bumped version number.
 
-2001-02-15 11:59  schoenw
+2001-02-15 11:59  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* snmp/g_dispatch.c, snmp/g_dispatch.h, snmp/g_session.h,
 	  snmp/g_snmp.c, snmp/g_transport.c: Several prototype fixes.
 
-2001-02-15 11:58  schoenw
+2001-02-15 11:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* scli/system.c: Implemented the "show system storage" command.
 
-2001-02-15 11:58  schoenw
+2001-02-15 11:58  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* stop/process.c, stub/stools.c, stub/stools.h: Some prototype
 	  fixes.
 
-2001-02-14 13:28  schoenw
+2001-02-14 13:28  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* Makefile.in, NEWS, README, TODO, aclocal.m4, configure,
 	  configure.in, doc/Makefile.in, scli/Makefile.in, scli/cmds.c,
 	  scli/interface.c, scli/scli.1, scli/system.c, snmp/Makefile.in,
 	  snmp/g_message.c, snmp/g_snmp.c, snmp/g_snmp.h,
 	  snmp/g_transport.c, stop/Makefile.in, stop/interface.c,
-	  stop/stop.1, stop/stop.c, stub/Makefile.in: Documentation updates,
-	  fixes for constructions that violate ANSI C, minor bug fixes and
-	  improved scli help output.
+	  stop/stop.1, stop/stop.c, stub/Makefile.in: Documentation
+	  updates, fixes for constructions that violate ANSI C, minor bug
+	  fixes and improved scli help output.
 
-2001-02-14 13:25  schoenw
+2001-02-14 13:25  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* doc/stools.info, doc/stools.texinfo: Added some initial text to
 	  the stools documentation.
 
-2001-02-13 15:16  schoenw
+2001-02-13 15:16  Jürgen Schönwälder <j.schoenwaelder@iu-bremen.de>
 
 	* AUTHORS, COPYING, ChangeLog, INSTALL, Makefile.am, Makefile.in,
 	  NEWS, README, TODO, aclocal.m4, config.guess, config.h.in,

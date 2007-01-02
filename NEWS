@@ -1,4 +1,14 @@
+Changes in scli 0.3.2:
+
+- new "show bridge vlan info" command
+- new "show bridge vlan details" command
+- removed the SNMP specific option which are now provided by gsnmp
+- dropped getopt in favour of glib's option parsing library
+- reworked the behaviour on an non-interactive tty (aka protocol mode)
+- minor bug fixes plus some new bugs
+
 Changes in scli 0.3.1:
+
 - many new commands (I am too lazy to list them here)
 - scli now uses gsnmp which uses gnet
 - IPv6 support and some SNMP over TCP support

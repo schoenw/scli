@@ -27,6 +27,10 @@
 #define SCLI_PLUGIN_PATH "/usr/local/lib/scli"
 
 
+/* Define to 1 if you have the declaration of `tzname', and to 0 if you don't.
+   */
+#undef HAVE_DECL_TZNAME
+
 /* Define to 1 if you have the <dmalloc.h> header file. */
 #undef HAVE_DMALLOC_H
 
