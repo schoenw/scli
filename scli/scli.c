@@ -344,7 +344,7 @@ main(int argc, char **argv)
      */
 
     if (opt_bool_version) {
-	g_print("scli version %s\n", PACKAGE_VERSION);
+	g_print("scli version %s\n", VERSION);
 	g_print("Copyright %s\n", scli_copyright);
 	g_print("scli comes with ABSOLUTELY NO WARRANTY.\n"
 		"You may redistribute copies of scli under\n"
@@ -431,7 +431,7 @@ main(int argc, char **argv)
 
     if (!scli_interp_quiet(interp)) {
 	g_print("%3d-scli version %s %s\n",
-		SCLI_MSG, PACKAGE_VERSION, scli_copyright);
+		SCLI_MSG, VERSION, scli_copyright);
     }
 
     if (scli_interp_interactive(interp) && ! scli_interp_proto(interp)) {

@@ -851,7 +851,7 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
     }
 
     g_string_sprintfa(interp->result, "%-*s %s\n", indent, "Version:",
-		      PACKAGE_VERSION);
+		      VERSION);
     
     g_string_sprintfa(interp->result, "%-*s %lu\n", indent, "Epoch:",
 		      interp->epoch);

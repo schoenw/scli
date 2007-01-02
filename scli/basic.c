@@ -46,8 +46,8 @@ struct error_info {
 
 static const struct error_info error_infos[] = {
     { SCLI_MSG,			"%s" },
-    { SCLI_OK,			"ok; scli " PACKAGE_VERSION " ready" },
-    { SCLI_EXIT,		"ok; scli " PACKAGE_VERSION " exiting" },
+    { SCLI_OK,			"ok; scli " VERSION " ready" },
+    { SCLI_EXIT,		"ok; scli " VERSION " exiting" },
     { SCLI_ERROR,		"%s" },
     { SCLI_ERROR_NOPEER,	"no association to a remote SNMP agent" },
     { SCLI_ERROR_NOXML,		"command `%s' does not support xml" },
@@ -365,7 +365,7 @@ scli_interp_reset(scli_interp_t *interp)
     interp->xml_doc->children = xmlNewDocNode(interp->xml_doc, NULL,
 					      "scli", NULL);
     interp->xml_node = interp->xml_doc->children;
-    xmlSetProp(interp->xml_node, "version", PACKAGE_VERSION);
+    xmlSetProp(interp->xml_node, "version", VERSION);
 }
 
 
