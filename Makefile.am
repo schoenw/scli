@@ -1,4 +1,4 @@
-EXTRA_DIST	= TODO PORTING doc/gpl.texinfo doc/scli.info doc/scli.ps
+EXTRA_DIST	= TODO PORTING doc/gpl.texinfo doc/scli.info doc/scli.pdf
 
 SUBDIRS		= stub proc scli doc
 
