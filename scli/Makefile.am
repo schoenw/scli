@@ -1,5 +1,7 @@
 INCLUDES	= -I$(top_srcdir)/stub -I$(top_srcdir)/proc $(GSNMP_CFLAGS) $(GNET_CFLAGS) $(GTK_CFLAGS) $(XML_CFLAGS) $(XML_CPPFLAGS)
 
+EXTRA_DIST	= oui.c
+
 bin_PROGRAMS	= scli # gscli
 
 scli_SOURCES	= scli.c scli.h scli.1 vendors.c \
@@ -49,7 +51,7 @@ oui.c:
 	echo " * from http://standards.ieee.org/regauth/oui/oui.txt" >> oui.c
 	echo " */" >> oui.c
 	echo "static scli_vendor_t ieee802_vendor_table[] = {" >> oui.c
-	wget -O - http://standards.ieee.org/regauth/oui/oui.txt | grep '(base 16)' | cut -c 1-6,23- | sed -e 's/\(......\)\(.*\)$$/    { 0x\1, \"\2\" },/' >> oui.c
+	wget -O - http://standards.ieee.org/regauth/oui/oui.txt | grep '(base 16)' | sed 's/"/\\"/g' | cut -c 1-6,23- | sed -e 's/\(......\)\(.*\)$$/    { 0x\1, \"\2\" },/' >> oui.c
 	echo "    { 0, NULL }" >> oui.c
 	echo "};" >> oui.c
 
