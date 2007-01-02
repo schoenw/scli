@@ -581,7 +581,7 @@ help(scli_cmd_t *cmd, int argc, char **argv)
 
 
 static int
-mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
+mainloop_curses(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 {
     int c, num, flags = 0;
     char *input, buffer[80], *end;
@@ -734,19 +734,53 @@ mainloop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 
 
 int
-scli_monitor(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
+scli_monitor_curses(scli_interp_t *interp, scli_cmd_t *cmd,
+		    int argc, char **argv)
 {
     int code = SCLI_OK;
 
     scli_curses_on();
     g_snmp_list_decode_hook = snmp_decode_hook;
-    code = mainloop(interp, cmd, argc, argv);
+    code = mainloop_curses(interp, cmd, argc, argv);
     if (code == SCLI_OK || code == SCLI_EXIT) {
 	scli_interp_reset(interp);
     }
     scli_curses_off();
     return code;
 }
+
+
+
+int
+scli_monitor_proto(scli_interp_t *interp, scli_cmd_t *cmd,
+		   int argc, char **argv)
+{
+    int flags = 0;
+    int code = SCLI_OK;
+
+    flags |= STOP_FLAG_RESTART;
+    flags |= STOP_FLAG_NODELAY;
+    
+    while (! (flags & STOP_FLAG_DONE)) {
+	if (! (flags & STOP_FLAG_SNMP_FAILURE)) {
+	    scli_interp_reset(interp);
+	    if (! (interp->flags & SCLI_INTERP_FLAG_DRY)
+		|| ((interp->flags & SCLI_INTERP_FLAG_DRY) && (cmd->flags & SCLI_CMD_FLAG_DRY))) {
+		code = (cmd->func) (interp, argc, argv);
+	    } else {
+		code = SCLI_OK;
+	    }
+	    if (code != SCLI_OK) {
+		break;
+	    }
+	    scli_show_results(interp, cmd, code);
+	    g_printerr("** sleeping (%d)...\n", code);
+	    sleep(1);
+	}
+    }
+    return code;
+}
+    
 
 
 struct loop_data {
@@ -765,14 +799,14 @@ loop_iteration(gpointer data)
     scli_cmd_t *cmd = loop_data->cmd;
     int argc = loop_data->argc;
     char **argv = loop_data->argv;
+    int code = SCLI_OK;
     
-    g_printerr("loop_iteration()\n");
     scli_interp_reset(interp);
     if (! (interp->flags & SCLI_INTERP_FLAG_DRY)
 	|| ((interp->flags & SCLI_INTERP_FLAG_DRY) && (cmd->flags & SCLI_CMD_FLAG_DRY))) {
-	(void) (cmd->func) (interp, argc, argv);
+	code = (cmd->func) (interp, argc, argv);
     }
-    g_print("%s\n%s", interp->header->str, interp->result->str);
+    scli_show_results(interp, cmd, code);
     return TRUE;
 }
 
@@ -782,7 +816,6 @@ static gboolean
 loop_input(GIOChannel *source, GIOCondition condition, gpointer data)
 {
     GMainLoop *loop = (GMainLoop *) data;
-    g_printerr("loop_input()\n");
     g_main_quit(loop);
     return TRUE;
 }
@@ -814,7 +847,7 @@ scli_loop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 
     loop = g_main_new(TRUE);
     
-    g_timeout_add(1000, loop_iteration, &loop_data);
+    g_timeout_add(5000, loop_iteration, &loop_data);
 
     /*
     (void) initscr();
