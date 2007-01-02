@@ -22,6 +22,7 @@
 
 #include "scli.h"
 
+#include "snmpv2-tc.h"
 #include "bridge-mib.h"
 #include "q-bridge-mib.h"
 #include "if-mib-proc.h"
@@ -976,7 +977,7 @@ show_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 
 static void
 fmt_bridge_filter(GString *s,
-		   bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry)
+		  bridge_mib_dot1dStaticEntry_t *dot1dStaticEntry)
 {
     const char *status;
     
@@ -1042,6 +1043,212 @@ show_bridge_filter(scli_interp_t *interp, int argc, char **argv)
 
     if (dot1dStaticTable)
 	bridge_mib_free_dot1dStaticTable(dot1dStaticTable);
+
+    return SCLI_OK;
+}
+
+
+static int
+match_vlan(regex_t *regex_vlan,
+	   q_bridge_mib_dot1qVlanStaticEntry_t *vlanEntry)
+{
+    int status;
+    
+    if (! regex_vlan) {
+	return 1;
+    }
+
+    if (vlanEntry->dot1qVlanStaticName) {
+	char *string = g_malloc0(vlanEntry->_dot1qVlanStaticNameLength + 1);
+	memcpy(string, vlanEntry->dot1qVlanStaticName,
+	       vlanEntry->_dot1qVlanStaticNameLength);
+	status = regexec(regex_vlan, string, (size_t) 0, NULL, 0);
+	g_free(string);
+	if (status == 0) {
+	    return 1;
+	}
+    }
+
+    return 0;
+}
+
+
+static void
+fmt_bridge_vlan_details(GString *s,
+			q_bridge_mib_dot1qVlanStaticEntry_t *vlanEntry)
+{
+    int const indent = 18;
+    const char *e;
+
+    g_string_sprintfa(s, "%-*s %d\n", indent, "Vlan Id:",
+		      vlanEntry->dot1qVlanIndex);
+
+    if (vlanEntry->dot1qVlanStaticName) {
+	g_string_sprintfa(s, "%-*s %.*s\n", indent, "Vlan Name:",
+			  vlanEntry->_dot1qVlanStaticNameLength,
+			  vlanEntry->dot1qVlanStaticName);
+    }
+
+    if (vlanEntry->dot1qVlanStaticEgressPorts) {
+	g_string_sprintfa(s, "%-*s ", indent, "Egress Ports:");
+	fmt_port_set(s, vlanEntry->dot1qVlanStaticEgressPorts,
+		     vlanEntry->_dot1qVlanStaticEgressPortsLength);
+	g_string_sprintfa(s, "\n");
+    }
+
+    if (vlanEntry->dot1qVlanForbiddenEgressPorts) {
+	g_string_sprintfa(s, "%-*s ", indent, "Forbidden Ports:");
+	fmt_port_set(s, vlanEntry->dot1qVlanForbiddenEgressPorts,
+		     vlanEntry->_dot1qVlanForbiddenEgressPortsLength);
+	g_string_sprintfa(s, "\n");
+    }
+
+    if (vlanEntry->dot1qVlanStaticUntaggedPorts) {
+	g_string_sprintfa(s, "%-*s ", indent, "Untagged Ports:");
+	fmt_port_set(s, vlanEntry->dot1qVlanStaticUntaggedPorts,
+		     vlanEntry->_dot1qVlanStaticUntaggedPortsLength);
+	g_string_sprintfa(s, "\n");
+    }
+
+    if (vlanEntry->dot1qVlanStaticRowStatus) {
+	e = fmt_enum(snmpv2_tc_enums_RowStatus,
+		     vlanEntry->dot1qVlanStaticRowStatus);
+	g_string_sprintfa(s, "%-*s %s\n", indent, "Status:", e ? e : "");
+    }
+}
+
+
+static int
+show_bridge_vlan_details(scli_interp_t *interp, int argc, char **argv)
+{
+    q_bridge_mib_dot1qVlanStaticEntry_t **vlanTable = NULL;
+    regex_t _regex_vlan, *regex_vlan = NULL;
+    int i, c;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (argc == 2) {
+	regex_vlan = &_regex_vlan;
+	if (regcomp(regex_vlan, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_vlan) regfree(regex_vlan);
+	return SCLI_OK;
+    }
+
+    q_bridge_mib_get_dot1qVlanStaticTable(interp->peer, &vlanTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (vlanTable) {
+	for (i = 0, c = 0; vlanTable[i]; i++) {
+	    if (match_vlan(regex_vlan, vlanTable[i])) {
+		if (c) {
+		    g_string_append(interp->result, "\n");
+		}
+		fmt_bridge_vlan_details(interp->result, vlanTable[i]);
+		c++;
+	    }
+	}
+    }
+
+    if (vlanTable) q_bridge_mib_free_dot1qVlanStaticTable(vlanTable);
+    if (regex_vlan) regfree(regex_vlan);
+
+    return SCLI_OK;
+}
+
+
+static void
+fmt_bridge_vlan_info(GString *s,
+		     q_bridge_mib_dot1qVlanStaticEntry_t *vlanEntry,
+		     int name_width)
+{
+    const char *e;
+
+    g_string_sprintfa(s, "%5d ", vlanEntry->dot1qVlanIndex);
+
+    e = fmt_enum(snmpv2_tc_enums_RowStatus,
+		 vlanEntry->dot1qVlanStaticRowStatus);
+    g_string_sprintfa(s, "%-13s ", e ? e : "");
+
+    if (vlanEntry->dot1qVlanStaticName) {
+	g_string_sprintfa(s, "%-*.*s ", name_width,
+			  vlanEntry->_dot1qVlanStaticNameLength,
+			  vlanEntry->dot1qVlanStaticName);
+    } else {
+	g_string_sprintfa(s, "%-*.*s ", name_width, 0, "");
+    }
+
+    if (vlanEntry->dot1qVlanStaticEgressPorts) {
+	fmt_port_set(s, vlanEntry->dot1qVlanStaticEgressPorts,
+		     vlanEntry->_dot1qVlanStaticEgressPortsLength);
+    }
+
+    g_string_sprintfa(s, "\n");
+}
+
+
+static int
+show_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
+{
+    q_bridge_mib_dot1qVlanStaticEntry_t **vlanTable = NULL;
+    regex_t _regex_vlan, *regex_vlan = NULL;
+    int name_width = 8;
+    int i;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (argc == 2) {
+	regex_vlan = &_regex_vlan;
+	if (regcomp(regex_vlan, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_vlan) regfree(regex_vlan);
+	return SCLI_OK;
+    }
+
+    q_bridge_mib_get_dot1qVlanStaticTable(interp->peer, &vlanTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (vlanTable) {
+	for (i = 0; vlanTable[i]; i++) {
+	    if (match_vlan(regex_vlan, vlanTable[i])) {
+		if (vlanTable[i]->_dot1qVlanStaticNameLength > name_width) {
+		    name_width = vlanTable[i]->_dot1qVlanStaticNameLength;
+		}
+	    }
+	}
+	g_string_sprintfa(interp->header, "VLAN  %-13s %-*s PORTS",
+			  "STATUS", name_width, "NAME");
+	for (i = 0; vlanTable[i]; i++) {
+	    if (match_vlan(regex_vlan, vlanTable[i])) {
+		fmt_bridge_vlan_info(interp->result, vlanTable[i], name_width);
+	    }
+	}
+    }
+
+    if (vlanTable) q_bridge_mib_free_dot1qVlanStaticTable(vlanTable);
+    if (regex_vlan) regfree(regex_vlan);
 
     return SCLI_OK;
 }
@@ -1183,7 +1390,7 @@ scli_init_bridge_mode(scli_interp_t *interp)
     static scli_cmd_t cmds[] = {
 
 	{ "show bridge info", NULL,
-	  "The show bridge info command displays summary information about\n"
+	  "The `show bridge info' command displays summary information about\n"
 	  "a bridge, such as the number of ports and the supported bridging\n"
 	  "functions and associated parameters.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
@@ -1191,16 +1398,16 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  show_bridge_info },
 
 	{ "show bridge ports", NULL,
-	  "The show bridge ports command displays information about the\n"
+	  "The `show bridge ports' command displays information about the\n"
 	  "bridge ports.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "bridge ports", NULL,
 	  show_bridge_ports },
 
 	{ "show bridge stp ports", NULL,
-	  "The show bridge stp ports command displays information about the\n"
-	  "bridge ports which participate in the spanning tree protocol. The\n"
-	  "command generates a table with the following columns:\n"
+	  "The `show bridge stp ports' command displays information about\n"
+	  "the bridge ports which participate in the spanning tree protocol.\n"
+	  "The command generates a table with the following columns:\n"
 	  "\n"
 	  "  PORT     port number\n"
 	  "  PRIO     spanning tree priority of the port\n"
@@ -1221,7 +1428,7 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  show_bridge_stp_ports },
 
 	{ "show bridge forwarding", NULL,
-	  "The show bridge forwarding command displays the forwarding\n"
+	  "The `show bridge forwarding' command displays the forwarding\n"
 	  "data base used by transparent bridges. The command generates\n"
 	  "a table with the following columns:\n"
 	  "\n"
@@ -1235,13 +1442,13 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  show_bridge_forwarding },
 
 	{ "show bridge filter", NULL,
-	  "The show bridge filter command shows filtering information.",
+	  "The `show bridge filter' command shows filtering information.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_bridge_filter },
 
 	{ "show bridge stats", NULL,
-	  "The show bridge stats command displays per port statistics for\n"
+	  "The `show bridge stats' command displays per port statistics for\n"
 	  "transparent bridges. The command generates a table with the\n"
 	  "following columns:\n"
 	  "\n"
@@ -1255,12 +1462,34 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  show_bridge_stats },
 
 	{ "monitor bridge stats", NULL,
-	  "The monitor bridge stats command shows the same\n"
-	  "information as the show bridge stats command. The"
+	  "The `monitor bridge stats' command shows the same\n"
+	  "information as the show bridge stats command. The\n"
 	  "information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_bridge_stats },
+
+	{ "show bridge vlan info", "[<regexp>]",
+	  "The `show bridge vlan info' command shows summary information\n"
+	  "about configured VLANs. The command generates a\n"
+	  "table with the following columns:\n"
+	  "\n"
+	  "  VLAN        VLAN number (between 1 and 4094)\n"
+	  "  STATUS	 status of the VLAN\n"
+	  "  NAME        name of the VLAN\n"
+	  "  PORTS       ports assigned the the VLAN",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_bridge_vlan_info },
+
+	{ "show bridge vlan details", "[<regexp>]",
+	  "The `show bridge vlan details' command describes the selected\n"
+	  "VLANs in detail. The optional regular expression <regexp>\n"
+	  "is matched against the VLAN names to select the VLANs\n"
+	  "of interest.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_bridge_vlan_details },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
@@ -1268,8 +1497,9 @@ scli_init_bridge_mode(scli_interp_t *interp)
     static scli_mode_t bridge_mode = {
 	"bridge",
 	"The scli bridge mode is based on the BRIDGE-MIB as published in\n"
-	"RFC 1493. It provides commands to browse information specific\n"
-	"to LAN bridges (also known as layer two switches).",
+	"RFC 4188 and the Q-BRIDGE-MIB as published in RFC 4363.\n"
+	"It provides commands to browse information specific\n"
+	"to IEEE 802.1 LAN bridges (also known as layer two switches).",
 	cmds
     };
     
