@@ -13,7 +13,7 @@
 .\" along with this program; see the file COPYING.  If not, write to
 .\" the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 .\"
-.TH SCLI 1 "June 5, 2002"
+.TH SCLI 1 "Jan 2, 2007"
 .\" Please update the above date whenever this man page is modified.
 .\"
 .\" Some roff macros, for reference:
@@ -263,8 +263,8 @@ Individual readline initialization file.
 More information can be found on the scli web page which is
 available at:
 .PP
-<http://www.ibr.cs.tu-bs.de/projects/scli/>
+<https://trac.eecs.iu-bremen.de/projects/scli/>
 .SH "SEE ALSO"
 .BR regex(7)
 .SH AUTHOR
-Juergen Schoenwaelder <schoenw@ibr.cs.tu-bs.de>.
+Juergen Schoenwaelder <j.schoenwaelder@iu-bremen.de>.
