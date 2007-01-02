@@ -68,7 +68,7 @@ extern char const scli_copyright[];	/* copyright message (surprise) */
 #define TV_DELTA	0.1
 
 /*
- * The return codes used by the scli commands functions.
+ * The return codes used by the scli command functions.
  *
  * Theory of scli return codes:
  *
@@ -268,6 +268,9 @@ scli_eval_file_stream(scli_interp_t *interp, FILE *stream);
 
 extern int
 scli_eval_init_file(scli_interp_t *interp);
+
+extern void
+scli_show_results(scli_interp_t *interp, scli_cmd_t *cmd, int code);
 
 extern void
 scli_register_mode(scli_interp_t *interp, scli_mode_t *mode);
