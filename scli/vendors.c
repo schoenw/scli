@@ -52,6 +52,7 @@ static scli_vendor_t iana_vendor_table[] = {
     { 5567,	"Riverstone Networks",	"http://www.riverstonenet.com/" },
     { 7313,	"1stWave",              "http://www.1stwave.de/" },
     { 8072,	"NET-SNMP",		"http://www.net-snmp.org/" },
+    { 12622,	"Devicescape",		"http://www.devicescape.com/" },
     {    0,	NULL,			NULL },
 };
 
