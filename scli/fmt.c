@@ -23,6 +23,7 @@
 #include "scli.h"
 
 #include "snmpv2-tm.h"
+#include "inet-address-mib.h"
 
 
 #include <ctype.h>
@@ -550,7 +551,7 @@ xml_display_string(int len, char *string)
     }
 
     e = g_malloc0(len+1);
-    snprintf(e, len+1, "%s\0", string);
+    snprintf(e, len+1, "%s", string);
     
     return e;
 }
@@ -653,6 +654,7 @@ fmt_taddress(guint32 *tdomain, gsize tdomain_len,
 	    }
 	    break;
 	default:
+	    g_warning("unknown tdomain value");
 	    break;
 	}
     }
@@ -793,3 +795,45 @@ scan_port_set(guchar *bits, gsize bits_len, char *string)
 
 
 
+const char *
+fmt_inet_address(gint32 *inetAddressType,
+		 guchar *inetAddress, guint16 _inetAddressLength)
+{
+    static char *e = NULL;
+    
+    if (e) {
+	g_free(e);
+	e = NULL;
+    }
+
+    if (!inetAddressType || ! inetAddress) {
+	return NULL;
+    }
+
+    switch (*inetAddressType) {
+    case INET_ADDRESS_MIB_INETADDRESSTYPE_UNKNOWN:
+	break;
+    case INET_ADDRESS_MIB_INETADDRESSTYPE_IPV4:
+	if (_inetAddressLength == 4) {
+	    e = g_strdup_printf("%d.%d.%d.%d",
+				inetAddress[0], inetAddress[1],
+				inetAddress[2], inetAddress[3]);
+	} else {
+	    g_warning("invalid inet address value");
+	}
+	break;
+    case INET_ADDRESS_MIB_INETADDRESSTYPE_IPV6:
+	break;
+    case INET_ADDRESS_MIB_INETADDRESSTYPE_IPV4Z:
+	break;
+    case INET_ADDRESS_MIB_INETADDRESSTYPE_IPV6Z:
+	break;
+    case INET_ADDRESS_MIB_INETADDRESSTYPE_DNS:
+	break;
+    default:
+	g_warning("unknown inet address type");
+	break;
+    }
+    
+    return e;
+}

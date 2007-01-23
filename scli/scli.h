@@ -487,6 +487,10 @@ fmt_port_set(GString *s, guchar *bits, gsize bits_len);
 extern int
 scan_port_set(guchar *bits, gsize bits_len, char *string);
 
+extern const char*
+fmt_inet_address(gint32 *inetAddressType,
+		 guchar *inetAddress, guint16 _inetAddressLength);
+
     
 /*
  * XML utilities that are quite handy and used frequently by scli
