@@ -349,6 +349,7 @@ void scli_interp_init(scli_interp_t *interp)
     scli_init_netsnmp_mode(interp);
     scli_init_3com_mode(interp);
     scli_init_hp_mode(interp);
+    scli_init_sflow_mode(interp);
 }
 
 
