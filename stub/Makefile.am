@@ -44,7 +44,8 @@ MIBS			= IF-MIB \
 			  RAPID-CITY \
 			  UCD-SNMP-MIB \
 			  PRODUCTMIB \
-			  CISCO-DOT11-ASSOCIATION-MIB
+			  CISCO-DOT11-ASSOCIATION-MIB \
+			  SFLOW5-MIB
 
 STUBS			= if-mib.h if-mib.c \
 			  ianaiftype-mib.h ianaiftype-mib.c \
@@ -93,7 +94,8 @@ STUBS			= if-mib.h if-mib.c \
 			  iana-printer-mib.h iana-printer-mib.c \
 			  cisco-process-mib.h cisco-process-mib.c \
 			  cisco-dot11-association-mib.h cisco-dot11-association-mib.c \
-			  hp-icf-fault-finder-mib.h hp-icf-fault-finder-mib.c
+			  hp-icf-fault-finder-mib.h hp-icf-fault-finder-mib.c \
+			  sflow5-mib.h sflow5-mib.c
 
 MAINTAINERCLEANFILES	= $(STUBS)
 
@@ -243,3 +245,6 @@ productmib.h productmib.c:
 
 cisco-dot11-association-mib.h cisco-dot11-association-mib.c:
 	$(SMIDUMP) -f scli CISCO-DOT11-ASSOCIATION-MIB
+
+sflow5-mib.h sflow5-mib.c:
+	$(SMIDUMP) -f scli SFLOW5-MIB
