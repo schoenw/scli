@@ -387,19 +387,19 @@ fmt_bridge_info(GString *s,
 
     if (dot1qBase) {
 	if (dot1qBase->dot1qVlanVersionNumber) {
-	    g_string_sprintfa(s, "%-*s%d\n", indent, "Vlan Version",
+	    g_string_sprintfa(s, "%-*s%d\n", indent, "Vlan Version:",
 			      *dot1qBase->dot1qVlanVersionNumber);
 	}
 	if (dot1qBase->dot1qNumVlans) {
-	    g_string_sprintfa(s, "%-*s%d\n", indent, "Vlan Current",
+	    g_string_sprintfa(s, "%-*s%d\n", indent, "Vlan Current:",
 			      *dot1qBase->dot1qNumVlans);
 	}
 	if (dot1qBase->dot1qMaxSupportedVlans) {
-	    g_string_sprintfa(s, "%-*s%d\n", indent, "Vlan Capacity",
+	    g_string_sprintfa(s, "%-*s%d\n", indent, "Vlan Capacity:",
 			      *dot1qBase->dot1qMaxSupportedVlans);
 	}
 	if (dot1qBase->dot1qMaxVlanId) {
-	    g_string_sprintfa(s, "%-*s%d\n", indent, "Vlan Max VlanId",
+	    g_string_sprintfa(s, "%-*s%d\n", indent, "Vlan Max VlanId:",
 			      *dot1qBase->dot1qMaxVlanId);
 	}
     }
