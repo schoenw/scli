@@ -378,6 +378,9 @@ scli_init_3com_mode(scli_interp_t *interp);
 extern void
 scli_init_hp_mode(scli_interp_t *interp);
 
+extern void
+scli_init_sflow_mode(scli_interp_t *interp);
+
 /* 
  * A data structure used to obtain vendor information from the
  * enterprise OID. See the file vendors.c for details.
