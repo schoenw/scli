@@ -66,7 +66,7 @@ onwinch(int n)
 
 /*
  * This is the main loop of the scli command interpreter. It reads a
- * command and calls the function which has been register to process
+ * command and calls the function which has been registered to process
  * the command.
  */
 
@@ -274,7 +274,7 @@ int
 main(int argc, char **argv)
 {
     scli_interp_t *interp;
-    int i, c;
+    int c;
     gint args = 0;
 
     GError *error = NULL;
@@ -430,7 +430,7 @@ main(int argc, char **argv)
     }
 
     if (!scli_interp_quiet(interp)) {
-	g_print("%3d-scli version %s %s\n",
+	g_print("%3d scli version %s %s\n",
 		SCLI_MSG, VERSION, scli_copyright);
     }
 
