@@ -823,7 +823,7 @@ scli_show_results(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 	if (error_infos[i].code == code) break;
     }
     g_assert(error_infos[i].code);
-    
+
     switch (code) {
     case SCLI_SYNTAX_VALUE:
     case SCLI_SYNTAX_NUMBER:
@@ -929,7 +929,10 @@ scli_show_results(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 		}
 	    }
 	} else {
-	    g_printerr("%3d %s\n", code, reason);
+	    if (interp->master && interp->name) {
+		g_print("%s ", interp->name);
+	    }
+	    g_print("%3d %s\n", code, reason);
 	}
     }
 
@@ -1063,25 +1066,9 @@ scli_eval_argc_argv(scli_interp_t *interp, int argc, char **argv)
     GNode *node = NULL;
     gboolean done = FALSE;
     int i, code = SCLI_OK;
-#ifdef SCLI_FORK
-    pid_t pid = -1;
-#endif
 
     scli_interp_reset(interp);
     interp->xid++;
-
-#ifdef SCLI_FORK
-    pid = fork();
-    if (pid < 0) {
-	    /* xxxx */
-    }
-    if (pid == 0) {
-	    g_print("** %d **\n", getpid());
-    } else {
-	    waitpid(pid, &code, 0);
-	    return code;
-    }
-#endif
 
     node = g_node_first_child(interp->cmd_root);
     for (i = 0; i < argc && ! done; i++) {
@@ -1122,7 +1109,7 @@ scli_eval_argc_argv(scli_interp_t *interp, int argc, char **argv)
 	    g_string_free(s, 1);
 	    show_result(interp, code);
 	    if (scli_interp_proto(interp)) {
-		g_printerr("%3d xxx\n", code);
+		g_print("%3d xxx\n", code);
 	    }
 	    scli_interp_reset(interp);
 	    interp->flags &= ~SCLI_INTERP_FLAG_RECURSIVE;
@@ -1131,6 +1118,9 @@ scli_eval_argc_argv(scli_interp_t *interp, int argc, char **argv)
 
     if (! done) {
 	int j;
+	if (interp->master && interp->name) {
+	    g_print("%s ", interp->name);
+	}
 	g_print("%3d invalid command name \"", SCLI_SYNTAX_COMMAND);
 	for (j = 0; j <= i; j++) {
 	    g_print("%s%s", j ? " ": "", argv[j]);
@@ -1138,10 +1128,6 @@ scli_eval_argc_argv(scli_interp_t *interp, int argc, char **argv)
 	g_print("\"\n");
 	code = SCLI_SYNTAX;
     }
-
-#ifdef SCLI_FORK
-    exit(code);
-#endif
 
     return code;
 }
@@ -1372,6 +1358,7 @@ scli_open_community(scli_interp_t *interp, GNetSnmpTDomain tdomain,
 	return SCLI_SNMP;
     }
 
+#if 0
     if (verbose) {
 	g_print("%3d scli trying SNMP advisory lock support ... ", SCLI_MSG);
     }
@@ -1390,6 +1377,7 @@ scli_open_community(scli_interp_t *interp, GNetSnmpTDomain tdomain,
     if (serial) {
 	snmpv2_mib_free_snmpSet(serial);
     }
+#endif
     
     interp->epoch = time(NULL);
     return SCLI_OK;

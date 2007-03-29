@@ -747,7 +747,9 @@ scli_interp_eval(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_ERROR;
     }
 
-    return scli_eval_argc_argv(slave, argc-1, argv+1);
+    (void) scli_eval_argc_argv(slave, argc-1, argv+1);
+
+    return SCLI_OK;
 }
 
 
