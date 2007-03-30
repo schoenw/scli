@@ -1,0 +1,398 @@
+		       SCLI Protocol Definition
+
+		     V. Marinov, J. Schoenwaelder
+		       Jacobs University Bremen
+
+				 $Id$
+
+1. Introduction
+
+The scli protocol is a request/response protocol which provides a way
+for an external program to read data from managed devices and to
+configure them by utilizing simple command messages. An external
+program establishes a communication channel with an scli interpreter
+and sends commands, subsequently called request messages. The scli
+interpreter generates SNMP messages based on the data contained in the
+scli request messages and sends them to the respective managed
+device. When SNMP responses are received, the data is converted in an
+scli format and sent back to the external program as an scli response
+message.
+
+This scli protocol documented in this memo can be used for the purpose
+of integration of cfengine and scli. cfengine is a configuration
+language and execution system for configuring Unix-like systems
+attached to a TCP/IP network. A process called cfagent runs on every
+host and parses a cfengine configuration file after which the
+configuration of the host is checked against the configuration defined
+in this file. If necessary, any deviations are fixed. The scli
+protocol can be used by the cfengine system in order to retrieve the
+necessary information from a managed device and change its
+configuration if anomaly is detected. Therefore, scli will serve as an
+interface between cfengine and managed devices which have running SNMP
+agents.
+
+The document is structured as follows: Section 2 provides the ABNF
+definition of the protocol. Section 3 gives an overview of the
+response codes. Section 4 provides usage-based scenarios. Section 5
+describes how messages are processed by scli interpreters. Section 6
+provides some sample sessions where the scli protocol is utilized and
+section 7 gives an overview of the scli multi-threaded model, which is
+currently work in progress.
+
+
+2. ABNF Definitions
+
+The format of the scli protocol messages exchanged between an
+application and the scli server is defined using the ABNF [RFC4234].
+
+MESSAGE   = REQUEST / RESPONSE
+
+REQUEST   = MREQUEST / SREQUEST
+MREQUEST  = TOKEN *(WSP TOKEN) CR LF
+SREQUEST  = INTERP WSP MREQUEST
+TOKEN     = DQTOKEN / SQTOKEN / NQTOKEN
+DQTOKEN   = DQUOTE NQTOKEN DQUOTE
+SQTOKEN   = SQUOTE NQTOKEN SQUOTE
+NQTOKEN   = 1*REQCHAR
+
+RESPONSE  = MRESPONSE WSP [SRESPONSE]
+MRESPONSE = *(CODE "-" DATA CR LF) CODE WSP DATA CR LF
+SRESPONSE = *(INTERP WSP CODE "-" DATA CR LF) INTERP WSP CODE WSP DATA CR LF
+DATA      = *RESCHAR
+
+CODE	  =  "100"	;arbitrary message
+CODE	  =/ "200"	;normal return code
+CODE	  =/ "201"	;return and exit the command loop
+CODE	  =/ "300"	;generic error return code
+CODE	  =/ "301"	;no association to SNMP peer
+CODE	  =/ "302"	;command does not support XML
+CODE	  =/ "400"	;generic syntax error
+CODE	  =/ "401"	;syntax error in number of args
+CODE	  =/ "402"	;syntax error in regexp
+CODE	  =/ "403"	;syntax error in number
+CODE	  =/ "404"	;syntax error in value
+CODE	  =/ "405"	;syntax error in tokenizer
+CODE	  =/ "406"	;syntax error unknown command
+CODE	  =/ "500"	;snmp error return code
+CODE	  =/ "501"	;snmp name lookup error
+
+INTERP    = ALPHA *(ALPHA / DIGIT / %x2E / %x3A)
+	        ;Combination of letters, digits, dots and colon
+	        ;starting with a letter
+
+REQCHAR   = WSP / %x21 / %x24-26 / %x28-7E
+		;All letters, digits, space and special characters
+ 		;excluding quotes and #. Special characters may be
+		;needed for regular expressions etc.
+
+RESCHAR   = %x20-7E / HTAB		
+		;Letters, digits, special characters, horizontal tab
+
+WSP       = SP / HTAB		; white space
+SP        = %x20		; space
+HTAB      = %x09		; horizontal tab
+CR        = %x0D		; carriage return
+LF        = %x0A		; line-feed
+DQUOTE    = %x22		; double quote	      
+SQUOTE    = %x27		; single quote
+ALPHA     = %x41-5A / %x61-7A	; alphabet (upper and lower case)
+DIGIT     = %30-39		; digits 0-9
+
+An scli message is either a request or a response message.  A request
+message is sent to an scli interpreter. scli has one master
+interpreter and can have many slave interpreters. A request message
+sent to the master interpreter consists of a number of tokens. Each
+token can contain letters, digits and special characters excluding
+single and double quotes and the # character. Tokens themselves can be
+encapsulated into single or double quotes. A request sent to a slave
+interpreter is always prefixed with the name of the slave interpreter.
+Interpreter names can contain letters, digits as well as dots and
+colons and must always start with a letter. All requests sent to an
+scli interpreter must end with a carriage return and line feed (CRLF).
+
+A response message consists of a message from the master interpreter
+and can be optionally followed by a message from a slave interpreter.
+A message from the master interpreter contains a response code
+followed by a short description of the code and it can optionally
+carry data.  Whenever a response contains data each line of data is
+prefixed with a response code followed by a "-". The last line of the
+master interpreter response contains the final response code together
+with a short description. A message from a slave interpreter might
+follow the message from the master interpreter (in the case when the
+request message was sent to the slave interpreter). The response from
+the slave interpreter has the same structure as the response from the
+master interpreter, however each response line is prefixed with the
+name of the slave interpreter. All lines in the response end with a
+carriage return and line feed (CRLF).
+
+
+3. Response Codes
+
+Response codes can be classified into one of the following categories:
+
+   1xy - transient messages
+   2xy - positive completion
+   3xy - generic error codes
+   4xy - errors detected before command processing (syntax errors)
+   5xy - communication failure
+
+
+4. Architecture
+
+A general usage diagram where scli is utilized by an external entity
+to communicate with a managed device looks like the following. The
+external entity sends scli request messages via an I/O stream to an
+scli interpreter and receives scli response messages back.
+
+      scli   |  ^  scli	
+     request |	| response
+	     |	|
+	     v	|
+	+-----------+	
+	|   scli    |
+	+-----------+	
+	      ^
+	      | SNMP messages
+	      v		
+        +-----------+
+	|   SNMP    |
+	|   Agent   |
+	+-----------+
+
+For the particular case when cfengine has to communicate with a
+managed device by using the scli protocol, the diagram looks like the
+the following:
+
+	+-----------+
+	|  cfagent  |	
+	+-----------+
+	     |  ^ 	
+      scli   |  |  scli	
+     request |	| response
+	     |	|
+	     v	|
+	+-----------+	
+	|   scli    |
+	+-----------+	
+	      ^
+	      | SNMP messages
+	      v		
+        +-----------+
+	|   SNMP    |
+	|   Agent   |
+	+-----------+
+
+
+An entity which runs scli contains a master interpreter and can
+optionally contain several slave interpreters. When a request message
+is sent via an I/O stream to the entity running scli, the master
+interpreter handles the message. If the command inside the request
+message is destined for the master interpreter, then it executes the
+command. If the command inside the message is destined for a slave
+interpreter, the master interpreter communicates the command to the
+respective slave interpreter via an scli internal communication
+mechanism after checking if the respective slave interpreter exists.
+
+
+			    |  ^
+		      scli  |  | scli
+	             request|  |response
+			    v  |
+	+-------------------------------------------+
+	|              +-------------+              |    +---------+
+	|	       | scli master |<----------------->|SNMP	   |
+	|	       | interpreter |	   SNMP	    |    |Agent	   |
+	|	       +-------------+		    |	 +---------+      				    	
+	|	      /	      |	      \		    |
+	|+-----------+  +-----------+  +-----------+|	
+	||slave	     |	|slave	    |  |slave	   ||		
+	||interpreter|	|interpreter|  |interpreter||
+	|+-----------+  +-----------+  +-----------+|
+	|     ^		      ^              ^      |
+	+---- |---------------|	-------------|------+	 
+	      |		      |		     |
+	 SNMP |		 SNMP |		SNMP |
+	      v		      v		     v
+	 +---------+      +--------+     +--------+  
+	 |SNMP	   |	  |SNMP	   |	 |SNMP	  |    		     
+	 |Agent    |	  |Agent   |	 |Agent	  |
+	 +---------+	  +--------+	 +--------+
+
+
+
+
+5. Processing of scli request/response messages by an interpreter
+
+The master scli interpreter waits for request messages (commands). The
+set of specific commands as well as the syntax of the commands is
+specified in the scli documentation. Whenever a slave interpreter is
+created it registers its identifier as a command with the master
+interpreter. It is the responsibility of the external program that
+invokes the scli interpreter to ensure that the syntax of the command
+invoked is correct.
+
+Whenever a command is received by an interpreter it is initially
+parsed and the tokens are extracted. If tokenizing fails, then the
+error code 405 (syntax error in tokenizer) is returned by the
+respective interpreter. If tokenizing is successful then the command
+is matched against the set of registered commands. If there is no such
+command registered, then the error code 406 (syntax error unknown
+command) is returned by the interpreter. At this point if the command
+is destined for a slave interpreter of the current interpreter the
+command as well as the arguments are communicated to the respective
+slave interpreter and the current interpreter returns a status code of
+200 (ok) thus declaring that it is done with processing the command.
+Any error or status codes as well as data that results from the
+execution of the command by the slave interpreter will be returned by
+the slave interpreter. If the command requires communication with an
+SNMP agent the scli interpreter checks whether the interpreter is
+associated with an SNMP agent and whether the output format requested
+is supported by the command. If the command requires and SNMP
+association and there is no SNMP agent associated with the scli
+interpreter executing the command, then the error code 301 (no
+association to SNMP peer) is returned by the respective interpreter.
+Furthermore, if the output is requested in XML format and the command
+does not support XML output format, then error code 302 (command does
+not support XML) is returned by the interpreter. Otherwise, the
+interpreter checks the number of arguments provided. If a wrong number
+of arguments is provided, then error code 401 (syntax error in number
+of arguments) is returned. After verifying that the correct number of
+arguments is provided, each argument is checked whether it belongs to
+the correct type and range. If the check fails, then one of the syntax
+error codes is returned by the interpreter: error 402 (syntax error in
+regexp), error 403 (syntax error in number) or error 404 (syntax error
+in value). If any other syntax error is detected, then error 400
+(generic syntax error) is returned. If all checks are successful the
+respective interpreter starts executing the command. If there is a
+runtime error during the execution of the command, then a respective
+error code is returned by the interpreter executing the command. The
+runtime error codes are: error 500 (snmp error return code) or error
+501 (snmp name lookup error). If the command has been successfully
+executed, then the respective scli interpreter returns the data (if
+any) together with a status code of 200 (ok).
+
+The processing of commands by scli interpreters is described in the
+following figure:
+
+
+		   +--------------------+ fail 
+		   | extract tokens	|------> error 405
+		   +--------------------+
+			     |OK	
+			     v 
+		   +--------------------+ fail
+		   | match command	|------> error 406
+		   | (forward to slave	|
+		   | if necessary)	| 
+		   +--------------------+
+			     |OK
+			     v
+	           +--------------------+ fail
+		   |check output format	|------> error 302
+		   +--------------------+
+		             |OK
+			     v
+	           +--------------------+ fail
+		   |check association	|------> error 301
+		   |with an SNMP agent	|
+		   +--------------------+
+			     |OK
+			     v
+		   +--------------------+ fail
+		   |check N of args	|------> error 401
+		   +--------------------+
+			     |OK
+			     v
+		   +--------------------+ fail
+		   |check value and type|------> error 402,403,404
+		   |of args		|
+		   +--------------------+
+		             |OK
+			     v
+	           +--------------------+ fail		     
+		   |processing command  |------> runtime errors (500, 501)
+		   +--------------------+
+		             |OK
+			     V
+	           +--------------------+
+		   |return response	|
+		   +--------------------+
+ 		     
+
+
+		  
+6. Example communication using the scli protocol mode
+
+An example session using the default (master) interpreter:
+
+S: 100 scli version 0.3.1 (c) 2001-2007 Juergen Schoenwaelder
+C: set scli mode protocol
+S: 200 ok; scli 0.3.1 ready
+C: show system info
+S: 301 no association to a remote SNMP agent
+C: open curve
+S: 200 ok; scli 0.3.1 ready
+C: show system info
+S: 200-Name:             curve
+S: 200-Agent:            snmp://public@192.168.1.33:161//
+S: 200-Description:      ProCurve J4903A Switch 2824, revision I.08.105, ROM
+S: 200-                  I.08.07 (/sw/code/build/mako(ts_08_5))
+S: 200-Contact:          <j.schoenwaelder@iu-bremen.de>
+S: 200-Location:         Jacobs University Bremen, Germany
+S: 200-Vendor:           Hewlett Packard <http://www.hp.com/>
+S: 200-Services:         datalink transport application
+S: 200-Agent-Boot-Time:  2007-01-29 00:49:09 +01:00
+S: 200-Interfaces:       39
+S: 200-Interface Swap:   2007-03-28 11:39:15 +02:00
+S: 200-Entity Swap:      2007-01-29 00:49:09 +01:00
+S: 200-Bridge Ports:     24
+S: 200-Bridge Type:      transparent-only
+S: 200 ok; scli 0.3.1 ready
+C: show system info foo
+S: 401 wrong number of arguments: should be `show system info'
+C: set scli timeout 100
+S: 200 ok; scli 0.3.1 ready
+C: set scli timeout foo
+S: 403 invalid number "foo"
+C: set scli "timeout" 100
+S: 200 ok; scli 0.3.1 ready
+C: set scli "timeout 50
+S: 405 failed to tokenize input: Text ended before matching quote was found for ". (The text was 'set scli "timeout 50')
+C: set system name foo
+S: 500 noAccess @ varbind 0
+C: foo
+S: 406 invalid command name "foo"
+C: exit
+S: 201 ok; scli 0.3.1 exiting
+
+
+An example session using a slave interpreter:
+
+S: 100 scli version 0.3.1 (c) 2001-2007 Juergen Schoenwaelder
+C: create scli interp foo
+S: 200 ok; scli 0.3.1 ready
+C: foo show scli info
+S: foo 200-Version:           0.3.1
+S: foo 200-Epoch:             1175195954
+S: foo 200-Format:            scli
+S: foo 200-Interactive:       false
+S: foo 200-Delay:             0 seconds
+S: foo 200-Regex:             extended
+S: foo 200-Debugging:         
+S: foo 200-Rows:              32
+S: foo 200-Columns:           80
+S: foo 200-Pager:             scli
+S: foo 200 ok; scli 0.3.1 ready
+S: 200 ok; scli 0.3.1 ready
+C: foo gaga
+S: foo 406 invalid command name "gaga"
+S: 200 ok; scli 0.3.1 ready
+C: foo set scli timeout 400
+S: foo 200 ok; scli 0.3.1 ready
+S: 200 ok; scli 0.3.1 ready
+C: foo set scli timeout oops
+S: foo 403 invalid number "oops"
+S: 200 ok; scli 0.3.1 ready
+C: exit
+S: 201 ok; scli 0.3.1 exiting
+
