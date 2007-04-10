@@ -373,6 +373,12 @@ main(int argc, char **argv)
 	(void) localtime(&t);
     }
 
+    /*
+     * Initialize the thread support. (Should this be optional?)
+     */
+
+    g_thread_init(NULL);
+
 #if 0
     /*
      * Initialize the g_snmp library.

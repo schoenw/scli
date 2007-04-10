@@ -50,10 +50,40 @@ alias_compare(gconstpointer a, gconstpointer b)
 static int
 cmd_scli_exit(scli_interp_t *interp, int argc, char **argv)
 {
+    GSList *elem;
+    scli_interp_t *slave = NULL;
+
     g_return_val_if_fail(interp, SCLI_ERROR);
         
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    /*
+     * Wait until all threads have finished they command queues.  The
+     * clean way would be to ship an exit command to all threads and
+     * then to wait until the threads terminate themself.
+     */
+
+    for (elem = interp->slave_list; elem; elem = g_slist_next(elem)) {
+	slave = (scli_interp_t *) elem->data;
+	if (slave->thread) {
+	    char *cmd_exit = "exit";
+	    g_print("xxx pushing exit %p\n", slave->thread);
+	    scli_thread_eval_argc_argv(slave, 1, &cmd_exit);
+	}
+    }
+	    
+ again:
+    for (elem = interp->slave_list; elem; elem = g_slist_next(elem)) {
+	slave = (scli_interp_t *) elem->data;
+	if (slave->thread) {
+	    g_print("xxx joining %p\n", slave->thread);
+	    (void) g_thread_join(slave->thread);
+	    g_print("xxx joining %p done\n", slave->thread);
+	    slave->thread = NULL;
+	    goto again;
+	}
     }
 
     return SCLI_EXIT;
@@ -747,7 +777,11 @@ scli_interp_eval(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_ERROR;
     }
 
-    (void) scli_eval_argc_argv(slave, argc-1, argv+1);
+    if (slave->thread) {
+	(void) scli_thread_eval_argc_argv(slave, argc-1, argv+1);
+    } else {
+	(void) scli_eval_argc_argv(slave, argc-1, argv+1);
+    }
 
     return SCLI_OK;
 }
@@ -793,6 +827,9 @@ create_scli_interp(scli_interp_t *interp, int argc, char **argv)
 				argv[1], argv[1]);
     cmd->func = scli_interp_eval;
     scli_create_command(interp, cmd);
+
+    slave->cmd_queue = g_async_queue_new();
+    slave->thread = g_thread_create(scli_thread, slave, TRUE, NULL);
 
     return SCLI_OK;
 }
@@ -1576,6 +1613,29 @@ cmd_scli_scan(scli_interp_t *interp, int argc, char **argv)
 }
 
 
+int
+cmd_scli_sleep(scli_interp_t *interp, int argc, char **argv)
+{
+    char *end;
+    guint32 secs;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    secs = strtoul(argv[1], &end, 0);
+    if (*end || secs < 0) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_NUMBER;
+    }
+
+    sleep(secs);
+
+    return SCLI_OK;
+}
+
 
 void
 scli_init_scli_mode(scli_interp_t *interp)
@@ -1625,6 +1685,13 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  0,
 	  NULL, NULL,
 	  cmd_scli_scan },
+
+	{ "run scli sleep", "<secs>",
+	  "The `run scli sleep' command simply sleeps for the given amount\n"
+	  "of seconds.",
+	  SCLI_CMD_FLAG_NORECURSE,
+	  NULL, NULL,
+	  cmd_scli_sleep },
 
 	{ "create scli plugin", "<module>",
 	  "The `create scli plugin' command dynamically loads an scli mode\n"
@@ -1778,17 +1845,17 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_scli_info },
 
-	{ "show scli command info", "[<regex]",
+	{ "show scli command info", "[<regex>]",
 	  "The `show scli command info' command displays summary information\n"
-	  "about scli commands. The optional regular expression <regexp> is\n"
+	  "about scli commands. The optional regular expression <regex> is\n"
 	  "matched against the command names to select the scli commands.",
 	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  show_scli_command_info },
 
-	{ "show scli command details", "[<regex]",
+	{ "show scli command details", "[<regex>]",
 	  "The `show scli command details' command displays detailed information\n"
-	  "about scli commands. The optional regular expression <regexp> is\n"
+	  "about scli commands. The optional regular expression <regex> is\n"
 	  "matched against the command names to select the scli commands.",
 	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,

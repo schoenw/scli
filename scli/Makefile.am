@@ -5,7 +5,7 @@ EXTRA_DIST	= oui.c
 bin_PROGRAMS	= scli # gscli
 
 scli_SOURCES	= scli.c scli.h scli.1 vendors.c \
-		  basic.c monitor.c cmds.c \
+		  basic.c monitor.c cmds.c thread.c \
 		  fmt.c xml.c netconf.c \
 		  system.c entity.c interface.c disman.c snmp.c \
 		  ip.c udp.c tcp.c \

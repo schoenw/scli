@@ -55,8 +55,9 @@
 #include <gsnmp.h>
 
 
-extern char const scli_copyright[];	/* copyright message (surprise) */
+extern char const scli_copyright[];	/* copyright message (see basic.c) */
 
+extern GStaticMutex scli_global_lock;	/* global synchronization lock (see basic.c) */
 
 /*
  * Some defines used internally to compute time differences and
@@ -101,6 +102,7 @@ typedef struct scli_mode	scli_mode_t;
 typedef struct scli_cmd		scli_cmd_t;
 typedef struct scli_alias	scli_alias_t;
 typedef struct scli_alarm	scli_alarm_t;
+typedef struct scli_message	scli_message_t;
 
 
 #define SCLI_CMD_FLAG_NEED_PEER	(1 << 0)
@@ -169,6 +171,13 @@ struct scli_alarm {
 };
 
 
+struct scli_message {
+    scli_interp_t *interp;
+    int		   argc;
+    char	   **argv;
+};
+
+
 #define SCLI_INTERP_FLAG_INTERACTIVE	0x001
 #define SCLI_INTERP_FLAG_RECURSIVE	0x002
 #define SCLI_INTERP_FLAG_MONITOR	0x004
@@ -205,6 +214,8 @@ struct scli_interp {
     int regex_flags;		/* regular expression flags (see regcomp(3)) */
     guint retries;		/* number of retries */
     guint timeout;		/* timeout causing a retry in ms */
+    GThread *thread;		/* thread executing this interpreter */
+    GAsyncQueue *cmd_queue;	/* thread command queue */
 };
 
 extern scli_interp_t *
@@ -250,6 +261,9 @@ scli_monitor(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv);
 
 extern int
 scli_loop(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv);
+
+extern gpointer
+scli_thread(gpointer data);
 
 extern int
 scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv);

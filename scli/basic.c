@@ -36,6 +36,8 @@
 
 char const scli_copyright[] = "(c) 2001-2007 Juergen Schoenwaelder";
 
+GStaticMutex scli_global_lock = G_STATIC_MUTEX_INIT;
+
 static int scli_curses_running = 0;
 
 
@@ -1003,6 +1005,12 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 }
 
 
+/*
+ * This is the most basic command evaluation function which assumes
+ * the caller already knows which scli_cmt_t needs to be called.
+ * Please always use this function and never bypass it by calling
+ * cmd->func directly.
+ */
 
 int
 scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
@@ -1010,6 +1018,10 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
     int code = SCLI_OK;
 
     g_return_val_if_fail(cmd && cmd->func, SCLI_OK);
+
+#if 1
+    g_static_mutex_lock(&scli_global_lock);
+#endif
 
     g_string_truncate(interp->result, 0);
     g_string_truncate(interp->header, 0);
@@ -1024,7 +1036,8 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 	    code = SCLI_ERROR_NOXML;
 	    goto done;
 	} else {
-	    return SCLI_OK;
+	    code = SCLI_OK;
+	    goto quit;
 	}
     }
 
@@ -1055,10 +1068,17 @@ scli_eval_cmd(scli_interp_t *interp, scli_cmd_t *cmd, int argc, char **argv)
 
  done:
     scli_show_results(interp, cmd, code);
+ quit:
+#if 1
+    g_static_mutex_unlock(&scli_global_lock);
+#endif
     return code;
 }
 
-
+/*
+ * This is the most basic evaluation function for string arguments (I
+ * am not counting scli_eval_cmd() here).
+ */
 
 int
 scli_eval_argc_argv(scli_interp_t *interp, int argc, char **argv)
