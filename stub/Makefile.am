@@ -102,8 +102,8 @@ MAINTAINERCLEANFILES	= $(STUBS)
 noinst_LIBRARIES	= libstub.a
 libstub_a_SOURCES	= $(STUBS)
 
-#SMIDUMP			= ../../libsmi/trunk/tools/smidump
 SMIDUMP			= $(bindir)/smidump
+SMIDUMP			= ../../libsmi/tools/smidump
 SMIPATH			= $(HOME)/mibs/cisco:$(HOME)/mibs/3com:$(HOME)/mibs/nortel:$(HOME)/mibs:/usr/local/share/mibs/site:/usr/local/share/mibs/ietf:/usr/local/share/mibs/iana:/usr/share/snmp/mibs
 
 export SMIPATH
@@ -196,10 +196,10 @@ mau-mib.h mau-mib.c:
 	$(SMIDUMP) -f scli --scli-exclude='broadMauBasic' MAU-MIB
 
 rfc1213-mib.h rfc1213-mib.c:
-	$(SMIDUMP) -f scli --scli-include='ipRouteEntry' RFC1213-MIB
+	$(SMIDUMP) -f scli -k --scli-include='ipRouteEntry' RFC1213-MIB
 
 ospf-mib.h ospf-mib.c:
-	$(SMIDUMP) -f scli --scli-include='ospfGeneralGroup|ospfAreaEntry|ospfIfEntry|ospfLsdbEntry' OSPF-MIB
+	$(SMIDUMP) -f scli -k --scli-include='ospfGeneralGroup|ospfAreaEntry|ospfIfEntry|ospfLsdbEntry' OSPF-MIB
 
 iana-charset-mib.h iana-charset-mib.c:
 	$(SMIDUMP) -f scli IANA-CHARSET-MIB
@@ -235,7 +235,7 @@ cisco-process-mib.h cisco-process-mib.c:
 	$(SMIDUMP) -f scli CISCO-PROCESS-MIB
 
 rapid-city.h rapid-city.c:
-	$(SMIDUMP) -f scli --scli-include='rcVlanEntry|rcVlanPortEntry' RAPID-CITY
+	$(SMIDUMP) -f scli -k --scli-include='rcVlanEntry|rcVlanPortEntry' RAPID-CITY
 
 ucd-snmp-mib.h ucd-snmp-mib.c:
 	$(SMIDUMP) -f scli --scli-set UCD-SNMP-MIB
@@ -244,7 +244,10 @@ productmib.h productmib.c:
 	$(SMIDUMP) -f scli --scli-include='a3ComVlanIfEntry|a3ComVirtualGroup' PRODUCTMIB
 
 cisco-dot11-association-mib.h cisco-dot11-association-mib.c:
-	$(SMIDUMP) -f scli CISCO-DOT11-ASSOCIATION-MIB
+	$(SMIDUMP) -f scli -k CISCO-DOT11-ASSOCIATION-MIB
+
+hp-icf-fault-finder-mib.h hp-icf-fault-finder-mib.c:
+	$(SMIDUMP) -f scli HP-ICF-FAULT-FINDER-MIB
 
 sflow5-mib.h sflow5-mib.c:
 	$(SMIDUMP) -f scli SFLOW5-MIB

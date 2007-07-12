@@ -146,9 +146,11 @@ void
 q_bridge_mib_get_dot1qBase(GNetSnmp *s, q_bridge_mib_dot1qBase_t **dot1qBase, gint64 mask)
 {
     GList *in = NULL, *out = NULL;
-    static guint32 base[] = {1, 3, 6, 1, 2, 1, 17, 7, 1, 1, 0};
+    static const guint32 _base[] = {1, 3, 6, 1, 2, 1, 17, 7, 1, 1, 0};
+    guint32 base[128];
 
     *dot1qBase = NULL;
+    memcpy(base, _base, sizeof(_base));
 
     gnet_snmp_attr_get(s, &in, base, 11, 10, dot1qBase_attr, mask);
 
@@ -254,9 +256,11 @@ q_bridge_mib_get_dot1qVlanStaticTable(GNetSnmp *s, q_bridge_mib_dot1qVlanStaticE
     GList *in = NULL, *out = NULL;
     GList *row;
     int i;
-    static guint32 base[] = {1, 3, 6, 1, 2, 1, 17, 7, 1, 4, 3, 1, 0};
+    static guint32 const _base[] = {1, 3, 6, 1, 2, 1, 17, 7, 1, 4, 3, 1, 0};
+    guint32 base[128];
 
     *dot1qVlanStaticEntry = NULL;
+    memcpy(base, _base, sizeof(_base));
 
     gnet_snmp_attr_get(s, &in, base, 13, 12, dot1qVlanStaticEntry_attr, mask);
 

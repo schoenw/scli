@@ -200,9 +200,11 @@ void
 sflow5_mib_get_sFlowAgent(GNetSnmp *s, sflow5_mib_sFlowAgent_t **sFlowAgent, gint64 mask)
 {
     GList *in = NULL, *out = NULL;
-    static guint32 base[] = {1, 3, 6, 1, 4, 1, 14706, 1, 1, 0};
+    static const guint32 _base[] = {1, 3, 6, 1, 4, 1, 14706, 1, 1, 0};
+    guint32 base[128];
 
     *sFlowAgent = NULL;
+    memcpy(base, _base, sizeof(_base));
 
     gnet_snmp_attr_get(s, &in, base, 10, 9, sFlowAgent_attr, mask);
 
@@ -294,9 +296,11 @@ sflow5_mib_get_sFlowRcvrTable(GNetSnmp *s, sflow5_mib_sFlowRcvrEntry_t ***sFlowR
     GList *in = NULL, *out = NULL;
     GList *row;
     int i;
-    static guint32 base[] = {1, 3, 6, 1, 4, 1, 14706, 1, 1, 4, 1, 0};
+    static guint32 const _base[] = {1, 3, 6, 1, 4, 1, 14706, 1, 1, 4, 1, 0};
+    guint32 base[128];
 
     *sFlowRcvrEntry = NULL;
+    memcpy(base, _base, sizeof(_base));
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, sFlowRcvrEntry_attr, mask);
 
@@ -474,9 +478,11 @@ sflow5_mib_get_sFlowFsTable(GNetSnmp *s, sflow5_mib_sFlowFsEntry_t ***sFlowFsEnt
     GList *in = NULL, *out = NULL;
     GList *row;
     int i;
-    static guint32 base[] = {1, 3, 6, 1, 4, 1, 14706, 1, 1, 5, 1, 0};
+    static guint32 const _base[] = {1, 3, 6, 1, 4, 1, 14706, 1, 1, 5, 1, 0};
+    guint32 base[128];
 
     *sFlowFsEntry = NULL;
+    memcpy(base, _base, sizeof(_base));
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, sFlowFsEntry_attr, mask);
 
@@ -654,9 +660,11 @@ sflow5_mib_get_sFlowCpTable(GNetSnmp *s, sflow5_mib_sFlowCpEntry_t ***sFlowCpEnt
     GList *in = NULL, *out = NULL;
     GList *row;
     int i;
-    static guint32 base[] = {1, 3, 6, 1, 4, 1, 14706, 1, 1, 6, 1, 0};
+    static guint32 const _base[] = {1, 3, 6, 1, 4, 1, 14706, 1, 1, 6, 1, 0};
+    guint32 base[128];
 
     *sFlowCpEntry = NULL;
+    memcpy(base, _base, sizeof(_base));
 
     gnet_snmp_attr_get(s, &in, base, 12, 11, sFlowCpEntry_attr, mask);
 

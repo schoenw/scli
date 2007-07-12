@@ -241,9 +241,11 @@ tunnel_mib_get_tunnelIfTable(GNetSnmp *s, tunnel_mib_tunnelIfEntry_t ***tunnelIf
     GList *in = NULL, *out = NULL;
     GList *row;
     int i;
-    static guint32 base[] = {1, 3, 6, 1, 2, 1, 10, 131, 1, 1, 1, 1, 0};
+    static guint32 const _base[] = {1, 3, 6, 1, 2, 1, 10, 131, 1, 1, 1, 1, 0};
+    guint32 base[128];
 
     *tunnelIfEntry = NULL;
+    memcpy(base, _base, sizeof(_base));
 
     gnet_snmp_attr_get(s, &in, base, 13, 12, tunnelIfEntry_attr, mask);
 
@@ -431,9 +433,11 @@ tunnel_mib_get_tunnelConfigTable(GNetSnmp *s, tunnel_mib_tunnelConfigEntry_t ***
     GList *in = NULL, *out = NULL;
     GList *row;
     int i;
-    static guint32 base[] = {1, 3, 6, 1, 2, 1, 10, 131, 1, 1, 2, 1, 0};
+    static guint32 const _base[] = {1, 3, 6, 1, 2, 1, 10, 131, 1, 1, 2, 1, 0};
+    guint32 base[128];
 
     *tunnelConfigEntry = NULL;
+    memcpy(base, _base, sizeof(_base));
 
     gnet_snmp_attr_get(s, &in, base, 13, 12, tunnelConfigEntry_attr, mask);
 
@@ -632,9 +636,11 @@ tunnel_mib_get_tunnelInetConfigTable(GNetSnmp *s, tunnel_mib_tunnelInetConfigEnt
     GList *in = NULL, *out = NULL;
     GList *row;
     int i;
-    static guint32 base[] = {1, 3, 6, 1, 2, 1, 10, 131, 1, 1, 3, 1, 0};
+    static guint32 const _base[] = {1, 3, 6, 1, 2, 1, 10, 131, 1, 1, 3, 1, 0};
+    guint32 base[128];
 
     *tunnelInetConfigEntry = NULL;
+    memcpy(base, _base, sizeof(_base));
 
     gnet_snmp_attr_get(s, &in, base, 13, 12, tunnelInetConfigEntry_attr, mask);
 
