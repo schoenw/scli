@@ -85,7 +85,7 @@ fix_string(guchar *s, guint16 *len)
 static void
 snmp_decode_hook(GList *list)
 {
-    static char x[] = { '-', '/', '-', '\\', '|' };
+    static const char x[] = { '-', '/', '-', '\\', '|' };
     static int i = 0;
     char buffer[80];
 
