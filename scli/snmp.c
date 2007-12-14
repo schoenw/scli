@@ -1116,6 +1116,7 @@ fmt_snmp_context(GString *s,
 {
     int const indent = 22;
     const char *e;
+    int i;
 
     fmt_display_string(s, indent, "Description:",
 		       (int) logEntEntry->_entLogicalDescrLength,
@@ -1124,6 +1125,35 @@ fmt_snmp_context(GString *s,
     fmt_display_string(s, indent, "Community:",
 		       (int) logEntEntry->_entLogicalCommunityLength,
 		       logEntEntry->entLogicalCommunity);
+
+    if (logEntEntry->entLogicalContextEngineID) {
+	guint32 enterp = 0;
+	const scli_vendor_t *vendor;
+	g_string_sprintfa(s, "%-*s", indent, "Engine-Identifier:");
+	for (i = 0; i < logEntEntry->_entLogicalContextEngineIDLength; i++) {
+		g_string_sprintfa(s, "%02x", logEntEntry->entLogicalContextEngineID[i]);
+	}
+	g_string_append(s, "\n");
+	enterp = (enterp << 8) + (logEntEntry->entLogicalContextEngineID[0] & 0x7F);
+	enterp = (enterp << 8) + logEntEntry->entLogicalContextEngineID[1];
+	enterp = (enterp << 8) + logEntEntry->entLogicalContextEngineID[2];
+	enterp = (enterp << 8) + logEntEntry->entLogicalContextEngineID[3];
+	vendor = scli_get_vendor(enterp);
+	if (vendor && vendor->name) {
+		g_string_sprintfa(s, "%-*s%s", indent, "Engine-Vendor:",
+				  vendor->name);
+		if (vendor->url) {
+			g_string_sprintfa(s, " <%s>", vendor->url);
+		}
+		g_string_append(s, "\n");
+	}
+    }
+    
+    if (logEntEntry->entLogicalContextName) {
+        fmt_display_string(s, indent, "Context:",
+			   (int) logEntEntry->_entLogicalContextNameLength,
+			   logEntEntry->entLogicalContextName);
+    }
 
     e = fmt_tdomain(logEntEntry->entLogicalTDomain,
 		    logEntEntry->_entLogicalTDomainLength);
@@ -1163,6 +1193,9 @@ show_snmp_contexts(scli_interp_t *interp, int argc, char **argv)
 
     if (logEntTable) {
 	for (i = 0; logEntTable[i]; i++) {
+	    if (i) {
+		g_string_append(interp->result, "\n");
+	    }
 	    fmt_snmp_context(interp->result, logEntTable[i]);
 	}
     }

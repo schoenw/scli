@@ -530,7 +530,10 @@ scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
 
     /*
      * We prefer to use TCP so try TCP first and fall back to UDP if
-     * this fails for whatever reason.
+     * this fails for whatever reason. Note that this may lead to a
+     * long long TCP timeout. Should we have an option to force the
+     * transport domain? Yes, lets add an scli configuration property
+     * which lists the sequence of transports to probe.
      */
 #if 1
     interp->tdomain
