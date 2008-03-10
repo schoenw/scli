@@ -241,7 +241,7 @@ page(scli_interp_t *interp, GString *s)
 	return;
     }
     
-    if (! interp->pager) {
+    if (scli_interp_proto(interp) || !interp->pager) {
 	goto nopager;
     }
 
