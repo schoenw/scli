@@ -38,6 +38,7 @@ static scli_vendor_t iana_vendor_table[] = {
     {  480,	"QMS",			"http://www.qms.com/" },
     {  641,	"Lexmark",		"http://www.lexmark.com/" },
     {  762,	"Karlnet",		"http://www.karlnet.com/" },
+    {  890,	"ZyXEL",		"http://www.zyxel.com/" },
     {  915,	"SerComm",		"http://www.sercomm.com/" },
     {  937,	"Netgear",		"http://www.netgear.com/" },
     { 1347,	"Kyocera Corporation",	"http://www.kyocera.com/" },
