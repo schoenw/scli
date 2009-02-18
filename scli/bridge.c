@@ -31,6 +31,8 @@
 #endif
 #include "ianaiftype-mib.h"
 
+#include "q-bridge-mib-proc.h"
+
 
 static GNetSnmpEnum const dot1dBaseType[] = {
     { BRIDGE_MIB_DOT1DBASETYPE_UNKNOWN,	"unknown" },
@@ -1110,6 +1112,37 @@ fmt_bridge_vlan_details(GString *s,
 	g_string_sprintfa(s, "\n");
     }
 
+    if (vlanEntry->dot1qVlanStaticEgressPorts
+	&& vlanEntry->dot1qVlanStaticUntaggedPorts) {
+        guchar *taggedPorts = NULL;
+	guint16 taggedPortsLength = 0;
+
+	taggedPortsLength = vlanEntry->_dot1qVlanStaticEgressPortsLength;
+	if (taggedPortsLength < vlanEntry->_dot1qVlanStaticUntaggedPortsLength) {
+	    taggedPortsLength = vlanEntry->_dot1qVlanStaticUntaggedPortsLength;
+	}
+ 	taggedPorts = g_malloc0(taggedPortsLength);
+	fprintf(stderr, "taggedPorts = %d\n", taggedPortsLength);
+	if (taggedPorts) {
+	    int i, bit;
+	    memcpy(taggedPorts, vlanEntry->dot1qVlanStaticEgressPorts,
+		   vlanEntry->_dot1qVlanStaticEgressPortsLength);
+	    for (i = 0; i < taggedPortsLength * 8 &&
+		     i < vlanEntry->_dot1qVlanStaticUntaggedPortsLength * 8; i++) {
+		bit = taggedPorts[i/8] & 1 << (7-(i%8));
+		if (bit &&
+		    vlanEntry->dot1qVlanStaticUntaggedPorts[i/8] & 1 << (7-(i%8))) {
+		    taggedPorts[i/8] &= ~(1 << (7-(i%8)));
+		}
+	    }
+	    g_string_sprintfa(s, "%-*s ", indent, "Tagged Ports:");
+	    fmt_port_set(s, taggedPorts, taggedPortsLength);
+	    g_string_sprintfa(s, "\n");
+	    g_free(taggedPorts);
+	}
+    }
+
+
     if (vlanEntry->dot1qVlanStaticRowStatus) {
 	e = fmt_enum(snmpv2_tc_enums_RowStatus,
 		     vlanEntry->dot1qVlanStaticRowStatus);
@@ -1384,6 +1417,90 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+create_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
+{
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    gint32 vlanId;
+    char *end;
+    
+    if (argc != 3) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    vlanId = strtol(argv[1], &end, 0);
+    if (*end || vlanId < 0) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_NUMBER;
+    }
+
+    if (strlen(argv[2]) < Q_BRIDGE_MIB_DOT1QVLANSTATICNAMEMINLENGTH
+	|| strlen(argv[2]) > Q_BRIDGE_MIB_DOT1QVLANSTATICNAMEMAXLENGTH) {
+	g_string_assign(interp->result, argv[2]);
+	return SCLI_SYNTAX_VALUE;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    q_bridge_mib_proc_create_vlan(interp->peer, vlanId, argv[2]);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    return SCLI_OK;
+    
+}
+
+
+static int
+delete_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
+{
+    q_bridge_mib_dot1qVlanStaticEntry_t **vlanTable = NULL;
+    regex_t _regex_vlan, *regex_vlan = NULL;
+    int i;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (argc == 2) {
+	regex_vlan = &_regex_vlan;
+	if (regcomp(regex_vlan, argv[1], interp->regex_flags) != 0) {
+	    g_string_assign(interp->result, argv[1]);
+	    return SCLI_SYNTAX_REGEXP;
+	}
+    }
+
+    if (scli_interp_dry(interp)) {
+	if (regex_vlan) regfree(regex_vlan);
+	return SCLI_OK;
+    }
+
+    q_bridge_mib_get_dot1qVlanStaticTable(interp->peer, &vlanTable, 0);
+    if (interp->peer->error_status) {
+	return SCLI_SNMP;
+    }
+
+    if (vlanTable) {
+	for (i = 0; vlanTable[i]; i++) {
+	    if (match_vlan(regex_vlan, vlanTable[i])) {
+		q_bridge_mib_proc_delete_vlan(interp->peer, vlanTable[i]->dot1qVlanIndex);
+	    }
+	}
+    }
+
+    if (vlanTable) q_bridge_mib_free_dot1qVlanStaticTable(vlanTable);
+    if (regex_vlan) regfree(regex_vlan);
+
+    return SCLI_OK;
+}
+
+
+
 void
 scli_init_bridge_mode(scli_interp_t *interp)
 {
@@ -1490,6 +1607,20 @@ scli_init_bridge_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_bridge_vlan_details },
+
+	{ "create bridge vlan", "<id> <name>",
+	  "The `create bridge vlan' command creates a new vlan\n"
+	  "with the given <id> and name <name>.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  create_bridge_vlan },
+
+	{ "delete bridge vlan", "<regexp>",
+	  "The `delete bridge vlan' command deletes all vlans\n"
+	  "whose vlan name matches the regular expression <regexp>.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  delete_bridge_vlan },
 
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
