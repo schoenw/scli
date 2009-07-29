@@ -31,6 +31,7 @@ show_sflow_info(scli_interp_t *interp, int argc, char **argv)
 {
     sflow5_mib_sFlowAgent_t *agent = NULL;
     int const indent = 17;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -42,8 +43,8 @@ show_sflow_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    sflow5_mib_get_sFlowAgent(interp->peer, &agent, 0);
-    if (interp->peer->error_status) {
+    sflow5_mib_get_sFlowAgent(interp->peer, &agent, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -120,6 +121,7 @@ show_sflow_receiver(scli_interp_t *interp, int argc, char **argv)
     sflow5_mib_sFlowRcvrEntry_t **rcvrEntry = NULL;
     int const indent = 17;
     int i, c;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -131,8 +133,8 @@ show_sflow_receiver(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    sflow5_mib_get_sFlowRcvrTable(interp->peer, &rcvrEntry, 0);
-    if (interp->peer->error_status) {
+    sflow5_mib_get_sFlowRcvrTable(interp->peer, &rcvrEntry, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

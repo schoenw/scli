@@ -48,7 +48,8 @@ typedef struct {
 
 extern void
 udp_mib_proc_get_stats(GNetSnmp *s,
-		       udp_mib_proc_stats_t **udpStatsEntry);
+		       udp_mib_proc_stats_t **udpStatsEntry,
+		       GError **error);
 
 
 #endif /* _UDP_MIB_PROC_H_ */

@@ -28,6 +28,7 @@ MIBS			= IF-MIB \
 			  TUNNEL-MIB \
 			  ATM-MIB \
 			  EtherLike-MIB \
+			  IANA-MAU-MIB \
 			  MAU-MIB \
 			  RFC1213-MIB \
 			  OSPF-MIB \
@@ -75,6 +76,7 @@ STUBS			= if-mib.h if-mib.c \
 			  tunnel-mib.h tunnel-mib.c \
 			  atm-mib.h atm-mib.c \
                           etherlike-mib.h etherlike-mib.c \
+			  iana-mau-mib.h iana-mau-mib.c \
                           mau-mib.h mau-mib.c \
                           rfc1213-mib.h rfc1213-mib.c \
                           ospf-mib.h ospf-mib.c \
@@ -191,6 +193,9 @@ atm-mib.h atm-mib.c:
 
 etherlike-mib.h etherlike-mib.c:
 	$(SMIDUMP) -f scli --scli-include='dot3StatsEntry' EtherLike-MIB
+
+iana-mau-mib.h iana-mau-mib.c:
+	$(SMIDUMP) -f scli IANA-MAU-MIB
 
 mau-mib.h mau-mib.c:
 	$(SMIDUMP) -f scli --scli-exclude='broadMauBasic' MAU-MIB

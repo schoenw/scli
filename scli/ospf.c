@@ -127,6 +127,7 @@ static int
 show_ospf_info(scli_interp_t *interp, int argc, char **argv)
 {
     ospf_mib_ospfGeneralGroup_t *ospfGeneralGroup = NULL;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -138,8 +139,8 @@ show_ospf_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
     
-    ospf_mib_get_ospfGeneralGroup(interp->peer, &ospfGeneralGroup, 0);
-    if (interp->peer->error_status) {
+    ospf_mib_get_ospfGeneralGroup(interp->peer, &ospfGeneralGroup, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     
@@ -265,6 +266,7 @@ show_ospf_area(scli_interp_t *interp, int argc, char **argv)
 {
     int i;
     ospf_mib_ospfAreaEntry_t **ospfAreaTable = NULL;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -276,8 +278,8 @@ show_ospf_area(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
     
-    ospf_mib_get_ospfAreaTable(interp->peer, &ospfAreaTable, 0);
-    if (interp->peer->error_status) {
+    ospf_mib_get_ospfAreaTable(interp->peer, &ospfAreaTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     
@@ -389,6 +391,7 @@ show_ospf_interfaces(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifXEntry_t **ifXTable = NULL;
     ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -400,15 +403,15 @@ show_ospf_interfaces(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
     
-    ospf_mib_get_ospfIfTable(interp->peer, &ospfIfTable, 0);
-    if (interp->peer->error_status) {
+    ospf_mib_get_ospfIfTable(interp->peer, &ospfIfTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     
     if (ospfIfTable) {
-	if_mib_get_ifTable(interp->peer, &ifTable, 0);
-	if_mib_get_ifXTable(interp->peer, &ifXTable, 0);
-	ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0);
+	if_mib_get_ifTable(interp->peer, &ifTable, 0, NULL);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, 0, NULL);
+	ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0, NULL);
 	for (i = 0; ospfIfTable[i]; i++) {
 	    if (i) {
 		g_string_append(interp->result, "\n");
@@ -432,12 +435,45 @@ static void
 fmt_ospf_lsdb(GString *s, ospf_mib_ospfLsdbEntry_t *ospfLsdbEntry)
 {
     int const indent = 18;
+    const char *e;
+
+    g_string_sprintfa(s,"%-*s %-15s\n", indent, "Area:",
+		      fmt_ipv4_address(ospfLsdbEntry->ospfLsdbAreaId,
+				       SCLI_FMT_ADDR));
+
+    e = fmt_enum(ospf_mib_enums_ospfLsdbType, &ospfLsdbEntry->ospfLsdbType);
+    g_string_sprintfa(s, "%-*s %s\n",
+		      indent, "Type:", e ? e : "");
+
+    g_string_sprintfa(s,"%-*s %-15s\n", indent, "Link State ID:",
+		      fmt_ipv4_address(ospfLsdbEntry->ospfLsdbLsid,
+				       SCLI_FMT_ADDR));
+
+    g_string_sprintfa(s,"%-*s %-15s\n", indent, "Router ID:",
+		      fmt_ipv4_address(ospfLsdbEntry->ospfLsdbRouterId,
+				       SCLI_FMT_ADDR));
+
 
     if (ospfLsdbEntry->ospfLsdbSequence) {
-	g_string_sprintfa(s, "Sequence:   %d\n",
+	g_string_sprintfa(s, "%-*s %d\n", indent, "Sequenze No:",
 			  *ospfLsdbEntry->ospfLsdbSequence);
     }
-    
+
+    if (ospfLsdbEntry->ospfLsdbAge) {
+	g_string_sprintfa(s, "%-*s %d (seconds)\n", indent, "Age:",
+			  *ospfLsdbEntry->ospfLsdbAge);
+    }
+
+    if (ospfLsdbEntry->ospfLsdbChecksum) {
+	g_string_sprintfa(s, "%-*s %d\n", indent, "Checksum:",
+			  *ospfLsdbEntry->ospfLsdbChecksum);
+    }
+
+    if (ospfLsdbEntry->ospfLsdbAdvertisement) {
+	g_string_sprintfa(s, "%-*s %d\n", indent, "Link State Adv:",
+			  ospfLsdbEntry->_ospfLsdbAdvertisementLength);
+    }
+
 }
 
 
@@ -447,6 +483,7 @@ show_ospf_lsdb(scli_interp_t *interp, int argc, char **argv)
 {
     ospf_mib_ospfLsdbEntry_t **ospfLsdbTable = NULL;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -458,8 +495,8 @@ show_ospf_lsdb(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
     
-    ospf_mib_get_ospfLsdbTable(interp->peer, &ospfLsdbTable, 0);
-    if (interp->peer->error_status) {
+    ospf_mib_get_ospfLsdbTable(interp->peer, &ospfLsdbTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     

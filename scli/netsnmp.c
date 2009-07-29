@@ -43,12 +43,12 @@ fmt_info(GString *s, ucd_snmp_mib_version_t *version)
     if (version->versionTag) {
 	fmt_display_string(s, indent, "Version:",
 			   (int) version->_versionTagLength,
-			   version->versionTag);
+			   (gchar *) version->versionTag);
     }
     if (version->versionConfigureOptions) {
 	fmt_display_string(s, indent, "Configuration:",
 			   (int) version->_versionConfigureOptionsLength,
-			   version->versionConfigureOptions);
+			   (gchar *) version->versionConfigureOptions);
     }
 
     e = fmt_enum(ucd_snmp_mib_enums_versionDoDebugging,
@@ -64,6 +64,7 @@ static int
 show_netsnmp_info(scli_interp_t *interp, int argc, char **argv)
 {
     ucd_snmp_mib_version_t *version = NULL;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -78,8 +79,9 @@ show_netsnmp_info(scli_interp_t *interp, int argc, char **argv)
     ucd_snmp_mib_get_version(interp->peer, &version,
 			     UCD_SNMP_MIB_VERSIONTAG
 			     | UCD_SNMP_MIB_VERSIONCONFIGUREOPTIONS
-			     | UCD_SNMP_MIB_VERSIONDODEBUGGING);
-    if (interp->peer->error_status) {
+			     | UCD_SNMP_MIB_VERSIONDODEBUGGING,
+			     &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -122,7 +124,7 @@ fmt_load(GString *s, ucd_snmp_mib_laEntry_t *laEntry)
     if (laEntry->_laErrMessageLength) {
 	fmt_display_string(s, indent, "Error:",
 			   (int) laEntry->_laErrMessageLength,
-			   laEntry->laErrMessage);
+			   (gchar *) laEntry->laErrMessage);
     }
 }
 
@@ -133,6 +135,7 @@ show_netsnmp_load(scli_interp_t *interp, int argc, char **argv)
 {
     ucd_snmp_mib_laEntry_t **laTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -147,8 +150,9 @@ show_netsnmp_load(scli_interp_t *interp, int argc, char **argv)
     ucd_snmp_mib_get_laTable(interp->peer, &laTable,
 			     UCD_SNMP_MIB_LANAMES
 			     | UCD_SNMP_MIB_LALOADINT
-			     | UCD_SNMP_MIB_LAERRMESSAGE);
-    if (interp->peer->error_status) {
+			     | UCD_SNMP_MIB_LAERRMESSAGE,
+			     &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     
@@ -174,13 +178,13 @@ fmt_ext(GString *s, ucd_snmp_mib_extEntry_t *extEntry)
 		      extEntry->extIndex);
     fmt_display_string(s, indent, "Name:",
 		       (int) extEntry->_extNamesLength,
-		       extEntry->extNames);
+		       (gchar *) extEntry->extNames);
     fmt_display_string(s, indent, "Command:",
 		       (int) extEntry->_extCommandLength,
-		       extEntry->extCommand);
+		       (gchar *) extEntry->extCommand);
     fmt_display_string(s, indent, "Output:",
 		       (int) extEntry->_extOutputLength,
-		       extEntry->extOutput);
+		       (gchar *) extEntry->extOutput);
     if (extEntry->extResult) {
 	g_string_sprintfa(s, "%-*s%d\n", indent, "Code:",
 			  *extEntry->extResult);
@@ -194,6 +198,7 @@ show_netsnmp_exec(scli_interp_t *interp, int argc, char **argv)
 {
     ucd_snmp_mib_extEntry_t **extTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -205,8 +210,8 @@ show_netsnmp_exec(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    ucd_snmp_mib_get_extTable(interp->peer, &extTable, 0);
-    if (interp->peer->error_status) {
+    ucd_snmp_mib_get_extTable(interp->peer, &extTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -232,7 +237,7 @@ fmt_proc(GString *s, ucd_snmp_mib_prEntry_t *prEntry)
 		      prEntry->prIndex);
     fmt_display_string(s, indent, "Process:",
 		       (int) prEntry->_prNamesLength,
-		       prEntry->prNames);
+		       (gchar *) prEntry->prNames);
     g_string_sprintfa(s, "%-*s%d\n", indent, "Minimum:",
 		      *prEntry->prMin);
     g_string_sprintfa(s, "%-*s%d\n", indent, "Maximum:",
@@ -242,7 +247,7 @@ fmt_proc(GString *s, ucd_snmp_mib_prEntry_t *prEntry)
     if (prEntry->_prErrMessageLength) {
 	fmt_display_string(s, indent, "Error:",
 			   (int) prEntry->_prErrMessageLength,
-			   prEntry->prErrMessage);
+			   (gchar *) prEntry->prErrMessage);
     }
 }
 
@@ -253,6 +258,7 @@ show_netsnmp_proc(scli_interp_t *interp, int argc, char **argv)
 {
     ucd_snmp_mib_prEntry_t **prTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -264,8 +270,8 @@ show_netsnmp_proc(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    ucd_snmp_mib_get_prTable(interp->peer, &prTable, 0);
-    if (interp->peer->error_status) {
+    ucd_snmp_mib_get_prTable(interp->peer, &prTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -287,6 +293,7 @@ static int
 set_netsnmp_debugging(scli_interp_t *interp, int argc, char **argv)
 {
     gint32 value = 1;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -304,8 +311,8 @@ set_netsnmp_debugging(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    ucd_snmp_mib_set_versionDoDebugging(interp->peer, value);
-    if (interp->peer->error_status) {
+    ucd_snmp_mib_set_versionDoDebugging(interp->peer, value, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -318,6 +325,7 @@ static int
 set_netsnmp_restart(scli_interp_t *interp, int argc, char **argv)
 {
     gint32 value = 1;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
     
@@ -329,8 +337,8 @@ set_netsnmp_restart(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    ucd_snmp_mib_set_versionRestartAgent(interp->peer, value);
-    if (interp->peer->error_status) {
+    ucd_snmp_mib_set_versionRestartAgent(interp->peer, value, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -344,6 +352,7 @@ dump_netsnmp(scli_interp_t *interp, int argc, char **argv)
 {
     ucd_snmp_mib_version_t *version = NULL;
     const char *e;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -356,8 +365,8 @@ dump_netsnmp(scli_interp_t *interp, int argc, char **argv)
     }
 
     ucd_snmp_mib_get_version(interp->peer, &version,
-			     UCD_SNMP_MIB_VERSIONDODEBUGGING);
-    if (interp->peer->error_status) {
+			     UCD_SNMP_MIB_VERSIONDODEBUGGING, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

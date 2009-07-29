@@ -23,6 +23,7 @@
 #include "scli.h"
 
 #include "snmpv2-tc.h"
+#include "iana-mau-mib.h"
 #include "mau-mib.h"
 #include "etherlike-mib.h"
 #include "rmon-mib.h" 
@@ -30,65 +31,65 @@
 
 
 static guint32 const dot3MauTypeAUI[]
-	= { MAU_MIB_DOT3MAUTYPEAUI };
+	= { IANA_MAU_MIB_DOT3MAUTYPEAUI };
 static guint32 const dot3MauType10Base5[]
-	= { MAU_MIB_DOT3MAUTYPE10BASE5 };
+	= { IANA_MAU_MIB_DOT3MAUTYPE10BASE5 };
 static guint32 const dot3MauTypeFoirl[]
-	= { MAU_MIB_DOT3MAUTYPEFOIRL };
+	= { IANA_MAU_MIB_DOT3MAUTYPEFOIRL };
 static guint32 const dot3MauType10Base2[]
-	= { MAU_MIB_DOT3MAUTYPE10BASE2 };
+	= { IANA_MAU_MIB_DOT3MAUTYPE10BASE2 };
 static guint32 const dot3MauType10BaseT[]
-	= { MAU_MIB_DOT3MAUTYPE10BASET };
+	= { IANA_MAU_MIB_DOT3MAUTYPE10BASET };
 static guint32 const dot3MauType10BaseFP[]
-	= { MAU_MIB_DOT3MAUTYPE10BASEFP };
+	= { IANA_MAU_MIB_DOT3MAUTYPE10BASEFP };
 static guint32 const dot3MauType10BaseFB[]
-	= { MAU_MIB_DOT3MAUTYPE10BASEFB };
+	= { IANA_MAU_MIB_DOT3MAUTYPE10BASEFB };
 static guint32 const dot3MauType10BaseFL[]
-	= { MAU_MIB_DOT3MAUTYPE10BASEFL };
+	= { IANA_MAU_MIB_DOT3MAUTYPE10BASEFL };
 static guint32 const dot3MauType10Broad36[]
-	= { MAU_MIB_DOT3MAUTYPE10BROAD36 };
+	= { IANA_MAU_MIB_DOT3MAUTYPE10BROAD36 };
 static guint32 const dot3MauType10BaseTHD[]
-	= { MAU_MIB_DOT3MAUTYPE10BASETHD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE10BASETHD };
 static guint32 const dot3MauType10BaseTFD[]
-	= { MAU_MIB_DOT3MAUTYPE10BASETFD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE10BASETFD };
 static guint32 const dot3MauType10BaseFLHD[]
-	= { MAU_MIB_DOT3MAUTYPE10BASEFLHD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE10BASEFLHD };
 static guint32 const dot3MauType10BaseFLFD[]
-	= { MAU_MIB_DOT3MAUTYPE10BASEFLFD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE10BASEFLFD };
 static guint32 const dot3MauType100BaseT4[]
-	= { MAU_MIB_DOT3MAUTYPE100BASET4 };
+	= { IANA_MAU_MIB_DOT3MAUTYPE100BASET4 };
 static guint32 const dot3MauType100BaseTXHD[]
-	= { MAU_MIB_DOT3MAUTYPE100BASETXHD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE100BASETXHD };
 static guint32 const dot3MauType100BaseTXFD[]
-	= { MAU_MIB_DOT3MAUTYPE100BASETXFD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE100BASETXFD };
 static guint32 const dot3MauType100BaseFXHD[]
-	= { MAU_MIB_DOT3MAUTYPE100BASEFXHD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE100BASEFXHD };
 static guint32 const dot3MauType100BaseFXFD[]
-	= { MAU_MIB_DOT3MAUTYPE100BASEFXFD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE100BASEFXFD };
 static guint32 const dot3MauType100BaseT2HD[]
-	= { MAU_MIB_DOT3MAUTYPE100BASET2HD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE100BASET2HD };
 static guint32 const dot3MauType100BaseT2FD[]
-	= { MAU_MIB_DOT3MAUTYPE100BASET2FD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE100BASET2FD };
 static guint32 const dot3MauType1000BaseXHD[]
-	= { MAU_MIB_DOT3MAUTYPE1000BASEXHD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE1000BASEXHD };
 static guint32 const dot3MauType1000BaseXFD[]
-	= { MAU_MIB_DOT3MAUTYPE1000BASEXFD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE1000BASEXFD };
 static guint32 const dot3MauType1000BaseLXHD[]
-	= { MAU_MIB_DOT3MAUTYPE1000BASELXHD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE1000BASELXHD };
 static guint32 const dot3MauType1000BaseLXFD[]
-	= { MAU_MIB_DOT3MAUTYPE1000BASELXFD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE1000BASELXFD };
 static guint32 const dot3MauType1000BaseSXHD[]
-	= { MAU_MIB_DOT3MAUTYPE1000BASESXHD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE1000BASESXHD };
 static guint32 const dot3MauType1000BaseSXFD[]
-	= { MAU_MIB_DOT3MAUTYPE1000BASESXFD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE1000BASESXFD };
 static guint32 const dot3MauType1000BaseCXHD[]
-	= { MAU_MIB_DOT3MAUTYPE1000BASECXHD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE1000BASECXHD };
 static guint32 const dot3MauType1000BaseCXFD[]
-	= { MAU_MIB_DOT3MAUTYPE1000BASECXFD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE1000BASECXFD };
 static guint32 const dot3MauType1000BaseTHD[]
-	= { MAU_MIB_DOT3MAUTYPE1000BASETHD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE1000BASETHD };
 static guint32 const dot3MauType1000BaseTFD[]
-	= { MAU_MIB_DOT3MAUTYPE1000BASETFD };
+	= { IANA_MAU_MIB_DOT3MAUTYPE1000BASETFD };
 
 GNetSnmpIdentity const mau_type_identities[] = {
     { dot3MauTypeAUI,
@@ -197,7 +198,7 @@ fmt_ether_mau_info(GString *s, mau_mib_ifMauEntry_t *ifMauEntry)
 		 ifMauEntry->ifMauStatus);
     g_string_sprintfa(s, "%-12s", e ? e : "");
 
-    e = fmt_enum(mau_mib_enums_ifMauMediaAvailable,
+    e = fmt_enum(iana_mau_mib_enums_IANAifMauMediaAvailable,
 		 ifMauEntry->ifMauMediaAvailable);
     g_string_sprintfa(s, "%-14s", e ? e : "");
 
@@ -242,6 +243,7 @@ show_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
     mau_mib_ifMauEntry_t **ifMauTable = NULL;
     mau_mib_ifJackEntry_t **ifJackTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -253,13 +255,13 @@ show_ether_mau_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    mau_mib_get_ifMauTable(interp->peer, &ifMauTable, 0);
-    if (interp->peer->error_status) {
+    mau_mib_get_ifMauTable(interp->peer, &ifMauTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (ifMauTable) {
-	mau_mib_get_ifJackTable(interp->peer, &ifJackTable, 0);
+	mau_mib_get_ifJackTable(interp->peer, &ifJackTable, 0, NULL);
 	g_string_sprintfa(interp->header,
 		  "INTERFACE   MAU STATUS      MEDIA         JABBER   AUTONEG TYPE");
 	for (i = 0; ifMauTable[i]; i++) {
@@ -301,6 +303,7 @@ show_ether_stats(scli_interp_t *interp, int argc, char **argv)
     int i;
     static ether_stats_t *stats = NULL;
     static time_t epoch = 0;
+    GError *error = NULL;
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
@@ -310,8 +313,8 @@ show_ether_stats(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    etherlike_mib_get_dot3StatsTable(interp->peer, &dot3StatsTable, 0);
-    if (interp->peer->error_status) {
+    etherlike_mib_get_dot3StatsTable(interp->peer, &dot3StatsTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -407,6 +410,7 @@ show_ether_history(scli_interp_t *interp, int argc, char **argv)
 {
     rmon_mib_historyControlEntry_t **ctrlTable = NULL;
     int i;
+    GError *error = NULL;
 
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
@@ -416,8 +420,8 @@ show_ether_history(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    rmon_mib_get_historyControlTable(interp->peer, &ctrlTable, 0);
-    if (interp->peer->error_status) {
+    rmon_mib_get_historyControlTable(interp->peer, &ctrlTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

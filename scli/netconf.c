@@ -31,9 +31,10 @@ netconf_send_hello(scli_interp_t *interp)
     xmlChar *buffer;
     int len;
 
-    hello = xmlNewDoc("1.0");
-    hello->children = xmlNewDocNode(interp->xml_doc, NULL, "hello", NULL);
-    xmlNewChild(hello->children, NULL, "capabilities", NULL);
+    hello = xmlNewDoc(BAD_CAST("1.0"));
+    hello->children = xmlNewDocNode(interp->xml_doc, NULL,
+				    BAD_CAST("hello"), NULL);
+    xml_new_child(hello->children, NULL, BAD_CAST("capabilities"), NULL);
 
     xmlDocDumpFormatMemory(hello, &buffer, &len, 1);
     g_print("%.*s%s\n", len, buffer, EOM);

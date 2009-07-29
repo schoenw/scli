@@ -313,11 +313,11 @@ xml_subunit(xmlNodePtr tree, gint32 *status)
 	return;
     }
 
-    xml_new_child(tree, NULL, "availability", "%s",
+    xml_new_child(tree, NULL, BAD_CAST("availability"), "%s",
 		  fmt_subunit_availability(status));
-    xml_new_child(tree, NULL, "alerts", "%s",
+    xml_new_child(tree, NULL, BAD_CAST("alerts"), "%s",
 		  fmt_subunit_alerts(status));
-    xml_new_child(tree, NULL, "status", "%s",
+    xml_new_child(tree, NULL, BAD_CAST("status"), "%s",
 		  fmt_subunit_status(status));
 }
 
@@ -387,22 +387,22 @@ xml_media_dimensions(xmlNodePtr root, gchar *label,
 	return;
     }
 #if 0
-    node = xmlNewChild(root, NULL, label,
-		       lookup_media_name(*dir, *xdir, *unit));
-    xml_set_prop(node, "direction", "%d", *dir);
-    xml_set_prop(node, "cross-direction", "%d", *xdir);
-    if (e) xml_set_prop(node, "unit", "%s", e);
+    node = xml_new_child(root, NULL, label, "%s",
+			 lookup_media_name(*dir, *xdir, *unit));
+    xml_set_prop(node, BAD_CAST("direction"), "%d", *dir);
+    xml_set_prop(node, BAD_CAST("cross-direction"), "%d", *xdir);
+    if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
 #else
     name = lookup_media_name(*dir, *xdir, *unit);
     
-    tree = xmlNewChild(root, NULL, label, NULL);
+    tree = xml_new_child(root, NULL, label, NULL);
     e = fmt_enum(enums, unit);
-    node = xml_new_child(tree, NULL, "direction", "%d", *dir);
-    if (e) xml_set_prop(node, "unit", "%s", e);
-    node = xml_new_child(tree, NULL, "cross-direction", "%d", *xdir);
-    if (e) xml_set_prop(node, "unit", "%s", e);
+    node = xml_new_child(tree, NULL, BAD_CAST("direction"), "%d", *dir);
+    if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
+    node = xml_new_child(tree, NULL, BAD_CAST("cross-direction"), "%d", *xdir);
+    if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
     if (name) {
-	node = xml_new_child(tree, NULL, "description", "%s", name);
+	node = xml_new_child(tree, NULL, BAD_CAST("description"), "%s", name);
     }
 #endif
 }
@@ -426,8 +426,8 @@ get_printer_node(xmlNodePtr tree, gint32 printer, const char *xpath)
 	}
     }
     if (! node) {
-	node = xmlNewChild(tree, NULL, "printer", NULL);
-	xml_set_prop(node, "device", "%s", buffer);
+	node = xml_new_child(tree, NULL, BAD_CAST("printer"), NULL);
+	xml_set_prop(node, BAD_CAST("device"), "%s", buffer);
     }
 
     /*
@@ -442,7 +442,7 @@ get_printer_node(xmlNodePtr tree, gint32 printer, const char *xpath)
 	    }
 	}
 	if (! child) {
-	    child = xmlNewChild(node, NULL, xpath, NULL);
+	    child = xml_new_child(node, NULL, xpath, NULL);
 	}
 	node = child;
     }
@@ -528,7 +528,7 @@ fmt_printer_info(GString *s,
     if (hrDeviceEntry && hrDeviceEntry->hrDeviceDescr) {
 	fmt_display_string(s, indent, "Description:",
 			   (int) hrDeviceEntry->_hrDeviceDescrLength,
-			   hrDeviceEntry->hrDeviceDescr);
+			   (gchar *) hrDeviceEntry->hrDeviceDescr);
     }
 
     if (hrDeviceEntry) {
@@ -574,7 +574,7 @@ xml_printer_info(xmlNodePtr tree,
     GString *s;
 
     if (hrDeviceEntry) {
-	(void) xml_new_child(tree, NULL, "description", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 			  (int) hrDeviceEntry->_hrDeviceDescrLength,
 			  hrDeviceEntry->hrDeviceDescr);
     }
@@ -584,7 +584,7 @@ xml_printer_info(xmlNodePtr tree,
 			 hrDeviceEntry->hrDeviceType,
 			 hrDeviceEntry->_hrDeviceDescrLength);
 	if (e) {
-	    (void) xml_new_child(tree, NULL, "type", "%s", e);
+	    (void) xml_new_child(tree, NULL, BAD_CAST("type"), "%s", e);
 	}
     }
 	
@@ -592,21 +592,21 @@ xml_printer_info(xmlNodePtr tree,
 	e = fmt_enum(host_resources_mib_enums_hrDeviceStatus,
 		     hrDeviceEntry->hrDeviceStatus);
 	if (e) {
-	    (void) xml_new_child(tree, NULL, "device-status", "%s", e);
+	    (void) xml_new_child(tree, NULL, BAD_CAST("device-status"), "%s", e);
 	}
     }
 
     e = fmt_enum(host_resources_mib_enums_hrPrinterStatus,
 		 hrPrinterEntry->hrPrinterStatus);
     if (e) {
-	(void) xml_new_child(tree, NULL, "printer-status", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("printer-status"), "%s", e);
     }
 
     s = g_string_new(NULL);
     fmt_bits(s, error_states,
 	     hrPrinterEntry->hrPrinterDetectedErrorState,
 	     hrPrinterEntry->_hrPrinterDetectedErrorStateLength);
-    (void) xml_new_child(tree, NULL, "error-state", "%s", s->str);
+    (void) xml_new_child(tree, NULL, BAD_CAST("error-state"), "%s", s->str);
     g_string_free(s, 1);
 }
 
@@ -748,6 +748,7 @@ show_printer_info(scli_interp_t *interp, int argc, char **argv)
     printer_mib_prtLocalizationEntry_t **prtLocalTable = NULL;
     gint32 last = 0;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -759,15 +760,15 @@ show_printer_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    host_resources_mib_get_hrPrinterTable(interp->peer, &hrPrinterTable, 0);
-    if (interp->peer->error_status) {
+    host_resources_mib_get_hrPrinterTable(interp->peer, &hrPrinterTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (hrPrinterTable) {
-	host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable, 0);
-	printer_mib_get_prtGeneralTable(interp->peer, &prtGeneralTable, 0);
-	printer_mib_get_prtLocalizationTable(interp->peer, &prtLocalTable, 0);
+	host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable, 0, NULL);
+	printer_mib_get_prtGeneralTable(interp->peer, &prtGeneralTable, 0, NULL);
+	printer_mib_get_prtLocalizationTable(interp->peer, &prtLocalTable, 0, NULL);
 	for (i = 0; hrPrinterTable[i]; i++) {
 	    if (scli_interp_xml(interp)) {
 		xmlNodePtr node = get_printer_node(interp->xml_node,
@@ -796,14 +797,16 @@ show_printer_info(scli_interp_t *interp, int argc, char **argv)
 			    printer_mib_get_prtInputEntry(interp->peer, &input,
 					  gent->hrDeviceIndex,
 					  *(gent->prtInputDefaultIndex),
-					  PRINTER_MIB_PRTINPUTNAME);
+					  PRINTER_MIB_PRTINPUTNAME,
+					  NULL);
 			}
 			if (gent->prtOutputDefaultIndex) {
 			    printer_mib_get_prtOutputEntry(interp->peer,
 					  &output,
 					  gent->hrDeviceIndex,
 					  *(gent->prtOutputDefaultIndex),
-					  PRINTER_MIB_PRTOUTPUTNAME);
+					  PRINTER_MIB_PRTOUTPUTNAME,
+					  NULL);
 			}
 			fmt_printer_general(interp->result, gent,
 					    input, output, prtLocalTable);
@@ -865,12 +868,12 @@ xml_printer_cover(xmlNodePtr root,
     xmlNodePtr tree;
     const char *e;
     
-    tree = xmlNewChild(root, NULL, "cover", NULL);
-    xml_set_prop(tree, "number", "%d",
+    tree = xml_new_child(root, NULL, BAD_CAST("cover"), NULL);
+    xml_set_prop(tree, BAD_CAST("number"), "%d",
 		 prtCoverEntry->prtCoverIndex);
 
     if (prtCoverEntry->prtCoverDescription) {
-	(void) xml_new_child(tree, NULL, "description", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 			  (int) prtCoverEntry->_prtCoverDescriptionLength,
 			  prtCoverEntry->prtCoverDescription);
     }
@@ -878,7 +881,7 @@ xml_printer_cover(xmlNodePtr root,
     e = fmt_enum(iana_printer_mib_enums_PrtCoverStatusTC,
 		 prtCoverEntry->prtCoverStatus);
     if (e) {
-	(void) xml_new_child(tree, NULL, "status", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("status"), "%s", e);
     }
 }
 
@@ -889,6 +892,7 @@ show_printer_covers(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtCoverEntry_t **prtCoverTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -900,8 +904,8 @@ show_printer_covers(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    printer_mib_get_prtCoverTable(interp->peer, &prtCoverTable, 0);
-    if (interp->peer->error_status) {
+    printer_mib_get_prtCoverTable(interp->peer, &prtCoverTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -985,12 +989,12 @@ xml_printer_path(xmlNodePtr root,
     xmlNodePtr tree, node;
     const char *e;
     
-    tree = xmlNewChild(root, NULL, "path", NULL);
-    xml_set_prop(tree, "number", "%d",
+    tree = xml_new_child(root, NULL, BAD_CAST("path"), NULL);
+    xml_set_prop(tree, BAD_CAST("number"), "%d",
 		 prtPathEntry->prtMediaPathIndex);
 
     if (prtPathEntry->prtMediaPathDescription) {
-	(void) xml_new_child(tree, NULL, "description", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 			  (int) prtPathEntry->_prtMediaPathDescriptionLength,
 			  prtPathEntry->prtMediaPathDescription);
     }
@@ -998,17 +1002,17 @@ xml_printer_path(xmlNodePtr root,
     e = fmt_enum(iana_printer_mib_enums_PrtMediaPathTypeTC,
 		 prtPathEntry->prtMediaPathType);
     if (e) {
-	(void) xml_new_child(tree, NULL, "type", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("type"), "%s", e);
     }
 
     xml_subunit(tree, prtPathEntry->prtMediaPathStatus);
 
     if (prtPathEntry->prtMediaPathMaxSpeed) {
-	node = xml_new_child(tree, NULL, "max-speed", "%d",
+	node = xml_new_child(tree, NULL, BAD_CAST("max-speed"), "%d",
 			     *prtPathEntry->prtMediaPathMaxSpeed);
 	e = fmt_enum(printer_mib_enums_PrtMediaPathMaxSpeedPrintUnitTC,
 		     prtPathEntry->prtMediaPathMaxSpeedPrintUnit);
-	if (e) xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
     }
 
     xml_media_dimensions(tree, "min-dimensions",
@@ -1031,6 +1035,7 @@ show_printer_paths(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtMediaPathEntry_t **prtPathTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1042,8 +1047,8 @@ show_printer_paths(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    printer_mib_get_prtMediaPathTable(interp->peer, &prtPathTable, 0);
-    if (interp->peer->error_status) {
+    printer_mib_get_prtMediaPathTable(interp->peer, &prtPathTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1287,24 +1292,24 @@ xml_printer_inputs(xmlNodePtr root,
     xmlNodePtr tree, node;
     const char *e;
 
-    tree = xmlNewChild(root, NULL, "input", NULL);
-    xml_set_prop(tree, "number", "%d",
+    tree = xml_new_child(root, NULL, BAD_CAST("input"), NULL);
+    xml_set_prop(tree, BAD_CAST("number"), "%d",
 		 prtInputEntry->prtInputIndex);
 
     if (prtInputEntry->prtInputName) {
-	(void) xml_new_child(tree, NULL, "name", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("name"), "%.*s",
 			     (int) prtInputEntry->_prtInputNameLength,
 			     prtInputEntry->prtInputName);
     }
 
     if (prtInputEntry->prtInputDescription) {
-	(void) xml_new_child(tree, NULL, "description", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 			     (int) prtInputEntry->_prtInputDescriptionLength,
 			     prtInputEntry->prtInputDescription);
     }
 
     if (prtInputEntry->prtInputVendorName) {
-	(void) xml_new_child(tree, NULL, "vendor", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("vendor"), "%.*s",
 			     (int) prtInputEntry->_prtInputVendorNameLength,
 			     prtInputEntry->prtInputVendorName);
     }
@@ -1312,11 +1317,11 @@ xml_printer_inputs(xmlNodePtr root,
     e = fmt_enum(iana_printer_mib_enums_PrtInputTypeTC,
 		 prtInputEntry->prtInputType);
     if (e) {
-	(void) xml_new_child(tree, NULL, "type", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("type"), "%s", e);
     }
 
     if (prtInputEntry->prtInputModel) {
-	(void) xml_new_child(tree, NULL, "model", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("model"), "%.*s",
 			     (int) prtInputEntry->_prtInputModelLength,
 			     prtInputEntry->prtInputModel);
     }
@@ -1326,46 +1331,46 @@ xml_printer_inputs(xmlNodePtr root,
     if (prtInputEntry->prtInputMaxCapacity) {
 	switch (*prtInputEntry->prtInputMaxCapacity) {
 	case -1:
-	    node = xml_new_child(tree, NULL, "capacity", "unlimited");
+	    node = xml_new_child(tree, NULL, BAD_CAST("capacity"), "unlimited");
 	    break;
 	case -2:
-	    node = xml_new_child(tree, NULL, "capacity", "unknown");
+	    node = xml_new_child(tree, NULL, BAD_CAST("capacity"), "unknown");
 	    break;
 	default:
-	    node = xml_new_child(tree, NULL, "capacity", "%d",
+	    node = xml_new_child(tree, NULL, BAD_CAST("capacity"), "%d",
 				 *prtInputEntry->prtInputMaxCapacity);
 	}
-	if (e) xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
     }
 
     if (prtInputEntry->prtInputCurrentLevel) {
 	switch (*prtInputEntry->prtInputCurrentLevel) {
 	case -1:
-	    node = xml_new_child(tree, NULL, "level", "unlimited");
+	    node = xml_new_child(tree, NULL, BAD_CAST("level"), "unlimited");
 	    break;
 	case -2:
-	    node = xml_new_child(tree, NULL, "level", "unknown");
+	    node = xml_new_child(tree, NULL, BAD_CAST("level"), "unknown");
 	    break;
 	case -3:
-	    node = xml_new_child(tree, NULL, "level", ">0");
+	    node = xml_new_child(tree, NULL, BAD_CAST("level"), ">0");
 	    break;
 	default:
-	    node = xml_new_child(tree, NULL, "level", "%d",
+	    node = xml_new_child(tree, NULL, BAD_CAST("level"), "%d",
 				 *prtInputEntry->prtInputCurrentLevel);
 	}
-	if (e) xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
     }
 
     xml_subunit(tree, prtInputEntry->prtInputStatus);
 
     if (prtInputEntry->prtInputSerialNumber) {
-	(void) xml_new_child(tree, NULL, "serial", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("serial"), "%.*s",
 			     (int) prtInputEntry->_prtInputSerialNumberLength,
 			     prtInputEntry->prtInputSerialNumber);
     }
     
     if (prtInputEntry->prtInputVersion) {
-	(void) xml_new_child(tree, NULL, "version", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("version"), "%.*s",
 			     (int) prtInputEntry->_prtInputVersionLength,
 			     prtInputEntry->prtInputVersion);
     }
@@ -1373,21 +1378,21 @@ xml_printer_inputs(xmlNodePtr root,
     e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtInputEntry->prtInputSecurity);
     if (e) {
-	(void) xml_new_child(tree, NULL, "security", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("security"), "%s", e);
     }
 
     /* ...media specific stuff begins here... */
 
-    tree = xmlNewChild(tree, NULL, "media", NULL);
+    tree = xml_new_child(tree, NULL, BAD_CAST("media"), NULL);
     
     if (prtInputEntry->prtInputMediaName) {
-	(void) xml_new_child(tree, NULL, "name", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("name"), "%.*s",
 			     (int) prtInputEntry->_prtInputMediaNameLength,
 			     prtInputEntry->prtInputMediaName);
     }
     
     if (prtInputEntry->prtInputMediaType) {
-	(void) xml_new_child(tree, NULL, "type", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("type"), "%.*s",
 			     (int) prtInputEntry->_prtInputMediaTypeLength,
 			     prtInputEntry->prtInputMediaType);
     }
@@ -1395,17 +1400,17 @@ xml_printer_inputs(xmlNodePtr root,
     if (prtInputEntry->prtInputMediaWeight) {
 	switch (*prtInputEntry->prtInputMediaWeight) {
 	case -2:
-	    (void) xml_new_child(tree, NULL, "weight", "%s", "unknown");
+	    (void) xml_new_child(tree, NULL, BAD_CAST("weight"), "%s", "unknown");
 	    break;
 	default:
-	    node = xml_new_child(tree, NULL, "weight",
+	    node = xml_new_child(tree, NULL, BAD_CAST("weight"),
 				 "%d", *prtInputEntry->prtInputMediaWeight);
-	    xml_set_prop(node, "unit", "%s", "g/m^2");
+	    xml_set_prop(node, BAD_CAST("unit"), "%s", "g/m^2");
 	}
     }
 
     if (prtInputEntry->prtInputMediaColor) {
-	(void) xml_new_child(tree, NULL, "color", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("color"), "%.*s",
 			     (int) prtInputEntry->_prtInputMediaColorLength,
 			     prtInputEntry->prtInputMediaColor);
     }
@@ -1413,13 +1418,13 @@ xml_printer_inputs(xmlNodePtr root,
     if (prtInputEntry->prtInputMediaFormParts) {
 	switch (*prtInputEntry->prtInputMediaFormParts) {
 	case -1:
-	    (void) xml_new_child(tree, NULL, "parts", "%s", "other");
+	    (void) xml_new_child(tree, NULL, BAD_CAST("parts"), "%s", "other");
 	    break;
 	case -2:
-	    (void) xml_new_child(tree, NULL, "parts", "%s", "unknown");
+	    (void) xml_new_child(tree, NULL, BAD_CAST("parts"), "%s", "unknown");
 	    break;
 	default:
-	    (void) xml_new_child(tree, NULL, "parts",
+	    (void) xml_new_child(tree, NULL, BAD_CAST("parts"),
 				 "%u", *prtInputEntry->prtInputMediaFormParts);
 	}
      }
@@ -1442,17 +1447,17 @@ xml_printer_inputs(xmlNodePtr root,
     if (prtInputEntry->prtInputMediaLoadTimeout) {
 	switch (*prtInputEntry->prtInputMediaLoadTimeout) {
 	case -1:
-	    (void) xml_new_child(tree, NULL, "load-timeout",
+	    (void) xml_new_child(tree, NULL, BAD_CAST("load-timeout"),
 				 "%s", "wait forever");
 	    break;
 	case -2:
-	    (void) xml_new_child(tree, NULL, "load-timeout",
+	    (void) xml_new_child(tree, NULL, BAD_CAST("load-timeout"),
 				 "%s", "unknown");
 	    break;
 	default:
-	    node = xml_new_child(tree, NULL, "load-timeout",
+	    node = xml_new_child(tree, NULL, BAD_CAST("load-timeout"),
 			 "%u", *prtInputEntry->prtInputMediaLoadTimeout);
-	    xml_set_prop(node, "unit", "%s", "seconds");
+	    xml_set_prop(node, BAD_CAST("unit"), "%s", "seconds");
 	}
     }
 }
@@ -1464,6 +1469,7 @@ show_printer_inputs(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtInputEntry_t **prtInputTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1475,8 +1481,8 @@ show_printer_inputs(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    printer_mib_get_prtInputTable(interp->peer, &prtInputTable, 0);
-    if (interp->peer->error_status) {
+    printer_mib_get_prtInputTable(interp->peer, &prtInputTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1666,24 +1672,24 @@ xml_printer_outputs(xmlNodePtr root,
     xmlNodePtr tree, node;
     const char *e;
 
-    tree = xmlNewChild(root, NULL, "output", NULL);
-    xml_set_prop(tree, "number", "%d",
+    tree = xml_new_child(root, NULL, BAD_CAST("output"), NULL);
+    xml_set_prop(tree, BAD_CAST("number"), "%d",
 		 prtOutputEntry->prtOutputIndex);
 
     if (prtOutputEntry->prtOutputName) {
-        (void) xml_new_child(tree, NULL, "name", "%.*s",
+        (void) xml_new_child(tree, NULL, BAD_CAST("name"), "%.*s",
 			     (int) prtOutputEntry->_prtOutputNameLength,
 			     prtOutputEntry->prtOutputName);
     }
 
     if (prtOutputEntry->prtOutputDescription) {
-        (void) xml_new_child(tree, NULL, "description", "%.*s",
+        (void) xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 			     (int) prtOutputEntry->_prtOutputDescriptionLength,
 			     prtOutputEntry->prtOutputDescription);
     }
 
     if (prtOutputEntry->prtOutputVendorName) {
-        (void) xml_new_child(tree, NULL, "vendor", "%.*s",
+        (void) xml_new_child(tree, NULL, BAD_CAST("vendor"), "%.*s",
 			     (int) prtOutputEntry->_prtOutputVendorNameLength,
 			     prtOutputEntry->prtOutputVendorName);
     }
@@ -1691,11 +1697,11 @@ xml_printer_outputs(xmlNodePtr root,
     e = fmt_enum(iana_printer_mib_enums_PrtOutputTypeTC,
 		 prtOutputEntry->prtOutputType);
     if (e) {
-	(void) xml_new_child(tree, NULL, "type", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("type"), "%s", e);
     }
     
     if (prtOutputEntry->prtOutputModel) {
-        (void) xml_new_child(tree, NULL, "model", "%.*s",
+        (void) xml_new_child(tree, NULL, BAD_CAST("model"), "%.*s",
 			     (int) prtOutputEntry->_prtOutputModelLength,
 			     prtOutputEntry->prtOutputModel);
     }
@@ -1706,46 +1712,46 @@ xml_printer_outputs(xmlNodePtr root,
     if (prtOutputEntry->prtOutputMaxCapacity) {
 	switch (*prtOutputEntry->prtOutputMaxCapacity) {
 	case -1:
-	    node = xml_new_child(tree, NULL, "capacity", "unlimited");
+	    node = xml_new_child(tree, NULL, BAD_CAST("capacity"), "unlimited");
 	    break;
 	case -2:
-	    node = xml_new_child(tree, NULL, "capacity", "unknown");
+	    node = xml_new_child(tree, NULL, BAD_CAST("capacity"), "unknown");
 	    break;
 	default:
-	    node = xml_new_child(tree, NULL, "capacity", "%d",
+	    node = xml_new_child(tree, NULL, BAD_CAST("capacity"), "%d",
 				 *prtOutputEntry->prtOutputMaxCapacity);
 	}
-	if (e) xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
     }
 
     if (prtOutputEntry->prtOutputRemainingCapacity) {
 	switch (*prtOutputEntry->prtOutputRemainingCapacity) {
 	case -1:
-	    node = xml_new_child(tree, NULL, "level", "unlimited");
+	    node = xml_new_child(tree, NULL, BAD_CAST("level"), "unlimited");
 	    break;
 	case -2:
-	    node = xml_new_child(tree, NULL, "level", "unknown");
+	    node = xml_new_child(tree, NULL, BAD_CAST("level"), "unknown");
 	    break;
 	case -3:
-	    node = xml_new_child(tree, NULL, "level", ">0");
+	    node = xml_new_child(tree, NULL, BAD_CAST("level"), ">0");
 	    break;
 	default:
-	    node = xml_new_child(tree, NULL, "level", "%d",
+	    node = xml_new_child(tree, NULL, BAD_CAST("level"), "%d",
 				 *prtOutputEntry->prtOutputRemainingCapacity);
 	}
-	if (e) xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
     }
 
     xml_subunit(tree, prtOutputEntry->prtOutputStatus);
 
     if (prtOutputEntry->prtOutputSerialNumber) {
-	(void) xml_new_child(tree, NULL, "serial", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("serial"), "%.*s",
 			     (int) prtOutputEntry->_prtOutputSerialNumberLength,
 			     prtOutputEntry->prtOutputSerialNumber);
     }
     
     if (prtOutputEntry->prtOutputVersion) {
-	(void) xml_new_child(tree, NULL, "version", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("version"), "%.*s",
 			     (int) prtOutputEntry->_prtOutputVersionLength,
 			     prtOutputEntry->prtOutputVersion);
     }
@@ -1753,7 +1759,7 @@ xml_printer_outputs(xmlNodePtr root,
     e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputSecurity);
     if (e) {
-	(void) xml_new_child(tree, NULL, "security", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("security"), "%s", e);
     }
 
     /* ...media specific stuff begins here... */
@@ -1773,37 +1779,37 @@ xml_printer_outputs(xmlNodePtr root,
     e = fmt_enum(printer_mib_enums_PrtOutputStackingOrderTC,
 		 prtOutputEntry->prtOutputStackingOrder);
     if (e) {
-	(void) xml_new_child(tree, NULL, "stacking-order", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("stacking-order"), "%s", e);
     }
 
     e = fmt_enum(printer_mib_enums_PrtOutputPageDeliveryOrientationTC,
 		 prtOutputEntry->prtOutputPageDeliveryOrientation);
     if (e) {
-	(void) xml_new_child(tree, NULL, "orientation", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("orientation"), "%s", e);
     }
 
     e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputBursting);
     if (e) {
-	(void) xml_new_child(tree, NULL, "bursting", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("bursting"), "%s", e);
     }
 
     e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputDecollating);
     if (e) {
-	(void) xml_new_child(tree, NULL, "decollating", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("decollating"), "%s", e);
     }
 
     e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputPageCollated);
     if (e) {
-	(void) xml_new_child(tree, NULL, "collation", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("collation"), "%s", e);
     }
 
     e = fmt_enum(printer_mib_enums_PresentOnOff,
 		 prtOutputEntry->prtOutputOffsetStacking);
     if (e) {
-	(void) xml_new_child(tree, NULL, "offset-stacking", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("offset-stacking"), "%s", e);
     }
 }
 
@@ -1814,6 +1820,7 @@ show_printer_outputs(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtOutputEntry_t **prtOutputTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1825,8 +1832,8 @@ show_printer_outputs(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    printer_mib_get_prtOutputTable(interp->peer, &prtOutputTable, 0);
-    if (interp->peer->error_status) {
+    printer_mib_get_prtOutputTable(interp->peer, &prtOutputTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1942,38 +1949,38 @@ xml_printer_marker(xmlNodePtr root,
     xmlNodePtr tree, node;
     const char *e;
 
-    tree = xmlNewChild(root, NULL, "marker", NULL);
-    xml_set_prop(tree, "number", "%d",
+    tree = xml_new_child(root, NULL, BAD_CAST("marker"), NULL);
+    xml_set_prop(tree, BAD_CAST("number"), "%d",
 		      prtMarkerEntry->prtMarkerIndex);
     e = fmt_enum(printer_mib_enums_PrtMarkerCounterUnitTC,
 		 prtMarkerEntry->prtMarkerCounterUnit);
 
     if (prtMarkerEntry->prtMarkerLifeCount) {
-	node = xml_new_child(tree, NULL, "life-count", "%u",
+	node = xml_new_child(tree, NULL, BAD_CAST("life-count"), "%u",
 			     *prtMarkerEntry->prtMarkerLifeCount);
-	if (e) xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
     }
 
     if (prtMarkerEntry->prtMarkerPowerOnCount) {
-	node = xml_new_child(tree, NULL, "power-on-count", "%u",
+	node = xml_new_child(tree, NULL, BAD_CAST("power-on-count"), "%u",
 			     *prtMarkerEntry->prtMarkerPowerOnCount);
-	if (e) xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
     }
 
     if (prtMarkerEntry->prtMarkerProcessColorants) {
-	node = xml_new_child(tree, NULL, "process-colors", "%u",
+	node = xml_new_child(tree, NULL, BAD_CAST("process-colors"), "%u",
 			  *prtMarkerEntry->prtMarkerProcessColorants);
     }
 
     if (prtMarkerEntry->prtMarkerSpotColorants) {
-	node = xml_new_child(tree, NULL, "spot-colors", "%u",
+	node = xml_new_child(tree, NULL, BAD_CAST("spot-colors"), "%u",
 			  *prtMarkerEntry->prtMarkerSpotColorants);
     }
 
     e = fmt_enum(iana_printer_mib_enums_PrtMarkerMarkTechTC,
 		 prtMarkerEntry->prtMarkerMarkTech);
     if (e) {
-	(void) xml_new_child(tree, NULL, "technology", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("technology"), "%s", e);
     }
 
     e = fmt_enum(markerResolutionUnit,
@@ -1982,14 +1989,14 @@ xml_printer_marker(xmlNodePtr root,
 	&& prtMarkerEntry->prtMarkerAddressabilityXFeedDir) {
 
 	xmlNodePtr res;
-	res = xmlNewChild(tree, NULL, "resolution", NULL);
-	node = xml_new_child(res, NULL, "direction", "%s",
+	res = xml_new_child(tree, NULL, BAD_CAST("resolution"), NULL);
+	node = xml_new_child(res, NULL, BAD_CAST("direction"), "%s",
 	     fmt_dimensions(prtMarkerEntry->prtMarkerAddressabilityFeedDir));
-	if (e) xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
 
-	node = xml_new_child(res, NULL, "cross-direction", "%s",
+	node = xml_new_child(res, NULL, BAD_CAST("cross-direction"), "%s",
 	     fmt_dimensions(prtMarkerEntry->prtMarkerAddressabilityXFeedDir));
-	if (e) xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
     }
 
     e = fmt_enum(printer_mib_enums_PrtMarkerAddressabilityUnitTC,
@@ -2000,20 +2007,20 @@ xml_printer_marker(xmlNodePtr root,
 	&& prtMarkerEntry->prtMarkerEastMargin) {
 
 	xmlNodePtr margins;
-	margins = xmlNewChild(tree, NULL, "margins", NULL);
+	margins = xml_new_child(tree, NULL, BAD_CAST("margins"), NULL);
 
-	node = xml_new_child(margins, NULL, "north", "%s",
+	node = xml_new_child(margins, NULL, BAD_CAST("north"), "%s",
 			     fmt_dimensions(prtMarkerEntry->prtMarkerNorthMargin));
-	if (e) xml_set_prop(node, "unit", "%s", e);
-	node = xml_new_child(margins, NULL, "south", "%s",
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
+	node = xml_new_child(margins, NULL, BAD_CAST("south"), "%s",
 			     fmt_dimensions(prtMarkerEntry->prtMarkerSouthMargin));
-	if (e) xml_set_prop(node, "unit", "%s", e);
-	node = xml_new_child(margins, NULL, "west", "%s",
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
+	node = xml_new_child(margins, NULL, BAD_CAST("west"), "%s",
 			     fmt_dimensions(prtMarkerEntry->prtMarkerWestMargin));
-	if (e) xml_set_prop(node, "unit", "%s", e);
-	node = xml_new_child(margins, NULL, "east", "%s",
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
+	node = xml_new_child(margins, NULL, BAD_CAST("east"), "%s",
 			     fmt_dimensions(prtMarkerEntry->prtMarkerEastMargin));
-	if (e) xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
     }
     
     xml_subunit(tree, prtMarkerEntry->prtMarkerStatus);
@@ -2026,6 +2033,7 @@ show_printer_markers(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtMarkerEntry_t **prtMarkerTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -2037,8 +2045,8 @@ show_printer_markers(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    printer_mib_get_prtMarkerTable(interp->peer, &prtMarkerTable, 0);
-    if (interp->peer->error_status) {
+    printer_mib_get_prtMarkerTable(interp->peer, &prtMarkerTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -2111,29 +2119,29 @@ xml_printer_colorant(xmlNodePtr root,
     xmlNodePtr tree;
     const char *e;
 
-    tree = xmlNewChild(root, NULL, "colorant", NULL);
-    xml_set_prop(tree, "number", "%d",
+    tree = xml_new_child(root, NULL, BAD_CAST("colorant"), NULL);
+    xml_set_prop(tree, BAD_CAST("number"), "%d",
 		 prtColorantEntry->prtMarkerColorantIndex);
 
     if (prtColorantEntry->prtMarkerColorantMarkerIndex) {
-	(void) xml_new_child(tree, NULL, "marker", "%d",
+	(void) xml_new_child(tree, NULL, BAD_CAST("marker"), "%d",
 			     *prtColorantEntry->prtMarkerColorantMarkerIndex);
     }
 
     e = fmt_enum(printer_mib_enums_PrtMarkerColorantRoleTC,
 		 prtColorantEntry->prtMarkerColorantRole);
     if (e) {
-	(void) xml_new_child(tree, NULL, "role", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("role"), "%s", e);
     }
 
     if (prtColorantEntry->prtMarkerColorantValue) {
-	(void) xml_new_child(tree, NULL, "color", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("color"), "%.*s",
 		  (int) prtColorantEntry->_prtMarkerColorantValueLength,
 		  prtColorantEntry->prtMarkerColorantValue);
     }
 
     if (prtColorantEntry->prtMarkerColorantTonality) {
-	(void) xml_new_child(tree, NULL, "tonality", "%d",
+	(void) xml_new_child(tree, NULL, BAD_CAST("tonality"), "%d",
 			     *prtColorantEntry->prtMarkerColorantTonality);
     }
 }
@@ -2145,6 +2153,7 @@ show_printer_colorants(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtMarkerColorantEntry_t **prtColorantTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -2156,8 +2165,8 @@ show_printer_colorants(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    printer_mib_get_prtMarkerColorantTable(interp->peer, &prtColorantTable, 0);
-    if (interp->peer->error_status) {
+    printer_mib_get_prtMarkerColorantTable(interp->peer, &prtColorantTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -2274,24 +2283,24 @@ xml_printer_supplies(xmlNodePtr root,
     xmlNodePtr tree, node;
     const char *e;
 
-    tree = xmlNewChild(root, NULL, "supply", NULL);
-    xml_set_prop(tree, "number", "%d",
+    tree = xml_new_child(root, NULL, BAD_CAST("supply"), NULL);
+    xml_set_prop(tree, BAD_CAST("number"), "%d",
 		 prtSuppliesEntry->prtMarkerSuppliesIndex);
 
     if (prtSuppliesEntry->prtMarkerSuppliesMarkerIndex
 	&& *prtSuppliesEntry->prtMarkerSuppliesMarkerIndex) {
-	(void) xml_new_child(tree, NULL, "marker", "%d",
+	(void) xml_new_child(tree, NULL, BAD_CAST("marker"), "%d",
 			  *prtSuppliesEntry->prtMarkerSuppliesMarkerIndex);
     }
 
     if (prtSuppliesEntry->prtMarkerSuppliesColorantIndex
 	&& *prtSuppliesEntry->prtMarkerSuppliesColorantIndex) {
-	(void) xml_new_child(tree, NULL, "colorant", "%d",
+	(void) xml_new_child(tree, NULL, BAD_CAST("colorant"), "%d",
 			  *prtSuppliesEntry->prtMarkerSuppliesColorantIndex);
     }
 
     if (prtSuppliesEntry->prtMarkerSuppliesDescription) {
-	(void) xml_new_child(tree, NULL, "description", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 			     (int) prtSuppliesEntry->_prtMarkerSuppliesDescriptionLength,
 			     prtSuppliesEntry->prtMarkerSuppliesDescription);
     }
@@ -2299,13 +2308,13 @@ xml_printer_supplies(xmlNodePtr root,
     e = fmt_enum(iana_printer_mib_enums_PrtMarkerSuppliesTypeTC,
 		 prtSuppliesEntry->prtMarkerSuppliesType);
     if (e) {
-	(void) xml_new_child(tree, NULL, "type", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("type"), "%s", e);
     }
 
     e = fmt_enum(printer_mib_enums_PrtMarkerSuppliesClassTC,
 		 prtSuppliesEntry->prtMarkerSuppliesClass);
     if (e) {
-	(void) xml_new_child(tree, NULL, "class", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("class"), "%s", e);
     }
 
     e = fmt_enum(printer_mib_enums_PrtMarkerSuppliesSupplyUnitTC,
@@ -2314,34 +2323,34 @@ xml_printer_supplies(xmlNodePtr root,
     if (prtSuppliesEntry->prtMarkerSuppliesMaxCapacity) {
 	switch (*prtSuppliesEntry->prtMarkerSuppliesMaxCapacity) {
 	case -1:
-	    node = xml_new_child(tree, NULL, "capacity", "unlimited");
+	    node = xml_new_child(tree, NULL, BAD_CAST("capacity"), "unlimited");
 	    break;
 	case -2:
-	    node = xml_new_child(tree, NULL, "capacity", "unknown");
+	    node = xml_new_child(tree, NULL, BAD_CAST("capacity"), "unknown");
 	    break;
 	default:
-	    node = xml_new_child(tree, NULL, "capacity", "%d",
+	    node = xml_new_child(tree, NULL, BAD_CAST("capacity"), "%d",
 			 *prtSuppliesEntry->prtMarkerSuppliesMaxCapacity);
 	}
-	if (e) xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
     }
 
     if (prtSuppliesEntry->prtMarkerSuppliesLevel) {
 	switch (*prtSuppliesEntry->prtMarkerSuppliesLevel) {
 	case -1:
-	    node = xml_new_child(tree, NULL, "level", "unlimited");
+	    node = xml_new_child(tree, NULL, BAD_CAST("level"), "unlimited");
 	    break;
 	case -2:
-	    node = xml_new_child(tree, NULL, "level", "unknown");
+	    node = xml_new_child(tree, NULL, BAD_CAST("level"), "unknown");
 	    break;
 	case -3:
-	    node = xml_new_child(tree, NULL, "level", ">0");
+	    node = xml_new_child(tree, NULL, BAD_CAST("level"), ">0");
 	    break;
 	default:
-	    node = xml_new_child(tree, NULL, "level", "%d",
+	    node = xml_new_child(tree, NULL, BAD_CAST("level"), "%d",
 				 *prtSuppliesEntry->prtMarkerSuppliesLevel);
 	}
-	if (e) xml_set_prop(node, "unit", "%s", e);
+	if (e) xml_set_prop(node, BAD_CAST("unit"), "%s", e);
     }
 }
 
@@ -2352,6 +2361,7 @@ show_printer_supplies(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtMarkerSuppliesEntry_t **prtMarkerSuppliesTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -2363,8 +2373,8 @@ show_printer_supplies(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    printer_mib_get_prtMarkerSuppliesTable(interp->peer, &prtMarkerSuppliesTable, 0);
-    if (interp->peer->error_status) {
+    printer_mib_get_prtMarkerSuppliesTable(interp->peer, &prtMarkerSuppliesTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -2414,19 +2424,19 @@ fmt_printer_interpreter(GString *s,
 
     fmt_display_string(s, indent, "Language Level:",
 		       (int) interpEntry->_prtInterpreterLangLevelLength,
-		       interpEntry->prtInterpreterLangLevel);
+		       (gchar *) interpEntry->prtInterpreterLangLevel);
 
     fmt_display_string(s, indent, "Language Version:",
 		       (int) interpEntry->_prtInterpreterLangVersionLength,
-		       interpEntry->prtInterpreterLangVersion);
+		       (gchar *) interpEntry->prtInterpreterLangVersion);
 
     fmt_display_string(s, indent, "Description:",
 		       (int) interpEntry->_prtInterpreterDescriptionLength,
-		       interpEntry->prtInterpreterDescription);
+		       (gchar *) interpEntry->prtInterpreterDescription);
 
     fmt_display_string(s, indent, "Version:",
 		       (int) interpEntry->_prtInterpreterVersionLength,
-		       interpEntry->prtInterpreterVersion);
+		       (gchar *) interpEntry->prtInterpreterVersion);
 
     e = fmt_enum(printer_mib_enums_PrtPrintOrientationTC,
 		 interpEntry->prtInterpreterDefaultOrientation);
@@ -2471,38 +2481,38 @@ xml_printer_interpreter(xmlNodePtr root,
     xmlNodePtr tree, lang;
     const char *e;
 
-    tree = xmlNewChild(root, NULL, "interpreter", NULL);
-    xml_set_prop(tree, "number", "%d",
+    tree = xml_new_child(root, NULL, BAD_CAST("interpreter"), NULL);
+    xml_set_prop(tree, BAD_CAST("number"), "%d",
 		 interpEntry->prtInterpreterIndex);
 
-    lang = xmlNewChild(tree, NULL, "language", NULL);
+    lang = xml_new_child(tree, NULL, BAD_CAST("language"), NULL);
 
     e = fmt_enum(iana_printer_mib_enums_PrtInterpreterLangFamilyTC,
 		 interpEntry->prtInterpreterLangFamily);
     if (e) {
-	(void) xml_new_child(lang, NULL, "name", "%s", e);
+	(void) xml_new_child(lang, NULL, BAD_CAST("name"), "%s", e);
     }
 
     if (interpEntry->prtInterpreterLangLevel) {
-	(void) xml_new_child(lang, NULL, "level", "%.*s",
+	(void) xml_new_child(lang, NULL, BAD_CAST("level"), "%.*s",
 		       (int) interpEntry->_prtInterpreterLangLevelLength,
 			     interpEntry->prtInterpreterLangLevel);
     }
 
     if (interpEntry->prtInterpreterLangVersion) {
-	(void) xml_new_child(lang, NULL, "version", "%.*s",
+	(void) xml_new_child(lang, NULL, BAD_CAST("version"), "%.*s",
 		       (int) interpEntry->_prtInterpreterLangVersionLength,
 			     interpEntry->prtInterpreterLangVersion);
     }
 
     if (interpEntry->prtInterpreterDescription) {
-	(void) xml_new_child(tree, NULL, "description", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 		     (int) interpEntry->_prtInterpreterDescriptionLength,
 		     interpEntry->prtInterpreterDescription);
     }
 
     if (interpEntry->prtInterpreterVersion) {
-	(void) xml_new_child(tree, NULL, "version", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("version"), "%.*s",
 			     (int) interpEntry->_prtInterpreterVersionLength,
 			     interpEntry->prtInterpreterVersion);
     }
@@ -2510,7 +2520,7 @@ xml_printer_interpreter(xmlNodePtr root,
     e = fmt_enum(printer_mib_enums_PrtPrintOrientationTC,
 		 interpEntry->prtInterpreterDefaultOrientation);
     if (e) {
-	(void) xml_new_child(tree, NULL, "orientation", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("orientation"), "%s", e);
     }
 
 #if 0
@@ -2532,19 +2542,19 @@ xml_printer_interpreter(xmlNodePtr root,
     e = fmt_enum(iana_charset_mib_enums_IANACharset,
 		 interpEntry->prtInterpreterDefaultCharSetIn);
     if (e) {
-	(void) xml_new_child(tree, NULL, "charset-in", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("charset-in"), "%s", e);
     }
     
     e = fmt_enum(iana_charset_mib_enums_IANACharset,
 		 interpEntry->prtInterpreterDefaultCharSetOut);
     if (e) {
-	(void) xml_new_child(tree, NULL, "charset-out", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("charset-out"), "%s", e);
     }
 
     e = fmt_enum(printer_mib_enums_PrtInterpreterTwoWayTC,
 		 interpEntry->prtInterpreterTwoWay);
     if (e) {
-	(void) xml_new_child(tree, NULL, "two-way", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("two-way"), "%s", e);
     }
 }
 
@@ -2555,6 +2565,7 @@ show_printer_interpreters(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtInterpreterEntry_t **interpTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -2566,8 +2577,8 @@ show_printer_interpreters(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    printer_mib_get_prtInterpreterTable(interp->peer, &interpTable, 0);
-    if (interp->peer->error_status) {
+    printer_mib_get_prtInterpreterTable(interp->peer, &interpTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -2639,7 +2650,7 @@ fmt_printer_channel(GString *s,
 
     fmt_display_string(s, indent, "Version:",
 		       (int) channelEntry->_prtChannelProtocolVersionLength,
-		       channelEntry->prtChannelProtocolVersion);
+		       (gchar *) channelEntry->prtChannelProtocolVersion);
 
     e = fmt_enum(printer_mib_enums_PrtChannelStateTC,
 		 channelEntry->prtChannelState);
@@ -2684,7 +2695,7 @@ fmt_printer_channel(GString *s,
 
     fmt_display_string(s, indent, "Information:",
 		       (int) channelEntry->_prtChannelInformationLength,
-		       channelEntry->prtChannelInformation);
+		       (gchar *) channelEntry->prtChannelInformation);
 }
 
 
@@ -2698,18 +2709,18 @@ xml_printer_channel(xmlNodePtr root,
     xmlNodePtr tree;
     const char *e;
 
-    tree = xmlNewChild(root, NULL, "channel", NULL);
-    xml_set_prop(tree, "number", "%d",
+    tree = xml_new_child(root, NULL, BAD_CAST("channel"), NULL);
+    xml_set_prop(tree, BAD_CAST("number"), "%d",
 		 channelEntry->prtChannelIndex);
 
     e = fmt_enum(iana_printer_mib_enums_PrtChannelTypeTC,
 		 channelEntry->prtChannelType);
     if (e) {
-	(void) xml_new_child(tree, NULL, "type", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("type"), "%s", e);
     }
 
     if (channelEntry->prtChannelProtocolVersion) {
-	(void) xml_new_child(tree, NULL, "version", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("version"), "%.*s",
 		     (int) channelEntry->_prtChannelProtocolVersionLength,
 		     channelEntry->prtChannelProtocolVersion);
     }
@@ -2717,11 +2728,11 @@ xml_printer_channel(xmlNodePtr root,
     e = fmt_enum(printer_mib_enums_PrtChannelStateTC,
 		 channelEntry->prtChannelState);
     if (e) {
-	(void) xml_new_child(tree, NULL, "state", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("state"), "%s", e);
     }
 
     if (channelEntry->prtChannelIfIndex) {
-	(void) xml_new_child(tree, NULL, "interface", "%d",
+	(void) xml_new_child(tree, NULL, BAD_CAST("interface"), "%d",
 			     *channelEntry->prtChannelIfIndex);
     }
 
@@ -2732,9 +2743,9 @@ xml_printer_channel(xmlNodePtr root,
 	    fmt_enum(iana_printer_mib_enums_PrtInterpreterLangFamilyTC,
 		     interpEntry->prtInterpreterLangFamily) : NULL;
 	if (e) {
-	    (void) xml_new_child(tree, NULL, "crtl-language", "%s", e);
+	    (void) xml_new_child(tree, NULL, BAD_CAST("crtl-language"), "%s", e);
 	} else {
-	    (void) xml_new_child(tree, NULL, "crtl-language", "%d",
+	    (void) xml_new_child(tree, NULL, BAD_CAST("crtl-language"), "%d",
 			 *channelEntry->prtChannelCurrentJobCntlLangIndex);
 	}
     }
@@ -2746,9 +2757,9 @@ xml_printer_channel(xmlNodePtr root,
 	    fmt_enum(iana_printer_mib_enums_PrtInterpreterLangFamilyTC,
 		     interpEntry->prtInterpreterLangFamily) : NULL;
 	if (e) {
-	    (void) xml_new_child(tree, NULL, "page-language", "%s", e);
+	    (void) xml_new_child(tree, NULL, BAD_CAST("page-language"), "%s", e);
 	} else {
-	    (void) xml_new_child(tree, NULL, "page-language", "%d",
+	    (void) xml_new_child(tree, NULL, BAD_CAST("page-language"), "%d",
 			 *channelEntry->prtChannelDefaultPageDescLangIndex);
 	}
     }
@@ -2756,7 +2767,7 @@ xml_printer_channel(xmlNodePtr root,
     xml_subunit(tree, channelEntry->prtChannelStatus);
 
     if (channelEntry->prtChannelInformation) {
-	(void) xml_new_child(tree, NULL, "information", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("information"), "%.*s",
 			     (int) channelEntry->_prtChannelInformationLength,
 			     channelEntry->prtChannelInformation);
     }
@@ -2770,6 +2781,7 @@ show_printer_channels(scli_interp_t *interp, int argc, char **argv)
     printer_mib_prtChannelEntry_t **channelTable = NULL;
     printer_mib_prtInterpreterEntry_t **interpTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -2781,11 +2793,11 @@ show_printer_channels(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    printer_mib_get_prtChannelTable(interp->peer, &channelTable, 0);
-    if (interp->peer->error_status) {
+    printer_mib_get_prtChannelTable(interp->peer, &channelTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
-    printer_mib_get_prtInterpreterTable(interp->peer, &interpTable, 0);
+    printer_mib_get_prtInterpreterTable(interp->peer, &interpTable, 0, NULL);
 
     if (channelTable) {
 	for (i = 0; channelTable[i]; i++) {
@@ -2839,8 +2851,8 @@ xml_printer_display(xmlNodePtr root,
     xmlNodePtr tree;
 
     if (displayEntry->prtConsoleDisplayBufferText) {
-	tree = xmlNewChild(root, NULL, "line", NULL);
-	xml_set_prop(tree, "number", "%d",
+	tree = xml_new_child(root, NULL, BAD_CAST("line"), NULL);
+	xml_set_prop(tree, BAD_CAST("number"), "%d",
 		     displayEntry->prtConsoleDisplayBufferIndex);
 	xml_set_content(tree, "%.*s", 
 		  (int) displayEntry->_prtConsoleDisplayBufferTextLength,
@@ -2855,6 +2867,7 @@ show_printer_display(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtConsoleDisplayBufferEntry_t **displayTable;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -2867,8 +2880,8 @@ show_printer_display(scli_interp_t *interp, int argc, char **argv)
     }
 
     printer_mib_get_prtConsoleDisplayBufferTable(interp->peer,
-						 &displayTable, 0);
-    if (interp->peer->error_status) {
+						 &displayTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -2942,11 +2955,11 @@ xml_printer_light(xmlNodePtr root,
     const char *state = "off";
     const char *e;
     
-    tree = xmlNewChild(root, NULL, "light", NULL);
-    xml_set_prop(tree, "number", "%d", lightEntry->prtConsoleLightIndex);
+    tree = xml_new_child(root, NULL, BAD_CAST("light"), NULL);
+    xml_set_prop(tree, BAD_CAST("number"), "%d", lightEntry->prtConsoleLightIndex);
 
     if (lightEntry->prtConsoleDescription) {
-	(void) xml_new_child(tree, NULL, "description", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 		       (int) lightEntry->_prtConsoleDescriptionLength,
 			     lightEntry->prtConsoleDescription);
     }
@@ -2954,7 +2967,7 @@ xml_printer_light(xmlNodePtr root,
     e = fmt_enum(iana_printer_mib_enums_PrtConsoleColorTC,
 		 lightEntry->prtConsoleColor);
     if (e) {
-	xml_new_child(tree, NULL, "color", e);
+	xml_new_child(tree, NULL, BAD_CAST("color"), e);
     }
 
     if (*lightEntry->prtConsoleOnTime
@@ -2967,7 +2980,7 @@ xml_printer_light(xmlNodePtr root,
 	       && *lightEntry->prtConsoleOffTime) {
 	state = "blink";
     }
-    xml_new_child(tree, NULL, "status", state);
+    xml_new_child(tree, NULL, BAD_CAST("status"), state);
 }
 
 
@@ -2978,6 +2991,7 @@ show_printer_lights(scli_interp_t *interp, int argc, char **argv)
     printer_mib_prtConsoleLightEntry_t **lightTable;
     int i;
     int light_width = 12;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -2990,8 +3004,8 @@ show_printer_lights(scli_interp_t *interp, int argc, char **argv)
     }
 
     printer_mib_get_prtConsoleLightTable(interp->peer,
-					 &lightTable, 0);
-    if (interp->peer->error_status) {
+					 &lightTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -3122,7 +3136,7 @@ fmt_printer_alert_orig(GString *s, printer_mib_prtAlertEntry_t *alertEntry)
 
     fmt_display_string(s, indent, "Description:",
 		       (int) alertEntry->_prtAlertDescriptionLength,
-		       alertEntry->prtAlertDescription);
+		       (gchar *) alertEntry->prtAlertDescription);
 
     e = fmt_enum(prtAlertGroup, alertEntry->prtAlertGroup);
     if (e) {
@@ -3153,28 +3167,28 @@ xml_printer_alert(xmlNodePtr root, printer_mib_prtAlertEntry_t *alertEntry)
     xmlNodePtr tree;
     const char *e;
 
-    tree = xmlNewChild(root, NULL, "alert", NULL);
-    xml_set_prop(tree, "number", "%d", alertEntry->prtAlertIndex);
+    tree = xml_new_child(root, NULL, BAD_CAST("alert"), NULL);
+    xml_set_prop(tree, BAD_CAST("number"), "%d", alertEntry->prtAlertIndex);
 
     if (alertEntry->prtAlertTime) {
-	xml_new_child(tree, NULL, "date",
+	xml_new_child(tree, NULL, BAD_CAST("date"),
 		      xml_timeticks(*alertEntry->prtAlertTime));
     }
 
     e = fmt_enum(iana_printer_mib_enums_PrtAlertCodeTC,
 		 alertEntry->prtAlertCode);
     if (e) {
-	xml_new_child(tree, NULL, "code", e);
+	xml_new_child(tree, NULL, BAD_CAST("code"), e);
     }
 
     e = fmt_enum(printer_mib_enums_PrtAlertSeverityLevelTC,
 		 alertEntry->prtAlertSeverityLevel);
     if (e) {
-	xml_new_child(tree, NULL, "severity", e);
+	xml_new_child(tree, NULL, BAD_CAST("severity"), e);
     }
 
     if (alertEntry->prtAlertDescription) {
-	xml_new_child(tree, NULL, "description", "%.*s",
+	xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 		(int) alertEntry->_prtAlertDescriptionLength,
 		      alertEntry->prtAlertDescription);
     }
@@ -3190,14 +3204,14 @@ xml_printer_alert(xmlNodePtr root, printer_mib_prtAlertEntry_t *alertEntry)
 	    && *alertEntry->prtAlertLocation > 0) {
 	    g_string_sprintfa(s, " (at location %u)", *alertEntry->prtAlertLocation);
 	}
-	xml_new_child(tree, NULL, "location", s->str);
+	xml_new_child(tree, NULL, BAD_CAST("location"), s->str);
 	g_string_free(s, 1);
     }
 
     e = fmt_enum(iana_printer_mib_enums_PrtAlertTrainingLevelTC,
 		 alertEntry->prtAlertTrainingLevel);
     if (e) {
-	xml_new_child(tree, NULL, "personnel", "%s", e);
+	xml_new_child(tree, NULL, BAD_CAST("personnel"), "%s", e);
     }
 }
 
@@ -3208,6 +3222,7 @@ show_printer_alert(scli_interp_t *interp, int argc, char **argv)
 {
     printer_mib_prtAlertEntry_t **alertTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -3219,8 +3234,8 @@ show_printer_alert(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    printer_mib_get_prtAlertTable(interp->peer, &alertTable, 0);
-    if (interp->peer->error_status) {
+    printer_mib_get_prtAlertTable(interp->peer, &alertTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -3252,6 +3267,7 @@ set_printer_operator(scli_interp_t *interp, int argc, char **argv)
 {
     gchar *operator;
     gsize operator_len;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -3272,8 +3288,8 @@ set_printer_operator(scli_interp_t *interp, int argc, char **argv)
     }
 
     printer_mib_set_prtGeneralCurrentOperator(interp->peer, 42, /* xxx */
-					      operator, operator_len);
-    if (interp->peer->error_status) {
+			      (guchar *) operator, operator_len, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -3285,6 +3301,8 @@ set_printer_operator(scli_interp_t *interp, int argc, char **argv)
 static int
 exec_printer_reboot(scli_interp_t *interp, int argc, char **argv)
 {
+    GError *error = NULL;
+    
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 1) {
@@ -3296,8 +3314,8 @@ exec_printer_reboot(scli_interp_t *interp, int argc, char **argv)
     }
 
     printer_mib_set_prtGeneralReset(interp->peer, 1, /* xxx */
-			    IANA_PRINTER_MIB_PRTGENERALRESETTC_RESETTONVRAM);
-    if (interp->peer->error_status) {
+		    IANA_PRINTER_MIB_PRTGENERALRESETTC_RESETTONVRAM, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

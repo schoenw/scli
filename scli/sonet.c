@@ -118,6 +118,7 @@ show_sonet_media(scli_interp_t *interp, int argc, char **argv)
     sonet_mib_sonetMediumEntry_t **sonetMediumTable = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -138,8 +139,8 @@ show_sonet_media(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    sonet_mib_get_sonetMediumTable(interp->peer, &sonetMediumTable, 0);
-    if (interp->peer->error_status) {
+    sonet_mib_get_sonetMediumTable(interp->peer, &sonetMediumTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
     }
@@ -152,7 +153,8 @@ show_sonet_media(scli_interp_t *interp, int argc, char **argv)
 	for (i = 0; sonetMediumTable[i]; i++) {
 	    if_mib_ifEntry_t *ifEntry;
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
-			       sonetMediumTable[i]->ifIndex, IF_MIB_IFDESCR);
+			       sonetMediumTable[i]->ifIndex,
+			       IF_MIB_IFDESCR, NULL);
 	    if (interface_match(regex_iface, ifEntry)) {
 		fmt_sonet_media(interp->result, sonetMediumTable[i], ifEntry,
 				line_type_width);
@@ -250,6 +252,7 @@ show_sonet_section_stats(scli_interp_t *interp, int argc, char **argv)
     sonet_mib_sonetSectionCurrentEntry_t **sonetSectionTable = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -271,7 +274,7 @@ show_sonet_section_stats(scli_interp_t *interp, int argc, char **argv)
     }
 
     sonet_mib_get_sonetSectionCurrentTable(interp->peer,
-					   &sonetSectionTable, 0);
+					   &sonetSectionTable, 0, &error);
     if (interp->peer->error_status) {
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
@@ -284,7 +287,8 @@ show_sonet_section_stats(scli_interp_t *interp, int argc, char **argv)
 	for (i = 0; sonetSectionTable[i]; i++) {
             if_mib_ifEntry_t *ifEntry;
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
-			       sonetSectionTable[i]->ifIndex, IF_MIB_IFDESCR);
+			       sonetSectionTable[i]->ifIndex,
+			       IF_MIB_IFDESCR, NULL);
 	    if (interface_match(regex_iface, ifEntry)) {
                 fmt_sonet_section_stats(interp->result, sonetSectionTable[i],
 					ifEntry);
@@ -365,6 +369,7 @@ show_sonet_section_history(scli_interp_t *interp, int argc, char **argv)
     sonet_mib_sonetSectionIntervalEntry_t **sonetSectionTable = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -386,8 +391,8 @@ show_sonet_section_history(scli_interp_t *interp, int argc, char **argv)
     }
 
     sonet_mib_get_sonetSectionIntervalTable(interp->peer,
-					    &sonetSectionTable, 0);
-    if (interp->peer->error_status) {
+					    &sonetSectionTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
     }
@@ -399,7 +404,8 @@ show_sonet_section_history(scli_interp_t *interp, int argc, char **argv)
 	for (i = 0; sonetSectionTable[i]; i++) {
             if_mib_ifEntry_t *ifEntry;
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
-			       sonetSectionTable[i]->ifIndex, IF_MIB_IFDESCR);
+			       sonetSectionTable[i]->ifIndex,
+			       IF_MIB_IFDESCR, NULL);
 	    if (interface_match(regex_iface, ifEntry)) {
                 fmt_sonet_section_history(interp->result,
 					  sonetSectionTable[i], ifEntry);

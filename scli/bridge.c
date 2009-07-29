@@ -102,23 +102,23 @@ xml_bridge_stp_info(xmlNodePtr root,
     const char *e;
     xmlNodePtr node;
 
-    root = xml_new_child(root, NULL, "stp", NULL);
+    root = xml_new_child(root, NULL, BAD_CAST("stp"), NULL);
 
     if (dot1dStp->dot1dStpProtocolSpecification) {
 	e = fmt_enum(bridge_mib_enums_dot1dStpProtocolSpecification,
 		     dot1dStp->dot1dStpProtocolSpecification);
 	if (e) {
-	    (void) xml_new_child(root, NULL, "type", "%s", e);
+	    (void) xml_new_child(root, NULL, BAD_CAST("type"), "%s", e);
 	}
     }
     
     if (dot1dStp->dot1dStpPriority) {
-	(void) xml_new_child(root, NULL, "priority", "%d",
+	(void) xml_new_child(root, NULL, BAD_CAST("priority"), "%d",
 			     *dot1dStp->dot1dStpPriority);
     }
 
     if (dot1dStp->dot1dStpPriority && dot1dBase->dot1dBaseBridgeAddress) {
-	(void) xml_new_child(root, NULL, "bridge-id",
+	(void) xml_new_child(root, NULL, BAD_CAST("bridge-id"),
 			     "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
 			     (*dot1dStp->dot1dStpPriority >> 8) & 0xff,
 			     (*dot1dStp->dot1dStpPriority) & 0xff,
@@ -131,51 +131,51 @@ xml_bridge_stp_info(xmlNodePtr root,
     }
     
     if (dot1dStp->dot1dStpDesignatedRoot) {
-	(void) xml_new_child(root, NULL, "root-id", "%s",
+	(void) xml_new_child(root, NULL, BAD_CAST("root-id"), "%s",
 			     fmt_bridgeid(dot1dStp->dot1dStpDesignatedRoot));
     }
 
     if (dot1dStp->dot1dStpRootCost) {
-	(void) xml_new_child(root, NULL, "root-cost", "%d",
+	(void) xml_new_child(root, NULL, BAD_CAST("root-cost"), "%d",
 			     *dot1dStp->dot1dStpRootCost);
     }
 
     if (dot1dStp->dot1dStpRootPort) {
-	(void) xml_new_child(root, NULL, "root-port", "%d",
+	(void) xml_new_child(root, NULL, BAD_CAST("root-port"), "%d",
 			     *dot1dStp->dot1dStpRootPort);
     }
 
     if (dot1dStp->dot1dStpMaxAge) {
-	node = xml_new_child(root, NULL, "aging-time", "%d",
+	node = xml_new_child(root, NULL, BAD_CAST("aging-time"), "%d",
 			     *dot1dStp->dot1dStpMaxAge * 10);
-	xml_set_prop(node, "unit", "milliseconds");
+	xml_set_prop(node, BAD_CAST("unit"), "milliseconds");
     }
 
     if (dot1dStp->dot1dStpHelloTime) {
-	node = xml_new_child(root, NULL, "hello-time", "%d",
+	node = xml_new_child(root, NULL, BAD_CAST("hello-time"), "%d",
 			     *dot1dStp->dot1dStpHelloTime * 10);
-	xml_set_prop(node, "unit", "milliseconds");
+	xml_set_prop(node, BAD_CAST("unit"), "milliseconds");
     }
 
     if (dot1dStp->dot1dStpHoldTime) {
-	node = xml_new_child(root, NULL, "hold-time", "%d",
+	node = xml_new_child(root, NULL, BAD_CAST("hold-time"), "%d",
 			     *dot1dStp->dot1dStpHoldTime * 10);
-	xml_set_prop(node, "unit", "milliseconds");
+	xml_set_prop(node, BAD_CAST("unit"), "milliseconds");
     }
 
     if (dot1dStp->dot1dStpForwardDelay) {
-	node = xml_new_child(root, NULL, "forward-delay", "%d",
+	node = xml_new_child(root, NULL, BAD_CAST("forward-delay"), "%d",
 			     *dot1dStp->dot1dStpForwardDelay * 10);
-	xml_set_prop(node, "unit", "milliseconds");
+	xml_set_prop(node, BAD_CAST("unit"), "milliseconds");
     }
 
     if (dot1dStp->dot1dStpTimeSinceTopologyChange) {
-	node = xml_new_child(root, NULL, "topology-change", "%s",
+	node = xml_new_child(root, NULL, BAD_CAST("topology-change"), "%s",
 			     xml_timeticks(*(dot1dStp->dot1dStpTimeSinceTopologyChange)));
     }
     
     if (dot1dStp->dot1dStpTopChanges) {
-	node = xml_new_child(root, NULL, "topology-changes", "%u",
+	node = xml_new_child(root, NULL, BAD_CAST("topology-changes"), "%u",
 			     *dot1dStp->dot1dStpTopChanges);
     }
     
@@ -185,25 +185,25 @@ xml_bridge_stp_info(xmlNodePtr root,
 
 static void
 xml_bridge_vlan_info(xmlNodePtr root,
-		    bridge_mib_dot1dBase_t *dot1dBase,
-		    q_bridge_mib_dot1qBase_t *dot1qBase)
+		     bridge_mib_dot1dBase_t *dot1dBase,
+		     q_bridge_mib_dot1qBase_t *dot1qBase)
 {
-    root = xml_new_child(root, NULL, "vlan", NULL);
+    root = xml_new_child(root, NULL, BAD_CAST("vlan"), NULL);
 
     if (dot1qBase->dot1qVlanVersionNumber) {
-	(void) xml_new_child(root, NULL, "version", "%d",
+	(void) xml_new_child(root, NULL, BAD_CAST("version"), "%d",
 			     *(dot1qBase->dot1qVlanVersionNumber));
     }
     if (dot1qBase->dot1qNumVlans) {
-	(void) xml_new_child(root, NULL, "current", "%d",
+	(void) xml_new_child(root, NULL, BAD_CAST("current"), "%d",
 			     *(dot1qBase->dot1qNumVlans));
     }
     if (dot1qBase->dot1qMaxSupportedVlans) {
-	(void) xml_new_child(root, NULL, "capacity", "%d",
+	(void) xml_new_child(root, NULL, BAD_CAST("capacity"), "%d",
 			     *(dot1qBase->dot1qMaxSupportedVlans));
     }
     if (dot1qBase->dot1qMaxVlanId) {
-	(void) xml_new_child(root, NULL, "max-vlanid", "%d",
+	(void) xml_new_child(root, NULL, BAD_CAST("max-vlanid"), "%d",
 			     *(dot1qBase->dot1qMaxVlanId));
     }
 }
@@ -307,26 +307,26 @@ xml_bridge_info(xmlNodePtr root,
     xmlNodePtr node;
 
     if (dot1dBase->dot1dBaseBridgeAddress) {
-	(void) xml_new_child(root, NULL, "address", "%s",
+	(void) xml_new_child(root, NULL, BAD_CAST("address"), "%s",
 			     fmt_ether_address(dot1dBase->dot1dBaseBridgeAddress,
 					       SCLI_FMT_ADDR));
     }
     if (dot1dBase->dot1dBaseNumPorts) {
-	(void) xml_new_child(root, NULL, "ports", "%d",
+	(void) xml_new_child(root, NULL, BAD_CAST("ports"), "%d",
 			     *(dot1dBase->dot1dBaseNumPorts));
     }
     if (dot1dBase->dot1dBaseType) {
 	e = fmt_enum(bridge_mib_enums_dot1dBaseType, dot1dBase->dot1dBaseType);
 	if (e) {
-	    (void) xml_new_child(root, NULL, "type", "%s", e);
+	    (void) xml_new_child(root, NULL, BAD_CAST("type"), "%s", e);
 	}
 	if (dot1dBase->dot1dBaseType
 	    && (*dot1dBase->dot1dBaseType == BRIDGE_MIB_DOT1DBASETYPE_TRANSPARENT_ONLY
 		|| *dot1dBase->dot1dBaseType == BRIDGE_MIB_DOT1DBASETYPE_SRT)) {
 	    if (dot1dTp && dot1dTp->dot1dTpAgingTime) {
-		node = xml_new_child(root, NULL, "tp-aging-time", "%d",
+		node = xml_new_child(root, NULL, BAD_CAST("tp-aging-time"), "%d",
 				     *dot1dTp->dot1dTpAgingTime);
-		xml_set_prop(node, "unit", "seconds");
+		xml_set_prop(node, BAD_CAST("unit"), "seconds");
 	    }
 	}
     }
@@ -416,6 +416,7 @@ show_bridge_info(scli_interp_t *interp, int argc, char **argv)
     bridge_mib_dot1dTp_t *dot1dTp = NULL;
     bridge_mib_dot1dStp_t *dot1dStp = NULL;
     q_bridge_mib_dot1qBase_t *dot1qBase = NULL;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -427,18 +428,18 @@ show_bridge_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    bridge_mib_get_dot1dBase(interp->peer, &dot1dBase, 0);
-    if (interp->peer->error_status) {
+    bridge_mib_get_dot1dBase(interp->peer, &dot1dBase, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     
     if (dot1dBase
 	&& dot1dBase->dot1dBaseNumPorts
 	&& *dot1dBase->dot1dBaseNumPorts) {
-	bridge_mib_get_dot1dTp(interp->peer, &dot1dTp, 0);
-	bridge_mib_get_dot1dStp(interp->peer, &dot1dStp, 0);
+	bridge_mib_get_dot1dTp(interp->peer, &dot1dTp, 0, NULL);
+	bridge_mib_get_dot1dStp(interp->peer, &dot1dStp, 0, NULL);
 
-	q_bridge_mib_get_dot1qBase(interp->peer, &dot1qBase, 0);
+	q_bridge_mib_get_dot1qBase(interp->peer, &dot1qBase, 0, NULL);
 
 	if (scli_interp_xml(interp)) {
 	    xml_bridge_info(interp->xml_node, 
@@ -473,19 +474,19 @@ xml_bridge_port(xmlNodePtr root,
     xmlNodePtr tree, node;
     const char *s;
 
-    tree = xmlNewChild(root, NULL, "port", NULL);
-    xml_set_prop(tree, "index", "%u", 
+    tree = xml_new_child(root, NULL, BAD_CAST("port"), NULL);
+    xml_set_prop(tree, BAD_CAST("index"), "%u", 
 		 dot1dBasePortEntry->dot1dBasePort);
 
     if (dot1dBasePortEntry->dot1dBasePortIfIndex) {
-	(void) xml_new_child(tree, NULL, "interface", "%u",
+	(void) xml_new_child(tree, NULL, BAD_CAST("interface"), "%u",
 			   *dot1dBasePortEntry->dot1dBasePortIfIndex);
     }
 #if 0 // In case of XML output, we should avoid duplicated information 
     if (ifEntry) {
 	const char *type;
 	type = fmt_enum(ianaiftype_mib_enums_IANAifType, ifEntry->ifType);
-	(void) xmlNewChild(tree, NULL, "type", "%s", type);
+	(void) xml_new_child(tree, NULL, "type", "%s", type);
 
 	if (ifEntry->ifSpeed) {
 	    if (*(ifEntry->ifSpeed) == 0xffffffff
@@ -575,6 +576,7 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
     int type_width = 6;
     int name_width = 6;
     int i, j = -1;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -586,14 +588,15 @@ show_bridge_ports(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    bridge_mib_get_dot1dBasePortTable(interp->peer, &dot1dBasePortTable, 0);
-    if (interp->peer->error_status) {
+    bridge_mib_get_dot1dBasePortTable(interp->peer, &dot1dBasePortTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     if_mib_proc_get_ifTable(interp->peer, &ifTable,
-			    IF_MIB_IFTYPE | IF_MIB_IFSPEED | IF_MIB_IFDESCR, interp->epoch);
+			    IF_MIB_IFTYPE | IF_MIB_IFSPEED | IF_MIB_IFDESCR,
+			    interp->epoch, NULL);
     if_mib_get_ifXTable(interp->peer, &ifXTable,
-			IF_MIB_IFNAME | IF_MIB_IFHIGHSPEED);
+			IF_MIB_IFNAME | IF_MIB_IFHIGHSPEED, NULL);
     
     if (dot1dBasePortTable) {
 	for (i = 0; ifTable[i]; i++) {
@@ -657,47 +660,47 @@ xml_bridge_stp_port(xmlNodePtr root,
     xmlNodePtr tree;
     const char *e;
 
-    tree = xmlNewChild(root, NULL, "port", NULL);
-    xml_set_prop(tree, "index", "%u", dot1dStpPortEntry->dot1dStpPort);
+    tree = xml_new_child(root, NULL, BAD_CAST("port"), NULL);
+    xml_set_prop(tree, BAD_CAST("index"), "%u", dot1dStpPortEntry->dot1dStpPort);
 
     if (dot1dStpPortEntry->dot1dStpPortPriority) {
-	(void) xml_new_child(tree, NULL, "priority", "%u",
+	(void) xml_new_child(tree, NULL, BAD_CAST("priority"), "%u",
 			     *dot1dStpPortEntry->dot1dStpPortPriority);
     }
 
     e = fmt_enum(bridge_mib_enums_dot1dStpPortEnable,
 		 dot1dStpPortEntry->dot1dStpPortEnable);
     if (e) {
-	(void) xml_new_child(tree, NULL, "enable", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("enable"), "%s", e);
     }
     e = fmt_enum(bridge_mib_enums_dot1dStpPortState,
 		 dot1dStpPortEntry->dot1dStpPortState);
     if (e) {
-	(void) xml_new_child(tree, NULL, "state", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("state"), "%s", e);
     }
 
     if (dot1dStpPortEntry->dot1dStpPortPathCost) {
-	(void) xml_new_child(tree, NULL, "path-cost", "%u",
+	(void) xml_new_child(tree, NULL, BAD_CAST("path-cost"), "%u",
 			     *dot1dStpPortEntry->dot1dStpPortPathCost);
     }
 
     if (dot1dStpPortEntry->dot1dStpPortDesignatedRoot) {
-	(void) xml_new_child(tree, NULL, "designated-root", "%s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("designated-root"), "%s",
 			     fmt_bridgeid(dot1dStpPortEntry->dot1dStpPortDesignatedRoot));
     }
 
     if (dot1dStpPortEntry->dot1dStpPortDesignatedCost) {
-	(void) xml_new_child(tree, NULL, "designated-cost", "%u",
+	(void) xml_new_child(tree, NULL, BAD_CAST("designated-cost"), "%u",
 			     *dot1dStpPortEntry->dot1dStpPortDesignatedCost);
     }
     
     if (dot1dStpPortEntry->dot1dStpPortDesignatedBridge) {
-	(void) xml_new_child(tree, NULL, "designated-bridge", "%s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("designated-bridge"), "%s",
 			     fmt_bridgeid(dot1dStpPortEntry->dot1dStpPortDesignatedBridge));
     }
 
     if (dot1dStpPortEntry->dot1dStpPortDesignatedPort) {
-	(void) xml_new_child(tree, NULL, "designated-port", "%u",
+	(void) xml_new_child(tree, NULL, BAD_CAST("designated-port"), "%u",
 			     *dot1dStpPortEntry->dot1dStpPortDesignatedPort);
     }
 }
@@ -751,6 +754,7 @@ show_bridge_stp_ports(scli_interp_t *interp, int argc, char **argv)
 {
     bridge_mib_dot1dStpPortEntry_t **dot1dStpPortTable = NULL;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -762,8 +766,8 @@ show_bridge_stp_ports(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    bridge_mib_get_dot1dStpPortTable(interp->peer, &dot1dStpPortTable, 0);
-    if (interp->peer->error_status) {
+    bridge_mib_get_dot1dStpPortTable(interp->peer, &dot1dStpPortTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -800,28 +804,28 @@ xml_bridge_forwarding(xmlNodePtr root,
     char *name;
     const char *status;
 
-    tree = xmlNewChild(root, NULL, "forward", NULL);
-    xml_set_prop(tree, "port", "%u", *dot1dTpFdbEntry->dot1dTpFdbPort);
+    tree = xml_new_child(root, NULL, BAD_CAST("forward"), NULL);
+    xml_set_prop(tree, BAD_CAST("port"), "%u", *dot1dTpFdbEntry->dot1dTpFdbPort);
 
     status = fmt_enum(bridge_mib_enums_dot1dTpFdbStatus,
 	     dot1dTpFdbEntry->dot1dTpFdbStatus);
-    (void) xml_new_child(tree, NULL, "status", "%s", status);
+    (void) xml_new_child(tree, NULL, BAD_CAST("status"), "%s", status);
 
     if (dot1dTpFdbEntry->dot1dTpFdbAddress) {
-	xml_set_prop(tree, "address", "%s",
+	xml_set_prop(tree, BAD_CAST("address"), "%s",
 		     fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress,
 				       SCLI_FMT_ADDR));
 	name = fmt_ether_address(dot1dTpFdbEntry->dot1dTpFdbAddress,
 				 SCLI_FMT_NAME);
 	if (name) {
-	    (void) xml_new_child(tree, NULL, "name", "%s", name);
+	    (void) xml_new_child(tree, NULL, BAD_CAST("name"), "%s", name);
 	}
 #if 1
 	if (ipNetToMediaEntry) {
-	    node = xml_new_child(tree, NULL, "address", "%s",
+	    node = xml_new_child(tree, NULL, BAD_CAST("address"), "%s",
 		 fmt_ipv4_address(ipNetToMediaEntry->ipNetToMediaNetAddress,
 				  SCLI_FMT_ADDR));
-	    xml_set_prop(node, "type", "ipv4");
+	    xml_set_prop(node, BAD_CAST("type"), "ipv4");
 	}
 #endif
 	prefix = dot1dTpFdbEntry->dot1dTpFdbAddress[0] * 65536
@@ -829,7 +833,8 @@ xml_bridge_forwarding(xmlNodePtr root,
 	    + dot1dTpFdbEntry->dot1dTpFdbAddress[2];
 	vendor = scli_get_ieee_vendor(prefix);
 	if (vendor && vendor->name) {
-	    (void) xml_new_child(tree, NULL, "vendor", "%s", vendor->name);
+	    (void) xml_new_child(tree, NULL, BAD_CAST("vendor"),
+				 "%s", vendor->name);
 	}
     }
 }
@@ -893,6 +898,7 @@ show_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
     int i, p, max = 0;
     int name_width = 8;
     int k = 0;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -904,15 +910,13 @@ show_bridge_forwarding(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    bridge_mib_get_dot1dTpFdbTable(interp->peer, &dot1dTpFdbTable, 0);
-    if (interp->peer->error_status) {
+    bridge_mib_get_dot1dTpFdbTable(interp->peer, &dot1dTpFdbTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
-#if 1
     ip_mib_get_ipNetToMediaTable(interp->peer, &ipNetToMediaTable,
-				 IP_MIB_IPNETTOMEDIAPHYSADDRESS);
-#endif
+				 IP_MIB_IPNETTOMEDIAPHYSADDRESS, NULL);
 
     if (dot1dTpFdbTable) {
 	for (i = 0; dot1dTpFdbTable[i]; i++) {
@@ -1019,6 +1023,7 @@ show_bridge_filter(scli_interp_t *interp, int argc, char **argv)
 {
     bridge_mib_dot1dStaticEntry_t **dot1dStaticTable = NULL;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1030,8 +1035,8 @@ show_bridge_filter(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    bridge_mib_get_dot1dStaticTable(interp->peer, &dot1dStaticTable, 0);
-    if (interp->peer->error_status) {
+    bridge_mib_get_dot1dStaticTable(interp->peer, &dot1dStaticTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1157,6 +1162,7 @@ show_bridge_vlan_details(scli_interp_t *interp, int argc, char **argv)
     q_bridge_mib_dot1qVlanStaticEntry_t **vlanTable = NULL;
     regex_t _regex_vlan, *regex_vlan = NULL;
     int i, c;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1177,8 +1183,8 @@ show_bridge_vlan_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    q_bridge_mib_get_dot1qVlanStaticTable(interp->peer, &vlanTable, 0);
-    if (interp->peer->error_status) {
+    q_bridge_mib_get_dot1qVlanStaticTable(interp->peer, &vlanTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1238,6 +1244,7 @@ show_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
     regex_t _regex_vlan, *regex_vlan = NULL;
     int name_width = 8;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1258,8 +1265,8 @@ show_bridge_vlan_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    q_bridge_mib_get_dot1qVlanStaticTable(interp->peer, &vlanTable, 0);
-    if (interp->peer->error_status) {
+    q_bridge_mib_get_dot1qVlanStaticTable(interp->peer, &vlanTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1302,19 +1309,26 @@ get_port_description(scli_interp_t *interp, gint32 dot1dTpPort)
     bridge_mib_dot1dBasePortEntry_t *dot1dBasePortEntry = NULL;
     if_mib_ifEntry_t *ifEntry = NULL;
     char *descr = NULL;
+    GError *error = NULL;
 
     bridge_mib_get_dot1dBasePortEntry(interp->peer, &dot1dBasePortEntry,
 				      dot1dTpPort,
-				      BRIDGE_MIB_DOT1DBASEPORTIFINDEX);
-    if (interp->peer->error_status) {
+				      BRIDGE_MIB_DOT1DBASEPORTIFINDEX,
+				      &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return NULL;
     }
 
     if (dot1dBasePortEntry && dot1dBasePortEntry->dot1dBasePortIfIndex) {
 	if_mib_get_ifEntry(interp->peer, &ifEntry,
 			   *dot1dBasePortEntry->dot1dBasePortIfIndex,
-			   IF_MIB_IFDESCR);
-	if (! interp->peer->error_status && ifEntry) {
+			   IF_MIB_IFDESCR, &error);
+	if (scli_interp_set_error_snmp(interp, &error)) {
+	    if (dot1dBasePortEntry)
+		bridge_mib_free_dot1dBasePortEntry(dot1dBasePortEntry);
+	    return NULL;
+	}
+	if (ifEntry) {
 	    descr = g_strdup_printf("%.*s", ifEntry->_ifDescrLength,
 				    ifEntry->ifDescr);
 	}
@@ -1338,6 +1352,7 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
     static int stats_size = 0;
     static time_t epoch = 0;
     int i;
+    GError *error = NULL;
     
     if (argc > 1) {
 	return SCLI_SYNTAX_NUMARGS;
@@ -1347,8 +1362,8 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    bridge_mib_get_dot1dTpPortTable(interp->peer, &portTable, 0);
-    if (interp->peer->error_status) {
+    bridge_mib_get_dot1dTpPortTable(interp->peer, &portTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

@@ -36,13 +36,15 @@ extern void
 disman_script_mib_proc_create_script(GNetSnmp *s,
 				     guchar *owner,
 				     guchar *name,
-				     guchar *descr);
+				     guchar *descr,
+				     GError **error);
 
 extern void
 disman_script_mib_proc_create_run(GNetSnmp *s,
 				  guchar *lowner,
 				  guchar *lname,
-				  guchar *args);
+				  guchar *args,
+				  GError **error);
 
 
 #endif /* _DISMAN_SCRIPT_MIB_PROC_H_ */

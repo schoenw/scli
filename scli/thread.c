@@ -69,4 +69,5 @@ scli_thread_eval_argc_argv(scli_interp_t *interp, int argc, char **argv)
     }
 
     g_async_queue_push(interp->cmd_queue, msg);
+    return SCLI_OK;
 }

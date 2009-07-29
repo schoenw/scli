@@ -31,13 +31,13 @@ xml_tcp_listener(xmlNodePtr root, tcp_mib_tcpConnEntry_t *tcpConnEntry, int widt
 {
     xmlNodePtr node;
 
-    node = xmlNewChild(root, NULL, "listener", NULL);
-    xmlSetProp(node, "address",
-	       fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress,
-				SCLI_FMT_ADDR));
-    xmlSetProp(node, "port",
-	       fmt_tcp_port(tcpConnEntry->tcpConnLocalPort,
-			    SCLI_FMT_ADDR));
+    node = xml_new_child(root, NULL, BAD_CAST("listener"), NULL);
+    xml_set_prop(node, BAD_CAST("address"), "%s",
+		 fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress,
+				  SCLI_FMT_ADDR));
+    xml_set_prop(node, BAD_CAST("port"), "%s",
+		 fmt_tcp_port(tcpConnEntry->tcpConnLocalPort,
+			      SCLI_FMT_ADDR));
 }
 
 
@@ -70,6 +70,7 @@ show_tcp_listener(scli_interp_t *interp, int argc, char **argv)
     int width = 20;
     char *addr, *port;
     int i, len, cnt;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -81,8 +82,8 @@ show_tcp_listener(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0);
-    if (interp->peer->error_status) {
+    tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -135,23 +136,23 @@ xml_tcp_connection(xmlNodePtr root, tcp_mib_tcpConnEntry_t *tcpConnEntry)
 {
     xmlNodePtr node;
 
-    node = xmlNewChild(root, NULL, "connection", NULL);
-    xmlSetProp(node, "local-address",
-	       fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress,
-				SCLI_FMT_ADDR));
-    xmlSetProp(node, "local-port",
-	       fmt_tcp_port(tcpConnEntry->tcpConnLocalPort,
-			    SCLI_FMT_ADDR));
-    xmlSetProp(node, "remote-address",
-	       fmt_ipv4_address(tcpConnEntry->tcpConnRemAddress,
-				SCLI_FMT_ADDR));
-    xmlSetProp(node, "remote-port",
-	       fmt_tcp_port(tcpConnEntry->tcpConnRemPort,
-			    SCLI_FMT_ADDR));
+    node = xml_new_child(root, NULL, BAD_CAST("connection"), NULL);
+    xml_set_prop(node, BAD_CAST("local-address"), "%s",
+		 fmt_ipv4_address(tcpConnEntry->tcpConnLocalAddress,
+				  SCLI_FMT_ADDR));
+    xml_set_prop(node, BAD_CAST("local-port"), "%s",
+		 fmt_tcp_port(tcpConnEntry->tcpConnLocalPort,
+			      SCLI_FMT_ADDR));
+    xml_set_prop(node, BAD_CAST("remote-address"), "%s",
+		 fmt_ipv4_address(tcpConnEntry->tcpConnRemAddress,
+				  SCLI_FMT_ADDR));
+    xml_set_prop(node, BAD_CAST("remote-port"), "%s",
+		 fmt_tcp_port(tcpConnEntry->tcpConnRemPort,
+			      SCLI_FMT_ADDR));
 
-    node = xmlNewChild(node, NULL, "state",
-		       fmt_enum(tcp_mib_enums_tcpConnState,
-				tcpConnEntry->tcpConnState));
+    node = xml_new_child(node, NULL, BAD_CAST("state"), "%s",
+			 fmt_enum(tcp_mib_enums_tcpConnState,
+				  tcpConnEntry->tcpConnState));
 }
 
 
@@ -193,6 +194,7 @@ show_tcp_connections(scli_interp_t *interp, int argc, char **argv)
     int remote_width = 20;
     char *addr, *port;
     int i, len, cnt;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -204,8 +206,8 @@ show_tcp_connections(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0);
-    if (interp->peer->error_status) {
+    tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -341,14 +343,14 @@ xml_tcp_state(xmlNodePtr root, gint32 state, guint32 count, GSList *ports)
     e = fmt_enum(tcp_mib_enums_tcpConnState, &state);
     if (! e) return;
 		 
-    tree = xmlNewChild(root, NULL, "state", NULL);
-    xmlSetProp(tree, "name", e);
+    tree = xml_new_child(root, NULL, BAD_CAST("state"), NULL);
+    xml_set_prop(tree, BAD_CAST("name"), "%s", e);
 
     for (elem = ports; elem; elem = g_slist_next(elem)) {
 	tcp_state_t *t = (tcp_state_t *) elem->data;
-	node = xml_new_child(tree, NULL, "service", "%u", t->count);
-	xml_set_prop(node, "port", "%d", t->port);
-	xml_set_prop(node, "name", "%s", t->name);
+	node = xml_new_child(tree, NULL, BAD_CAST("service"), "%u", t->count);
+	xml_set_prop(node, BAD_CAST("port"), "%d", t->port);
+	xml_set_prop(node, BAD_CAST("name"), "%s", t->name);
     }
 }
 
@@ -394,6 +396,7 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 {
     tcp_mib_tcpConnEntry_t **tcpConnTable = NULL;
     int i, j, t;
+    GError *error = NULL;
 
     const gint32 tcp_states[] = { TCP_MIB_TCPCONNSTATE_LISTEN,
 				  TCP_MIB_TCPCONNSTATE_SYNSENT,
@@ -417,8 +420,8 @@ show_tcp_states(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0);
-    if (interp->peer->error_status) {
+    tcp_mib_get_tcpConnTable(interp->peer, &tcpConnTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -498,21 +501,21 @@ xml_tcp_info(xmlNodePtr root, tcp_mib_tcp_t *tcp)
     xmlNodePtr tree, node;
     const char *e;
 
-    tree = xmlNewChild(root, NULL, "rto", NULL);
+    tree = xml_new_child(root, NULL, BAD_CAST("rto"), NULL);
     e = fmt_enum(tcp_mib_enums_tcpRtoAlgorithm, tcp->tcpRtoAlgorithm);
     if (e) {
-	(void) xml_new_child(tree, NULL, "algorithm", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("algorithm"), "%s", e);
     }
     if (tcp->tcpRtoMin) {
-	node = xml_new_child(tree, NULL, "minimum", "%d", *tcp->tcpRtoMin);
-	xml_set_prop(node, "unit", "milliseconds");
+	node = xml_new_child(tree, NULL, BAD_CAST("minimum"), "%d", *tcp->tcpRtoMin);
+	xml_set_prop(node, BAD_CAST("unit"), "milliseconds");
     }
     if (tcp->tcpRtoMax) {
-	node = xml_new_child(tree, NULL, "maximum", "%d", *tcp->tcpRtoMax);
-	xml_set_prop(node, "unit", "milliseconds");
+	node = xml_new_child(tree, NULL, BAD_CAST("maximum"), "%d", *tcp->tcpRtoMax);
+	xml_set_prop(node, BAD_CAST("unit"), "milliseconds");
     }
     if (tcp->tcpCurrEstab) {
-	(void) xml_new_child(root, NULL, "established", "%u", *tcp->tcpCurrEstab);
+	(void) xml_new_child(root, NULL, BAD_CAST("established"), "%u", *tcp->tcpCurrEstab);
     }
 }
 
@@ -556,6 +559,7 @@ static int
 show_tcp_info(scli_interp_t *interp, int argc, char **argv)
 {
     tcp_mib_tcp_t *tcp;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -567,8 +571,8 @@ show_tcp_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    tcp_mib_get_tcp(interp->peer, &tcp, 0);
-    if (interp->peer->error_status) {
+    tcp_mib_get_tcp(interp->peer, &tcp, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

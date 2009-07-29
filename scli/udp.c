@@ -33,11 +33,11 @@ xml_udp_listener(xmlNodePtr root, udp_mib_udpEntry_t *udpEntry, int width)
 {
     xmlNodePtr node;
 
-    node = xmlNewChild(root, NULL, "listener", NULL);
-    xmlSetProp(node, "address",
-	       fmt_ipv4_address(udpEntry->udpLocalAddress, SCLI_FMT_ADDR));
-    xmlSetProp(node, "port",
-	       fmt_udp_port(udpEntry->udpLocalPort, SCLI_FMT_ADDR));
+    node = xml_new_child(root, NULL, BAD_CAST("listener"), NULL);
+    xml_set_prop(node, BAD_CAST("address"), "%s",
+		 fmt_ipv4_address(udpEntry->udpLocalAddress, SCLI_FMT_ADDR));
+    xml_set_prop(node, BAD_CAST("port"), "%s",
+		 fmt_udp_port(udpEntry->udpLocalPort, SCLI_FMT_ADDR));
 }
 
 
@@ -66,6 +66,7 @@ show_udp_listener(scli_interp_t *interp, int argc, char **argv)
     int width = 20;
     char *addr, *port;
     int i, len;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -77,8 +78,8 @@ show_udp_listener(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    udp_mib_get_udpTable(interp->peer, &udpTable, 0);
-    if (interp->peer->error_status) {
+    udp_mib_get_udpTable(interp->peer, &udpTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -117,6 +118,7 @@ static int
 show_udp_stats(scli_interp_t *interp, int argc, char **argv)
 {
     udp_mib_proc_stats_t _udpStats, *udpStats = &_udpStats;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -124,8 +126,8 @@ show_udp_stats(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    udp_mib_proc_get_stats(interp->peer, &udpStats);
-    if (interp->peer->error_status) {
+    udp_mib_proc_get_stats(interp->peer, &udpStats, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

@@ -100,6 +100,7 @@ show_entity_containment(scli_interp_t *interp, int argc, char **argv)
     int class_width = 6;
     int i;
     const char *class;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -111,8 +112,8 @@ show_entity_containment(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
-    if (interp->peer->error_status) {
+    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -151,6 +152,7 @@ show_entity_sensors(scli_interp_t *interp, int argc, char **argv)
 {
     entity_sensor_mib_entPhySensorEntry_t **entSensorTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -162,8 +164,8 @@ show_entity_sensors(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    entity_sensor_mib_get_entPhySensorTable(interp->peer, &entSensorTable, 0);
-    if (interp->peer->error_status) {
+    entity_sensor_mib_get_entPhySensorTable(interp->peer, &entSensorTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -264,10 +266,10 @@ fmt_entity_details(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
     
     fmt_display_string(s, 8, "Alias:",
 		       (int) entPhysicalEntry->_entPhysicalAliasLength,
-		       entPhysicalEntry->entPhysicalAlias);
+		       (gchar *) entPhysicalEntry->entPhysicalAlias);
     fmt_display_string(s, 8, "Descr:",
 		       (int) entPhysicalEntry->_entPhysicalDescrLength,
-		       entPhysicalEntry->entPhysicalDescr);
+		       (gchar *) entPhysicalEntry->entPhysicalDescr);
 }
 
 
@@ -279,17 +281,17 @@ xml_entity_details(xmlNodePtr root,
     xmlNodePtr tree;
     const char *e;
 
-    tree = xmlNewChild(root, NULL, "entity", NULL);
-    xml_set_prop(tree, "index", "%d", entPhysicalEntry->entPhysicalIndex);
+    tree = xml_new_child(root, NULL, BAD_CAST("entity"), NULL);
+    xml_set_prop(tree, BAD_CAST("index"), "%d", entPhysicalEntry->entPhysicalIndex);
     
     if (entPhysicalEntry->entPhysicalDescr) {
-	(void) xml_new_child(tree, NULL, "description", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 			     (int) entPhysicalEntry->_entPhysicalDescrLength,
 			     entPhysicalEntry->entPhysicalDescr);
     }
 
     if (entPhysicalEntry->entPhysicalName) {
-	(void) xml_new_child(tree, NULL, "name", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("name"), "%.*s",
 			     (int) entPhysicalEntry->_entPhysicalNameLength,
 			     entPhysicalEntry->entPhysicalName);
     }
@@ -297,63 +299,63 @@ xml_entity_details(xmlNodePtr root,
     e = fmt_enum(entity_mib_enums_PhysicalClass,
 		 entPhysicalEntry->entPhysicalClass);
     if (e) {
-	(void) xml_new_child(tree, NULL, "class", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("class"), "%s", e);
     }
 
     if (entPhysicalEntry->entPhysicalContainedIn) {
-	(void) xml_new_child(tree, NULL, "contained-in", "%d",
+	(void) xml_new_child(tree, NULL, BAD_CAST("contained-in"), "%d",
 			     *entPhysicalEntry->entPhysicalContainedIn);
     }
 
     if (entPhysicalEntry->entPhysicalIsFRU
 	&& (*entPhysicalEntry->entPhysicalIsFRU
 	    == SNMPV2_TC_TRUTHVALUE_TRUE)) {
-	(void) xmlNewChild(tree, NULL, "replaceable", NULL);
+	(void) xml_new_child(tree, NULL, BAD_CAST("replaceable"), NULL);
     } 
  
     if (entPhysicalEntry->entPhysicalMfgName) {
-	(void) xml_new_child(tree, NULL, "manufacturer", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("manufacturer"), "%.*s",
 			     (int) entPhysicalEntry->_entPhysicalMfgNameLength,
 			     entPhysicalEntry->entPhysicalMfgName);
     }
 
     if (entPhysicalEntry->entPhysicalModelName) {
-	(void) xml_new_child(tree, NULL, "model", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("model"), "%.*s",
 		       (int) entPhysicalEntry->_entPhysicalModelNameLength,
 			     entPhysicalEntry->entPhysicalModelName);
     }
     
     if (entPhysicalEntry->entPhysicalSerialNum) {
-	(void) xml_new_child(tree, NULL, "serial", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("serial"), "%.*s",
 		       (int) entPhysicalEntry->_entPhysicalSerialNumLength,
 			     entPhysicalEntry->entPhysicalSerialNum);
     }
     
     if (entPhysicalEntry->entPhysicalHardwareRev) {
-	(void) xml_new_child(tree, NULL, "hardware-revision", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("hardware-revision"), "%.*s",
 		       (int) entPhysicalEntry->_entPhysicalHardwareRevLength,
 			     entPhysicalEntry->entPhysicalHardwareRev);
     }
     
     if (entPhysicalEntry->entPhysicalFirmwareRev) {
-	(void) xml_new_child(tree, NULL, "firmware-revision", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("firmware-revision"), "%.*s",
 		       (int) entPhysicalEntry->_entPhysicalFirmwareRevLength,
 			     entPhysicalEntry->entPhysicalFirmwareRev);
     }
     
     if (entPhysicalEntry->entPhysicalSoftwareRev) {
-	(void) xml_new_child(tree, NULL, "software-revision", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("software-revision"), "%.*s",
 		       (int) entPhysicalEntry->_entPhysicalSoftwareRevLength,
 			     entPhysicalEntry->entPhysicalSoftwareRev);
     }
     
     if (entPhysicalEntry->entPhysicalAlias) {
-	(void) xml_new_child(tree, NULL, "alias", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("alias"), "%.*s",
 			     (int) entPhysicalEntry->_entPhysicalAliasLength,
 			     entPhysicalEntry->entPhysicalAlias);
     }
     if (entPhysicalEntry->entPhysicalAssetID) {
-	(void) xml_new_child(tree, NULL, "asset","%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("asset"), "%.*s",
 			     (int) entPhysicalEntry->_entPhysicalAssetIDLength,
 			     entPhysicalEntry->entPhysicalAssetID);
     }
@@ -366,6 +368,7 @@ show_entity_details(scli_interp_t *interp, int argc, char **argv)
 {
     entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -377,8 +380,8 @@ show_entity_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
-    if (interp->peer->error_status) {
+    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -443,6 +446,7 @@ show_entity_info(scli_interp_t *interp, int argc, char **argv)
     int class_width = 6, name_width = 6;
     int i;
     const char *class;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -454,8 +458,8 @@ show_entity_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0);
-    if (interp->peer->error_status) {
+    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

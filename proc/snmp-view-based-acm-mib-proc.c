@@ -28,7 +28,8 @@ void
 snmp_view_based_acm_mib_proc_create_member(GNetSnmp *s,
 					   guchar *name,
 					   guchar *group,
-					   gint32 model)
+					   gint32 model,
+					   GError **error)
 {
     snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t *vacmGroupEntry;
     gint32 createAndGo = SNMPV2_TC_ROWSTATUS_CREATEANDGO;
@@ -45,7 +46,7 @@ snmp_view_based_acm_mib_proc_create_member(GNetSnmp *s,
     vacmGroupEntry->vacmGroupName = group;
     vacmGroupEntry->vacmSecurityModel = model;
     vacmGroupEntry->vacmSecurityToGroupStatus = &createAndGo;
-    snmp_view_based_acm_mib_set_vacmSecurityToGroupEntry(s, vacmGroupEntry, 0);
+    snmp_view_based_acm_mib_set_vacmSecurityToGroupEntry(s, vacmGroupEntry, 0, error);
     snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(vacmGroupEntry);
 }
 
@@ -53,7 +54,8 @@ void
 snmp_view_based_acm_mib_proc_delete_member(GNetSnmp *s,
 					   guchar *name, gsize name_len,
 					   guchar *group, gsize group_len,
-					   gint32 model)
+					   gint32 model,
+					   GError **error)
 {
     snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t *vacmGroupEntry;
     gint32 destroy = SNMPV2_TC_ROWSTATUS_DESTROY;
@@ -70,7 +72,7 @@ snmp_view_based_acm_mib_proc_delete_member(GNetSnmp *s,
     vacmGroupEntry->vacmGroupName = group;
     vacmGroupEntry->vacmSecurityModel = 0;
     vacmGroupEntry->vacmSecurityToGroupStatus = &destroy;
-    snmp_view_based_acm_mib_set_vacmSecurityToGroupEntry(s, vacmGroupEntry, 0);
+    snmp_view_based_acm_mib_set_vacmSecurityToGroupEntry(s, vacmGroupEntry, 0, error);
     snmp_view_based_acm_mib_free_vacmSecurityToGroupEntry(vacmGroupEntry);
 }
 

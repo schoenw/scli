@@ -28,7 +28,8 @@ void
 disman_script_mib_proc_create_script(GNetSnmp *s,
 				     guchar *owner,
 				     guchar *name,
-				     guchar *descr)
+				     guchar *descr,
+				     GError **error)
 {
     disman_script_mib_smScriptEntry_t *smScriptEntry;
     gint32 createAndGo = SNMPV2_TC_ROWSTATUS_CREATEANDGO;
@@ -38,14 +39,14 @@ disman_script_mib_proc_create_script(GNetSnmp *s,
 	s->error_status = GNET_SNMP_PDU_ERR_PROCEDURE;
 	return;
     }
-    strcpy(smScriptEntry->smScriptOwner, owner);
-    smScriptEntry->_smScriptOwnerLength = strlen(owner);
-    strcpy(smScriptEntry->smScriptName, name);
-    smScriptEntry->_smScriptNameLength = strlen(name);
+    strcpy((char *) smScriptEntry->smScriptOwner, (char *) owner);
+    smScriptEntry->_smScriptOwnerLength = strlen((char *) owner);
+    strcpy((char *) smScriptEntry->smScriptName, (char *) name);
+    smScriptEntry->_smScriptNameLength = strlen((char *) name);
     smScriptEntry->smScriptDescr = descr;
-    smScriptEntry->_smScriptDescrLength = strlen(descr);
+    smScriptEntry->_smScriptDescrLength = strlen((char *) descr);
     smScriptEntry->smScriptRowStatus = &createAndGo;
-    disman_script_mib_set_smScriptEntry(s, smScriptEntry, 0);
+    disman_script_mib_set_smScriptEntry(s, smScriptEntry, 0, error);
     disman_script_mib_free_smScriptEntry(smScriptEntry);
 }
 
@@ -58,7 +59,8 @@ void
 disman_script_mib_proc_create_run(GNetSnmp *s,
 				  guchar *lowner,
 				  guchar *lname,
-				  guchar *args)
+				  guchar *args,
+				  GError **error)
 {
     disman_script_mib_smLaunchEntry_t *smLaunchEntry;
     disman_script_mib_smRunEntry_t *smRunEntry;
@@ -66,10 +68,11 @@ disman_script_mib_proc_create_run(GNetSnmp *s,
     int i, done = 0;
 
     disman_script_mib_get_smLaunchEntry(s, &smLaunchEntry,
-					lowner, strlen(lowner),
-					lname, strlen(lname),
-					DISMAN_SCRIPT_MIB_SMLAUNCHRUNINDEXNEXT);
-    if (s->error_status) return;
+					lowner, strlen((char *) lowner),
+					lname, strlen((char *) lname),
+					DISMAN_SCRIPT_MIB_SMLAUNCHRUNINDEXNEXT,
+					error);
+    if ((error && *error) || s->error_status) return;
     if (!smLaunchEntry || !smLaunchEntry->smLaunchRunIndexNext) {
     proc_error:
 	s->error_status = GNET_SNMP_PDU_ERR_PROCEDURE;
@@ -77,20 +80,22 @@ disman_script_mib_proc_create_run(GNetSnmp *s,
     }
     smRunIndex = *smLaunchEntry->smLaunchRunIndexNext;
     smLaunchEntry->smLaunchArgument = args;
-    smLaunchEntry->_smLaunchArgumentLength = args ? strlen(args) : 0;
+    smLaunchEntry->_smLaunchArgumentLength = args ? strlen((char *) args) : 0;
     smLaunchEntry->smLaunchStart = &smRunIndex;
     disman_script_mib_set_smLaunchEntry(s, smLaunchEntry,
 					DISMAN_SCRIPT_MIB_SMLAUNCHSTART
-					| DISMAN_SCRIPT_MIB_SMLAUNCHARGUMENT);
+					| DISMAN_SCRIPT_MIB_SMLAUNCHARGUMENT,
+					error);
     disman_script_mib_free_smLaunchEntry(smLaunchEntry);
-    if (s->error_status) return;
+    if ((error && *error) || s->error_status) return;
     for (i = 0; i < 5 && ! done; i++) {
 	disman_script_mib_get_smRunEntry(s, &smRunEntry,
-					 lowner, strlen(lowner),
-					 lname, strlen(lname),
+					 lowner, strlen((char *) lowner),
+					 lname, strlen((char *) lname),
 					 smRunIndex,
-					 DISMAN_SCRIPT_MIB_SMRUNSTATE);
-	if (s->error_status) return;	/* oops - cleanup ? */
+					 DISMAN_SCRIPT_MIB_SMRUNSTATE,
+					 error);
+	if ((error && *error) || s->error_status) return;	/* oops - cleanup ? */
 	if (! smRunEntry) goto proc_error;
 	done = ! smRunEntry->smRunState
 	    || *smRunEntry->smRunState == DISMAN_SCRIPT_MIB_SMRUNSTATE_EXECUTING

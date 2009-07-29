@@ -36,15 +36,16 @@ struct state {
 
 extern void
 udp_mib_proc_get_stats(GNetSnmp *s,
-		       udp_mib_proc_stats_t **udpStatsEntry)
+		       udp_mib_proc_stats_t **udpStatsEntry,
+		       GError **error)
 {
     udp_mib_udp_t *udp;
     static struct state state = { {0,0}, NULL};
     GTimeVal now;
     double delta;
     
-    udp_mib_get_udp(s, &udp, 0);
-    if (s->error_status || !udp) return;
+    udp_mib_get_udp(s, &udp, 0, error);
+    if ((error && *error) || s->error_status || !udp) return;
 
 #if 0
     if (state.last_poll_time.tv_sec < interp->epoch) {

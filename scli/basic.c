@@ -1,7 +1,7 @@
 /* 
  * basic.c -- basic functions for the scli command interpreter
  *
- * Copyright (C) 2001 Juergen Schoenwaelder
+ * Copyright (C) 2001-2009 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
 #endif
 
 
-char const scli_copyright[] = "(c) 2001-2007 Juergen Schoenwaelder";
+char const scli_copyright[] = "(c) 2001-2009 Juergen Schoenwaelder";
 
 GStaticMutex scli_global_lock = G_STATIC_MUTEX_INIT;
 
@@ -285,14 +285,9 @@ scli_interp_create(char *name)
     interp->header = g_string_new(NULL);
     interp->epoch = time(NULL);
     interp->regex_flags = REG_EXTENDED|REG_NOSUB;
-    interp->tdomain = GNET_SNMP_TDOMAIN_UDP_IPV4;
-    interp->taddress = gnet_inetaddr_new("localhost", 161);
     interp->retries = gnet_snmp_retries;
     interp->timeout = gnet_snmp_timeout;
     interp->snmp = gnet_snmp_version;
-#if 0
-    interp->tdomain = gnet_snmp_transport; /* ?? */
-#endif
 
     return interp;
 }
@@ -314,6 +309,9 @@ scli_interp_delete(scli_interp_t *interp)
 	}
 	if (interp->result) {
 	    g_string_free(interp->result, 1);
+	}
+	if (interp->error) {
+	    g_clear_error(&interp->error);
 	}
 	if (interp->header) {
 	    g_string_free(interp->header, 1);
@@ -364,11 +362,45 @@ scli_interp_reset(scli_interp_t *interp)
     if (interp->xml_doc) {
 	xmlFreeDoc(interp->xml_doc);
     }
-    interp->xml_doc = xmlNewDoc("1.0");
+    if (interp->error) {
+	g_clear_error(&interp->error);
+    }
+    interp->xml_doc = xmlNewDoc(BAD_CAST("1.0"));
     interp->xml_doc->children = xmlNewDocNode(interp->xml_doc, NULL,
-					      "scli", NULL);
+					      BAD_CAST("scli"), NULL);
     interp->xml_node = interp->xml_doc->children;
-    xmlSetProp(interp->xml_node, "version", VERSION);
+    xml_set_prop(interp->xml_node, BAD_CAST("version"), "%s", VERSION);
+}
+
+
+
+gboolean
+scli_interp_set_error(scli_interp_t *interp, GError **error)
+{
+    if (error && *error) {
+	interp->error = g_error_copy(*error);
+	g_clear_error(error);
+	return TRUE;
+    }
+
+    return FALSE;
+}
+
+
+
+gboolean
+scli_interp_set_error_snmp(scli_interp_t *interp, GError **error)
+{
+    if (scli_interp_set_error(interp, error)) {
+	g_prefix_error(&interp->error, "snmp: ");
+	return TRUE;
+    }
+    if (interp->peer->error_status) {
+	/* in the future, we might generate a proper GError for this */
+	return TRUE;
+    }
+
+    return FALSE;
 }
 
 
@@ -700,11 +732,11 @@ get_xml_tree(scli_interp_t *interp, char *xpath)
     tree = xmlDocGetRootElement(interp->xml_doc);
     for (i = 0; argv[i]; i++) {
 	for (sibling = tree->children; sibling; sibling = sibling->next) {
-	    if (strcmp(sibling->name, argv[i]) == 0) {
+	    if (strcmp((char *) sibling->name, argv[i]) == 0) {
 		break;
 	    }
 	}
-	tree = sibling ? sibling : xmlNewChild(tree, NULL, argv[i], NULL);
+	tree = sibling ? sibling : xml_new_child(tree, NULL, BAD_CAST(argv[i]), NULL);
     }
 
     g_strfreev(argv);
@@ -803,7 +835,7 @@ show_result(scli_interp_t *interp, int code)
     if (scli_interp_xml(interp) && !(interp->flags & SCLI_INTERP_FLAG_FMT)) {
 	xmlDocDumpFormatMemory(interp->xml_doc, &buffer, &len, 1);
 	g_string_truncate(interp->header, 0);
-	g_string_assign(interp->result, buffer);
+        g_string_assign(interp->result, (gchar *) buffer);
 	xmlFree(buffer);
     }
     if (! scli_interp_recursive(interp) && interp->header->len) {
@@ -849,7 +881,9 @@ scli_show_results(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 				 cmd->options ? cmd->options : "");
 	break;
     case SCLI_SNMP:
-	if (interp->peer) {
+	if (interp->error && interp->error->message) {
+	    reason = g_strdup(interp->error->message);
+	} else if (interp->peer) {
 	    const char *error;
 	    error = gnet_snmp_enum_get_label(gnet_snmp_enum_error_table,
 					     interp->peer->error_status);
@@ -896,15 +930,13 @@ scli_show_results(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 	    }
 #endif
 	    if (interp->peer) {
-		GURI *uri;
-		uri = gnet_snmp_get_uri(interp->peer);
-		if (uri) {
-		    gchar *name = gnet_uri_get_string(uri);
-		    xml_set_prop(top, "uri", name ? name : "?");
+		gchar *name = gnet_snmp_get_uri_string(interp->peer);
+		if (name) {
+		    xml_set_prop(top, BAD_CAST("uri"), name ? name : "?");
 		    g_free(name);
 		}
 	    }
-	    xml_set_prop(top, "date", "%s", xml_timeticks(0));
+	    xml_set_prop(top, BAD_CAST("date"), "%s", xml_timeticks(0));
 	}
 	if (! (scli_interp_recursive(interp))) {
 	    if (interp->xml_doc->children
@@ -975,7 +1007,7 @@ eval_all_cmd_node(scli_interp_t *interp, GNode *node, GString *s)
 			if (cmd->flags & SCLI_CMD_FLAG_NEED_PEER) {
 			    gchar *name = NULL;
 			    if (interp->peer) {
-				name = gnet_inetaddr_get_canonical_name(interp->peer->taddress);
+				name = gnet_snmp_taddress_get_short_name(interp->peer->taddress);
 			    }
 			    g_string_sprintfa(s, " [%s]", (name) ? name : "?");
 			    g_string_sprintfa(s, " [%s]", fmt_timeticks(0));
@@ -1288,11 +1320,16 @@ scli_eval_init_file(scli_interp_t *interp)
 
 
 int
-scli_open_community(scli_interp_t *interp, GNetSnmpTDomain tdomain,
-		    GInetAddr *taddress, char *community)
+#if 0
+scli_open_community(scli_interp_t *interp, GNetSnmpTAddress *taddress,
+		    char *community)
+#else
+scli_open_community(scli_interp_t *interp, gchar *target)
+#endif
 {
     snmpv2_mib_system_t *system = NULL;
     snmpv2_mib_snmpSet_t *serial = NULL;
+    GError *error = NULL;
     int verbose;
     const char *transport_domain = NULL;
 
@@ -1300,8 +1337,9 @@ scli_open_community(scli_interp_t *interp, GNetSnmpTDomain tdomain,
 	scli_close(interp);
     }
 
+#if 0
     interp->peer = gnet_snmp_new();
-    gnet_snmp_set_transport(interp->peer, tdomain, taddress);
+    gnet_snmp_set_transport(interp->peer, taddress);
     gnet_snmp_set_community(interp->peer, community ? community : "public");
     gnet_snmp_set_timeout(interp->peer, interp->timeout);
     gnet_snmp_set_retries(interp->peer, interp->retries);
@@ -1309,14 +1347,22 @@ scli_open_community(scli_interp_t *interp, GNetSnmpTDomain tdomain,
     if (! interp->peer) {
 	return SCLI_SNMP_NAME;
     }
+#else
+    interp->peer = gnet_snmp_new_string(target, &error);
+    if (! interp->peer) {
+	scli_interp_set_error(interp, &error);
+	return SCLI_SNMP;
+    }
+#endif
 
-    if (tdomain == GNET_SNMP_TDOMAIN_TCP_IPV6
-	|| tdomain == GNET_SNMP_TDOMAIN_TCP_IPV4) {
+    if (interp->peer->taddress->domain == GNET_SNMP_TDOMAIN_TCP_IPV6
+	|| interp->peer->taddress->domain == GNET_SNMP_TDOMAIN_TCP_IPV4
+	|| interp->peer->taddress->domain == GNET_SNMP_TDOMAIN_LOCAL) {
 	gnet_snmp_set_retries(interp->peer, 0);
     }
 
     transport_domain = gnet_snmp_enum_get_label(gnet_snmp_enum_tdomain_table,
-						tdomain);
+						interp->peer->taddress->domain);
     
     /*
      * Lets see how we can talk to this guy. We first try to speek
@@ -1334,8 +1380,8 @@ scli_open_community(scli_interp_t *interp, GNetSnmpTDomain tdomain,
 	|| interp->snmp == GNET_SNMP_V2C
 	|| interp->snmp == GNET_SNMP_V3) {
 	interp->peer->version = interp->snmp;
-	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
-	if (interp->peer->error_status) {
+	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME, &error);
+	if (scli_interp_set_error_snmp(interp, &error)) {
 	    scli_close(interp);
 	}
     } else {
@@ -1345,8 +1391,8 @@ scli_open_community(scli_interp_t *interp, GNetSnmpTDomain tdomain,
 		    transport_domain ? transport_domain : "");
 	}
 	interp->peer->version = GNET_SNMP_V2C;
-	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
-	if (interp->peer->error_status == 0) {
+	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME, &error);
+	if (! scli_interp_set_error_snmp(interp, &error)) {
 	    if (verbose) {
 		g_print("good\n");
 	    }
@@ -1357,8 +1403,9 @@ scli_open_community(scli_interp_t *interp, GNetSnmpTDomain tdomain,
 			transport_domain ? transport_domain : "");
 	    }
 	    interp->peer->version = GNET_SNMP_V1;
-	    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
-	    if (interp->peer->error_status == 0) {
+	    g_clear_error(&error);
+	    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME, &error);
+	    if (! scli_interp_set_error_snmp(interp, &error)) {
 		if (verbose) {
 		    g_print("ok.\n");
 		}
@@ -1377,6 +1424,8 @@ scli_open_community(scli_interp_t *interp, GNetSnmpTDomain tdomain,
     if (! interp->peer) {
 	return SCLI_SNMP;
     }
+
+    g_clear_error(&error);
 
 #if 0
     if (verbose) {
@@ -1430,7 +1479,7 @@ scli_prompt(scli_interp_t *interp)
     
     if (interp->peer) {
 	prompt = g_strdup_printf("(%s) scli > ",
-		 gnet_inetaddr_get_name(interp->peer->taddress));
+		 gnet_snmp_taddress_get_short_name(interp->peer->taddress));
     } else {
 	prompt = g_strdup_printf("scli > ");
     }

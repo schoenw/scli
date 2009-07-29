@@ -37,7 +37,10 @@ xml_set_prop(xmlNodePtr node, const xmlChar *name, const char *format, ...)
     va_end(args);
 
     if (s) {
-	xmlSetProp(node, name, s);
+	xmlChar *xs;
+	xs = xmlCharStrdup(s);
+	xmlSetProp(node, name, xs);
+	xmlFree(xs);
 	g_free(s);
     }
 }
@@ -55,7 +58,10 @@ xml_set_content(xmlNodePtr node, const char *format, ...)
     va_end(args);
 
     if (s) {
-	xmlNodePtr text = xmlNewText(s);
+	xmlChar *xs;
+	xs = xmlCharStrdup(s);
+	xmlNodePtr text = xmlNewText(xs);
+	xmlFree(xs);
 	if (text) xmlAddChild(node, text);
 	g_free(s);
     }
@@ -78,7 +84,10 @@ xml_new_child(xmlNodePtr parent, xmlNsPtr ns, const xmlChar *name,
 	va_end(args);
 
 	if (s) {
-	    xmlNodePtr text = xmlNewText(s);
+	    xmlChar *xs;
+	    xs = xmlCharStrdup(s);
+	    xmlNodePtr text = xmlNewText(xs);
+	    xmlFree(xs);
 	    if (text) xmlAddChild(node, text);
 	    g_free(s);
 	}

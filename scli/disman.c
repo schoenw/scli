@@ -584,6 +584,7 @@ show_languages(scli_interp_t *interp, int argc, char **argv)
     disman_script_mib_smLangEntry_t **smLangTable = NULL;
     disman_script_mib_smExtsnEntry_t **smExtsnTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -595,13 +596,15 @@ show_languages(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0);
-    if (interp->peer->error_status) {
+    disman_script_mib_get_smLangTable(interp->peer, &smLangTable,
+				      0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (smLangTable) {
-	disman_script_mib_get_smExtsnTable(interp->peer, &smExtsnTable, 0);
+	disman_script_mib_get_smExtsnTable(interp->peer, &smExtsnTable,
+					   0, NULL);
 	for (i = 0; smLangTable[i]; i++) {
 	    if (i) {
 		g_string_append(interp->result, "\n");
@@ -692,6 +695,7 @@ show_script_details(scli_interp_t *interp, int argc, char **argv)
     disman_script_mib_smLangEntry_t **smLangTable = NULL;
     disman_script_mib_smScriptEntry_t **smScriptTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -703,13 +707,14 @@ show_script_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0);
-    if (interp->peer->error_status) {
+    disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (smLangTable) {
-	disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable, 0);
+	disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable,
+					    0, NULL);
 	if (smScriptTable) {
 	    for (i = 0; smScriptTable[i]; i++) {
 		if (i) {
@@ -802,6 +807,7 @@ show_script_info(scli_interp_t *interp, int argc, char **argv)
     disman_script_mib_smLaunchEntry_t **smLaunchTable = NULL;
     int i;
     int owner_width = 8, lang_width = 8;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -813,14 +819,16 @@ show_script_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0);
-    if (interp->peer->error_status) {
+    disman_script_mib_get_smLangTable(interp->peer, &smLangTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (smLangTable) {
-	disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable, 0);
-	disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
+	disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable,
+					    0, NULL);
+	disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable,
+					    0, NULL);
 	if (smScriptTable) {
 	    for (i = 0; smScriptTable[i]; i++) {
 		if (smScriptTable[i]->_smScriptOwnerLength > owner_width) {
@@ -933,6 +941,7 @@ show_launch_info(scli_interp_t *interp, int argc, char **argv)
     disman_script_mib_smRunEntry_t **smRunTable = NULL;
     int i;
     int owner_width = 8;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -944,14 +953,17 @@ show_launch_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
-    if (interp->peer->error_status) {
+    disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable,
+					0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (smLaunchTable) {
-	disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable, 0);
-	disman_script_mib_get_smRunTable(interp->peer, &smRunTable, 0);
+	disman_script_mib_get_smScriptTable(interp->peer, &smScriptTable,
+					    0, NULL);
+	disman_script_mib_get_smRunTable(interp->peer, &smRunTable,
+					 0, NULL);
 	for (i = 0; smLaunchTable[i]; i++) {
 	    if (smLaunchTable[i]->_smLaunchOwnerLength > owner_width) {
 		owner_width = smLaunchTable[i]->_smLaunchOwnerLength;
@@ -1095,6 +1107,7 @@ show_launch_details(scli_interp_t *interp, int argc, char **argv)
 {
     disman_script_mib_smLaunchEntry_t **smLaunchTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1106,8 +1119,9 @@ show_launch_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
-    if (interp->peer->error_status) {
+    disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable,
+					0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1175,6 +1189,7 @@ show_run_info(scli_interp_t *interp, int argc, char **argv)
     int l_owner_width = 8;
     int l_name_width = 8;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1186,8 +1201,8 @@ show_run_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    disman_script_mib_get_smRunTable(interp->peer, &smRunTable, 0);
-    if (interp->peer->error_status) {
+    disman_script_mib_get_smRunTable(interp->peer, &smRunTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1327,6 +1342,7 @@ show_run_details(scli_interp_t *interp, int argc, char **argv)
     disman_script_mib_smLaunchEntry_t **smLaunchTable = NULL;
     disman_script_mib_smRunEntry_t **smRunTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1338,13 +1354,14 @@ show_run_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    disman_script_mib_get_smRunTable(interp->peer, &smRunTable, 0);
-    if (interp->peer->error_status) {
+    disman_script_mib_get_smRunTable(interp->peer, &smRunTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (smRunTable) {
-	disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable, 0);
+	disman_script_mib_get_smLaunchTable(interp->peer, &smLaunchTable,
+					    0, NULL);
 	for (i = 0; smRunTable[i]; i++) {
 	    if (i) {
 		g_string_append(interp->result, "\n");
@@ -1394,6 +1411,7 @@ show_scheduler_info(scli_interp_t *interp, int argc, char **argv)
     disman_schedule_mib_schedEntry_t **schedTable = NULL;
     int name_width = 5, owner_width = 5;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1405,8 +1423,8 @@ show_scheduler_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    disman_schedule_mib_get_schedTable(interp->peer, &schedTable, 0);
-    if (interp->peer->error_status) {
+    disman_schedule_mib_get_schedTable(interp->peer, &schedTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1523,6 +1541,7 @@ show_scheduler_details(scli_interp_t *interp, int argc, char **argv)
 {
     disman_schedule_mib_schedEntry_t **schedTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1534,8 +1553,8 @@ show_scheduler_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    disman_schedule_mib_get_schedTable(interp->peer, &schedTable, 0);
-    if (interp->peer->error_status) {
+    disman_schedule_mib_get_schedTable(interp->peer, &schedTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1558,6 +1577,8 @@ show_scheduler_details(scli_interp_t *interp, int argc, char **argv)
 static int
 create_disman_script(scli_interp_t *interp, int argc, char **argv)
 {
+    GError *error = NULL;
+    
     g_return_val_if_fail(interp, SCLI_ERROR);
     
     if (argc != 4) {
@@ -1576,8 +1597,11 @@ create_disman_script(scli_interp_t *interp, int argc, char **argv)
     }
 
     disman_script_mib_proc_create_script(interp->peer,
-					 argv[1], argv[2], argv[3]);
-    if (interp->peer->error_status) {
+					 (guchar *) argv[1],
+					 (guchar *) argv[2],
+					 (guchar *) argv[3],
+					 &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1589,6 +1613,8 @@ create_disman_script(scli_interp_t *interp, int argc, char **argv)
 static int
 create_disman_run(scli_interp_t *interp, int argc, char **argv)
 {
+    GError *error = NULL;
+    
     g_return_val_if_fail(interp, SCLI_ERROR);
     
     if (argc != 4) {
@@ -1608,8 +1634,11 @@ create_disman_run(scli_interp_t *interp, int argc, char **argv)
     }
 
     disman_script_mib_proc_create_run(interp->peer,
-				      argv[1], argv[2], argv[3]);
-    if (interp->peer->error_status) {
+				      (guchar *) argv[1],
+				      (guchar *) argv[2],
+				      (guchar *) argv[3],
+				      &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1619,7 +1648,7 @@ create_disman_run(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-create_schedule(GNetSnmp *s, const char *owner, const char *name)
+create_schedule(GNetSnmp *s, const char *owner, const char *name, GError **error)
 {
     disman_schedule_mib_schedEntry_t *schedEntry;
     gint32 createAndGo = SNMPV2_TC_ROWSTATUS_CREATEANDGO;
@@ -1629,13 +1658,14 @@ create_schedule(GNetSnmp *s, const char *owner, const char *name)
 	s->error_status = GNET_SNMP_PDU_ERR_PROCEDURE;
 	return;
     }
-    strcpy(schedEntry->schedOwner, owner);
+    strcpy((char *) schedEntry->schedOwner, owner);
     schedEntry->_schedOwnerLength = strlen(owner);
-    strcpy(schedEntry->schedName, name);
+    strcpy((char *) schedEntry->schedName, name);
     schedEntry->_schedNameLength = strlen(name);
     schedEntry->schedRowStatus = &createAndGo;
     disman_schedule_mib_set_schedEntry(s, schedEntry,
-				       DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS);
+				       DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS,
+				       error);
     disman_schedule_mib_free_schedEntry(schedEntry);
 }
 
@@ -1644,6 +1674,8 @@ create_schedule(GNetSnmp *s, const char *owner, const char *name)
 static int
 create_disman_schedule(scli_interp_t *interp, int argc, char **argv)
 {
+    GError *error = NULL;
+    
     g_return_val_if_fail(interp, SCLI_ERROR);
     
     if (argc != 3) {
@@ -1661,8 +1693,8 @@ create_disman_schedule(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_VALUE;
     }
 
-    create_schedule(interp->peer, argv[1], argv[2]);
-    if (interp->peer->error_status) {
+    create_schedule(interp->peer, argv[1], argv[2], &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1675,6 +1707,7 @@ static int
 delete_disman_schedule(scli_interp_t *interp, int argc, char **argv)
 {
     disman_schedule_mib_schedEntry_t *schedEntry;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1694,17 +1727,26 @@ delete_disman_schedule(scli_interp_t *interp, int argc, char **argv)
     }
 
     disman_schedule_mib_get_schedEntry(interp->peer, &schedEntry,
-				       argv[1], strlen(argv[1]),
-				       argv[2], strlen(argv[2]),
-				       DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS);
-    if (! schedEntry || !schedEntry->schedRowStatus) {
+				       (guchar *) argv[1], strlen(argv[1]),
+				       (guchar *) argv[2], strlen(argv[2]),
+				       DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS,
+				       &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
+	return SCLI_SNMP;
+    }
+    
+    if (!schedEntry->schedRowStatus) {
 	return SCLI_SNMP;
     }
 
     *schedEntry->schedRowStatus = SNMPV2_TC_ROWSTATUS_DESTROY;
     disman_schedule_mib_set_schedEntry(interp->peer, schedEntry,
-				       DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS);
+				       DISMAN_SCHEDULE_MIB_SCHEDROWSTATUS,
+				       &error);
     disman_schedule_mib_free_schedEntry(schedEntry);
+    if (scli_interp_set_error_snmp(interp, &error)) {
+	return SCLI_ERROR;
+    }
     return SCLI_OK;    
 }
 
@@ -1715,6 +1757,8 @@ dump_schedule(scli_interp_t *interp, int argc, char **argv)
 {
     disman_schedule_mib_schedEntry_t **schedTable = NULL;
     int i;
+    GError *error = NULL;
+    
     const int mask = (DISMAN_SCHEDULE_MIB_SCHEDDESCR
 		      | DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS
 		      | DISMAN_SCHEDULE_MIB_SCHEDADMINSTATUS);
@@ -1729,8 +1773,9 @@ dump_schedule(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    disman_schedule_mib_get_schedTable(interp->peer, &schedTable, mask);
-    if (interp->peer->error_status) {
+    disman_schedule_mib_get_schedTable(interp->peer, &schedTable,
+				       mask, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

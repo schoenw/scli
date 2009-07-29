@@ -204,6 +204,7 @@ show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifEntry_t **ifTable = NULL;
     if_mib_ifXEntry_t **ifXTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -215,17 +216,17 @@ show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    ip_forward_mib_get_ipCidrRouteTable(interp->peer, &ipCidrRouteTable, 0);
-    if (interp->peer->error_status || !ipCidrRouteTable) {
-	rfc1213_mib_get_ipRouteTable(interp->peer, &ipRouteTable, RFC1213_MIB_IPROUTE_MASK);
-	if (interp->peer->error_status) {
+    ip_forward_mib_get_ipCidrRouteTable(interp->peer, &ipCidrRouteTable, 0, &error);
+    if (error || interp->peer->error_status || !ipCidrRouteTable) {
+	rfc1213_mib_get_ipRouteTable(interp->peer, &ipRouteTable, RFC1213_MIB_IPROUTE_MASK, &error);
+	if (scli_interp_set_error_snmp(interp, &error)) {
 	    return SCLI_SNMP;
 	}
     }
 
     if (ipCidrRouteTable || ipRouteTable) {
-	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR);
-	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFNAME);
+	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR, NULL);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFNAME, NULL);
 	g_string_sprintfa(interp->header, "%-20s TOS %-16s%-10s%-10s%s",
 		  "DESTINATION", "NEXT-HOP", "TYPE", "PROTO", "INTERFACE");
 	if (ipCidrRouteTable) {
@@ -261,22 +262,24 @@ xml_ip_address(xmlNodePtr root, ip_mib_ipAddrEntry_t *ipAddrEntry)
     xmlNodePtr tree;
     char *name;
 
-    tree = xmlNewChild(root, NULL, "address", NULL);
-    xmlSetProp(tree, "address",
-	       fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_ADDR));
-    xmlSetProp(tree, "type", "ipv4");
+    tree = xml_new_child(root, NULL, BAD_CAST("address"), NULL);
+    xml_set_prop(tree, BAD_CAST("address"),
+		 fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_ADDR));
+    xml_set_prop(tree, BAD_CAST("type"), "ipv4");
 
     if (ipAddrEntry->ipAdEntNetMask) {
-	xmlSetProp(tree, "prefix", fmt_ipv4_mask(ipAddrEntry->ipAdEntNetMask));
+	xml_set_prop(tree, BAD_CAST("prefix"),
+		     fmt_ipv4_mask(ipAddrEntry->ipAdEntNetMask));
     }
 
     if (ipAddrEntry->ipAdEntIfIndex) {
-	xml_set_prop(tree, "interface", "%d", *ipAddrEntry->ipAdEntIfIndex);
+	xml_set_prop(tree, BAD_CAST("interface"),
+		     "%d", *ipAddrEntry->ipAdEntIfIndex);
     }
 
     name = fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_NAME);
     if (name) {
-	(void) xmlNewChild(tree, NULL, "name", name);
+	(void) xml_new_child(tree, NULL, BAD_CAST("name"), name);
     }
 }
 
@@ -342,6 +345,7 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifEntry_t **ifTable = NULL;
     if_mib_ifXEntry_t **ifXTable = NULL;
     int i, name_width = 4, ifName_width;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -353,14 +357,14 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0);
-    if (interp->peer->error_status) {
+    ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (ipAddrTable) {
-	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR);
-	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFNAME);
+	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR, NULL);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFNAME, NULL);
 	ifName_width = get_if_name_width(ifXTable);
 	if (! scli_interp_xml(interp)) {
 	    for (i = 0; ipAddrTable[i]; i++) {
@@ -492,6 +496,7 @@ show_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifEntry_t **ifTable = NULL;
     if_mib_ifXEntry_t **ifXTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -503,14 +508,14 @@ show_ip_tunnel(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    tunnel_mib_get_tunnelIfTable(interp->peer, &tunnelIfTable, 0);
-    if (interp->peer->error_status) {
+    tunnel_mib_get_tunnelIfTable(interp->peer, &tunnelIfTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     
     if (tunnelIfTable) {
-	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR);
-	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFNAME);
+	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR, NULL);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFNAME, NULL);
 	g_string_append(interp->header,
 	"LOCAL ADDRESS    REMOTE ADDRESS   TYPE    SEC.  TTL TOS INTERFACE");
 	for (i = 0; tunnelIfTable[i]; i++) {
@@ -576,6 +581,7 @@ show_ip_mapping(scli_interp_t *interp, int argc, char **argv)
     ip_mib_ipNetToMediaEntry_t **ipNetToMediaTable = NULL;
     if_mib_ifEntry_t **ifTable = NULL, *ifEntry = NULL;
     int i, j;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -587,13 +593,13 @@ show_ip_mapping(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    ip_mib_get_ipNetToMediaTable(interp->peer, &ipNetToMediaTable, 0);
-    if (interp->peer->error_status) {
+    ip_mib_get_ipNetToMediaTable(interp->peer, &ipNetToMediaTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (ipNetToMediaTable) {
-	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFTYPE);
+	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFTYPE, NULL);
 	g_string_append(interp->header,
 		"INTERFACE STATUS   ADDRESS          LOWER LAYER ADDRESS");
 	for (i = 0; ipNetToMediaTable[i]; i++) {
@@ -651,19 +657,19 @@ xml_ip_info(xmlNodePtr tree, ip_mib_ip_t *ip)
 
     e = fmt_enum(forwarding, ip->ipForwarding);
     if (e) {
-	(void) xml_new_child(tree, NULL, "forwarding", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("forwarding"), "%s", e);
     }
 
     if (ip->ipDefaultTTL) {
-	node = xml_new_child(tree, NULL, "default-ttl", "%d",
+	node = xml_new_child(tree, NULL, BAD_CAST("default-ttl"), "%d",
 			     *ip->ipDefaultTTL);
-	xml_set_prop(node, "unit", "hops");
+	xml_set_prop(node, BAD_CAST("unit"), "hops");
     }
 
     if (ip->ipReasmTimeout) {
-	node = xml_new_child(tree, NULL, "reassemble-timeout", "%d",
+	node = xml_new_child(tree, NULL, BAD_CAST("reassemble-timeout"), "%d",
 			     *ip->ipDefaultTTL);
-	xml_set_prop(node, "unit", "seconds");
+	xml_set_prop(node, BAD_CAST("unit"), "seconds");
     }
 }
 
@@ -690,6 +696,7 @@ static int
 show_ip_info(scli_interp_t *interp, int argc, char **argv)
 {
     ip_mib_ip_t *ip;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -701,8 +708,8 @@ show_ip_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    ip_mib_get_ip(interp->peer, &ip, 0);
-    if (interp->peer->error_status) {
+    ip_mib_get_ip(interp->peer, &ip, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -731,6 +738,7 @@ set_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 {
     ip_mib_ip_t *ip;
     gint32 value;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -749,10 +757,10 @@ set_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 
     ip = ip_mib_new_ip();
     ip->ipForwarding = &value;
-    ip_mib_set_ip(interp->peer, ip, IP_MIB_IPFORWARDING);
+    ip_mib_set_ip(interp->peer, ip, IP_MIB_IPFORWARDING, &error);
     ip_mib_free_ip(ip);
 
-    if (interp->peer->error_status) {
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -767,6 +775,7 @@ set_ip_ttl(scli_interp_t *interp, int argc, char **argv)
     ip_mib_ip_t *ip;
     gint32 value;
     char *end;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -786,10 +795,10 @@ set_ip_ttl(scli_interp_t *interp, int argc, char **argv)
 
     ip = ip_mib_new_ip();
     ip->ipDefaultTTL = &value;
-    ip_mib_set_ip(interp->peer, ip, IP_MIB_IPDEFAULTTTL);
+    ip_mib_set_ip(interp->peer, ip, IP_MIB_IPDEFAULTTTL, &error);
     ip_mib_free_ip(ip);
 
-    if (interp->peer->error_status) {
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -803,6 +812,7 @@ dump_ip(scli_interp_t *interp, int argc, char **argv)
 {
     ip_mib_ip_t *ip;
     const char *e;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -814,8 +824,9 @@ dump_ip(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    ip_mib_get_ip(interp->peer, &ip, IP_MIB_IPFORWARDING | IP_MIB_IPDEFAULTTTL);
-    if (interp->peer->error_status) {
+    ip_mib_get_ip(interp->peer, &ip,
+		  IP_MIB_IPFORWARDING | IP_MIB_IPDEFAULTTTL, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

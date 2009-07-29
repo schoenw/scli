@@ -60,6 +60,7 @@ show_atm_interface_info(scli_interp_t *interp, int argc, char **argv)
     atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfTable = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -81,8 +82,8 @@ show_atm_interface_info(scli_interp_t *interp, int argc, char **argv)
     }
 
     atm_mib_get_atmInterfaceConfTable(interp->peer,
-				      &atmInterfaceConfTable, 0);
-    if (interp->peer->error_status) {
+				      &atmInterfaceConfTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     
@@ -93,7 +94,7 @@ show_atm_interface_info(scli_interp_t *interp, int argc, char **argv)
 	    if_mib_ifEntry_t *ifEntry = NULL;
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
 			       atmInterfaceConfTable[i]->ifIndex,
-			       IF_MIB_IFDESCR);
+			       IF_MIB_IFDESCR, NULL);
 	    if (! ifEntry) continue;
 	    if (interface_match(regex_iface, ifEntry)) {
 		fmt_atm_interface_info(interp->result,
@@ -120,26 +121,26 @@ xml_atm_interface_details(xmlNodePtr root,
 {
     xmlNodePtr tree;
 
-    tree = xmlNewChild(root, NULL, "interface", NULL);
-    xml_set_prop(tree, "index", "%d", atmIfaceConfEntry->ifIndex);
+    tree = xml_new_child(root, NULL, BAD_CAST("interface"), NULL);
+    xml_set_prop(tree, BAD_CAST("index"), "%d", atmIfaceConfEntry->ifIndex);
     
     if (atmIfaceConfEntry->atmInterfaceMaxVpcs) {
-	(void) xml_new_child(tree, NULL, "max-vpcs", "%d",
+	(void) xml_new_child(tree, NULL, BAD_CAST("max-vpcs"), "%d",
 			     *atmIfaceConfEntry->atmInterfaceMaxVpcs);
     }
 
     if (atmIfaceConfEntry->atmInterfaceMaxVccs) {
-	(void) xml_new_child(tree, NULL, "max-vccs", "%d",
+	(void) xml_new_child(tree, NULL, BAD_CAST("max-vccs"), "%d",
 			     *atmIfaceConfEntry->atmInterfaceMaxVccs);
     }
 
     if (atmIfaceConfEntry->atmInterfaceConfVpcs) {
-	(void) xml_new_child(tree, NULL, "conf-vpcs", "%d",
+	(void) xml_new_child(tree, NULL, BAD_CAST("conf-vpcs"), "%d",
 			     *atmIfaceConfEntry->atmInterfaceConfVpcs);
     }
 
     if (atmIfaceConfEntry->atmInterfaceConfVccs) {
-	(void) xml_new_child(tree, NULL, "conf-vccs", "%d",
+	(void) xml_new_child(tree, NULL, BAD_CAST("conf-vccs"), "%d",
 			     *atmIfaceConfEntry->atmInterfaceConfVccs);
     }
 }
@@ -209,6 +210,7 @@ show_atm_interface_details(scli_interp_t *interp, int argc, char **argv)
     atm_mib_atmInterfaceConfEntry_t **atmInterfaceConfTable = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i, c;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -230,8 +232,8 @@ show_atm_interface_details(scli_interp_t *interp, int argc, char **argv)
     }
 
     atm_mib_get_atmInterfaceConfTable(interp->peer,
-				      &atmInterfaceConfTable, 0);
-    if (interp->peer->error_status) {
+				      &atmInterfaceConfTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     
@@ -240,7 +242,7 @@ show_atm_interface_details(scli_interp_t *interp, int argc, char **argv)
 	    if_mib_ifEntry_t *ifEntry = NULL;
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
 			       atmInterfaceConfTable[i]->ifIndex,
-			       IF_MIB_IFDESCR);
+			       IF_MIB_IFDESCR, NULL);
 	    if (interface_match(regex_iface, ifEntry)) {
 		if (scli_interp_xml(interp)) {
 		    xml_atm_interface_details(interp->xml_node,

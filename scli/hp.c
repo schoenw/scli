@@ -77,6 +77,7 @@ show_hp_fault_finder_log(scli_interp_t *interp, int argc, char **argv)
     snmpv2_mib_system_t *system = NULL;
     hp_icf_fault_finder_mib_hpicfFfLogEntry_t **logTable = NULL;
     int i, j, n;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -89,13 +90,13 @@ show_hp_fault_finder_log(scli_interp_t *interp, int argc, char **argv)
     }
 
     hp_icf_fault_finder_mib_get_hpicfFfLogTable(interp->peer,
-						&logTable, 0);
-    if (interp->peer->error_status) {
+						&logTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (logTable) {
-	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
+	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME, NULL);
 #if 0
 	g_string_sprintfa(interp->header,
 			  "SOURCE           DESTINATION       "

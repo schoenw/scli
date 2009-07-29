@@ -1,7 +1,7 @@
 /* 
  * monitor.c -- basic monitor functions for the scli command interpreter
  *
- * Copyright (C) 2001 Juergen Schoenwaelder
+ * Copyright (C) 2001-2009 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -187,6 +187,7 @@ show_system(GNetSnmp *peer, int flags)
     char timestr[10];
     struct tm *now_tm;
     int mask = (SNMPV2_MIB_SYSDESCR | SNMPV2_MIB_SYSUPTIME);
+    GError *error = NULL;
 
     if (flags & STOP_FLAG_RESTART) {
         last.tv_sec = last.tv_usec = 0;
@@ -204,19 +205,15 @@ show_system(GNetSnmp *peer, int flags)
 	mask |= SNMPV2_MIB_SYSCONTACT;
 	mask |= SNMPV2_MIB_SYSLOCATION;
     }
-    snmpv2_mib_get_system(peer, &system, mask);
-    if (peer->error_status) {
-	GURI *uri;
-	gchar *name = NULL;
-	uri = gnet_snmp_get_uri(peer);
-	if (uri) {
-	    name = gnet_uri_get_string(uri);
-	}
+    snmpv2_mib_get_system(peer, &system, mask, &error);
+    if (error || peer->error_status) {
+	gchar *name = gnet_snmp_get_uri_string(peer);
         move(0, 10);
         clrtoeol();
         mvprintw(0, 10, "%s", name ? name : "?");
         mvaddstr(0, (int) (COLS-strlen(timestr)-1), timestr);
 	if (name) g_free(name);
+	g_clear_error(&error);
         return STOP_FLAG_SNMP_FAILURE;
     }
 
@@ -226,7 +223,6 @@ show_system(GNetSnmp *peer, int flags)
 	    unsigned days, hours, minutes, seconds;
 	    guint32 secs;
 	    gchar *name = NULL;
-	    GURI *uri;
 	    if (last.tv_sec && last.tv_usec) {
 		if (sysUpTime > *(system->sysUpTime)) {
 		    return STOP_FLAG_RESTART;
@@ -239,10 +235,7 @@ show_system(GNetSnmp *peer, int flags)
 	    seconds = secs % 60;
 	    move(0, 10);
 	    clrtoeol();
-	    uri = gnet_snmp_get_uri(peer);
-	    if (uri) {
-		name = gnet_uri_get_string(uri);
-	    }
+	    name = gnet_snmp_get_uri_string(peer);
 	    mvprintw(0, 10, "%s up %d %s %02d:%02d:%02d",
 		     name ? name : "?",
 		     days, (days == 1) ? "day" : "days",
@@ -299,13 +292,15 @@ show_ip(GNetSnmp *peer, int flags)
 	    IP_MIB_IPOUTNOROUTES | IP_MIB_IPFRAGOKS |
 	    IP_MIB_IPFRAGFAILS | IP_MIB_IPFRAGCREATES |
 	    IP_MIB_IPREASMOKS;
+    GError *error = NULL;
 
     if (flags & STOP_FLAG_RESTART) {
         last.tv_sec = last.tv_usec = 0;
     }
 
-    ip_mib_get_ip(peer, &ip, mask);
-    if (peer->error_status || !ip) {
+    ip_mib_get_ip(peer, &ip, mask, &error);
+    if (error || peer->error_status || !ip) {
+	g_clear_error(&error);
         return;
     }
     
@@ -389,13 +384,15 @@ show_udp(GNetSnmp *peer, int flags)
     static struct timeval last, now;
     double delta;
     int mask = (UDP_MIB_UDPINDATAGRAMS | UDP_MIB_UDPOUTDATAGRAMS);
+    GError *error = NULL;
     
     if (flags & STOP_FLAG_RESTART) {
         last.tv_sec = last.tv_usec = 0;
     }
 
-    udp_mib_get_udp(peer, &udp, mask);
-    if (peer->error_status || !udp) {
+    udp_mib_get_udp(peer, &udp, mask, &error);
+    if (error || peer->error_status || !udp) {
+	g_clear_error(&error);
         return;
     }
 
@@ -438,13 +435,15 @@ show_tcp(GNetSnmp *peer, int flags)
     double delta;
     int mask = (TCP_MIB_TCPINSEGS | TCP_MIB_TCPOUTSEGS | TCP_MIB_TCPCURRESTAB
 	| TCP_MIB_TCPACTIVEOPENS | TCP_MIB_TCPPASSIVEOPENS);
+    GError *error = NULL;
 
     if (flags & STOP_FLAG_RESTART) {
         last.tv_sec = last.tv_usec = 0;
     }
 
-    tcp_mib_get_tcp(peer, &tcp, mask);
-    if (peer->error_status || !tcp) {
+    tcp_mib_get_tcp(peer, &tcp, mask, &error);
+    if (error || peer->error_status || !tcp) {
+	g_clear_error(&error);
         return;
     }
 
@@ -502,14 +501,9 @@ static void
 show_interior(GNetSnmp *peer)
 {
     int y = 0;
-    GURI *uri;
     gchar *name = NULL;
 
-    uri = gnet_snmp_get_uri(peer);
-    if (uri) {
-	name = gnet_uri_get_string(uri);
-    }
-    
+    name = gnet_snmp_get_uri_string(peer);
     clear();
     y = 0;
     mvprintw(y, 10, "%s", name ? name : "?");

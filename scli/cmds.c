@@ -1,7 +1,7 @@
 /* 
  * cmds.c -- basic commands for the scli command interpreter
  *
- * Copyright (C) 2001 Juergen Schoenwaelder
+ * Copyright (C) 2001-2009 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -502,10 +502,12 @@ scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
     gint ipv6, port = 161;
     gchar *community = NULL;
     GInetAddr *addr;
+    GNetSnmpTAddress *taddr;
     int code;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
+#if 0
     if (argc < 2 || argc > 4) {
         return SCLI_SYNTAX_NUMARGS;
     }
@@ -519,14 +521,14 @@ scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
 	community = argv[3];
     }
 
+    taddr = gnet_snmp_trans
+
     addr = gnet_inetaddr_new(host, port);
     if (! addr) {
 	return SCLI_SYNTAX_VALUE;
     }
 
-    if (interp->taddress) gnet_inetaddr_delete(interp->taddress);
-    interp->taddress = addr;
-    ipv6 = gnet_inetaddr_is_ipv6(interp->taddress);
+    ipv6 = gnet_inetaddr_is_ipv6(addr);
 
     /*
      * We prefer to use TCP so try TCP first and fall back to UDP if
@@ -549,6 +551,12 @@ scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
 	    = ipv6 ? GNET_SNMP_TDOMAIN_UDP_IPV6 : GNET_SNMP_TDOMAIN_UDP_IPV4;
     code = scli_open_community(interp, interp->tdomain,
 			       interp->taddress, community);
+#else
+    if (argc != 2) {
+        return SCLI_SYNTAX_NUMARGS;
+    }
+    code = scli_open_community(interp, argv[1]);
+#endif
     return code;
 }
 
@@ -937,10 +945,8 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 		      "Pager:", interp->pager ? interp->pager : "scli");
 
     if (interp->peer) {
-        GURI *uri;
-	uri = gnet_snmp_get_uri(interp->peer);
-	if (uri) {
-	    gchar *name = gnet_uri_get_string(uri);
+	gchar *name = gnet_snmp_get_uri_string(interp->peer);
+	if (name) {
 	    g_string_sprintfa(interp->result, "%-*s %s\n",
 			      indent, "URI:", name);
 	    g_free(name);
@@ -1297,6 +1303,7 @@ cmd_scli_walk(scli_interp_t *interp, int argc, char **argv)
     GList *elem;
     int i, len;
     char *p;
+    GError *error = NULL;
     GNetSnmpVarBind *vb;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -1330,9 +1337,13 @@ cmd_scli_walk(scli_interp_t *interp, int argc, char **argv)
 	in = g_list_append(in, vb);
     }
 
-    out = gnet_snmp_sync_walk(interp->peer, in);
+    out = gnet_snmp_sync_walk(interp->peer, in, &error);
     g_list_foreach(in, (GFunc) gnet_snmp_varbind_delete, NULL);
     g_list_free(in);
+    if (error) {
+	g_string_assign(interp->result, error->message);
+	return SCLI_ERROR;
+    }
     if (out) {
 	for (elem = out; elem; elem = g_list_next(elem)) {
 	    fmt_walk(interp->result, (GNetSnmpVarBind *) elem->data);
@@ -1347,8 +1358,7 @@ cmd_scli_walk(scli_interp_t *interp, int argc, char **argv)
 
 
 struct scan_elem {
-    GNetSnmpTDomain tdomain;
-    GInetAddr *taddress;	/* xxx - not very efficient */
+    GNetSnmpTAddress *taddress;	/* xxx - not very efficient */
     int descr_len;
     char *descr;
 };
@@ -1358,7 +1368,7 @@ scan_elem_free(gpointer data, gpointer user_data)
 {
     struct scan_elem *p = data;
     if (p) {
-	if (p->taddress) gnet_inetaddr_delete(p->taddress);
+	if (p->taddress) gnet_snmp_taddress_delete(p->taddress);
 	if (p->descr) g_free(p->descr);
 	g_free(p);
     }
@@ -1415,11 +1425,11 @@ scan_cmp(gconstpointer a, gconstpointer b)
     gchar ip_b[GNET_INETADDR_MAX_LEN];
     gint len_a, len_b;
 
-    len_a = gnet_inetaddr_get_length(n_a->taddress);
-    len_b = gnet_inetaddr_get_length(n_b->taddress);
+    len_a = gnet_inetaddr_get_length(n_a->taddress->inetaddr);
+    len_b = gnet_inetaddr_get_length(n_b->taddress->inetaddr);
 
-    gnet_inetaddr_get_bytes(n_a->taddress, ip_a);
-    gnet_inetaddr_get_bytes(n_b->taddress, ip_b);
+    gnet_inetaddr_get_bytes(n_a->taddress->inetaddr, ip_a);
+    gnet_inetaddr_get_bytes(n_b->taddress->inetaddr, ip_b);
 
     if (len_a == len_b) {
 	return memcmp(ip_a, ip_b, len_a);
@@ -1435,7 +1445,7 @@ scan_print(gpointer data, gpointer user_data)
     scli_interp_t *interp = (scli_interp_t *) user_data;
     gchar *name = NULL;
 
-    name = gnet_inetaddr_get_canonical_name(p->taddress);
+    name = gnet_snmp_taddress_get_short_name(p->taddress);
     g_string_sprintfa(interp->result, "%-16s ", name);
     if (p->descr_len && p->descr) {
 	append_flat_string(interp->result, p->descr_len, p->descr);
@@ -1455,8 +1465,7 @@ scan_one_done(GNetSnmp *s, GNetSnmpPdu *pdu, GList *vbl, gpointer magic)
     if (s->error_status == GNET_SNMP_PDU_ERR_NOERROR && vbl) {
 	struct scan_elem *p;
 	p = g_new0(struct scan_elem, 1);
-	p->tdomain = s->tdomain;
-	p->taddress = gnet_inetaddr_clone(s->taddress);
+	p->taddress = gnet_snmp_taddress_clone(s->taddress);
 	vb = vbl->data;
 	if (vb->type == GNET_SNMP_VARBIND_TYPE_OCTETSTRING) {
 	    p->descr_len = vb->value_len;
@@ -1480,45 +1489,60 @@ scan_one_time(GNetSnmp *s, void *magic)
 static void
 scan_one(char *host, int port, char *community, gpointer magic)
 {
-    GInetAddr *taddress;
+    GInetAddr *inetaddr;
     GNetSnmpTDomain tdomain;
+    GNetSnmpTAddress *taddress;
     GNetSnmp *s;
     static GList *in = NULL;
     static guint32 base[] = {1, 3, 6, 1, 2, 1, 1, 1, 0};
     GNetSnmpVarBind *vb;
+    GError *error = NULL;
 
-    taddress = gnet_inetaddr_new(host, port); /* xxx where to release? */
-    if (! taddress) {
+    inetaddr = gnet_inetaddr_new(host, port); /* xxx where to release? */
+    if (! inetaddr) {
         g_warning("failed to convert address");
 	return;
     }
-    tdomain = gnet_inetaddr_is_ipv6(taddress)
-	    ? GNET_SNMP_TDOMAIN_UDP_IPV6 : GNET_SNMP_TDOMAIN_UDP_IPV4;
-     
+
+    taddress = gnet_snmp_taddress_new_inet(
+    	gnet_inetaddr_is_ipv6(inetaddr) ? GNET_SNMP_TDOMAIN_UDP_IPV6 : GNET_SNMP_TDOMAIN_UDP_IPV4, inetaddr);
+    if (! taddress) {
+        g_warning("failed to generate transport address");
+	return;
+    }
+
     s = gnet_snmp_new();
-    gnet_snmp_set_transport(s, tdomain, taddress);
+    gnet_snmp_set_transport(s, taddress);
     gnet_snmp_set_community(s, community ? community : "public");
     gnet_snmp_set_version(s, GNET_SNMP_V1);
     if (! s) {
-	 g_warning("failed to create session: %s\n", host);
-	 return;
+	g_warning("failed to create session: %s\n", host);
+	if (taddress) gnet_snmp_taddress_delete(taddress);
+	if (inetaddr) gnet_inetaddr_delete(inetaddr);
+	return;
     }
 
     if (! in) {
-	 vb = gnet_snmp_varbind_new(base, G_N_ELEMENTS(base),
-				    GNET_SNMP_VARBIND_TYPE_NULL, NULL, 0);
-	 in = g_list_append(in, vb);
+	vb = gnet_snmp_varbind_new(base, G_N_ELEMENTS(base),
+				   GNET_SNMP_VARBIND_TYPE_NULL, NULL, 0);
+	in = g_list_append(in, vb);
     }
 
     s->done_callback = scan_one_done;
     s->time_callback = scan_one_time;
     s->magic = magic;
 
-    if (gnet_snmp_async_get(s, in) == NULL) {
-        g_warning("failed to send async request");
+    if (gnet_snmp_async_get(s, in, &error) == NULL) {
+        g_warning("failed to send async request%s%s",
+		  error ? ": " : "",
+		  error ? error->message : "");
+	if (taddress) gnet_snmp_taddress_delete(taddress);
+	if (inetaddr) gnet_inetaddr_delete(inetaddr);
 	return;
     }
     ((struct scanmagic *) magic)->count++;
+    if (taddress) gnet_snmp_taddress_delete(taddress);
+    if (inetaddr) gnet_inetaddr_delete(inetaddr);
 }
 
 

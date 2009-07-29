@@ -2,7 +2,7 @@ SCLI -- SNMP COMMAND LINE INTERFACE
 ===================================
 
 Copyright (c) 2001-2002 Juergen Schoenwaelder, TU Braunschweig, Germany
-Copyright (c) 2003-2007 Juergen Schoenwaelder, IU Bremen, Germany
+Copyright (c) 2003-2009 Juergen Schoenwaelder, Jacobs University Bremen, Germany
 
 $Id$
 
@@ -31,7 +31,7 @@ To compile scli, you need the following packages:
   - GNU readline version 4.X
   - glib version 2.0.X
   - gnet version 2.0.X
-  - gsnmp version 0.2.X
+  - gsnmp version 0.3.X
   - ncurses version 5.X (or a native working curses implementation)
   - libxml2
 
@@ -84,7 +84,7 @@ distribution.
 COPYRIGHT
 =========
 
-Copyright (c) 2001-2006 Juergen Schoenwaelder
+Copyright (c) 2001-2009 Juergen Schoenwaelder
 
 The scli package is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as

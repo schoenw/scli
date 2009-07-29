@@ -118,6 +118,7 @@ static int
 create_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
 {
     gint32 model = 0;	/* "any" */
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -149,8 +150,8 @@ create_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
     }
     
     snmp_view_based_acm_mib_proc_create_member(interp->peer,
-					       argv[1], argv[2], model);
-    if (interp->peer->error_status) {
+		       (guchar *) argv[1], (guchar *) argv[2], model, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     
@@ -168,6 +169,7 @@ delete_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
     gint32 model = 0;	/* "any" */
     int i, status;
     char *s;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -204,8 +206,8 @@ delete_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
     }
 
     snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(interp->peer,
-							 &vacmGroupTable, 0);
-    if (interp->peer->error_status) {
+						 &vacmGroupTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	if (regex_name) regfree(regex_name);
 	if (regex_group) regfree(regex_group);
 	return SCLI_SNMP;
@@ -235,7 +237,8 @@ delete_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
 			       vacmGroupTable[i]->vacmSecurityName,
 			       vacmGroupTable[i]->_vacmSecurityNameLength,
 			       vacmGroupTable[i]->vacmGroupName,
-			       vacmGroupTable[i]->_vacmGroupNameLength, model);
+			       vacmGroupTable[i]->_vacmGroupNameLength,
+						       model, NULL);
 	}
     }
     
@@ -257,6 +260,8 @@ delete_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
 static int
 create_snmp_usm_user(scli_interp_t *interp, int argc, char **argv)
 {
+    GError *error = NULL;
+    
     g_return_val_if_fail(interp, SCLI_ERROR);
 
     if (argc != 3) {
@@ -280,9 +285,10 @@ create_snmp_usm_user(scli_interp_t *interp, int argc, char **argv)
     }
     
     snmp_user_based_sm_mib_proc_clone_user(interp->peer,
-					   argv[1], strlen(argv[1]),
-					   argv[2], strlen(argv[2]));
-    if (interp->peer->error_status) {
+					   (guchar *) argv[1], strlen(argv[1]),
+					   (guchar *) argv[2], strlen(argv[2]),
+					   &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     
@@ -370,6 +376,7 @@ show_snmp_engine(scli_interp_t *interp, int argc, char **argv)
     snmp_framework_mib_snmpEngine_t *snmpEngine;
     snmpv2_mib_snmp_t *snmp;
     notification_log_mib_nlmConfig_t *nlmConfig;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -381,12 +388,13 @@ show_snmp_engine(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmp_framework_mib_get_snmpEngine(interp->peer, &snmpEngine, 0);
-    if (interp->peer->error_status) {
+    snmp_framework_mib_get_snmpEngine(interp->peer, &snmpEngine, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
-    snmpv2_mib_get_snmp(interp->peer, &snmp, SNMPV2_MIB_SNMPENABLEAUTHENTRAPS);
-    notification_log_mib_get_nlmConfig(interp->peer, &nlmConfig, 0);
+    snmpv2_mib_get_snmp(interp->peer, &snmp,
+			SNMPV2_MIB_SNMPENABLEAUTHENTRAPS, NULL);
+    notification_log_mib_get_nlmConfig(interp->peer, &nlmConfig, 0, NULL);
 
     fmt_snmp_engine(interp->result, snmpEngine, snmp, nlmConfig);
     
@@ -418,7 +426,7 @@ fmt_snmp_resource(GString *s,
     if (sysOREntry->sysORDescr) {
 	fmt_display_string(s, indent, "Description:",
 			   (int) sysOREntry->_sysORDescrLength,
-			   sysOREntry->sysORDescr);
+			   (gchar *) sysOREntry->sysORDescr);
     }
     if (sysOREntry->sysORID && sysOREntry->_sysORIDLength) {
 	g_string_sprintfa(s, "%-*s", indent, "Capabilities:");
@@ -438,6 +446,7 @@ show_snmp_resources(scli_interp_t *interp, int argc, char **argv)
     snmpv2_mib_sysOREntry_t **sysORTable;
     snmpv2_mib_system_t *system;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -449,11 +458,11 @@ show_snmp_resources(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmpv2_mib_get_sysORTable(interp->peer, &sysORTable, 0);
-    if (interp->peer->error_status) {
+    snmpv2_mib_get_sysORTable(interp->peer, &sysORTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
-    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
+    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME, NULL);
         
     if (sysORTable) {
 	for (i = 0; sysORTable[i]; i++) {
@@ -502,6 +511,7 @@ show_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
     int sec_name_width = 8;
     int sec_group_width = 8;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -514,8 +524,8 @@ show_snmp_vacm_member(scli_interp_t *interp, int argc, char **argv)
     }
 
     snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(interp->peer,
-							 &vacmGroupTable, 0);
-    if (interp->peer->error_status) {
+						 &vacmGroupTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -602,6 +612,7 @@ show_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
     int write_width = 5;
     int notify_width = 5;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -614,8 +625,8 @@ show_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
     }
 
     snmp_view_based_acm_mib_get_vacmAccessTable(interp->peer,
-						&vacmAccessTable, 0);
-    if (interp->peer->error_status) {
+						&vacmAccessTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -707,6 +718,7 @@ show_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
     snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t **vacmViewTable;
     int view_width = 8;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -719,8 +731,8 @@ show_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
     }
 
     snmp_view_based_acm_mib_get_vacmViewTreeFamilyTable(interp->peer,
-							&vacmViewTable, 0);
-    if (interp->peer->error_status) {
+						&vacmViewTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -786,6 +798,7 @@ show_snmp_usm_users(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_user_based_sm_mib_usmUserEntry_t **usmUserTable = NULL;
     int i, user_width = 8, sec_width = 8;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -797,8 +810,9 @@ show_snmp_usm_users(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmp_user_based_sm_mib_get_usmUserTable(interp->peer, &usmUserTable, 0);
-    if (interp->peer->error_status) {
+    snmp_user_based_sm_mib_get_usmUserTable(interp->peer, &usmUserTable,
+					    0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -894,6 +908,7 @@ show_snmp_target_addresses(scli_interp_t *interp, int argc, char **argv)
     int name_width = 8, tag_width = 8, addr_width = 8, para_width = 8;
     const char *e;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -905,8 +920,9 @@ show_snmp_target_addresses(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmp_target_mib_get_snmpTargetAddrTable(interp->peer, &snmpTargetTable, 0);
-    if (interp->peer->error_status) {
+    snmp_target_mib_get_snmpTargetAddrTable(interp->peer, &snmpTargetTable,
+					    0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -992,6 +1008,7 @@ show_snmp_target_parameters(scli_interp_t *interp, int argc, char **argv)
     snmp_target_mib_snmpTargetParamsEntry_t **snmpParamsTable = NULL;
     int name_width = 8, para_width = 8;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1003,8 +1020,9 @@ show_snmp_target_parameters(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmp_target_mib_get_snmpTargetParamsTable(interp->peer, &snmpParamsTable, 0);
-    if (interp->peer->error_status) {
+    snmp_target_mib_get_snmpTargetParamsTable(interp->peer, &snmpParamsTable,
+					      0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1070,6 +1088,7 @@ show_snmp_notification_targets(scli_interp_t *interp, int argc, char **argv)
     snmp_notification_mib_snmpNotifyEntry_t **snmpNotifyTable = NULL;
     int name_width = 8;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1081,8 +1100,9 @@ show_snmp_notification_targets(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmp_notification_mib_get_snmpNotifyTable(interp->peer, &snmpNotifyTable, 0);
-    if (interp->peer->error_status) {
+    snmp_notification_mib_get_snmpNotifyTable(interp->peer, &snmpNotifyTable,
+					      0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1120,11 +1140,11 @@ fmt_snmp_context(GString *s,
 
     fmt_display_string(s, indent, "Description:",
 		       (int) logEntEntry->_entLogicalDescrLength,
-		       logEntEntry->entLogicalDescr);
+		       (gchar *) logEntEntry->entLogicalDescr);
     
     fmt_display_string(s, indent, "Community:",
 		       (int) logEntEntry->_entLogicalCommunityLength,
-		       logEntEntry->entLogicalCommunity);
+		       (gchar *) logEntEntry->entLogicalCommunity);
 
     if (logEntEntry->entLogicalContextEngineID) {
 	guint32 enterp = 0;
@@ -1152,7 +1172,7 @@ fmt_snmp_context(GString *s,
     if (logEntEntry->entLogicalContextName) {
         fmt_display_string(s, indent, "Context:",
 			   (int) logEntEntry->_entLogicalContextNameLength,
-			   logEntEntry->entLogicalContextName);
+			   (gchar *) logEntEntry->entLogicalContextName);
     }
 
     e = fmt_tdomain(logEntEntry->entLogicalTDomain,
@@ -1175,6 +1195,7 @@ show_snmp_contexts(scli_interp_t *interp, int argc, char **argv)
 {
     entity_mib_entLogicalEntry_t **logEntTable = NULL;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1186,8 +1207,8 @@ show_snmp_contexts(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    entity_mib_get_entLogicalTable(interp->peer, &logEntTable, 0);
-    if (interp->peer->error_status) {
+    entity_mib_get_entLogicalTable(interp->peer, &logEntTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1217,15 +1238,15 @@ fmt_snmp_csm_community(GString *s,
 
     fmt_display_string(s, indent, "Index:",
 		       (int) snmpCommunityEntry->_snmpCommunityIndexLength,
-		       snmpCommunityEntry->snmpCommunityIndex);
+		       (gchar *) snmpCommunityEntry->snmpCommunityIndex);
     
     fmt_display_string(s, indent, "Name:",
 		       (int) snmpCommunityEntry->_snmpCommunityNameLength,
-		       snmpCommunityEntry->snmpCommunityName);
+		       (gchar *) snmpCommunityEntry->snmpCommunityName);
 
     fmt_display_string(s, indent, "SecurityName:",
 		       (int) snmpCommunityEntry->_snmpCommunitySecurityNameLength,
-		       snmpCommunityEntry->snmpCommunitySecurityName);
+		       (gchar *) snmpCommunityEntry->snmpCommunitySecurityName);
 
     g_string_sprintfa(s, "\n");
 }
@@ -1237,6 +1258,7 @@ show_snmp_csm_communities(scli_interp_t *interp, int argc, char **argv)
 {
     snmp_community_mib_snmpCommunityEntry_t **snmpCommunityTable;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1248,8 +1270,9 @@ show_snmp_csm_communities(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmp_community_mib_get_snmpCommunityTable(interp->peer, &snmpCommunityTable, 0);
-    if (interp->peer->error_status) {
+    snmp_community_mib_get_snmpCommunityTable(interp->peer, &snmpCommunityTable,
+					      0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1403,6 +1426,7 @@ show_snmp_notification_log_details(scli_interp_t *interp,
     notification_log_mib_nlmLogEntry_t **nlmLogTable;
     notification_log_mib_nlmLogVariableEntry_t **nlmLogVarTable;
     int i, c;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1414,12 +1438,13 @@ show_snmp_notification_log_details(scli_interp_t *interp,
 	return SCLI_OK;
     }
 
-    notification_log_mib_get_nlmLogTable(interp->peer, &nlmLogTable, 0);
-    if (interp->peer->error_status) {
+    notification_log_mib_get_nlmLogTable(interp->peer, &nlmLogTable,
+					 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     notification_log_mib_get_nlmLogVariableTable(interp->peer,
-						 &nlmLogVarTable, 0);
+						 &nlmLogVarTable, 0, NULL);
 
     if (nlmLogTable) {
 	for (i = 0, c = 0; nlmLogTable[i]; i++) {
@@ -1498,6 +1523,7 @@ show_snmp_notification_log_info(scli_interp_t *interp,
     snmpv2_mib_system_t *system = NULL;
     notification_log_mib_nlmLogEntry_t **nlmLogTable;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1509,12 +1535,13 @@ show_snmp_notification_log_info(scli_interp_t *interp,
 	return SCLI_OK;
     }
 
-    notification_log_mib_get_nlmLogTable(interp->peer, &nlmLogTable, 0);
-    if (interp->peer->error_status) {
+    notification_log_mib_get_nlmLogTable(interp->peer, &nlmLogTable,
+					 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
-    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
+    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME, NULL);
     
     if (nlmLogTable) {
 	g_string_sprintfa(interp->header,
@@ -1544,6 +1571,7 @@ static int
 set_snmp_authentication_traps(scli_interp_t *interp, int argc, char **argv)
 {
     gint32 value;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1561,8 +1589,8 @@ set_snmp_authentication_traps(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmpv2_mib_set_snmpEnableAuthenTraps(interp->peer, value);
-    if (interp->peer->error_status) {
+    snmpv2_mib_set_snmpEnableAuthenTraps(interp->peer, value, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1578,6 +1606,7 @@ dump_snmp(scli_interp_t *interp, int argc, char **argv)
     snmp_view_based_acm_mib_vacmSecurityToGroupEntry_t **vacmGroupTable;
     const char *e;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1589,8 +1618,9 @@ dump_snmp(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmpv2_mib_get_snmp(interp->peer, &snmp, SNMPV2_MIB_SNMPENABLEAUTHENTRAPS);
-    if (interp->peer->error_status) {
+    snmpv2_mib_get_snmp(interp->peer, &snmp,
+			SNMPV2_MIB_SNMPENABLEAUTHENTRAPS, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1604,8 +1634,8 @@ dump_snmp(scli_interp_t *interp, int argc, char **argv)
     }
 
     snmp_view_based_acm_mib_get_vacmSecurityToGroupTable(interp->peer,
-							 &vacmGroupTable, 0);
-    if (interp->peer->error_status) {
+					 &vacmGroupTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

@@ -27,15 +27,16 @@
 
 extern void
 rapid_city_proc_create_vlan(GNetSnmp *s, gint32 vlanid,
-			    guchar *name, gsize name_len, guint32 type);
+			    guchar *name, gsize name_len, guint32 type,
+			    GError **error);
 extern void
-rapid_city_proc_delete_vlan(GNetSnmp *s, gint32 vlanid);
+rapid_city_proc_delete_vlan(GNetSnmp *s, gint32 vlanid, GError **error);
 
 extern void
 rapid_city_proc_set_vlan_port_default(GNetSnmp *s, gint32 port,
-				      gint32 vlanid);
+				      gint32 vlanid, GError **error);
 extern void
 rapid_city_proc_set_vlan_port_member(GNetSnmp *s, gint32 vlanid,
-				     guchar *ports);
+				     guchar *ports, GError **error);
     
 #endif /* _RAPID_CITY_PROC_H_ */

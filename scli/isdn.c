@@ -66,6 +66,7 @@ show_isdn_bri(scli_interp_t * interp, int argc, char **argv)
     isdn_mib_isdnBasicRateEntry_t **briTable = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -86,8 +87,8 @@ show_isdn_bri(scli_interp_t * interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    isdn_mib_get_isdnBasicRateTable(interp->peer, &briTable, 0);
-    if (interp->peer->error_status) {
+    isdn_mib_get_isdnBasicRateTable(interp->peer, &briTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -98,7 +99,8 @@ show_isdn_bri(scli_interp_t * interp, int argc, char **argv)
 	for (i = 0; briTable[i]; i++) {
 	    if_mib_ifEntry_t *ifEntry;
 	    if_mib_get_ifEntry(interp->peer, &ifEntry,
-			       briTable[i]->ifIndex, IF_MIB_IFDESCR);
+			       briTable[i]->ifIndex,
+			       IF_MIB_IFDESCR, NULL);
 	    if (interface_match(regex_iface, ifEntry)) {
 		fmt_isdn_bri(interp->result, briTable[i], ifEntry);
 	    }
@@ -186,6 +188,7 @@ show_isdn_bearer(scli_interp_t * interp, int argc, char **argv)
 {
     isdn_mib_isdnBearerEntry_t **bearerTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -197,8 +200,8 @@ show_isdn_bearer(scli_interp_t * interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    isdn_mib_get_isdnBearerTable(interp->peer, &bearerTable, 0);
-    if (interp->peer->error_status) {
+    isdn_mib_get_isdnBearerTable(interp->peer, &bearerTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -296,6 +299,7 @@ show_isdn_endpoints(scli_interp_t * interp, int argc, char **argv)
 {
     isdn_mib_isdnEndpointEntry_t **endpointTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -307,8 +311,8 @@ show_isdn_endpoints(scli_interp_t * interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    isdn_mib_get_isdnEndpointTable(interp->peer, &endpointTable, 0);
-    if (interp->peer->error_status) {
+    isdn_mib_get_isdnEndpointTable(interp->peer, &endpointTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

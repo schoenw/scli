@@ -148,6 +148,7 @@ show_rs232_details(scli_interp_t *interp, int argc, char **argv)
     rs_232_mib_rs232AsyncPortEntry_t **asyncPortTable = NULL;
     rs_232_mib_rs232SyncPortEntry_t **syncPortTable = NULL;
     int i, j;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -159,12 +160,12 @@ show_rs232_details(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    rs_232_mib_get_rs232PortTable(interp->peer, &portTable, 0);
-    if (interp->peer->error_status) {
+    rs_232_mib_get_rs232PortTable(interp->peer, &portTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
-    rs_232_mib_get_rs232AsyncPortTable(interp->peer, &asyncPortTable, 0);
-    rs_232_mib_get_rs232SyncPortTable(interp->peer, &syncPortTable, 0);
+    rs_232_mib_get_rs232AsyncPortTable(interp->peer, &asyncPortTable, 0, NULL);
+    rs_232_mib_get_rs232SyncPortTable(interp->peer, &syncPortTable, 0, NULL);
 
     if (portTable) {
 	for (i = 0; portTable[i]; i++) {

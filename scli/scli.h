@@ -4,7 +4,7 @@
  *       After more than 10 years of SNMP, I felt it is time for the
  *       first really useful command line SNMP management tool. ;-)
  *
- * Copyright (C) 2001 Juergen Schoenwaelder
+ * Copyright (C) 2001-2009 Juergen Schoenwaelder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -200,13 +200,12 @@ struct scli_interp {
     int	flags;			/* interpreter flags */
     GString *result;		/* string result buffer */
     GString *header;		/* header line to display */
+    GError *error;		/* runtime error reporting */
     xmlDocPtr xml_doc;		/* xml document if we produce xml output */
     xmlNodePtr xml_node;	/* current xml node in the xml document */
     char *pager;		/* external pager we are using */
     GNetSnmp *peer;		/* snmp session we are using */
     gint delay;			/* delay between updates in milliseconds */
-    GNetSnmpTDomain tdomain;	/* transport domain */
-    GInetAddr *taddress;	/* transport address */
     int snmp;			/* version of the preferred SNMP protocol */
     time_t epoch;		/* epoch (used to invalidate cached data) */
     int xid;			/* unique identifier for each transaction */
@@ -229,6 +228,12 @@ scli_interp_init(scli_interp_t *interp);
 
 extern void
 scli_interp_reset(scli_interp_t *interp);
+
+extern gboolean
+scli_interp_set_error(scli_interp_t *interp, GError **error);
+
+extern gboolean
+scli_interp_set_error_snmp(scli_interp_t *interp, GError **error);
 
 #define scli_interp_interactive(interp) \
 	(interp->flags & SCLI_INTERP_FLAG_INTERACTIVE)
@@ -293,8 +298,12 @@ extern int
 scli_create_command(scli_interp_t *interp, scli_cmd_t *cmd);
 
 extern int
-scli_open_community(scli_interp_t *interp, GNetSnmpTDomain tdomain,
-		    GInetAddr *addr, char *community);
+#if 0
+scli_open_community(scli_interp_t *interp, GNetSnmpTAddress *taddress,
+		    char *community);
+#else
+scli_open_community(scli_interp_t *interp, gchar *target);
+#endif
 extern void
 scli_close(scli_interp_t *interp);
 

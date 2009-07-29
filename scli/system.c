@@ -392,24 +392,24 @@ xml_system_device(xmlNodePtr root,
     xmlNodePtr tree;
     char const *e;
     
-    tree = xmlNewChild(root, NULL, "device", NULL);
-    xml_set_prop(tree, "index", "%d", hrDeviceEntry->hrDeviceIndex);
+    tree = xml_new_child(root, NULL, BAD_CAST("device"), NULL);
+    xml_set_prop(tree, BAD_CAST("index"), "%d", hrDeviceEntry->hrDeviceIndex);
 
     if (hrDeviceEntry->hrDeviceStatus) {
-	(void) xmlNewChild(tree, NULL, "status",
-			   fmt_enum(host_resources_mib_enums_hrDeviceStatus,
-				    hrDeviceEntry->hrDeviceStatus));
+	(void) xml_new_child(tree, NULL, BAD_CAST("status"), "%s",
+			     fmt_enum(host_resources_mib_enums_hrDeviceStatus,
+				      hrDeviceEntry->hrDeviceStatus));
     }
 
     e = fmt_identity(host_resources_types_identities,
 		     hrDeviceEntry->hrDeviceType,
 		     hrDeviceEntry->_hrDeviceDescrLength);
     if (e) {
-	(void) xmlNewChild(tree, NULL, "type", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("type"), e);
     }
 	
     if (hrDeviceEntry->hrDeviceDescr && hrDeviceEntry->_hrDeviceDescrLength) {
-	(void) xml_new_child(tree, NULL, "description", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 			     (int) hrDeviceEntry->_hrDeviceDescrLength,
 			     hrDeviceEntry->hrDeviceDescr);
     }
@@ -451,6 +451,7 @@ show_system_devices(scli_interp_t *interp, int argc, char **argv)
     int type_width = 8;
     char const *type;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -462,8 +463,8 @@ show_system_devices(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable, 0);
-    if (interp->peer->error_status) {
+    host_resources_mib_get_hrDeviceTable(interp->peer, &hrDeviceTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
     
@@ -505,42 +506,42 @@ xml_system_process(xmlNodePtr root,
     xmlNodePtr tree, node;
     char *c;
 
-    tree = xmlNewChild(root, NULL, "process", NULL);
-    xml_set_prop(tree, "index", "%d", hrSWRunEntry->hrSWRunIndex);
+    tree = xml_new_child(root, NULL, BAD_CAST("process"), NULL);
+    xml_set_prop(tree, BAD_CAST("index"), "%d", hrSWRunEntry->hrSWRunIndex);
     
     if (hrSWRunEntry->hrSWRunStatus) {
-	(void) xmlNewChild(tree, NULL, "status",
-			   fmt_enum(host_resources_mib_enums_hrSWRunStatus,
-				    hrSWRunEntry->hrSWRunStatus));
+	(void) xml_new_child(tree, NULL, BAD_CAST("status"), "%s",
+			     fmt_enum(host_resources_mib_enums_hrSWRunStatus,
+				      hrSWRunEntry->hrSWRunStatus));
     }
 
     if (hrSWRunEntry->hrSWRunType) {
-	(void) xmlNewChild(tree, NULL, "type",
-			   fmt_enum(host_resources_mib_enums_hrSWRunType,
-				    hrSWRunEntry->hrSWRunType));
+	(void) xml_new_child(tree, NULL, BAD_CAST("type"), "%s",
+			     fmt_enum(host_resources_mib_enums_hrSWRunType,
+				      hrSWRunEntry->hrSWRunType));
     }
 
     if (hrSWRunPerfEntry && hrSWRunPerfEntry->hrSWRunPerfMem) {
-	node = xml_new_child(tree, NULL, "memory", "%llu",
+	node = xml_new_child(tree, NULL, BAD_CAST("memory"), "%llu",
 			     (guint64)1024 * *hrSWRunPerfEntry->hrSWRunPerfMem);
-	xml_set_prop(node, "unit", "bytes");
+	xml_set_prop(node, BAD_CAST("unit"), "bytes");
     }
     if (hrSWRunPerfEntry && hrSWRunPerfEntry->hrSWRunPerfCPU) {
-	node = xml_new_child(tree, NULL, "cpu", "%u",
+	node = xml_new_child(tree, NULL, BAD_CAST("cpu"), "%u",
 			     *hrSWRunPerfEntry->hrSWRunPerfCPU/100);
-	xml_set_prop(node, "unit", "seconds");
+	xml_set_prop(node, BAD_CAST("unit"), "seconds");
     }
 
     c = get_command(hrSWRunEntry);
     if (c) {
-	(void) xml_new_child(tree, NULL, "path", "%s", c);
+	(void) xml_new_child(tree, NULL, BAD_CAST("path"), "%s", c);
 	g_free(c);
     }
     if (hrSWRunEntry->hrSWRunParameters
 	&& hrSWRunEntry->_hrSWRunParametersLength) {
 	strip_white(hrSWRunEntry->hrSWRunParameters,
 		    &hrSWRunEntry->_hrSWRunParametersLength);
-	(void) xml_new_child(tree, NULL, "parameter", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("parameter"), "%.*s",
 			     (int) hrSWRunEntry->_hrSWRunParametersLength,
 			     hrSWRunEntry->hrSWRunParameters);
     }
@@ -602,6 +603,7 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
     host_resources_mib_hrSWRunPerfEntry_t **hrSWRunPerfTable = NULL;
     regex_t _regex_path, *regex_path = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -622,14 +624,14 @@ show_system_processes(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    host_resources_mib_get_hrSWRunTable(interp->peer, &hrSWRunTable, 0);
-    if (interp->peer->error_status) {
+    host_resources_mib_get_hrSWRunTable(interp->peer, &hrSWRunTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (hrSWRunTable) {
 	host_resources_mib_get_hrSWRunPerfTable(interp->peer,
-				  &hrSWRunPerfTable, 0);
+						&hrSWRunPerfTable, 0, NULL);
 	if (! scli_interp_xml(interp)) {
 	    g_string_append(interp->header,
 			    "    PID S T MEMORY       TIME COMMAND");
@@ -694,6 +696,7 @@ show_system_software(scli_interp_t *interp, int argc, char **argv)
     host_resources_mib_hrSWInstalledEntry_t **hrSWTable = NULL;
     regex_t _regex_path, *regex_path = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -714,8 +717,8 @@ show_system_software(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    host_resources_mib_get_hrSWInstalledTable(interp->peer, &hrSWTable, 0);
-    if (interp->peer->error_status) {
+    host_resources_mib_get_hrSWInstalledTable(interp->peer, &hrSWTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -752,19 +755,19 @@ xml_system_mount(xmlNodePtr root,
     const char *e;
     xmlNodePtr tree;
     
-    tree = xmlNewChild(root, NULL, "filesystem", NULL);
-    xml_set_prop(tree, "index", "%d", fsEntry->hrFSIndex);
+    tree = xml_new_child(root, NULL, BAD_CAST("filesystem"), NULL);
+    xml_set_prop(tree, BAD_CAST("index"), "%d", fsEntry->hrFSIndex);
 
     if (fsEntry->hrFSMountPoint
 	&& fsEntry->_hrFSMountPointLength) {
-	(void) xml_new_child(tree, NULL, "local", "%.*s", 
+	(void) xml_new_child(tree, NULL, BAD_CAST("local"), "%.*s", 
 			     (int) fsEntry->_hrFSMountPointLength,
 			     fsEntry->hrFSMountPoint);
     }
 
     if (fsEntry->hrFSRemoteMountPoint
 	&& fsEntry->_hrFSRemoteMountPointLength) {
-	(void) xml_new_child(tree, NULL, "remote", "%.*s", 
+	(void) xml_new_child(tree, NULL, BAD_CAST("remote"), "%.*s", 
 			     (int) fsEntry->_hrFSRemoteMountPointLength,
 			     fsEntry->hrFSRemoteMountPoint);
     }
@@ -772,18 +775,18 @@ xml_system_mount(xmlNodePtr root,
     e = fmt_identity(filesystem_types,
 		     fsEntry->hrFSType, fsEntry->_hrFSTypeLength);
     if (e) {
-	(void) xml_new_child(tree, NULL, "type", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("type"), "%s", e);
     }
 
     e = fmt_enum(host_resources_mib_enums_hrFSAccess,
 		 fsEntry->hrFSAccess);
     if (e) {
-	(void) xml_new_child(tree, NULL, "access", "%s", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("access"), "%s", e);
     }
 
     if (fsEntry->hrFSBootable
 	&& *(fsEntry->hrFSBootable) == SNMPV2_TC_TRUTHVALUE_TRUE) {
-	(void) xmlNewChild(tree, NULL, "boot", NULL);
+	(void) xml_new_child(tree, NULL, BAD_CAST("boot"), NULL);
     }
 }
 
@@ -837,6 +840,7 @@ show_system_mounts(scli_interp_t *interp, int argc, char **argv)
     host_resources_mib_hrFSEntry_t **hrFSTable = NULL;
     int i, loc_len = 8, rem_len = 8, type_len = 4;
     const char *type;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -848,8 +852,8 @@ show_system_mounts(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    host_resources_mib_get_hrFSTable(interp->peer, &hrFSTable, 0);
-    if (interp->peer->error_status) {
+    host_resources_mib_get_hrFSTable(interp->peer, &hrFSTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -899,12 +903,12 @@ xml_system_storage(xmlNodePtr root,
     xmlNodePtr node, tree;
     gchar const *e;
 
-    tree = xmlNewChild(root, NULL, "area", NULL);
-    xml_set_prop(tree, "index", "%d", hrStorageEntry->hrStorageIndex);
+    tree = xml_new_child(root, NULL, BAD_CAST("area"), NULL);
+    xml_set_prop(tree, BAD_CAST("index"), "%d", hrStorageEntry->hrStorageIndex);
     
     if (hrStorageEntry->hrStorageDescr
 	&& hrStorageEntry->_hrStorageDescrLength) {
-	(void) xml_new_child(tree, NULL, "description", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 			     (int) hrStorageEntry->_hrStorageDescrLength,
 			     hrStorageEntry->hrStorageDescr);
     }
@@ -913,7 +917,7 @@ xml_system_storage(xmlNodePtr root,
 		     hrStorageEntry->hrStorageType,
 		     hrStorageEntry->_hrStorageTypeLength);
     if (e) {
-	(void) xmlNewChild(tree, NULL, "type", e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("type"), "%s", e);
     }
 
     if (hrStorageEntry->hrStorageAllocationUnits
@@ -932,11 +936,11 @@ xml_system_storage(xmlNodePtr root,
 	storage_used *= *(hrStorageEntry->hrStorageAllocationUnits);
 	storage_used /= scale;
 
-	node = xml_new_child(tree, NULL, "size", "%llu", (guint64)1024 * storage_size);
-	xml_set_prop(node, "unit", "bytes");
+	node = xml_new_child(tree, NULL, BAD_CAST("size"), "%llu", (guint64)1024 * storage_size);
+	xml_set_prop(node, BAD_CAST("unit"), "bytes");
 
-	node = xml_new_child(tree, NULL, "used", "%llu", (guint64)1024 * storage_used);
-	xml_set_prop(node, "unit", "bytes");
+	node = xml_new_child(tree, NULL, BAD_CAST("used"), "%llu", (guint64)1024 * storage_used);
+	xml_set_prop(node, BAD_CAST("unit"), "bytes");
     }
 }
 
@@ -1005,6 +1009,7 @@ show_system_storage(scli_interp_t *interp, int argc, char **argv)
     int descr_width = 14, type_width = 4;
     const char *type;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1017,8 +1022,8 @@ show_system_storage(scli_interp_t *interp, int argc, char **argv)
     }
 
     host_resources_mib_get_hrStorageTable(interp->peer,
-					  &hrStorageTable, 0);
-    if (interp->peer->error_status) {
+					  &hrStorageTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1061,26 +1066,25 @@ static void
 xml_system_info(xmlNodePtr root, scli_interp_t *interp,
 		snmpv2_mib_system_t *system)
 {
-    GURI *uri;
+    gchar *name;
 
     if (system) {
-	(void) xml_new_child(root, NULL, "name", "%.*s",
+	(void) xml_new_child(root, NULL, BAD_CAST("name"), "%.*s",
 			     (int) system->_sysNameLength,
 			     system->sysName);
-	uri = gnet_snmp_get_uri(interp->peer);
-	if (uri) {
-	    gchar *name = gnet_uri_get_string(uri);
-	    (void) xml_new_child(root, NULL, "uri", "%s", name);
+	name = gnet_snmp_get_uri_string(interp->peer);
+	if (name) {
+	    (void) xml_new_child(root, NULL, BAD_CAST("uri"), "%s", name);
 	    g_free(name);
 	}
 	
-	(void) xml_new_child(root, NULL, "description", "%.*s",
+	(void) xml_new_child(root, NULL, BAD_CAST("description"), "%.*s",
 			     (int) system->_sysDescrLength,
 			     system->sysDescr);
-	(void) xml_new_child(root, NULL, "contact", "%.*s",
+	(void) xml_new_child(root, NULL, BAD_CAST("contact"), "%.*s",
 			     (int) system->_sysContactLength,
 			     system->sysContact);
-	(void) xml_new_child(root, NULL, "location", "%.*s",
+	(void) xml_new_child(root, NULL, BAD_CAST("location"), "%.*s",
 			     (int) system->_sysLocationLength,
 			     system->sysLocation);
 
@@ -1089,10 +1093,10 @@ xml_system_info(xmlNodePtr root, scli_interp_t *interp,
 	    vendor = scli_get_vendor_oid(system->sysObjectID,
 					 system->_sysObjectIDLength);
 	    if (vendor && vendor->name) {
-		(void) xml_new_child(root, NULL, "vendor", "%s", vendor->name);
+		(void) xml_new_child(root, NULL, BAD_CAST("vendor"), "%s", vendor->name);
 	    }
 	    if (vendor && vendor->url) {
-		(void) xml_new_child(root, NULL, "vendor-url", "%s", vendor->url);
+		(void) xml_new_child(root, NULL, BAD_CAST("vendor-url"), "%s", vendor->url);
 	    }
 	}
 
@@ -1105,7 +1109,7 @@ xml_system_info(xmlNodePtr root, scli_interp_t *interp,
 
 	    for (i = 0; serv_names[i]; i++) {
 		if (*(system->sysServices) & (1 << i)) {
-		    (void) xml_new_child(root, NULL, "service", "%s",
+		    (void) xml_new_child(root, NULL, BAD_CAST("service"), "%s",
 					 serv_names[i]);
 		}
 	    }
@@ -1119,7 +1123,7 @@ static void
 fmt_system_info(GString *s, scli_interp_t *interp,
 		snmpv2_mib_system_t *system)
 {
-    GURI *uri;
+    gchar *name;
     int i;
     int const indent = 18;
 
@@ -1127,28 +1131,27 @@ fmt_system_info(GString *s, scli_interp_t *interp,
 	if (system->sysName) {
 	    fmt_display_string(s, indent, "Name:",
 			       (int) system->_sysNameLength,
-			       system->sysName);
+			       (gchar *) system->sysName);
 	}
-	uri = gnet_snmp_get_uri(interp->peer);
-	if (uri) {
-	    gchar *name = gnet_uri_get_string(uri);
+	name = gnet_snmp_get_uri_string(interp->peer);
+	if (name) {
 	    g_string_sprintfa(s, "%-*s%s\n", indent, "Agent:", name);
 	    g_free(name);
 	}
 	if (system->sysDescr && system->_sysDescrLength) {
 	    fmt_display_string(s, indent, "Description:",
 			       (int) system->_sysDescrLength,
-			       system->sysDescr);
+			       (gchar *) system->sysDescr);
 	}
 	if (system->sysContact) {
 	    fmt_display_string(s, indent, "Contact:",
 			       (int) system->_sysContactLength,
-			       system->sysContact);
+			       (gchar *) system->sysContact);
 	}
 	if (system->sysLocation) {
 	    fmt_display_string(s, indent, "Location:",
 			       (int) system->_sysLocationLength,
-			       system->sysLocation);
+			       (gchar *) system->sysLocation);
 	}
 	if (system->sysObjectID) {
 	    scli_vendor_t const *vendor;
@@ -1203,6 +1206,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     int i;
     int const indent = 18;
     xmlNodePtr node;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1214,19 +1218,19 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmpv2_mib_get_system(interp->peer, &system, 0);
-    if (interp->peer->error_status) {
+    snmpv2_mib_get_system(interp->peer, &system, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
-    host_resources_mib_get_hrSystem(interp->peer, &hrSystem, 0);
-    host_resources_mib_get_hrStorage(interp->peer, &hrStorage, 0);
-    if_mib_get_interfaces(interp->peer, &interfaces, 0);
-    if_mib_get_ifMIBObjects(interp->peer, &ifMibObjects, 0);
-    entity_mib_get_entityGeneral(interp->peer, &entityGeneral, 0);
-    bridge_mib_get_dot1dBase(interp->peer, &dot1dBase, 0);
-    rs_232_mib_get_rs232(interp->peer, &rs232, 0);
+    host_resources_mib_get_hrSystem(interp->peer, &hrSystem, 0, NULL);
+    host_resources_mib_get_hrStorage(interp->peer, &hrStorage, 0, NULL);
+    if_mib_get_interfaces(interp->peer, &interfaces, 0, NULL);
+    if_mib_get_ifMIBObjects(interp->peer, &ifMibObjects, 0, NULL);
+    entity_mib_get_entityGeneral(interp->peer, &entityGeneral, 0, NULL);
+    bridge_mib_get_dot1dBase(interp->peer, &dot1dBase, 0, NULL);
+    rs_232_mib_get_rs232(interp->peer, &rs232, 0, NULL);
     disman_script_mib_get_smLangTable(interp->peer, &smLangTable,
-				      DISMAN_SCRIPT_MIB_SMLANGDESCR);
+				      DISMAN_SCRIPT_MIB_SMLANGDESCR, NULL);
 
     if (scli_interp_xml(interp)) {
 	xml_system_info(interp->xml_node, interp, system);
@@ -1239,7 +1243,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	if (hrSystem->hrSystemDate && hrSystem->_hrSystemDateLength) {
 	    if (scli_interp_xml(interp)) {
 		(void) xml_new_child(interp->xml_node, NULL,
-				     "current-time", "%s",
+				     BAD_CAST("current-time"), "%s",
 			     xml_date_and_time(hrSystem->hrSystemDate,
 					       hrSystem->_hrSystemDateLength));
 	    } else {
@@ -1255,7 +1259,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	if (system->sysUpTime) {
 	    if (scli_interp_xml(interp)) {
 		(void) xml_new_child(interp->xml_node, NULL,
-				     "agent-boot-time", "%s",
+				     BAD_CAST("agent-boot-time"), "%s",
 				     xml_timeticks(*(system->sysUpTime)));
 	    } else {
 		g_string_sprintfa(s, "%-*s", indent, "Agent-Boot-Time:");
@@ -1269,7 +1273,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	if (hrSystem->hrSystemUptime) {
 	    if (scli_interp_xml(interp)) {
 		(void) xml_new_child(interp->xml_node, NULL,
-				     "system-boot-time", "%s",
+				     BAD_CAST("system-boot-time"), "%s",
 				     xml_timeticks(*(hrSystem->hrSystemUptime)));
 	    } else {
 	    g_string_sprintfa(s, "%-*s", indent, "System-Boot-Time:");
@@ -1280,17 +1284,17 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	if (hrSystem->hrSystemInitialLoadDevice) {
 	    host_resources_mib_hrDeviceEntry_t *dev;
 	    host_resources_mib_get_hrDeviceEntry(interp->peer, &dev,
-						 *hrSystem->hrSystemInitialLoadDevice, 0);
+						 *hrSystem->hrSystemInitialLoadDevice, 0, NULL);
 	    if (dev && dev->hrDeviceDescr) {
 		if (scli_interp_xml(interp)) {
 		    (void) xml_new_child(interp->xml_node, NULL,
-					 "system-boot-dev", "%.*s",
+					 BAD_CAST("system-boot-dev"), "%.*s",
 					 (int) dev->_hrDeviceDescrLength,
 					 dev->hrDeviceDescr);
 		} else {
 		fmt_display_string(s, indent, "System-Boot-Dev:",
 				   (int) dev->_hrDeviceDescrLength,
-				   dev->hrDeviceDescr);
+				   (gchar *) dev->hrDeviceDescr);
 	    }
 	    }
 	    host_resources_mib_free_hrDeviceEntry(dev);
@@ -1298,19 +1302,19 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	if (hrSystem->hrSystemInitialLoadParameters) {
 	    if (scli_interp_xml(interp)) {
 		(void) xml_new_child(interp->xml_node, NULL,
-				     "system-boot-args", "%s",
+				     BAD_CAST("system-boot-args"), "%s",
 				     xml_display_string((int) hrSystem->_hrSystemInitialLoadParametersLength,
-							hrSystem->hrSystemInitialLoadParameters));
+							(gchar *) hrSystem->hrSystemInitialLoadParameters));
 	    } else {
 	    fmt_display_string(s, indent, "System-Boot-Args:",
 			       (int) hrSystem->_hrSystemInitialLoadParametersLength,
-			       hrSystem->hrSystemInitialLoadParameters);
+			       (gchar *) hrSystem->hrSystemInitialLoadParameters);
 	}
 	}
 	if (hrSystem->hrSystemNumUsers) {
 	    if (scli_interp_xml(interp)) {
 		(void) xml_new_child(interp->xml_node, NULL,
-				     "users", "%u",
+				     BAD_CAST("users"), "%u",
 				     *(hrSystem->hrSystemNumUsers));
 	    } else {
 	    g_string_sprintfa(s, "%-*s%u", indent, "Users:", 
@@ -1321,7 +1325,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	if (hrSystem->hrSystemProcesses) {
 	    if (scli_interp_xml(interp)) {
 		(void) xml_new_child(interp->xml_node, NULL,
-				     "processes", "%u",
+				     BAD_CAST("processes"), "%u",
 				     *(hrSystem->hrSystemProcesses));
 	    } else {
 	    g_string_sprintfa(s, "%-*s%u", indent, "Processes:",
@@ -1331,7 +1335,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 		&& *(hrSystem->hrSystemMaxProcesses)) {
 		if (scli_interp_xml(interp)) {
 		    (void) xml_new_child(interp->xml_node, NULL,
-					 "max-processes", "%u",
+					 BAD_CAST("max-processes"), "%u",
 					 *(hrSystem->hrSystemMaxProcesses));
 		} else {
 		g_string_sprintfa(s, " (%u maximum)",
@@ -1348,9 +1352,9 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	if (hrStorage->hrMemorySize) {
 	    if (scli_interp_xml(interp)) {
 		node = xml_new_child(interp->xml_node, NULL,
-				     "memory", "%llu",
+				     BAD_CAST("memory"), "%llu",
 				     (guint64)1024 * *(hrStorage->hrMemorySize));
-		xml_set_prop(node, "unit", "bytes");
+		xml_set_prop(node, BAD_CAST("unit"), "bytes");
 	    } else {
 	    g_string_sprintfa(s, "%-*s", indent, "Memory:");
 	    fmt_kbytes(s, (guint32) *(hrStorage->hrMemorySize));
@@ -1363,7 +1367,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	if (interfaces->ifNumber) {
 	    if (scli_interp_xml(interp)) {
 		(void) xml_new_child(interp->xml_node, NULL,
-				     "interfaces", "%d",
+				     BAD_CAST("interfaces"), "%d",
 				     *(interfaces->ifNumber));
 	    } else {
 		g_string_sprintfa(s, "%-*s%d\n", indent, "Interfaces:",
@@ -1392,7 +1396,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	if (dot1dBase->dot1dBaseNumPorts && *dot1dBase->dot1dBaseNumPorts) {
 	    if (scli_interp_xml(interp)) {
 		(void) xml_new_child(interp->xml_node, NULL,
-				     "bridge-ports", "%d",
+				     BAD_CAST("bridge-ports"), "%d",
 				     *(dot1dBase->dot1dBaseNumPorts));
 	    } else {
 	    g_string_sprintfa(s, "%-*s%d\n", indent, "Bridge Ports:",
@@ -1404,7 +1408,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	    if (e) {
 		if (scli_interp_xml(interp)) {
 		    (void) xml_new_child(interp->xml_node, NULL,
-					 "bridge-type", "%s", e);
+					 BAD_CAST("bridge-type"), "%s", e);
 		} else {
 		    g_string_sprintfa(s, "%-*s%s\n", indent,
 				      "Bridge Type:", e);
@@ -1416,7 +1420,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
     if (rs232 && rs232->rs232Number && rs232->rs232Number > 0) {
 	if (scli_interp_xml(interp)) {
 	    (void) xml_new_child(interp->xml_node, NULL,
-				 "rs232-ports", "%d", *(rs232->rs232Number));
+				 BAD_CAST("rs232-ports"), "%d", *(rs232->rs232Number));
 	} else {
 	g_string_sprintfa(s, "%-*s%d\n", indent, "RS 232 Ports:",
 			  *(rs232->rs232Number));
@@ -1427,7 +1431,7 @@ show_system_info(scli_interp_t *interp, int argc, char **argv)
 	for (i = 0; smLangTable[i]; i++) ;
 	if (scli_interp_xml(interp)) {
 	    (void) xml_new_child(interp->xml_node, NULL,
-				 "script-languages", "%d", i);
+				 BAD_CAST("script-languages"), "%d", i);
 	} else {
 	g_string_sprintfa(s, "%-*s%u\n", indent, "Script Languages:", i);
     }
@@ -1462,6 +1466,7 @@ set_system_contact(scli_interp_t *interp, int argc, char **argv)
 {
     gchar *contact;
     gsize contact_len;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1481,8 +1486,8 @@ set_system_contact(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmpv2_mib_set_sysContact(interp->peer, contact, contact_len);
-    if (interp->peer->error_status) {
+    snmpv2_mib_set_sysContact(interp->peer, (guchar *) contact, contact_len, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1496,6 +1501,7 @@ set_system_name(scli_interp_t *interp, int argc, char **argv)
 {
     gchar *name;
     gsize name_len;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1515,8 +1521,8 @@ set_system_name(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmpv2_mib_set_sysName(interp->peer, name, name_len);
-    if (interp->peer->error_status) {
+    snmpv2_mib_set_sysName(interp->peer, (guchar *) name, name_len, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1530,6 +1536,7 @@ set_system_location(scli_interp_t *interp, int argc, char **argv)
 {
     gchar *location;
     gsize location_len;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1549,8 +1556,8 @@ set_system_location(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmpv2_mib_set_sysLocation(interp->peer, location, location_len);
-    if (interp->peer->error_status) {
+    snmpv2_mib_set_sysLocation(interp->peer, (guchar *) location, location_len, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1563,6 +1570,7 @@ static int
 dump_system(scli_interp_t *interp, int argc, char **argv)
 {
     snmpv2_mib_system_t *system = NULL;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1574,8 +1582,8 @@ dump_system(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmpv2_mib_get_system(interp->peer, &system, 0);
-    if (interp->peer->error_status) {
+    snmpv2_mib_get_system(interp->peer, &system, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1613,6 +1621,7 @@ check_system_contact(scli_interp_t *interp, int argc, char **argv)
     regex_t _regex_contact, *regex_contact = NULL;
     snmpv2_mib_system_t *system;
     int status = 1;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1633,8 +1642,8 @@ check_system_contact(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSCONTACT);
-    if (interp->peer->error_status) {
+    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSCONTACT, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
         if (regex_contact) regfree(regex_contact);
 	return SCLI_SNMP;
     }
@@ -1676,6 +1685,7 @@ check_system_storage(scli_interp_t *interp, int argc, char **argv)
 {
     host_resources_mib_hrStorageEntry_t **hrStorageTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1688,8 +1698,8 @@ check_system_storage(scli_interp_t *interp, int argc, char **argv)
     }
 
     host_resources_mib_get_hrStorageTable(interp->peer,
-					  &hrStorageTable, 0);
-    if (interp->peer->error_status) {
+					  &hrStorageTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1739,6 +1749,7 @@ check_system_process(scli_interp_t *interp, int argc, char **argv)
     regex_t _regex_path, *regex_path = NULL;
     int i;
     guint min = 0, max = 0xffffffff, cnt = 0;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1770,8 +1781,9 @@ check_system_process(scli_interp_t *interp, int argc, char **argv)
     }
 
     host_resources_mib_get_hrSWRunTable(interp->peer, &hrSWRunTable,
-					HOST_RESOURCES_MIB_HRSWRUNPATH);
-    if (interp->peer->error_status) {
+					HOST_RESOURCES_MIB_HRSWRUNPATH,
+					&error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 

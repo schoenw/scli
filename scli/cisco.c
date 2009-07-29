@@ -200,6 +200,7 @@ show_cisco_ip_accounting_current_sorted(scli_interp_t *interp, int argc, char **
     old_cisco_ip_mib_lipAccountEntry_t **lipAccountTable = NULL;
     int i, j, n;
     act_stats_t *stats;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -212,8 +213,8 @@ show_cisco_ip_accounting_current_sorted(scli_interp_t *interp, int argc, char **
     }
 
     old_cisco_ip_mib_get_lipAccountingTable(interp->peer,
-					    &lipAccountTable, 0);
-    if (interp->peer->error_status) {
+					    &lipAccountTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -269,6 +270,7 @@ show_cisco_ip_accounting_current_raw(scli_interp_t *interp, int argc, char **arg
 {
     old_cisco_ip_mib_lipAccountEntry_t **lipAccountTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -281,8 +283,8 @@ show_cisco_ip_accounting_current_raw(scli_interp_t *interp, int argc, char **arg
     }
 
     old_cisco_ip_mib_get_lipAccountingTable(interp->peer,
-					    &lipAccountTable, 0);
-    if (interp->peer->error_status) {
+					    &lipAccountTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -308,6 +310,7 @@ show_cisco_ip_accounting_snapshot_sorted(scli_interp_t *interp, int argc, char *
 {
     old_cisco_ip_mib_lipCkAccountEntry_t **lipCkAccountTable = NULL;
     int i, j;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -320,8 +323,8 @@ show_cisco_ip_accounting_snapshot_sorted(scli_interp_t *interp, int argc, char *
     }
 
     old_cisco_ip_mib_get_lipCkAccountingTable(interp->peer,
-					      &lipCkAccountTable, 0);
-    if (interp->peer->error_status) {
+					      &lipCkAccountTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -357,6 +360,7 @@ show_cisco_ip_accounting_snapshot_raw(scli_interp_t *interp, int argc, char **ar
 {
     old_cisco_ip_mib_lipCkAccountEntry_t **lipCkAccountTable = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -369,8 +373,8 @@ show_cisco_ip_accounting_snapshot_raw(scli_interp_t *interp, int argc, char **ar
     }
 
     old_cisco_ip_mib_get_lipCkAccountingTable(interp->peer,
-					      &lipCkAccountTable, 0);
-    if (interp->peer->error_status) {
+					      &lipCkAccountTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -431,6 +435,7 @@ static int
 show_cisco_ip_accounting_info(scli_interp_t *interp, int argc, char **argv)
 {
     old_cisco_ip_mib_lip_t *lip;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -442,8 +447,8 @@ show_cisco_ip_accounting_info(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    old_cisco_ip_mib_get_lip(interp->peer, &lip, 0);
-    if (interp->peer->error_status) {
+    old_cisco_ip_mib_get_lip(interp->peer, &lip, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -536,6 +541,7 @@ show_cisco_processes(scli_interp_t *interp, int argc, char **argv)
     cisco_process_mib_cpmProcessExtEntry_t **extTable = NULL;
     cisco_process_mib_cpmProcessExtRevEntry_t **extRevTable = NULL;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -548,16 +554,16 @@ show_cisco_processes(scli_interp_t *interp, int argc, char **argv)
     }
 
     cisco_process_mib_get_cpmProcessTable(interp->peer,
-					  &procTable, 0);
-    if (interp->peer->error_status) {
+					  &procTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (procTable) {
 	cisco_process_mib_get_cpmProcessExtTable(interp->peer,
-						 &extTable, 0);
+						 &extTable, 0, NULL);
 	cisco_process_mib_get_cpmProcessExtRevTable(interp->peer,
-						    &extRevTable, 0);
+						    &extRevTable, 0, NULL);
 	g_string_sprintfa(interp->header,
 			  "  CPU   PID P MEMORY      TIME COMMAND");
 	for (i = 0; procTable[i]; i++) {
@@ -582,6 +588,7 @@ static int
 set_cisco_ip_accounting_checkpoint(scli_interp_t *interp, int argc, char **argv)
 {
     old_cisco_ip_mib_lip_t *lip;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -593,14 +600,14 @@ set_cisco_ip_accounting_checkpoint(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    old_cisco_ip_mib_get_lip(interp->peer, &lip, OLD_CISCO_IP_MIB_ACTCHECKPOINT);
-    if (interp->peer->error_status) {
+    old_cisco_ip_mib_get_lip(interp->peer, &lip, OLD_CISCO_IP_MIB_ACTCHECKPOINT, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (lip) {
-        old_cisco_ip_mib_set_lip(interp->peer, lip, OLD_CISCO_IP_MIB_ACTCHECKPOINT);
-        if (interp->peer->error_status) {
+        old_cisco_ip_mib_set_lip(interp->peer, lip, OLD_CISCO_IP_MIB_ACTCHECKPOINT, &error);
+        if (scli_interp_set_error_snmp(interp, &error)) {
 	    return SCLI_SNMP;
         }
     }
@@ -712,8 +719,6 @@ fmt_interface_info(GString *s,
 	     if_mib_ifXEntry_t *ifXEntry,
 	     int name_width)
 {
-    const char *e;
-    
     g_string_sprintfa(s, "%5u ", deviceEntry->ifIndex);
 
     if (ifEntry->ifSpeed) {
@@ -796,6 +801,7 @@ show_cisco_dot11_interface_info(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifXEntry_t **ifXTable = NULL;
     int name_width;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -808,15 +814,15 @@ show_cisco_dot11_interface_info(scli_interp_t *interp, int argc, char **argv)
     }
 
     cisco_dot11_association_mib_get_cDot11ActiveDevicesTable(interp->peer,
-					  &deviceTable, 0);
-    if (interp->peer->error_status) {
+						     &deviceTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (deviceTable) {
-	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_PARAMS);
-	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS);
-	cisco_dot11_association_mib_get_cDot11AssociationStatsTable(interp->peer, &assStatsTable, 0);
+	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_PARAMS, NULL);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS, NULL);
+	cisco_dot11_association_mib_get_cDot11AssociationStatsTable(interp->peer, &assStatsTable, 0, NULL);
 	name_width = get_if_name_width(ifXTable);
 	g_string_sprintfa(interp->header,
 			  "IFACE SPEED %-*s CLNT BRDG RPTR ASSCI ASSCO ROAMI ROAMO AUTHI AUTHO",
@@ -867,8 +873,6 @@ fmt_client_info(GString *s,
 		cisco_dot11_association_mib_cDot11ClientStatisticEntry_t *statsEntry,
 		int ssid_width)
 {
-    const char *e;
-    
     g_string_sprintfa(s, "%2u ", configEntry->ifIndex);
 
     if (configEntry && configEntry->cd11IfAuxSsid) {
@@ -933,6 +937,7 @@ show_cisco_dot11_clients_stats(scli_interp_t *interp, int argc, char **argv)
     double delta;
     static client_stats_t *stats = NULL;
     static time_t epoch = 0;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -945,8 +950,8 @@ show_cisco_dot11_clients_stats(scli_interp_t *interp, int argc, char **argv)
     }
 
     cisco_dot11_association_mib_get_cDot11ClientConfigInfoTable(interp->peer,
-					  &configTable, 0);
-    if (interp->peer->error_status) {
+						&configTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -966,7 +971,7 @@ show_cisco_dot11_clients_stats(scli_interp_t *interp, int argc, char **argv)
     delta = TV_DIFF(last, now);
 
     if (configTable) {
-	cisco_dot11_association_mib_get_cDot11ClientStatisticTable(interp->peer, &statsTable, 0);
+	cisco_dot11_association_mib_get_cDot11ClientStatisticTable(interp->peer, &statsTable, 0, NULL);
 	ssid_width = get_client_ssid_width(configTable);
 	g_string_sprintfa(interp->header,
 			  "IF %-*s ADDRESS           IPv4-ADDRESS    SGNL     UPTIME I-BPS O-BPS   ERR",

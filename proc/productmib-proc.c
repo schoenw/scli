@@ -26,14 +26,15 @@
 
 void
 productmib_proc_create_vlan(GNetSnmp *s, gint32 vlanId,
-			    guchar *name, gsize name_len, guint32 type)
+			    guchar *name, gsize name_len, guint32 type,
+			    GError **error)
 {
     productmib_a3ComVirtualGroup_t *vg = NULL;
     productmib_a3ComVlanIfEntry_t *vlanEntry;
     gint32 createAndGo = PRODUCTMIB_ROWSTATUS_CREATEANDGO;
 
-    productmib_get_a3ComVirtualGroup(s, &vg, 0);
-    if (s->error_status || !vg) return;
+    productmib_get_a3ComVirtualGroup(s, &vg, 0, error);
+    if ((error && *error) || s->error_status || !vg) return;
     vlanEntry = productmib_new_a3ComVlanIfEntry();
     if (! vlanEntry) return;
     if (!vg->a3ComNextAvailableVirtIfIndex
@@ -47,24 +48,24 @@ productmib_proc_create_vlan(GNetSnmp *s, gint32 vlanId,
     vlanEntry->a3ComVlanIfGlobalIdentifier = &vlanId;
     vlanEntry->a3ComVlanIfType = &type;
     vlanEntry->a3ComVlanIfStatus = &createAndGo;
-    productmib_set_a3ComVlanIfEntry(s, vlanEntry, 0);
+    productmib_set_a3ComVlanIfEntry(s, vlanEntry, 0, error);
     productmib_free_a3ComVlanIfEntry(vlanEntry);
 }
 
 
 
 void
-productmib_proc_delete_vlan(GNetSnmp *s, gint32 ifIndex)
+productmib_proc_delete_vlan(GNetSnmp *s, gint32 ifIndex, GError **error)
 {
     productmib_a3ComVlanIfEntry_t *vlanEntry;
     gint32 destroy = PRODUCTMIB_ROWSTATUS_DESTROY;
 
     productmib_get_a3ComVlanIfEntry(s, &vlanEntry, ifIndex,
-				    PRODUCTMIB_A3COMVLANIFSTATUS);
-    if (s->error_status || !vlanEntry) return;
+				    PRODUCTMIB_A3COMVLANIFSTATUS, error);
+    if ((error && *error) || s->error_status || !vlanEntry) return;
     vlanEntry->a3ComVlanIfStatus = &destroy;
     productmib_set_a3ComVlanIfEntry(s, vlanEntry,
-				    PRODUCTMIB_A3COMVLANIFSTATUS);
+				    PRODUCTMIB_A3COMVLANIFSTATUS, error);
     productmib_free_a3ComVlanIfEntry(vlanEntry);
 }
 
@@ -73,13 +74,14 @@ void
 productmib_proc_set_vlan_port_member(GNetSnmp *s,
 				     gint32 ifIndex,
 				     guchar *bits,
-				     gsize bits_len)
+				     gsize bits_len,
+				     GError **error)
 {
     if_mib_ifStackEntry_t **ifStackTable = NULL;
     int i;
 
-    if_mib_get_ifStackTable(s, &ifStackTable, 0);
-    if (s->error_status) return;
+    if_mib_get_ifStackTable(s, &ifStackTable, 0, error);
+    if ((error && *error) || s->error_status) return;
 
     for (i = 0; ifStackTable[i]; i++) {
 	if (ifStackTable[i]->ifStackHigherLayer == ifIndex) {
@@ -89,7 +91,8 @@ productmib_proc_set_vlan_port_member(GNetSnmp *s,
 		if (! bit) {
 		    if_mib_delete_ifStackEntry(s,
 					       ifStackTable[i]->ifStackHigherLayer,
-					       ifStackTable[i]->ifStackLowerLayer);
+					       ifStackTable[i]->ifStackLowerLayer,
+					       NULL);
 		    /* xxx error handling ? xxx */
 		}
 	    }
@@ -99,7 +102,7 @@ productmib_proc_set_vlan_port_member(GNetSnmp *s,
     for (i = 0; i < bits_len * 8; i++) {
 	int bit = bits[i/8] & 1 << (7-(i%8));
 	if (bit) {
-	    if_mib_create_ifStackEntry(s, ifIndex, i);
+	    if_mib_create_ifStackEntry(s, ifIndex, i, NULL);
 	    /* xxx error handling ? xxx */
 	}
     }

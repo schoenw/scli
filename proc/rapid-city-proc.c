@@ -29,7 +29,8 @@ rapid_city_proc_create_vlan(GNetSnmp *s,
 			    gint32 vlanid,
 			    guchar *name,
 			    gsize name_len,
-			    guint32 type)
+			    guint32 type,
+			    GError **error)
 {
     rapid_city_rcVlanEntry_t *vlanEntry;
     gint32 createAndGo = SNMPV2_TC_ROWSTATUS_CREATEANDGO;
@@ -44,7 +45,8 @@ rapid_city_proc_create_vlan(GNetSnmp *s,
 	rapid_city_set_rcVlanEntry(s, vlanEntry,
 				   RAPID_CITY_RCVLANNAME
 				   | RAPID_CITY_RCVLANTYPE
-				   | RAPID_CITY_RCVLANROWSTATUS);
+				   | RAPID_CITY_RCVLANROWSTATUS,
+				   error);
 	rapid_city_free_rcVlanEntry(vlanEntry);
     }
 }
@@ -52,17 +54,20 @@ rapid_city_proc_create_vlan(GNetSnmp *s,
 
 
 void
-rapid_city_proc_delete_vlan(GNetSnmp *s, gint32 vlanid)
+rapid_city_proc_delete_vlan(GNetSnmp *s, gint32 vlanid,
+			    GError **error)
 {
     rapid_city_rcVlanEntry_t *vlanEntry;
     gint32 destroy = SNMPV2_TC_ROWSTATUS_DESTROY;
 
     rapid_city_get_rcVlanEntry(s, &vlanEntry, vlanid,
-			       RAPID_CITY_RCVLANROWSTATUS);
-    if (s->error_status || !vlanEntry) return;
+			       RAPID_CITY_RCVLANROWSTATUS,
+			       error);
+    if ((error && *error) || s->error_status || !vlanEntry) return;
     vlanEntry->rcVlanRowStatus = &destroy;
     rapid_city_set_rcVlanEntry(s, vlanEntry,
-			       RAPID_CITY_RCVLANROWSTATUS);
+			       RAPID_CITY_RCVLANROWSTATUS,
+			       error);
     rapid_city_free_rcVlanEntry(vlanEntry);
 }
 
@@ -71,16 +76,19 @@ rapid_city_proc_delete_vlan(GNetSnmp *s, gint32 vlanid)
 void
 rapid_city_proc_set_vlan_port_default(GNetSnmp *s,
 				      gint32 port,
-				      gint32 vlanid)
+				      gint32 vlanid,
+				      GError **error)
 {
     rapid_city_rcVlanPortEntry_t *rcVlanPortEntry;
 
     rapid_city_get_rcVlanPortEntry(s, &rcVlanPortEntry, port,
-				   RAPID_CITY_RCVLANPORTDEFAULTVLANID);
-    if (s->error_status || !rcVlanPortEntry) return;
+				   RAPID_CITY_RCVLANPORTDEFAULTVLANID,
+				   error);
+    if ((error && *error) || s->error_status || !rcVlanPortEntry) return;
     rcVlanPortEntry->rcVlanPortDefaultVlanId = &vlanid;
     rapid_city_set_rcVlanPortEntry(s, rcVlanPortEntry,
-				   RAPID_CITY_RCVLANPORTDEFAULTVLANID);
+				   RAPID_CITY_RCVLANPORTDEFAULTVLANID,
+				   error);
     rapid_city_free_rcVlanPortEntry(rcVlanPortEntry);
 }
 
@@ -89,15 +97,18 @@ rapid_city_proc_set_vlan_port_default(GNetSnmp *s,
 void
 rapid_city_proc_set_vlan_port_member(GNetSnmp *s,
 				     gint32 vlanid,
-				     guchar *ports)
+				     guchar *ports,
+				     GError **error)
 {
     rapid_city_rcVlanEntry_t *rcVlanEntry;
 
     rapid_city_get_rcVlanEntry(s, &rcVlanEntry, vlanid,
-			       RAPID_CITY_RCVLANPORTMEMBERS);
-    if (s->error_status || !rcVlanEntry) return;
+			       RAPID_CITY_RCVLANPORTMEMBERS,
+			       error);
+    if ((error && *error) || s->error_status || !rcVlanEntry) return;
     rcVlanEntry->rcVlanPortMembers = ports;
     rapid_city_set_rcVlanEntry(s, rcVlanEntry,
-			       RAPID_CITY_RCVLANPORTMEMBERS);
+			       RAPID_CITY_RCVLANPORTMEMBERS,
+			       error);
     rapid_city_free_rcVlanEntry(rcVlanEntry);
 }

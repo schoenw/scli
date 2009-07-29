@@ -27,13 +27,15 @@
 void
 snmp_user_based_sm_mib_proc_clone_user(GNetSnmp *s,
 				       guchar *user, size_t user_len,
-				       guchar *dolly, size_t dolly_len)
+				       guchar *dolly, size_t dolly_len,
+				       GError **error)
 {
     snmp_framework_mib_snmpEngine_t *snmpEngine;
     snmp_user_based_sm_mib_usmUserEntry_t *usmUser;
     gint32 createAndWait = SNMPV2_TC_ROWSTATUS_CREATEANDWAIT;
     
-    snmp_framework_mib_get_snmpEngine(s, &snmpEngine, 0);
+    snmp_framework_mib_get_snmpEngine(s, &snmpEngine, 0, error);
+    if (error && *error) return;
     if (s->error_status) return;
 
     usmUser = snmp_user_based_sm_mib_new_usmUserEntry();
@@ -62,7 +64,7 @@ snmp_user_based_sm_mib_proc_clone_user(GNetSnmp *s,
 #endif
     usmUser->usmUserStatus = &createAndWait;
 
-    snmp_user_based_sm_mib_set_usmUserEntry(s, usmUser, 0);
+    snmp_user_based_sm_mib_set_usmUserEntry(s, usmUser, 0, error);
     snmp_user_based_sm_mib_free_usmUserEntry(usmUser);
 }
 
@@ -70,6 +72,7 @@ void
 snmp_user_based_sm_mib_proc_delete_user(GNetSnmp *s,
 					guchar *name, gsize name_len,
 					guchar *group, gsize group_len,
-					gint32 model)
+					gint32 model,
+					GError **error)
 {
 }

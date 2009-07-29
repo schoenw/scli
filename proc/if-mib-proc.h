@@ -36,7 +36,8 @@ extern void
 if_mib_proc_get_ifTable(GNetSnmp *s,
 			if_mib_ifEntry_t ***ifEntry,
 			gint mask,
-			time_t epoch);
+			time_t epoch,
+			GError **error);
 
 extern void
 if_mib_proc_free_ifTable(if_mib_ifEntry_t **ifEntry);

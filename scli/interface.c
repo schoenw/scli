@@ -447,28 +447,28 @@ xml_interface_details(xmlNodePtr root,
     xmlNodePtr tree, node;
     const char *s;
 
-    tree = xmlNewChild(root, NULL, "interface", NULL);
-    xml_set_prop(tree, "index", "%d", ifEntry->ifIndex);
+    tree = xml_new_child(root, NULL, BAD_CAST("interface"), NULL);
+    xml_set_prop(tree, BAD_CAST("index"), "%d", ifEntry->ifIndex);
 
     if (ifXEntry && ifXEntry->ifName) {
-	(void) xml_new_child(tree, NULL, "name", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("name"), "%.*s",
 			     (int) ifXEntry->_ifNameLength,
 			     ifXEntry->ifName);
     }
 
     s = fmt_enum(if_mib_enums_ifOperStatus, ifEntry->ifOperStatus);
     if (s) {
-	(void) xml_new_child(tree, NULL, "operational", "%s", s);
+	(void) xml_new_child(tree, NULL, BAD_CAST("operational"), "%s", s);
     }
     
     s = fmt_enum(if_mib_enums_ifAdminStatus, ifEntry->ifAdminStatus);
     if (s) {
-	(void) xml_new_child(tree, NULL, "administrative", "%s", s);
+	(void) xml_new_child(tree, NULL, BAD_CAST("administrative"), "%s", s);
     }
 
     s = fmt_enum(ianaiftype_mib_enums_IANAifType, ifEntry->ifType);
     if (s) {
-	(void) xml_new_child(tree, NULL, "type", "%s", s);
+	(void) xml_new_child(tree, NULL, BAD_CAST("type"), "%s", s);
     }
 
     if (ifEntry->ifPhysAddress && ifEntry->_ifPhysAddressLength) {
@@ -479,48 +479,48 @@ xml_interface_details(xmlNodePtr root,
 		    ifEntry->ifPhysAddress[j]);
 	    b += strlen(b);
 	}
-	(void) xml_new_child(tree, NULL, "address", "%s", a);
+	(void) xml_new_child(tree, NULL, BAD_CAST("address"), "%s", a);
 	g_free(a);
     }
 
     if (ifEntry->ifMtu && *ifEntry->ifMtu != 0x7fffffff) {
-	node = xml_new_child(tree, NULL, "mtu", "%d", *ifEntry->ifMtu);
-	xml_set_prop(node, "unit", "bytes");	
+	node = xml_new_child(tree, NULL, BAD_CAST("mtu"), "%d", *ifEntry->ifMtu);
+	xml_set_prop(node, BAD_CAST("unit"), "bytes");	
     }
 
     if (ifEntry->ifSpeed) {
 	if (*(ifEntry->ifSpeed) == 0xffffffff
 	    && ifXEntry && ifXEntry->ifHighSpeed) {
-	    node = xml_new_child(tree, NULL, "speed", "%u000000",
+	    node = xml_new_child(tree, NULL, BAD_CAST("speed"), "%u000000",
 				 *(ifXEntry->ifHighSpeed));
 	} else {
-	    node = xml_new_child(tree, NULL, "speed", "%u",
+	    node = xml_new_child(tree, NULL, BAD_CAST("speed"), "%u",
 				 *(ifEntry->ifSpeed));
 	}
-	xml_set_prop(node, "unit", "bps");
+	xml_set_prop(node, BAD_CAST("unit"), "bps");
     }
     
     s = fmt_enum(snmpv2_tc_enums_TruthValue,
 		 ifXEntry ? ifXEntry->ifConnectorPresent : NULL);
     if (s) {
-	(void) xml_new_child(tree, NULL, "connector", s);
+	(void) xml_new_child(tree, NULL, BAD_CAST("connector"), s);
     }
 
     s = fmt_enum(snmpv2_tc_enums_TruthValue,
 		 ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
     if (s) {
-	(void) xml_new_child(tree, NULL, "promiscuous", s);
+	(void) xml_new_child(tree, NULL, BAD_CAST("promiscuous"), s);
     }
 
     s = fmt_enum(if_mib_enums_ifLinkUpDownTrapEnable,
 		 ifXEntry ? ifXEntry->ifLinkUpDownTrapEnable : NULL);
     if (s) {
-	(void) xml_new_child(tree, NULL, "notifications", s);
+	(void) xml_new_child(tree, NULL, BAD_CAST("notifications"), s);
     }
 
     if (ifEntry->ifLastChange && system && system->sysUpTime) {
 	guint32 dsecs = *(system->sysUpTime) - *(ifEntry->ifLastChange);
-	(void) xml_new_child(tree, NULL, "change", "%s", xml_timeticks(dsecs));
+	(void) xml_new_child(tree, NULL, BAD_CAST("change"), "%s", xml_timeticks(dsecs));
     }
 
 #if 0
@@ -542,13 +542,13 @@ xml_interface_details(xmlNodePtr root,
 #endif
     
     if (ifEntry->ifDescr && ifEntry->_ifDescrLength) {
-	(void) xml_new_child(tree, NULL, "description", "%.*s",
+	(void) xml_new_child(tree, NULL, BAD_CAST("description"), "%.*s",
 			     (int) ifEntry->_ifDescrLength,
 			     ifEntry->ifDescr);
     }
     
     if (ifXEntry && ifXEntry->ifAlias && ifXEntry->_ifAliasLength) {
-	(void) xml_new_child(tree, NULL, "alias", "%.*s", 
+	(void) xml_new_child(tree, NULL, BAD_CAST("alias"), "%.*s", 
 			     (int) ifXEntry->_ifAliasLength,
 			     ifXEntry->ifAlias);
     }
@@ -617,6 +617,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
     entity_mib_entPhysicalEntry_t *entPhysicalEntry = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i, c;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -638,24 +639,24 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
     }
 
     if_mib_proc_get_ifTable(interp->peer, &ifTable,
-			    IF_MIB_IFENTRY_PARAMS, interp->epoch);
-    if (interp->peer->error_status) {
+			    IF_MIB_IFENTRY_PARAMS, interp->epoch, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
     }
 
     if (ifTable) {
-	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS);
-	if_mib_get_ifRcvAddressTable(interp->peer, &ifRcvAddrTable, 0);
-	ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS, NULL);
+	if_mib_get_ifRcvAddressTable(interp->peer, &ifRcvAddrTable, 0, NULL);
+	ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0, NULL);
 	
 	entity_mib_get_entAliasMappingTable(interp->peer,
-					    &entAliasMappingTable, 0);
+					    &entAliasMappingTable, 0, NULL);
 	if (!interp->peer->error_status && entAliasMappingTable) {
 	    entity_mib_get_entPhysicalTable(interp->peer, &entPhysicalTable,
-					    ENTITY_MIB_ENTPHYSICAL_MASK);
+					    ENTITY_MIB_ENTPHYSICAL_MASK, NULL);
 	}
- 	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
+ 	snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME, NULL);
 	for (i = 0, c = 0; ifTable[i]; i++) {
 	    if (interface_match(regex_iface, ifTable[i])) {
 		if_mib_ifXEntry_t *ifXEntry;
@@ -764,6 +765,7 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
     int name_width, type_width;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -785,14 +787,14 @@ show_interface_info(scli_interp_t *interp, int argc, char **argv)
     }
 
     if_mib_proc_get_ifTable(interp->peer, &ifTable,
-			    IF_MIB_IFENTRY_PARAMS, interp->epoch);
-    if (interp->peer->error_status) {
+			    IF_MIB_IFENTRY_PARAMS, interp->epoch, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
     }
 
     if (ifTable) {
-	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS, NULL);
 	type_width = get_if_type_width(ifTable);
 	name_width = get_if_name_width(ifXTable);
 	g_string_sprintfa(interp->header,
@@ -982,6 +984,7 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifEntry_t **ifTable = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i, type_width;
+    GError *error = NULL;
 
     if (argc > 2) {
 	return SCLI_SYNTAX_NUMARGS;
@@ -1000,8 +1003,8 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    if_mib_get_ifStackTable(interp->peer, &ifStackTable, 0);
-    if (interp->peer->error_status) {
+    if_mib_get_ifStackTable(interp->peer, &ifStackTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
     }
@@ -1020,7 +1023,7 @@ show_interface_stack(scli_interp_t *interp, int argc, char **argv)
 
 	if (ifStackTable[i]) {
 	    if_mib_proc_get_ifTable(interp->peer, &ifTable,
-				    IF_MIB_IFENTRY_PARAMS, interp->epoch);
+				    IF_MIB_IFENTRY_PARAMS, interp->epoch, NULL);
 	    type_width = get_if_type_width(ifTable);
 	    g_string_sprintfa(interp->header,
 			      "INTERFACE STACK %-*s DESCRIPTION",
@@ -1065,6 +1068,7 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
     static time_t epoch = 0;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
+    GError *error = NULL;
 
     if (argc > 2) {
 	return SCLI_SYNTAX_NUMARGS;
@@ -1083,12 +1087,12 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_STATS);
-    if (interp->peer->error_status) {
+    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_STATS, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
     }
-    if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_STATS);
+    if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_STATS, NULL);
 
     if (epoch < interp->epoch) {
 	if (stats) g_free(stats);
@@ -1220,11 +1224,13 @@ show_interface_stats(scli_interp_t *interp, int argc, char **argv)
 
 typedef void (*InterfaceForeachFunc)	(scli_interp_t    *interp,
 					 if_mib_ifEntry_t *ifEntry,
-					 gpointer	  user_data);
+					 gpointer	  user_data,
+					 GError		  **error);
 
 static int
 foreach_interface(scli_interp_t *interp, char *regex,
-		  InterfaceForeachFunc func, gpointer user_data)
+		  InterfaceForeachFunc func, gpointer user_data,
+		  GError **error)
 {
     if_mib_ifEntry_t **ifTable = NULL;
     regex_t _regex_iface, *regex_iface = &_regex_iface;
@@ -1241,8 +1247,8 @@ foreach_interface(scli_interp_t *interp, char *regex,
     }
     
     if_mib_proc_get_ifTable(interp->peer, &ifTable,
-			    IF_MIB_IFDESCR, interp->epoch);
-    if (interp->peer->error_status) {
+			    IF_MIB_IFDESCR, interp->epoch, error);
+    if (scli_interp_set_error_snmp(interp, error)) {
 	regfree(regex_iface);
 	return SCLI_SNMP;
     }
@@ -1250,7 +1256,7 @@ foreach_interface(scli_interp_t *interp, char *regex,
     if (ifTable) {
 	for (i = 0; ifTable[i]; i++) {
 	    if (interface_match(regex_iface, ifTable[i])) {
-		(func) (interp, ifTable[i], user_data);
+		(func) (interp, ifTable[i], user_data, NULL);
 	    }
 	}
     }
@@ -1265,11 +1271,11 @@ foreach_interface(scli_interp_t *interp, char *regex,
 
 static void
 set_status(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
-	   gpointer user_data)
+	   gpointer user_data, GError **error)
 {
     gint32 *value = (gint32 *) user_data;
 
-    if_mib_set_ifAdminStatus(interp->peer, ifEntry->ifIndex, *value);
+    if_mib_set_ifAdminStatus(interp->peer, ifEntry->ifIndex, *value, error);
     if (interp->peer->error_status) {
 	interface_snmp_error(interp, ifEntry);
     }
@@ -1295,7 +1301,7 @@ set_interface_status(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_VALUE;
     }
 
-    status = foreach_interface(interp, argv[1], set_status, &value);
+    status = foreach_interface(interp, argv[1], set_status, &value, NULL);
     return status;
 }
 
@@ -1303,10 +1309,10 @@ set_interface_status(scli_interp_t *interp, int argc, char **argv)
 
 static void
 set_alias(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
-	  gpointer user_data)
+	  gpointer user_data, GError **error)
 {
     if_mib_set_ifAlias(interp->peer, ifEntry->ifIndex,
-		       (char *) user_data, strlen((char *) user_data));
+		       (guchar *) user_data, strlen((char *) user_data), error);
     if (interp->peer->error_status) {
 	interface_snmp_error(interp, ifEntry);
     }
@@ -1325,7 +1331,7 @@ set_interface_alias(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMARGS;
     }
 
-    status = foreach_interface(interp, argv[1], set_alias, argv[2]);
+    status = foreach_interface(interp, argv[1], set_alias, argv[2], NULL);
     return status;
 }
 
@@ -1333,11 +1339,11 @@ set_interface_alias(scli_interp_t *interp, int argc, char **argv)
 
 static void
 set_promiscuous(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
-		gpointer user_data)
+		gpointer user_data, GError **error)
 {
     gint32 *value = (gint32 *) user_data;
 
-    if_mib_set_ifPromiscuousMode(interp->peer, ifEntry->ifIndex, *value);
+    if_mib_set_ifPromiscuousMode(interp->peer, ifEntry->ifIndex, *value, error);
     if (interp->peer->error_status) {
 	interface_snmp_error(interp, ifEntry);
     }
@@ -1363,7 +1369,7 @@ set_interface_promiscuous(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_VALUE;
     }
 
-    status = foreach_interface(interp, argv[1], set_promiscuous, &value);
+    status = foreach_interface(interp, argv[1], set_promiscuous, &value, NULL);
     return status;
 }
 
@@ -1371,11 +1377,11 @@ set_interface_promiscuous(scli_interp_t *interp, int argc, char **argv)
 
 static void
 set_notifications(scli_interp_t *interp, if_mib_ifEntry_t *ifEntry,
-		  gpointer user_data)
+		  gpointer user_data, GError **error)
 {
     gint32 *value = (gint32 *) user_data;
 
-    if_mib_set_ifLinkUpDownTrapEnable(interp->peer, ifEntry->ifIndex, *value);
+    if_mib_set_ifLinkUpDownTrapEnable(interp->peer, ifEntry->ifIndex, *value, error);
     if (interp->peer->error_status) {
 	interface_snmp_error(interp, ifEntry);
     }
@@ -1401,7 +1407,7 @@ set_interface_notifications(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_VALUE;
     }
 
-    status = foreach_interface(interp, argv[1], set_notifications, &value);
+    status = foreach_interface(interp, argv[1], set_notifications, &value, NULL);
     return status;
 }
 
@@ -1414,6 +1420,7 @@ dump_interface(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifXEntry_t **ifXTable = NULL;
     const char *e;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1426,13 +1433,13 @@ dump_interface(scli_interp_t *interp, int argc, char **argv)
     }
 
     if_mib_proc_get_ifTable(interp->peer, &ifTable,
-			    IF_MIB_IFENTRY_CONFIG, interp->epoch);
-    if (interp->peer->error_status) {
+			    IF_MIB_IFENTRY_CONFIG, interp->epoch, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (ifTable) {
-	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS);
+	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS, NULL);
 	for (i = 0; ifTable[i]; i++) {
 	    if_mib_ifXEntry_t *ifXEntry;
 	    ifXEntry = get_ifXEntry(ifXTable, ifTable[i]->ifIndex);
@@ -1534,6 +1541,7 @@ check_interface_status(scli_interp_t *interp, int argc, char **argv)
     snmpv2_mib_system_t *system = NULL;
     regex_t _regex_iface, *regex_iface = NULL;
     int i;
+    GError *error = NULL;
 
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1554,13 +1562,13 @@ check_interface_status(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
     
-    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_STATUS);
-    if (interp->peer->error_status) {
+    if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_STATUS, &error);
+    if (scli_interp_set_error_snmp(interp->peer, &error)) {
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
     }
-
-    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME);
+    
+    snmpv2_mib_get_system(interp->peer, &system, SNMPV2_MIB_SYSUPTIME, NULL);
     
     if (ifTable) {
 	for (i = 0; ifTable[i]; i++) {

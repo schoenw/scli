@@ -27,12 +27,14 @@
 
 extern void
 productmib_proc_create_vlan(GNetSnmp *s, gint32 vlanid,
-			    guchar *name, gsize name_len, guint32 type);
+			    guchar *name, gsize name_len, guint32 type,
+			    GError **error);
 extern void
-productmib_proc_delete_vlan(GNetSnmp *s, gint32 ifIndex);
+productmib_proc_delete_vlan(GNetSnmp *s, gint32 ifIndex, GError **error);
 
 extern void
 productmib_proc_set_vlan_port_member(GNetSnmp *s, gint32 ifIndex,
-				     guchar *ports, gsize ports_len);
+				     guchar *ports, gsize ports_len,
+				     GError **error);
     
 #endif /* _PRODUCTMIB_PROC_H_ */

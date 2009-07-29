@@ -29,13 +29,15 @@ extern void
 snmp_view_based_acm_mib_proc_create_member(GNetSnmp *s,
 					   guchar *name,
 					   guchar *group,
-					   gint32 model);
+					   gint32 model,
+					   GError **error);
 
 extern void
 snmp_view_based_acm_mib_proc_delete_member(GNetSnmp *s,
 					   guchar *name, gsize name_len,
 					   guchar *group, gsize group_len,
-					   gint32 model);
+					   gint32 model,
+					   GError **error);
 
 
 #endif /* _SNMP_VIEW_BASED_ACM_MIB_PROC_H_ */

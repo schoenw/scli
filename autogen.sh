@@ -46,7 +46,7 @@ if test -z "$*"; then
 fi
 
 #aclocal_flags="`./aclocal-flags`"
-aclocal_flags="-I /usr/local/share/aclocal"
+#aclocal_flags="-I /usr/local/share/aclocal"
 aclocalinclude="$ACLOCAL_FLAGS $aclocal_flags"; \
 echo aclocal $aclocalinclude
 aclocal $aclocalinclude || exit 1

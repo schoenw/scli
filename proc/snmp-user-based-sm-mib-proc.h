@@ -29,13 +29,15 @@
 extern void
 snmp_user_based_sm_mib_proc_clone_user(GNetSnmp *s,
 				       guchar *user, size_t user_len,
-				       guchar *dolly, size_t dolly_len);
+				       guchar *dolly, size_t dolly_len,
+				       GError **error);
 
 extern void
 snmp_user_based_sm_mib_proc_delete_user(GNetSnmp *s,
 					guchar *name, gsize name_len,
 					guchar *group, gsize group_len,
-					gint32 model);
+					gint32 model,
+					GError **error);
 
 
 #endif /* _SNMP_USER_BASED_SM_MIB_PROC_H_ */

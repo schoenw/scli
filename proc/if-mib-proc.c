@@ -37,7 +37,8 @@ void
 if_mib_proc_get_ifTable(GNetSnmp *s,
 			if_mib_ifEntry_t ***ifEntry,
 			gint mask,
-			time_t epoch)
+			time_t epoch,
+			GError **error)
 {
     static ifEntry_t cache = {NULL, 0};
     time_t now = time(NULL);
@@ -51,8 +52,8 @@ if_mib_proc_get_ifTable(GNetSnmp *s,
 	cache.data = NULL;
     }
 
-    if_mib_get_ifTable(s, ifEntry, 0);
-    if (! s->error_status) {
+    if_mib_get_ifTable(s, ifEntry, 0, error);
+    if (! s->error_status && (!error || !*error)) {
 	cache.data = *ifEntry;
 	cache.time = now;
 	cache.epoch = epoch;
