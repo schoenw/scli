@@ -1,10 +1,10 @@
-INCLUDES	= -I$(top_srcdir)/stub -I$(top_srcdir)/proc $(GSNMP_CFLAGS) $(GNET_CFLAGS) $(GTK_CFLAGS) $(XML_CFLAGS) $(XML_CPPFLAGS)
+AM_CPPFLAGS	= -I$(top_srcdir)/stub -I$(top_srcdir)/proc $(GSNMP_CFLAGS) $(GNET_CFLAGS) $(GTK_CFLAGS) $(XML_CFLAGS) $(XML_CPPFLAGS)
 
 EXTRA_DIST	= oui.c
 
 bin_PROGRAMS	= scli # gscli
 
-xxscli_SOURCES	= scli.c scli.h scli.1 vendors.c \
+scli_SOURCES	= scli.c scli.h scli.1 vendors.c \
 		  basic.c monitor.c cmds.c thread.c \
 		  fmt.c xml.c netconf.c \
 		  system.c entity.c interface.c disman.c snmp.c \
@@ -13,11 +13,6 @@ xxscli_SOURCES	= scli.c scli.h scli.1 vendors.c \
 		  ospf.c printer.c \
 		  isdn.c rs232.c sonet.c \
 		  cisco.c nortel.c netsnmp.c 3com.c hp.c sflow.c
-
-scli_SOURCES	= scli.c scli.h scli.1 vendors.c \
-		  basic.c monitor.c cmds.c thread.c \
-		  fmt.c xml.c netconf.c \
-		  system.c
 
 scli_LDADD	= $(top_builddir)/proc/libproc.a \
 		  $(top_builddir)/stub/libstub.a \

@@ -392,7 +392,9 @@ gboolean
 scli_interp_set_error_snmp(scli_interp_t *interp, GError **error)
 {
     if (scli_interp_set_error(interp, error)) {
+#if (GLIB_MINOR_VERSION > 15)
 	g_prefix_error(&interp->error, "snmp: ");
+#endif
 	return TRUE;
     }
     if (interp->peer->error_status) {

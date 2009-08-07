@@ -1,4 +1,4 @@
-INCLUDES		= $(GSNMP_CFLAGS) $(GNET_CFLAGS) -I$(top_srcdir)/stub
+AM_CPPFLAGS		= $(GSNMP_CFLAGS) $(GNET_CFLAGS) -I$(top_srcdir)/stub
 
 PROCS			= if-mib-proc.h if-mib-proc.c \
 			  rapid-city-proc.h rapid-city-proc.c \

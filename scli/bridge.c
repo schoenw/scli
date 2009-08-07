@@ -1438,6 +1438,7 @@ create_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     g_return_val_if_fail(interp, SCLI_ERROR);
     gint32 vlanId;
     char *end;
+    GError *error = NULL;
     
     if (argc != 3) {
 	return SCLI_SYNTAX_NUMARGS;
@@ -1459,8 +1460,8 @@ create_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    q_bridge_mib_proc_create_vlan(interp->peer, vlanId, argv[2]);
-    if (interp->peer->error_status) {
+    q_bridge_mib_proc_create_vlan(interp->peer, vlanId, argv[2], &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
@@ -1475,6 +1476,7 @@ delete_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
     q_bridge_mib_dot1qVlanStaticEntry_t **vlanTable = NULL;
     regex_t _regex_vlan, *regex_vlan = NULL;
     int i;
+    GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
@@ -1495,15 +1497,15 @@ delete_bridge_vlan(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    q_bridge_mib_get_dot1qVlanStaticTable(interp->peer, &vlanTable, 0);
-    if (interp->peer->error_status) {
+    q_bridge_mib_get_dot1qVlanStaticTable(interp->peer, &vlanTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
 
     if (vlanTable) {
 	for (i = 0; vlanTable[i]; i++) {
 	    if (match_vlan(regex_vlan, vlanTable[i])) {
-		q_bridge_mib_proc_delete_vlan(interp->peer, vlanTable[i]->dot1qVlanIndex);
+		q_bridge_mib_proc_delete_vlan(interp->peer, vlanTable[i]->dot1qVlanIndex, NULL);
 	    }
 	}
     }
