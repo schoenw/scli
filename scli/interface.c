@@ -1498,7 +1498,7 @@ check_if_status(GString *s,
 		snmpv2_mib_system_t *system)
 {
     int fault = 0;
-    
+
     if (! ifEntry->ifOperStatus || ! ifEntry->ifAdminStatus) {
 	return;
     }
@@ -1523,8 +1523,8 @@ check_if_status(GString *s,
 
     if (fault) {
 	g_string_sprintfa(s,
-		  "Interface #%d (%.*s) has an operational status (%s) "
-		  "which does not match its administrative status (%s).\n\n",
+		  "Interface #%d (%.*s) operational status '%s', "
+		  "administrative status '%s'.\n",
 		  ifEntry->ifIndex, ifEntry->_ifDescrLength,
 		  ifEntry->ifDescr,
 		  fmt_enum(if_mib_enums_ifOperStatus, ifEntry->ifOperStatus),
@@ -1563,7 +1563,7 @@ check_interface_status(scli_interp_t *interp, int argc, char **argv)
     }
     
     if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFENTRY_STATUS, &error);
-    if (scli_interp_set_error_snmp(interp->peer, &error)) {
+    if (scli_interp_set_error_snmp(interp, &error)) {
 	if (regex_iface) regfree(regex_iface);
 	return SCLI_SNMP;
     }
@@ -1744,6 +1744,14 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "information as the show interface stats command. The\n"
 	  "information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_interface_stats },
+
+	{ "loop interface stats", "[<regexp>]",
+	  "The `loop interface stats' command shows the same\n"
+	  "information as the show interface stats command. The\n"
+	  "information is updated periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_LOOP | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_interface_stats },
 
