@@ -235,16 +235,19 @@ completion(char *text, int start, int end)
 #endif
 
     /*
-     * Do not switch to filename completion if no matches were found.
+     * Do not attempt filename completion. Readline falls back to
+     * filename completion unless we set rl_completion_entry_function
+     * again when no matches were found. Since on some platforms
+     * (reported by Henri Bragge) rl_completion_matches returns a non
+     * NULL result even if there were no matches, we always set the
+     * completion function.
      */
-    
-    if (! matches) {
+
 #ifdef HAVE_RL_COMPLETION_MATCHES
-       rl_completion_entry_function = (rl_compentry_func_t *) completion;
+    rl_completion_entry_function = (rl_compentry_func_t *) completion;
 #else
-       rl_completion_entry_function = (Function *) completion;
+    rl_completion_entry_function = (Function *) completion;
 #endif
-    }
     
     return matches;
 }
