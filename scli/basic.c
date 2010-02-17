@@ -1364,7 +1364,7 @@ scli_open_community(scli_interp_t *interp, gchar *target)
     }
 
     transport_domain = gnet_snmp_enum_get_label(gnet_snmp_enum_tdomain_table,
-						interp->peer->taddress->domain);
+					gnet_snmp_get_tdomain(interp->peer));
     
     /*
      * Lets see how we can talk to this guy. We first try to speek

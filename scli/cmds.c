@@ -951,6 +951,12 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 			      indent, "URI:", name);
 	    g_free(name);
 	}
+	label = gnet_snmp_enum_get_label(gnet_snmp_enum_tdomain_table,
+				 (gint32) gnet_snmp_get_tdomain(interp->peer));
+	if (label) {
+	    g_string_sprintfa(interp->result, "%-*s %s\n", indent,
+			      "Transport:", label);
+	}
 	g_string_sprintfa(interp->result, "%-*s %u\n", indent,
 			  "Retries:", gnet_snmp_get_retries(interp->peer));
 	g_string_sprintfa(interp->result, "%-*s %u ms\n", indent,
