@@ -237,7 +237,7 @@ structures that every programmer can easily understand and handle.
 The following sections describe the @code{scli} modes together with
 their commands.
 
-100-scli version  (c) 2001-2007 Juergen Schoenwaelder
+100 scli version 0.4.0 (c) 2001-2010 Juergen Schoenwaelder
 3COM MODE
 
 The 3com scli mode allows to manipulate virtual lans (vlans)
@@ -334,6 +334,8 @@ to IEEE 802.1 LAN bridges (also known as layer two switches).
 @command{monitor bridge stats}
 @command{show bridge vlan info [<regexp>]}
 @command{show bridge vlan details [<regexp>]}
+@command{create bridge vlan <id> <name>}
+@command{delete bridge vlan <regexp>}
 @end example
 
 The @command{show bridge info} command displays summary information about
@@ -409,6 +411,12 @@ The @command{show bridge vlan details} command describes the selected
 VLANs in detail. The optional regular expression <regexp>
 is matched against the VLAN names to select the VLANs
 of interest.
+
+The @command{create bridge vlan} command creates a new vlan
+with the given <id> and name <name>.
+
+The @command{delete bridge vlan} command deletes all vlans
+whose vlan name matches the regular expression <regexp>.
 @section CISCO MODE
 
 The cisco scli mode is used to display and configure cisco
@@ -1185,6 +1193,7 @@ manipulate the internal state of the scli interpreter.
 @command{close}
 @command{run scli walk <oid> [<oid> ...]}
 @command{run scli scan <network> [community]}
+@command{run scli sleep <secs>}
 @command{create scli plugin <module>}
 @command{delete scli plugin <module>}
 @command{exit}
@@ -1202,8 +1211,8 @@ manipulate the internal state of the scli interpreter.
 @command{set scli format <fmt>}
 @command{set scli mode <mode>}
 @command{show scli info}
-@command{show scli command info [<regex]}
-@command{show scli command details [<regex]}
+@command{show scli command info [<regex>]}
+@command{show scli command details [<regex>]}
 @command{show scli command tree}
 @command{show scli aliases}
 @command{show scli modes [<regex>]}
@@ -1238,6 +1247,9 @@ must be specified in the format <ipv4address>/<prefix>.
 The optional <community> argument is the community string
 needed to communicate with the remote SNMP agent. The default
 community string is "public".
+
+The @command{run scli sleep} command simply sleeps for the given amount
+of seconds.
 
 The @command{create scli plugin} command dynamically loads an scli mode
 into a running scli process. This can be used to dynamically
@@ -1324,11 +1336,11 @@ The @command{show scli info} command displays the current status of the
 scli interpreter.
 
 The @command{show scli command info} command displays summary information
-about scli commands. The optional regular expression <regexp> is
+about scli commands. The optional regular expression <regex> is
 matched against the command names to select the scli commands.
 
 The @command{show scli command details} command displays detailed information
-about scli commands. The optional regular expression <regexp> is
+about scli commands. The optional regular expression <regex> is
 matched against the command names to select the scli commands.
 
 The @command{show scli command tree} command displays the scli command
@@ -1583,7 +1595,6 @@ parameters and characteristics.
 @command{show system processes [<regexp>]}
 @command{show system software [<regexp>]}
 @command{monitor system storage}
-@command{loop system storage}
 @command{monitor system processes [<regexp>]}
 @command{check system contact}
 @command{check system storage}
@@ -1677,10 +1688,6 @@ The @command{monitor system storage} command shows the same
 information as the show system storage command. The
 information is updated periodically.
 
-The @command{loop system storage} command shows the same
-information as the show system storage command. The
-information is updated periodically.
-
 The @command{monitor system processes} command show the same
 information as the show system processes command. The
 information is updated periodically.
@@ -1763,6 +1770,22 @@ by the remote SNMP agent. The information is updated periodically.
 
 The @command{monitor tcp states} command displays the distribution of TCP
 connection states. The information is updated periodically.
+@section UDP MODE
+
+The scli sflow mode is based on the SFLOW-MIB as published in
+RFC 3176 and the SFLOW5-MIB published on the slow.org web site. It
+provides commands to browse information specific to sflow probes.
+
+@example
+@command{show sflow info}
+@command{show sflow receiver}
+@end example
+
+The @command{show sflow info} command displays information about
+an sflow implementation.
+
+The @command{show sflow receiver} command displays information about
+sflow receivers.
 @section UDP MODE
 
 The scli udp mode is based on the UDP-MIB as published in
