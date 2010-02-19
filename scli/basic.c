@@ -34,7 +34,7 @@
 #endif
 
 
-char const scli_copyright[] = "(c) 2001-2009 Juergen Schoenwaelder";
+char const scli_copyright[] = "(c) 2001-2010 Juergen Schoenwaelder";
 
 GStaticMutex scli_global_lock = G_STATIC_MUTEX_INIT;
 

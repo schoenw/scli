@@ -1,3 +1,8 @@
+Changes in scli 0.4.0:
+
+- support for local domain sockets (aka unix domain sockets)
+- several small improvements
+
 Changes in scli 0.3.2:
 
 - new "show bridge vlan info" command

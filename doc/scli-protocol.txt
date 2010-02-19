@@ -3,7 +3,7 @@
 		     V. Marinov, J. Schoenwaelder
 		       Jacobs University Bremen
 
-				 $Id$
+    $Id$
 
 1. Introduction
 
@@ -337,7 +337,7 @@ S: 200-Name:             curve
 S: 200-Agent:            snmp://public@192.168.1.33:161//
 S: 200-Description:      ProCurve J4903A Switch 2824, revision I.08.105, ROM
 S: 200-                  I.08.07 (/sw/code/build/mako(ts_08_5))
-S: 200-Contact:          <j.schoenwaelder@iu-bremen.de>
+S: 200-Contact:          <admin@eecs.jacobs-university.de>
 S: 200-Location:         Jacobs University Bremen, Germany
 S: 200-Vendor:           Hewlett Packard <http://www.hp.com/>
 S: 200-Services:         datalink transport application

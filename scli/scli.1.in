@@ -243,11 +243,10 @@ The scli startup file.
 .I ~/.inputrc
 Individual readline initialization file.
 .SH "FURTHER INFORMATION"
-More information can be found on the scli web page which is
-available at:
+More information can be found on the scli repository:
 .PP
-<https://trac.eecs.iu-bremen.de/projects/scli/>
+<https://cnds.eecs.jacobs-university.de/svn/schoenw/src/scli/>
 .SH "SEE ALSO"
 .BR regex(7)
 .SH AUTHOR
-Juergen Schoenwaelder <j.schoenwaelder@iu-bremen.de>.
+Juergen Schoenwaelder <j.schoenwaelder@jacobs-university.de>.

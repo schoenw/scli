@@ -2,7 +2,7 @@ SCLI -- SNMP COMMAND LINE INTERFACE
 ===================================
 
 Copyright (c) 2001-2002 Juergen Schoenwaelder, TU Braunschweig, Germany
-Copyright (c) 2003-2009 Juergen Schoenwaelder, Jacobs University Bremen, Germany
+Copyright (c) 2003-2010 Juergen Schoenwaelder, Jacobs University Bremen, Germany
 
 $Id$
 
@@ -69,9 +69,9 @@ to the list, send a message with the subject ``subscribe'' to
 WEB SITE
 ========
 
-The Web site for the scli package is located at the following URL:
+The source repository for the scli package is located at the following URL:
 
-  <https://trac.eecs.iu-bremen.de/projects/scli/>
+  <https://cnds.eecs.jacobs-university.de/svn/schoenw/src/scli/>
 
 
 CONTACTING AUTHORS
@@ -84,7 +84,7 @@ distribution.
 COPYRIGHT
 =========
 
-Copyright (c) 2001-2009 Juergen Schoenwaelder
+Copyright (c) 2001-2010 Juergen Schoenwaelder
 
 The scli package is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
