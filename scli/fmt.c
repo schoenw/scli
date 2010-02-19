@@ -747,9 +747,9 @@ fmt_port_set(GString *s, guchar *bits, gsize bits_len)
 		    g_string_append_c(s, ',');
 		}
 		if (first == i-1) {
-		    g_string_sprintfa(s, "%d", first);
+		    g_string_sprintfa(s, "%d", first+1);
 		} else {
-		    g_string_sprintfa(s, "%d-%d", first, i-1);
+		    g_string_sprintfa(s, "%d-%d", first+1, i-1+1);
 		}
 		n++;
 	    }
@@ -757,7 +757,7 @@ fmt_port_set(GString *s, guchar *bits, gsize bits_len)
 	}
     }
     if (first >= 0) {
-	g_string_sprintfa(s, "%s%d-%d", n ? ", " : "", first, i-1);
+	g_string_sprintfa(s, "%s%d-%d", n ? ", " : "", first+1, i-1+1);
     }
 }
 
