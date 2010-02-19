@@ -70,7 +70,7 @@ Process commands from a file and exit.
 Show summary of scli options.
 .TP
 .B \-i, \-\-inet
-Execute in inet mode. This option implies -q, -n and -x.
+Execute in inet mode. This option implies \-q, \-n and \-x.
 .TP
 .B \-n, \-\-norc
 Do not evaluate ~/.sclirc on startup.
