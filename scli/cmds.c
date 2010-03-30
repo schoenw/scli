@@ -507,56 +507,11 @@ scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
     
     g_return_val_if_fail(interp, SCLI_ERROR);
 
-#if 0
-    if (argc < 2 || argc > 4) {
-        return SCLI_SYNTAX_NUMARGS;
-    }
-
-    host = argv[1];
-    if (argc == 3) {
-	community = argv[2];
-    }
-    if (argc == 4) {
-        port = atoi(argv[2]);
-	community = argv[3];
-    }
-
-    taddr = gnet_snmp_trans
-
-    addr = gnet_inetaddr_new(host, port);
-    if (! addr) {
-	return SCLI_SYNTAX_VALUE;
-    }
-
-    ipv6 = gnet_inetaddr_is_ipv6(addr);
-
-    /*
-     * We prefer to use TCP so try TCP first and fall back to UDP if
-     * this fails for whatever reason. Note that this may lead to a
-     * long long TCP timeout. Should we have an option to force the
-     * transport domain? Yes, lets add an scli configuration property
-     * which lists the sequence of transports to probe.
-     */
-#if 1
-    interp->tdomain
-	    = ipv6 ? GNET_SNMP_TDOMAIN_TCP_IPV6 : GNET_SNMP_TDOMAIN_TCP_IPV4;
-    
-    code = scli_open_community(interp, interp->tdomain,
-			       interp->taddress, community);
-    if (code == SCLI_OK) {
-	return code;
-    }
-#endif
-    interp->tdomain
-	    = ipv6 ? GNET_SNMP_TDOMAIN_UDP_IPV6 : GNET_SNMP_TDOMAIN_UDP_IPV4;
-    code = scli_open_community(interp, interp->tdomain,
-			       interp->taddress, community);
-#else
     if (argc != 2) {
         return SCLI_SYNTAX_NUMARGS;
     }
     code = scli_open_community(interp, argv[1]);
-#endif
+
     return code;
 }
 
@@ -1675,19 +1630,20 @@ scli_init_scli_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
 
-	{ "open", "<nodename> [<community>]",
-	  "The `open' command establishes an association to a remote SNMP\n"
-	  "agent. The <nodename> argument is the DNS name or the IP\n"
-	  "address of the remote node. Scli will try to talk to the SNMP\n"
-	  "agent on this node by using the default port number (usually 161)\n"
-	  "and the default transport mapping (usually SNMP over UDP).\n"
-	  "The optional <community> argument is the community string\n"
-	  "needed to communicate with the remote SNMP agent. The default\n"
-	  "community string is \"public\". Opening an association while\n"
-	  "an association is already established is not considered an\n"
-	  "error. The existing established association will be closed\n"
-	  "automatically before an attempt to create a new association\n"
-	  "is started.",
+	{ "open", "<uri>",
+          "The `open' command establishes an association to a remote SNMP\n"
+	  "agent. The <uri> argument follows in spirit RFC 4088. A URI\n"
+	  "to establish an SNMPv1/SNMPv2c session to \"localhost\" using the\n"
+	  "community string \"public\" and the default port number 161 looks\n"
+	  "like this:\n"
+	  "    snmp://public@localhost:161/\n\n"
+	  "The port number is optional (default 161) as is the community\n"
+	  "string (default \"public\"). One can leave out the scheme\n"
+	  "prefix, leading to URIs as short as \"public@localhost\" or just\n"
+	  "\"localhost\". Opening a new association while an association is\n"
+	  "already established is not considered an error. The existing\n"
+	  "association will be closed automatically before an attempt to\n"
+	  "create a new association is started.",
 	  SCLI_CMD_FLAG_XML,
 	  "", NULL,
 	  scli_cmd_open },
