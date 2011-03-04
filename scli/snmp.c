@@ -104,6 +104,22 @@ GNetSnmpIdentity const sec_proto_identities[] = {
 };
 
 
+static guint32 const bridge[]
+	= { 1,3,6,1,2,1,17 };
+static guint32 const mib2[]
+	= { 1,3,6,1,2,1 };
+
+GNetSnmpIdentity const entity_type_identities[] = {
+    { bridge,
+      sizeof(bridge)/sizeof(guint32),
+      "IEEE 802.1d Bridge (dot1dBridge)" },
+    { mib2,
+      sizeof(mib2)/sizeof(guint32),
+      "Managed Internet Node (mib-2)" },
+    { 0, 0, NULL }
+};
+
+
 
 static int
 creatable(gint32 *storage)
@@ -1138,6 +1154,9 @@ fmt_snmp_context(GString *s,
     const char *e;
     int i;
 
+    g_string_sprintfa(s, "%-*s%d\n", indent, "Index:",
+		      logEntEntry->entLogicalIndex);
+
     fmt_display_string(s, indent, "Description:",
 		       (int) logEntEntry->_entLogicalDescrLength,
 		       (gchar *) logEntEntry->entLogicalDescr);
@@ -1146,46 +1165,57 @@ fmt_snmp_context(GString *s,
 		       (int) logEntEntry->_entLogicalCommunityLength,
 		       (gchar *) logEntEntry->entLogicalCommunity);
 
+    if (logEntEntry->entLogicalType && logEntEntry->_entLogicalTypeLength) {
+	g_string_sprintfa(s, "%-*s", indent, "Type:");
+	e = fmt_identity(entity_type_identities,
+			 logEntEntry->entLogicalType,
+			 logEntEntry->_entLogicalTypeLength);
+	if (e) {
+	    g_string_sprintfa(s, "%s", e);
+	} else {
+	    for (i = 0; i < logEntEntry->_entLogicalTypeLength; i++) {
+		g_string_sprintfa(s, "%s%u", (i == 0) ? "" : ".",
+				  logEntEntry->entLogicalType[i]);
+	    }
+	}
+	g_string_sprintfa(s, "\n");
+    }
+
     if (logEntEntry->entLogicalContextEngineID) {
 	guint32 enterp = 0;
 	const scli_vendor_t *vendor;
-	g_string_sprintfa(s, "%-*s", indent, "Engine-Identifier:");
+	g_string_sprintfa(s, "%-*s", indent, "ContextEngine:");
 	for (i = 0; i < logEntEntry->_entLogicalContextEngineIDLength; i++) {
 		g_string_sprintfa(s, "%02x", logEntEntry->entLogicalContextEngineID[i]);
 	}
-	g_string_append(s, "\n");
 	enterp = (enterp << 8) + (logEntEntry->entLogicalContextEngineID[0] & 0x7F);
 	enterp = (enterp << 8) + logEntEntry->entLogicalContextEngineID[1];
 	enterp = (enterp << 8) + logEntEntry->entLogicalContextEngineID[2];
 	enterp = (enterp << 8) + logEntEntry->entLogicalContextEngineID[3];
 	vendor = scli_get_vendor(enterp);
 	if (vendor && vendor->name) {
-		g_string_sprintfa(s, "%-*s%s", indent, "Engine-Vendor:",
-				  vendor->name);
-		if (vendor->url) {
-			g_string_sprintfa(s, " <%s>", vendor->url);
-		}
-		g_string_append(s, "\n");
+		g_string_sprintfa(s, " (%s)", vendor->name);
 	}
+	g_string_append(s, "\n");
     }
     
     if (logEntEntry->entLogicalContextName) {
-        fmt_display_string(s, indent, "Context:",
+        fmt_display_string(s, indent, "ContextName:",
 			   (int) logEntEntry->_entLogicalContextNameLength,
 			   (gchar *) logEntEntry->entLogicalContextName);
     }
 
-    e = fmt_tdomain(logEntEntry->entLogicalTDomain,
-		    logEntEntry->_entLogicalTDomainLength);
-    g_string_sprintfa(s, " %-6s", e ? e : "?");
-
-    e = fmt_taddress(logEntEntry->entLogicalTDomain,
-		     logEntEntry->_entLogicalTDomainLength,
-		     logEntEntry->entLogicalTAddress,
-		     logEntEntry->_entLogicalTAddressLength);
-    g_string_sprintfa(s, " %-*s", 32, e ? e : "?");
-    g_string_sprintfa(s, "\n");
-
+    if (logEntEntry->entLogicalTDomain && logEntEntry->_entLogicalTDomainLength
+	&& logEntEntry->entLogicalTAddress && logEntEntry->_entLogicalTAddressLength) {
+	e = fmt_taddress(logEntEntry->entLogicalTDomain,
+			 logEntEntry->_entLogicalTDomainLength,
+			 logEntEntry->entLogicalTAddress,
+			 logEntEntry->_entLogicalTAddressLength);
+	g_string_sprintfa(s, "%-*s%s", indent, "Address:", e ? e : "?");
+	e = fmt_tdomain(logEntEntry->entLogicalTDomain,
+			logEntEntry->_entLogicalTDomainLength);
+	g_string_sprintfa(s, " (%s)\n", e ? e : "");
+    }
 }
 
 
