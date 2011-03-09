@@ -498,19 +498,28 @@ history(scli_interp_t *interp, int argc, char **argv)
 static int
 scli_cmd_open(scli_interp_t *interp, int argc, char **argv)
 {
-    gchar *host;
-    gint ipv6, port = 161;
-    gchar *community = NULL;
-    GInetAddr *addr;
-    GNetSnmpTAddress *taddr;
+    gchar *uri;
     int code;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
-
-    if (argc != 2) {
-        return SCLI_SYNTAX_NUMARGS;
+    
+    switch (argc) {
+    case 2:
+	code = scli_open_community(interp, argv[1]);
+	break;
+    case 3: /* support the old calling convention */
+	uri = g_strdup_printf("snmp://%s@%s", argv[2], argv[1]);
+	if (uri) {
+	    code = scli_open_community(interp, uri);
+	} else {
+	    code = SCLI_ERROR;
+	}
+	g_free(uri);
+	break;
+    default:
+	code = SCLI_SYNTAX_NUMARGS;
+	break;
     }
-    code = scli_open_community(interp, argv[1]);
 
     return code;
 }
@@ -627,7 +636,7 @@ create_scli_alias(scli_interp_t *interp, int argc, char **argv)
 
     if (elem) {
 	g_free(alias->value);
-	alias->value = g_strdup_printf(argv[2]);
+	alias->value = g_strdup_printf("%s", argv[2]);
     } else {
 	alias = g_new0(scli_alias_t, 1);
 	alias->name = g_strdup(argv[1]);
