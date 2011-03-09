@@ -31,24 +31,22 @@ scli \- SNMP Command Line Interface
 .SH SYNOPSIS
 .B scli
 .RI [ options ]
-.I [hostname]
-.RI [ community ]
+.RI [ snmp-uri ]
 .SH DESCRIPTION
 \fBscli\fP provides a simple command line interface on top of the
 Simple Network Management Protocol (SNMP). It can be used to read
 data from devices and to configure them with simple commands. It
 relies on the capabilities of the devices and thus not all commands
-may work with all devices.
+may work with all devices. 
 .PP
-The optional \fIhostname\fR argument is the name or the IP address of
-the remote host. \fBscli\fP talks to this host's SNMP agent on the
-default port number 161 using the SNMP over UDP transport mapping.
-.PP
-The optional \fIcommunity\fR argument is the community string used to
-communicate with the remote SNMP agent. The default string is
-\fIpublic\fR. Please check the configuration of the SNMP agent to get
-a clue about the community string to use, if the default community
-string does not work.
+The optional \fIsnmp-uri\fR argument takes an SNMP service URI as
+defined in RFC 4088. For SNMPv1 and SNMPv2c, the securityName is
+mapped to a community name. The URI snmp://example.com gives you
+SNMPv1 or SNMPv2c access to the agent on example.com (port 161)
+using the default community string 'public'. A more advanced URI
+would be snmp://private@example.com:1611, which gives you
+SNMPv1 or SNMPv2c access to the agent on example.com listening on
+port 1611 using the community string 'private'.
 .PP
 .SH OPTIONS
 \fBscli\fP accepts the following options:

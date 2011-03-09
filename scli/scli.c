@@ -320,7 +320,7 @@ main(int argc, char **argv)
 	{ NULL }
     };
 
-    context = g_option_context_new("[hostname [community]]");
+    context = g_option_context_new("[snmp-uri]");
     g_option_context_add_main_entries(context, entries, NULL);
     g_option_context_add_group (context, gnet_snmp_get_option_group());
     if (! g_option_context_parse(context, &argc, &argv, &error)) {
