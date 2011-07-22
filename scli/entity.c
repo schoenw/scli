@@ -141,8 +141,27 @@ static void
 fmt_entity_sensors(GString *s,
 		   entity_sensor_mib_entPhySensorEntry_t *entSensorEntry)
 {
-    g_string_sprintfa(s, "sensor %d\n",
+    const char *label;
+    
+    g_string_sprintfa(s, "Sensor: %d\n",
 		      entSensorEntry->entPhysicalIndex);
+    label = fmt_enum(entity_sensor_mib_enums_EntitySensorDataType,
+		     entSensorEntry->entPhySensorType);
+    g_string_sprintfa(s, "Type:   %s\n", label);
+    label = fmt_enum(entity_sensor_mib_enums_EntitySensorStatus,
+		     entSensorEntry->entPhySensorOperStatus);
+    g_string_sprintfa(s, "Status: %s\n", label);
+    g_string_sprintfa(s, "Scale:  %d\n", *entSensorEntry->entPhySensorScale);
+    g_string_sprintfa(s, "Prec:   %d\n", *entSensorEntry->entPhySensorPrecision);
+    g_string_sprintfa(s, "Value:  %d\n", *entSensorEntry->entPhySensorValue);
+
+    g_string_sprintfa(s, "Units:  %.*s\n",
+		      (int) entSensorEntry->_entPhySensorUnitsDisplayLength,
+		      entSensorEntry->entPhySensorUnitsDisplay);
+    g_string_sprintfa(s, "Time:   %s\n",
+		      fmt_timeticks(*(entSensorEntry->entPhySensorValueTimeStamp)));
+    g_string_sprintfa(s, "Update: %u (milliseconds)\n",
+		      *entSensorEntry->entPhySensorValueUpdateRate);
 }
 
 
@@ -529,6 +548,14 @@ scli_init_entity_mode(scli_interp_t *interp)
 	  "entities in more detail.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
 	  "entities sensors", NULL,
+	  show_entity_sensors },
+
+	{ "monitor entity sensors", NULL,
+	  "The `monitor entity sensors' command shows the same\n"
+	  "information as the show entity sensors command. The \n"
+	  "information is updated periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
 	  show_entity_sensors },
 	
 #if 0

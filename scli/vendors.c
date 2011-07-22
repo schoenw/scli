@@ -54,6 +54,7 @@ static scli_vendor_t iana_vendor_table[] = {
     { 7313,	"1stWave",              "http://www.1stwave.de/" },
     { 8072,	"NET-SNMP",		"http://www.net-snmp.org/" },
     { 12622,	"Devicescape",		"http://www.devicescape.com/" },
+    { 30982,	"Jacobs University",	"http://www.jacobs-university.de/" },
     {    0,	NULL,			NULL },
 };
 
