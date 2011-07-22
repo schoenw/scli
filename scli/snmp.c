@@ -686,6 +686,29 @@ show_snmp_vacm_access(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
+xml_snmp_vacm_view(xmlNodePtr root,
+	   snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t *vacmViewEntry,
+		   int view_width)
+{
+    char const *type = NULL;
+    xmlNodePtr node, tree;
+
+    tree = xml_new_child(root, NULL, BAD_CAST("view"), NULL);
+
+    node = xml_new_child(tree, NULL, BAD_CAST("name"), "%.*s",
+			 (int) vacmViewEntry->_vacmViewTreeFamilyViewNameLength,
+			 vacmViewEntry->vacmViewTreeFamilyViewName);
+
+    node = xml_new_child(tree, NULL, BAD_CAST("subtree"), "");
+    
+    type = gnet_snmp_enum_get_label(view_tree_family_type,
+				    *vacmViewEntry->vacmViewTreeFamilyType);
+    node = xml_new_child(tree, NULL, BAD_CAST("type"), "%s", type); 
+}
+
+
+
+static void
 fmt_snmp_vacm_view(GString *s,
 	   snmp_view_based_acm_mib_vacmViewTreeFamilyEntry_t *vacmViewEntry,
 		   int view_width)
@@ -753,15 +776,21 @@ show_snmp_vacm_views(scli_interp_t *interp, int argc, char **argv)
     }
 
     if (vacmViewTable) {
-	for (i = 0; vacmViewTable[i]; i++) {
-	    if (vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength > view_width) {
-		view_width = vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength;
+	if (! scli_interp_xml(interp)) {
+	    for (i = 0; vacmViewTable[i]; i++) {
+		if (vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength > view_width) {
+		    view_width = vacmViewTable[i]->_vacmViewTreeFamilyViewNameLength;
+		}
 	    }
+	    g_string_sprintfa(interp->header, "ROW %-*s TYPE PREFIX",
+			      view_width, "VIEW");
 	}
-	g_string_sprintfa(interp->header, "ROW %-*s TYPE PREFIX",
-			  view_width, "VIEW");
 	for (i = 0; vacmViewTable[i]; i++) {
-	    fmt_snmp_vacm_view(interp->result, vacmViewTable[i], view_width);
+	    if (scli_interp_xml(interp)) {
+		xml_snmp_vacm_view(interp->xml_node, vacmViewTable[i], view_width);
+	    } else {
+		fmt_snmp_vacm_view(interp->result, vacmViewTable[i], view_width);
+	    }
 	}
     }
 
@@ -1205,17 +1234,16 @@ fmt_snmp_context(GString *s,
 			   (gchar *) logEntEntry->entLogicalContextName);
     }
 
-    if (logEntEntry->entLogicalTDomain && logEntEntry->_entLogicalTDomainLength
-	&& logEntEntry->entLogicalTAddress && logEntEntry->_entLogicalTAddressLength) {
-	e = fmt_taddress(logEntEntry->entLogicalTDomain,
-			 logEntEntry->_entLogicalTDomainLength,
-			 logEntEntry->entLogicalTAddress,
-			 logEntEntry->_entLogicalTAddressLength);
-	g_string_sprintfa(s, "%-*s%s", indent, "Address:", e ? e : "?");
-	e = fmt_tdomain(logEntEntry->entLogicalTDomain,
-			logEntEntry->_entLogicalTDomainLength);
-	g_string_sprintfa(s, " (%s)\n", e ? e : "");
-    }
+    e = fmt_tdomain(logEntEntry->entLogicalTDomain,
+		    logEntEntry->_entLogicalTDomainLength);
+    g_string_sprintfa(s, "%-*s%s:", indent, "Transport:", e ? e : "?");
+
+    e = fmt_taddress(logEntEntry->entLogicalTDomain,
+		     logEntEntry->_entLogicalTDomainLength,
+		     logEntEntry->entLogicalTAddress,
+		     logEntEntry->_entLogicalTAddressLength);
+    g_string_sprintfa(s, "%-*s", 32, e ? e : "?");
+    g_string_sprintfa(s, "\n");
 }
 
 
@@ -1788,8 +1816,8 @@ scli_init_snmp_mode(scli_interp_t *interp)
 	  "  VIEW   view name\n"
 	  "  TYPE   access to the view subtree (incl/excl)\n"
 	  "  PREFIX object identifier wildcard prefix",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
-	  NULL, NULL,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "snmp views", NULL,
 	  show_snmp_vacm_views },
 
 	{ "show snmp usm users", NULL,

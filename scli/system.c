@@ -1653,7 +1653,7 @@ check_system_contact(scli_interp_t *interp, int argc, char **argv)
 	    g_string_sprintfa(interp->result,
 			      "System contact is a zero-length string and "
 			      "should be configured to include at least an "
-			      "email address.\n\n");
+			      "email address.\n");
 	}
 	if (regex_contact) {
 	    char *s = g_strdup_printf("%.*s",
@@ -1664,7 +1664,7 @@ check_system_contact(scli_interp_t *interp, int argc, char **argv)
 	    if (status != 0) {
 		g_string_sprintfa(interp->result,
 				  "System contact `%.*s' does not match the "
-				  "regular expression `%s'.\n\n",
+				  "regular expression `%s'.\n",
 				  (int) system->_sysContactLength,
 				  system->sysContact, argv[1]);
 	    }
@@ -1725,7 +1725,7 @@ check_system_storage(scli_interp_t *interp, int argc, char **argv)
 		percentage = storage_size ? storage_used * 100 / storage_size : 0;
 		if (percentage > 90) {
 		    g_string_sprintfa(interp->result,
-			      "Storage #%d (%.*s) is %3.1f%% (> 90%%) filled\n\n",
+			      "Storage #%d (%.*s) is %3.1f%% (> 90%%) filled\n",
 			      hrStorageTable[i]->hrStorageIndex,
 			      hrStorageTable[i]->_hrStorageDescrLength,
 			      hrStorageTable[i]->hrStorageDescr,
@@ -1796,7 +1796,7 @@ check_system_process(scli_interp_t *interp, int argc, char **argv)
 	if (cnt < min || cnt > max) {
 	    g_string_sprintfa(interp->result,
 		  "Number of processes (%d) matching the regular "
-	          "expression `%s' does not match the bound %u*%u.\n\n",
+	          "expression `%s' does not match the bound %u*%u.\n",
 			      cnt, argv[1], min, max);
 	}
     }
@@ -1972,6 +1972,14 @@ scli_init_system_mode(scli_interp_t *interp)
 	  "information as the show system storage command. The\n"
 	  "information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_system_storage },
+
+	{ "loop system storage", NULL,
+	  "The `loop system storage' command shows the same\n"
+	  "information as the show system storage command. The\n"
+	  "information is updated periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_LOOP | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_system_storage },
 
