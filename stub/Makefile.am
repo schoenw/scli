@@ -46,7 +46,9 @@ MIBS			= IF-MIB \
 			  UCD-SNMP-MIB \
 			  PRODUCTMIB \
 			  CISCO-DOT11-ASSOCIATION-MIB \
-			  SFLOW5-MIB
+			  SFLOW5-MIB \
+			  JACOBS-RPL-MIB \
+			  IANA-RTPROTO-MIB
 
 STUBS			= if-mib.h if-mib.c \
 			  ianaiftype-mib.h ianaiftype-mib.c \
@@ -97,7 +99,9 @@ STUBS			= if-mib.h if-mib.c \
 			  cisco-process-mib.h cisco-process-mib.c \
 			  cisco-dot11-association-mib.h cisco-dot11-association-mib.c \
 			  hp-icf-fault-finder-mib.h hp-icf-fault-finder-mib.c \
-			  sflow5-mib.h sflow5-mib.c
+			  sflow5-mib.h sflow5-mib.c \
+			  jacobs-rpl-mib.h jacobs-rpl-mib.c \
+			  iana-rtproto-mib.c
 
 MAINTAINERCLEANFILES	= $(STUBS)
 
@@ -256,3 +260,9 @@ hp-icf-fault-finder-mib.h hp-icf-fault-finder-mib.c:
 
 sflow5-mib.h sflow5-mib.c:
 	$(SMIDUMP) -f scli SFLOW5-MIB
+
+jacobs-rpl-mib.h jacobs-rpl-mib.c:
+	$(SMIDUMP) -f scli JACOBS-RPL-MIB
+
+iana-rtproto-mib.h iana-rtproto-mib.c:
+	$(SMIDUMP) -f scli IANA-RTPROTO-MIB
