@@ -37,6 +37,7 @@
 #ifdef HAVE_NETINET_ETHER_H
 #include <netinet/ether.h>
 #endif
+#include <arpa/inet.h>
 
 
 
@@ -839,23 +840,36 @@ fmt_inet_address(gint32 *inetAddressType,
 
     switch (*inetAddressType) {
     case INET_ADDRESS_MIB_INETADDRESSTYPE_UNKNOWN:
+	g_warning("unknown inet address type");
 	break;
     case INET_ADDRESS_MIB_INETADDRESSTYPE_IPV4:
 	if (_inetAddressLength == 4) {
-	    e = g_strdup_printf("%d.%d.%d.%d",
-				inetAddress[0], inetAddress[1],
-				inetAddress[2], inetAddress[3]);
+	    char buffer[INET_ADDRSTRLEN];
+	    if (inet_ntop(AF_INET, inetAddress, buffer, sizeof(buffer))) {
+		e = g_strdup(buffer);
+	    }
 	} else {
-	    g_warning("invalid inet address value");
+	    g_warning("invalid ipv4 address value");
 	}
 	break;
     case INET_ADDRESS_MIB_INETADDRESSTYPE_IPV6:
+	if (_inetAddressLength == 16) {
+	    char buffer[INET6_ADDRSTRLEN];
+	    if (inet_ntop(AF_INET6, inetAddress, buffer, sizeof(buffer))) {
+		e = g_strdup(buffer);
+	    }
+	} else {
+	    g_warning("invalid ipv6 address value");
+	}
 	break;
     case INET_ADDRESS_MIB_INETADDRESSTYPE_IPV4Z:
+	g_warning("code missing to handle ipv4z address type");
 	break;
     case INET_ADDRESS_MIB_INETADDRESSTYPE_IPV6Z:
+	g_warning("code missing to handle ipv6z address type");
 	break;
     case INET_ADDRESS_MIB_INETADDRESSTYPE_DNS:
+	g_warning("code missing to handle dns address type");
 	break;
     default:
 	g_warning("unknown inet address type");

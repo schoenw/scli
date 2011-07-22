@@ -29,6 +29,7 @@
 #include "if-mib.h"
 #include "rfc1213-mib.h"
 #include "ianaiftype-mib.h"
+#include "inet-address-mib.h"
 
 #include "ianaiftype-mib-proc.h"
 
@@ -62,6 +63,83 @@ get_if_name_width(if_mib_ifXEntry_t **ifXTable)
 }
 
 
+static void
+fmt_route_if(GString *s, gint32 *ifIndex,
+	     if_mib_ifXEntry_t **ifXTable,
+	     if_mib_ifEntry_t **ifTable)
+{
+    int i;
+    
+    if (ifIndex) {
+	g_string_sprintfa(s, "%2d", *ifIndex);
+	if (ifXTable) {
+	    for (i = 0; ifXTable[i]; i++) {
+		if (ifXTable[i]->ifIndex == *ifIndex
+		    && ifXTable[i]->ifName) {
+		    g_string_sprintfa(s, " (%.*s)",
+				      (int) ifXTable[i]->_ifNameLength,
+				      ifXTable[i]->ifName);
+		    break;
+		}
+	    }
+	} else if (ifTable) {
+	    for (i = 0; ifTable[i]; i++) {
+		if (ifTable[i]->ifIndex == *ifIndex
+		    && ifTable[i]->ifDescr) {
+		    g_string_sprintfa(s, " (%.*s)",
+				      (int) ifTable[i]->_ifDescrLength,
+				      ifTable[i]->ifDescr);
+		    break;
+		}
+	    }
+	}
+    }
+    g_string_append(s, "\n");
+}
+
+
+
+static void
+fmt_inet_route(GString *s,
+	       ip_forward_mib_inetCidrRouteEntry_t *inetCidrRouteEntry,
+	       if_mib_ifXEntry_t **ifXTable,
+	       if_mib_ifEntry_t **ifTable)
+{
+    const char *label;
+    int pos;
+
+    label = fmt_inet_address(&inetCidrRouteEntry->inetCidrRouteDestType,
+			     inetCidrRouteEntry->inetCidrRouteDest,
+			     inetCidrRouteEntry->_inetCidrRouteDestLength);
+    g_string_sprintfa(s, "%s/%u%n", label ? label : "?",
+		      inetCidrRouteEntry->inetCidrRoutePfxLen, &pos);
+    g_string_sprintfa(s, "%*s", MAX(20-pos, 1), "");
+
+    label = fmt_inet_address(&inetCidrRouteEntry->inetCidrRouteNextHopType,
+			     inetCidrRouteEntry->inetCidrRouteNextHop,
+			     inetCidrRouteEntry->_inetCidrRouteNextHopLength);
+    g_string_sprintfa(s, "%s%n", label ? label : "?", &pos);
+    g_string_sprintfa(s, "%*s", MAX(20-pos, 1), "");
+    
+    label = NULL;
+    if (inetCidrRouteEntry->inetCidrRouteType) {
+	label = gnet_snmp_enum_get_label(ip_forward_mib_enums_inetCidrRouteType,
+					 *inetCidrRouteEntry->inetCidrRouteType);
+    }
+    g_string_sprintfa(s, "%-10s", label ? label : "");
+    
+    label = NULL;
+    if (inetCidrRouteEntry->inetCidrRouteProto) {
+	label = gnet_snmp_enum_get_label(ip_forward_mib_enums_ipCidrRouteProto,
+					 *inetCidrRouteEntry->inetCidrRouteProto);
+    }
+    g_string_sprintfa(s, "%-10s", label ? label : "");
+
+    fmt_route_if(s, inetCidrRouteEntry->inetCidrRouteIfIndex,
+		 ifXTable, ifTable);
+}
+
+
 
 static void
 fmt_ip_forward(GString *s,
@@ -70,7 +148,7 @@ fmt_ip_forward(GString *s,
 	       if_mib_ifEntry_t **ifTable)
 {
     const char *label;
-    int i, pos;
+    int pos;
     
     if (ipCidrRouteEntry->ipCidrRouteIfIndex) {
 	g_string_sprintfa(s, "%s/%s%n",
@@ -99,30 +177,8 @@ fmt_ip_forward(GString *s,
 	}
 	g_string_sprintfa(s, "%-10s", label ? label : "");
 
-	g_string_sprintfa(s, "%2d", *ipCidrRouteEntry->ipCidrRouteIfIndex);
-
-	if (ifXTable) {
-	    for (i = 0; ifXTable[i]; i++) {
-		if (ifXTable[i]->ifIndex == *ipCidrRouteEntry->ipCidrRouteIfIndex
-		    && ifXTable[i]->ifName) {
-		    g_string_sprintfa(s, " (%.*s)",
-				      (int) ifXTable[i]->_ifNameLength,
-				      ifXTable[i]->ifName);
-		    break;
-		}
-	    }
-	} else if (ifTable) {
-	    for (i = 0; ifTable[i]; i++) {
-		if (ifTable[i]->ifIndex == *ipCidrRouteEntry->ipCidrRouteIfIndex
-		    && ifTable[i]->ifDescr) {
-		    g_string_sprintfa(s, " (%.*s)",
-				      (int) ifTable[i]->_ifDescrLength,
-				      ifTable[i]->ifDescr);
-		    break;
-		}
-	    }
-	}
-	g_string_append(s, "\n");
+	fmt_route_if(s, ipCidrRouteEntry->ipCidrRouteIfIndex,
+		     ifXTable, ifTable);
     }
 }
 
@@ -135,7 +191,7 @@ fmt_ip_route(GString *s,
 	     if_mib_ifEntry_t **ifTable)
 {
     const char *label;
-    int i, pos;
+    int pos;
     
     if (ipRouteEntry->ipRouteDest
 	&& ipRouteEntry->ipRouteNextHop
@@ -167,30 +223,8 @@ fmt_ip_route(GString *s,
 	}
 	g_string_sprintfa(s, "%-10s", label ? label : "");
 
-	g_string_sprintfa(s, "%2d", *ipRouteEntry->ipRouteIfIndex);
-
-	if (ifXTable) {
-	    for (i = 0; ifXTable[i]; i++) {
-		if (ifXTable[i]->ifIndex == *ipRouteEntry->ipRouteIfIndex
-		    && ifXTable[i]->ifName) {
-		    g_string_sprintfa(s, " (%.*s)",
-				      (int) ifXTable[i]->_ifNameLength,
-				      ifXTable[i]->ifName);
-		    break;
-		}
-	    }
-	} else if (ifTable) {
-	    for (i = 0; ifTable[i]; i++) {
-		if (ifTable[i]->ifIndex == *ipRouteEntry->ipRouteIfIndex
-		    && ifTable[i]->ifDescr) {
-		    g_string_sprintfa(s, " (%.*s)",
-				      (int) ifTable[i]->_ifDescrLength,
-				      ifTable[i]->ifDescr);
-		    break;
-		}
-	    }
-	}
-	g_string_append(s, "\n");
+	fmt_route_if(s, ipRouteEntry->ipRouteIfIndex,
+		     ifXTable, ifTable);
     }
 }
 
@@ -199,6 +233,7 @@ fmt_ip_route(GString *s,
 static int
 show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 {
+    ip_forward_mib_inetCidrRouteEntry_t **inetCidrRouteTable = NULL;
     ip_forward_mib_ipCidrRouteEntry_t **ipCidrRouteTable = NULL;
     rfc1213_mib_ipRouteEntry_t **ipRouteTable = NULL;
     if_mib_ifEntry_t **ifTable = NULL;
@@ -216,20 +251,28 @@ show_ip_forwarding(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    ip_forward_mib_get_ipCidrRouteTable(interp->peer, &ipCidrRouteTable, 0, &error);
-    if (error || interp->peer->error_status || !ipCidrRouteTable) {
-	rfc1213_mib_get_ipRouteTable(interp->peer, &ipRouteTable, RFC1213_MIB_IPROUTE_MASK, &error);
-	if (scli_interp_set_error_snmp(interp, &error)) {
-	    return SCLI_SNMP;
+    ip_forward_mib_get_inetCidrRouteTable(interp->peer, &inetCidrRouteTable, 0, &error);
+    if (error || interp->peer->error_status || !inetCidrRouteTable) {
+	ip_forward_mib_get_ipCidrRouteTable(interp->peer, &ipCidrRouteTable, 0, &error);
+	if (error || interp->peer->error_status || !ipCidrRouteTable) {
+	    rfc1213_mib_get_ipRouteTable(interp->peer, &ipRouteTable, RFC1213_MIB_IPROUTE_MASK, &error);
+	    if (scli_interp_set_error_snmp(interp, &error)) {
+		return SCLI_SNMP;
+	    }
 	}
     }
 
-    if (ipCidrRouteTable || ipRouteTable) {
+    if (inetCidrRouteTable || ipCidrRouteTable || ipRouteTable) {
 	if_mib_get_ifTable(interp->peer, &ifTable, IF_MIB_IFDESCR, NULL);
 	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFNAME, NULL);
 	g_string_sprintfa(interp->header, "%-20s TOS %-16s%-10s%-10s%s",
 		  "DESTINATION", "NEXT-HOP", "TYPE", "PROTO", "INTERFACE");
-	if (ipCidrRouteTable) {
+	if (inetCidrRouteTable) {
+	    for (i = 0; inetCidrRouteTable[i]; i++) {
+		fmt_inet_route(interp->result, inetCidrRouteTable[i],
+			       ifXTable, ifTable);
+	    }
+	} else if (ipCidrRouteTable) {
 	    for (i = 0; ipCidrRouteTable[i]; i++) {
 		fmt_ip_forward(interp->result, ipCidrRouteTable[i],
 			       ifXTable, ifTable);
@@ -263,12 +306,12 @@ xml_ip_address(xmlNodePtr root, ip_mib_ipAddrEntry_t *ipAddrEntry)
     char *name;
 
     tree = xml_new_child(root, NULL, BAD_CAST("address"), NULL);
-    xml_set_prop(tree, BAD_CAST("address"),
+    xml_set_prop(tree, BAD_CAST("address"), "%s",
 		 fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_ADDR));
     xml_set_prop(tree, BAD_CAST("type"), "ipv4");
 
     if (ipAddrEntry->ipAdEntNetMask) {
-	xml_set_prop(tree, BAD_CAST("prefix"),
+	xml_set_prop(tree, BAD_CAST("prefix"), "%s",
 		     fmt_ipv4_mask(ipAddrEntry->ipAdEntNetMask));
     }
 
@@ -279,7 +322,7 @@ xml_ip_address(xmlNodePtr root, ip_mib_ipAddrEntry_t *ipAddrEntry)
 
     name = fmt_ipv4_address(ipAddrEntry->ipAdEntAddr, SCLI_FMT_NAME);
     if (name) {
-	(void) xml_new_child(tree, NULL, BAD_CAST("name"), name);
+	(void) xml_new_child(tree, NULL, BAD_CAST("name"), "%s", name);
     }
 }
 
@@ -723,7 +766,7 @@ show_ip_info(scli_interp_t *interp, int argc, char **argv)
 
     if (scli_interp_xml(interp)) {
 	xxx_ip_info(interp->result, interp->xml_node);
-	g_printerr(interp->result->str);
+	g_printerr("%s", interp->result->str);
     }
 
     if (ip) ip_mib_free_ip(ip);
