@@ -23,7 +23,7 @@
 #include "scli.h"
 
 #include "sflow5-mib.h"
-
+#include "sflow5-mib-proc.h"
 
 
 static int
@@ -77,11 +77,15 @@ static void
 fmt_sflow_receiver(GString *s, sflow5_mib_sFlowRcvrEntry_t *rcvrEntry)
 {
     const char *e;
+    int const indent = 20;
     
-    g_string_sprintfa(s, "sFlow Rcvr Index: %d\n", rcvrEntry->sFlowRcvrIndex);
+    g_string_sprintfa(s, "%-*s%d\n",
+		      indent, "sFlow Rcvr Index:",
+		      rcvrEntry->sFlowRcvrIndex);
 
     if (rcvrEntry->sFlowRcvrOwner) {
-	g_string_sprintfa(s, "sFlow Rcvr Owner: %.*s\n",
+	g_string_sprintfa(s, "%-*s%.*s\n",
+			  indent, "sFlow Rcvr Owner:",
 			  rcvrEntry->_sFlowRcvrOwnerLength,
 			  rcvrEntry->sFlowRcvrOwner);
     }
@@ -90,25 +94,30 @@ fmt_sflow_receiver(GString *s, sflow5_mib_sFlowRcvrEntry_t *rcvrEntry)
 			 rcvrEntry->sFlowRcvrAddress,
 			 rcvrEntry->_sFlowRcvrAddressLength);
     if (e) {
-	g_string_sprintfa(s, "sFlow Rcvr Addr: %s\n", e);
+	g_string_sprintfa(s, "%-*s%s\n",
+			  indent, "sFlow Rcvr Addr:", e);
     }
     if (rcvrEntry->sFlowRcvrPort) {
-	g_string_sprintfa(s, "sFlow Rcvr Port: %d\n",
+	g_string_sprintfa(s, "%-*s%d\n",
+			  indent, "sFlow Rcvr Port:",
 			  *rcvrEntry->sFlowRcvrPort);
     }
 
     if (rcvrEntry->sFlowRcvrDatagramVersion) {
-	g_string_sprintfa(s, "sFlow Rcvr Version: %d\n",
+	g_string_sprintfa(s, "%-*s%d\n",
+			  indent, "sFlow Rcvr Version:",
 			  *rcvrEntry->sFlowRcvrDatagramVersion);
     }
     
     if (rcvrEntry->sFlowRcvrTimeout) {
-	g_string_sprintfa(s, "sFlow Rcvr Timeout: %d [seconds]\n",
+	g_string_sprintfa(s, "%-*s%d [seconds]\n",
+			  indent, "sFlow Rcvr Timeout:",
 			  *rcvrEntry->sFlowRcvrTimeout);
     }
 
     if (rcvrEntry->sFlowRcvrMaximumDatagramSize) {
-	g_string_sprintfa(s, "sFlow Rcvr MaxSize: %d [bytes]\n",
+	g_string_sprintfa(s, "%-*s%d [bytes]\n",
+			  indent, "sFlow Rcvr MaxSize:",
 			  *rcvrEntry->sFlowRcvrMaximumDatagramSize);
     }
 }
@@ -119,7 +128,6 @@ static int
 show_sflow_receiver(scli_interp_t *interp, int argc, char **argv)
 {
     sflow5_mib_sFlowRcvrEntry_t **rcvrEntry = NULL;
-    int const indent = 17;
     int i, c;
     GError *error = NULL;
 
@@ -152,6 +160,30 @@ show_sflow_receiver(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+create_sflow_receiver(scli_interp_t *interp, int argc, char **argv)
+{
+    GError *error = NULL;
+    
+    sflow5_mib_proc_create_receiver(interp->peer, "nase", 42, 11, 22, 33, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
+	return SCLI_SNMP;
+    }
+    return SCLI_OK;
+}
+
+
+
+static int
+delete_sflow_receiver(scli_interp_t *interp, int argc, char **argv)
+{
+    // retrieve receiver, search owner matching regex (arg1), if
+    // present check matching address regex (arg2), call delete proc
+    // for each match
+}
+
+
+
 void
 scli_init_sflow_mode(scli_interp_t *interp)
 {
@@ -174,6 +206,12 @@ scli_init_sflow_mode(scli_interp_t *interp)
 	/* show sflow source */
 
 	/* show sflow */
+
+	{ "create sflow receiver", NULL,
+	  "xxx",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  "sflow", NULL,
+	  create_sflow_receiver },
 	
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
