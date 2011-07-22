@@ -668,6 +668,47 @@ show_ip_mapping(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static int
+create_ip_mapping(scli_interp_t *interp, int argc, char **argv)
+{
+    ip_mib_ipNetToMediaEntry_t *ipNetToMediaEntry = NULL;
+    gint32 type = IP_MIB_IPNETTOMEDIATYPE_STATIC;
+    GError *error = NULL;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 4) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    ipNetToMediaEntry = ip_mib_new_ipNetToMediaEntry();
+    if (! ipNetToMediaEntry) {
+	return SCLI_ERROR;
+    }
+
+    ipNetToMediaEntry->ipNetToMediaIfIndex = 42;
+    memcpy(ipNetToMediaEntry->ipNetToMediaNetAddress, "gaga",
+	   IP_MIB_IPNETTOMEDIANETADDRESSLENGTH);
+    ipNetToMediaEntry->ipNetToMediaPhysAddress = "deadbeef";
+    ipNetToMediaEntry->_ipNetToMediaPhysAddressLength = 8;
+    ipNetToMediaEntry->ipNetToMediaType = &type;
+
+    ip_mib_set_ipNetToMediaEntry(interp->peer, ipNetToMediaEntry, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
+	return SCLI_SNMP;
+    }
+
+    if (ipNetToMediaEntry) ip_mib_free_ipNetToMediaEntry(ipNetToMediaEntry);
+    
+    return SCLI_OK;
+}
+
+
+
 static void
 fmt_ip_info(GString *s, ip_mib_ip_t *ip)
 {
@@ -969,6 +1010,13 @@ scli_init_ip_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_ip_mapping },
+
+	{ "create ip mapping", "<interface> <ip> <mac>",
+	  "The `create ip mapping' command creates a mapping of an IP\n"
+	  "address to a lower layer address (e.g., IEEE 802 addresses).",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  create_ip_mapping },
 	
 	{ "dump ip", NULL,
 	  "The `dump ip' command generates a sequence of scli commands\n"
