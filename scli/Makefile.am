@@ -10,7 +10,7 @@ scli_SOURCES	= scli.c scli.h scli.1 vendors.c \
 		  system.c entity.c interface.c disman.c snmp.c \
 		  ip.c udp.c tcp.c \
 		  bridge.c atm.c ether.c \
-		  ospf.c printer.c \
+		  ospf.c rpl.c printer.c \
 		  isdn.c rs232.c sonet.c \
 		  cisco.c nortel.c netsnmp.c 3com.c hp.c sflow.c
 

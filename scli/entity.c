@@ -138,7 +138,7 @@ show_entity_containment(scli_interp_t *interp, int argc, char **argv)
 
 
 static void
-fmt_entity_sensors(GString *s,
+fmt_entity_sensors_details(GString *s,
 		   entity_sensor_mib_entPhySensorEntry_t *entSensorEntry)
 {
     const char *label;
@@ -166,8 +166,38 @@ fmt_entity_sensors(GString *s,
 
 
 
+static void
+fmt_entity_sensors_info(GString *s,
+		   entity_sensor_mib_entPhySensorEntry_t *entSensorEntry)
+{
+    const char *label;
+    
+    g_string_sprintfa(s, "%6d ", entSensorEntry->entPhysicalIndex);
+
+    label = fmt_enum(entity_sensor_mib_enums_EntitySensorStatus,
+		     entSensorEntry->entPhySensorOperStatus);
+    g_string_sprintfa(s, "%6s ", label ? label : "?");
+
+    label = fmt_enum(entity_sensor_mib_enums_EntitySensorDataType,
+		     entSensorEntry->entPhySensorType);
+    g_string_sprintfa(s, "%-8s ", label ? label : "?");
+    g_string_sprintfa(s, "%10d ", *entSensorEntry->entPhySensorValue);
+    g_string_sprintfa(s, "%-7.*s ",
+		      (int) entSensorEntry->_entPhySensorUnitsDisplayLength,
+		      entSensorEntry->entPhySensorUnitsDisplay);
+    g_string_sprintfa(s, "%s\n",
+		      fmt_timeticks(*(entSensorEntry->entPhySensorValueTimeStamp)));
+
+#if 0
+    g_string_sprintfa(s, "Scale:  %d\n", *entSensorEntry->entPhySensorScale);
+    g_string_sprintfa(s, "Update: %u (milliseconds)\n",
+		      *entSensorEntry->entPhySensorValueUpdateRate);
+#endif
+}
+
+
 static int
-show_entity_sensors(scli_interp_t *interp, int argc, char **argv)
+show_entity_sensors_details(scli_interp_t *interp, int argc, char **argv)
 {
     entity_sensor_mib_entPhySensorEntry_t **entSensorTable = NULL;
     int i;
@@ -190,7 +220,44 @@ show_entity_sensors(scli_interp_t *interp, int argc, char **argv)
 
     if (entSensorTable) {
 	for (i = 0; entSensorTable[i]; i++) {
-	    fmt_entity_sensors(interp->result, entSensorTable[i]);
+	    fmt_entity_sensors_details(interp->result, entSensorTable[i]);
+	}
+    }
+
+    if (entSensorTable) entity_sensor_mib_free_entPhySensorTable(entSensorTable);
+    
+    return SCLI_OK;
+}
+
+
+
+static int
+show_entity_sensors_info(scli_interp_t *interp, int argc, char **argv)
+{
+    entity_sensor_mib_entPhySensorEntry_t **entSensorTable = NULL;
+    int i;
+    GError *error = NULL;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    entity_sensor_mib_get_entPhySensorTable(interp->peer, &entSensorTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
+	return SCLI_SNMP;
+    }
+
+    if (entSensorTable) {
+      g_string_sprintfa(interp->header,
+			"SENSOR STATUS TYPE          VALUE UNIT    TIMESTAMP");
+	for (i = 0; entSensorTable[i]; i++) {
+	    fmt_entity_sensors_info(interp->result, entSensorTable[i]);
 	}
     }
 
@@ -543,12 +610,19 @@ scli_init_entity_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_entity_containment },
 
-	{ "show entity sensors ", NULL,
-	  "The `show entity sensors' command describes the physical sensor\n"
-	  "entities in more detail.",
+	{ "show entity sensor details ", NULL,
+	  "The `show entity sensor details' command describes the physical\n"
+	  "sensor entities in more detail.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
-	  "entities sensors", NULL,
-	  show_entity_sensors },
+	  "entities sensor details", NULL,
+	  show_entity_sensors_details },
+
+	{ "show entity sensor info ", NULL,
+	  "The `show entity sensor details' command shows compact information\n"
+	  "about physical sensor entities.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_XML | SCLI_CMD_FLAG_DRY,
+	  "entities sensor info", NULL,
+	  show_entity_sensors_info },
 
 	{ "monitor entity sensors", NULL,
 	  "The `monitor entity sensors' command shows the same\n"
@@ -556,7 +630,7 @@ scli_init_entity_mode(scli_interp_t *interp)
 	  "information is updated periodically.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  show_entity_sensors },
+	  show_entity_sensors_info },
 	
 #if 0
 	{ "set entity serial", NULL,

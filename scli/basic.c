@@ -340,6 +340,7 @@ void scli_interp_init(scli_interp_t *interp)
     scli_init_atm_mode(interp);
     scli_init_ether_mode(interp);
     scli_init_ospf_mode(interp);
+    scli_init_rpl_mode(interp);
     scli_init_printer_mode(interp);
     scli_init_isdn_mode(interp);
     scli_init_rs232_mode(interp);
