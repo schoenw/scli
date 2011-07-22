@@ -404,6 +404,9 @@ scli_init_hp_mode(scli_interp_t *interp);
 extern void
 scli_init_sflow_mode(scli_interp_t *interp);
 
+extern void
+scli_init_rpl_mode(scli_interp_t *interp);
+
 /* 
  * A data structure used to obtain vendor information from the
  * enterprise OID. See the file vendors.c for details.
@@ -478,6 +481,9 @@ fmt_ipv4_address(guchar *addr, int flags);
 
 extern char*
 fmt_ipv4_mask(guchar *addr);
+
+extern char*
+fmt_ipv6_address(guchar *addr, int flags);
 
 extern char*
 fmt_ether_address(guchar *addr, int flags);

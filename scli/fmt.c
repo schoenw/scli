@@ -466,6 +466,33 @@ fmt_ipv4_mask(guchar *addr)
 }
 
 
+char*
+fmt_ipv6_address(guchar *addr, int flags)
+{
+    static char buffer[INET6_ADDRSTRLEN];
+    struct hostent *h;
+
+    if (flags & SCLI_FMT_NAME) {
+	if (! addr[0] && ! addr[1] && ! addr[2] && ! addr[3] &&
+	    ! addr[4] && ! addr[5] && ! addr[6] && ! addr[7] &&
+	    ! addr[8] && ! addr[9] && ! addr[10] && ! addr[11] &&
+	    ! addr[12] && ! addr[13] && ! addr[14] && ! addr[15]) {
+	    return "*";
+	}
+	h = gethostbyaddr((char *) addr, 16, AF_INET6);
+	if (h) {
+	    return h->h_name;
+	}
+    }
+    if (flags & SCLI_FMT_ADDR) {
+	inet_ntop(AF_INET6, addr, buffer, sizeof(buffer));
+	return buffer;
+    }
+    return NULL;
+}
+
+
+
 char *
 fmt_ether_address(guchar *addr, int flags)
 {
