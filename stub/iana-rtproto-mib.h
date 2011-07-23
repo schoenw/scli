@@ -15,6 +15,9 @@
  *   will be selected by the IESG Area Director(s) of the Routing
  *   Area.
  *
+ * Revision 2011-07-22 00:00:
+ *   Added rpl(18) .
+ *
  * Revision 2000-09-26 00:00:
  *   Original version, published in coordination
  *   with RFC 2932.
@@ -50,6 +53,7 @@ G_BEGIN_DECLS
 #define IANA_RTPROTO_MIB_IANAIPROUTEPROTOCOL_IDPR       15
 #define IANA_RTPROTO_MIB_IANAIPROUTEPROTOCOL_CISCOEIGRP 16
 #define IANA_RTPROTO_MIB_IANAIPROUTEPROTOCOL_DVMRP      17
+#define IANA_RTPROTO_MIB_IANAIPROUTEPROTOCOL_RPL        18
 
 extern GNetSnmpEnum const iana_rtproto_mib_enums_IANAipRouteProtocol[];
 

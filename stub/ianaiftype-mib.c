@@ -7,6 +7,45 @@
  *   Convention, and thus the enumerated values of
  *   the ifType object defined in MIB-II's ifTable.
  *
+ * Revision 2011-07-22 00:00:
+ *   Registration of new IANAifType 259.
+ *
+ * Revision 2011-06-03 00:00:
+ *   Registration of new IANAifType 258.
+ *
+ * Revision 2010-09-21 00:00:
+ *   Registration of new IANAifTypes 256 and 257.
+ *
+ * Revision 2010-07-21 00:00:
+ *   Registration of new IANAifType 255.
+ *
+ * Revision 2010-02-11 00:00:
+ *   Registration of new IANAifType 254.
+ *
+ * Revision 2010-02-08 00:00:
+ *   Registration of new IANAifTypes 252 and 253.
+ *
+ * Revision 2009-05-06 00:00:
+ *   Registration of new IANAifType 251.
+ *
+ * Revision 2009-02-06 00:00:
+ *   Registration of new IANAtunnelType 15.
+ *
+ * Revision 2008-10-09 00:00:
+ *   Registration of new IANAifType 250.
+ *
+ * Revision 2008-08-12 00:00:
+ *   Registration of new IANAifType 249.
+ *
+ * Revision 2008-07-22 00:00:
+ *   Registration of new IANAifTypes 247 and 248.
+ *
+ * Revision 2008-06-24 00:00:
+ *   Registration of new IANAifType 246.
+ *
+ * Revision 2008-05-29 00:00:
+ *   Registration of new IANAifType 245.
+ *
  * Revision 2007-09-13 00:00:
  *   Registration of new IANAifTypes 243 and 244.
  *
@@ -331,7 +370,7 @@ GNetSnmpEnum const ianaiftype_mib_enums_IANAifType[] = {
     { IANAIFTYPE_MIB_IANAIFTYPE_V37,                           "v37" },
     { IANAIFTYPE_MIB_IANAIFTYPE_X25MLP,                        "x25mlp" },
     { IANAIFTYPE_MIB_IANAIFTYPE_X25HUNTGROUP,                  "x25huntGroup" },
-    { IANAIFTYPE_MIB_IANAIFTYPE_TRASNPHDLC,                    "trasnpHdlc" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_TRANSPHDLC,                    "transpHdlc" },
     { IANAIFTYPE_MIB_IANAIFTYPE_INTERLEAVE,                    "interleave" },
     { IANAIFTYPE_MIB_IANAIFTYPE_FAST,                          "fast" },
     { IANAIFTYPE_MIB_IANAIFTYPE_IP,                            "ip" },
@@ -453,6 +492,21 @@ GNetSnmpEnum const ianaiftype_mib_enums_IANAifType[] = {
     { IANAIFTYPE_MIB_IANAIFTYPE_X86LAPS,                       "x86Laps" },
     { IANAIFTYPE_MIB_IANAIFTYPE_WWANPP,                        "wwanPP" },
     { IANAIFTYPE_MIB_IANAIFTYPE_WWANPP2,                       "wwanPP2" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_VOICEEBS,                      "voiceEBS" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_IFPWTYPE,                      "ifPwType" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_ILAN,                          "ilan" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_PIP,                           "pip" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_ALUELP,                        "aluELP" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_GPON,                          "gpon" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_VDSL2,                         "vdsl2" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_CAPWAPDOT11PROFILE,            "capwapDot11Profile" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_CAPWAPDOT11BSS,                "capwapDot11Bss" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_CAPWAPWTPVIRTUALRADIO,         "capwapWtpVirtualRadio" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_BITS,                          "bits" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_DOCSCABLEUPSTREAMRFPORT,       "docsCableUpstreamRfPort" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_CABLEDOWNSTREAMRFPORT,         "cableDownstreamRfPort" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_VMWAREVIRTUALNIC,              "vmwareVirtualNic" },
+    { IANAIFTYPE_MIB_IANAIFTYPE_IEEE802154,                    "ieee802154" },
     { 0, NULL }
 };
 
@@ -471,6 +525,7 @@ GNetSnmpEnum const ianaiftype_mib_enums_IANAtunnelType[] = {
     { IANAIFTYPE_MIB_IANATUNNELTYPE_SIXOVERFOUR, "sixOverFour" },
     { IANAIFTYPE_MIB_IANATUNNELTYPE_ISATAP,      "isatap" },
     { IANAIFTYPE_MIB_IANATUNNELTYPE_TEREDO,      "teredo" },
+    { IANAIFTYPE_MIB_IANATUNNELTYPE_IPHTTPS,     "ipHttps" },
     { 0, NULL }
 };
 
