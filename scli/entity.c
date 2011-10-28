@@ -21,6 +21,7 @@
  */
 
 #include "scli.h"
+#include <math.h>
 
 #include "snmpv2-tc.h"
 #include "entity-mib.h"
@@ -181,7 +182,13 @@ fmt_entity_sensors_info(GString *s,
     label = fmt_enum(entity_sensor_mib_enums_EntitySensorDataType,
 		     entSensorEntry->entPhySensorType);
     g_string_sprintfa(s, "%-8s ", label ? label : "?");
-    g_string_sprintfa(s, "%10d ", *entSensorEntry->entPhySensorValue);
+    if (*entSensorEntry->entPhySensorPrecision <= 0) {
+	g_string_sprintfa(s, "%10d ",
+			  *entSensorEntry->entPhySensorValue);
+    } else {
+	g_string_sprintfa(s, "%10.*f ", *entSensorEntry->entPhySensorPrecision,
+			  *entSensorEntry->entPhySensorValue/pow(10,*entSensorEntry->entPhySensorPrecision));
+    }
     g_string_sprintfa(s, "%-7.*s ",
 		      (int) entSensorEntry->_entPhySensorUnitsDisplayLength,
 		      entSensorEntry->entPhySensorUnitsDisplay);
@@ -220,6 +227,7 @@ show_entity_sensors_details(scli_interp_t *interp, int argc, char **argv)
 
     if (entSensorTable) {
 	for (i = 0; entSensorTable[i]; i++) {
+	    if (i) g_string_append(interp->result, "\n");
 	    fmt_entity_sensors_details(interp->result, entSensorTable[i]);
 	}
     }
@@ -356,6 +364,9 @@ fmt_entity_details(GString *s, entity_mib_entPhysicalEntry_t *entPhysicalEntry)
     fmt_display_string(s, 8, "Descr:",
 		       (int) entPhysicalEntry->_entPhysicalDescrLength,
 		       (gchar *) entPhysicalEntry->entPhysicalDescr);
+    fmt_display_string(s, 8, "URIs:",
+		       (int) entPhysicalEntry->_entPhysicalUrisLength,
+		       (gchar *) entPhysicalEntry->entPhysicalUris);
 }
 
 
@@ -444,6 +455,11 @@ xml_entity_details(xmlNodePtr root,
 	(void) xml_new_child(tree, NULL, BAD_CAST("asset"), "%.*s",
 			     (int) entPhysicalEntry->_entPhysicalAssetIDLength,
 			     entPhysicalEntry->entPhysicalAssetID);
+    }
+    if (entPhysicalEntry->entPhysicalUris) {
+	(void) xml_new_child(tree, NULL, BAD_CAST("uris"), "%.*s",
+			     (int) entPhysicalEntry->_entPhysicalUrisLength,
+			     entPhysicalEntry->entPhysicalUris);
     }
 }
 
