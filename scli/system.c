@@ -405,7 +405,7 @@ xml_system_device(xmlNodePtr root,
 		     hrDeviceEntry->hrDeviceType,
 		     hrDeviceEntry->_hrDeviceDescrLength);
     if (e) {
-	(void) xml_new_child(tree, NULL, BAD_CAST("type"), e);
+	(void) xml_new_child(tree, NULL, BAD_CAST("type"), "%s", e);
     }
 	
     if (hrDeviceEntry->hrDeviceDescr && hrDeviceEntry->_hrDeviceDescrLength) {

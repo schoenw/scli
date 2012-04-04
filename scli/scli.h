@@ -322,12 +322,6 @@ scli_curses_off(void);
 extern int
 scli_set_pager(scli_interp_t *interp, const char *pager);
 
-extern int
-scli_set_retries(scli_interp_t *interp, const guint retries);
-
-extern int
-scli_set_timeout(scli_interp_t *interp, guint timeout);
-
 extern void
 scli_snmp_error(scli_interp_t *interp);
 

@@ -248,24 +248,24 @@ xml_nortel_bridge_vlan_details(xmlNodePtr root,
 
     s = fmt_enum(rapid_city_enums_rcVlanType, vlanEntry->rcVlanType);
     if (s) {
-	node = xml_new_child(tree, NULL, BAD_CAST("type"), s);
+	node = xml_new_child(tree, NULL, BAD_CAST("type"), "%s", s);
     }
 
     s = fmt_enum(vlan_priority, vlanEntry->rcVlanHighPriority);
     if (s) {
-	node = xml_new_child(tree, NULL, BAD_CAST("priority"), s);
+	node = xml_new_child(tree, NULL, BAD_CAST("priority"), "%s", s);
     }
 
     s = fmt_enum(snmpv2_tc_enums_TruthValue,
 		 vlanEntry->rcVlanRoutingEnable);
     if (s) {
-	node = xml_new_child(tree, NULL, BAD_CAST("routing"), s);
+	node = xml_new_child(tree, NULL, BAD_CAST("routing"), "%s", s);
     }
 
     s = fmt_enum(snmpv2_tc_enums_RowStatus,
 		 vlanEntry->rcVlanRowStatus);
     if (s) {
-	node = xml_new_child(tree, NULL, BAD_CAST("status"), s);
+	node = xml_new_child(tree, NULL, BAD_CAST("status"), "%s", s);
     }
 
     if (vlanEntry->rcVlanType

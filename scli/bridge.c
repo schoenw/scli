@@ -1402,7 +1402,7 @@ show_bridge_stats(scli_interp_t *interp, int argc, char **argv)
 
 	    if (portTable[i]->dot1dTpPortMaxInfo) {
 		g_string_sprintfa(interp->result, "%9d ",
-				  portTable[i]->dot1dTpPortMaxInfo);
+				  *(portTable[i]->dot1dTpPortMaxInfo));
 	    } else {
 		g_string_sprintfa(interp->result, "%9s ", "");
 	    }

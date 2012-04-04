@@ -306,6 +306,7 @@ fmt_interface_details(GString *s,
 		      if_mib_ifXEntry_t *ifXEntry,
 		      snmpv2_mib_system_t *system,
 		      ip_mib_ipAddrEntry_t **ipAddrTable,
+		      ip_mib_ipAddressEntry_t **ipAddressTable,
 		      if_mib_ifRcvAddressEntry_t **ifRcvAddrTable)
 {
     int j;
@@ -404,7 +405,17 @@ fmt_interface_details(GString *s,
 	}
     }
 
-    if (ipAddrTable) {
+    if (ipAddressTable) {
+	for (j = 0; ipAddressTable[j]; j++) {
+	  if (ipAddressTable[j]->ipAddressIfIndex
+	      && (ifEntry->ifIndex == *(ipAddressTable[j]->ipAddressIfIndex))) {
+	    g_string_sprintfa(s, "IP-Address:  %s\n",
+			      fmt_inet_address(&ipAddressTable[j]->ipAddressAddrType,
+					       ipAddressTable[j]->ipAddressAddr,
+					       ipAddressTable[j]->_ipAddressAddrLength));
+	  }
+	}
+    } else if (ipAddrTable) {
 	for (j = 0; ipAddrTable[j]; j++) {
 	    if (ipAddrTable[j]->ipAdEntIfIndex
 		&& (ifEntry->ifIndex == *(ipAddrTable[j]->ipAdEntIfIndex))) {
@@ -441,6 +452,7 @@ xml_interface_details(xmlNodePtr root,
 		      if_mib_ifXEntry_t *ifXEntry,
 		      snmpv2_mib_system_t *system,
 		      ip_mib_ipAddrEntry_t **ipAddrTable,
+		      ip_mib_ipAddressEntry_t **ipAddressTable,
 		      if_mib_ifRcvAddressEntry_t **ifRcvAddrTable)
 {
     int j;
@@ -503,19 +515,19 @@ xml_interface_details(xmlNodePtr root,
     s = fmt_enum(snmpv2_tc_enums_TruthValue,
 		 ifXEntry ? ifXEntry->ifConnectorPresent : NULL);
     if (s) {
-	(void) xml_new_child(tree, NULL, BAD_CAST("connector"), s);
+	(void) xml_new_child(tree, NULL, BAD_CAST("connector"), "%s", s);
     }
 
     s = fmt_enum(snmpv2_tc_enums_TruthValue,
 		 ifXEntry ? ifXEntry->ifPromiscuousMode : NULL);
     if (s) {
-	(void) xml_new_child(tree, NULL, BAD_CAST("promiscuous"), s);
+	(void) xml_new_child(tree, NULL, BAD_CAST("promiscuous"), "%s", s);
     }
 
     s = fmt_enum(if_mib_enums_ifLinkUpDownTrapEnable,
 		 ifXEntry ? ifXEntry->ifLinkUpDownTrapEnable : NULL);
     if (s) {
-	(void) xml_new_child(tree, NULL, BAD_CAST("notifications"), s);
+	(void) xml_new_child(tree, NULL, BAD_CAST("notifications"), "%s", s);
     }
 
     if (ifEntry->ifLastChange && system && system->sysUpTime) {
@@ -612,6 +624,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
     if_mib_ifRcvAddressEntry_t **ifRcvAddrTable = NULL;
     snmpv2_mib_system_t *system = NULL;
     ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
+    ip_mib_ipAddressEntry_t **ipAddressTable = NULL;
     entity_mib_entAliasMappingEntry_t **entAliasMappingTable = NULL;
     entity_mib_entPhysicalEntry_t **entPhysicalTable = NULL;
     entity_mib_entPhysicalEntry_t *entPhysicalEntry = NULL;
@@ -648,7 +661,10 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
     if (ifTable) {
 	if_mib_get_ifXTable(interp->peer, &ifXTable, IF_MIB_IFXENTRY_PARAMS, NULL);
 	if_mib_get_ifRcvAddressTable(interp->peer, &ifRcvAddrTable, 0, NULL);
-	ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0, NULL);
+	ip_mib_get_ipAddressTable(interp->peer, &ipAddressTable, 0 , NULL);
+	if (! ipAddressTable) {
+	    ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0, NULL);
+	}
 	
 	entity_mib_get_entAliasMappingTable(interp->peer,
 					    &entAliasMappingTable, 0, NULL);
@@ -663,7 +679,8 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 		ifXEntry = get_ifXEntry(ifXTable, ifTable[i]->ifIndex);
 		if (scli_interp_xml(interp)) {
 		    xml_interface_details(interp->xml_node, ifTable[i],
-					  ifXEntry, system, ipAddrTable,
+					  ifXEntry, system, 
+					  ipAddrTable, ipAddressTable, 
 					  ifRcvAddrTable);
 		} else {
 		    if (c) {
@@ -672,7 +689,8 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
 		    entPhysicalEntry = get_entity(ifTable[i]->ifIndex,
 				  entAliasMappingTable, entPhysicalTable);
 		    fmt_interface_details(interp->result, ifTable[i],
-					  ifXEntry, system, ipAddrTable,
+					  ifXEntry, system, 
+					  ipAddrTable, ipAddressTable,
 					  ifRcvAddrTable);
 		    if (entPhysicalEntry) {
 			fmt_entity_root(interp, entPhysicalTable,
@@ -689,6 +707,7 @@ show_interface_details(scli_interp_t *interp, int argc, char **argv)
     if (ifRcvAddrTable) if_mib_free_ifRcvAddressTable(ifRcvAddrTable);
     if (system) snmpv2_mib_free_system(system);
     if (ipAddrTable) ip_mib_free_ipAddrTable(ipAddrTable);
+    if (ipAddressTable) ip_mib_free_ipAddressTable(ipAddressTable);
     if (entAliasMappingTable)
 	entity_mib_free_entAliasMappingTable(entAliasMappingTable);
     if (entPhysicalTable)

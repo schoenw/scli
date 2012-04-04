@@ -2967,7 +2967,7 @@ xml_printer_light(xmlNodePtr root,
     e = fmt_enum(iana_printer_mib_enums_PrtConsoleColorTC,
 		 lightEntry->prtConsoleColor);
     if (e) {
-	xml_new_child(tree, NULL, BAD_CAST("color"), e);
+	xml_new_child(tree, NULL, BAD_CAST("color"), "%s", e);
     }
 
     if (*lightEntry->prtConsoleOnTime
@@ -2980,7 +2980,7 @@ xml_printer_light(xmlNodePtr root,
 	       && *lightEntry->prtConsoleOffTime) {
 	state = "blink";
     }
-    xml_new_child(tree, NULL, BAD_CAST("status"), state);
+    xml_new_child(tree, NULL, BAD_CAST("status"), "%s", state);
 }
 
 
@@ -3171,20 +3171,20 @@ xml_printer_alert(xmlNodePtr root, printer_mib_prtAlertEntry_t *alertEntry)
     xml_set_prop(tree, BAD_CAST("number"), "%d", alertEntry->prtAlertIndex);
 
     if (alertEntry->prtAlertTime) {
-	xml_new_child(tree, NULL, BAD_CAST("date"),
+	xml_new_child(tree, NULL, BAD_CAST("date"), "%s",
 		      xml_timeticks(*alertEntry->prtAlertTime));
     }
 
     e = fmt_enum(iana_printer_mib_enums_PrtAlertCodeTC,
 		 alertEntry->prtAlertCode);
     if (e) {
-	xml_new_child(tree, NULL, BAD_CAST("code"), e);
+	xml_new_child(tree, NULL, BAD_CAST("code"), "%s", e);
     }
 
     e = fmt_enum(printer_mib_enums_PrtAlertSeverityLevelTC,
 		 alertEntry->prtAlertSeverityLevel);
     if (e) {
-	xml_new_child(tree, NULL, BAD_CAST("severity"), e);
+	xml_new_child(tree, NULL, BAD_CAST("severity"), "%s", e);
     }
 
     if (alertEntry->prtAlertDescription) {
@@ -3204,7 +3204,7 @@ xml_printer_alert(xmlNodePtr root, printer_mib_prtAlertEntry_t *alertEntry)
 	    && *alertEntry->prtAlertLocation > 0) {
 	    g_string_sprintfa(s, " (at location %u)", *alertEntry->prtAlertLocation);
 	}
-	xml_new_child(tree, NULL, BAD_CAST("location"), s->str);
+	xml_new_child(tree, NULL, BAD_CAST("location"), "%s", s->str);
 	g_string_free(s, 1);
     }
 

@@ -385,6 +385,7 @@ static int
 show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 {
     ip_mib_ipAddrEntry_t **ipAddrTable = NULL;
+    ip_mib_ipAddressEntry_t **ipAddressTable = NULL;
     if_mib_ifEntry_t **ifTable = NULL;
     if_mib_ifXEntry_t **ifXTable = NULL;
     int i, name_width = 4, ifName_width;
@@ -400,9 +401,12 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0, &error);
-    if (scli_interp_set_error_snmp(interp, &error)) {
-	return SCLI_SNMP;
+    ip_mib_get_ipAddressTable(interp->peer, &ipAddressTable, 0, &error);
+    if (! ipAddressTable) {
+        ip_mib_get_ipAddrTable(interp->peer, &ipAddrTable, 0, &error);
+	if (scli_interp_set_error_snmp(interp, &error)) {
+	    return SCLI_SNMP;
+	}
     }
 
     if (ipAddrTable) {
@@ -437,6 +441,8 @@ show_ip_addresses(scli_interp_t *interp, int argc, char **argv)
 	if_mib_free_ifXTable(ifXTable);
     if (ipAddrTable)
 	ip_mib_free_ipAddrTable(ipAddrTable);
+    if (ipAddressTable)
+        ip_mib_free_ipAddressTable(ipAddressTable);
 
     return SCLI_OK;
 }

@@ -907,6 +907,49 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 		      "Columns:", cols);
     g_string_sprintfa(interp->result, "%-*s %s\n", indent,
 		      "Pager:", interp->pager ? interp->pager : "scli");
+    g_string_sprintfa(interp->result, "%-*s %u\n", indent,
+		      "Retries:", interp->retries);
+    g_string_sprintfa(interp->result, "%-*s %u ms\n", indent,
+		      "Timeout:", interp->timeout);
+    label = gnet_snmp_enum_get_label(gnet_snmp_enum_version_table,
+				     (gint32) interp->snmp);
+    if (label) {
+	g_string_sprintfa(interp->result, "%-*s %s\n", indent,
+			  "Protocol:", label);
+    } else {
+	g_string_sprintfa(interp->result, "%-*s %d\n", indent,
+			  "Protocol:", interp->snmp);
+    }
+
+    if (interp->slave_list) {
+	g_string_sprintfa(interp->result, "%-*s", indent, "Interpreters:");
+	for (elem = interp->slave_list; elem; elem = g_slist_next(elem)) {
+	    scli_interp_t *slave = (scli_interp_t *) elem->data;
+	    g_string_sprintfa(interp->result, " %s", slave->name);
+	}
+	g_string_sprintfa(interp->result, "\n");
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+show_scli_peer(scli_interp_t *interp, int argc, char **argv)
+{
+    int const indent = 18;
+    int rows, cols, c;
+    GNetSnmpEnum const *dft;
+    char const *label;
+    char const *fmt;
+    GSList *elem;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
 
     if (interp->peer) {
 	gchar *name = gnet_snmp_get_uri_string(interp->peer);
@@ -936,15 +979,6 @@ show_scli_info(scli_interp_t *interp, int argc, char **argv)
 	    g_string_sprintfa(interp->result, "%-*s %d\n", indent,
 			      "Protocol:", gnet_snmp_get_version(interp->peer));
 	}
-    }
-
-    if (interp->slave_list) {
-	g_string_sprintfa(interp->result, "%-*s", indent, "Interpreters:");
-	for (elem = interp->slave_list; elem; elem = g_slist_next(elem)) {
-	    scli_interp_t *slave = (scli_interp_t *) elem->data;
-	    g_string_sprintfa(interp->result, " %s", slave->name);
-	}
-	g_string_sprintfa(interp->result, "\n");
     }
 
     return SCLI_OK;
@@ -1104,12 +1138,13 @@ set_scli_retries(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMBER;
     }
 
-    if (scli_set_retries(interp, retries) < 0) {
+    if (retries > 100) {
 	g_string_sprintfa(interp->result,
 			  "illegal number of retries `%u'", retries);
 	return SCLI_ERROR;
     }
 
+    interp->retries = retries;
     return SCLI_OK;
 }
 
@@ -1133,12 +1168,158 @@ set_scli_timeout(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_SYNTAX_NUMBER;
     }
 
+    if ((timeout < 10) || (timeout > 60 * 1000)) {
+	g_string_sprintfa(interp->result,
+			  "illegal timeout `%u'", timeout);
+	return SCLI_ERROR;
+    }
+
+    interp->timeout = timeout;
+    return SCLI_OK;
+}
+
+
+
+static int
+set_scli_version(scli_interp_t *interp, int argc, char **argv)
+{
+    char *end;
+    guint32 timeout; 
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    timeout = strtoul(argv[1], &end, 0);
+    if (*end || timeout < 0) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_NUMBER;
+    }
+
     if (scli_set_timeout(interp, timeout) < 0) {
 	g_string_sprintfa(interp->result,
 			  "illegal timeout `%u'", timeout);
 	return SCLI_ERROR;
     }
 
+    return SCLI_OK;
+}
+
+
+
+static int
+set_scli_protocol(scli_interp_t *interp, int argc, char **argv)
+{
+    char *end;
+    gint32 version; 
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (! gnet_snmp_enum_get_number(gnet_snmp_enum_version_table,
+				    argv[1], &version)) {
+	g_string_sprintfa(interp->result,
+			  "unknown protocol version `%s'", argv[1]);
+	return SCLI_ERROR;
+    }
+
+    interp->snmp = version;
+    return SCLI_OK;
+}
+
+
+
+set_peer_retries(scli_interp_t *interp, int argc, char **argv)
+{
+    char *end;
+    guint32 retries; 
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    retries = strtoul(argv[1], &end, 0);
+    if (*end || retries < 0) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_NUMBER;
+    }
+
+    if (retries > 100) {
+	g_string_sprintfa(interp->result,
+			  "illegal number of retries `%u'", retries);
+	return SCLI_ERROR;
+    }
+
+    if (interp->peer) {
+	gnet_snmp_set_retries(interp->peer, retries);
+    }
+
+    return SCLI_OK;
+}
+
+
+
+static int
+set_peer_timeout(scli_interp_t *interp, int argc, char **argv)
+{
+    char *end;
+    guint32 timeout; 
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    timeout = strtoul(argv[1], &end, 0);
+    if (*end || timeout < 0) {
+	g_string_assign(interp->result, argv[1]);
+	return SCLI_SYNTAX_NUMBER;
+    }
+
+    if ((timeout < 10) || (timeout > 60 * 1000)) {
+	g_string_sprintfa(interp->result,
+			  "illegal timeout `%u'", timeout);
+	return SCLI_ERROR;
+    }
+
+    if (interp->peer) {
+	gnet_snmp_set_timeout(interp->peer, timeout);
+    }
+    return SCLI_OK;
+}
+
+
+
+static int
+set_peer_protocol(scli_interp_t *interp, int argc, char **argv)
+{
+    char *end;
+    gint32 version; 
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc != 2) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+
+    if (! gnet_snmp_enum_get_number(gnet_snmp_enum_version_table,
+				    argv[1], &version)) {
+	g_string_sprintfa(interp->result,
+			  "unknown protocol version `%s'", argv[1]);
+	return SCLI_ERROR;
+    }
+
+    if (interp->peer) {
+	gnet_snmp_set_version(interp->peer, version);
+    }
     return SCLI_OK;
 }
 
@@ -1804,17 +1985,48 @@ scli_init_scli_mode(scli_interp_t *interp)
 
 	{ "set scli retries", "<retries>",
 	  "The `set scli retries' command defines the number of SNMP\n"
-	  "request retries before giving up requesting a certain object.",
+	  "request retries before giving up requesting a certain object.\n"
+	  "This command sets the default used by new associations to peers.",
 	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_scli_retries },
 
 	{ "set scli timeout", "<milliseconds>",
 	  "The `set scli timeout' command defines the number milliseconds\n"
-	  "between subsequent SNMP request retries.",
+	  "between subsequent SNMP request retries. This command sets the\n"
+	  "default used by new associations to peers.",
 	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  set_scli_timeout },
+	
+	{ "set scli protocol", "<protocol>",
+	  "The `set scli protocol' command selects the protocol used to\n"
+	  "communicate with an SNMP agent. This command sets the default\n"
+	  "used by new associations to peers.",
+	  SCLI_CMD_FLAG_NORECURSE,
+	  NULL, NULL,
+	  set_scli_protocol },
+	
+	{ "set peer retries", "<retries>",
+	  "The `set peer retries' command defines the number of SNMP\n"
+	  "request retries before giving up requesting a certain object.",
+	  SCLI_CMD_FLAG_NORECURSE | SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  set_peer_retries },
+
+	{ "set peer timeout", "<milliseconds>",
+	  "The `set peer timeout' command defines the number milliseconds\n"
+	  "between subsequent SNMP request retries.",
+	  SCLI_CMD_FLAG_NORECURSE | SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  set_peer_timeout },
+	
+	{ "set peer protocol", "<protocol>",
+	  "The `set peer protocol' command selects the protocol used to\n"
+	  "communicate with an SNMP agent.",
+	  SCLI_CMD_FLAG_NORECURSE | SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  set_peer_protocol },
 	
 	{ "set scli format", "<fmt>",
 	  "The `set scli format' command defines the output format used by\n"
@@ -1842,6 +2054,13 @@ scli_init_scli_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NORECURSE,
 	  NULL, NULL,
 	  show_scli_info },
+
+	{ "show peer", NULL,
+	  "The `show peer' command displays the current status of the\n"
+	  "association to an SNMP peer.",
+	  SCLI_CMD_FLAG_NORECURSE | SCLI_CMD_FLAG_NEED_PEER,
+	  NULL, NULL,
+	  show_scli_peer },
 
 	{ "show scli command info", "[<regex>]",
 	  "The `show scli command info' command displays summary information\n"

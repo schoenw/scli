@@ -114,38 +114,6 @@ scli_set_pager(scli_interp_t *interp, const char *pager)
 
 
 
-int
-scli_set_retries(scli_interp_t *interp, const guint retries)
-{
-    if (retries > 100) {
-	return -1;
-    }
-
-    interp->retries = retries;
-    if (interp->peer) {
-	gnet_snmp_set_retries(interp->peer, interp->retries);
-    }
-    return 0;
-}
-
-
-
-int
-scli_set_timeout(scli_interp_t *interp, const guint timeout)
-{
-    if ((timeout < 10) || (timeout > 60 * 1000)) {
-	return -1;
-    }
-
-    interp->timeout = timeout;
-    if (interp->peer) {
-	gnet_snmp_set_timeout(interp->peer, interp->timeout);
-    }
-    return 0;
-}
-
-
-
 void
 scli_snmp_error(scli_interp_t *interp)
 {
@@ -937,7 +905,8 @@ scli_show_results(scli_interp_t *interp, scli_cmd_t *cmd, int code)
 	    if (interp->peer) {
 		gchar *name = gnet_snmp_get_uri_string(interp->peer);
 		if (name) {
-		    xml_set_prop(top, BAD_CAST("uri"), name ? name : "?");
+		    xml_set_prop(top, BAD_CAST("uri"),
+				 "%s", name ? name : "?");
 		    g_free(name);
 		}
 	    }
