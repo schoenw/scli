@@ -265,7 +265,7 @@ readline_init()
     rl_readline_name = "scli";
 
     /* Tell the completer that we want a crack first. */
-    rl_attempted_completion_function = (CPPFunction *) completion;
+    rl_attempted_completion_function = (rl_completion_func_t *) completion;
 }
 
 /*
@@ -380,7 +380,10 @@ main(int argc, char **argv)
      * Initialize the thread support. (Should this be optional?)
      */
 
+#if 0
+    /* not needed anymore since glib 2.32 */
     g_thread_init(NULL);
+#endif
 
 #if 0
     /*
