@@ -1,4 +1,4 @@
-dnl Process this file with autoconf to produce a configure script.
+configdnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(scli, 0.4.0, scli@ibr.cs.tu-bs.de)
 AC_REVISION([$Rev$])
@@ -6,7 +6,7 @@ AC_CONFIG_SRCDIR(scli/scli.c)
 AM_INIT_AUTOMAKE([-Wall])
 
 dnl create a config.h file (Automake will add -DHAVE_CONFIG_H)
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS(config.h)
 
 ISODATE=`date +%Y-%m-%d`
 AC_SUBST(ISODATE)
@@ -19,8 +19,10 @@ AC_PROG_CC
 AC_PROG_RANLIB
 AC_CHECK_PROG(SMIDUMP, smidump, smidump)
 AC_SUBST(SMIDUMP)
+AM_PROG_AR
 
-AC_DEFINE_UNQUOTED(SCLI_PLUGIN_PATH, "${pkglibdir}")
+AC_DEFINE_UNQUOTED(SCLI_PLUGIN_PATH, "${pkglibdir}",
+     [The full pathname of the directory containing scli plugins.])
 
 AC_MSG_CHECKING([whether to enable -Wall])
 AC_ARG_ENABLE(warnings,

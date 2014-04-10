@@ -1,7 +1,7 @@
-info_TEXINFOS = scli.texinfo
-scli_TEXINFOS = gpl.texinfo scli.texinfo
+info_TEXINFOS = scli.texi
+scli_TEXINFOS = gpl.texi scli.texi
 
-scli.texinfo:
+scli.texi:
 	$(top_builddir)/scli/scli -n -c "show scli modes" | \
 	awk '/^$$/		{ if (example) { \
 				    printf("@end example\n"); \
@@ -29,5 +29,5 @@ scli.texinfo:
 				  next } \
 	     /^ $$/		{ next } \
 	     //			{ printf("%s\n", $$0) }' | \
-	sed -e "s/\`/@command\\{/" -e "s/'/\\}/" > modes.texinfo
-	m4 -P scli.texinfo.in > scli.texinfo
+	sed -e "s/\`/@command\\{/" -e "s/'/\\}/" > modes.texi
+	m4 -P scli.texi.in > scli.texi

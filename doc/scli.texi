@@ -102,7 +102,7 @@ third part contains a step by step instructions how @code{scli} can be
 extended with new modes and commands
 
 @node Copying, Overview, Instructions, Top
-@include gpl.texinfo
+@include gpl.texi
 
 @node Overview, Modes and Commands, Copying, Top
 @chapter Overview
