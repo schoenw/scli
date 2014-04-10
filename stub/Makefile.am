@@ -101,7 +101,8 @@ STUBS			= if-mib.h if-mib.c \
 			  hp-icf-fault-finder-mib.h hp-icf-fault-finder-mib.c \
 			  sflow5-mib.h sflow5-mib.c \
 			  jacobs-rpl-mib.h jacobs-rpl-mib.c \
-			  iana-rtproto-mib.c
+			  iana-rtproto-mib.c \
+			  lm-sensors-mib.h lm-sensors-mib.c
 
 MAINTAINERCLEANFILES	= $(STUBS)
 
@@ -232,7 +233,7 @@ rmon-mib.h rmon-mib.c:
 	$(SMIDUMP) -f scli --scli-include='historyControlEntry' RMON-MIB
 
 q-bridge-mib.h q-bridge-mib.c:
-	$(SMIDUMP) -f scli --scli-include='dot1qBase|dot1qVlanStaticEntry' Q-BRIDGE-MIB
+	$(SMIDUMP) -f scli --scli-include='dot1qBase|dot1qVlanStaticEntry|dot1qTpFdbEntry' Q-BRIDGE-MIB
 
 inet-address-mib.h inet-address-mib.c:
 	$(SMIDUMP) -f scli INET-ADDRESS-MIB
@@ -266,3 +267,6 @@ jacobs-rpl-mib.h jacobs-rpl-mib.c:
 
 iana-rtproto-mib.h iana-rtproto-mib.c:
 	$(SMIDUMP) -f scli IANA-RTPROTO-MIB
+
+lm-sensors-mib.h lm-sensors-mib.c:
+	$(SMIDUMP) -f scli LM-SENSORS-MIB

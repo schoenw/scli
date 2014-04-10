@@ -1743,7 +1743,7 @@ check_system_storage(scli_interp_t *interp, int argc, char **argv)
 
 
 static int
-check_system_process(scli_interp_t *interp, int argc, char **argv)
+check_system_processes(scli_interp_t *interp, int argc, char **argv)
 {
     host_resources_mib_hrSWRunEntry_t **hrSWRunTable = NULL;
     regex_t _regex_path, *regex_path = NULL;
@@ -1766,7 +1766,7 @@ check_system_process(scli_interp_t *interp, int argc, char **argv)
 
     if (argc == 3) {
 	/* xxx scan this by hand to make sure it does what we want */
-	if (2 == sscanf(argv[2], "%u*%u", &min, &max)) {
+	if (2 == sscanf(argv[2], "%u:%u", &min, &max)) {
 	} else if (1 == sscanf(argv[2], "%u", &min)) {
 	    max = min;
 	} else {
@@ -1796,7 +1796,7 @@ check_system_process(scli_interp_t *interp, int argc, char **argv)
 	if (cnt < min || cnt > max) {
 	    g_string_sprintfa(interp->result,
 		  "Number of processes (%d) matching the regular "
-	          "expression `%s' does not match the bound %u*%u.\n",
+	          "expression `%s' does not match the bound %u:%u.\n",
 			      cnt, argv[1], min, max);
 	}
     }
@@ -2005,11 +2005,13 @@ scli_init_system_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  check_system_storage },
 
-	{ "check system processes", "[<regexp>] [<n>*<m>]",
-	  "The `check system processes' command checks xxx.",
+	{ "check system processes", "[<regexp>] [<n>:<m>]",
+	  "The `check system processes' command checks whether the\n"
+	  "between <n> and <m> processes with a name matching the\n"
+	  "regular expression <regexp> are present.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
-	  check_system_process },
+	  check_system_processes },
 
 #ifdef MEM_DEBUG
 	{ "xxx", "<repetitions>",

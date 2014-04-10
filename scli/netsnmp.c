@@ -23,6 +23,7 @@
 #include "scli.h"
 
 #include "ucd-snmp-mib.h"
+#include "lm-sensors-mib.h"
 
 #define UCD_SNMP_MIB_VERSIONDODEBUGGING_DISABLED 0
 #define UCD_SNMP_MIB_VERSIONDODEBUGGING_ENABLED  1
@@ -289,6 +290,54 @@ show_netsnmp_proc(scli_interp_t *interp, int argc, char **argv)
 
 
 
+static void
+fmt_temp(GString *s, lm_sensors_mib_lmTempSensorsEntry_t * tempEntry)
+{
+    g_string_sprintfa(s, "%6d  ", tempEntry->lmTempSensorsIndex);
+    g_string_sprintfa(s, "%.*s  ",
+		       (int) tempEntry->_lmTempSensorsDeviceLength,
+		       (gchar *) tempEntry->lmTempSensorsDevice);
+    g_string_sprintfa(s, "%12.3f\n", *tempEntry->lmTempSensorsValue/1000.0);
+}
+
+
+
+static int
+show_netsnmp_sensors(scli_interp_t *interp, int argc, char **argv)
+{
+    lm_sensors_mib_lmTempSensorsEntry_t **tempTable = NULL;
+    int i;
+    GError *error = NULL;
+
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    lm_sensors_mib_get_lmTempSensorsTable(interp->peer, &tempTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
+	return SCLI_SNMP;
+    }
+
+    if (tempTable) {
+	g_string_append(interp->header, "SENSOR DESCRIPTION TEMPERATURE [C]");
+	for (i = 0; tempTable[i]; i++) {
+	    fmt_temp(interp->result, tempTable[i]);
+	}
+    }
+
+    if (tempTable) lm_sensors_mib_free_lmTempSensorsTable(tempTable);
+
+    return SCLI_OK;
+}
+
+
+
 static int
 set_netsnmp_debugging(scli_interp_t *interp, int argc, char **argv)
 {
@@ -433,6 +482,21 @@ scli_init_netsnmp_mode(scli_interp_t *interp)
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_netsnmp_proc },
+
+	{ "show netsnmp sensors", NULL,
+	  "The `show netsnmp sensors' command shows readings of sensors\n"
+	  "attached to the system.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_netsnmp_sensors },
+
+	{ "monitor netsnmp sensors", NULL,
+	  "The `monitor netsnmp sensors' command shows the same\n"
+	  "information as the show netsnmp sensors command. The\n"
+	  "information is updated periodically.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_MONITOR | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_netsnmp_sensors },
 
 	{ "dump netsnmp", NULL,
 	  "The `dump netsnmp' command generates a sequence of scli commands\n"
