@@ -1991,8 +1991,10 @@ scli_init_system_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_system_processes },
 
-	{ "check system contact", NULL,
-	  "The `check system contact' command xxx.",
+	{ "check system contact", "[<regexp>]",
+	  "The `check system contact' command checks whether a system\n"
+	  "contact is configured and whether it matches the provided\n"
+	  "regular expression <regexp>.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  check_system_contact },
@@ -2003,8 +2005,8 @@ scli_init_system_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  check_system_storage },
 
-	{ "check system process", "[<regexp>] [<n>*<m>]",
-	  "The `check system process' command checks xxx.",
+	{ "check system processes", "[<regexp>] [<n>*<m>]",
+	  "The `check system processes' command checks xxx.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  check_system_process },
