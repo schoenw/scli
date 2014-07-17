@@ -1781,7 +1781,7 @@ scli_init_interface_mode(scli_interp_t *interp)
 	  "In particular, the check interface status commands detects\n"
 	  "fault conditions if (a) ifAdminStatus is not down and\n"
 	  "ifOperStatus is down or (b) ifAdminStatus is down and\n"
-	  "ifOperStatus is not down and not notPresent",
+	  "ifOperStatus is not down and not notPresent.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  check_interface_status },

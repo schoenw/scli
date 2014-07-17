@@ -124,6 +124,17 @@ fmt_sflow_receiver(GString *s, sflow5_mib_sFlowRcvrEntry_t *rcvrEntry)
 
 
 
+static void
+xml_sflow_receiver(xmlNodePtr root, sflow5_mib_sFlowRcvrEntry_t *rcvrEntry)
+{
+    xmlNodePtr tree;
+
+    tree = xmlNewChild(root, NULL, "receiver", NULL);
+    xml_set_prop(tree, "index", "%d", rcvrEntry->sFlowRcvrIndex);
+}
+
+
+
 static int
 show_sflow_receiver(scli_interp_t *interp, int argc, char **argv)
 {
@@ -148,8 +159,12 @@ show_sflow_receiver(scli_interp_t *interp, int argc, char **argv)
 
     if (rcvrEntry) {
         for (i = 0, c = 0; rcvrEntry[i]; i++) {
-	    if (i) g_string_append(interp->result, "\n");
-	    fmt_sflow_receiver(interp->result, rcvrEntry[i]);
+	    if (scli_interp_xml(interp)) {
+		xml_sflow_receiver(interp->xml_node, rcvrEntry[i]);
+	    } else {
+		if (i) g_string_append(interp->result, "\n");
+		fmt_sflow_receiver(interp->result, rcvrEntry[i]);
+	    }
 	}
     }
 
@@ -199,7 +214,7 @@ scli_init_sflow_mode(scli_interp_t *interp)
 	{ "show sflow receiver", NULL,
 	  "The `show sflow receiver' command displays information about\n"
 	  "sflow receivers.",
-	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY |  SCLI_CMD_FLAG_XML,
 	  "sflow", NULL,
 	  show_sflow_receiver },
 

@@ -28,37 +28,32 @@
 #include "jacobs-rpl-mib.h"
 
 
-
 static void
-fmt_rpl_instance(GString *s, jacobs_rpl_mib_rplRPLInstanceEntry_t *rplInstancEntry)
+fmt_rpl_info(GString *s, jacobs_rpl_mib_rplActive_t *rplActive)
 {
-    const char *label;
-
-    g_string_sprintfa(s, "Instance: %d\n",
-		      rplInstancEntry->rplRPLInstanceID);
-    if (rplInstancEntry->rplRPLInstanceOCP) {
-	g_string_sprintfa(s, "Objective Code Point: %u\n",
-			  *rplInstancEntry->rplRPLInstanceOCP);
+    if (rplActive->rplActiveInstance) {
+	g_string_sprintfa(s, "Active Instance: %u\n",
+			  *rplActive->rplActiveInstance);
     }
-    label = fmt_enum(jacobs_rpl_mib_enums_RplDISMode,
-		     rplInstancEntry->rplRPLInstanceDisMode);
-    g_string_sprintfa(s, "DIS Mode: %s\n", label);
-    label = fmt_enum(jacobs_rpl_mib_enums_rplRPLInstanceDAOAcknowledgement,
-		     rplInstancEntry->rplRPLInstanceDAOAcknowledgement);
-    g_string_sprintfa(s, "DAO Acknowledgement: %s\n", label);
-    label = fmt_enum(jacobs_rpl_mib_enums_RplModeOfOperation,
-		     rplInstancEntry->rplRPLInstanceModeOfOperation);
-    g_string_sprintfa(s, "Mode of Operation: %s\n", label);
-    return;
+
+    if (rplActive->rplActiveDodag) {
+	g_string_sprintfa(s, "Active Dodag: %s\n",
+			  fmt_ipv6_address(rplActive->rplActiveDodag,
+					   SCLI_FMT_ADDR));
+    }
+
+    if (rplActive->rplActiveDodagTriggerSequence) {
+	g_string_sprintfa(s, "Trigger Sequence: %u\n",
+			  *rplActive->rplActiveDodagTriggerSequence);
+    }
 }
 
 
-
 static int
-show_rpl_instances(scli_interp_t *interp, int argc, char **argv)
+show_rpl_info(scli_interp_t *interp, int argc, char **argv)
 {
     int i;
-    jacobs_rpl_mib_rplRPLInstanceEntry_t **rplInstanceTable = NULL;
+    jacobs_rpl_mib_rplActive_t *rplActive = NULL;
     GError *error = NULL;
     
     g_return_val_if_fail(interp, SCLI_ERROR);
@@ -71,7 +66,70 @@ show_rpl_instances(scli_interp_t *interp, int argc, char **argv)
 	return SCLI_OK;
     }
 
-    jacobs_rpl_mib_get_rplRPLInstanceTable(interp->peer, &rplInstanceTable, 0, &error);
+    jacobs_rpl_mib_get_rplActive(interp->peer, &rplActive, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
+	return SCLI_SNMP;
+    }
+    
+    if (rplActive) {
+	fmt_rpl_info(interp->result, rplActive);
+    }
+
+    if (rplActive) jacobs_rpl_mib_free_rplActive(rplActive);
+    
+    return SCLI_OK;
+}
+
+
+
+static void
+fmt_rpl_instance(GString *s, jacobs_rpl_mib_rplInstanceEntry_t *rplInstanceEntry)
+{
+    const char *label;
+
+    g_string_sprintfa(s, "Instance: %d\n",
+		      rplInstanceEntry->rplInstanceID);
+
+    label = fmt_enum(jacobs_rpl_mib_enums_RplDISMode,
+		     rplInstanceEntry->rplInstanceDISMode);
+    g_string_sprintfa(s, "DIS Mode: %s\n", label);
+    
+    if (rplInstanceEntry->rplInstanceDISMessages) {
+	g_string_sprintfa(s, "DIS Messages: %d\n",
+			  *rplInstanceEntry->rplInstanceDISMessages);
+    }
+		  
+    if (rplInstanceEntry->rplInstanceDISTimeout) {
+	g_string_sprintfa(s, "DIS Timeout: %d seconds\n",
+			  *rplInstanceEntry->rplInstanceDISTimeout);
+    }
+
+    label = fmt_enum(jacobs_rpl_mib_enums_RplModeOfOperation,
+		     rplInstanceEntry->rplInstanceModeOfOperation);
+    g_string_sprintfa(s, "Mode of Operation: %s\n", label);
+    return;
+}
+
+
+
+static int
+show_rpl_instances(scli_interp_t *interp, int argc, char **argv)
+{
+    int i;
+    jacobs_rpl_mib_rplInstanceEntry_t **rplInstanceTable = NULL;
+    GError *error = NULL;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    jacobs_rpl_mib_get_rplInstanceTable(interp->peer, &rplInstanceTable, 0, &error);
     if (scli_interp_set_error_snmp(interp, &error)) {
 	return SCLI_SNMP;
     }
@@ -85,7 +143,7 @@ show_rpl_instances(scli_interp_t *interp, int argc, char **argv)
 	}
     }
     
-    if (rplInstanceTable) jacobs_rpl_mib_free_rplRPLInstanceTable(rplInstanceTable);
+    if (rplInstanceTable) jacobs_rpl_mib_free_rplInstanceTable(rplInstanceTable);
     
     return SCLI_OK;
 }
@@ -98,9 +156,11 @@ fmt_rpl_dodag(GString *s, jacobs_rpl_mib_rplDodagEntry_t *rplDodagEntry)
     const char *label;
 
     g_string_sprintfa(s, "Instance: %d\n",
-		      rplDodagEntry->rplRPLInstanceID);
-    g_string_sprintfa(s, "Root: %s\n",
-		      fmt_ipv6_address(rplDodagEntry->rplDodagRoot,
+		      rplDodagEntry->rplInstanceID);
+    g_string_sprintfa(s, "Dodag: %d\n",
+		      rplDodagEntry->rplDodagIndex);
+    g_string_sprintfa(s, "DodagID: %s\n",
+		      fmt_ipv6_address(rplDodagEntry->rplDodagID,
                                        SCLI_FMT_ADDR));
     if (rplDodagEntry->rplDodagVersion) {
 	g_string_sprintfa(s, "Version: %u\n",
@@ -177,10 +237,9 @@ static void
 fmt_rpl_parent(GString *s, jacobs_rpl_mib_rplDodagParentEntry_t *rplParentEntry)
 {
     g_string_sprintfa(s, "Instance: %d\n",
-		      rplParentEntry->rplRPLInstanceID);
-    g_string_sprintfa(s, "Root: %s\n",
-		      fmt_ipv6_address(rplParentEntry->rplDodagRoot,
-                                       SCLI_FMT_ADDR));
+		      rplParentEntry->rplInstanceID);
+    g_string_sprintfa(s, "Dodag: %d\n",
+		      rplParentEntry->rplDodagIndex);
     g_string_sprintfa(s, "Parent: %s\n",
 		      fmt_ipv6_address(rplParentEntry->rplDodagParentID,
                                        SCLI_FMT_ADDR));
@@ -234,10 +293,9 @@ static void
 fmt_rpl_child(GString *s, jacobs_rpl_mib_rplDodagChildEntry_t *rplChildEntry)
 {
     g_string_sprintfa(s, "Instance: %d\n",
-		      rplChildEntry->rplRPLInstanceID);
-    g_string_sprintfa(s, "Root: %s\n",
-		      fmt_ipv6_address(rplChildEntry->rplDodagRoot,
-                                       SCLI_FMT_ADDR));
+		      rplChildEntry->rplInstanceID);
+    g_string_sprintfa(s, "Dodag: %d\n",
+		      rplChildEntry->rplDodagIndex);
     g_string_sprintfa(s, "Child: %s\n",
 		      fmt_ipv6_address(rplChildEntry->rplDodagChildID,
                                        SCLI_FMT_ADDR));
@@ -288,9 +346,19 @@ fmt_rpl_stats(GString *s, jacobs_rpl_mib_rplStats_t *rplStats)
 {
     const char *label;
 
-    if (rplStats->rplStatsMemOverflows) {
+    if (rplStats->rplMemOverflows) {
 	g_string_sprintfa(s, "Memory Overflows: %u\n",
-			  *rplStats->rplStatsMemOverflows);
+			  *rplStats->rplMemOverflows);
+    }
+
+    if (rplStats->rplParseErrors) {
+	g_string_sprintfa(s, "Parse Errors: %u\n",
+			  *rplStats->rplParseErrors);
+    }
+
+    if (rplStats->rplUnknownMsgTypes) {
+	g_string_sprintfa(s, "Unknown Message Types: %u\n",
+			  *rplStats->rplUnknownMsgTypes);
     }
 }
 
@@ -327,11 +395,76 @@ show_rpl_stats(scli_interp_t *interp, int argc, char **argv)
 }
 
 
+static void
+fmt_rpl_msg_stats(GString *s,
+		  jacobs_rpl_mib_rplMsgStatsEntry_t *rplMsgStatsEntry)
+{
+    g_string_sprintfa(s, "Message type %3d:",
+		      rplMsgStatsEntry->rplMsgStatsType);
+    if (rplMsgStatsEntry->rplMsgStatsInMsgs) {
+	g_string_sprintfa(s, "%8d", *rplMsgStatsEntry->rplMsgStatsInMsgs);
+    } else {
+	g_string_sprintfa(s, "  ----  ");
+    }
+    g_string_sprintfa(s, " in, ");
+    if (rplMsgStatsEntry->rplMsgStatsOutMsgs) {
+	g_string_sprintfa(s, "%8d", *rplMsgStatsEntry->rplMsgStatsOutMsgs);
+    } else {
+	g_string_sprintfa(s, "  ----  ");
+    }
+    g_string_sprintfa(s, " out\n");
+}
+
+
+
+static int
+show_rpl_msg_stats(scli_interp_t *interp, int argc, char **argv)
+{
+    int i;
+    jacobs_rpl_mib_rplMsgStatsEntry_t **rplMsgStatsTable = NULL;
+    GError *error = NULL;
+    
+    g_return_val_if_fail(interp, SCLI_ERROR);
+    
+    if (argc > 1) {
+	return SCLI_SYNTAX_NUMARGS;
+    }
+    
+    if (scli_interp_dry(interp)) {
+	return SCLI_OK;
+    }
+
+    jacobs_rpl_mib_get_rplMsgStatsTable(interp->peer, &rplMsgStatsTable, 0, &error);
+    if (scli_interp_set_error_snmp(interp, &error)) {
+	return SCLI_SNMP;
+    }
+    
+    if (rplMsgStatsTable) {
+	for (i = 0; rplMsgStatsTable[i]; i++) {
+	    if (i) {
+		g_string_append(interp->result, "\n");
+	    }
+	    fmt_rpl_msg_stats(interp->result, rplMsgStatsTable[i]);
+	}
+    }
+    
+    if (rplMsgStatsTable) jacobs_rpl_mib_free_rplMsgStatsTable(rplMsgStatsTable);
+    
+    return SCLI_OK;
+}
+
+
 
 void
 scli_init_rpl_mode(scli_interp_t *interp)
 {
     static scli_cmd_t cmds[] = {
+
+	{ "show rpl info", NULL,
+	  "",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_rpl_info },
 
 	{ "show rpl instances", NULL,
 	  "The `show rpl instances' command displays information about\n"
@@ -342,7 +475,7 @@ scli_init_rpl_mode(scli_interp_t *interp)
 
 	{ "show rpl dodags", NULL,
 	  "The `show rpl dodags' command displays information about\n"
-	  "RPL dodag known by the system.",
+	  "RPL dodags known by the system.",
 	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
 	  NULL, NULL,
 	  show_rpl_dodags },
@@ -368,6 +501,13 @@ scli_init_rpl_mode(scli_interp_t *interp)
 	  NULL, NULL,
 	  show_rpl_stats },
 	
+	{ "show rpl msg stats", NULL,
+	  "The `show rpl msg stats' command displays statistics about\n"
+	  "messages handled by the RPL implementation of the system.",
+	  SCLI_CMD_FLAG_NEED_PEER | SCLI_CMD_FLAG_DRY,
+	  NULL, NULL,
+	  show_rpl_msg_stats },
+
 	{ NULL, NULL, NULL, 0, NULL, NULL, NULL }
     };
 	
