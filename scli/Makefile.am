@@ -13,7 +13,7 @@ scli_SOURCES	= scli.c scli.h scli.1 vendors.c \
 		  ospf.c printer.c \
 		  isdn.c rs232.c sonet.c \
 		  cisco.c nortel.c netsnmp.c 3com.c hp.c sflow.c \
-		  rpl.c graph.c
+		  rpl.c 6lowpan.c graph.c
 
 scli_LDADD	= $(top_builddir)/proc/libproc.a \
 		  $(top_builddir)/stub/libstub.a \
