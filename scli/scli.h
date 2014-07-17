@@ -405,6 +405,9 @@ extern void
 scli_init_rpl_mode(scli_interp_t *interp);
 
 extern void
+scli_init_6lowpan_mode(scli_interp_t *interp);
+
+extern void
 scli_init_graph_mode(scli_interp_t *interp);
 
 /* 
