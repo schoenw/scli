@@ -47,6 +47,7 @@ MIBS			= IF-MIB \
 			  PRODUCTMIB \
 			  CISCO-DOT11-ASSOCIATION-MIB \
 			  SFLOW5-MIB \
+			  JACOBS-LOWPAN-MIB \
 			  JACOBS-RPL-MIB \
 			  IANA-RTPROTO-MIB
 
@@ -100,7 +101,8 @@ STUBS			= if-mib.h if-mib.c \
 			  cisco-dot11-association-mib.h cisco-dot11-association-mib.c \
 			  hp-icf-fault-finder-mib.h hp-icf-fault-finder-mib.c \
 			  sflow5-mib.h sflow5-mib.c \
-			  jacobs-rpl-mib.h jacobs-rpl-mib.c \
+			  jacobs-lowpan-mib.h jacobs-lowpan-mib.c \
+			  jacobs-rpl-mib.h jacobs-rpl-mib.c
 			  iana-rtproto-mib.c \
 			  lm-sensors-mib.h lm-sensors-mib.c
 
@@ -261,6 +263,9 @@ hp-icf-fault-finder-mib.h hp-icf-fault-finder-mib.c:
 
 sflow5-mib.h sflow5-mib.c:
 	$(SMIDUMP) -f scli SFLOW5-MIB
+
+jacobs-lowpan-mib.h jacobs-lowpan-mib.c:
+	$(SMIDUMP) -f scli --scli-include='lowpanStats' JACOBS-LOWPAN-MIB
 
 jacobs-rpl-mib.h jacobs-rpl-mib.c:
 	$(SMIDUMP) -f scli JACOBS-RPL-MIB
