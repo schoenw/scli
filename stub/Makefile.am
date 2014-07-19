@@ -102,7 +102,7 @@ STUBS			= if-mib.h if-mib.c \
 			  hp-icf-fault-finder-mib.h hp-icf-fault-finder-mib.c \
 			  sflow5-mib.h sflow5-mib.c \
 			  jacobs-lowpan-mib.h jacobs-lowpan-mib.c \
-			  jacobs-rpl-mib.h jacobs-rpl-mib.c
+			  jacobs-rpl-mib.h jacobs-rpl-mib.c \
 			  iana-rtproto-mib.c \
 			  lm-sensors-mib.h lm-sensors-mib.c
 
